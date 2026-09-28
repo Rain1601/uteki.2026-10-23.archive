@@ -1,0 +1,1906 @@
+--- a/apps/uteki_zero/tools/import_company_brand.py
++++ b/apps/uteki_zero/tools/import_company_brand.py
+@@ -9,7 +9,10 @@
+ from __future__ import annotations
+ 
+ import argparse
++from contextlib import contextmanager
+ from datetime import datetime, timezone
++from email.utils import parsedate_to_datetime
++import fcntl
+ import hashlib
+ from html.parser import HTMLParser
+ import http.client
+@@ -38,6 +41,33 @@
+ 
+ class BrandImportError(ValueError):
+     """Explicit coverage/validation failure; callers must not substitute a brand."""
++
++
++class IdentityReviewRequired(BrandImportError):
++    """The supplied website redirects to a different identity; review it first."""
++
++
++class FetchError(BrandImportError):
++    """Transport failure with explicit retry policy, shared by the batch runner."""
++
++    def __init__(self, message, *, retryable=False, retry_after=None):
++        super().__init__(message)
++        self.retryable = retryable
++        self.retry_after = retry_after
++
++
++def retry_after_seconds(value):
++    if not value:
++        return None
++    try:
++        if value.strip().isdigit():
++            return float(value.strip())
++        date = parsedate_to_datetime(value)
++        if date.tzinfo is None:
++            date = date.replace(tzinfo=timezone.utc)
++        return max(0.0, (date - datetime.now(timezone.utc)).total_seconds())
++    except (ValueError, TypeError, OverflowError):
++        return None
+ 
+ 
+ def is_public_address(value: str) -> bool:
+@@ -118,11 +148,11 @@
+             raise BrandImportError(f"Refusing non-public address for {host}")
+         return addresses
+     except queue.Empty as exc:
+-        raise BrandImportError(f"DNS resolution exceeded time limit for {host}") from exc
++        raise FetchError(f"DNS resolution exceeded time limit for {host}", retryable=True) from exc
+     except (OSError, ValueError) as exc:
+         if isinstance(exc, BrandImportError):
+             raise
+-        raise BrandImportError(f"Cannot resolve public HTTPS host {host}: {exc}") from exc
++        raise FetchError(f"Cannot resolve public HTTPS host {host}: {exc}", retryable=True) from exc
+ 
+ 
+ class PinnedHTTPSConnection(http.client.HTTPSConnection):
+@@ -141,16 +171,22 @@
+             raise
+ 
+ 
+-def fetch_public(url: str, max_bytes: int) -> tuple[bytes, str, str]:
++def fetch_public(url: str, max_bytes: int, *, before_request=None) -> tuple[bytes, str, str]:
+     """Bounded download; revalidate and pin DNS for every redirect hop."""
+     current = https_url(url)
+     deadline = time.monotonic() + TIMEOUT_SECONDS
+     for redirect_count in range(MAX_REDIRECTS + 1):
++        # Scheduling is outside the network deadline. Each redirect and retry
++        # goes through the same batch-wide limiter before sending a request.
++        if before_request:
++            start = time.monotonic()
++            before_request(current)
++            deadline += time.monotonic() - start
+         parsed = urlsplit(current)
+         addresses = public_addresses(parsed.hostname, deadline - time.monotonic())
+         remaining = deadline - time.monotonic()
+         if remaining <= 0:
+-            raise BrandImportError("Download exceeded time limit")
++            raise FetchError("Download exceeded time limit", retryable=True)
+         connection = PinnedHTTPSConnection(parsed.hostname, addresses[0], remaining)
+         try:
+             path = parsed.path + (f"?{parsed.query}" if parsed.query else "")
+@@ -166,7 +202,9 @@
+                 current = https_url(urljoin(current, location))
+                 continue
+             if response.status != 200:
+-                raise BrandImportError(f"HTTP {response.status} for {current}")
++                raise FetchError(f"HTTP {response.status} for {current}",
++                                 retryable=response.status in (408, 429, 500, 502, 503, 504),
++                                 retry_after=retry_after_seconds(response.getheader("Retry-After")))
+             if response.getheader("Content-Encoding", "identity").lower() != "identity":
+                 raise BrandImportError("Compressed HTTP responses are not supported")
+             length = response.getheader("Content-Length")
+@@ -176,7 +214,7 @@
+             while True:
+                 remaining = deadline - time.monotonic()
+                 if remaining <= 0:
+-                    raise BrandImportError("Download exceeded time limit")
++                    raise FetchError("Download exceeded time limit", retryable=True)
+                 # HTTPConnection clears its socket on Connection: close even
+                 # while the response still owns that socket through its file.
+                 response_socket = connection.sock or getattr(getattr(response.fp, "raw", None), "_sock", None)
+@@ -190,10 +228,10 @@
+                 if count > max_bytes:
+                     raise BrandImportError("Download exceeded byte limit")
+             if length is not None and count != int(length):
+-                raise BrandImportError("Truncated response")
++                raise FetchError("Truncated response", retryable=True)
+             return b"".join(chunks), current, response.getheader("Content-Type", "").split(";")[0].lower()
+         except (OSError, http.client.HTTPException) as exc:
+-            raise BrandImportError(f"HTTPS download failed for {current}: {exc}") from exc
++            raise FetchError(f"HTTPS download failed for {current}: {exc}", retryable=True) from exc
+         finally:
+             connection.close()
+     raise BrandImportError("Too many redirects")
+@@ -348,22 +386,33 @@
+             temporary.unlink()
+ 
+ 
+-def import_brand(website: str, registry: Path = DEFAULT_REGISTRY, *, asset_url: str | None = None,
+-                 source_page: str | None = None, presentation: str | None = None, fetcher=fetch_public) -> dict:
++@contextmanager
++def registry_lock(path: Path):
++    """Both CLIs share this advisory lock; keep the lock inode after release."""
++    path = Path(path).resolve()
++    path.parent.mkdir(parents=True, exist_ok=True)
++    with path.with_name(path.name + ".lock").open("a+b") as handle:
++        try:
++            fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
++        except BlockingIOError as exc:
++            raise BrandImportError(f"Registry is locked by another importer: {path}") from exc
++        try:
++            yield
++        finally:
++            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
++
++
++def prepare_brand(website: str, *, asset_url: str | None = None,
++                  source_page: str | None = None, presentation: str | None = None,
++                  fetcher=fetch_public) -> tuple[str, dict, bytes]:
++    """Fetch and validate one asset without writes; the batch coordinator commits it."""
+     key, website = normalize_website(website)
+-    registry = Path(registry)
+-    # Validate existing data before downloading. Never reset a malformed registry.
+-    existing = read_registry(registry)
+     if bool(asset_url) != bool(source_page):
+         raise BrandImportError("A reviewed logo requires both --asset-url and --source-page")
+     if presentation not in (None, "icon", "wordmark"):
+         raise BrandImportError("presentation must be icon or wordmark")
+     if not asset_url and presentation not in (None, "icon"):
+         raise BrandImportError("Automatic site icon discovery only supports presentation icon")
+-    previous = existing["brands"].get(key)
+-    if not asset_url and isinstance(previous, dict) and previous.get("kind") == "reviewed-logo":
+-        # Discovery is a fallback. It must never downgrade a reviewed mark.
+-        return previous
+     if asset_url:
+         candidates = [https_url(asset_url)]
+         source_page = https_url(source_page)
+@@ -371,6 +420,12 @@
+         presentation = presentation or "wordmark"
+     else:
+         html, source_page, mime = fetcher(website, MAX_HTML_BYTES)
++        source_page = https_url(source_page)
++        source_origin = urlsplit(source_page)
++        source_domain, _ = normalize_website(f"https://{source_origin.netloc}/")
++        if source_domain != key:
++            raise IdentityReviewRequired(
++                f"Website redirects from {key} to {source_domain}; verify the entity/domain association before importing")
+         if mime not in ("text/html", "application/xhtml+xml"):
+             raise BrandImportError("Website did not return HTML; provide a reviewed asset explicitly")
+         candidates = discover_icons(html, source_page)
+@@ -385,6 +440,10 @@
+                 validate_icon_shape(data, extension)
+             break
+         except BrandImportError as exc:
++            # A rate limit or exhausted transient retry must stop this domain;
++            # cycling through other icon URLs could evade the server's limit.
++            if isinstance(exc, FetchError) and exc.retryable:
++                raise
+             errors.append(f"{candidate}: {exc}")
+     else:
+         raise BrandImportError("No usable company image found; registry was not changed.\n" + "\n".join(errors))
+@@ -397,8 +456,43 @@
+         "fetchedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+         "sha256": digest, "mimeType": mime,
+     }
++    return key, entry, data
++
++
++def import_brand(website: str, registry: Path = DEFAULT_REGISTRY, *, asset_url: str | None = None,
++                 source_page: str | None = None, presentation: str | None = None, fetcher=fetch_public) -> dict:
++    with registry_lock(registry):
++        return _import_brand_locked(website, registry, asset_url=asset_url,
++                                    source_page=source_page, presentation=presentation, fetcher=fetcher)
++
++
++def _import_brand_locked(website, registry, *, asset_url, source_page, presentation, fetcher):
++    key, website = normalize_website(website)
++    registry = Path(registry)
++    existing = read_registry(registry)
++    if bool(asset_url) != bool(source_page):
++        raise BrandImportError("A reviewed logo requires both --asset-url and --source-page")
++    if presentation not in (None, "icon", "wordmark"):
++        raise BrandImportError("presentation must be icon or wordmark")
++    if not asset_url and presentation not in (None, "icon"):
++        raise BrandImportError("Automatic site icon discovery only supports presentation icon")
++    previous = existing["brands"].get(key)
++    if not asset_url and isinstance(previous, dict) and previous.get("kind") == "reviewed-logo":
++        return previous
++    key, entry, data = prepare_brand(website, asset_url=asset_url, source_page=source_page,
++                                   presentation=presentation, fetcher=fetcher)
++    if isinstance(previous, dict) and "identity" in previous:
++        # The domain remains the same; a single-site refresh must not erase the
++        # issuer/listing binding established by a validated batch manifest.
++        if normalize_website(previous.get("website"))[0] != key:
++            raise BrandImportError("Existing registry identity does not match its domain")
++        entry["identity"] = previous["identity"]
++        entry["brandReview"] = "reviewed" if asset_url else "pending"
++    filename = entry["src"].rsplit("/", 1)[1]
+     # Re-read immediately before update to preserve intervening additions.
+     current = read_registry(registry)
++    if not asset_url and current["brands"].get(key, {}).get("kind") == "reviewed-logo":
++        return current["brands"][key]
+     atomic_write(registry.parent / filename, data)
+     current["brands"][key] = entry
+     atomic_write(registry, (json.dumps(current, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+--- a/apps/uteki_zero/tools/README.md
++++ b/apps/uteki_zero/tools/README.md
+@@ -43,8 +43,9 @@
+ 
+ These illustrative `example.com` URLs are not a configured provider or a
+ working asset. There are no default companies, external API keys, or paid logo
+-service dependencies. Run imports sequentially; the registry update is atomic,
+-but concurrent CLI writers are not supported.
++service dependencies. Both CLIs take the same nonblocking `registry.json.lock`;
++a competing writer exits with a lock error. The stable lock file may remain
++after the process exits; do not delete it while an importer is running.
+ 
+ Automatic discovery preserves an existing `reviewed-logo` entry without making
+ network requests; it never downgrades that asset to a favicon. To replace a
+@@ -94,3 +95,133 @@
+ format rejection, icon/wordmark separation, raster-header dimensions, wide/tall
+ icon rejection without mutation, and private redirect blocking. They make no network requests
+ and do not establish that a particular real company's brand has been approved.
++
++## Batch import
++
++The batch CLI is an offline asset-preparation interface. It does not edit the UI
++company list or infer a website from a name/ticker. Input and output paths are
++required so a research sample cannot silently become a production company pool.
++Python 3.9+ and a POSIX system with `fcntl` are supported; validation in this
++worktree used Python 3.13. The library entry point is `run_batch(...)` in
++`import_company_brands.py`, with the same explicit paths and options as the CLI.
++
++Provide a versioned manifest:
++
++```json
++{
++  "version": 1,
++  "scope": {"id": "caller-selected-universe-v1", "markets": ["XNAS", "XLON"]},
++  "companies": [
++    {"entityId": "caller-issuer-id", "exchange": "XNAS", "ticker": "CALLER", "website": "https://issuer.example"}
++  ]
++}
++```
++
++The issuer and domain above are synthetic and will not download a real logo.
++`entityId`, `exchange`, `ticker`, and HTTPS origin `website` must be explicit.
++`scope.markets` is a nonempty list of uppercase four-character MIC codes; every
++row's exchange must belong to it. The importer validates structure and internal
++consistency, not the existence of each exchange/listing or legal issuer ownership.
++Ticker case and punctuation are kept: there is no automatic exchange suffix,
++ADR, share-class, parent/subsidiary, or region conversion.
++
++```sh
++python3.13 apps/uteki_zero/tools/import_company_brands.py \
++  --manifest /path/to/companies-v1.json \
++  --registry /path/to/assets/companies/registry.json \
++  --state /path/to/run-v1.state.json \
++  --workers 3 --min-interval 1 --attempts 3 \
++  > /path/to/run-v1.report.json
++```
++
++`--workers` bounds concurrent domains (1–8, default 3). `--min-interval` spaces
++**HTTP starts**, including homepage, icon, redirects, and retries, globally
++(default one second). The bound is per process; use one run for one workload.
++`--attempts` bounds each fetch (1–5, default 3); only transport/timeouts, HTTP 408,
++429 and selected 5xx responses are retryable. Backoff and `Retry-After` are
++respected. A retry delay over 60 seconds ends that domain with `retryAt` instead
++of sleeping early and trying again. Host cooldowns apply to shared CDNs and are
++persisted in `state.hostCooldowns`, including across `--retry-failed` restarts.
++Keep that state while the server's cooldown is active; do not start a new state
++to evade it. An unrepresentably large delay is kept as `manual-clear-required`.
++HTTP 403 is a coverage failure; no browser,
++cookie, proxy or user-agent bypass is attempted. Homepage redirects to a different
++canonical domain require identity review; an image CDN is allowed when discovered
++from the supplied website. Other subdomains never become aliases implicitly.
++
++### Cache, identity, and continuation
++
++- Domain groups share one discovery/download. Repeated rows keep individual
++  results with `duplicateOf`; one issuer may explicitly have several listings.
++  Entity → conflicting domains, domain → conflicting entities, or the same
++  exchange/ticker → conflicting entities all require review before requests.
++  Legible conflicts in partially invalid rows also block the affected valid rows.
++- Saved entries preserve the version 1 renderer contract. Optional
++  `identity: {entityId, listings: [{exchange, ticker}]}` and
++  `brandReview: "pending" | "reviewed"` record the supplied association. Existing
++  entries without this metadata can be bound by a valid manifest; this is a
++  caller assertion, not independent identity verification. Later runs check the
++  bindings across the registry. Single-company refresh preserves them.
++- The default cache age is 720 hours (`--cache-max-age-hours`). Cache hits require
++  valid website/provenance, safe local path, existing raster bytes, SHA-256, MIME
++  and timestamp. A missing/corrupt site icon is fetched again. An expired icon
++  whose refresh fails stays on disk but the result remains `failed`.
++- `reviewed-logo` always wins, even with `--refresh`. A missing/corrupt reviewed
++  asset, reviewed `wordmark`, or reviewed asset without an explicit
++  `presentation: icon` becomes `needs_review`; restore or explicitly re-import
++  a reviewed compact icon through the single-company interface. It is never
++  replaced with a favicon merely to make the batch succeed. Legacy automatic
++  entries without `presentation` are reacquired through discovery; their shape
++  alone never silently classifies them as icons. Explicit icon caches also pass
++  the shared raster dimension/aspect-ratio checks.
++- One coordinator atomically writes files, registry, and a per-domain checkpoint.
++  Registry and state each have an exclusive advisory lock. No concurrent worker
++  rewrites the whole registry. A crash between registry and checkpoint writes
++  leaves usable content-addressed assets that are checked on restart.
++- Repeat the command with the same `--state` to continue. The checkpoint binds
++  the normalized full manifest hash; a changed list/scope requires a new state.
++  A completed result is still checked against current local asset bytes. Failures
++  remain visible and are retried only with `--retry-failed`; fixing an input means
++  creating a new versioned manifest/state, not editing the old checkpoint.
++- `--refresh` requests site-icon refresh; within that run its already completed,
++  still fresh domains are reused on restart. To start a separate refresh run,
++  select a new state path. Keep prior reports for comparison. Successfully
++  downloaded icons remain pending brand review.
++
++### Report and exit status
++
++Stdout is JSON. `summary.status` counts **all input rows**, including duplicates,
++invalid rows and review gaps. `domainCount` counts distinct parsed domains;
++`scheduledDomains` counts domains scheduled for work, and `networkDomains` counts
++domains that actually started HTTP in this run (a persisted cooldown can prevent
++a scheduled domain from starting). Do not sum copied per-row request counts as
++unique downloads.
++
++| `status` | Meaning |
++| --- | --- |
++| `success` | New website icon downloaded and committed; brand review is pending. |
++| `cached` | Existing local bytes and provenance verified; `cache` explains fresh/resumed/reviewed. |
++| `invalid` | A required row field or selected market is invalid; no inferred replacement. |
++| `needs_review` | Identity/provenance conflict, cross-domain homepage, or protected asset requiring restoration. |
++| `failed` | Fetch/format failure; any retained prior asset is identified separately. |
++
++Rows retain their input identity, canonical domain, error, asset provenance,
++`attempts` (maximum attempts for any one fetch), `requestAttempts` (fetch calls),
++and `httpRequests` (HTTP starts including redirects). `retainedPrevious` does not
++mean the refresh succeeded. Exit 0 means all rows are `success` or `cached`;
++exit 1 means at least one row is invalid, failed or needs review; exit 2 means
++manifest/options/state/registry/lock-level failure. Save stdout even on exit 1.
++Technical completion does not mean all returned images are audited company logos.
++
++The frozen [public evaluation](../../../experiments/company-brand-import/2026-09-29-v1/README.md)
++contains companies outside the original six. It is optional test input, with
++separate output assets, not a fallback configuration. The
++[provider comparison](../../../docs/COMPANY_LOGO_PROVIDERS_2026-09-29.zh-CN.md)
++records authentication and storage-permission gaps for third-party services.
++
++Limits: raster formats only; static homepage declarations only; some sites need
++JavaScript, block automation, change regional domains, or have no usable icon.
++An explicit but wrong website can still return a technically valid wrong brand:
++the importer cannot establish corporate ownership from a successful HTTP response.
++No supplier key, market-wide coverage, production add-company backend, or new
++company UI is included in this change.
+--- a/apps/uteki_zero/README.md
++++ b/apps/uteki_zero/README.md
+@@ -63,6 +63,11 @@
+ 
+ 当前接入点是数据导入工具；自动发现不等于已核实品牌身份，也不保证所有官网都能获取成功。生产环境“新增公司”后台还未连接，完整搜索/新增公司 UI 仍是后续工作。当前六家图标的来源见 [素材记录](assets/companies/SOURCES.md) 和 [机器可读注册表](assets/companies/registry.json)。
+ 
++批量准备素材使用 [批量导入接口](tools/README.md#batch-import)，必须提交有版本的市场范围和公司身份清单。
++它复用同一注册表，提供缓存、有限并发、HTTP 限流、重试、断点续跑和逐条失败记录。
++[来源比较](../../docs/COMPANY_LOGO_PROVIDERS_2026-09-29.zh-CN.md) 记录了 TradingView、官网、Logo.dev、Brandfetch 和 Finnhub 的接口及许可边界；
++[名单外小批次](../../experiments/company-brand-import/2026-09-29-v1/README.md) 的输出与前端公司池隔离。
++
+ 公司标识检查：
+ 
+ ```sh
+--- /dev/null
++++ b/apps/uteki_zero/tools/import_company_brands.py
+@@ -0,0 +1,567 @@
++#!/usr/bin/env python3
++"""Import official website icons for an explicit, versioned company manifest.
++
++Standard library only. Entity IDs and MIC/ticker pairs are caller assertions,
++not identities inferred from company names or external logo search. Discovered
++icons remain pending brand review. See README.md for the manifest and report.
++"""
++
++from __future__ import annotations
++
++import argparse
++from concurrent.futures import ThreadPoolExecutor, as_completed
++from contextlib import contextmanager
++from datetime import datetime, timedelta, timezone
++import fcntl
++import hashlib
++import json
++import math
++from pathlib import Path
++import re
++import threading
++import time
++from urllib.parse import urlsplit
++
++from import_company_brand import (
++    BrandImportError, FetchError, IdentityReviewRequired, MAX_IMAGE_BYTES,
++    atomic_write, fetch_public, https_url, image_type, normalize_website,
++    prepare_brand, read_registry, validate_icon_shape,
++)
++
++
++STATUSES = ("success", "cached", "invalid", "needs_review", "failed")
++MAX_RETRY_WAIT_SECONDS = 60
++
++
++def utc_now():
++    return datetime.now(timezone.utc)
++
++
++def timestamp():
++    return utc_now().isoformat(timespec="seconds")
++
++
++def write_json(path, value):
++    atomic_write(Path(path), (json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n").encode("utf-8"))
++
++
++def read_json(path, label):
++    def reject_constant(value):
++        raise ValueError(f"Non-JSON numeric constant {value}")
++
++    def unique_keys(pairs):
++        result = {}
++        for key, value in pairs:
++            if key in result:
++                raise ValueError(f"Duplicate JSON field {key}")
++            result[key] = value
++        return result
++
++    try:
++        return json.loads(Path(path).read_text(encoding="utf-8"), parse_constant=reject_constant,
++                          object_pairs_hook=unique_keys)
++    except (OSError, ValueError) as exc:
++        raise BrandImportError(f"Cannot read {label}: {exc}") from exc
++
++
++def required_text(value, label, *, limit=256):
++    if not isinstance(value, str) or not value.strip() or len(value) > limit or re.search(r"[\x00-\x1f\x7f]", value):
++        raise BrandImportError(f"{label} must be a nonempty string without control characters (maximum {limit})")
++    return value.strip()
++
++
++def validate_manifest(path):
++    value = read_json(path, "manifest")
++    if not isinstance(value, dict) or type(value.get("version")) is not int or value["version"] != 1:
++        raise BrandImportError("Manifest must be an object with version: 1")
++    scope = value.get("scope")
++    if not isinstance(scope, dict):
++        raise BrandImportError("Manifest scope with explicit id and markets is required")
++    scope_id = required_text(scope.get("id"), "scope.id")
++    markets = scope.get("markets")
++    if not isinstance(markets, list) or not markets or any(not isinstance(m, str) or not re.fullmatch(r"[A-Z0-9]{4}", m) for m in markets):
++        raise BrandImportError("scope.markets must be a nonempty list of uppercase 4-character exchange MICs")
++    if len(markets) != len(set(markets)):
++        raise BrandImportError("scope.markets must not contain duplicate MICs")
++    companies = value.get("companies")
++    if not isinstance(companies, list) or not companies:
++        raise BrandImportError("Manifest companies must be a nonempty explicit list")
++    normalized = dict(value)
++    normalized["scope"] = dict(scope, id=scope_id, markets=sorted(markets))
++    normalized["companies"] = []
++    rows = []
++    for index, company in enumerate(companies):
++        row = {"inputIndex": index, "entityId": None, "exchange": None, "ticker": None,
++               "website": None, "domain": None, "status": None, "error": None,
++               "attempts": 0, "requestAttempts": 0, "httpRequests": 0,
++               "cache": "none", "brandReview": None}
++        errors = []
++        canonical = dict(company) if isinstance(company, dict) else company
++        if not isinstance(company, dict):
++            errors.append("Company must be an object")
++        else:
++            for key in ("entityId", "exchange", "ticker"):
++                row[key] = company.get(key)
++                try:
++                    row[key] = required_text(company.get(key), key, limit=64 if key == "ticker" else 256)
++                    canonical[key] = row[key]
++                except BrandImportError as exc:
++                    errors.append(str(exc))
++            if row["exchange"] not in markets:
++                errors.append("exchange must be an explicitly selected MIC in scope.markets")
++            row["website"] = company.get("website")
++            try:
++                row["domain"], row["website"] = normalize_website(company.get("website"))
++                canonical["website"] = row["website"]
++            except (BrandImportError, TypeError) as exc:
++                errors.append(str(exc))
++        if errors:
++            row.update(status="invalid", error="; ".join(errors))
++        normalized["companies"].append(canonical)
++        rows.append(row)
++
++    # Check all legible claims, including partially invalid rows, so a malformed
++    # listing cannot hide an otherwise visible entity/domain contradiction.
++    entities, domains, listings = {}, {}, {}
++    for row in rows:
++        entity, domain = row["entityId"], row["domain"]
++        if isinstance(entity, str) and entity.strip() and domain:
++            entities.setdefault(entity, set()).add(domain)
++            domains.setdefault(domain, set()).add(entity)
++        exchange, ticker = row["exchange"], row["ticker"]
++        if isinstance(entity, str) and entity.strip() and isinstance(exchange, str) and isinstance(ticker, str) and ticker.strip():
++            listings.setdefault((exchange, ticker), set()).add(entity)
++    for row in rows:
++        if row["status"]:
++            continue
++        conflicts = []
++        if len(entities.get(row["entityId"], ())) > 1:
++            conflicts.append("entityId is associated with more than one canonical domain")
++        if len(domains.get(row["domain"], ())) > 1:
++            conflicts.append("canonical domain is associated with more than one entityId")
++        if len(listings.get((row["exchange"], row["ticker"]), ())) > 1:
++            conflicts.append("exchange/ticker is associated with more than one entityId")
++        if conflicts:
++            row.update(status="needs_review", error="; ".join(conflicts))
++    manifest_hash = hashlib.sha256(json.dumps(normalized, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")).hexdigest()
++    return normalized["scope"], rows, manifest_hash
++
++
++@contextmanager
++def locked_paths(*paths):
++    """Keep stable lock files: unlinking them would permit two lock inodes."""
++    handles = []
++    try:
++        for path in sorted({Path(p).resolve() for p in paths}, key=str):
++            path.parent.mkdir(parents=True, exist_ok=True)
++            handle = Path(str(path) + ".lock").open("a+b")
++            handles.append(handle)
++            try:
++                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
++            except BlockingIOError as exc:
++                raise BrandImportError(f"Another batch import holds the lock for {path}") from exc
++        yield
++    finally:
++        for handle in reversed(handles):
++            handle.close()
++
++
++class RateLimiter:
++    """Space every actual HTTP start, including redirects, across all workers."""
++
++    def __init__(self, interval):
++        self.interval = interval
++        self.lock = threading.Lock()
++        self.next_request = 0.0
++        self.host_cooldowns = {}
++        self.blocked_hosts = set()
++
++    def defer(self, url, seconds):
++        host = urlsplit(url).hostname
++        with self.lock:
++            self.host_cooldowns[host] = max(self.host_cooldowns.get(host, 0), time.monotonic() + seconds)
++            if seconds > MAX_RETRY_WAIT_SECONDS:
++                self.blocked_hosts.add(host)
++
++    def restore(self, cooldowns):
++        if not isinstance(cooldowns, dict):
++            raise BrandImportError("State hostCooldowns must be an object")
++        for host, until in cooldowns.items():
++            if not isinstance(host, str) or not isinstance(until, str):
++                raise BrandImportError("Invalid state host cooldown")
++            try:
++                url = https_url("https://" + host)
++                if until == "manual-clear-required":
++                    self.defer(url, 1e300)
++                    continue
++                parsed = datetime.fromisoformat(until.replace("Z", "+00:00"))
++                if parsed.tzinfo is None:
++                    raise ValueError("timezone required")
++                remaining = (parsed - utc_now()).total_seconds()
++            except (ValueError, TypeError) as exc:
++                raise BrandImportError("Invalid state host cooldown") from exc
++            if remaining > 0:
++                self.defer(url, remaining)
++
++    def snapshot(self):
++        with self.lock:
++            now, wall_now = time.monotonic(), utc_now()
++            result = {}
++            for host, until in self.host_cooldowns.items():
++                if until > now:
++                    try:
++                        result[host] = (wall_now + timedelta(seconds=until - now)).isoformat()
++                    except OverflowError:
++                        # Never truncate an unrepresentably long server delay
++                        # and accidentally permit requests on the next run.
++                        result[host] = "manual-clear-required"
++            return result
++
++    def before_request(self, url):
++        host = urlsplit(url).hostname
++        while True:
++            with self.lock:
++                now = time.monotonic()
++                cooldown = self.host_cooldowns.get(host, 0)
++                if host in self.blocked_hosts:
++                    raise FetchError(f"Host {host} requested a long Retry-After; deferred for this run",
++                                     retryable=True, retry_after=max(0, cooldown - now))
++                wait = max(self.next_request, cooldown) - now
++                if wait <= 0:
++                    self.next_request = now + self.interval
++                    return
++            # Do not hold the mutex while a host cools down: unrelated origins
++            # may still proceed, subject to the shared global request interval.
++            time.sleep(min(wait, MAX_RETRY_WAIT_SECONDS))
++
++
++def parse_timestamp(value):
++    if not isinstance(value, str):
++        raise BrandImportError("fetchedAt must be an ISO timestamp with a timezone")
++    try:
++        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
++    except ValueError as exc:
++        raise BrandImportError("fetchedAt must be an ISO timestamp with a timezone") from exc
++    if parsed.tzinfo is None or parsed > utc_now() + timedelta(minutes=5):
++        raise BrandImportError("fetchedAt has no timezone or is in the future")
++    return parsed
++
++
++def entry_identity(entry):
++    identity = entry.get("identity")
++    if identity is None:
++        return None
++    if not isinstance(identity, dict):
++        raise BrandImportError("Registry identity must be an object")
++    entity = required_text(identity.get("entityId"), "registry identity.entityId")
++    listings = identity.get("listings")
++    if not isinstance(listings, list) or not listings:
++        raise BrandImportError("Registry identity.listings must be a nonempty list")
++    pairs = set()
++    for listing in listings:
++        if not isinstance(listing, dict) or not isinstance(listing.get("exchange"), str) or not re.fullmatch(r"[A-Z0-9]{4}", listing["exchange"]):
++            raise BrandImportError("Registry listing exchange must be an explicit MIC")
++        ticker = required_text(listing.get("ticker"), "registry listing ticker", limit=64)
++        pairs.add((listing["exchange"], ticker))
++    return entity, pairs
++
++
++def identity_conflict(domain, entity, pairs, registry):
++    for existing_domain, entry in registry["brands"].items():
++        if not isinstance(entry, dict):
++            continue
++        try:
++            existing = entry_identity(entry)
++        except BrandImportError as exc:
++            if existing_domain == domain:
++                return str(exc)
++            # Broken claims referring to this entity or listing are ambiguous.
++            raw = entry.get("identity")
++            raw_listings = raw.get("listings") if isinstance(raw, dict) else None
++            matches_listing = isinstance(raw_listings, list) and any(
++                isinstance(item, dict) and isinstance(item.get("exchange"), str) and isinstance(item.get("ticker"), str)
++                and (item["exchange"], item["ticker"]) in pairs for item in raw_listings)
++            if isinstance(raw, dict) and (raw.get("entityId") == entity or matches_listing):
++                return f"Conflicting malformed identity in registry domain {existing_domain}"
++            continue
++        if existing is None:
++            continue
++        old_entity, old_pairs = existing
++        if existing_domain == domain and old_entity != entity:
++            return f"Registry domain {domain} is already bound to entityId {old_entity}"
++        if old_entity == entity and existing_domain != domain:
++            return f"Registry entityId {entity} is already bound to domain {existing_domain}"
++        if old_entity != entity and pairs.intersection(old_pairs):
++            return f"Registry exchange/ticker is already bound to entityId {old_entity}"
++    return None
++
++
++def bind_identity(entry, entity, pairs):
++    previous = entry_identity(entry)
++    if previous:
++        pairs = pairs | previous[1]
++    bound = dict(entry)
++    bound["identity"] = {"entityId": entity, "listings": [
++        {"exchange": exchange, "ticker": ticker} for exchange, ticker in sorted(pairs)]}
++    bound["brandReview"] = "reviewed" if entry["kind"] == "reviewed-logo" else "pending"
++    return bound
++
++
++def inspect_cache(entry, domain, registry_path):
++    """Return (usable, fetched_at, asset_error); provenance errors need review."""
++    if not isinstance(entry, dict) or entry.get("kind") not in ("reviewed-logo", "official-site-icon"):
++        raise BrandImportError("Registry entry has an unknown or missing kind")
++    if entry["kind"] == "reviewed-logo" and entry.get("presentation") != "icon":
++        raise BrandImportError("Reviewed material is not explicitly presentation: icon; preserve it and review a compact icon before batch use")
++    if "presentation" in entry and entry["presentation"] != "icon":
++        raise BrandImportError("Official site icon has an invalid presentation; compact icon review is required")
++    actual_domain, _ = normalize_website(entry.get("website"))
++    if actual_domain != domain:
++        raise BrandImportError("Registry website does not match its canonical domain")
++    source_page = https_url(entry.get("sourcePage"))
++    https_url(entry.get("assetUrl"))
++    if entry["kind"] == "official-site-icon":
++        source_domain, _ = normalize_website("https://" + urlsplit(source_page).netloc)
++        if source_domain != domain:
++            raise BrandImportError("Automatic icon sourcePage belongs to another canonical domain")
++    fetched_at = parse_timestamp(entry.get("fetchedAt"))
++    digest = entry.get("sha256")
++    if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
++        raise BrandImportError("Registry sha256 is missing or invalid")
++    source = entry.get("src")
++    prefix = "./assets/companies/"
++    if not isinstance(source, str) or not source.startswith(prefix):
++        raise BrandImportError("Registry src must be a local ./assets/companies/ file")
++    filename = source[len(prefix):]
++    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", filename) or filename in (".", ".."):
++        raise BrandImportError("Registry src contains an unsafe or nested asset path")
++    if Path(filename).suffix.lower() not in (".png", ".jpg", ".jpeg", ".ico", ".webp"):
++        raise BrandImportError("Registry src must name a supported raster asset")
++    asset_path = registry_path.parent / filename
++    if asset_path.resolve().parent != registry_path.parent.resolve():
++        raise BrandImportError("Registry asset resolves outside its local directory")
++    if "presentation" not in entry:
++        # A legacy favicon may be a wordmark. Reacquire through prepare_brand's
++        # current icon contract; never infer or migrate its role from dimensions.
++        return False, fetched_at, "Legacy official site icon has no presentation; reacquisition is required"
++    try:
++        if asset_path.stat().st_size > MAX_IMAGE_BYTES:
++            raise BrandImportError("Local asset exceeds byte limit")
++        data = asset_path.read_bytes()
++        if hashlib.sha256(data).hexdigest() != digest:
++            raise BrandImportError("Local asset sha256 does not match registry")
++        extension, actual_mime = image_type(data)
++        if entry.get("mimeType") != actual_mime:
++            raise BrandImportError("Local asset mimeType does not match registry")
++        validate_icon_shape(data, extension)
++    except (OSError, BrandImportError) as exc:
++        return False, fetched_at, str(exc)
++    return True, fetched_at, None
++
++
++def process_domain(website, limiter, fetcher, max_attempts):
++    result = {"status": "failed", "error": None, "attempts": 0,
++              "requestAttempts": 0, "httpRequests": 0, "cache": "none",
++              "brandReview": "pending", "retryAt": None}
++
++    def fetch_with_retry(url, max_bytes):
++        last_request_url = url
++
++        def before_request(request_url):
++            nonlocal last_request_url
++            last_request_url = request_url
++            limiter.before_request(request_url)
++            result["httpRequests"] += 1
++
++        for attempt in range(1, max_attempts + 1):
++            result["attempts"] = max(result["attempts"], attempt)
++            result["requestAttempts"] += 1
++            try:
++                return fetcher(url, max_bytes, before_request=before_request)
++            except FetchError as exc:
++                if not exc.retryable:
++                    raise
++                retry_after = exc.retry_after
++                if retry_after is not None and (not isinstance(retry_after, (int, float)) or not math.isfinite(retry_after) or retry_after < 0):
++                    raise BrandImportError("Invalid server Retry-After; manual retry is required") from exc
++                delay = max(float(retry_after or 0), float(2 ** (attempt - 1)))
++                limiter.defer(last_request_url, delay)
++                if retry_after is not None:
++                    try:
++                        result["retryAt"] = (utc_now() + timedelta(seconds=delay)).isoformat(timespec="seconds")
++                    except OverflowError:
++                        result["retryAt"] = "beyond supported timestamp range"
++                    result["retryAfterSeconds"] = delay
++                if delay > MAX_RETRY_WAIT_SECONDS:
++                    raise
++                if attempt == max_attempts:
++                    raise
++                time.sleep(delay)
++        raise AssertionError("unreachable")
++
++    try:
++        domain, entry, data = prepare_brand(website, fetcher=fetch_with_retry)
++        result.update(status="success", domain=domain, entry=entry, retryAt=None)
++        result.pop("retryAfterSeconds", None)
++        return result, data
++    except IdentityReviewRequired as exc:
++        result.update(status="needs_review", error=str(exc))
++    except (BrandImportError, OSError) as exc:
++        result["error"] = str(exc)
++    return result, None
++
++
++def validate_options(workers, min_interval, attempts, cache_max_age_hours):
++    if type(workers) is not int or not 1 <= workers <= 8:
++        raise BrandImportError("workers must be an integer from 1 to 8")
++    if type(attempts) is not int or not 1 <= attempts <= 5:
++        raise BrandImportError("attempts must be an integer from 1 to 5")
++    for value, label in ((min_interval, "min_interval"), (cache_max_age_hours, "cache_max_age_hours")):
++        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
++            raise BrandImportError(f"{label} must be a finite nonnegative number")
++
++
++def run_batch(manifest_path, registry_path, state_path, *, workers=3, min_interval=1,
++              attempts=3, cache_max_age_hours=720, refresh=False, retry_failed=False,
++              fetcher=None):
++    validate_options(workers, min_interval, attempts, cache_max_age_hours)
++    scope, rows, manifest_hash = validate_manifest(manifest_path)
++    registry_path, state_path = Path(registry_path), Path(state_path)
++    if registry_path.resolve() == state_path.resolve() or Path(manifest_path).resolve() in (registry_path.resolve(), state_path.resolve()):
++        raise BrandImportError("Manifest, registry and state must be separate files")
++    with locked_paths(registry_path, state_path):
++        registry = read_registry(registry_path)
++        if state_path.exists():
++            state = read_json(state_path, "state")
++            if not isinstance(state, dict) or state.get("version") != 1 or not isinstance(state.get("results"), dict):
++                raise BrandImportError("State must have version: 1 and a results object")
++            if state.get("manifestHash") != manifest_hash:
++                raise BrandImportError("State manifest hash differs from this normalized input; choose a new --state file")
++        else:
++            state = {"version": 1, "manifestHash": manifest_hash, "scope": scope, "results": {}}
++        limiter = RateLimiter(min_interval)
++        limiter.restore(state.get("hostCooldowns", {}))
++        groups = {}
++        for row in rows:
++            if not row["status"]:
++                groups.setdefault(row["domain"], []).append(row)
++        pending, outcomes = {}, {}
++
++        def save_result(domain, outcome):
++            outcomes[domain] = outcome
++            state["results"][domain] = outcome
++            state["updatedAt"] = timestamp()
++            state["hostCooldowns"] = limiter.snapshot()
++            write_json(state_path, state)
++
++        for domain, group in groups.items():
++            entity = group[0]["entityId"]
++            pairs = {(row["exchange"], row["ticker"]) for row in group}
++            baseline = {"domain": domain, "status": "failed", "error": None,
++                        "attempts": 0, "requestAttempts": 0, "httpRequests": 0,
++                        "cache": "none", "brandReview": None}
++            conflict = identity_conflict(domain, entity, pairs, registry)
++            if conflict:
++                save_result(domain, dict(baseline, status="needs_review", error=conflict))
++                continue
++            previous = registry["brands"].get(domain)
++            usable, fetched_at, asset_error = False, None, None
++            if previous is not None:
++                try:
++                    usable, fetched_at, asset_error = inspect_cache(previous, domain, registry_path)
++                except (BrandImportError, TypeError) as exc:
++                    save_result(domain, dict(baseline, status="needs_review", error=str(exc)))
++                    continue
++                if previous["kind"] == "reviewed-logo" and not usable:
++                    save_result(domain, dict(baseline, status="needs_review", cache="reviewed", brandReview="reviewed",
++                                             error="Reviewed asset requires manual restoration: " + asset_error))
++                    continue
++            prior_result = state["results"].get(domain)
++            previous_failure = isinstance(prior_result, dict) and prior_result.get("status") in ("failed", "needs_review")
++            fresh = usable and (utc_now() - fetched_at).total_seconds() <= cache_max_age_hours * 3600
++            reviewed = previous is not None and previous["kind"] == "reviewed-logo"
++            # A failed refresh is a failure until explicit retry. An older valid
++            # cached icon must not silently turn that failure into a success.
++            if previous_failure and not retry_failed:
++                held = dict(prior_result, attempts=0, requestAttempts=0, httpRequests=0, resumed=True)
++                save_result(domain, held)
++                continue
++            resumed = isinstance(prior_result, dict) and prior_result.get("status") in ("success", "cached")
++            if reviewed or (fresh and (not refresh or resumed) and not previous_failure):
++                entry = bind_identity(previous, entity, pairs)
++                if entry != previous:
++                    registry["brands"][domain] = entry
++                    write_json(registry_path, registry)
++                save_result(domain, dict(baseline, status="cached", entry=entry,
++                                         cache="reviewed" if reviewed else "resumed" if resumed else "fresh",
++                                         brandReview=entry["brandReview"]))
++                continue
++            pending[domain] = (group[0]["website"], entity, pairs, previous, usable, asset_error)
++
++        with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="brand-import") as executor:
++            futures = {executor.submit(process_domain, values[0], limiter, fetcher or fetch_public, attempts): domain
++                       for domain, values in pending.items()}
++            for future in as_completed(futures):
++                domain = futures[future]
++                _, entity, pairs, previous, usable, asset_error = pending[domain]
++                outcome, data = future.result()
++                outcome["domain"] = domain
++                if outcome["status"] == "success":
++                    entry = bind_identity(outcome["entry"], entity, pairs | (entry_identity(previous)[1] if previous and entry_identity(previous) else set()))
++                    filename = entry["src"].rsplit("/", 1)[1]
++                    # Only this coordinator writes assets, registry and state.
++                    atomic_write(registry_path.parent / filename, data)
++                    registry["brands"][domain] = entry
++                    write_json(registry_path, registry)
++                    outcome.update(entry=entry, brandReview="pending")
++                elif previous is not None:
++                    outcome.update(cache="stale" if usable else "unusable", retainedPrevious=True,
++                                   previousAssetUsable=usable)
++                    if asset_error:
++                        outcome["previousAssetError"] = asset_error
++                save_result(domain, outcome)
++        # Persist even an entirely invalid manifest report, without network.
++        if not state_path.exists():
++            state["updatedAt"] = timestamp()
++            write_json(state_path, state)
++        for domain, group in groups.items():
++            first_index = group[0]["inputIndex"]
++            for row in group:
++                row.update(outcomes[domain])
++                if row["inputIndex"] != first_index:
++                    row["duplicateOf"] = first_index
++        counts = {status: sum(row["status"] == status for row in rows) for status in STATUSES}
++        return {"version": 1, "manifestHash": manifest_hash, "scope": scope,
++                "generatedAt": timestamp(), "summary": {"inputCount": len(rows),
++                    "domainCount": len({row["domain"] for row in rows if row["domain"]}),
++                    "scheduledDomains": len(pending),
++                    "networkDomains": sum(outcome.get("httpRequests", 0) > 0 for outcome in outcomes.values()),
++                    "status": counts}, "results": rows}
++
++
++def main(argv=None):
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument("--manifest", type=Path, required=True, help="Version 1 company manifest with explicit scope")
++    parser.add_argument("--registry", type=Path, required=True, help="Compatible local registry; assets are stored beside it")
++    parser.add_argument("--state", type=Path, required=True, help="Checkpoint bound to this normalized manifest")
++    parser.add_argument("--workers", type=int, default=3, help="Concurrent domains, 1..8 (default: 3)")
++    parser.add_argument("--min-interval", type=float, default=1, help="Global minimum seconds between HTTP starts (default: 1)")
++    parser.add_argument("--attempts", type=int, default=3, help="Maximum attempts per fetch, 1..5 (default: 3)")
++    parser.add_argument("--cache-max-age-hours", type=float, default=720, help="Freshness for ordinary site icons (default: 720)")
++    parser.add_argument("--refresh", action="store_true", help="Refresh site icons; reviewed logos remain protected")
++    parser.add_argument("--retry-failed", action="store_true", help="Explicitly retry previous failures or review gaps after fixing inputs")
++    args = parser.parse_args(argv)
++    try:
++        report = run_batch(args.manifest, args.registry, args.state, workers=args.workers,
++                           min_interval=args.min_interval, attempts=args.attempts,
++                           cache_max_age_hours=args.cache_max_age_hours, refresh=args.refresh,
++                           retry_failed=args.retry_failed)
++    except (BrandImportError, OSError) as exc:
++        print(json.dumps({"version": 1, "status": "invalid", "error": str(exc)}, ensure_ascii=False))
++        return 2
++    print(json.dumps(report, ensure_ascii=False, indent=2))
++    return 1 if any(report["summary"]["status"][status] for status in ("invalid", "needs_review", "failed")) else 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/apps/uteki_zero/tools/test_import_company_brands.py
+@@ -0,0 +1,716 @@
++#!/usr/bin/env python3
++"""Offline contract tests for the explicit-scope batch company icon importer.
++
++The companies, markets and domains below are deliberately synthetic. Passing
++these tests establishes import/control behavior, never corporate brand review.
++Run: python3 -m unittest discover -s apps/uteki_zero/tools -p 'test_*.py' -v
++"""
++
++from __future__ import annotations
++
++import copy
++from datetime import datetime, timedelta, timezone
++import fcntl
++import hashlib
++import json
++from pathlib import Path
++import struct
++import tempfile
++import threading
++import time
++import unittest
++from unittest.mock import patch
++import zlib
++
++import import_company_brand as single
++import import_company_brands as batch
++
++
++def png(red: int = 37, *, width: int = 1, height: int = 1) -> bytes:
++    """Produce an actual tiny PNG, including CRCs; no network/file fixtures."""
++    def chunk(kind: bytes, payload: bytes) -> bytes:
++        return (struct.pack(">I", len(payload)) + kind + payload
++                + struct.pack(">I", zlib.crc32(kind + payload) & 0xFFFFFFFF))
++
++    return (b"\x89PNG\r\n\x1a\n"
++            + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
++            + chunk(b"IDAT", zlib.compress((b"\0" + bytes([red, 71, 109]) * width) * height))
++            + chunk(b"IEND", b""))
++
++
++PNG = png()
++OTHER_PNG = png(199)
++
++
++def company(entity="issuer-a", exchange="XAAA", ticker="AAA", website="https://a.example"):
++    return {"entityId": entity, "exchange": exchange, "ticker": ticker, "website": website}
++
++
++class FixtureFetcher:
++    """A request-aware fetch double, including redirect and retry fixtures.
++
++    Every simulated HTTP hop calls the same hook as fetch_public. This matters:
++    limiting only prepare_brand calls would not limit homepage/icon/redirect
++    requests and must not satisfy the rate-limit tests.
++    """
++
++    def __init__(self, *, payload=PNG, delay=0.0):
++        self.payload = payload
++        self.delay = delay
++        self.routes = {}
++        self.calls = []
++        self.events = []
++        self.active = 0
++        self.peak_active = 0
++        self._lock = threading.Lock()
++
++    def add(self, url, *responses):
++        self.routes[url] = list(responses)
++        return self
++
++    def __call__(self, url, max_bytes, *, before_request=None):
++        if before_request is not None:
++            before_request(url)
++        with self._lock:
++            self.calls.append(url)
++            self.events.append((url, time.monotonic()))
++            self.active += 1
++            self.peak_active = max(self.peak_active, self.active)
++            responses = self.routes.get(url)
++            response = responses.pop(0) if responses and len(responses) > 1 else (responses[0] if responses else None)
++        try:
++            if self.delay:
++                time.sleep(self.delay)
++            if isinstance(response, Exception):
++                raise response
++            if callable(response):
++                return response(url, max_bytes, before_request)
++            if response is not None:
++                data, final_url, mime = response
++                if len(data) > max_bytes:
++                    raise single.BrandImportError("Synthetic response exceeds byte limit")
++                return data, final_url, mime
++            if url.endswith("/"):
++                return b'<html><link rel="icon" href="/icon.png"></html>', url, "text/html"
++            if url.endswith(("/icon.png", "/favicon.ico")):
++                return self.payload, url, "image/png"
++            raise AssertionError(f"Unexpected synthetic request: {url}")
++        finally:
++            with self._lock:
++                self.active -= 1
++
++
++class FakeClock:
++    """Advance scheduling time on sleep without waiting or spinning."""
++
++    def __init__(self):
++        self.now = 1000.0
++        self.sleeps = []
++        self.lock = threading.Lock()
++
++    def monotonic(self):
++        with self.lock:
++            return self.now
++
++    def sleep(self, seconds):
++        with self.lock:
++            self.sleeps.append(seconds)
++            self.now += seconds
++
++
++class BatchContractTests(unittest.TestCase):
++    def setUp(self):
++        self.tmp = tempfile.TemporaryDirectory(prefix="uteki-brands-test-")
++        self.addCleanup(self.tmp.cleanup)
++        self.root = Path(self.tmp.name)
++        self.manifest = self.root / "companies.json"
++        self.registry = self.root / "assets" / "companies" / "registry.json"
++        self.state = self.root / "checkpoint.json"
++        self.fetcher = FixtureFetcher()
++
++    def write_manifest(self, companies=None, *, scope=None):
++        value = {"version": 1,
++                 "scope": scope if scope is not None else {"id": "synthetic-v1", "markets": ["XAAA", "XBBB"]},
++                 "companies": companies if companies is not None else [company()]}
++        self.manifest.write_text(json.dumps(value), encoding="utf-8")
++        return value
++
++    def run_batch(self, *, fetcher=None, **kwargs):
++        kwargs.setdefault("min_interval", 0)
++        kwargs.setdefault("attempts", 1)
++        return batch.run_batch(self.manifest, self.registry, self.state,
++                               fetcher=fetcher if fetcher is not None else self.fetcher, **kwargs)
++
++    def load_registry(self):
++        return json.loads(self.registry.read_text(encoding="utf-8"))
++
++    def store_entry(self, *, domain="a.example", kind="official-site-icon", data=PNG,
++                    age_hours=0, write_asset=True, identity=None, presentation="icon"):
++        digest = hashlib.sha256(data).hexdigest()
++        entry = {"src": f"./assets/companies/{digest}.png",
++                 "website": f"https://{domain}/", "sourcePage": f"https://{domain}/",
++                 "assetUrl": f"https://{domain}/icon.png", "kind": kind,
++                 "fetchedAt": (datetime.now(timezone.utc) - timedelta(hours=age_hours)).isoformat(),
++                 "sha256": digest, "mimeType": "image/png"}
++        if presentation is not None:
++            entry["presentation"] = presentation
++        if identity is not None:
++            entry["identity"] = identity
++        registry = self.load_registry() if self.registry.exists() else {"version": 1, "brands": {}}
++        registry["brands"][domain] = entry
++        self.registry.parent.mkdir(parents=True, exist_ok=True)
++        self.registry.write_text(json.dumps(registry), encoding="utf-8")
++        if write_asset:
++            (self.registry.parent / f"{digest}.png").write_bytes(data)
++        return entry
++
++    def assert_statuses(self, report, statuses):
++        self.assertEqual([r["status"] for r in report["results"]], statuses)
++        self.assertEqual(report["summary"]["inputCount"], len(statuses))
++        for status in set(statuses):
++            self.assertEqual(report["summary"]["status"][status], statuses.count(status))
++
++    def assert_no_network(self):
++        self.assertEqual(self.fetcher.calls, [])
++
++    def test_two_markets_same_ticker_do_not_merge_distinct_issuers(self):
++        self.write_manifest([company(ticker="SHARED"),
++                             company("issuer-b", "XBBB", "SHARED", "https://b.example")])
++        report = self.run_batch()
++        self.assert_statuses(report, ["success", "success"])
++        self.assertEqual(report["summary"]["domainCount"], 2)
++        self.assertEqual(set(self.load_registry()["brands"]), {"a.example", "b.example"})
++        self.assertEqual(set(self.fetcher.calls), {"https://a.example/", "https://a.example/icon.png",
++                                                 "https://b.example/", "https://b.example/icon.png"})
++        self.assertTrue(all(r["brandReview"] == "pending" for r in report["results"]))
++        self.assertTrue(all(entry["presentation"] == "icon" for entry in self.load_registry()["brands"].values()))
++
++    def test_www_aliases_deduplicate_a_domain_and_preserve_listing_identity(self):
++        self.write_manifest([company(), company(website="https://www.a.example"),
++                             company(exchange="XBBB", ticker="AA", website="https://a.example")])
++        report = self.run_batch()
++        self.assert_statuses(report, ["success", "success", "success"])
++        self.assertEqual(report["summary"]["domainCount"], 1)
++        self.assertEqual(len(self.fetcher.calls), 2)
++        self.assertEqual(report["results"][1]["duplicateOf"], 0)
++        self.assertEqual(report["results"][2]["duplicateOf"], 0)
++        identity = self.load_registry()["brands"]["a.example"]["identity"]
++        self.assertEqual(identity["entityId"], "issuer-a")
++        self.assertEqual({(x["exchange"], x["ticker"]) for x in identity["listings"]},
++                         {("XAAA", "AAA"), ("XBBB", "AA")})
++
++    def test_non_www_subdomain_remains_a_separate_identity(self):
++        self.write_manifest([company(), company("issuer-ir", "XBBB", "IR", "https://ir.a.example")])
++        report = self.run_batch()
++        self.assert_statuses(report, ["success", "success"])
++        self.assertEqual(set(self.load_registry()["brands"]), {"a.example", "ir.a.example"})
++        self.assertEqual(len(self.fetcher.calls), 4)
++
++    def test_missing_or_blank_required_identity_fields_are_reported_without_network(self):
++        entries = []
++        for key in ("entityId", "exchange", "ticker", "website"):
++            missing = company()
++            del missing[key]
++            entries.append(missing)
++            blank = company()
++            blank[key] = "   "
++            entries.append(blank)
++        self.write_manifest(entries)
++        report = self.run_batch()
++        self.assert_statuses(report, ["invalid"] * len(entries))
++        self.assertTrue(all(row["error"] for row in report["results"]))
++        self.assert_no_network()
++
++    def test_market_outside_explicit_scope_is_invalid(self):
++        self.write_manifest([company(exchange="XOUT")])
++        self.assert_statuses(self.run_batch(), ["invalid"])
++        self.assert_no_network()
++
++    def test_missing_scope_is_rejected_instead_of_selecting_a_market(self):
++        value = self.write_manifest()
++        del value["scope"]
++        self.manifest.write_text(json.dumps(value), encoding="utf-8")
++        with self.assertRaises(single.BrandImportError):
++            self.run_batch()
++        self.assert_no_network()
++
++    def test_invalid_website_is_not_replaced_by_another_company(self):
++        entries = [company("bad-http", ticker="BAD1", website="http://bad.example"),
++                   company("bad-path", ticker="BAD2", website="https://bad.example/investors"),
++                   company("private", ticker="BAD3", website="https://127.0.0.1"),
++                   company("good", ticker="OK", website="https://good.example")]
++        self.write_manifest(entries)
++        self.assert_statuses(self.run_batch(), ["invalid", "invalid", "invalid", "success"])
++        self.assertEqual(set(self.load_registry()["brands"]), {"good.example"})
++        self.assertTrue(all(url.startswith("https://good.example/") for url in self.fetcher.calls))
++
++    def test_identity_conflicts_require_review_without_fetching(self):
++        cases = {
++            "one_entity_two_domains": [company(), company(website="https://other.example")],
++            "one_listing_two_entities": [company(), company("other", website="https://other.example")],
++            "one_domain_two_entities": [company(), company("other", "XBBB", "OTHER")],
++        }
++        for label, entries in cases.items():
++            with self.subTest(label=label):
++                self.state = self.root / f"{label}.json"
++                self.write_manifest(entries)
++                self.assert_statuses(self.run_batch(), ["needs_review", "needs_review"])
++                self.assert_no_network()
++
++    def test_existing_registry_identity_conflict_does_not_overwrite_asset(self):
++        prior = self.store_entry(identity={"entityId": "different-issuer", "listings": [{"exchange": "XBBB", "ticker": "DIFF"}]})
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["needs_review"])
++        self.assertEqual(self.load_registry()["brands"]["a.example"], prior)
++        self.assert_no_network()
++
++    def test_unrelated_malformed_registry_identity_does_not_crash_other_imports(self):
++        prior = self.store_entry(domain="unrelated.example",
++                                 identity={"entityId": "unrelated-issuer", "listings": None})
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["success"])
++        self.assertEqual(self.load_registry()["brands"]["unrelated.example"], prior)
++        self.assertEqual(len(self.fetcher.calls), 2)
++
++    def test_malformed_registry_identity_for_requested_entity_requires_review(self):
++        prior = self.store_entry(domain="other.example",
++                                 identity={"entityId": "issuer-a", "listings": None})
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["needs_review"])
++        self.assertEqual(self.load_registry()["brands"]["other.example"], prior)
++        self.assert_no_network()
++
++    def test_fresh_cache_requires_an_existing_file_with_matching_hash(self):
++        self.store_entry()
++        self.write_manifest()
++        report = self.run_batch()
++        self.assert_statuses(report, ["cached"])
++        self.assertEqual(report["results"][0]["cache"], "fresh")
++        self.assertEqual(report["results"][0]["brandReview"], "pending")
++        self.assert_no_network()
++
++    def test_tampered_cached_icon_is_refetched_and_saved_with_its_actual_hash(self):
++        previous = self.store_entry()
++        (self.registry.parent / Path(previous["src"]).name).write_bytes(b"tampered")
++        self.write_manifest()
++        self.fetcher.payload = OTHER_PNG
++        self.assert_statuses(self.run_batch(), ["success"])
++        entry = self.load_registry()["brands"]["a.example"]
++        self.assertEqual(entry["sha256"], hashlib.sha256(OTHER_PNG).hexdigest())
++        self.assertEqual((self.registry.parent / Path(entry["src"]).name).read_bytes(), OTHER_PNG)
++        self.assertEqual(len(self.fetcher.calls), 2)
++
++    def test_missing_cached_icon_is_refetched(self):
++        self.store_entry(write_asset=False)
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["success"])
++        self.assertEqual(len(self.fetcher.calls), 2)
++
++    def test_legacy_automatic_icon_without_presentation_is_fetched_again(self):
++        self.store_entry(presentation=None)
++        self.write_manifest()
++        self.fetcher.payload = OTHER_PNG
++        self.assert_statuses(self.run_batch(), ["success"])
++        entry = self.load_registry()["brands"]["a.example"]
++        self.assertEqual(entry["presentation"], "icon")
++        self.assertEqual(entry["sha256"], hashlib.sha256(OTHER_PNG).hexdigest())
++        self.assertEqual(len(self.fetcher.calls), 2)
++
++    def test_png_bytes_with_unsupported_local_extension_are_not_accepted_as_cache(self):
++        prior = self.store_entry()
++        value = self.load_registry()
++        invalid_src = f'./assets/companies/{prior["sha256"]}.txt'
++        value["brands"]["a.example"]["src"] = invalid_src
++        self.registry.write_text(json.dumps(value), encoding="utf-8")
++        (self.registry.parent / Path(invalid_src).name).write_bytes(PNG)
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["needs_review"])
++        self.assertEqual(self.load_registry(), value)
++        self.assert_no_network()
++
++    def test_completed_checkpoint_resumes_without_http_requests(self):
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["success"])
++        second_fetcher = FixtureFetcher()
++        report = self.run_batch(fetcher=second_fetcher)
++        self.assert_statuses(report, ["cached"])
++        self.assertEqual(report["results"][0]["cache"], "resumed")
++        self.assertEqual(second_fetcher.calls, [])
++
++    def test_resumed_checkpoint_does_not_hide_a_missing_local_asset(self):
++        self.write_manifest()
++        self.run_batch()
++        entry = self.load_registry()["brands"]["a.example"]
++        (self.registry.parent / Path(entry["src"]).name).unlink()
++        second_fetcher = FixtureFetcher()
++        self.assert_statuses(self.run_batch(fetcher=second_fetcher), ["success"])
++        self.assertEqual(len(second_fetcher.calls), 2)
++
++    def test_failed_checkpoint_is_visible_and_retry_failed_explicitly_retries(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 403", retryable=False))
++        self.assert_statuses(self.run_batch(), ["failed"])
++        second_fetcher = FixtureFetcher()
++        self.assert_statuses(self.run_batch(fetcher=second_fetcher), ["failed"])
++        self.assertEqual(second_fetcher.calls, [])
++        self.assert_statuses(self.run_batch(fetcher=second_fetcher, retry_failed=True), ["success"])
++        self.assertEqual(len(second_fetcher.calls), 2)
++
++    def test_retry_failed_refresh_does_not_disguise_older_fresh_icon_as_success(self):
++        self.store_entry()
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 403", retryable=False))
++        self.assert_statuses(self.run_batch(refresh=True), ["failed"])
++        second_fetcher = FixtureFetcher(payload=OTHER_PNG)
++        self.assert_statuses(self.run_batch(fetcher=second_fetcher, retry_failed=True), ["success"])
++        self.assertEqual(len(second_fetcher.calls), 2)
++        self.assertEqual(self.load_registry()["brands"]["a.example"]["sha256"],
++                         hashlib.sha256(OTHER_PNG).hexdigest())
++
++    def test_changed_manifest_cannot_reuse_checkpoint_for_a_different_input(self):
++        self.write_manifest()
++        self.run_batch()
++        previous = copy.deepcopy(self.load_registry())
++        self.write_manifest([company(), company("issuer-b", "XBBB", "B", "https://b.example")])
++        second_fetcher = FixtureFetcher()
++        with self.assertRaises(single.BrandImportError):
++            self.run_batch(fetcher=second_fetcher)
++        self.assertEqual(second_fetcher.calls, [])
++        self.assertEqual(self.load_registry(), previous)
++        self.state = self.root / "new-input-checkpoint.json"
++        self.assert_statuses(self.run_batch(fetcher=second_fetcher), ["cached", "success"])
++        self.assertTrue(all("b.example" in url for url in second_fetcher.calls))
++
++    def test_expired_cache_refresh_failure_remains_failure_and_preserves_previous_entry(self):
++        prior = self.store_entry(age_hours=48)
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 403", retryable=False))
++        report = self.run_batch(cache_max_age_hours=24)
++        self.assert_statuses(report, ["failed"])
++        self.assertEqual(report["results"][0]["cache"], "stale")
++        self.assertEqual(self.load_registry()["brands"]["a.example"], prior)
++
++    def test_reviewed_logo_never_downgrades_to_favicon_even_on_refresh(self):
++        prior = self.store_entry(kind="reviewed-logo", age_hours=9999)
++        self.write_manifest()
++        report = self.run_batch(refresh=True, cache_max_age_hours=1)
++        self.assert_statuses(report, ["cached"])
++        self.assertEqual(report["results"][0]["cache"], "reviewed")
++        self.assertEqual(report["results"][0]["brandReview"], "reviewed")
++        current = self.load_registry()["brands"]["a.example"]
++        for key, value in prior.items():
++            self.assertEqual(current[key], value)
++        self.assert_no_network()
++
++    def test_reviewed_wordmark_requires_review_without_replacement_or_network(self):
++        prior = self.store_entry(kind="reviewed-logo", presentation="wordmark", data=png(width=8, height=1))
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(refresh=True), ["needs_review"])
++        self.assertEqual(self.load_registry()["brands"]["a.example"], prior)
++        self.assert_no_network()
++
++    def test_reviewed_logo_without_presentation_cannot_be_inferred_from_square_ratio(self):
++        prior = self.store_entry(kind="reviewed-logo", presentation=None)
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["needs_review"])
++        self.assertEqual(self.load_registry()["brands"]["a.example"], prior)
++        self.assert_no_network()
++
++    def test_single_automatic_import_records_icon_presentation(self):
++        result = single.import_brand("https://a.example", self.registry, fetcher=self.fetcher)
++        self.assertEqual(result["kind"], "official-site-icon")
++        self.assertEqual(result["presentation"], "icon")
++        self.assertEqual(self.load_registry()["brands"]["a.example"]["presentation"], "icon")
++
++    def test_single_reviewed_import_defaults_to_wordmark_and_accepts_wide_asset(self):
++        data = png(width=8, height=1)
++        self.fetcher.add("https://a.example/wordmark.png", (data, "https://a.example/wordmark.png", "image/png"))
++        result = single.import_brand("https://a.example", self.registry,
++                                     asset_url="https://a.example/wordmark.png",
++                                     source_page="https://a.example/brand", fetcher=self.fetcher)
++        self.assertEqual(result["kind"], "reviewed-logo")
++        self.assertEqual(result["presentation"], "wordmark")
++        self.assertEqual(result["sha256"], hashlib.sha256(data).hexdigest())
++
++    def test_single_explicit_icon_rejects_wide_or_tall_shape_without_changing_registry(self):
++        prior = self.store_entry(kind="reviewed-logo")
++        for width, height in ((8, 1), (1, 8)):
++            with self.subTest(width=width, height=height):
++                data = png(width=width, height=height)
++                fetcher = FixtureFetcher()
++                fetcher.add("https://a.example/replacement.png", (data, "https://a.example/replacement.png", "image/png"))
++                with self.assertRaises(single.BrandImportError):
++                    single.import_brand("https://a.example", self.registry,
++                                        asset_url="https://a.example/replacement.png",
++                                        source_page="https://a.example/brand", presentation="icon", fetcher=fetcher)
++                self.assertEqual(self.load_registry()["brands"]["a.example"], prior)
++                self.assertFalse((self.registry.parent / (hashlib.sha256(data).hexdigest() + ".png")).exists())
++
++    def test_missing_reviewed_logo_requires_review_and_is_not_counted_as_success(self):
++        prior = self.store_entry(kind="reviewed-logo", write_asset=False)
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["needs_review"])
++        self.assertEqual(self.load_registry()["brands"]["a.example"], prior)
++        self.assert_no_network()
++
++    def test_tampered_reviewed_logo_requires_review_without_favicon_replacement(self):
++        prior = self.store_entry(kind="reviewed-logo")
++        (self.registry.parent / Path(prior["src"]).name).write_bytes(OTHER_PNG)
++        self.write_manifest()
++        self.assert_statuses(self.run_batch(), ["needs_review"])
++        self.assertEqual(self.load_registry()["brands"]["a.example"], prior)
++        self.assert_no_network()
++
++    def test_429_retry_after_is_observed_and_then_import_succeeds(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/",
++                         single.FetchError("HTTP 429", retryable=True, retry_after=2),
++                         (b'<link rel="icon" href="/icon.png">', "https://a.example/", "text/html"))
++        clock = FakeClock()
++        with patch.object(batch.time, "monotonic", side_effect=clock.monotonic), \
++             patch.object(batch.time, "sleep", side_effect=clock.sleep):
++            report = self.run_batch(attempts=3)
++        self.assert_statuses(report, ["success"])
++        self.assertEqual(report["results"][0]["attempts"], 2)
++        self.assertEqual(self.fetcher.calls.count("https://a.example/"), 2)
++        self.assertGreaterEqual(sum(clock.sleeps), 2)
++
++    def test_asset_retry_does_not_repeat_homepage_or_cycle_to_other_icon_urls(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/icon.png",
++                         single.FetchError("HTTP 429", retryable=True, retry_after=1),
++                         (PNG, "https://a.example/icon.png", "image/png"))
++        clock = FakeClock()
++        with patch.object(batch.time, "monotonic", side_effect=clock.monotonic), \
++             patch.object(batch.time, "sleep", side_effect=clock.sleep):
++            report = self.run_batch(attempts=3)
++        self.assert_statuses(report, ["success"])
++        self.assertEqual(self.fetcher.calls, ["https://a.example/", "https://a.example/icon.png",
++                                             "https://a.example/icon.png"])
++        self.assertEqual(report["results"][0]["attempts"], 2)
++
++    def test_excessive_retry_after_is_reported_without_early_retry(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 429", retryable=True, retry_after=3600))
++        with patch.object(batch.time, "sleep") as sleep:
++            report = self.run_batch(attempts=3)
++        self.assert_statuses(report, ["failed"])
++        self.assertEqual(self.fetcher.calls, ["https://a.example/"])
++        self.assertTrue(report["results"][0].get("retryAt"))
++        self.assertEqual(sum(call.args[0] for call in sleep.call_args_list), 0)
++
++    def test_checkpoint_retry_failed_still_respects_unexpired_server_retry_after(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 429", retryable=True, retry_after=3600))
++        self.assert_statuses(self.run_batch(attempts=3), ["failed"])
++        second_fetcher = FixtureFetcher()
++        with patch.object(batch.time, "sleep") as sleep:
++            report = self.run_batch(fetcher=second_fetcher, retry_failed=True, attempts=3)
++        self.assert_statuses(report, ["failed"])
++        self.assertTrue(report["results"][0].get("retryAt"))
++        self.assertEqual(second_fetcher.calls, [])
++        self.assertEqual(sleep.call_count, 0)
++
++    def test_extreme_finite_retry_after_can_be_saved_and_resumed_without_overflow(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 429", retryable=True, retry_after=1e30))
++        report = self.run_batch(attempts=3)
++        self.assert_statuses(report, ["failed"])
++        report_path = self.root / "report.json"
++        report_path.write_text(json.dumps(report, allow_nan=False), encoding="utf-8")
++        self.assertEqual(json.loads(report_path.read_text(encoding="utf-8")), report)
++        saved = json.loads(self.state.read_text(encoding="utf-8"))
++        self.assertEqual(saved["hostCooldowns"]["a.example"], "manual-clear-required")
++        second_fetcher = FixtureFetcher()
++        with patch.object(batch.time, "sleep") as sleep:
++            resumed = self.run_batch(fetcher=second_fetcher, retry_failed=True, attempts=3)
++        self.assert_statuses(resumed, ["failed"])
++        self.assertEqual(resumed["summary"]["networkDomains"], 0)
++        self.assertEqual(second_fetcher.calls, [])
++        self.assertEqual(sleep.call_count, 0)
++        report_path.write_text(json.dumps(resumed, allow_nan=False), encoding="utf-8")
++        saved = json.loads(self.state.read_text(encoding="utf-8"))
++        self.assertEqual(saved["hostCooldowns"]["a.example"], "manual-clear-required")
++
++    def test_403_is_not_retried(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 403", retryable=False))
++        report = self.run_batch(attempts=3)
++        self.assert_statuses(report, ["failed"])
++        self.assertEqual(report["results"][0]["attempts"], 1)
++        self.assertEqual(self.fetcher.calls, ["https://a.example/"])
++
++    def test_transient_failure_retries_are_bounded(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/", single.FetchError("HTTP 503", retryable=True))
++        clock = FakeClock()
++        with patch.object(batch.time, "monotonic", side_effect=clock.monotonic), \
++             patch.object(batch.time, "sleep", side_effect=clock.sleep):
++            report = self.run_batch(attempts=3)
++        self.assert_statuses(report, ["failed"])
++        self.assertEqual(report["results"][0]["attempts"], 3)
++        self.assertEqual(self.fetcher.calls, ["https://a.example/"] * 3)
++
++    def test_rate_limiter_applies_retry_after_to_shared_host_without_blocking_other_hosts(self):
++        clock = FakeClock()
++        with patch.object(batch.time, "monotonic", side_effect=clock.monotonic), \
++             patch.object(batch.time, "sleep", side_effect=clock.sleep):
++            limiter = batch.RateLimiter(0)
++            limiter.defer("https://shared.example/first.png", 3)
++            limiter.before_request("https://unrelated.example/other.png")
++            self.assertEqual(clock.now, 1000)
++            limiter.before_request("https://shared.example/second.png")
++        self.assertGreaterEqual(clock.now, 1003)
++        self.assertGreaterEqual(sum(clock.sleeps), 3)
++
++    def test_long_retry_after_stops_other_companies_requesting_same_asset_host(self):
++        self.write_manifest([company(), company("issuer-b", "XBBB", "B", "https://b.example")])
++        self.fetcher.add("https://a.example/",
++                         (b'<link rel="icon" href="https://shared.example/a.png">',
++                          "https://a.example/", "text/html"))
++        self.fetcher.add("https://b.example/",
++                         (b'<link rel="icon" href="https://shared.example/b.png">',
++                          "https://b.example/", "text/html"))
++        self.fetcher.add("https://shared.example/a.png",
++                         single.FetchError("HTTP 429", retryable=True, retry_after=3600))
++        self.fetcher.add("https://shared.example/b.png", (PNG, "https://shared.example/b.png", "image/png"))
++        with patch.object(batch.time, "sleep") as sleep:
++            report = self.run_batch(workers=1, attempts=3)
++        self.assert_statuses(report, ["failed", "failed"])
++        self.assertIn("https://b.example/", self.fetcher.calls)
++        self.assertNotIn("https://shared.example/b.png", self.fetcher.calls)
++        self.assertFalse(any("favicon.ico" in url for url in self.fetcher.calls))
++        self.assertTrue(all(row.get("retryAt") for row in report["results"]))
++        self.assertEqual(sleep.call_count, 0)
++
++    def test_http_requests_respect_global_spacing_and_worker_limit(self):
++        self.write_manifest([company(f"issuer-{n}", "XAAA", f"T{n}", f"https://d{n}.example")
++                             for n in range(5)])
++        fetcher = FixtureFetcher(delay=0.025)
++        report = self.run_batch(fetcher=fetcher, workers=2, min_interval=0.01)
++        self.assert_statuses(report, ["success"] * 5)
++        self.assertEqual(len(fetcher.events), 10)  # Homepages AND images are paced.
++        timestamps = sorted(at for _, at in fetcher.events)
++        self.assertTrue(all(later - earlier >= 0.008 for earlier, later in zip(timestamps, timestamps[1:])),
++                        f"HTTP requests were not globally spaced: {timestamps}")
++        self.assertLessEqual(fetcher.peak_active, 2)
++        self.assertGreaterEqual(fetcher.peak_active, 2)  # Exercise actual independent work.
++
++    def test_redirect_hops_also_pass_through_http_rate_limiter(self):
++        self.write_manifest()
++        def redirect(url, max_bytes, before_request):
++            final = "https://www.a.example/"
++            self.assertIsNotNone(before_request)
++            before_request(final)
++            self.fetcher.events.append((final, time.monotonic()))
++            return b'<link rel="icon" href="/icon.png">', final, "text/html"
++        self.fetcher.add("https://a.example/", redirect)
++        report = self.run_batch(min_interval=0.01)
++        self.assert_statuses(report, ["success"])
++        timestamps = sorted(at for _, at in self.fetcher.events)
++        self.assertEqual(len(timestamps), 3)
++        self.assertTrue(all(later - earlier >= 0.008 for earlier, later in zip(timestamps, timestamps[1:])))
++
++    def test_homepage_redirect_to_another_domain_requires_identity_review(self):
++        self.write_manifest()
++        self.fetcher.add("https://a.example/",
++                         (b'<link rel="icon" href="/icon.png">', "https://unrelated.example/", "text/html"))
++        report = self.run_batch()
++        self.assert_statuses(report, ["needs_review"])
++        self.assertEqual(self.fetcher.calls, ["https://a.example/"])
++        self.assertFalse(self.registry.exists() and self.load_registry()["brands"].get("a.example"))
++
++    def test_both_registry_and_checkpoint_locks_prevent_concurrent_writers(self):
++        self.write_manifest()
++        for target in (self.registry, self.state):
++            with self.subTest(target=target.name):
++                lock_path = Path(str(target) + ".lock")
++                lock_path.parent.mkdir(parents=True, exist_ok=True)
++                with lock_path.open("a+") as held:
++                    fcntl.flock(held.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
++                    with self.assertRaises(single.BrandImportError):
++                        self.run_batch()
++                self.assert_no_network()
++        # Releasing a lock must restore normal operation.
++        self.assert_statuses(self.run_batch(), ["success"])
++
++    def test_single_import_refresh_preserves_identity_bound_by_batch(self):
++        self.write_manifest()
++        self.run_batch()
++        previous = self.load_registry()["brands"]["a.example"]
++        result = single.import_brand("https://a.example", self.registry,
++                                     fetcher=FixtureFetcher(payload=OTHER_PNG))
++        self.assertEqual(result["identity"], previous["identity"])
++        self.assertEqual(result["sha256"], hashlib.sha256(OTHER_PNG).hexdigest())
++        self.assertEqual(self.load_registry()["brands"]["a.example"]["identity"], previous["identity"])
++
++    def test_single_import_obeys_the_same_registry_lock_as_batch(self):
++        previous = self.store_entry(kind="reviewed-logo")
++        lock_path = Path(str(self.registry) + ".lock")
++        with lock_path.open("a+") as held:
++            fcntl.flock(held.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
++            with self.assertRaises(single.BrandImportError):
++                single.import_brand("https://a.example", self.registry, fetcher=self.fetcher)
++        self.assertEqual(self.load_registry()["brands"]["a.example"], previous)
++        self.assert_no_network()
++
++    def test_malformed_existing_registry_is_not_reset(self):
++        self.registry.parent.mkdir(parents=True)
++        corrupt = '{"version":1,"brands":'
++        self.registry.write_text(corrupt, encoding="utf-8")
++        self.write_manifest()
++        with self.assertRaises(single.BrandImportError):
++            self.run_batch()
++        self.assertEqual(self.registry.read_text(encoding="utf-8"), corrupt)
++        self.assert_no_network()
++
++    def test_malformed_checkpoint_is_not_silently_discarded(self):
++        corrupt = '{"version":1,"results":'
++        self.state.write_text(corrupt, encoding="utf-8")
++        self.write_manifest()
++        with self.assertRaises(single.BrandImportError):
++            self.run_batch()
++        self.assertEqual(self.state.read_text(encoding="utf-8"), corrupt)
++        self.assert_no_network()
++
++    def test_non_json_nan_in_manifest_or_checkpoint_is_rejected_before_network(self):
++        for target in ("manifest", "checkpoint"):
++            with self.subTest(target=target):
++                value = self.write_manifest()
++                if target == "manifest":
++                    invalid = json.dumps(value)[:-1] + ', "extra": NaN}'
++                    path = self.manifest
++                else:
++                    self.store_entry()
++                    self.run_batch()
++                    valid_state = json.loads(self.state.read_text(encoding="utf-8"))
++                    invalid = json.dumps(valid_state)[:-1] + ', "extra": NaN}'
++                    path = self.state
++                path.write_text(invalid, encoding="utf-8")
++                with self.assertRaises(single.BrandImportError):
++                    self.run_batch()
++                self.assertEqual(path.read_text(encoding="utf-8"), invalid)
++                self.assert_no_network()
++
++    def test_duplicate_json_fields_in_manifest_or_checkpoint_are_rejected(self):
++        for target in ("manifest", "checkpoint"):
++            with self.subTest(target=target):
++                value = self.write_manifest()
++                if target == "manifest":
++                    invalid = json.dumps(value)[:-1] + ', "version": 1}'
++                    path = self.manifest
++                else:
++                    self.store_entry()
++                    self.run_batch()
++                    valid_state = json.loads(self.state.read_text(encoding="utf-8"))
++                    invalid = json.dumps(valid_state)[:-1] + ', "version": 1}'
++                    path = self.state
++                path.write_text(invalid, encoding="utf-8")
++                with self.assertRaises(single.BrandImportError):
++                    self.run_batch()
++                self.assertEqual(path.read_text(encoding="utf-8"), invalid)
++                self.assert_no_network()
++
++
++if __name__ == "__main__":
++    unittest.main()
+--- /dev/null
++++ b/apps/uteki_zero/tools/test_import_company_brand_network.py
+@@ -0,0 +1,162 @@
++#!/usr/bin/env python3
++"""Offline transport/identity checks using fake HTTP connections, never sockets."""
++
++from datetime import datetime, timedelta, timezone
++from email.utils import format_datetime
++import io
++import socket
++import unittest
++from unittest.mock import Mock, patch
++
++import import_company_brand as brand
++
++
++class FakeResponse:
++    def __init__(self, status=200, data=b"ok", headers=None):
++        self.status = status
++        self._data = io.BytesIO(data)
++        self._headers = {key.lower(): value for key, value in (headers or {}).items()}
++        self.fp = None
++
++    def getheader(self, name, default=None):
++        return self._headers.get(name.lower(), default)
++
++    def read1(self, count):
++        return self._data.read(count)
++
++
++class FakeConnection:
++    def __init__(self, response):
++        self.response = response
++        self.requests = []
++        self.sock = None
++        self.closed = False
++
++    def request(self, method, path, headers):
++        self.requests.append((method, path, headers))
++
++    def getresponse(self):
++        return self.response
++
++    def close(self):
++        self.closed = True
++
++
++class TransportContractTests(unittest.TestCase):
++    def download(self, response, *, before_request=None):
++        connection = FakeConnection(response)
++        with patch.object(brand, "public_addresses", return_value=["93.184.216.34"]), \
++             patch.object(brand, "PinnedHTTPSConnection", return_value=connection):
++            try:
++                return brand.fetch_public("https://a.example/", 1024, before_request=before_request)
++            finally:
++                self.assertTrue(connection.closed)
++
++    def test_retryable_http_statuses_remain_machine_readable(self):
++        for status in (408, 429, 500, 502, 503, 504):
++            with self.subTest(status=status), self.assertRaises(brand.FetchError) as caught:
++                self.download(FakeResponse(status=status))
++            self.assertTrue(caught.exception.retryable)
++            self.assertIn(str(status), str(caught.exception))
++
++    def test_nonretryable_http_statuses_do_not_become_transient_failures(self):
++        for status in (400, 401, 403, 404, 410):
++            with self.subTest(status=status), self.assertRaises(brand.FetchError) as caught:
++                self.download(FakeResponse(status=status))
++            self.assertFalse(caught.exception.retryable)
++
++    def test_429_numeric_retry_after_is_preserved_as_seconds(self):
++        with self.assertRaises(brand.FetchError) as caught:
++            self.download(FakeResponse(status=429, headers={"Retry-After": "17"}))
++        self.assertTrue(caught.exception.retryable)
++        self.assertEqual(caught.exception.retry_after, 17)
++
++    def test_http_date_retry_after_is_parsed_and_invalid_values_are_absent(self):
++        future = datetime.now(timezone.utc) + timedelta(hours=1)
++        seconds = brand.retry_after_seconds(format_datetime(future, usegmt=True))
++        self.assertGreater(seconds, 3595)
++        self.assertLessEqual(seconds, 3600)
++        self.assertEqual(brand.retry_after_seconds("Mon, 01 Jan 1990 00:00:00 GMT"), 0)
++        self.assertIsNone(brand.retry_after_seconds("not-a-delay"))
++        self.assertIsNone(brand.retry_after_seconds(None))
++
++    def test_request_hook_is_called_for_each_redirect_hop(self):
++        first = FakeConnection(FakeResponse(status=302, headers={"Location": "https://www.a.example/icon.png"}))
++        second = FakeConnection(FakeResponse(data=b"image", headers={"Content-Type": "image/png", "Content-Length": "5"}))
++        hook = Mock()
++        with patch.object(brand, "public_addresses", return_value=["93.184.216.34"]) as addresses, \
++             patch.object(brand, "PinnedHTTPSConnection", side_effect=[first, second]):
++            data, final_url, mime = brand.fetch_public("https://a.example/", 1024, before_request=hook)
++        self.assertEqual([call.args[0] for call in hook.call_args_list],
++                         ["https://a.example/", "https://www.a.example/icon.png"])
++        self.assertEqual([call.args[0] for call in addresses.call_args_list], ["a.example", "www.a.example"])
++        self.assertEqual((data, final_url, mime), (b"image", "https://www.a.example/icon.png", "image/png"))
++        self.assertTrue(first.closed and second.closed)
++
++    def test_private_ip_redirect_is_rejected_before_another_connection(self):
++        first = FakeConnection(FakeResponse(status=302, headers={"Location": "https://127.0.0.1/icon.png"}))
++        with patch.object(brand, "public_addresses", return_value=["93.184.216.34"]) as addresses, \
++             patch.object(brand, "PinnedHTTPSConnection", return_value=first) as connection, \
++             self.assertRaises(brand.BrandImportError):
++            brand.fetch_public("https://a.example/", 1024)
++        self.assertEqual(addresses.call_count, 1)
++        self.assertEqual(connection.call_count, 1)
++        self.assertTrue(first.closed)
++
++    def test_redirect_target_dns_is_revalidated_and_private_answer_is_rejected(self):
++        first = FakeConnection(FakeResponse(status=302, headers={"Location": "https://internal.example/icon.png"}))
++        def resolve(host, *args, **kwargs):
++            address = "93.184.216.34" if host == "a.example" else "10.0.0.5"
++            return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (address, 443))]
++        with patch.object(brand.socket, "getaddrinfo", side_effect=resolve) as resolver, \
++             patch.object(brand, "PinnedHTTPSConnection", return_value=first) as connection, \
++             self.assertRaises(brand.BrandImportError):
++            brand.fetch_public("https://a.example/", 1024)
++        self.assertEqual([call.args[0] for call in resolver.call_args_list], ["a.example", "internal.example"])
++        self.assertEqual(connection.call_count, 1)
++        self.assertTrue(first.closed)
++
++    def test_mixed_public_private_dns_answers_are_rejected(self):
++        answers = [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 443)),
++                   (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("192.168.1.5", 443))]
++        with patch.object(brand.socket, "getaddrinfo", return_value=answers), \
++             self.assertRaises(brand.BrandImportError):
++            brand.public_addresses("mixed.example")
++
++    def test_transport_error_is_retryable_and_connection_is_closed(self):
++        connection = FakeConnection(FakeResponse())
++        connection.request = Mock(side_effect=TimeoutError("synthetic timeout"))
++        with patch.object(brand, "public_addresses", return_value=["93.184.216.34"]), \
++             patch.object(brand, "PinnedHTTPSConnection", return_value=connection), \
++             self.assertRaises(brand.FetchError) as caught:
++            brand.fetch_public("https://a.example/", 1024)
++        self.assertTrue(caught.exception.retryable)
++        self.assertTrue(connection.closed)
++
++    def test_truncated_response_is_retryable(self):
++        with self.assertRaises(brand.FetchError) as caught:
++            self.download(FakeResponse(data=b"small", headers={"Content-Length": "10"}))
++        self.assertTrue(caught.exception.retryable)
++
++    def test_download_byte_cap_is_enforced_with_or_without_content_length(self):
++        for headers in ({}, {"Content-Length": "1025"}):
++            with self.subTest(headers=headers), self.assertRaises(brand.BrandImportError):
++                self.download(FakeResponse(data=b"x" * 1025, headers=headers))
++
++    def test_cross_domain_homepage_redirect_requires_review_before_icon_download(self):
++        fetcher = Mock(return_value=(b'<link rel="icon" href="/icon.png">',
++                                     "https://different.example/", "text/html"))
++        with self.assertRaises(brand.IdentityReviewRequired):
++            brand.prepare_brand("https://a.example", fetcher=fetcher)
++        self.assertEqual(fetcher.call_count, 1)
++
++    def test_subdomain_homepage_redirect_is_not_implicitly_the_same_company(self):
++        fetcher = Mock(return_value=(b'<link rel="icon" href="/icon.png">',
++                                     "https://investors.a.example/", "text/html"))
++        with self.assertRaises(brand.IdentityReviewRequired):
++            brand.prepare_brand("https://a.example", fetcher=fetcher)
++        self.assertEqual(fetcher.call_count, 1)
++
++
++if __name__ == "__main__":
++    unittest.main()
+--- /dev/null
++++ b/docs/COMPANY_LOGO_PROVIDERS_2026-09-29.zh-CN.md
+@@ -0,0 +1,57 @@
++# 公司 Logo 批量来源调查
++
++查询日期：2026-09-29。范围：TradingView、公司官网图标、Logo.dev、Brandfetch、Finnhub。只核对公开官方文档；未注册账号、购买套餐、使用他人密钥或调用需要认证的素材接口。以下价格与条款是本次查询快照，覆盖数字是供应商声明，不是 Uteki 实测覆盖率。
++
++## 建议与当前边界
++
++当前批量导入采用调用者明确提供的公司官网，从网页声明中发现 `rel=icon` / `apple-touch-icon`，保存为 `official-site-icon`。这条路径无需供应商账号，可在现有本地注册表上完成缓存、去重、重试和续跑；官网声明只能证明它是站点图标，不能自动升级为已审核企业 Logo。HTML 标准将 `icon` 定义为代表页面或站点的图标，Apple 文档则定义主页图标声明方式。[HTML 标准](https://html.spec.whatwg.org/multipage/links.html#rel-icon)、[Apple Web Clip 图标文档](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html)
++
++未来若需要减少官网解析失败并保留本地素材，优先评估 **Logo.dev 的 Pro 或带自托管许可的合同**：它明确描述了批量下载和自有存储流程。订阅有效期、密钥与目标市场验收仍是接入前的真实缺口；本轮不启用收费路径。[Logo.dev 自托管许可](https://www.logo.dev/docs/platform/self-hosting)
++
++TradingView 暂不作为导入源。Brandfetch 免费 Logo CDN 不适合当前脚本下载到本地的方式。Finnhub 可在已有合适数据许可时辅助核对证券身份，但不能把免费行情账号视为素材再分发许可。下面说明证据与边界。
++
++## 来源比较
++
++| 来源 | 批量与身份匹配 | 覆盖与缺失 | 价格、密钥 | 本地保存条件与本轮决定 |
++| --- | --- | --- | --- | --- |
++| 公司官网声明图标 | 对显式 `website` 逐站执行；站点域名匹配，不提供 `exchange/ticker → website` 身份解析。`rel=icon` 与 Apple 图标声明有公开规范。[HTML](https://html.spec.whatwg.org/multipage/links.html#rel-icon)、[Apple](https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html) | 依赖站点提供可访问的合适格式；不能从有限样本推出任何市场覆盖率。图标可能代表产品、集团或区域网站，需要保留未审核状态。 | 没有统一供应商费用或密钥；具体站点可能要求认证或拒绝自动请求。遇到这些情况记录缺口，不绕过。 | 没有统一的再使用许可；各站点素材条件需分别遵守。技术规范不授予商标许可。本轮实现这一公开来源路径，保留来源与哈希，不把技术下载成功当品牌审核通过。 |
++| TradingView | 已核对的 Advanced Charts 文档要求**调用方提供** `logo_urls` 与 `exchange_logo`；这不是供应商 Logo 导出接口。[图表文档](https://www.tradingview.com/charting-library-docs/latest/ui_elements/Symbol-Search/) | 未找到支持外部批量下载 Logo 的公开接口、覆盖保证或 SLA。此结论限于本次公开文档调查，不表示不存在商务合作产品。 | 未找到可用于该用途的公开 API 定价和密钥流程；普通 TradingView 订阅不据此视为已授权。 | 不猜测或遍历 CDN 路径，不使用非公开扫描接口。使用条款没有为本任务给出通用 Logo 下载/再分发许可。[条款](https://www.tradingview.com/policies/) |
++| Logo.dev | 单域名/单证券图像请求；官方自托管页给出循环并发批量示例。支持域名、ticker、ISIN；ticker 可加交易所后缀，裸 ticker 默认搜索美国交易所。[ticker 文档](https://www.logo.dev/docs/logo-images/ticker)、[自托管](https://www.logo.dev/docs/platform/self-hosting) | 股票产品页声称 70,000+ 股票/ETF/基金及 60+ 交易所。未知 ticker 默认可返回占位图，须显式 `fallback=404` 识别缺失；不能以 HTTP 200 作为品牌匹配证明。[覆盖声明](https://www.logo.dev/products/stock-ticker-logos)、[错误处理](https://www.logo.dev/docs/platform/errors) | Community $0、500,000 图像请求/月；Pro 页面价 $150/月、5,000,000 图像请求/月，包含自托管；Enterprise 可协商文件交付。图像使用自有 `pk_` 密钥，REST JSON 使用 `sk_`。[价格](https://www.logo.dev/pricing)、[认证](https://www.logo.dev/docs/api-reference/introduction) | Pro / Enterprise / custom 在订阅有效期内可保存到自有基础设施；免费浏览器缓存不是脚本批量落盘许可。[缓存](https://www.logo.dev/docs/platform/caching)、[自托管](https://www.logo.dev/docs/platform/self-hosting) 本轮缺少密钥和许可，保留为后续候选。 |
++| Brandfetch | Logo API 有显式 `domain/`、`ticker/`、`isin/` 路由；每次一个标识符。官方称批量数据集可联系商务确认范围；未确认公开多条输入的批量下载端点。[Logo API](https://docs.brandfetch.com/logo-api/overview)、[产品/批量 FAQ](https://brandfetch.com/developers/products) | 定价页声称 50M+ 品牌。默认可能用 HTTP 200 返回替代图，需 `fallback/404`。品牌覆盖声明不保证每个市场证券与官网都正确映射。[价格/覆盖](https://brandfetch.com/developers/pricing)、[错误与缺失](https://docs.brandfetch.com/logo-api/overview#errors) | 每请求需自有 Client ID。定价主表列免费 1M Logo 请求/月与 100 次一次性 Brand fetch；Growth 展示 $99/月并标示年付条件。真实账单周期需接入时确认。[定价](https://brandfetch.com/developers/pricing) | Logo API 使用指南要求热链，禁止程序化抓取，缓存需 custom setup；不能用于当前免费脚本批量保存。Brand API 条款另有最长 30 天缓存并需重新调用续期。[使用指南](https://docs.brandfetch.com/logo-api/overview#usage-guidelines)、[条款](https://brandfetch.com/terms) |
++| Finnhub Company Profile 2 | `/stock/profile2` 按单个 symbol / ISIN / CUSIP 查询，返回 `ticker`、`exchange`、`weburl`、`logo`；已查 schema 未给出多 symbol 的 profile2 批量参数，需按条调度。[官方 API](https://finnhub.io/docs/api/company-profile2)、[官方 OpenAPI](https://github.com/Finnhub-Stock-API/finnhub-go/blob/master/api/openapi.yaml) | 产品提供全球证券数据，但本轮没有 profile2 Logo 完整率或逐市场免费权限的可靠验收结果；不能把企业套餐的“所有交易所”声明当免费 Logo 覆盖。[企业方案](https://api.finnhub.io/pricing-startups-and-enterprise) | profile2 文档称免费版本，所有 GET 均需 API key；除套餐限额外还有 30 次/秒上限。企业方案询价。本轮未从可读取官方价格页确认免费账户当前每分钟限额，配置不得依赖网上常见旧数字。[API 认证/限额](https://finnhub.io/docs/api)、[企业价格](https://api.finnhub.io/pricing-startups-and-enterprise) | 普通方案按条款限个人用途，向第三方共享数据/派生结果需书面批准，订阅结束需删除对应数据；一般条款未给出永久本地 Logo 素材库授权。[条款](https://finnhub.io/terms-of-service) 本轮不接入。 |
++
++## 会影响实现的核实结果
++
++### TradingView：展示能力与素材获取要分开
++
++TradingView 官方帮助页明确说当前没有供用户获取数据的 API，其 REST API 服务于券商接入；该表述针对数据访问，不能单凭它断言所有 Logo 合作渠道均不存在。更直接的证据是 Advanced Charts `SearchSymbolResultItem.logo_urls` 接收调用方的 URL，官方示例也是自有服务器路径。因此本轮结论是：**公开资料不足以建立受支持、可授权本地保存的批量 Logo 接口**，不把网页可见图标或可猜出的 CDN URL 当成可靠供应商。[API 帮助页](https://www.tradingview.com/support/solutions/43000474413-i-need-access-to-your-api-in-order-to-get-data-or-indicator-values/)、[SearchSymbolResultItem](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Datafeed.SearchSymbolResultItem/)
++
++### Brandfetch：官方缓存表述存在冲突
++
++查询时，定价 FAQ 写 Logo API 图像可按指南本地缓存；产品页却写 Logo API 不可存储；Logo API 使用指南进一步明确禁止程序化访问，并指出有效 Client ID 也不会豁免自动化流量检查。这是同一供应商公开页面之间的差异，不能以较宽泛的营销 FAQ 覆盖更具体的接口限制。本轮按使用指南处理，未来必须先取得适用于服务端下载和缓存的明确方案。[定价 FAQ](https://brandfetch.com/developers/pricing)、[产品页](https://brandfetch.com/developers/products)、[接口指南与 automated_traffic](https://docs.brandfetch.com/logo-api/overview#usage-guidelines)
++
++文档还列出每 IP 每 5 分钟 1,000 次、每客户每 5 分钟 2,400 次的吞吐限制。它们不构成脚本抓取授权。Brand API 的 30 天缓存条件属于另一个接口与合同问题，不能直接套用于免费 CDN。[Logo API 限额](https://docs.brandfetch.com/logo-api/overview#rate-limits)、[缓存条款](https://brandfetch.com/terms)
++
++### Logo.dev：有明确批量路径，但需套餐许可
++
++自托管指南直接给出按域名批量下载、保存字节并从自有 CDN/文件系统提供的示例；fair-use 指南将该用途限定为 Pro、Enterprise 或定制许可下的自有应用。浏览器默认 24 小时缓存不能替代这一许可。官方文档的批量示例是客户端编排多个请求，不是一次请求返回整个市场素材库。[自托管](https://www.logo.dev/docs/platform/self-hosting)、[fair use](https://www.logo.dev/docs/platform/fair-use)、[浏览器缓存](https://www.logo.dev/docs/platform/caching)
++
++供应商 ticker 格式需要独立、版本化映射：例如文档列 `.L`、`.T`、`.HK`、`.SS`、`.SZ`。不能直接去掉交易所后传裸 ticker，因为该接口会将裸 ticker 按美股解释。候选匹配仍需核对调用方 `website` 与实体；下载图片本身不能完成证券身份验证。官方允许报告错误 Logo，也说明错误/缺失是必须保留的状态。[ticker 规则](https://www.logo.dev/docs/logo-images/ticker)
++
++### 官网图标：当前输入契约的意义
++
++本轮实现不承担全球证券主数据解析。调用者提交 `entityId`、`exchange`、`ticker`、HTTPS `website` 和明确市场范围；程序能检查缺失、格式和同批冲突，但不能仅凭这些字段证明网站属于该上市实体。若调用方把错误官网填给了公司，页面返回有效图标仍可能语义误匹配。这类情况应进入人工核实，不能统计成“已审核 Logo”。
++
++采用域名作为现有注册表键时，只按已约定规则归一化 `www`；保留其他子域。多个证券共享集团官网可能是合法情况，但需要输入中明确的身份关系；不自动把子品牌、母公司、ADR 或地区站合并。`sourcePage`、`assetUrl`、`fetchedAt`、`sha256` 与 `kind` 应保留，原图下载成功仅更新 `official-site-icon`，不得覆盖 `reviewed-logo`。
++
++## 验收口径与后续接入
++
++真实小批次结果由对应运行报告记录，本供应商调查未调用需认证服务，也没有供应商 API 成功率数据。官网验证名单必须是显式、版本化测试输入；它既不是生产默认名单，也不是未指定市场范围的替代。报告分母包含所有提交记录，同时分开列出输入错误、技术获取失败、待人工核实、官网图标成功和已审核素材保留，避免用占位图或跳过项抬高成功率。
++
++优先后续动作：
++
++1. 完成无密钥官网路径的小批次验证，逐条保留缺失和失败原因；成功案例仍标为站点图标。
++2. 当市场范围确定后，使用该范围内冻结的公司清单验收身份匹配与覆盖，并审核代表性图标。
++3. 只有用户选择供应商并提供合适密钥/许可后，再实现对应适配器；Logo.dev 优先验证自托管订阅，Brandfetch 先解决服务端下载许可冲突，Finnhub 先确认使用与分发权。
++
++本轮没有部署、推送、付费、注册账号或写入外部服务；没有使用供应商文档中的演示密钥。方案选择不改变已有六家公司名单，不宣称覆盖全市场。
