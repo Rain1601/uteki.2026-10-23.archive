@@ -1,0 +1,900 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "从已登记的台积电 FY2023 官方年报任务目录自主选取三张合并财务报表（利润表、资产负债表、现金流量表），调用财务提取能力，补充营收、营业利润、经营现金流、购置不动产厂房设备现金支出和期末现金五类指标。使用原披露新台币和尺度，保留表内年度比较期间。单表不存在某指标时说明其他表待处理；每个批次只执行一次，候选不得当作已复核正式事实。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+      "company_ids": [
+        "sec-0001046179"
+      ],
+      "source_snapshot_ids": [
+        "source-6719837a8d24b2b7df359f29"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+    "company_ids": [
+      "sec-0001046179"
+    ],
+    "source_snapshot_ids": [
+      "source-6719837a8d24b2b7df359f29"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-04",
+    "include_candidates": true
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0001046179",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001046179",
+          "company_id": "sec-0001046179",
+          "source_snapshot_ids": [
+            "source-6719837a8d24b2b7df359f29"
+          ],
+          "accounting_bases": [],
+          "reported_dimensions": []
+        }
+      ],
+      "metrics": {},
+      "fiscal_periods": []
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "source-6719837a8d24b2b7df359f29",
+          "company_id": "sec-0001046179",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1046179/000119312524099840/d592628d20f.htm",
+          "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+          "document_id": "source-6719837a8d24b2b7df359f29",
+          "index_id": "didx-225c084ca00067b9",
+          "index_folder": "indexes/source-6719837a8d24b2b7df359f29",
+          "raw_file": "raw/source-6719837a8d24b2b7df359f29.html",
+          "raw_file_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+          "form": "20-F",
+          "period_end": "2023-12-31",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2024-04-18",
+          "status": "candidate",
+          "fiscal_periods": [],
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes",
+            "html_table_structure"
+          ],
+          "stage_coverage": {
+            "schema_version": "source-stage-coverage-v1",
+            "original": {
+              "status": "hash_verified",
+              "byte_count": 7294361,
+              "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1"
+            },
+            "reading": {
+              "status": "indexed",
+              "parser_version": "sec-source-blocks-v0.1.7",
+              "block_count": 1929,
+              "block_type_counts": {
+                "heading_candidate": 378,
+                "page_marker": 80,
+                "paragraph": 965,
+                "table": 506
+              },
+              "index_diagnostic_count": 1
+            },
+            "tables": {
+              "status": "structure_parsed",
+              "table_node_count": 506,
+              "tables_with_cells": 506,
+              "tables_without_cells": 0,
+              "cell_count": 67764,
+              "layout_role_counts": {
+                "table_of_contents": 1,
+                "unclassified": 505
+              },
+              "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+              "financial_table_semantics": "not_evaluated"
+            },
+            "numeric": {
+              "status": "no_supported_records",
+              "record_count": 0,
+              "evidence_count": 0,
+              "gap_count": 3163,
+              "adapter": "us-gaap-inline-v1",
+              "supported_taxonomy": "US_GAAP",
+              "supported_currencies": [
+                "USD"
+              ],
+              "supported_metric_ids": [
+                "capex_cash_payments",
+                "net_income",
+                "operating_cash_flow",
+                "operating_income",
+                "revenue",
+                "revenue_including_assessed_tax"
+              ],
+              "period_support": "complete_month_boundaries_only",
+              "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+              "financial_package_completeness": "not_evaluated",
+              "semantic_review": "not_evaluated",
+              "adoption": "candidate"
+            }
+          },
+          "image_block_count": 0
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 2252,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "complete",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 241,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+        "returned_count": 0,
+        "total_count": 0,
+        "bytes_returned": 2,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+        "returned_count": 0,
+        "total_count": 0,
+        "bytes_returned": 2,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "financial_extract",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+      "batch_index": 3,
+      "requirement_id": "req-fs-income",
+      "description": "执行已登记台积电 FY2023 官方年报任务目录中利润表批次 3 的财务提取：取得营收与营业利润，保持原披露新台币和尺度，保留 2021、2022、2023 年度比较。"
+    },
+    {
+      "kind": "financial_extract",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+      "batch_index": 0,
+      "requirement_id": "req-fs-balance-sheet-assets",
+      "description": "执行资产负债表批次 0 的财务提取：取得期末现金及现金等价物，保持原披露新台币和尺度，保留 2022、2023 年末比较。"
+    },
+    {
+      "kind": "financial_extract",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+      "batch_index": 9,
+      "requirement_id": "req-fs-cash-flow-operating",
+      "description": "执行现金流量表经营活动批次 9 的财务提取：取得经营活动产生的净现金，保持原披露新台币和尺度，保留 2021、2022、2023 年度比较。购置不动产厂房设备现金支出位于投资活动批次 10，本批次不含该指标，留待处理。"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "financial_extract",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+      "batch_index": 3,
+      "requirement_id": "req-fs-income",
+      "description": "执行已登记台积电 FY2023 官方年报任务目录中利润表批次 3 的财务提取：取得营收与营业利润，保持原披露新台币和尺度，保留 2021、2022、2023 年度比较。",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "financial_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "company_ids": [
+          "sec-0001046179"
+        ],
+        "source_snapshot_ids": [
+          "source-6719837a8d24b2b7df359f29"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "catalog_id": "table-batches-3f4e633e7e0eaaa44e1996fa",
+      "financial_source_id": "source-6719837a8d24b2b7df359f29"
+    },
+    {
+      "kind": "financial_extract",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+      "batch_index": 0,
+      "requirement_id": "req-fs-balance-sheet-assets",
+      "description": "执行资产负债表批次 0 的财务提取：取得期末现金及现金等价物，保持原披露新台币和尺度，保留 2022、2023 年末比较。",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "financial_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "company_ids": [
+          "sec-0001046179"
+        ],
+        "source_snapshot_ids": [
+          "source-6719837a8d24b2b7df359f29"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "catalog_id": "table-batches-3f4e633e7e0eaaa44e1996fa",
+      "financial_source_id": "source-6719837a8d24b2b7df359f29"
+    },
+    {
+      "kind": "financial_extract",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+      "batch_index": 9,
+      "requirement_id": "req-fs-cash-flow-operating",
+      "description": "执行现金流量表经营活动批次 9 的财务提取：取得经营活动产生的净现金，保持原披露新台币和尺度，保留 2021、2022、2023 年度比较。购置不动产厂房设备现金支出位于投资活动批次 10，本批次不含该指标，留待处理。",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "financial_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "company_ids": [
+          "sec-0001046179"
+        ],
+        "source_snapshot_ids": [
+          "source-6719837a8d24b2b7df359f29"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "catalog_id": "table-batches-3f4e633e7e0eaaa44e1996fa",
+      "financial_source_id": "source-6719837a8d24b2b7df359f29"
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-ae610a778ae31db94d9e42d846395c07",
+    "kind": "run_state",
+    "path": "artifacts/art-ae610a778ae31db94d9e42d846395c07.json",
+    "sha256": "8db68aa04ff93a48a6a90dcbf9fbcec31d30eaeb4022b17e9bb98e61ea54be00",
+    "size_bytes": 5018,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+      "company_ids": [
+        "sec-0001046179"
+      ],
+      "source_snapshot_ids": [
+        "source-6719837a8d24b2b7df359f29"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    },
+    "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+    "created_step": 3,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-a465b8e7ec54eb4bdeb9bb14e2ac3adb",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+    "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 0,
+    "total_count": 0,
+    "returned_count": 0,
+    "bytes_returned": 2,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "status": "planned",
+    "plan": {
+      "version": 1,
+      "requirements": [
+        {
+          "kind": "financial_extract",
+          "query": null,
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+          "batch_index": 3,
+          "requirement_id": "req-fs-income",
+          "description": "执行已登记台积电 FY2023 官方年报任务目录中利润表批次 3 的财务提取：取得营收与营业利润，保持原披露新台币和尺度，保留 2021、2022、2023 年度比较。"
+        },
+        {
+          "kind": "financial_extract",
+          "query": null,
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+          "batch_index": 0,
+          "requirement_id": "req-fs-balance-sheet-assets",
+          "description": "执行资产负债表批次 0 的财务提取：取得期末现金及现金等价物，保持原披露新台币和尺度，保留 2022、2023 年末比较。"
+        },
+        {
+          "kind": "financial_extract",
+          "query": null,
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": "tsmc-fy2023-five-metric-candidates",
+          "batch_index": 9,
+          "requirement_id": "req-fs-cash-flow-operating",
+          "description": "执行现金流量表经营活动批次 9 的财务提取：取得经营活动产生的净现金，保持原披露新台币和尺度，保留 2021、2022、2023 年度比较。购置不动产厂房设备现金支出位于投资活动批次 10，本批次不含该指标，留待处理。"
+        }
+      ],
+      "reason": "依据财务任务目录 source_excerpt 选择三张合并财务报表相关批次：批次 3 对应利润表（营收、营业利润），批次 0 对应资产负债表资产部分（期末现金及现金等价物），批次 9 对应现金流量表经营部分（经营现金流）。每个批次只规划执行一次；投资活动中的购置不动产厂房设备支出在批次 10，视后续执行限制处理。提取结果为候选，不可当作已复核正式事实。",
+      "origin": "model",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "sha256": "8f5f4c466104f9d881e73a735a78a08120651abb74f71db535362c27db6de0fa"
+    },
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 2,
+      "action": "plan",
+      "requirement_ids": [],
+      "request_fingerprint": "b766e9f367e2a69772df9abcbadbfae89aa8222af24dd034c55517952591f651",
+      "status": "planned",
+      "error_code": null,
+      "layer": "runtime",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 2221,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-77cd531576a71776be4339cc394d37be",
+      "kind": "tool_output",
+      "path": "artifacts/art-77cd531576a71776be4339cc394d37be.json",
+      "sha256": "1a2b21cd69e4b677e46c0433add404f9a501ec3e275e06fc0c2d5da2df291cc4",
+      "size_bytes": 2520,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "company_ids": [
+          "sec-0001046179"
+        ],
+        "source_snapshot_ids": [
+          "source-6719837a8d24b2b7df359f29"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+      "created_step": 2,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2",
+    "content": "---\nname: data-agent-query\nversion: 7\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nUse kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.\n\nAn answer must declare model_claimed_coverage, coverage_note and unresolved_questions. partial requires concrete unresolved questions; claimed_complete requires none but remains a model judgment. The host validates references, never semantic completeness. No answer prevents finish unless an explicit gap is recorded; a partial answer seals a partial result. research_answers persists bounded candidate answers and artifact pointers across later reading. Revising an answer preserves old versions; changing only statement or label is not new evidence. Worker answers are untrusted candidates and do not satisfy the parent's requirements.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nWhen available_financial_extract is true, inspect the host's financial_tasks catalog. Each task fixes the company, source, frozen selection, method policy and available table batches. Use source_excerpt to select the pending batch relevant to the user's request; excerpts are navigation, not body-reading receipts. The financial_task_catalog artifact retains the full initial catalog. This task reuses its explicitly registered selection; it does not establish whole-filing recall.\n\nPlan a separate kind=financial_extract requirement with financial_task_id and batch_index. Execute action=financial_extract with financial_extraction={task_id,batch_index,method_id?}, referencing exactly that requirement. Omit method_id to select the task default, or choose only an allowed_method_ids entry. The execution host loads that method's versioned Skill and Prompt before extracting; do not send paths, jobs, financial answers, period replacements or model settings. Respect max_new_batches. Successful batches show candidate status and their receipt; do not rerun them merely to repeat a completed task.\n\nA candidate_financial_extraction receipt means a separate candidate dataset was generated. It does not update the active query baseline, satisfy a numeric query, prove source body was delivered to you, or approve financial semantics. Check returned raw/normalized counts and gaps; zero normalized records and unresolved drafts remain visible limitations. Only the matching task/catalog/batch receipt can complete its financial_extract requirement. Failed or unavailable execution requires an explicit gap. A run containing only these completed requirements ends candidate_ready; all outputs still need independent review and adoption.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": false,
+  "available_financial_extract": true,
+  "financial_tasks": [
+    {
+      "task_id": "tsmc-fy2023-five-metric-candidates",
+      "task_type": "annual_financial_extraction",
+      "company_id": "sec-0001046179",
+      "source_snapshot_id": "source-6719837a8d24b2b7df359f29",
+      "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+      "dataset_manifest_sha256": "6874d0d218d60861be1b6a66d09975e19248973035fbc00379febea28e7a30f3",
+      "catalog_id": "table-batches-3f4e633e7e0eaaa44e1996fa",
+      "task": "Find the original consolidated financial statements for FY2023 and extract reported revenue, operating income, operating cash flow, cash purchases of property plant and equipment, and ending cash and cash equivalents. Retain all presented annual comparative periods. Prioritize complete original consolidated financial-statement tables over rounded management summaries. Preserve reporting currency, scale, signed cash outflows and source period contexts. Do not substitute net investing cash flow or capital expenditure guidance for cash PP&E purchases. Use the explicitly selected reporting currency TWD. Preserve source scale, signed numeral and all presented annual comparatives. Candidates require independent source review.",
+      "default_method_id": "annual-financial-v2",
+      "allowed_method_ids": [
+        "annual-financial-v2"
+      ],
+      "max_new_batches": 3,
+      "batches": [
+        {
+          "batch_index": 0,
+          "table_block_id": "block-001124-d8a3ba3f",
+          "source_excerpt": "Notes December 31, 2022 December 31, 2023 NT$ NT$ US$ (Note 3) ASSETS CURRENT ASSETS Cash and cash equivalents 7 $ 1,342,814.1 $ 1,465,427.8 $ 47,858.5 Financial assets at fair value through profit or loss 8 1,070.4 924.6 30.2 Financial assets at fair value through other comprehensive income 9 122,998.5 154,530.8 5,046.7 Financial assets at amortized cost 10 94,600.2 66,761.2 2,180.3 Hedging financial assets 11 2.3 - - Notes and accounts receivable, net 12 229,755.9 201,313.9 6,574.6 Receivables from related parties 34 1,584.0 624.4 20.4 Other receivables from related parties 34 69.0 71.9 2.3 ",
+          "block_ids": [
+            "block-001122-e478aee6",
+            "block-001123-de1719a9",
+            "block-001124-d8a3ba3f",
+            "block-001125-2ea6a4cb",
+            "block-001126-334c9693"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 1,
+          "table_block_id": "block-001131-d0a29222",
+          "source_excerpt": "Notes December 31, 2022 December 31, 2023 NT$ NT$ US$ (Note 3) LIABILITIES AND EQUITY CURRENT LIABILITIES Financial liabilities at fair value through profit or loss 8 $ 116.2 $ 121.4 $ 4.0 Hedging financial liabilities 11, 31 0.8 27,334.2 892.7 Accounts payable 54,879.7 55,726.8 1,819.9 Payables to related parties 34 1,642.6 1,566.3 51.2 Salary and bonus payable 36,435.5 33,200.6 1,084.3 Accrued profit sharing bonus to employees and compensation to directors 29 61,748.6 50,716.9 1,656.3 Payables to contractors and equipment suppliers 213,499.6 171,484.6 5,600.4 Cash dividends payable 21 142,61",
+          "block_ids": [
+            "block-001129-e478aee6",
+            "block-001130-de1719a9",
+            "block-001131-d0a29222",
+            "block-001133-f74ec14f"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 2,
+          "table_block_id": "block-001132-22f82555",
+          "source_excerpt": "The accompanying notes are an integral part of the consolidated financial statements. (Concluded)",
+          "block_ids": [
+            "block-001130-de1719a9",
+            "block-001132-22f82555",
+            "block-001133-f74ec14f"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 3,
+          "table_block_id": "block-001138-1c870547",
+          "source_excerpt": "Notes 2021 2022 2023 NT$ NT$ NT$ US$ (Note 3) NET REVENUE 6, 22, 34, 37 $ 1,587,415.0 $ 2,263,891.3 $ 2,161,735.8 $ 70,598.8 COST OF REVENUE 6, 13, 29, 34 767,877.7 915,536.5 986,625.2 32,221.6 GROSS PROFIT 819,537.3 1,348,354.8 1,175,110.6 38,377.2 OPERATING EXPENSES 6, 29, 34 Research and development 124,734.8 163,262.2 182,370.2 5,955.9 General and administrative 36,929.6 53,524.8 60,872.8 1,988.0 Marketing 7,558.6 9,920.5 10,590.7 345.9 Total operating expenses 169,223.0 226,707.5 253,833.7 8,289.8 OTHER OPERATING INCOME AND EXPENSES, NET 15, 29 (333.4 ) (368.4 ) 188.7 6.2 INCOME FROM OPER",
+          "block_ids": [
+            "block-001136-f380a3a9",
+            "block-001137-50559005",
+            "block-001138-1c870547",
+            "block-001139-2ea6a4cb",
+            "block-001140-33ee14aa"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 4,
+          "table_block_id": "block-001145-1a58ef31",
+          "source_excerpt": "Notes 2021 2022 2023 NT$ NT$ NT$ US$ (Note 3) Gain (loss) on hedging instruments $ 131.6 $ 1,329.2 $ (74.7 ) $ (2.4 ) Share of other comprehensive income (loss) of associates (120.0 ) 550.3 63.9 2.1 Income tax benefit (expense) related to items that may be reclassified subsequently (3.4 ) 6.0 - - (9,605.4 ) 42,628.4 (10,352.0 ) (338.0 ) Other comprehensive income (loss) , net of income tax (7,619.4 ) 42,430.1 (8,813.7 ) (287.8 ) TOTAL COMPREHENSIVE INCOME $ 585,261.2 $ 1,035,724.8 $ 842,214.0 $ 27,505.4 NET INCOME (LOSS) ATTRIBUTABLE TO: Shareholders of the parent $ 592,359.2 $ 992,923.4 $ 851",
+          "block_ids": [
+            "block-001143-f380a3a9",
+            "block-001144-50559005",
+            "block-001145-1a58ef31",
+            "block-001147-330b3758"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 5,
+          "table_block_id": "block-001146-22f82555",
+          "source_excerpt": "The accompanying notes are an integral part of the consolidated financial statements. (Concluded)",
+          "block_ids": [
+            "block-001144-50559005",
+            "block-001146-22f82555",
+            "block-001147-330b3758"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 6,
+          "table_block_id": "block-001152-0b221056",
+          "source_excerpt": "Equity Attributable to Shareholders of the Parent Others Capital Stock - Common Stock Capital Surplus Retained Earnings Foreign Currency Translation Reserve Unrealized Gain (Loss) on Financial Assets at Fair Value Through Other Comprehensive Income Gain (Loss) on Hedging Instruments Unearned Stock-Based Employee Compensation Shares (In Millions) Amount Legal Capital Reserve Special Capital Reserve Unappropriated Earnings Total Total Treasury Stock Total Non-controlling Interests Total Equity BALANCE, JANUARY 1, 2021 25,930.3 $ 259,303.8 $ 56,347.2 $ 311,147.0 $ 42,259.1 $ 1,220,434.0 $ 1,573,8",
+          "block_ids": [
+            "block-001150-022dd0d6",
+            "block-001151-a3c943f1",
+            "block-001152-0b221056",
+            "block-001153-2ea6a4cb",
+            "block-001154-4076d849"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 7,
+          "table_block_id": "block-001159-6ea6b336",
+          "source_excerpt": "Equity Attributable to Shareholders of the Parent Others Capital Stock - Common Stock Capital Surplus Retained Earnings Foreign Currency Translation Reserve Unrealized Gain (Loss) on Financial Assets at Fair Value Through Other Comprehensive Income Gain (Loss) on Hedging Instruments Unearned Stock-Based Employee Compensation Shares (In Millions) Amount Legal Capital Reserve Special Capital Reserve Unappropriated Earnings Total Total Treasury Stock Total Non-controlling Interests Total Equity Appropriations of earnings Special capital reserve - $ - $ - $ - $ (3,154.3 ) $ 3,154.3 $ - $ - $ - $ -",
+          "block_ids": [
+            "block-001157-022dd0d6",
+            "block-001158-a3c943f1",
+            "block-001159-6ea6b336",
+            "block-001161-f171bb0a"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 8,
+          "table_block_id": "block-001160-22f82555",
+          "source_excerpt": "The accompanying notes are an integral part of the consolidated financial statements. (Concluded)",
+          "block_ids": [
+            "block-001158-a3c943f1",
+            "block-001160-22f82555",
+            "block-001161-f171bb0a"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 9,
+          "table_block_id": "block-001166-04f27bf6",
+          "source_excerpt": "2021 2022 2023 NT$ NT$ NT$ US$ (Note 3) CASH FLOWS FROM OPERATING ACTIVITIES Income before income tax $ 663,036.0 $ 1,144,072.2 $ 979,316.5 $ 31,982.9 Adjustments for: Depreciation expense 414,187.7 428,498.2 522,932.7 17,078.1 Amortization expense 8,207.2 8,756.1 9,258.2 302.4 Expected credit losses recognized (reversal) on investments in debt instruments (2.7 ) 52.4 35.7 1.2 Finance costs 5,414.2 11,750.0 11,999.4 391.9 Share of profits of associates (5,512.7 ) (7,679.8 ) (4,800.2 ) (156.8 ) Interest income (5,708.8 ) (22,422.2 ) (60,293.9 ) (1,969.1 ) Share-based compensation 7.8 302.4 483.",
+          "block_ids": [
+            "block-001164-76355f56",
+            "block-001165-de1719a9",
+            "block-001166-04f27bf6",
+            "block-001167-2ea6a4cb",
+            "block-001168-6501d17f"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 10,
+          "table_block_id": "block-001173-c0043817",
+          "source_excerpt": "2021 2022 2023 NT$ NT$ NT$ US$ (Note 3) CASH FLOWS FROM INVESTING ACTIVITIES Acquisitions of: Financial instruments at fair value through profit or loss $ - $ (125.5 ) $ (14,142.1 ) $ (461.8 ) Financial assets at fair value through other comprehensive income (255,888.7 ) (54,566.7 ) (62,752.0 ) (2,049.4 ) Financial assets at amortized cost (3,799.7 ) (183,125.9 ) (149,387.9 ) (4,878.8 ) Property, plant and equipment (839,195.7 ) (1,082,672.1 ) (949,816.8 ) (31,019.5 ) Intangible assets (9,040.7 ) (6,954.3 ) (5,518.4 ) (180.2 ) Proceeds from disposal or redemption of: Financial assets at fair v",
+          "block_ids": [
+            "block-001171-76355f56",
+            "block-001172-de1719a9",
+            "block-001173-c0043817",
+            "block-001174-2ea6a4cb",
+            "block-001175-5be4846e"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 11,
+          "table_block_id": "block-001180-43d87acf",
+          "source_excerpt": "2021 2022 2023 NT$ NT$ NT$ US$ (Note 3) Disposal of ownership interests in subsidiaries (without losing control) $ 9,451.8 $ - $ - $ - Donation from shareholders 11.3 13.2 16.5 0.6 Increase (decrease) in non-controlling interests (115.0 ) 16,263.6 11,048.8 360.8 Net cash generated by (used in) financing activities 136,608.5 (200,244.0 ) (204,894.2 ) (6,691.5 ) EFFECT OF EXCHANGE RATE CHANGES ON CASH AND CASH EQUIVALENTS (7,583.8 ) 58,397.0 (8,338.8 ) (272.4 ) NET INCREASE IN CASH AND CASH EQUIVALENTS 404,819.6 277,823.9 122,613.7 4,004.3 CASH AND CASH EQUIVALENTS, BEGINNING OF YEAR 660,170.6 1",
+          "block_ids": [
+            "block-001178-76355f56",
+            "block-001179-de1719a9",
+            "block-001180-43d87acf",
+            "block-001182-4f2c29b5"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 12,
+          "table_block_id": "block-001181-22f82555",
+          "source_excerpt": "The accompanying notes are an integral part of the consolidated financial statements. (Concluded)",
+          "block_ids": [
+            "block-001179-de1719a9",
+            "block-001181-22f82555",
+            "block-001182-4f2c29b5"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 13,
+          "table_block_id": "block-001190-ad55b959",
+          "source_excerpt": "2. THE AUTHORIZATION OF FINANCIAL STATEMENTS",
+          "block_ids": [
+            "block-001190-ad55b959",
+            "block-001191-6b3a365e"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 14,
+          "table_block_id": "block-001192-22f46473",
+          "source_excerpt": "3. U.S. DOLLAR AMOUNTS",
+          "block_ids": [
+            "block-001191-6b3a365e",
+            "block-001192-22f46473",
+            "block-001193-8d646e4a"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 15,
+          "table_block_id": "block-001194-c73c2975",
+          "source_excerpt": "4. APPLICATION OF NEW AND REVISED INTERNATIONAL FINANCIAL REPORTING STANDARDS (IFRS), INTERNATIONAL ACCOUNTING STANDARDS (IAS), IFRIC INTERPRETATIONS (IFRIC), AND SIC INTERPRETATIONS (SIC) ISSUED BY THE INTERNATIONAL ACCOUNTING STANDARDS BOARD (IASB) (collectively, “IFRS Accounting Standards”)",
+          "block_ids": [
+            "block-001193-8d646e4a",
+            "block-001194-c73c2975"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 16,
+          "table_block_id": "block-001195-d41e9941",
+          "source_excerpt": "a. Amendments to IFRS Accounting Standards and the new interpretation that are mandatorily effective for the current year",
+          "block_ids": [
+            "block-001193-8d646e4a",
+            "block-001195-d41e9941"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 17,
+          "table_block_id": "block-001416-7c2c0d7a",
+          "source_excerpt": "7. CASH AND CASH EQUIVALENTS",
+          "block_ids": [
+            "block-001414-a9e458be",
+            "block-001415-a9360e02",
+            "block-001416-7c2c0d7a",
+            "block-001418-28d2679c"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 18,
+          "table_block_id": "block-001417-cf7f54a7",
+          "source_excerpt": "December 31, 2022 December 31, 2023 NT$ NT$ (In Millions) (In Millions) Cash and deposits in banks $ 1,329,291.4 $ 1,453,101.6 Money market funds - 10,898.7 Repurchase agreements 1,133.3 1,346.7 Government bonds/Agency bonds 2,451.6 50.8 Commercial paper 9,566.4 30.0 Corporate bonds 371.4 - $ 1,342,814.1 $ 1,465,427.8",
+          "block_ids": [
+            "block-001415-a9360e02",
+            "block-001417-cf7f54a7",
+            "block-001418-28d2679c"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 19,
+          "table_block_id": "block-001419-905da5b4",
+          "source_excerpt": "8. FINANCIAL ASSETS AND LIABILITIES AT FAIR VALUE THROUGH PROFIT OR LOSS",
+          "block_ids": [
+            "block-001418-28d2679c",
+            "block-001419-905da5b4"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 20,
+          "table_block_id": "block-001531-2bc4be3b",
+          "source_excerpt": "18. BONDS PAYABLE",
+          "block_ids": [
+            "block-001529-423551fb",
+            "block-001530-88ccb186",
+            "block-001531-2bc4be3b",
+            "block-001533-8b4415d4"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 21,
+          "table_block_id": "block-001532-350ebac3",
+          "source_excerpt": "December 31, 2022 December 31, 2023 NT$ NT$ (In Millions) (In Millions) Domestic unsecured bonds $ 379,526.0 $ 447,194.0 Overseas unsecured bonds 476,051.5 476,578.5 Less: Discounts on bonds payable (3,141.1 ) (2,875.0 ) Less: Current portion (18,100.0 ) (6,997.7 ) $ 834,336.4 $ 913,899.8",
+          "block_ids": [
+            "block-001530-88ccb186",
+            "block-001532-350ebac3",
+            "block-001533-8b4415d4"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 22,
+          "table_block_id": "block-001534-e0506a33",
+          "source_excerpt": "Issuance Tranche Issuance Period Total Amount NT$(In Millions) Coupon Rate Repayment and Interest Payment NT$ unsecured bonds 101-3 - October 2012 to October 2022 $ 4,400.0 1.53% Bullet repayment; interest payable annually 101-4 C January 2013 to January 2023 3,000.0 1.49% The same as above 102-1 C February 2013 to February 2023 3,600.0 1.50% The same as above 102-2 B July 2013 to July 2023 3,500.0 1.70% The same as above 102-4 E September 2013 to March 2023 5,400.0 2.05% The same as above F September 2013 to September 2023 2,600.0 2.10% The same as above 109-1 A March 2020 to March 2025 3,000",
+          "block_ids": [
+            "block-001533-8b4415d4",
+            "block-001534-e0506a33"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 23,
+          "table_block_id": "block-001557-a36dda66",
+          "source_excerpt": "19. LONG-TERM BANK LOANS",
+          "block_ids": [
+            "block-001555-3d9bc0d2",
+            "block-001556-a9360e02",
+            "block-001557-a36dda66",
+            "block-001559-1df963fb"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 24,
+          "table_block_id": "block-001558-26aa3889",
+          "source_excerpt": "December 31, 2022 December 31, 2023 NT$(In Millions) NT$(In Millions) Unsecured loans $ 6,013.3 $ 6,706.4 Less: Discounts on government grants (39.4 ) (27.8 ) Less: Current portion (1,213.9 ) (2,295.6 ) $ 4,760.0 $ 4,383.0 Loan content Annual interest rate 1.03%-1.23% 1.15%-1.35% Maturity date Due by December 2027 Due by December 2027",
+          "block_ids": [
+            "block-001556-a9360e02",
+            "block-001558-26aa3889",
+            "block-001559-1df963fb"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 25,
+          "table_block_id": "block-001560-2cbbfd69",
+          "source_excerpt": "20. RETIREMENT BENEFIT PLANS",
+          "block_ids": [
+            "block-001559-1df963fb",
+            "block-001560-2cbbfd69"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 26,
+          "table_block_id": "block-001596-fcac3858",
+          "source_excerpt": "21. EQUITY",
+          "block_ids": [
+            "block-001594-3b64fce9",
+            "block-001595-a9360e02",
+            "block-001596-fcac3858"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 27,
+          "table_block_id": "block-001597-e1d7f80c",
+          "source_excerpt": "a. Capital stock",
+          "block_ids": [
+            "block-001595-a9360e02",
+            "block-001597-e1d7f80c",
+            "block-001599-edfbc85e"
+          ],
+          "status": "pending"
+        },
+        {
+          "batch_index": 28,
+          "table_block_id": "block-001598-fb15289d",
+          "source_excerpt": "December 31, 2022 December 31, 2023 NT$ NT$ (In Millions) (In Millions) Authorized shares (in millions) 28,050.0 28,050.0 Authorized capital $ 280,500.0 $ 280,500.0 Issued and paid shares (in millions) 25,930.3 25,932.1 Issued capital $ 259,303.8 $ 259,320.7",
+          "block_ids": [
+            "block-001598-fb15289d",
+            "block-001599-edfbc85e",
+            "block-001600-a4303e29"
+          ],
+          "status": "pending"
+        }
+      ],
+      "limits": [
+        "Neighbor selection does not establish sufficient headers or notes.",
+        "Unassigned prose and unselected source blocks remain outside completed batch coverage.",
+        "Returned candidates do not establish financial-package completeness or semantic acceptance."
+      ]
+    }
+  ],
+  "financial_task_catalog": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-229cf79d1dc537aa0f8c58bd16d25f2c",
+    "kind": "financial_task_catalog",
+    "path": "artifacts/art-229cf79d1dc537aa0f8c58bd16d25f2c.json",
+    "sha256": "cd418213b54fb6ff6d00c6bff39f6390337a8f2189cb3dbbd47522dca48aebf3",
+    "size_bytes": 19462,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+      "company_ids": [
+        "sec-0001046179"
+      ],
+      "source_snapshot_ids": [
+        "source-6719837a8d24b2b7df359f29"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    },
+    "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+    "created_step": 0,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req-fs-income",
+        "reason": "evidence_or_explicit_gap_required"
+      },
+      {
+        "requirement_id": "req-fs-income",
+        "reason": "candidate_financial_batch_missing"
+      },
+      {
+        "requirement_id": "req-fs-balance-sheet-assets",
+        "reason": "evidence_or_explicit_gap_required"
+      },
+      {
+        "requirement_id": "req-fs-balance-sheet-assets",
+        "reason": "candidate_financial_batch_missing"
+      },
+      {
+        "requirement_id": "req-fs-cash-flow-operating",
+        "reason": "evidence_or_explicit_gap_required"
+      },
+      {
+        "requirement_id": "req-fs-cash-flow-operating",
+        "reason": "candidate_financial_batch_missing"
+      }
+    ],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [],
+    "omitted_count": 0,
+    "byte_limit": 12000
+  },
+  "source_leads": [],
+  "source_lead_count": 0,
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 1,
+      "action": "load_skill",
+      "status": "skill_loaded"
+    },
+    {
+      "step": 2,
+      "action": "plan",
+      "status": "planned"
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 14
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": "record-review-model-config-v1",
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "prompt": "你是 Uteki 数据处理方法的设计者。请独立回答提供的问题，专业、具体、可实施，允许提出比任务描述更好的建议。提供的背景用于确定产品边界，不是财报原始证据。不要声称已读取链接、已提取年报或已完成系统实现。不要编造公司数值。你没有拿到另一位参与者的答案。请用中文在 answer_markdown 中给出完整方案，并列出尚未确定的问题。只返回符合给定 schema 的 JSON。",
+  "prompt_sha256": "0da21226c2a0f2d0e782e721fef7ca8903ba0861c7dd766f60f3807c9038de23",
+  "input_format": "packet_json_v1",
+  "output_schema": {
+    "properties": {
+      "answer_markdown": {
+        "title": "Answer Markdown",
+        "type": "string"
+      },
+      "uncertainties": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Uncertainties",
+        "type": "array"
+      }
+    },
+    "required": [
+      "answer_markdown",
+      "uncertainties"
+    ],
+    "title": "Proposal",
+    "type": "object"
+  },
+  "strict_provider_schema": false,
+  "business_validation": "caller_responsibility",
+  "pricing_snapshot": {
+    "provider": "deepseek",
+    "model": "deepseek-v4-pro",
+    "currency": "USD",
+    "input_per_million": "1.32",
+    "output_per_million": "3.96",
+    "cached_input_per_million": "0.044",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing",
+    "checked_on": "2026-09-22",
+    "basis": "Peak list price estimate; no cache or off-peak discounts applied"
+  },
+  "max_tokens": 16384,
+  "request_timeout": 300,
+  "max_retries": 0,
+  "max_request_bytes": 2500000,
+  "reasoning_effort": "high",
+  "thinking_mode": "enabled",
+  "provider_sdk_retries": 0,
+  "max_requests_total": null,
+  "budget_ledger": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/costs/shared.sqlite",
+  "budget_policy": "record_only",
+  "credential_origin": "local_env_file",
+  "budget_at_start": {
+    "limit_usd": null,
+    "estimated_spent_usd": "1.90092492",
+    "held_usd": "0.86635428",
+    "unknown_requests": 2,
+    "in_flight_requests": 0,
+    "requests": 46,
+    "actual_billed_usd": null,
+    "enforcement": "record_only"
+  }
+}

@@ -25,6 +25,7 @@ from uteki.infrastructure.document_sources.sec import normalize_text, text_hash
 
 SCHEMA_VERSION = "document-index-v0.1"
 PARSER_VERSION = "sec-source-blocks-v0.1.1"
+_VISIBLE_PARSERS = {'sec-source-blocks-v0.1.6', 'sec-source-blocks-v0.1.7'}
 _PART_RE = re.compile(r"^PART\s+([IVX]+)(?:[.\s—–:-]+(?:FINANCIAL INFORMATION|OTHER INFORMATION))?\.?$", re.IGNORECASE)
 _ITEM_RE = re.compile(r"^ITEM\s+(\d+[A-Z]?)\.?\s*(.*)$", re.IGNORECASE)
 _STRUCTURAL_ANCHOR_RE = re.compile(r"^i[a-f0-9]{16,}_\d+$", re.IGNORECASE)
@@ -45,6 +46,28 @@ def _tag(element: etree._Element) -> str:
     return str(element.tag).lower() if isinstance(element.tag, str) else ""
 
 
+def _hidden(element):
+    for node in (element, *element.iterancestors()):
+        tag = _tag(node)
+        if tag == 'ix:hidden' or 'hidden' in node.attrib or re.search(
+                r'(?:^|;)\s*display\s*:\s*none\s*(?:!important\s*)?(?:;|$)',
+                node.get('style', ''), re.I):
+            return True
+    return False
+
+
+def _visible_text(element):
+    """Read visible text without removing DOM nodes or changing source paths."""
+    if _hidden(element) or _tag(element) in {'script', 'style', 'noscript'}:
+        return ''
+    pieces = [element.text or '']
+    for child in element:
+        if _tag(child):
+            pieces.append(_visible_text(child))
+        pieces.append(child.tail or '')
+    return ''.join(pieces)
+
+
 def _style_values(element: etree._Element) -> tuple[tuple[str, str], ...]:
     values: dict[str, str] = {}
     styled = [element, *element.xpath(".//*[@style]")[:3]]
@@ -58,14 +81,25 @@ def _style_values(element: etree._Element) -> tuple[tuple[str, str], ...]:
     return tuple(sorted(values.items()))
 
 
-def _table_structure(table: etree._Element) -> TableStructure:
+def _table_rows(table, *, nearest_table=False):
+    if nearest_table:
+        return [row for row in table.xpath('.//tr') if next(row.iterancestors('table'), None) is table]
+    # Historical parser versions retain their frozen row-selection semantics.
+    return table.xpath('.//tr[not(ancestor::table[2])]')
+
+
+def _table_structure(table: etree._Element, *, visible_only=False, nearest_table=False) -> TableStructure:
     cells: list[TableCell] = []
     occupied: set[tuple[int, int]] = set()
     max_column = 0
-    rows = table.xpath(".//tr[not(ancestor::table[2])]")
+    rows = _table_rows(table, nearest_table=nearest_table)
+    if visible_only:
+        rows = [row for row in rows if not _hidden(row)]
     for row_number, row in enumerate(rows):
         column = 0
         for cell in row.xpath("./th|./td"):
+            if visible_only and _hidden(cell):
+                continue
             while (row_number, column) in occupied:
                 column += 1
             try:
@@ -78,7 +112,7 @@ def _table_structure(table: etree._Element) -> TableStructure:
                 colspan = 1
             cells.append(
                 TableCell(
-                    text=normalize_text(cell.text_content()),
+                    text=normalize_text(_visible_text(cell) if visible_only else cell.text_content()),
                     row=row_number,
                     column=column,
                     rowspan=rowspan,
@@ -94,19 +128,19 @@ def _table_structure(table: etree._Element) -> TableStructure:
     return TableStructure(row_count=len(rows), column_count=max_column, cells=tuple(cells))
 
 
-def _toc_table(root: etree._Element) -> etree._Element | None:
+def _toc_table(root: etree._Element, *, nearest_table=False) -> etree._Element | None:
     scored: list[tuple[int, etree._Element]] = []
     for table in root.xpath("//table"):
         count = sum(
             bool(_ITEM_RE.match(normalize_text(row.text_content())))
-            for row in table.xpath(".//tr[not(ancestor::table[2])]")
+            for row in _table_rows(table, nearest_table=nearest_table)
         )
         if count:
             scored.append((count, table))
     return max(scored, key=lambda item: item[0])[1] if scored else None
 
 
-def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_link_roles=False) -> tuple[tuple[TocEntry, ...], tuple[IndexDiagnostic, ...]]:
+def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_link_roles=False, nearest_table=False) -> tuple[tuple[TocEntry, ...], tuple[IndexDiagnostic, ...]]:
     if table is None:
         return (), (
             IndexDiagnostic("toc_missing", "warning", "No Part/Item table of contents was detected; body headings will be used."),
@@ -115,7 +149,7 @@ def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_lin
     diagnostics: list[IndexDiagnostic] = []
     seen_items: set[tuple[str, str]] = set()
     current_part = ""
-    for row_number, row in enumerate(table.xpath(".//tr[not(ancestor::table[2])]") , start=1):
+    for row_number, row in enumerate(_table_rows(table, nearest_table=nearest_table), start=1):
         cell_text = [normalize_text(cell.text_content()) for cell in row.xpath("./th|./td")]
         row_text = normalize_text(row.text_content())
         part_match = _PART_RE.match(next((value for value in cell_text if value), row_text))
@@ -183,6 +217,10 @@ def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_lin
 def _candidate_elements(body: etree._Element) -> list[etree._Element]:
     candidates: list[etree._Element] = []
     for child in body:
+        # Comments and processing instructions are DOM nodes, but not content
+        # elements accepted by lxml's text_content(). Keep the source DOM intact.
+        if not _tag(child):
+            continue
         tables = child.xpath(".//table") if _tag(child) != "table" else [child]
         images = child.xpath(".//img") if _tag(child) != "img" else [child]
         if tables or images:
@@ -196,7 +234,7 @@ def _candidate_elements(body: etree._Element) -> list[etree._Element]:
     return sorted(unique.values(), key=lambda element: positions[id(element)])
 
 
-def _nested_candidate_elements(body: etree._Element) -> list[etree._Element]:
+def _nested_candidate_elements(body: etree._Element, *, visible_only=False, preserve_nested_assets=False) -> list[etree._Element]:
     """Unwrap layout/XBRL containers, retaining paragraph-level inline markup.
 
     Tables remain atomic. Mixed direct text is kept intact rather than dropped.
@@ -208,20 +246,24 @@ def _nested_candidate_elements(body: etree._Element) -> list[etree._Element]:
 
     def walk(element):
         tag = _tag(element)
-        if not tag or tag in {'script', 'style', 'noscript'}:
+        if not tag or tag in {'script', 'style', 'noscript'} or (visible_only and _hidden(element)):
             return
         if tag in {'table', 'img'}:
             result.append(element)
             # Nested table/image assets also have their own source identities.
-            result.extend(element.xpath('.//table|.//img'))
+            result.extend(e for e in element.xpath('.//table|.//img') if not visible_only or not _hidden(e))
             return
         has_blocks = any(_tag(child) in boundaries for child in element.iterdescendants())
         direct_text = normalize_text(element.text or '') or any(normalize_text(c.tail or '') for c in element)
         if has_blocks and not direct_text:
             for child in element:
                 walk(child)
-        elif normalize_text(element.text_content()):
+        elif normalize_text(_visible_text(element) if visible_only else element.text_content()):
             result.append(element)
+            if preserve_nested_assets:
+                # Keep mixed prose intact, while also giving descendant assets
+                # their own DOM-bound blocks. Older versions keep atomic prose.
+                result.extend(e for e in element.xpath('.//table|.//img') if not visible_only or not _hidden(e))
 
     for child in body:
         walk(child)
@@ -283,10 +325,13 @@ def parse_sec_source(
     tree = root.getroottree()
     all_elements = list(body.iter())
     positions = {id(element): index for index, element in enumerate(all_elements)}
-    nested = parser_version in {"sec-source-blocks-v0.1.4-quarterly", "sec-source-blocks-v0.1.5"}
-    candidates = _nested_candidate_elements(body) if nested else _candidate_elements(body)
+    visible_only = parser_version in _VISIBLE_PARSERS
+    nearest_table = parser_version == 'sec-source-blocks-v0.1.7'
+    nested = visible_only or parser_version in {"sec-source-blocks-v0.1.4-quarterly", "sec-source-blocks-v0.1.5"}
+    candidates = _nested_candidate_elements(body, visible_only=visible_only,
+        preserve_nested_assets=nearest_table) if nested else _candidate_elements(body)
     candidate_positions = [positions[id(element)] for element in candidates]
-    toc = _toc_table(root)
+    toc = _toc_table(root, nearest_table=nearest_table)
     toc_path = tree.getpath(toc) if toc is not None else None
 
     structural_anchors: list[tuple[int, str]] = []
@@ -300,7 +345,8 @@ def parse_sec_source(
     for ordinal, element in enumerate(candidates, start=1):
         dom_path = tree.getpath(element)
         tag = _tag(element)
-        value = normalize_text(element.get("alt", "")) if tag == "img" else normalize_text(element.text_content())
+        value = normalize_text(element.get("alt", "")) if tag == "img" else normalize_text(
+            _visible_text(element) if visible_only else element.text_content())
         styles = _style_values(element)
         kind = _block_type(element, value, styles)
         if nested and kind not in {'table', 'image'} and value.startswith(('•', '◦')):
@@ -308,7 +354,7 @@ def parse_sec_source(
         element_position = positions[id(element)]
         preceding = [item for item in structural_anchors if item[0] <= element_position]
         source_anchor = preceding[-1][1] if preceding else None
-        table = _table_structure(element) if kind == "table" else None
+        table = _table_structure(element, visible_only=visible_only, nearest_table=nearest_table) if kind == "table" else None
         image_asset_id = None
         if kind == "image":
             asset = _asset_reference(element, source_url, ordinal, dom_path)
@@ -352,6 +398,39 @@ def parse_sec_source(
         segment_start = index + 1
     blocks = paged_blocks
 
+    header_diagnostics = []
+    if visible_only:
+        titled, current_part = set(), None
+        for block in blocks:
+            if block.type != 'heading_candidate' or block.layout_role:
+                continue
+            part, item = _PART_RE.match(block.text), _ITEM_RE.match(block.text)
+            if part:
+                current_part = part.group(1).upper()
+            elif item and current_part and item.group(2).strip(' .'):
+                titled.add((current_part, item.group(1).upper()))
+        seen, current_part, ignored = set(), None, 0
+        for index, block in enumerate(blocks):
+            if block.type != 'heading_candidate' or block.layout_role:
+                continue
+            part, item = _PART_RE.match(block.text), _ITEM_RE.match(block.text)
+            key, bare_label = None, False
+            if part:
+                current_part = part.group(1).upper()
+                key = ('part', current_part)
+            elif item and current_part:
+                number, title = item.group(1).upper(), item.group(2).strip(' .')
+                key = ('item', current_part, number, title.casefold())
+                bare_label = not title and (current_part, number) in titled
+            if key is not None:
+                if key in seen or bare_label:
+                    blocks[index] = replace(block, layout_role='running_header')
+                    ignored += 1
+                seen.add(key)
+        if ignored:
+            header_diagnostics.append(IndexDiagnostic('repeated_legal_headers_excluded', 'warning',
+                f'{ignored} repeated or titleless page labels excluded from body coverage and outline starts.'))
+
     block_positions = [
         (positions[id(element)], block.block_id)
         for element, block in zip(candidates, blocks, strict=True)
@@ -368,7 +447,8 @@ def parse_sec_source(
         anchors.append(SourceAnchor(anchor, tree.getpath(element), target_block_id))
 
     toc_entries, toc_diagnostics = _toc_entries(toc, blocks, anchors,
-        verify_link_roles=parser_version in {"sec-source-blocks-v0.1.3-quarterly", "sec-source-blocks-v0.1.4-quarterly", "sec-source-blocks-v0.1.5"})
+        verify_link_roles=visible_only or parser_version in {"sec-source-blocks-v0.1.3-quarterly", "sec-source-blocks-v0.1.4-quarterly", "sec-source-blocks-v0.1.5"},
+        nearest_table=nearest_table)
     return ParsedDocument(
         document_id=document_id,
         source_url=source_url,
@@ -380,7 +460,7 @@ def parse_sec_source(
         anchors=tuple(anchors),
         toc_entries=toc_entries,
         assets=tuple(assets),
-        parser_diagnostics=toc_diagnostics,
+        parser_diagnostics=tuple(toc_diagnostics) + tuple(header_diagnostics),
     )
 
 
@@ -410,6 +490,49 @@ def _body_outline_entries(parsed: ParsedDocument) -> tuple[TocEntry, ...]:
     return tuple(entries)
 
 
+def _verified_body_outline(parsed):
+    """Bind legal headings to their actual blocks, not inherited wrapper IDs."""
+    parts, items, diagnostics = {}, {}, []
+    current_part = None
+    for block in parsed.blocks:
+        if block.type != 'heading_candidate' or block.layout_role or len(block.text) > 300:
+            continue
+        part = _PART_RE.match(block.text)
+        if part:
+            current_part = part.group(1).upper()
+            parts.setdefault(current_part, block)
+            continue
+        item = _ITEM_RE.match(block.text)
+        if item and current_part:
+            key = (current_part, item.group(1).upper())
+            items.setdefault(key, []).append((block, item.group(2).strip(' .')))
+    chosen = [('part', number, f'PART {number}', block) for number, block in parts.items()]
+    anchors = {a.anchor: a.target_block_id for a in parsed.anchors}
+    for (part, number), candidates in items.items():
+        titled = [(block, title) for block, title in candidates if title]
+        if len({title.casefold() for _, title in titled}) > 1:
+            diagnostics.append(IndexDiagnostic('item_heading_ambiguous', 'error',
+                f'Part {part} Item {number} has conflicting body titles; no range published.'))
+            continue
+        block, title = (titled or candidates)[0]
+        if len(candidates) > 1:
+            diagnostics.append(IndexDiagnostic('repeated_legal_heading', 'warning',
+                f'Part {part} Item {number}: repeated labels do not create additional nodes.'))
+        if block.source_anchor and anchors.get(block.source_anchor) != block.block_id:
+            diagnostics.append(IndexDiagnostic('item_anchor_body_override', 'warning',
+                f'Part {part} Item {number}: inherited anchor does not locate the heading; using its original DOM block.'))
+        chosen.append(('item', number, title or f'Item {number}', block))
+    chosen.sort(key=lambda value: value[3].ordinal)
+    entries, targets = [], {}
+    for ordinal, (kind, number, title, block) in enumerate(chosen, 1):
+        entry = TocEntry(kind, number, title, block.source_anchor, block.reported_page, ordinal)
+        entries.append(entry)
+        targets[ordinal] = block
+    if not items:
+        diagnostics.append(IndexDiagnostic('item_unresolved', 'error', 'No visible legal Item body headings were found.'))
+    return tuple(entries), targets, diagnostics
+
+
 def build_legal_outline(parsed_document: ParsedDocument, *, schema_version: str = SCHEMA_VERSION) -> DocumentIndex:
     """Build only the filing's legal Document → Part → Item hierarchy."""
     blocks = parsed_document.blocks
@@ -419,7 +542,11 @@ def build_legal_outline(parsed_document: ParsedDocument, *, schema_version: str 
     anchor_targets = {anchor.anchor: anchor.target_block_id for anchor in parsed_document.anchors}
     diagnostics = list(parsed_document.parser_diagnostics)
     entries = parsed_document.toc_entries
-    if not any(entry.kind == "item" for entry in entries):
+    verified_targets = {}
+    if parsed_document.parser_version in _VISIBLE_PARSERS:
+        entries, verified_targets, body_diagnostics = _verified_body_outline(parsed_document)
+        diagnostics.extend(body_diagnostics)
+    elif not any(entry.kind == "item" for entry in entries):
         entries = _body_outline_entries(parsed_document)
         diagnostics.append(IndexDiagnostic("outline_body_fallback", "warning", "The legal outline was built from deterministic body heading patterns."))
 
@@ -433,6 +560,8 @@ def build_legal_outline(parsed_document: ParsedDocument, *, schema_version: str 
                 block for block in blocks
                 if block.ordinal >= search_after and _PART_RE.match(block.text) and _PART_RE.match(block.text).group(1).upper() == entry.number
             ]
+            if entry.ordinal in verified_targets:
+                candidates = [verified_targets[entry.ordinal]]
             if candidates:
                 resolved.append((entry, candidates[0]))
                 search_after = candidates[0].ordinal
@@ -441,6 +570,8 @@ def build_legal_outline(parsed_document: ParsedDocument, *, schema_version: str 
             continue
         target_id = anchor_targets.get(entry.source_anchor or "")
         target = by_id.get(target_id or "")
+        if entry.ordinal in verified_targets:
+            target = verified_targets[entry.ordinal]
         if target is None:
             candidates = [
                 block for block in blocks
@@ -492,10 +623,18 @@ def build_legal_outline(parsed_document: ParsedDocument, *, schema_version: str 
     ]
     part_start_ordinals = [block.ordinal for entry, block, _, _, _ in starts if entry.kind == "part"]
     all_start_ordinals = [block.ordinal for _, block, _, _, _ in starts]
+    if parsed_document.parser_version in _VISIBLE_PARSERS:
+        # Unresolved/conflicting headings still delimit their preceding section;
+        # omitting an ambiguous node must not absorb it into a different Item.
+        all_start_ordinals.extend(block.ordinal for block in blocks
+            if block.type == 'heading_candidate' and not block.layout_role and _ITEM_RE.match(block.text))
     for entry, start, node_id, parent_id, part_number in starts:
         boundaries = part_start_ordinals if entry.kind == "part" else all_start_ordinals
         following = [ordinal for ordinal in boundaries if ordinal > start.ordinal]
         end_ordinal = (min(following) - 1) if following else blocks[-1].ordinal
+        if parsed_document.parser_version in _VISIBLE_PARSERS:
+            while end_ordinal > start.ordinal and blocks[end_ordinal - 1].layout_role:
+                end_ordinal -= 1
         if end_ordinal < start.ordinal:
             diagnostics.append(IndexDiagnostic("node_range_invalid", "error", f"Invalid source range for {node_id}.", node_id))
             end_ordinal = start.ordinal

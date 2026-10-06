@@ -1,0 +1,256 @@
+{
+  "schema_version": "canary-held-out-review-v1",
+  "run_id": "amd-fy2023-main-agent-v2",
+  "company_id": "sec-0000002488",
+  "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+  "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+  "reviewer": "Codex source review with held-out comparison",
+  "created_at": "2026-10-04T16:30:31.038486+00:00",
+  "inputs": {
+    "run_manifest_sha256": "a04cc57e50752a663570fd7cbf67e5bdcedcd4b3355daf8ed6d6da3822c89ccc",
+    "packet_sha256": "a91de17a9a4110dd6820abb80f6c7ca5667aac7c1f6c22afa73743664e4ecfc2",
+    "extraction_sha256": "e9d12f6a6b31397e63bc927a0dd18e5c4f35496c4a44477b2e2a1279716ce649",
+    "held_out_path": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/independent-review-amd-fy2023-v2.json",
+    "held_out_sha256": "07814561302ebd02ffa7b6a8456af6ae026917e6141109a5a30fc68e02cb640e",
+    "comparison_script_sha256": "37995668334f3b76d16a513aeab8ff3ce4cca37e7d272a589922ee6249953273"
+  },
+  "summary": {
+    "raw_drafts": 10,
+    "database_records": 3,
+    "verdict_counts": {
+      "value_scope_matched": 9,
+      "needs_evidence": 1
+    },
+    "held_out_core_facts": 25,
+    "matched_period_core_facts": 10,
+    "held_out_core_facts_in_packet": 10,
+    "unmatched_supplied_core_fact_ids": [],
+    "core_fact_ids_outside_supplied_packet": [
+      "capex_cash_payments-fy2021",
+      "capex_cash_payments-fy2022",
+      "capex_cash_payments-fy2023",
+      "net_income-fy2021",
+      "net_income-fy2022",
+      "net_income-fy2023",
+      "operating_cash_flow-fy2021",
+      "operating_cash_flow-fy2022",
+      "operating_cash_flow-fy2023",
+      "operating_income-fy2021",
+      "operating_income-fy2022",
+      "operating_income-fy2023",
+      "revenue-fy2021",
+      "revenue-fy2022",
+      "revenue-fy2023"
+    ]
+  },
+  "facts": [
+    {
+      "draft_id": "draft-87f0a8ecdc5c58c63d1af1d3",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [],
+      "record_id": "direct-6286059310a048c4da21aa4e",
+      "held_out_fact_id": "cash_and_cash_equivalents-fy2023",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2023-12-30",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-f259655b0cf36c0d7036553f",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [],
+      "record_id": "direct-b17f839683a8c94b0f707f97",
+      "held_out_fact_id": "cash_and_cash_equivalents-fy2022",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-12ab1ee1c40d812e84c93827",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [
+        "unresolved_metric"
+      ],
+      "held_out_fact_id": "current_portion_long_term_debt_net-fy2023",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2023-12-30",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-60029eda8968c50139ad427c",
+      "verdict": "needs_evidence",
+      "rationale": "The source audit establishes zero through inline XBRL fixed-zero metadata, but the supplied text evidence is a dash. The draft must not treat a dash as zero without that support.",
+      "engineering_issues": [
+        "unresolved_metric",
+        "model_unresolved_fields",
+        "unresolved_value"
+      ],
+      "held_out_fact_id": "current_portion_long_term_debt_net-fy2022",
+      "value_matches": false,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-757b45ea1ee3243c2bece447",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [
+        "unresolved_metric"
+      ],
+      "held_out_fact_id": "long_term_debt_net_of_current_portion-fy2023",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2023-12-30",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-13816bbb30f02229c677e9e1",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [
+        "unresolved_metric"
+      ],
+      "held_out_fact_id": "long_term_debt_net_of_current_portion-fy2022",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-d19ba131777f71b132fd23aa",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [
+        "unresolved_metric",
+        "numeric_literal_not_in_evidence"
+      ],
+      "held_out_fact_id": "common_stock_carrying_value-fy2023",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2023-12-30",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-b63f409f8165558e11a1ac9f",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [
+        "unresolved_metric"
+      ],
+      "held_out_fact_id": "common_stock_carrying_value-fy2022",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-593dc6cdc160b5d91c73590e",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [],
+      "record_id": "direct-a24e2b8462504d8667bd8266",
+      "held_out_fact_id": "common_shares_outstanding-fy2023",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2023-12-30",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    },
+    {
+      "draft_id": "draft-a034c7ced4fd4937cdac4c09",
+      "verdict": "value_scope_matched",
+      "rationale": "Amount, statement sign, unit and exact period match the independent source audit. Mapping/protocol issues remain separate; candidate is not adopted.",
+      "engineering_issues": [
+        "numeric_literal_not_in_evidence"
+      ],
+      "held_out_fact_id": "common_shares_outstanding-fy2022",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-000674-2ab954ba",
+      "actual_period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "reviewer_scope": "Selected amount, unit, source table and exact period; does not approve the full mapping or completeness."
+    }
+  ],
+  "adoption": "unchanged_candidate",
+  "overall": "partial",
+  "limits": [
+    "Selected core rows only; not full-report recall, debt-note acceptance, or investment research.",
+    "Equal amount is insufficient for semantic acceptance; source signs, scope, mapping and qualifications remain review dimensions.",
+    "Drafts outside the held-out set stay not_reviewed, not incorrect. Evidence presence is not a financial quality score.",
+    "This review and its held-out values must never be supplied to extraction or normalization as answers."
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "packet_id": "semantic-545ee1cfc10d8d858ff3259d",
+  "checks": [
+    {
+      "axis": "comparability",
+      "status": "constraints_found",
+      "reason": "Note 1 明确说明前期分部信息已重述，而合并结果未变。该重述影响 2022 年分部收入与营业利润记录的可比性，但不影响 2023 年记录。",
+      "constraints": [
+        {
+          "record_ids": [
+            "birch-disclosure-b-revenue-2022",
+            "birch-disclosure-b-operating_income-2022"
+          ],
+          "statement": "2022 年 Sensors 分部收入与营业利润记录为前期分部信息重述后的数据，与原始报告金额不可直接比较；合并结果不受此重述影响。",
+          "citations": [
+            {
+              "source_snapshot_id": "birch-disclosure-b",
+              "block_id": "note-1-detail",
+              "quote": "Note 1. Segment presentation changed. Prior-period segment information was recast. Consolidated results were unchanged.",
+              "source_start": 0
+            }
+          ]
+        }
+      ],
+      "unresolved_questions": []
+    },
+    {
+      "axis": "allocation",
+      "status": "insufficient_evidence",
+      "reason": "Note 1 提及 Note 4 包含分配方法，但 Note 4 内容未提供，无法评估收入与营业利润的分配约束。",
+      "constraints": [],
+      "unresolved_questions": [
+        "Note 4 中关于收入与营业利润的分配方法具体内容是什么？"
+      ]
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "statement-a",
+      "verdict": "supported",
+      "reason": "Note 1 明确说明前期分部信息已重述，合并结果未变，与断言一致。",
+      "citations": [
+        {
+          "source_snapshot_id": "birch-disclosure-b",
+          "block_id": "note-1-detail",
+          "quote": "Note 1. Segment presentation changed. Prior-period segment information was recast. Consolidated results were unchanged.",
+          "source_start": 0
+        }
+      ]
+    },
+    {
+      "assertion_id": "statement-b",
+      "verdict": "insufficient_evidence",
+      "reason": "Note 1 提及 Note 4，但未提供 Note 4 内容，无法确认分配方法是否未提供。",
+      "citations": [
+        {
+          "source_snapshot_id": "birch-disclosure-b",
+          "block_id": "note-1-detail",
+          "quote": "See Note 4 for allocation methodology.",
+          "source_start": 120
+        }
+      ]
+    }
+  ],
+  "context_claims": [
+    {
+      "object_id": "context-fe8527e0f5892f1f403ef791",
+      "status": "supplied"
+    },
+    {
+      "object_id": "context-249483499ccc46f048a1d823",
+      "status": "supplied"
+    },
+    {
+      "object_id": "context-5ee02c2a974e85cdb3390b27",
+      "status": "unresolved"
+    },
+    {
+      "object_id": "context-47ff9a5a4fa5699bd85bc4d8",
+      "status": "unresolved"
+    }
+  ],
+  "context_requests": [
+    {
+      "question": "请提供 Note 4 的完整内容，以评估分配方法对收入与营业利润记录的影响。",
+      "reviewed_block_ids": [
+        "note-1-detail"
+      ],
+      "reference_ids": [
+        "context-47ff9a5a4fa5699bd85bc4d8"
+      ]
+    }
+  ]
+}

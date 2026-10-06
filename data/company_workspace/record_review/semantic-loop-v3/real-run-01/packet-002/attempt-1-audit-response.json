@@ -1,0 +1,45 @@
+{
+  "packet_id": "semantic-028aa4a1c4ab8fe0712009ce",
+  "assessment_sha256": "45a579531ec98f3e703016c3ff94018e595dc805b2eb4db72c37ca5d6fefe439",
+  "status": "revise",
+  "issues": [
+    {
+      "issue_id": "dimensions-overreach",
+      "kind": "unsupported_claim",
+      "location": "checks.1.constraints.0.statement",
+      "record_ids": [
+        "obs-f8e00a77890bcdeb3edd38a2",
+        "obs-0b93130590eaf7825ad22d22",
+        "obs-34467d4558b7878f6fb37d22"
+      ],
+      "explanation": "The constraint asserts that the XBRL dimension member msft:MicrosoftCloudMember corresponds to the source-defined Microsoft Cloud revenue. The cited source text defines Microsoft Cloud revenue and lists its components, but it does not state that the XBRL dimension member is equivalent to that definition. The records' normalization notes explicitly say dimensions are opaque and not interpreted as named segments. Therefore, the claim that the dimension member has this specific business meaning is unsupported by the supplied evidence.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "block_id": "block-001227-3bdf0315",
+          "quote": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively.",
+          "source_start": 0
+        }
+      ]
+    },
+    {
+      "issue_id": "additivity-scope",
+      "kind": "record_scope",
+      "location": "checks.0.constraints.0.statement",
+      "record_ids": [
+        "obs-f8e00a77890bcdeb3edd38a2",
+        "obs-0b93130590eaf7825ad22d22",
+        "obs-34467d4558b7878f6fb37d22"
+      ],
+      "explanation": "The additivity constraint states that the Microsoft Cloud revenue records are included in the four product/service categories and therefore cannot be treated as independent additional revenue. While the source text supports that the Microsoft Cloud revenue amounts are included in those categories, the records themselves are dimensioned with msft:MicrosoftCloudMember and are not the same as the undimensioned category totals. The constraint applies the inclusion relationship to the records without acknowledging that the records represent a subset (Microsoft Cloud) of those categories, not the categories themselves. This may be acceptable as a caution, but the statement's wording 'these records' could be misinterpreted as the records being the category totals. The source evidence only establishes that the Microsoft Cloud amounts are included in the categories, not that the dimensioned records are identical to the category totals.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "block_id": "block-001227-3bdf0315",
+          "quote": "These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.",
+          "source_start": 0
+        }
+      ]
+    }
+  ]
+}

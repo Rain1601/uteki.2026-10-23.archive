@@ -1,0 +1,93 @@
+{
+  "iteration": "20261005-ux1",
+  "sourceKind": "Browser walkthrough plus independent deterministic checks",
+  "baseline": {
+    "manifest": "docs/design/baselines/20261005-before-ux-review/manifest.json",
+    "files": 102,
+    "archiveHashCheck": "all match"
+  },
+  "automatedChecks": {
+    "tests": 257,
+    "passed": 257,
+    "failed": 0,
+    "controllerTests": 83,
+    "staticRefs": 53,
+    "missingStaticRefs": 0,
+    "pdfPreviewHttpStatus": 200
+  },
+  "browserViews": [
+    "institution overview/agent selection/holding/report/back",
+    "on-curve buy event/navigation transition/group change",
+    "below-curve report event/v1/back with 1m/day restored",
+    "company overview/report filters/materials/tracking",
+    "Manager coverage/report filters/coverage details/activity pagination",
+    "report v2/v1/citation/Escape/chapter jump"
+  ],
+  "browserDisplayCases": [
+    {
+      "width": 1200,
+      "height": 820,
+      "language": "zh",
+      "theme": "light"
+    },
+    {
+      "width": 960,
+      "height": 760,
+      "language": "en",
+      "theme": "dark"
+    }
+  ],
+  "navigationReproduction": {
+    "width": 1200,
+    "before": {
+      "closedColumns": "696px 348px",
+      "openColumns": "952px",
+      "chartTopAfter": -451.4
+    },
+    "after": {
+      "closedColumns": "696px 348px",
+      "openColumns": "600px 320px",
+      "chartTop": 187.796875
+    }
+  },
+  "pdf": {
+    "scope": {
+      "companyId": "alphabet",
+      "managerId": "north",
+      "reportId": "alpha-north-main",
+      "version": "v2",
+      "language": "zh-CN"
+    },
+    "qa": "output/pdf/uteki-research-sample.qa.json",
+    "pages": 5,
+    "sections": 8,
+    "references": 4,
+    "preservedTextItems": 87
+  },
+  "limitations": [
+    "Fictional data, no live account or new backend",
+    "Reduced motion checked in controller/CSS, not OS preference changed in browser",
+    "Pure hover timing and intermediate frame DOM retention checked in controller; actual browser checks used native entry/click/keyboard navigation expansion",
+    "Report/coverage multi-page cases use synthetic test datasets; existing small browser fixtures were not expanded",
+    "Browser warning/error inspection has no entries; not a full performance audit"
+  ],
+  "screenshots": [
+    "after-activity-dark.jpg",
+    "after-coverage.jpg",
+    "after-home.jpg",
+    "after-nav-expanded.jpg",
+    "after-no-report.jpg",
+    "after-report.jpg",
+    "before-coverage.jpg",
+    "before-home.jpg",
+    "before-nav-expanded.jpg",
+    "before-no-report.jpg",
+    "before-report-directory.jpg"
+  ],
+  "restoredDisplay": {
+    "language": "en",
+    "theme": "light",
+    "typography": "editorial",
+    "viewportOverride": "reset"
+  }
+}

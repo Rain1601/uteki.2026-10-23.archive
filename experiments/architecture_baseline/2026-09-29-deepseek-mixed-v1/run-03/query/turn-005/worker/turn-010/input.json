@@ -1,0 +1,964 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "仅依据选定的 Alphabet FY2025 10-K，核对 2024 年和 2025 年的合并经营现金流、购建固定资产的现金支出，并查找资本支出的主要用途。请自主制定有明确完成条件的取证计划，把购建固定资产现金支出的数值、期间及口径核对委派给 Worker；Worker 返回后，由主角色独立核验原文与查询结果。保留可追溯原始披露、单位、期间、会计口径及资料缺口。仅需读取支持这些问题的正文和表格，无需通读整份报表或整章。不得用摘要冒充已读原文，不得自行计算未注册公式，不推断维护性资本开支或 AI 投资回报。此次只验收取证分工，不作当前投资建议。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-02-05",
+    "include_candidates": true
+  },
+  "role": "worker",
+  "delegation_instruction": "仅依据选定的 Alphabet FY2025 10-K（source_snapshot_id=googl-2025-10k，company_id=sec-0001652044）核验 requirement req-capex-2024-2025。使用 kind=query，QueryPlan 只包含以下两条 records：metric_id=capex_cash_payments，value_kind=actual，period 分别为 2024-01-01 至 2024-12-31 与 2025-01-01 至 2025-12-31。核对返回数值、unit=USD、期间、accounting_basis=reported_consolidated 及披露口径，并给出可追溯原文表格/block 引用（block_id、quote、fact_id、context_ref 等）。不得自行计算、不得推断维护性资本开支或 AI 投资回报，不得用摘要冒充已读原文。Worker 返回的是候选材料，我会独立核验原文与查询结果。请报告明确缺口。",
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0001652044",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "goog:YouTubeAdvertisingRevenueMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "us-gaap:AllOtherSegmentsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ConsolidationItemsAxis": "us-gaap:OperatingSegmentsMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "goog:AmericasExcludingUnitedStatesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3d3534ee58538dd2",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3d3534ee58538dd2",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeAxis": "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeMember",
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:AccumulatedNetUnrealizedInvestmentGainLossMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-439d6f7254f42ebb",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-439d6f7254f42ebb",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeAxis": "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "capex_cash_payments",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Positive cash payments to acquire PPE; not total investment.",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "net_income",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "net_income",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "operating_cash_flow",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "operating_cash_flow",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "operating_income",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "operating_income",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "revenue",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "revenue",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-7d95f8d35723138498f123ab6c2e2b8e675d13bb9a7a1dae0fda631376a0f962",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "company_id": "sec-0001652044",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "document_id": "googl-2025-10k",
+          "index_id": "didx-d113d1d4ab51745c",
+          "index_folder": "indexes/googl-2025-10k",
+          "raw_file": "raw/googl-2025-10k.html",
+          "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "form": "10-K",
+          "period_end": "2025-12-31",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2026-02-05",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              }
+            }
+          ],
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes"
+          ],
+          "image_block_count": 2
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 913,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 10,
+        "total_count": 21,
+        "bytes_returned": 3948,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "scope_id": "scope-9971188484366854bf3045c2",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "f52047ae48ebf93aabbb651de919eab578f9baa6d8ad257e4d37bda50302f502",
+          "offset": 10,
+          "checksum": "f231f8a62d4dad009f1fc27b8b02a5d27ee26fa03cc11c1b04f11054a22252fe"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 1943,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 293,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2024-2025",
+      "description": "从选定的 Alphabet FY2025 10-K 查询 2024 年和 2025 年购建固定资产的现金支出 capex_cash_payments 的数值、期间及口径；此核对事项将委派给 Worker，Worker 返回后再由主角色独立核验。"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2024-2025",
+      "description": "从选定的 Alphabet FY2025 10-K 查询 2024 年和 2025 年购建固定资产的现金支出 capex_cash_payments 的数值、期间及口径；此核对事项将委派给 Worker，Worker 返回后再由主角色独立核验。",
+      "evidence_ids": [
+        "ev-ab92ca11037d639cc859c238",
+        "ev-687678a9185fb1537f1e46f6",
+        "ev-c471c412868600b8040f4a8a"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:2d6a4ae3dde68b3f46dfcc3d",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / capex_cash_payments / 2024-01-01 — 2024-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-a0343ddc7aedd6ae4e071851"
+          ],
+          "artifact_ids": [
+            "art-65669ccb76a6e08e34fc59bf"
+          ],
+          "event_sequences": [
+            8
+          ]
+        },
+        {
+          "check_id": "citations:obs-a0343ddc7aedd6ae4e071851",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-a0343ddc7aedd6ae4e071851"
+          ],
+          "artifact_ids": [
+            "art-1319bb66529e30b20565251f"
+          ],
+          "event_sequences": [
+            8
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "records:d046d84f3cd17680523d2104",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / capex_cash_payments / 2025-01-01 — 2025-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-56ba2c019c541769c0cce851"
+          ],
+          "artifact_ids": [
+            "art-5e4d2f156b0731df882b7341"
+          ],
+          "event_sequences": [
+            8
+          ]
+        },
+        {
+          "check_id": "citations:obs-56ba2c019c541769c0cce851",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-56ba2c019c541769c0cce851"
+          ],
+          "artifact_ids": [
+            "art-a960d8b03dbae5aea419ee0e"
+          ],
+          "event_sequences": [
+            8
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-002/query-receipt.json",
+          "sha256": "4ac5a45d94aa1222d720747920343259e890bbcbe0cf9ed4b9373213e9ffe568"
+        },
+        {
+          "path": "turn-008/query-receipt.json",
+          "sha256": "47946ae5753fcc966b5f41060b1f96655aae46e003e72f0e58dae251b5392bdb"
+        }
+      ]
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-e3a65c506870d165ce030db48e5ee7f8",
+    "kind": "run_state",
+    "path": "artifacts/art-e3a65c506870d165ce030db48e5ee7f8.json",
+    "sha256": "707c503e00f22c38baac4178f7629d1f36734e031bcf96103175ebeb9c7e8f96",
+    "size_bytes": 5237,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    },
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "created_step": 9,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-3005830acc68923fccd9c2a3d0f3a6ec",
+      "kind": "record",
+      "path": "artifacts/art-3005830acc68923fccd9c2a3d0f3a6ec.json",
+      "sha256": "4a5dd29dbf5dc127d07a8b0b33630700963331e44a24ac5d2fa6bb9c1e765261",
+      "size_bytes": 1358,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 2,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-ab92ca11037d639cc859c238"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-d6d47c73c60ba0ef3470a5fa089980eb",
+      "kind": "record",
+      "path": "artifacts/art-d6d47c73c60ba0ef3470a5fa089980eb.json",
+      "sha256": "33087962ef9b89a131ac24a05356aecc7c541260dac4708754ec29791a11ffbf",
+      "size_bytes": 1357,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 2,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-687678a9185fb1537f1e46f6"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-7c8911f667547bb76b26f20dffcb6b03",
+      "kind": "citation",
+      "path": "artifacts/art-7c8911f667547bb76b26f20dffcb6b03.json",
+      "sha256": "b95b081e4ec77ffbbe01bcda67c86fd226f0dcc73a5227dbaee490aac682b7dd",
+      "size_bytes": 1415,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 2,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-8aef7e7638c48fc1a1133194"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-c6f2897c6a769ba3dc26c4549e147d24",
+      "kind": "citation",
+      "path": "artifacts/art-c6f2897c6a769ba3dc26c4549e147d24.json",
+      "sha256": "e67c8b474c5f505ab109632dda2427318526295cf8ed1b20093ede4093882f4b",
+      "size_bytes": 1413,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 2,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-2f185f9e9d73206bc3281818"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-65a5bb98b1aced197915976000a10b45",
+      "kind": "context",
+      "path": "artifacts/art-65a5bb98b1aced197915976000a10b45.json",
+      "sha256": "ae3db93184f08a0751392f3673cafe4a298d096da7249a2b65102262f66ed89e",
+      "size_bytes": 80869,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 3,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-c471c412868600b8040f4a8a"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-656551dde26df1a8b806d5c553f43128",
+    "sha256": "c5d4ff36462234e688f42ca383e9ce7ed74e86f8c685f5cd471dd767e8316bcb",
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 5,
+    "total_count": 5,
+    "returned_count": 5,
+    "bytes_returned": 3646,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "status": "tool_returned",
+    "artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-65a5bb98b1aced197915976000a10b45",
+      "kind": "context",
+      "path": "artifacts/art-65a5bb98b1aced197915976000a10b45.json",
+      "sha256": "ae3db93184f08a0751392f3673cafe4a298d096da7249a2b65102262f66ed89e",
+      "size_bytes": 80869,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 3,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-c471c412868600b8040f4a8a"
+    },
+    "result": {
+      "status": "limited",
+      "artifact_id": "art-65a5bb98b1aced197915976000a10b45",
+      "sha256": "ae3db93184f08a0751392f3673cafe4a298d096da7249a2b65102262f66ed89e",
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "pointer": "",
+      "unit": "entries",
+      "offset": 0,
+      "end_offset": 4,
+      "total_count": 30,
+      "returned_count": 4,
+      "items": [
+        {
+          "key": "index_id",
+          "value": "didx-d113d1d4ab51745c"
+        },
+        {
+          "key": "node_id",
+          "value": "didx-d113d1d4ab51745c-document"
+        },
+        {
+          "key": "reading_group_version",
+          "value": "reading-groups-v0.2"
+        },
+        {
+          "key": "reading_groups",
+          "value": [
+            {
+              "group_id": "table-block-000774-67c9365e",
+              "version": "reading-groups-v0.2",
+              "kind": "table_context",
+              "block_ids": [
+                "block-000770-2f8c99ac",
+                "block-000771-9faf493a",
+                "block-000772-76355f56",
+                "block-000773-cb5b3af4",
+                "block-000774-67c9365e"
+              ],
+              "item_ids": [],
+              "table_id": "block-000774-67c9365e",
+              "rule": "nearby heading/unit/introduction and immediately following marked notes; remote notes not resolved"
+            }
+          ]
+        }
+      ],
+      "bytes_returned": 629,
+      "next_cursor": {
+        "cursor_version": "run-artifact-cursor-v1",
+        "artifact_id": "art-65a5bb98b1aced197915976000a10b45",
+        "sha256": "ae3db93184f08a0751392f3673cafe4a298d096da7249a2b65102262f66ed89e",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "pointer": "",
+        "offset": 4
+      },
+      "gaps": [],
+      "requested_max_bytes": 12000,
+      "effective_max_bytes": 8000
+    },
+    "result_artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-97964bbf0aee3542b648430010fb647b",
+      "kind": "tool_payload",
+      "path": "artifacts/art-97964bbf0aee3542b648430010fb647b.json",
+      "sha256": "0e56c619149f1b5ac8f9624e9002b9efbafd2eef6e30c2af85047daa11800e6e",
+      "size_bytes": 1733,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    },
+    "preview_truncated": false,
+    "reads": [],
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 9,
+      "action": "read_artifact",
+      "requirement_ids": [
+        "req-capex-2024-2025"
+      ],
+      "request_fingerprint": "7366ef8f486f545919f061e4e885a8594295ad5b42d01be6f7d407bd75d4d76f",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "artifact",
+      "retryable": false,
+      "progress_delta": false,
+      "observation_bytes": 2938,
+      "execution_limited": true,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-b61a801d77d57f975246d8e5bf916ea4",
+      "kind": "tool_output",
+      "path": "artifacts/art-b61a801d77d57f975246d8e5bf916ea4.json",
+      "sha256": "87b801e5da260a9050903ef8519f632f2f4883a4220164dcf89492be193a097a",
+      "size_bytes": 2784,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1",
+    "content": "---\nname: data-agent-query\nversion: 4\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nGeneral information requirements only check evidence references and remain semantically unreviewed. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": false,
+  "completion": {
+    "reference_checks_passed": true,
+    "unmet": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 4,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 5,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 6,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 7,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 8,
+      "action": "query",
+      "status": "tool_returned"
+    },
+    {
+      "step": 9,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    }
+  ],
+  "consecutive_no_progress": 2,
+  "no_progress_limit": 3,
+  "steps_remaining": 1
+}

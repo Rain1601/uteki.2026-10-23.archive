@@ -1,0 +1,312 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "Read the complete business section and verify operating margin for calendar year 2031.",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "synthetic-scoped-v1",
+      "company_ids": [
+        "acme"
+      ],
+      "source_snapshot_ids": [
+        "acme-annual"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2032-05-01",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "synthetic-scoped-v1",
+    "company_ids": [
+      "acme"
+    ],
+    "source_snapshot_ids": [
+      "acme-annual"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2032-05-01",
+    "include_candidates": true
+  },
+  "role": "worker",
+  "delegation_instruction": "Read the assigned section and retrieve the registered calculation with its citations.",
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "acme",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "acme",
+          "company_id": "acme",
+          "source_snapshot_ids": [
+            "acme-annual"
+          ],
+          "accounting_bases": [],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "acme-services",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "acme-services",
+          "company_id": "acme",
+          "source_snapshot_ids": [
+            "acme-annual"
+          ],
+          "accounting_bases": [
+            "reported_segment"
+          ],
+          "reported_dimensions": []
+        }
+      ],
+      "metrics": {
+        "operating_income": {
+          "metric_id": "operating_income",
+          "unit": "USD"
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "unit": "USD"
+        }
+      },
+      "fiscal_periods": []
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "acme-annual",
+          "company_id": "acme",
+          "form": "10-K",
+          "period_end": "2031-12-31",
+          "available_at": "2032-02-01",
+          "index_id": "index-acme-annual",
+          "index_folder": "indexes/acme-annual",
+          "source_sha256": "8b167041140bcaa7ea8ad814a87bea1b370f7bb3b12d99d2e54a04b00b548316",
+          "source_url": "https://example.invalid/acme-annual"
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "synthetic-scoped-v1",
+        "scope_id": "scope-ccd13fd35f1535d2292da5bf",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 412,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "complete",
+        "snapshot_id": "synthetic-scoped-v1",
+        "scope_id": "scope-ccd13fd35f1535d2292da5bf",
+        "returned_count": 2,
+        "total_count": 2,
+        "bytes_returned": 417,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "synthetic-scoped-v1",
+        "scope_id": "scope-ccd13fd35f1535d2292da5bf",
+        "returned_count": 2,
+        "total_count": 2,
+        "bytes_returned": 386,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "synthetic-scoped-v1",
+        "scope_id": "scope-ccd13fd35f1535d2292da5bf",
+        "returned_count": 0,
+        "total_count": 0,
+        "bytes_returned": 2,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "read_node",
+      "query": null,
+      "source_id": "acme-annual",
+      "node_id": "business",
+      "requirement_id": "business",
+      "description": "Read the complete business section."
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [],
+        "documents": [],
+        "calculations": [
+          {
+            "formula_id": "operating_margin",
+            "entity_id": "acme-services",
+            "periods": [
+              {
+                "kind": "year",
+                "start": "2031-01-01",
+                "end": "2031-12-31"
+              }
+            ]
+          }
+        ]
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "numbers",
+      "description": "Verify calendar year 2031 operating margin."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "read_node",
+      "query": null,
+      "source_id": "acme-annual",
+      "node_id": "business",
+      "requirement_id": "business",
+      "description": "Read the complete business section.",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "inventory_snapshot_id": "synthetic-scoped-v1",
+      "inventory_index_id": "index-acme-annual",
+      "inventory_status": "available",
+      "required_block_ids": [
+        "b0",
+        "b1",
+        "b2"
+      ],
+      "returned_block_ids": [],
+      "unread_block_ids": [
+        "b0",
+        "b1",
+        "b2"
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [],
+        "documents": [],
+        "calculations": [
+          {
+            "formula_id": "operating_margin",
+            "entity_id": "acme-services",
+            "periods": [
+              {
+                "kind": "year",
+                "start": "2031-01-01",
+                "end": "2031-12-31"
+              }
+            ]
+          }
+        ]
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "numbers",
+      "description": "Verify calendar year 2031 operating margin.",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "synthetic-scoped-v1",
+        "company_ids": [
+          "acme"
+        ],
+        "source_snapshot_ids": [
+          "acme-annual"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2032-05-01",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "query_execution",
+          "status": "missing_evidence",
+          "reason": "query_not_returned",
+          "detail": "尚无本要求的成功查询与已校验证据包。"
+        }
+      ],
+      "query_receipt_files": []
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-9b62078ceeb7c209ab7254967059a22c",
+    "kind": "run_state",
+    "path": "artifacts/art-9b62078ceeb7c209ab7254967059a22c.json",
+    "sha256": "81cdcc4306783cda465deb43960a02e747a7aa0d178defd03de3234b79b52152",
+    "size_bytes": 2839,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "synthetic-scoped-v1",
+      "company_ids": [
+        "acme"
+      ],
+      "source_snapshot_ids": [
+        "acme-annual"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2032-05-01",
+      "include_candidates": true
+    },
+    "scope_id": "scope-ccd13fd35f1535d2292da5bf",
+    "created_step": 1,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-75b7d4599398ddc36f548b79d62ef9c2",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "scope_id": "scope-ccd13fd35f1535d2292da5bf",
+    "snapshot_id": "synthetic-scoped-v1",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 0,
+    "total_count": 0,
+    "returned_count": 0,
+    "bytes_returned": 2,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": null,
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+    }
+  },
+  "loaded_skill": null,
+  "available_callbacks": [],
+  "available_worker": false,
+  "steps_remaining": 3
+}

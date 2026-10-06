@@ -8,6 +8,7 @@ import re
 
 
 ADAPTER_ORIGINS = {
+    "us-gaap-inline-v1": "deterministic",
     "alphabet-financial-v1": "deterministic",
     "alphabet-call-reviewed-v1": "model_assisted",
 }

@@ -1,0 +1,163 @@
+{
+  "schema_version": "direct-extraction-run-v1",
+  "strategy": "direct",
+  "status": "candidate",
+  "packet_id": "packet-fced71b58a8e4158c60faa2a",
+  "started_at": "2026-10-04T18:10:44.743009+00:00",
+  "plan_origin": "model",
+  "implementation": {
+    "implementation/uteki/infrastructure/research_data/direct_extraction.py": "9fe9c4b27286fe3280931b3662f889eb8be669dfe793628c7a3bc92bf10877ce",
+    "implementation/uteki/agents/data_extraction/direct.py": "14961620b9a3c5832c1f6d645e62b5bd2db906e81f02193f6856ef02910c87a7",
+    "implementation/uteki/infrastructure/research_data/direct_normalization.py": "b34278762726f74e86c49a95e5537d632efd7979b5ede1bb3bf1999391dcff9d",
+    "implementation/uteki/domain/research_data/direct_extraction.py": "7dd5c106e65bfcb29ae01e9a7c063b0056d200189f3689c93e1f7d41c34288c7"
+  },
+  "semantic_acceptance": "not_evaluated",
+  "coverage": {
+    "block-001171-76355f56": "extraction_returned",
+    "block-001172-de1719a9": "extraction_returned",
+    "block-001173-c0043817": "extraction_returned",
+    "block-001174-2ea6a4cb": "extraction_returned",
+    "block-001175-5be4846e": "extraction_returned"
+  },
+  "raw_record_count": 3,
+  "normalized_record_count": 3,
+  "validation": {
+    "normalization_version": "direct-normalization-v2",
+    "status": "partial",
+    "input_records": 3,
+    "normalized_records": 3,
+    "model_gaps": [
+      "Only the explicitly delivered table batch (blocks block-001171-76355f56 through block-001175-5be4846e) was in scope; other statement sections, notes and prose blocks of the filing remain pending and were not reviewed.",
+      "The 2023 column also presents a US$ convenience translation of the acquisitions line (printed US$ column; e.g. the row value carried in the table as (31,019.5 ) with the US$ column header). It is a translation of the NT$ amount into U.S. dollars and was not extracted as a separate record under the TWD-denominated metric mapping.",
+      "The exact NT$ literals are presented with a space between the closing amount and the accounting closing parenthesis in the source layout; the raw literals were preserved as-is without rescaling or sign normalization.",
+      "No aggregate investing cash flow, management CapEx summary or lease-addition figure was substituted for this metric; the 'Net cash used in investing activities' line in the same table is a different measure and is not extracted here.",
+      "Whether the 2023 fiscal year is a 52/53-week period, restatement status, and any Note 3 translation-rate details referenced by the header '(Note 3)' are not established by the supplied blocks."
+    ],
+    "semantic_acceptance": "not_evaluated",
+    "adoption": "unchanged_candidate"
+  },
+  "unresolved_count": 0,
+  "projection_snapshot_id": "query-direct-219fc9772a834eda82e9443a",
+  "dataset": {
+    "path": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-investing-cash-flow-batch-v2/extraction-01/dataset",
+    "snapshot_id": "query-direct-219fc9772a834eda82e9443a",
+    "manifest_sha256": "990a30ae2a7b5587cb9947dffc96ca1cdf4e1761e7f134a5439e9f8ceab5182c"
+  },
+  "usage": {
+    "artifact_root": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-investing-cash-flow-batch-v2/extraction-01/model",
+    "path": "usage-0002.json",
+    "sha256": "5d9246122a2922f37cb672041bbf1765d07ce8739bd114cee0bdef8573e847e5",
+    "summary": {
+      "schema_version": "record-review-model-usage-v1",
+      "plan_origin": "model",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "reasoning_effort": "low",
+      "thinking_mode": "enabled",
+      "max_request_bytes": 400000,
+      "model_config_sha256": "101bcbc0440c0582f23e61d9350e38a724147c66e9bbc7b02db1d2c412f48506",
+      "prompt_sha256": "92c685c655df1819fcae370bef133d082c4691eb9cb757dec0898716eabb92fc",
+      "calls": {
+        "requests": 1,
+        "unknown_cost_requests": 0,
+        "known_estimated_usd": "0.0151227",
+        "actual_billed_usd": null,
+        "records": [
+          {
+            "call_id": "aaa5b242-eb4e-4733-8ab9-345a0c218e99",
+            "stage": "record_review",
+            "provider": "deepseek",
+            "requested_model": "deepseek-flash",
+            "actual_upstream_model": "deepseek-flash",
+            "started_at": "2026-10-04T18:10:47.750157+00:00",
+            "pricing_snapshot": {
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "currency": "USD",
+              "input_per_million": "0.30",
+              "output_per_million": "1.20",
+              "cached_input_per_million": "0.006",
+              "source": "https://api-docs.deepseek.com/quick_start/pricing",
+              "checked_on": "2026-09-22",
+              "basis": "Peak list price estimate; no cache or off-peak discounts applied"
+            },
+            "actual_billed_usd": null,
+            "status": "succeeded",
+            "usage": {
+              "input_tokens": 37061,
+              "output_tokens": 3337,
+              "total_tokens": 40398,
+              "input_tokens_details": {
+                "cached_tokens": 3584
+              },
+              "output_tokens_details": {
+                "reasoning_tokens": 1568
+              }
+            },
+            "estimated_usd": "0.0151227",
+            "cost_basis": "uncached_list_price_estimate_not_bill",
+            "budget_reservation_id": "210c85c5-f653-46d7-9286-70e7fc9f8ffa",
+            "reserved_usd": "0.0577629",
+            "response_id": "d112bb5b-e28c-4e9d-ac75-3f68f68390dd",
+            "request_id": null,
+            "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+            "finish_reason": "stop",
+            "raw_usage": {
+              "completion_tokens": 3337,
+              "prompt_tokens": 37061,
+              "total_tokens": 40398,
+              "completion_tokens_details": {
+                "reasoning_tokens": 1568
+              },
+              "prompt_tokens_details": {
+                "cached_tokens": 3584
+              },
+              "prompt_cache_hit_tokens": 3584,
+              "prompt_cache_miss_tokens": 33477
+            },
+            "ended_at": "2026-10-04T18:11:03.373351+00:00",
+            "elapsed_seconds": 15.622777750017121
+          }
+        ]
+      },
+      "shared_budget": {
+        "limit_usd": null,
+        "estimated_spent_usd": "1.90092492",
+        "held_usd": "0.86635428",
+        "unknown_requests": 2,
+        "in_flight_requests": 0,
+        "requests": 46,
+        "actual_billed_usd": null,
+        "enforcement": "record_only"
+      },
+      "artifacts": [
+        {
+          "path": "calls/aaa5b242-eb4e-4733-8ab9-345a0c218e99-end.json",
+          "sha256": "3996021924f9b6eefcaa8b5a67652b400e4155ad5e4ab365d7e1655b99b1480d"
+        },
+        {
+          "path": "calls/aaa5b242-eb4e-4733-8ab9-345a0c218e99-start.json",
+          "sha256": "168553c08345b970111d0885473a40151e309df58b1f08b8eecc464ca541d544"
+        },
+        {
+          "path": "model-config.json",
+          "sha256": "101bcbc0440c0582f23e61d9350e38a724147c66e9bbc7b02db1d2c412f48506"
+        },
+        {
+          "path": "review-0001-attempt-01.json",
+          "sha256": "cdc401ff362c888a52b0478bda9e3a38267dcbef160ddfd130820aba37dfdcb3"
+        },
+        {
+          "path": "review-0001-input.json",
+          "sha256": "b2e74f6e377a40d96d2e3869cb34896b425441a002926e0d22418c07ffc8216c"
+        },
+        {
+          "path": "review-0001-parsed.json",
+          "sha256": "0794801be76339921a5c65a99a43f7d05e5961c776f8fc7a58005f371cd2a1e9"
+        }
+      ],
+      "business_validation": "not_evaluated"
+    }
+  },
+  "finished_at": "2026-10-04T18:11:03.636512+00:00"
+}

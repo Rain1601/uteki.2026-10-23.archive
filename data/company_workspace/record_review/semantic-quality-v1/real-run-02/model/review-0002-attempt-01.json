@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 2,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0002-input.json",
+    "sha256": "550df3bdbd32aaf2dac6db8fefaa24f5c171e51bb9fe46d889459e5ccab04792"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T10:10:58.425746+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-b71fb814025d8dcef099a688\",\n  \"checks\": [\n    {\n      \"axis\": \"additivity\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明 Microsoft Cloud 收入包含在四个产品/服务类别中，因此这些记录不是独立可加的，而是重叠的子集。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"Microsoft Cloud 收入（2025、2024、2023 财年分别为 168.9、137.7、111.6 十亿美元）包含在 Microsoft 365 Commercial products and cloud services、Server products and cloud services、LinkedIn 和 Dynamics products and cloud services 这些产品/服务类别中，因此不能与这些类别相加，否则会重复计算。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    },\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"记录中的维度成员 msft:MicrosoftCloudMember 对应披露中的 Microsoft Cloud 收入，该收入是多个产品/服务类别的子集，而非独立的产品/服务类别。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"维度 msft:ProductsOrServicesSecondaryCategorizationAxis 的成员 msft:MicrosoftCloudMember 表示 Microsoft Cloud 收入，该收入是 Microsoft 365 Commercial products and cloud services、Server products and cloud services、LinkedIn 和 Dynamics products and cloud services 这些产品/服务类别的子集，不是与这些类别并列的独立类别。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [],\n  \"limitations\": [\n    \"仅提供了 NOTE 18 的开头部分和目标邻域，未提供完整的段信息表，因此无法评估与段利润相关的分配或可比性约束。\",\n    \"未提供 Note 1 中关于重述的详细信息，无法确定重述对 Microsoft Cloud 收入的具体影响。\"\n  ]\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-b71fb814025d8dcef099a688\",\n  \"checks\": [\n    {\n      \"axis\": \"additivity\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明 Microsoft Cloud 收入包含在四个产品/服务类别中，因此这些记录不是独立可加的，而是重叠的子集。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"Microsoft Cloud 收入（2025、2024、2023 财年分别为 168.9、137.7、111.6 十亿美元）包含在 Microsoft 365 Commercial products and cloud services、Server products and cloud services、LinkedIn 和 Dynamics products and cloud services 这些产品/服务类别中，因此不能与这些类别相加，否则会重复计算。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    },\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"记录中的维度成员 msft:MicrosoftCloudMember 对应披露中的 Microsoft Cloud 收入，该收入是多个产品/服务类别的子集，而非独立的产品/服务类别。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"维度 msft:ProductsOrServicesSecondaryCategorizationAxis 的成员 msft:MicrosoftCloudMember 表示 Microsoft Cloud 收入，该收入是 Microsoft 365 Commercial products and cloud services、Server products and cloud services、LinkedIn 和 Dynamics products and cloud services 这些产品/服务类别的子集，不是与这些类别并列的独立类别。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [],\n  \"limitations\": [\n    \"仅提供了 NOTE 18 的开头部分和目标邻域，未提供完整的段信息表，因此无法评估与段利润相关的分配或可比性约束。\",\n    \"未提供 Note 1 中关于重述的详细信息，无法确定重述对 Microsoft Cloud 收入的具体影响。\"\n  ]\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "0503d7f2-9458-45ff-9ded-d6a6b4ee7df1",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 889,
+      "prompt_tokens": 18776,
+      "total_tokens": 19665,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 17880
+    }
+  },
+  "elapsed_seconds": 12.65047108399449,
+  "ended_at": "2026-09-24T10:11:11.075215+00:00",
+  "calls": [
+    {
+      "path": "calls/c47f512a-be9e-4a8d-96fd-5e07c35ff862-end.json",
+      "sha256": "cb40a6b8edbd03840125d5feaee05f3f37a12f72adf81353c2df95b01b629728"
+    },
+    {
+      "path": "calls/c47f512a-be9e-4a8d-96fd-5e07c35ff862-start.json",
+      "sha256": "89d64aa0c1e01a3b4538b97a4995780bf4db4c7c2df6d3f1071a4e2714fd4df4"
+    }
+  ]
+}

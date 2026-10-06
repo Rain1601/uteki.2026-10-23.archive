@@ -18,7 +18,7 @@ from uteki.agents.deepseek_model import DeepSeekChatCompletionsModel
 from uteki.agents.run_budget import RunBudget
 from uteki.domain.research_data.agent_query import AGENT_VERSION, AgentQuery, PlannerDecision
 from uteki.domain.research_data.execution_scope import ExecutionScope
-from uteki.domain.research_data.query_contract import DataQuery, QueryResult, ResearchRecord
+from uteki.domain.research_data.query_contract import DataQuery, QueryResult, ResearchRecord, VERSION, export_query_schema
 from uteki.domain.research_data.scoped_agent_query import (
     SCOPED_AGENT_VERSION, ScopedAgentQuery, ScopedPlannerDecision,
 )
@@ -381,7 +381,7 @@ class ScopedContractCompatibilityTests(unittest.TestCase):
         for name, model in (("query", DataQuery), ("record", ResearchRecord), ("result", QueryResult)):
             with self.subTest(schema=name):
                 expected = json.loads((PILOT / "schemas" / f"{name}.schema.json").read_text())
-                self.assertEqual(model.model_json_schema(), expected)
+                self.assertEqual(export_query_schema(model, version=VERSION), expected)
         self.assertEqual(AGENT_VERSION, "data-agent-query-v0.2")
         self.assertEqual(SCOPED_AGENT_VERSION, "data-agent-query-v0.3")
         self.assertNotIn("scope", AgentQuery.model_fields)

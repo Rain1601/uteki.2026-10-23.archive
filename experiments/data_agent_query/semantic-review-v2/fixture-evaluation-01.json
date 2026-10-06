@@ -1,0 +1,95 @@
+{
+  "schema_version": "semantic-fixture-independent-evaluation-v2",
+  "evaluation_only": true,
+  "result_path": "data/company_workspace/record_review/semantic-integrity-v2/fixture-run-01/result.json",
+  "result_sha256": "d2233753496cfa4030d14c0518da79d7393ab80df9f25a13d023d7ebb08ef4b4",
+  "expected_path": "data/company_workspace/record_review/semantic-integrity-v2/frozen-fixture-expected.json",
+  "expected_sha256": "eda2f137167755ec21157e514d36ef4d1a731af60e2bb2326e460c11b5a8a032",
+  "overall_status": "partial",
+  "cases": [
+    {
+      "case_id": "sv2-001",
+      "status": "not_accepted",
+      "accepted_assessment": false,
+      "host_rejection": {
+        "packet_id": "semantic-5120c777c863853e6aa280c5",
+        "error": {
+          "error_type": "ValueError",
+          "reason": "semantic citation needs source_start when quote is not uniquely located",
+          "instruction": "Correct schema, source offsets, per-record anchor coverage and context claims against the original packet."
+        }
+      },
+      "raw_verdict_note": "Raw all-values assertion is supported and amounts/years are recognized, but repeated Revenue row has no source_start. No accepted score is assigned."
+    },
+    {
+      "case_id": "sv2-002",
+      "status": "partial",
+      "accepted_assessment": true,
+      "packet_id": "semantic-545ee1cfc10d8d858ff3259d",
+      "checks": [
+        {
+          "item": "requested_axis_statuses",
+          "status": "pass",
+          "actual": {
+            "comparability": "constraints_found",
+            "allocation": "insufficient_evidence"
+          }
+        },
+        {
+          "item": "assertion_verdicts",
+          "status": "pass",
+          "actual": {
+            "statement-a": "supported",
+            "statement-b": "insufficient_evidence"
+          }
+        },
+        {
+          "item": "historical_affected_records",
+          "status": "pass",
+          "actual_record_ids": [
+            "birch-disclosure-b-operating_income-2022",
+            "birch-disclosure-b-revenue-2022"
+          ],
+          "expected_record_ids": [
+            "birch-disclosure-b-revenue-2022",
+            "birch-disclosure-b-operating_income-2022"
+          ]
+        },
+        {
+          "item": "required_context_claims",
+          "status": "pass",
+          "actual": {
+            "context-249483499ccc46f048a1d823": "supplied",
+            "context-5ee02c2a974e85cdb3390b27": "unresolved",
+            "context-47ff9a5a4fa5699bd85bc4d8": "unresolved"
+          }
+        },
+        {
+          "item": "forbidden_missing_material_inference",
+          "status": "partial",
+          "evidence": [
+            "Note 1 提及 Note 4 包含分配方法，但 Note 4 内容未提供，无法评估收入与营业利润的分配约束。",
+            "Note 1 提及 Note 4，但未提供 Note 4 内容，无法确认分配方法是否未提供。"
+          ],
+          "reason": "Structured reference status remains unresolved, but free-text reasons directly say Note 4 content was not supplied. They do not distinguish unverified target resolution from a verified inventory absence. Statement-b also says it cannot confirm whether methodology was supplied, creating an internal inconsistency. Do not infer that the underlying issuer source actually lacks methodology."
+        }
+      ],
+      "context_requests": [
+        {
+          "question": "请提供 Note 4 的完整内容，以评估分配方法对收入与营业利润记录的影响。",
+          "reviewed_block_ids": [
+            "note-1-detail"
+          ],
+          "reference_ids": [
+            "context-47ff9a5a4fa5699bd85bc4d8"
+          ]
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    "Unchanged expected case, including forbidden_missing_material_inference; assertion labels alone do not establish pass.",
+    "Absence of Note 4 text in this bounded fixture packet is distinct from an unresolved-reference object proving absence.",
+    "No original output, evaluator expectation or input was modified; no extra model call."
+  ]
+}

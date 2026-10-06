@@ -1,0 +1,134 @@
+{
+  "$defs": {
+    "Citation": {
+      "properties": {
+        "document_id": {
+          "title": "Document Id",
+          "type": "string"
+        },
+        "index_id": {
+          "title": "Index Id",
+          "type": "string"
+        },
+        "block_id": {
+          "title": "Block Id",
+          "type": "string"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "document_id",
+        "index_id",
+        "block_id",
+        "quote"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "NarrativeParagraph": {
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "fact",
+            "inference",
+            "unknown"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "citations": {
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "kind",
+        "citations"
+      ],
+      "title": "NarrativeParagraph",
+      "type": "object"
+    },
+    "NarrativeSection": {
+      "properties": {
+        "title": {
+          "description": "简短阅读标题，不要把整段核心判断写进标题",
+          "title": "Title",
+          "type": "string"
+        },
+        "paragraphs": {
+          "items": {
+            "$ref": "#/$defs/NarrativeParagraph"
+          },
+          "minItems": 1,
+          "title": "Paragraphs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "paragraphs"
+      ],
+      "title": "NarrativeSection",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "thesis": {
+      "$ref": "#/$defs/NarrativeParagraph"
+    },
+    "business": {
+      "$ref": "#/$defs/NarrativeSection"
+    },
+    "industry": {
+      "$ref": "#/$defs/NarrativeSection"
+    },
+    "earnings": {
+      "$ref": "#/$defs/NarrativeSection"
+    },
+    "valuation": {
+      "$ref": "#/$defs/NarrativeSection"
+    },
+    "watch": {
+      "$ref": "#/$defs/NarrativeSection"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "stop_reason": {
+      "title": "Stop Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "thesis",
+    "business",
+    "industry",
+    "earnings",
+    "valuation",
+    "watch",
+    "limitations",
+    "stop_reason"
+  ],
+  "title": "AnnualNarrative",
+  "type": "object"
+}

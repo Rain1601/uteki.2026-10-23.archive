@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 11,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0011-input.json",
+    "sha256": "0b482fa94110917fcbaf23ff06f9e82700e12f8c550aefa2b3370a4ee22af015"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T10:06:59.466361+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-d2740666219ea633e8d0d2a0\",\n  \"checks\": [\n    {\n      \"axis\": \"value\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明调整后利润为21（百万美元），并指出其定义和调节表见附注4，但附注4未包含在本摘录中。因此，该记录的价值受限于附注4中未提供的定义和调节信息。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-011-r1\"],\n          \"statement\": \"调整后利润的金额为21百万美元，但其定义和调节表需依据未提供的附注4，因此该数值的解释和使用受限于附注4的内容。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-011\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-011-a1\",\n      \"verdict\": \"insufficient_evidence\",\n      \"reason\": \"断言声称调整后利润仅排除重组费用且无其他项目，但源文本仅给出调整后利润金额为21百万美元，并提及附注4包含定义和调节表，而附注4未提供。因此无法验证排除项目的具体范围。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-011\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": [\n    \"附注4未提供，无法确认调整后利润的具体定义和调节项目。\"\n  ]\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-d2740666219ea633e8d0d2a0\",\n  \"checks\": [\n    {\n      \"axis\": \"value\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明调整后利润为21（百万美元），并指出其定义和调节表见附注4，但附注4未包含在本摘录中。因此，该记录的价值受限于附注4中未提供的定义和调节信息。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-011-r1\"],\n          \"statement\": \"调整后利润的金额为21百万美元，但其定义和调节表需依据未提供的附注4，因此该数值的解释和使用受限于附注4的内容。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-011\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-011-a1\",\n      \"verdict\": \"insufficient_evidence\",\n      \"reason\": \"断言声称调整后利润仅排除重组费用且无其他项目，但源文本仅给出调整后利润金额为21百万美元，并提及附注4包含定义和调节表，而附注4未提供。因此无法验证排除项目的具体范围。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-011\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": [\n    \"附注4未提供，无法确认调整后利润的具体定义和调节项目。\"\n  ]\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "e12787e4-f85c-4774-9b23-fdfef882234e",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 457,
+      "prompt_tokens": 2186,
+      "total_tokens": 2643,
+      "prompt_tokens_details": {
+        "cached_tokens": 640
+      },
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1546
+    }
+  },
+  "elapsed_seconds": 6.030911208014004,
+  "ended_at": "2026-09-24T10:07:05.496147+00:00",
+  "calls": [
+    {
+      "path": "calls/4596a903-ee66-427f-b494-5ec0e8b1c68a-end.json",
+      "sha256": "3b6bd7bb520291daf43404406ddf1958e643ae9ba83874d98a4bd80f20494e7e"
+    },
+    {
+      "path": "calls/4596a903-ee66-427f-b494-5ec0e8b1c68a-start.json",
+      "sha256": "818939ccc79f996b7671fffcb054bc4339ff25f35023815ef14933451c26df81"
+    }
+  ]
+}

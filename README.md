@@ -2,6 +2,55 @@
 
 An evaluation-driven AI investment research system.
 
+## Current code handoff · 2026-10-06
+
+The current checkout includes the Swiss C investor-facing prototype, the real
+data review workbench, scoped acquisition/extraction/query tools, and a read-only
+Data MCP server. These have different validation boundaries: the investor
+prototype uses named simulated reports, decisions, holdings, and risks; it is
+not a live investment account. The older milestone and experiment notes below
+retain their original dates and do not describe every subsequent increment.
+
+- Frontend: [Swiss C and its checks](docs/design/company-workspace-swiss-c/README.md).
+- Data work: [current tasks and remaining gaps](TODO.md),
+  [CLI](docs/DATA_AGENT_CLI.zh-CN.md), and [MCP](docs/DATA_AGENT_MCP.zh-CN.md).
+- Research policy: [core investment questions](docs/INVESTMENT_CORE_QUESTIONS.zh-CN.md).
+
+This public handoff includes reviewed source code, designs, public filing
+archives, experiment records, ordinary configuration, and report/brand samples.
+Credentials, private operator contact settings, usage ledgers, machine caches,
+and internal reference copies remain local. Frozen files that contain sensitive
+settings are omitted without redacting or rewriting the original run hashes.
+Some historical manifests or absolute run paths therefore still require the
+original local environment; the checkout alone does not independently establish
+every recorded live result.
+
+In particular, the six prepare/refresh manifests for AMD and TSMC under
+`data/company_workspace/official-filing-preparations/` retain references to
+omitted private `source-config.json` files. Their public `dataset/` artifacts
+remain included. Do not claim the parent run bundles are fully replayable or
+edit their hashes to hide that omission.
+
+The catalogs in `data/evaluation_views/` and `config/data-mcp-readonly-v1.json`
+select explicit frozen datasets. Preserve their company/source scopes and
+validate their hashes; do not silently substitute another company or the latest
+version. Source acquisition requires your own private SEC contact configuration.
+Missing inputs are reported as gaps. The Swiss C README documents the explicit
+build command for the included PDF sample.
+
+For a local frontend preview, run from the repository root:
+
+```bash
+python3 -m http.server 8769 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/`.
+For offline code checks, use the existing `scripts/run_offline_checks.py` entry
+point after installing the locked `analysis`, `data`, and `mcp` extras. Its
+`--integration` option additionally exercises local-data tests; see
+[offline test boundaries](docs/OFFLINE_TESTS.md) before interpreting skips or
+missing historical inputs.
+
 Uteki starts from a research question and evidence, then builds the data and
 automation needed to answer it. The first milestone is deliberately small:
 make one capability measurable before making the agent larger.

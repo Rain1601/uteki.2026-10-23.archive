@@ -1,0 +1,74 @@
+{
+  "schema_version": "company-source-run-v1",
+  "run_id": "20260924T034004-988b6f8a45b4",
+  "company": null,
+  "scope": {
+    "symbol": "MSFT",
+    "market": "NASDAQ",
+    "as_of": "2026-09-24",
+    "source_policy": {
+      "official": [
+        {
+          "url": "https://www.microsoft.com/en-us/Investor/",
+          "kind": "ir",
+          "allowed_hosts": [
+            "www.microsoft.com"
+          ]
+        },
+        {
+          "url": "https://blogs.microsoft.com/feed/",
+          "kind": "blog",
+          "allowed_hosts": [
+            "blogs.microsoft.com"
+          ]
+        },
+        {
+          "url": "https://www.microsoft.com/en-us/Investor/events/",
+          "kind": "events",
+          "allowed_hosts": [
+            "www.microsoft.com"
+          ]
+        }
+      ],
+      "third_party": []
+    },
+    "limits": {
+      "max_requests": 60,
+      "max_documents": 30,
+      "max_bytes_per_document": 20000000,
+      "timeout_seconds": 20,
+      "retries": 1,
+      "backoff_seconds": 0.5,
+      "max_discovery_links": 12
+    },
+    "selection": "latest_10k_and_subsequent_filings",
+    "automatic_adoption": false
+  },
+  "documents": [],
+  "gaps": [
+    {
+      "reason": "identity_or_discovery_failed",
+      "error_type": "HTTPError"
+    }
+  ],
+  "discovery": [
+    {
+      "source_url": "https://www.sec.gov/files/company_tickers.json",
+      "status": "failed",
+      "attempt": 1,
+      "error_type": "HTTPError",
+      "http_status": 403
+    },
+    {
+      "source_url": "https://www.sec.gov/files/company_tickers.json",
+      "status": "failed",
+      "attempt": 2,
+      "error_type": "HTTPError",
+      "http_status": 403
+    }
+  ],
+  "requests": 2,
+  "retrieved_at": "2026-09-24T03:40:04.767277+00:00",
+  "status": "identity_unresolved",
+  "manifest_path": "source-runs/20260924T034004-988b6f8a45b4/manifest.json"
+}

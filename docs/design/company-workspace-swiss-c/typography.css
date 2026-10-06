@@ -1,0 +1,93 @@
+/* Local-font comparisons only. Load after swiss-study-c.css. The default Swiss
+   stack is identical to the adopted C baseline; no font files are requested. */
+:root {
+  --font-sans:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-serif:"Times New Roman",Times,"Songti SC",STSong,SimSun,serif;
+  --font:var(--font-sans);
+  --font-reading:var(--font-sans);
+}
+:root[data-typography="swiss"] {--font:var(--font-sans);--font-reading:var(--font-sans)}
+:root[data-typography="hybrid"],
+:root[data-typography="editorial"] {--font:var(--font-sans);--font-reading:var(--font-serif)}
+
+.typography-control {display:inline-flex;align-items:center;gap:6px;min-width:0;font-family:var(--font-sans);font-size:12px;line-height:1.5;color:var(--muted);white-space:nowrap}
+.typography-control select {font-family:var(--font-sans);font-size:12px;line-height:1.5;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:5px;min-height:28px;max-width:130px;padding:3px 6px;cursor:pointer}
+.typography-control select:hover {border-color:var(--muted)}
+.typography-control select:focus-visible {outline:2px solid var(--accent);outline-offset:3px}
+
+/* Hybrid changes the reading voice and entity titles, keeping the analytical
+   workspace's controls, data columns and small annotations in the same sans. */
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) :is(
+  .company-heading h1,.report-title,.detail-article>h2,
+  .report-section h2,.report-section h3,.detail-section h3
+) {font-family:var(--font-serif);letter-spacing:-.015em}
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) :where(
+  .report-section p,.report-section li,.report-abstract p,.report-subtitle,
+  .detail-article p:not(.detail-subtitle):not(.detail-note),.detail-article blockquote
+) {font-family:var(--font-reading)}
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) :where(
+  .report-section p,.report-section li,.report-abstract p,
+  .detail-article p:not(.detail-subtitle):not(.detail-note),.detail-article blockquote
+) {font-size:18px;line-height:1.9;letter-spacing:0;font-weight:400}
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) .report-subtitle {font-size:16px;line-height:1.8;letter-spacing:0}
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) :is(.report-abstract,.reader>p.subheading) {font-family:var(--font-reading);font-size:18px;line-height:1.9;letter-spacing:0;font-weight:400}
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) .report-abstract>span {font-family:var(--font-sans);font-size:12px}
+
+/* Editorial extends the serif voice to substantial non-data titles and copy.
+   Small navigation, source metadata and numerical displays never become Songti. */
+:root[data-typography="editorial"] :is(
+  .institution-comparison-heading h2,.portfolio-stage-heading h2,.portfolio-stage-heading h3,
+  .overview-heading h2,.overview-module-heading h2,.overview-module-heading h3,
+  .directory-heading h2,.manager-section-head h2,.manager-coverage-group-head h3,
+  .allocation-history-heading h3,.detail-placeholder h2,.empty h3,
+  .investment-popover-identity h2,.investment-popover-report h3,.context-panel h3
+) {font-family:var(--font-serif);letter-spacing:0}
+:root[data-typography="editorial"] :is(
+  .portfolio-stage-heading p,.institution-section-note,.institution-footer-note,
+  .manager-coverage-reason,.manager-coverage-group-head p,.manager-footnote,
+  .overview-note,.overview-empty,.detail-placeholder p,.empty p,
+  .investment-popover-note,.context-panel p
+) {font-family:var(--font-serif);font-size:14px;line-height:1.75;letter-spacing:0}
+:root[data-typography="editorial"] .institution-company-link strong {font-family:var(--font-serif);font-size:15px;line-height:1.35;font-weight:600}
+
+/* These elements are reading tools or structured values. Their font identity
+   and tabular number treatment are explicit in both comparison modes. */
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) :is(
+  button,input,select,textarea,table,table p,table li,table strong,
+  .toolbar,.global-nav,.entity-sidebar,.content-nav,.entity-flyout,
+  .reader-nav,.identity-line,.detail-source-meta,.detail-subtitle,.detail-note,
+  .citation,.report-section .kicker,.report-abstract>span,
+  .simulation-label,.institution-header-meta,.company-summary,
+  .section-kicker,.swiss-comparison-label,.swiss-agent-name,
+  .institution-benchmark-legend,.portfolio-snapshot,.portfolio-snapshot-heading,
+  .swiss-holdings-heading,.allocation-center,.allocation-caption,
+  .institution-portfolio-value,.allocation-palette-picker,
+  .allocation-history-simulation,.allocation-history-timeline-heading,
+  .allocation-history-snapshot-heading,.investment-timeline-title,
+  .investment-popover-provenance,.investment-popover-facts,
+  .investment-popover-pagination,.investment-marker-date,
+  .overview-status,.overview-item-meta,.overview-count,.overview-tab-count,
+  .directory-row-meta,.directory-row-state,.manager-row-state,
+  .manager-coverage-date,.manager-coverage-report-count,.manager-sample-badge,
+  .manager-metrics,.manager-weight-legend,.manager-pagination,.manager-filters
+) {font-family:var(--font-sans)}
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) :is(
+  [data-agent-return],[data-benchmark-return],[data-selected-agent-return],
+  .holding-weight,.allocation-center strong,.institution-portfolio-value strong,
+  .manager-metric>strong,.manager-weight-item strong,.manager-coverage-stats,
+  .allocation-history-weight,.allocation-history-change,.allocation-history-date,
+  .allocation-history-snapshot-heading,.portfolio-position,.investment-event-total,
+  .investment-popover-facts dd,.investment-popover-count,.count,time,
+  .company-copy small,.institution-company-link small,.manager-company-cell small,
+  .allocation-history-holding-name small,svg text
+) {font-family:var(--font-sans);font-variant-numeric:lining-nums tabular-nums}
+
+@media(max-width:860px) {
+  .typography-control {gap:4px}
+  .typography-control select {max-width:112px;padding-inline:4px}
+}
+
+/* Report tables remain compact even when their cells contain rich paragraphs. */
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) .content table,
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) .content table * {font-family:var(--font-sans)}
+:root:is([data-typography="hybrid"],[data-typography="editorial"]) .content table :is(p,li) {font-size:inherit;line-height:inherit}

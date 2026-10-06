@@ -1,0 +1,106 @@
+{
+  "schema_version": "data-handoff-evaluation-v1",
+  "scope": "Alphabet FY2025 10-K; 2024/2025 OCF and cash PPE purchases; major capex uses",
+  "source_runs": {
+    "e2e-01": {
+      "path": "e2e-01",
+      "manifest_sha256": "9eec2f2bcb6a867fb9fcb303d36cf174e116d3a8c4c9adf6ef94eb08f7f54cbe"
+    },
+    "e2e-02": {
+      "path": "e2e-02",
+      "manifest_sha256": "d2026d2ec96b98d8fb71a2159a9975b402245555546cc85bb6653fe060efaba3"
+    }
+  },
+  "reviewed_query_manifest_sha256": "a96fa147866a60f59f400750380e05c4702a06cb5e1a313c7d68571cc829a294",
+  "functional_handoff": "passed_with_sealed_query_resume_after_request_envelope_fix",
+  "data_content": "passed_this_question_against_original_source",
+  "worker_autonomous_completion": "not_passed_step_limit_parent_recovered",
+  "model_data_review": "passed_7_facts_6_requirements",
+  "analysis_reference_gate": "passed",
+  "analysis_content": "partial_needs_revision",
+  "analysis_findings": [
+    "Confuses source candidate/global adoption with already completed task-scoped review.",
+    "Describes primary-source citations as model review opinions.",
+    "Requests repeated validation and out-of-scope supporting tasks without tying them to a material unresolved question."
+  ],
+  "not_accepted": [
+    "Full company report",
+    "Independent initial research Reviewer and author revision",
+    "Chinese and English complete report parity",
+    "Continuous Manager or simulated account",
+    "Stable multi-run or multi-company quality"
+  ],
+  "metrics": {
+    "planner": {
+      "requests": 25,
+      "transport_failed_calls": 0,
+      "input_tokens": 608368,
+      "output_tokens": 41792,
+      "known_estimated_usd": "0.96854208",
+      "sum_call_seconds": 471.06,
+      "actual_upstream_models": [
+        "deepseek-v4-pro"
+      ]
+    },
+    "worker": {
+      "requests": 10,
+      "transport_failed_calls": 0,
+      "input_tokens": 165724,
+      "output_tokens": 3505,
+      "known_estimated_usd": "0.0539232",
+      "sum_call_seconds": 18.94,
+      "actual_upstream_models": [
+        "deepseek-flash"
+      ]
+    },
+    "data_reviewer": {
+      "requests": 1,
+      "transport_failed_calls": 0,
+      "input_tokens": 573503,
+      "output_tokens": 7234,
+      "known_estimated_usd": "0.7856706",
+      "sum_call_seconds": 72.288,
+      "actual_upstream_models": [
+        "deepseek-v4-pro"
+      ]
+    },
+    "analysis": {
+      "requests": 1,
+      "transport_failed_calls": 0,
+      "input_tokens": 65837,
+      "output_tokens": 5524,
+      "known_estimated_usd": "0.10877988",
+      "sum_call_seconds": 58.119,
+      "actual_upstream_models": [
+        "deepseek-v4-pro"
+      ]
+    }
+  },
+  "requests": 37,
+  "estimated_usd": "1.91691576",
+  "actual_billed_usd": null,
+  "cost_basis": "saved_peak_list_price_estimate_not_provider_bill",
+  "offline_fix_checks": {
+    "runtime_sdk_and_narrative": 37,
+    "driver_config_and_resume": 8
+  },
+  "historical_failed_stage": {
+    "run": "e2e-01",
+    "stage": "data-review",
+    "error_type": "BudgetExceeded",
+    "diagnosed_reason": "Serialized review request exceeded former fixed 400000-byte envelope cap before provider call",
+    "review_model_calls": 0
+  },
+  "repair": {
+    "default_request_envelope_bytes": 400000,
+    "explicit_reviewer_envelope_bytes": 2500000,
+    "review_input_packet_bytes": 1577403,
+    "source_content_removed": false,
+    "same_shared_budget_ledger": true
+  },
+  "next_actions": [
+    "Clarify task review versus global adoption in Analysis handoff and require gap requests to state material impact.",
+    "Improve explicit omitted-body pointers and replay recency, then evaluate Worker completion and repeated reading.",
+    "Connect independent initial research assessment, author revision and bilingual complete reports."
+  ]
+}

@@ -9,6 +9,9 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 VERSION = "research-query-v0.3"
+SOURCE_PERIOD_VERSION = "research-query-v0.4"
+EXACT_SOURCE_PERIOD_VERSION = "research-query-v0.5"
+SUPPORTED_VERSIONS = (VERSION, SOURCE_PERIOD_VERSION, EXACT_SOURCE_PERIOD_VERSION)
 
 
 class Contract(BaseModel):
@@ -16,10 +19,15 @@ class Contract(BaseModel):
 
 
 class Period(Contract):
-    """Calendar fiscal periods only; other fiscal calendars require a new adapter."""
+    """Calendar periods, or exact source dates checked against the selected protocol.
+
+    Source basis preserves the supplied dates and period kind; it does not infer
+    a fiscal calendar, week count or a reporting period from duration alone.
+    """
     kind: Literal["quarter", "ytd", "year", "instant"]
     start: date | None
     end: date
+    basis: Literal["calendar", "source"] = Field(default="calendar", exclude_if=lambda value: value == "calendar")
 
     @model_validator(mode="after")
     def valid_range(self):
@@ -28,12 +36,96 @@ class Period(Contract):
                 raise ValueError("instant period cannot have a start")
         elif self.start is None or self.start > self.end:
             raise ValueError("duration requires an ordered start/end")
-        elif (self.start.year != self.end.year or self.start.day != 1 or self.end.day != monthrange(self.end.year, self.end.month)[1]
+        elif self.basis == "calendar" and (self.start.year != self.end.year or self.start.day != 1 or self.end.day != monthrange(self.end.year, self.end.month)[1]
               or (self.kind == "quarter" and (self.start.month not in (1, 4, 7, 10) or self.end.month - self.start.month != 2))
               or (self.kind == "ytd" and (self.start.month != 1 or self.end.month not in (3, 6, 9)))
               or (self.kind == "year" and (self.start.month != 1 or self.end.month != 12))):
             raise ValueError("pilot supports calendar fiscal periods only")
         return self
+
+
+class SourceMonthPeriod(Period):
+    """v0.4 source periods retain complete month boundaries and supported duration."""
+
+    @model_validator(mode="after")
+    def complete_source_months(self):
+        if self.basis == "source" and self.kind != "instant":
+            months = (self.end.year - self.start.year) * 12 + self.end.month - self.start.month + 1
+            expected = {"year": (12,), "quarter": (3,), "ytd": (6, 9)}[self.kind]
+            if self.start.day != 1 or self.end.day != monthrange(self.end.year, self.end.month)[1] or months not in expected:
+                raise ValueError("source periods require explicit complete month boundaries and supported duration")
+        return self
+
+
+class CalendarPeriod(Contract):
+    """Calendar fiscal periods only; other fiscal calendars require a new adapter."""
+    kind: Literal["quarter", "ytd", "year", "instant"]
+    start: date | None
+    end: date
+
+    @model_validator(mode="after")
+    def calendar_only(self):
+        Period.model_validate(self.model_dump())
+        return self
+
+
+def validate_period_version(period, version):
+    """The dataset selects the protocol; source basis cannot bypass legacy limits."""
+    if version not in SUPPORTED_VERSIONS:
+        raise ValueError("unsupported query contract version: " + version)
+    if period is not None:
+        value = period.model_dump(mode="json") if isinstance(period, Period) else period
+        model = {VERSION: CalendarPeriod, SOURCE_PERIOD_VERSION: SourceMonthPeriod,
+                 EXACT_SOURCE_PERIOD_VERSION: Period}[version]
+        model.model_validate(value)
+
+
+def export_query_schema(model, *, version):
+    """Explicit storage protocol export, separate from current runtime models."""
+    if version not in SUPPORTED_VERSIONS:
+        raise ValueError("unsupported query contract version: " + version)
+    schema = model.model_json_schema()
+    period_model = {VERSION: CalendarPeriod, SOURCE_PERIOD_VERSION: SourceMonthPeriod,
+                    EXACT_SOURCE_PERIOD_VERSION: Period}[version]
+    period_schema = period_model.model_json_schema()
+    period_schema["title"] = "Period"
+    if model is Period:
+        schema = period_schema
+    elif "Period" in schema.get("$defs", {}):
+        schema["$defs"]["Period"] = period_schema
+    # v0.3 schemas are frozen artifacts. Even additive annotations or const
+    # markers would change their published identity and legacy replay contract.
+    if version == VERSION:
+        return schema
+    period_schema["$comment"] = (
+        "Dates use ISO 8601. Cross-field ordering and calendar/month-boundary constraints "
+        "are validated by validate_period_version using the enclosing dataset protocol."
+    )
+    period_schema["x-period-validation"] = {
+        "protocol": version,
+        "calendar": "calendar_boundaries",
+        "source": {VERSION: "unsupported", SOURCE_PERIOD_VERSION: "complete_month_boundaries",
+                   EXACT_SOURCE_PERIOD_VERSION: "ordered_exact_dates"}[version],
+        "duration_start": "required_nonnull_and_not_after_end",
+        "instant_start": "required_null",
+    }
+    schema["x-query-contract-version"] = version
+    # Runtime models can read supported versions; each exported protocol has its own
+    # record/result marker, including nested ResearchRecord definitions.
+    def markers(node):
+        if isinstance(node, dict):
+            for key in ("schema_version", "result_schema_version"):
+                field = node.get("properties", {}).get(key)
+                if field is not None and field.get("default") == VERSION:
+                    field["default"] = version
+                    field["const"] = version
+            for value in node.values():
+                markers(value)
+        elif isinstance(node, list):
+            for value in node:
+                markers(value)
+    markers(schema)
+    return schema
 
 
 class ResearchRecord(Contract):
@@ -66,6 +158,7 @@ class ResearchRecord(Contract):
 
     @model_validator(mode="after")
     def validate_value(self):
+        validate_period_version(self.period, self.schema_version)
         if (self.period is not None) != (self.period_resolution == "resolved"):
             raise ValueError("period and resolution status disagree")
         for value in (self.value_decimal, self.upper_decimal):
@@ -158,3 +251,11 @@ class QueryResult(Contract):
     evidence: dict[str, dict] = Field(default_factory=dict)
     gaps: tuple[dict, ...] = ()
     trace: tuple[dict, ...] = ()
+
+    @model_validator(mode="after")
+    def consistent_versions(self):
+        if self.result_schema_version not in SUPPORTED_VERSIONS:
+            raise ValueError("unsupported result schema version")
+        if any(record.schema_version != self.result_schema_version for record in self.records):
+            raise ValueError("record and result schema versions disagree")
+        return self

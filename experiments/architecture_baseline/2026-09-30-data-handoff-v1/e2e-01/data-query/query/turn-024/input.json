@@ -1,0 +1,2740 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "仅依据选定的 Alphabet FY2025 10-K，核对 2024 年和 2025 年的合并经营现金流、购建固定资产的现金支出，并查找资本支出的主要用途。请自主制定有明确完成条件的取证计划，把购建固定资产现金支出的数值、期间及口径核对委派给 Worker；Worker 返回后，由主角色独立核验原文与查询结果。保留可追溯原始披露、单位、期间、会计口径及资料缺口。仅需读取支持这些问题的正文和表格，无需通读整份报表或整章。不得用摘要冒充已读原文，不得自行计算未注册公式，不推断维护性资本开支或 AI 投资回报。此次只验收取证分工，不作当前投资建议。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-02-05",
+    "include_candidates": true
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0001652044",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "goog:YouTubeAdvertisingRevenueMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "us-gaap:AllOtherSegmentsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ConsolidationItemsAxis": "us-gaap:OperatingSegmentsMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "goog:AmericasExcludingUnitedStatesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3d3534ee58538dd2",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3d3534ee58538dd2",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeAxis": "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeMember",
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:AccumulatedNetUnrealizedInvestmentGainLossMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-439d6f7254f42ebb",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-439d6f7254f42ebb",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeAxis": "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "capex_cash_payments",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Positive cash payments to acquire PPE; not total investment.",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "net_income",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "net_income",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "operating_cash_flow",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "operating_cash_flow",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "operating_income",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "operating_income",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "revenue",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "revenue",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-7d95f8d35723138498f123ab6c2e2b8e675d13bb9a7a1dae0fda631376a0f962",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "company_id": "sec-0001652044",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "document_id": "googl-2025-10k",
+          "index_id": "didx-d113d1d4ab51745c",
+          "index_folder": "indexes/googl-2025-10k",
+          "raw_file": "raw/googl-2025-10k.html",
+          "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "form": "10-K",
+          "period_end": "2025-12-31",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2026-02-05",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              }
+            }
+          ],
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes"
+          ],
+          "image_block_count": 2
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 913,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 10,
+        "total_count": 21,
+        "bytes_returned": 3948,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "scope_id": "scope-9971188484366854bf3045c2",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "f52047ae48ebf93aabbb651de919eab578f9baa6d8ad257e4d37bda50302f502",
+          "offset": 10,
+          "checksum": "f231f8a62d4dad009f1fc27b8b02a5d27ee26fa03cc11c1b04f11054a22252fe"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 1943,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 293,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2024",
+      "description": "核对 Alphabet FY2025 10-K 合并现金流量表中 2024年度经营活动产生的现金净额，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2025",
+      "description": "核对 Alphabet FY2025 10-K 合并现金流量表中 2025年度经营活动产生的现金净额，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2024",
+      "description": "核对 Alphabet FY2025 10-K 中购建固定资产的现金支出 2024年度数值、期间及会计口径，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2025",
+      "description": "核对 Alphabet FY2025 10-K 中购建固定资产的现金支出 2025年度数值、期间及会计口径，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req-source-cashflow",
+      "description": "仅读取 Alphabet FY2025 10-K 中支持 2024/2025 合并经营现金流与购建固定资产现金支出的原始现金流量表正文或表格，核对数值、单位、期间与合并口径，不要求通读整章。"
+    },
+    {
+      "kind": "source_answer",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req-capex-uses",
+      "description": "查找 Alphabet FY2025 10-K 中资本支出主要用途的披露类别，仅依据原文陈述，不推断维护性资本开支或 AI 投资回报。"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2024",
+      "description": "核对 Alphabet FY2025 10-K 合并现金流量表中 2024年度经营活动产生的现金净额，报告口径为合并口径，单位美元。",
+      "evidence_ids": [
+        "ev-04e89c6663a5772b619b0611",
+        "ev-c471c412868600b8040f4a8a"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:0e1d8f7077f05249bb046276",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / operating_cash_flow / 2024-01-01 — 2024-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-1ee7bb58b50f03e0f72b12e6"
+          ],
+          "artifact_ids": [
+            "art-ce6b8cee36d965fc855acef8"
+          ],
+          "event_sequences": [
+            5
+          ]
+        },
+        {
+          "check_id": "citations:obs-1ee7bb58b50f03e0f72b12e6",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-1ee7bb58b50f03e0f72b12e6"
+          ],
+          "artifact_ids": [
+            "art-058c27e13af7144b104dc1f3"
+          ],
+          "event_sequences": [
+            5
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-005/query-receipt.json",
+          "sha256": "f76b76693935e3e4495487d60d8fb6fb04f2cfd58ee847b428868d7667034c6d"
+        }
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2025",
+      "description": "核对 Alphabet FY2025 10-K 合并现金流量表中 2025年度经营活动产生的现金净额，报告口径为合并口径，单位美元。",
+      "evidence_ids": [
+        "ev-154f5b538ddbf9e02b3b2f73",
+        "ev-c471c412868600b8040f4a8a"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:2788fc6e633feff396e46b25",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / operating_cash_flow / 2025-01-01 — 2025-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-b8d3ac73ea8cbbe84ae10f92"
+          ],
+          "artifact_ids": [
+            "art-62a388a5b3811d6c9ee0d09d"
+          ],
+          "event_sequences": [
+            6
+          ]
+        },
+        {
+          "check_id": "citations:obs-b8d3ac73ea8cbbe84ae10f92",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-b8d3ac73ea8cbbe84ae10f92"
+          ],
+          "artifact_ids": [
+            "art-9fc6836667a81bd35d80b32e"
+          ],
+          "event_sequences": [
+            6
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-006/query-receipt.json",
+          "sha256": "8e393f24a5a84220e0db3f8bceb3432e426b0308d73eb2605979595db80c9edb"
+        }
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2024",
+      "description": "核对 Alphabet FY2025 10-K 中购建固定资产的现金支出 2024年度数值、期间及会计口径，报告口径为合并口径，单位美元。",
+      "evidence_ids": [
+        "ev-ab92ca11037d639cc859c238",
+        "ev-c471c412868600b8040f4a8a"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:2d6a4ae3dde68b3f46dfcc3d",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / capex_cash_payments / 2024-01-01 — 2024-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-a0343ddc7aedd6ae4e071851"
+          ],
+          "artifact_ids": [
+            "art-65669ccb76a6e08e34fc59bf"
+          ],
+          "event_sequences": [
+            7
+          ]
+        },
+        {
+          "check_id": "citations:obs-a0343ddc7aedd6ae4e071851",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-a0343ddc7aedd6ae4e071851"
+          ],
+          "artifact_ids": [
+            "art-1319bb66529e30b20565251f"
+          ],
+          "event_sequences": [
+            7
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-007/query-receipt.json",
+          "sha256": "82a7c35e13ec7e8673d70c8bccb9bcbf81b47ee1d56cdc43a5a94cfb803075e6"
+        }
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2025",
+      "description": "核对 Alphabet FY2025 10-K 中购建固定资产的现金支出 2025年度数值、期间及会计口径，报告口径为合并口径，单位美元。",
+      "evidence_ids": [
+        "ev-687678a9185fb1537f1e46f6",
+        "ev-c471c412868600b8040f4a8a"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:d046d84f3cd17680523d2104",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / capex_cash_payments / 2025-01-01 — 2025-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-56ba2c019c541769c0cce851"
+          ],
+          "artifact_ids": [
+            "art-5e4d2f156b0731df882b7341"
+          ],
+          "event_sequences": [
+            8
+          ]
+        },
+        {
+          "check_id": "citations:obs-56ba2c019c541769c0cce851",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-56ba2c019c541769c0cce851"
+          ],
+          "artifact_ids": [
+            "art-a960d8b03dbae5aea419ee0e"
+          ],
+          "event_sequences": [
+            8
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-008/query-receipt.json",
+          "sha256": "4c3717ef824662cad7358a1a596118792192b7b990e7c82402d788db58cd5e2d"
+        }
+      ]
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req-source-cashflow",
+      "description": "仅读取 Alphabet FY2025 10-K 中支持 2024/2025 合并经营现金流与购建固定资产现金支出的原始现金流量表正文或表格，核对数值、单位、期间与合并口径，不要求通读整章。",
+      "evidence_ids": [
+        "ev-c471c412868600b8040f4a8a"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      }
+    },
+    {
+      "kind": "source_answer",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req-capex-uses",
+      "description": "查找 Alphabet FY2025 10-K 中资本支出主要用途的披露类别，仅依据原文陈述，不推断维护性资本开支或 AI 投资回报。",
+      "evidence_ids": [
+        "ev-c471c412868600b8040f4a8a",
+        "ev-349b8112b5557e68b696a63e",
+        "ev-0cf945c1ca380dfde82cfa57",
+        "ev-29f23d52e7542c9b1c98e77c",
+        "ev-d7416b8610673352ed0fc42d",
+        "ev-e79308b651da1b92bb6e57e0",
+        "ev-f5a9d0523de0fb60dbceddea",
+        "ev-88d6156db193f765774ee294"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-c4b037f2e1f44a270d111743a29d35a9",
+    "kind": "run_state",
+    "path": "artifacts/art-c4b037f2e1f44a270d111743a29d35a9.json",
+    "sha256": "34f232dba65aa2a58c948cf523ec79353d2290ba2a7e7fc3db340011659d35b2",
+    "size_bytes": 31609,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    },
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "created_step": 24,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-6b75eee338a5fed11ca051d231ddc1a1",
+      "kind": "record",
+      "path": "artifacts/art-6b75eee338a5fed11ca051d231ddc1a1.json",
+      "sha256": "5f6689f4f27c0e12c1802918cda0050dd079ce9553bbbc0823b061567d15f9aa",
+      "size_bytes": 1359,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-04e89c6663a5772b619b0611"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-64abbd5903a93fac1c9b9e5011cdc43c",
+      "kind": "citation",
+      "path": "artifacts/art-64abbd5903a93fac1c9b9e5011cdc43c.json",
+      "sha256": "4f50f4af003a177eb4dbbdfef97a58395e56d84a5fd52ce832715804add8c1d6",
+      "size_bytes": 1418,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-b81659386fe845eb0f5fc4d3"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-ff6e03d84aa96429d5ce8ee590469bbd",
+      "kind": "record",
+      "path": "artifacts/art-ff6e03d84aa96429d5ce8ee590469bbd.json",
+      "sha256": "61feae014aeb2ee878aa7735c2310a674927ce4803d61380204b80bbd6c6b9a8",
+      "size_bytes": 1358,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 6,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-154f5b538ddbf9e02b3b2f73"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-9129a25f8e429d657bcccd1dc901c8b4",
+      "kind": "citation",
+      "path": "artifacts/art-9129a25f8e429d657bcccd1dc901c8b4.json",
+      "sha256": "749c57b94ab8a97adc4580428452edb90161d8d021d872a584d75f3983059aae",
+      "size_bytes": 1416,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 6,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-e9b2a74bf7f71215bf46d448"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-3005830acc68923fccd9c2a3d0f3a6ec",
+      "kind": "record",
+      "path": "artifacts/art-3005830acc68923fccd9c2a3d0f3a6ec.json",
+      "sha256": "4a5dd29dbf5dc127d07a8b0b33630700963331e44a24ac5d2fa6bb9c1e765261",
+      "size_bytes": 1358,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 7,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-ab92ca11037d639cc859c238"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-7c8911f667547bb76b26f20dffcb6b03",
+      "kind": "citation",
+      "path": "artifacts/art-7c8911f667547bb76b26f20dffcb6b03.json",
+      "sha256": "b95b081e4ec77ffbbe01bcda67c86fd226f0dcc73a5227dbaee490aac682b7dd",
+      "size_bytes": 1415,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 7,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-8aef7e7638c48fc1a1133194"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-d6d47c73c60ba0ef3470a5fa089980eb",
+      "kind": "record",
+      "path": "artifacts/art-d6d47c73c60ba0ef3470a5fa089980eb.json",
+      "sha256": "33087962ef9b89a131ac24a05356aecc7c541260dac4708754ec29791a11ffbf",
+      "size_bytes": 1357,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 8,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-687678a9185fb1537f1e46f6"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-c6f2897c6a769ba3dc26c4549e147d24",
+      "kind": "citation",
+      "path": "artifacts/art-c6f2897c6a769ba3dc26c4549e147d24.json",
+      "sha256": "e67c8b474c5f505ab109632dda2427318526295cf8ed1b20093ede4093882f4b",
+      "size_bytes": 1413,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 8,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-2f185f9e9d73206bc3281818"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-65a5bb98b1aced197915976000a10b45",
+      "kind": "context",
+      "path": "artifacts/art-65a5bb98b1aced197915976000a10b45.json",
+      "sha256": "ae3db93184f08a0751392f3673cafe4a298d096da7249a2b65102262f66ed89e",
+      "size_bytes": 80869,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-c471c412868600b8040f4a8a"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-76d785abd38ddf3c43680fd76def8344",
+      "kind": "context",
+      "path": "artifacts/art-76d785abd38ddf3c43680fd76def8344.json",
+      "sha256": "dd59472f5b967c5638ac8d99e240f35ba05efe363eb06ddb93b37528a2f1203a",
+      "size_bytes": 4614,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 15,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-349b8112b5557e68b696a63e"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-4c76fa4b17a631603205a7c4d35c3a0d",
+      "kind": "context",
+      "path": "artifacts/art-4c76fa4b17a631603205a7c4d35c3a0d.json",
+      "sha256": "f1785208a57942b9bd4604bd70357fa9a843cb379949f04c63d5c3d264479f0a",
+      "size_bytes": 5109,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 16,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-0cf945c1ca380dfde82cfa57"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-677b8f9232a4b2db1e69e53a803a3df6",
+      "kind": "context",
+      "path": "artifacts/art-677b8f9232a4b2db1e69e53a803a3df6.json",
+      "sha256": "b9f46fcb9baf99aa1e2a7cccaa520a965936d623c6cfb85c81fdaa7a0354f3e4",
+      "size_bytes": 15728,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 17,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-29f23d52e7542c9b1c98e77c"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "limited",
+    "artifact_id": "art-36e4aeca26d6a24a3839282412cf95b5",
+    "sha256": "94eef8b9644b15e471567be19af06c38e6e9ebc790533ed23863e6d699a4cd3b",
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 12,
+    "total_count": 16,
+    "returned_count": 12,
+    "bytes_returned": 8753,
+    "next_cursor": {
+      "cursor_version": "run-artifact-cursor-v1",
+      "artifact_id": "art-36e4aeca26d6a24a3839282412cf95b5",
+      "sha256": "94eef8b9644b15e471567be19af06c38e6e9ebc790533ed23863e6d699a4cd3b",
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "pointer": "",
+      "offset": 12
+    },
+    "gaps": []
+  },
+  "observation": {
+    "status": "tool_returned",
+    "evidence_ids": [
+      "ev-88d6156db193f765774ee294"
+    ],
+    "result": {
+      "index_id": "didx-d113d1d4ab51745c",
+      "node_id": "didx-d113d1d4ab51745c-document",
+      "reading_group_version": "reading-groups-v0.2",
+      "reading_groups": [
+        {
+          "group_id": "list-block-000614-4e902c64",
+          "version": "reading-groups-v0.2",
+          "kind": "list_context",
+          "block_ids": [
+            "block-000614-4e902c64",
+            "block-000615-414413ff",
+            "block-000616-051391dc"
+          ],
+          "item_ids": [
+            "block-000615-414413ff",
+            "block-000616-051391dc"
+          ],
+          "items": [
+            {
+              "block_id": "block-000615-414413ff",
+              "parent_id": null
+            },
+            {
+              "block_id": "block-000616-051391dc",
+              "parent_id": null
+            }
+          ],
+          "rule": "consecutive bullet items + colon introduction + adjacent heading"
+        }
+      ],
+      "expansion_note": "Complete list/table/turn/Q&A context may exceed requested count; original blocks unchanged.",
+      "blocks": [
+        {
+          "block_id": "block-000614-4e902c64",
+          "ordinal": 614,
+          "type": "paragraph",
+          "text": "Our capital investments in property and equipment consist primarily of the following major categories:",
+          "text_hash": "4e902c64635e1219b8a8c0f10311a8afdfbb6246f059fab86996fac45ce92569",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2121",
+          "dom_path": "/html/body/div[662]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        },
+        {
+          "block_id": "block-000615-414413ff",
+          "ordinal": 615,
+          "type": "list_item",
+          "text": "•technical infrastructure, which consists of our investments in servers and network equipment, data center land, and building construction and improvements; and",
+          "text_hash": "414413ff3b36fe13119a9baa8231d2b0ece780e1e429a8822860b54a306ffa77",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2121",
+          "dom_path": "/html/body/div[663]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "padding-left",
+              "36pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "-13.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        },
+        {
+          "block_id": "block-000616-051391dc",
+          "ordinal": 616,
+          "type": "list_item",
+          "text": "•office facilities, ground-up development projects, and building improvements.",
+          "text_hash": "051391dc89b7e3d7115db44035ced8dc754c4d275dd4d16b70dcd96b2bd9430f",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2121",
+          "dom_path": "/html/body/div[664]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "padding-left",
+              "36pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "-13.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        },
+        {
+          "block_id": "block-000617-b57c8ea3",
+          "ordinal": 617,
+          "type": "paragraph",
+          "text": "Assets not yet in service are those that are not ready for their intended use, including assets in the process of construction or assembly, and consist primarily of technical infrastructure. The time frame from date of purchase to placement in service of these assets may extend from months to years. For example, our data center construction projects are generally multi-year projects with multiple phases, where we acquire land and buildings, construct buildings, and secure and install servers and network equipment.",
+          "text_hash": "b57c8ea309d37559ddca34431a907c47a3e8005b0304358c83253530c3d7375e",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2121",
+          "dom_path": "/html/body/div[665]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "115%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        },
+        {
+          "block_id": "block-000618-45e1aa4d",
+          "ordinal": 618,
+          "type": "paragraph",
+          "text": "During the years ended December 31, 2024 and 2025, we spent $52.5 billion and $91.4 billion on capital expenditures, respectively. In 2026, we expect to significantly increase, relative to 2025, our investment in our technical infrastructure, including servers and network equipment, and data centers. Depreciation of our property and equipment commences when such assets are ready for their intended use. For the years ended December 31, 2024 and 2025, our depreciation on property and equipment was $15.3 billion and $21.1 billion, respectively.",
+          "text_hash": "45e1aa4d064a378168a6be3b408423630eef25186c70c0b49e24d194913254d7",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2121",
+          "dom_path": "/html/body/div[666]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        },
+        {
+          "block_id": "block-000619-86c4d4b8",
+          "ordinal": 619,
+          "type": "paragraph",
+          "text": "Leases",
+          "text_hash": "86c4d4b8b288efab668d553d5a67be84d95a50872757ec24bc0527a38423cf87",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2116",
+          "dom_path": "/html/body/div[668]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-style",
+              "italic"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        },
+        {
+          "block_id": "block-000620-d6411f5e",
+          "ordinal": 620,
+          "type": "paragraph",
+          "text": "As of December 31, 2025, the amount of total undiscounted future lease payments under operating leases was $18.3 billion, of which $3.3 billion is short-term, and total undiscounted future lease payments under finance leases was $2.9 billion, of which $491 million is short-term.",
+          "text_hash": "d6411f5e439b1f341be33d608811cecb0e80d19864f0f77a0965a8d31c0473b9",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2116",
+          "dom_path": "/html/body/div[669]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        },
+        {
+          "block_id": "block-000621-25f1a242",
+          "ordinal": 621,
+          "type": "paragraph",
+          "text": "As of December 31, 2025, we have entered into leases primarily related to data centers that have not yet commenced with short-term and long-term future lease payments of $5.8 billion and $52.7 billion, respectively. These leases will commence between 2026 and 2031 with non-cancelable lease terms primarily between one and 25 years.",
+          "text_hash": "25f1a242f8023490add7887d2b8f974a28c874d2f5048f6820d625ceeffacc8c",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_2116",
+          "dom_path": "/html/body/div[670]",
+          "reported_page": 38,
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "image_asset_id": null,
+          "layout_role": null
+        }
+      ],
+      "previous_block_id": "block-000613-1f944e51",
+      "next_block_id": "block-000622-47eb9e2b",
+      "context_note": "Check preceding heading/introduction and following list continuation; tables retain cells and XBRL.",
+      "execution_schema_version": "research-execution-v1",
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "candidate_data": true,
+      "source": {
+        "source_snapshot_id": "googl-2025-10k",
+        "company_id": "sec-0001652044",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "document_id": "googl-2025-10k",
+        "index_id": "didx-d113d1d4ab51745c",
+        "index_folder": "indexes/googl-2025-10k",
+        "raw_file": "raw/googl-2025-10k.html",
+        "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "form": "10-K",
+        "period_end": "2025-12-31",
+        "declared_mime_type": "text/html",
+        "parsed_mime_type": "text/html",
+        "available_at": "2026-02-05",
+        "status": "candidate",
+        "fiscal_periods": [
+          {
+            "fiscal_year": 2025,
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            }
+          }
+        ],
+        "capabilities": [
+          "read_context",
+          "literal_search",
+          "source_bytes"
+        ],
+        "image_block_count": 2
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "company_id": "sec-0001652044",
+      "source_period_end": "2025-12-31",
+      "available_at": "2026-02-05",
+      "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+      "status": "read",
+      "gaps": [],
+      "requested_start_block_id": "block-000614-4e902c64",
+      "block_ids": [
+        "block-000614-4e902c64",
+        "block-000615-414413ff",
+        "block-000616-051391dc",
+        "block-000617-b57c8ea3",
+        "block-000618-45e1aa4d",
+        "block-000619-86c4d4b8",
+        "block-000620-d6411f5e",
+        "block-000621-25f1a242"
+      ],
+      "next_cursor": {
+        "cursor_version": "document-cursor-v1",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "source_snapshot_id": "googl-2025-10k",
+        "index_id": "didx-d113d1d4ab51745c",
+        "node_id": "didx-d113d1d4ab51745c-document",
+        "kind": "read",
+        "start_block_id": "block-000622-47eb9e2b"
+      },
+      "node_complete": false,
+      "coverage": "Returned full blocks only; reaching the node end does not prove all earlier blocks were read."
+    },
+    "result_artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+      "kind": "context",
+      "path": "artifacts/art-d25530b7a103af92b44719b3b318e906.json",
+      "sha256": "0cb02d17a84d604c2b0e13ded91e6150af29341688b28f29e6e600ca93d14b03",
+      "size_bytes": 13507,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 23,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-88d6156db193f765774ee294"
+    },
+    "preview_truncated": false,
+    "reads": [],
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 23,
+      "action": "read_source",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "request_fingerprint": "f3fef8eed1dd6b75431da27938653779c310d8ca7845be99e96361ec8460cc48",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "reading",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 10857,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-2b4d9ebc223a9989bf1a8cd1d499f2dd",
+      "kind": "tool_output",
+      "path": "artifacts/art-2b4d9ebc223a9989bf1a8cd1d499f2dd.json",
+      "sha256": "a63b27828da87c4d58c4fb594644797966552ab4b516a348c50347a73d265c4d",
+      "size_bytes": 14563,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 23,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "882a036b94693ed5d406d9e5c4b51fbe00d1a5d943a1a2436bd26bed97a1e420"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "882a036b94693ed5d406d9e5c4b51fbe00d1a5d943a1a2436bd26bed97a1e420",
+    "content": "---\nname: data-agent-query\nversion: 6\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nUse kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.\n\nAn answer must declare model_claimed_coverage, coverage_note and unresolved_questions. partial requires concrete unresolved questions; claimed_complete requires none but remains a model judgment. The host validates references, never semantic completeness. No answer prevents finish unless an explicit gap is recorded; a partial answer seals a partial result. research_answers persists bounded candidate answers and artifact pointers across later reading. Revising an answer preserves old versions; changing only statement or label is not new evidence. Worker answers are untrusted candidates and do not satisfy the parent's requirements.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": true,
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req-capex-uses",
+        "reason": "source_answer_missing"
+      }
+    ],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000614-4e902c64",
+        "text": "Our capital investments in property and equipment consist primarily of the following major categories:",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000615-414413ff",
+        "text": "•technical infrastructure, which consists of our investments in servers and network equipment, data center land, and building construction and improvements; and",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000616-051391dc",
+        "text": "•office facilities, ground-up development projects, and building improvements.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000617-b57c8ea3",
+        "text": "Assets not yet in service are those that are not ready for their intended use, including assets in the process of construction or assembly, and consist primarily of technical infrastructure. The time frame from date of purchase to placement in service of these assets may extend from months to years. For example, our data center construction projects are generally multi-year projects with multiple phases, where we acquire land and buildings, construct buildings, and secure and install servers and network equipment.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000618-45e1aa4d",
+        "text": "During the years ended December 31, 2024 and 2025, we spent $52.5 billion and $91.4 billion on capital expenditures, respectively. In 2026, we expect to significantly increase, relative to 2025, our investment in our technical infrastructure, including servers and network equipment, and data centers. Depreciation of our property and equipment commences when such assets are ready for their intended use. For the years ended December 31, 2024 and 2025, our depreciation on property and equipment was $15.3 billion and $21.1 billion, respectively.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000619-86c4d4b8",
+        "text": "Leases",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000620-d6411f5e",
+        "text": "As of December 31, 2025, the amount of total undiscounted future lease payments under operating leases was $18.3 billion, of which $3.3 billion is short-term, and total undiscounted future lease payments under finance leases was $2.9 billion, of which $491 million is short-term.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-88d6156db193f765774ee294",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000621-25f1a242",
+        "text": "As of December 31, 2025, we have entered into leases primarily related to data centers that have not yet commenced with short-term and long-term future lease payments of $5.8 billion and $52.7 billion, respectively. These leases will commence between 2026 and 2031 with non-cancelable lease terms primarily between one and 25 years.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-d25530b7a103af92b44719b3b318e906",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-f5a9d0523de0fb60dbceddea",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000613-1f944e51",
+        "text": "Capital Expenditures",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-146807f85222f55b8524b3245816f314",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-e79308b651da1b92bb6e57e0",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000611-6bc06131",
+        "text": "Capital Expenditures and Leases",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-bf0b90fa52beaf360db166dcee7a1067",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-d7416b8610673352ed0fc42d",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000587-aaa3686f",
+        "text": "Changes to US tax law enacted on July 4, 2025, allow for immediate expensing of domestic research and experimentation costs, accelerated depreciation on eligible capital expenditures, and other tax law changes impacting 2025 with certain changes effective in 2026. These changes are reflected in our results for the year ended December 31, 2025.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-5b949a099df49f9da7c5bfc469840164",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-29f23d52e7542c9b1c98e77c",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000504-79716ffe",
+        "text": "•In 2025, we entered into definitive agreements to acquire Wiz, a leading cloud security platform, for $32.0 billion, and Intersect, a provider of data center and energy infrastructure solutions, for $4.8 billion in cash plus the assumption of debt. Both acquisitions are expected to close in 2026, subject to customary closing conditions, including the receipt of regulatory approvals.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-677b8f9232a4b2db1e69e53a803a3df6",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-29f23d52e7542c9b1c98e77c",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000505-80b6a813",
+        "text": "•In 2025, we issued senior unsecured notes for net proceeds of $37.3 billion, to be used for general corporate purposes.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-677b8f9232a4b2db1e69e53a803a3df6",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-29f23d52e7542c9b1c98e77c",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000506-52647acf",
+        "text": "•OI&E of $29.8 billion for the year ended December 31, 2025 included net gains on equity securities of $24.1 billion, primarily related to unrealized gains on our non-marketable equity securities.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-677b8f9232a4b2db1e69e53a803a3df6",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-29f23d52e7542c9b1c98e77c",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000507-f5e53cd5",
+        "text": "•Other Bets operating loss of $7.5 billion for the year ended December 31, 2025 included a $2.1 billion employee compensation charge recognized in the fourth quarter for Waymo, primarily reflected in research and development expenses, based on estimated stock valuation. In February 2026, Waymo announced an investment round of $16.0 billion, the significant majority of which was funded by Alphabet.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-677b8f9232a4b2db1e69e53a803a3df6",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 11,
+    "byte_limit": 12000
+  },
+  "source_leads": [
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000774-67c9365e",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "citation",
+      "requirement_ids": [
+        "req-capex-2024",
+        "req-capex-2025",
+        "req-ocf-2024",
+        "req-ocf-2025"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000774-67c9365e"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000403-e7c12495",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "search",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000403-e7c12495"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000508-db0825c7",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "search",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000508-db0825c7"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000511-5620c090",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "search",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000511-5620c090"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000587-aaa3686f",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "search",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000587-aaa3686f"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000611-6bc06131",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "search",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000611-6bc06131"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000613-1f944e51",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "search",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000613-1f944e51"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000618-45e1aa4d",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "search",
+      "requirement_ids": [
+        "req-capex-uses"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000618-45e1aa4d"
+      },
+      "read_status": "body_delivered"
+    }
+  ],
+  "source_lead_count": 8,
+  "delegations": [
+    {
+      "path": "turn-003/worker",
+      "requirement_ids": [
+        "req-capex-2024",
+        "req-capex-2025"
+      ],
+      "status": "worker_returned",
+      "handoff_artifact_id": "art-cd42e5e22e7096c688cbd57043e91f3a",
+      "full_handoff_artifact_id": "art-e14d816d31c3ede991e92eaf51685462",
+      "result_status": "limited",
+      "findings_preview": {
+        "value": {
+          "status": "limited",
+          "stop_reason": "step_limit",
+          "worker_run": "turn-003/worker",
+          "candidate_only": true,
+          "semantic_completeness": "not_evaluated",
+          "review_required": "Verify sources with parent tools; worker references do not satisfy parent coverage.",
+          "schema_version": "worker-handoff-summary-v1",
+          "records": [
+            {
+              "schema_version": "research-query-v0.4",
+              "record_id": "obs-a0343ddc7aedd6ae4e071851",
+              "record_type": "metric",
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "period_resolution": "resolved",
+              "value_kind": "actual",
+              "value_decimal": "52535000000",
+              "upper_decimal": null,
+              "value_relation": "eq",
+              "unit": "USD",
+              "denominator": null,
+              "modality": null,
+              "accounting_basis": "reported_consolidated",
+              "dimensions": {},
+              "available_at": "2026-02-05",
+              "source_snapshot_id": "googl-2025-10k",
+              "evidence_ids": [
+                "ev-1fea69caacad3e422fa3c65b"
+              ],
+              "qualifier_evidence_ids": [],
+              "question_evidence_ids": [],
+              "speaker": null,
+              "status": "candidate",
+              "worker_evidence_id": "ev-ab92ca11037d639cc859c238",
+              "full_read": {
+                "artifact_id": "art-e14d816d31c3ede991e92eaf51685462",
+                "pointer": "/evidence_bundle/items/0/value",
+                "limit": 32
+              }
+            },
+            {
+              "schema_version": "research-query-v0.4",
+              "record_id": "obs-56ba2c019c541769c0cce851",
+              "record_type": "metric",
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              },
+              "period_resolution": "resolved",
+              "value_kind": "actual",
+              "value_decimal": "91447000000",
+              "upper_decimal": null,
+              "value_relation": "eq",
+              "unit": "USD",
+              "denominator": null,
+              "modality": null,
+              "accounting_basis": "reported_consolidated",
+              "dimensions": {},
+              "available_at": "2026-02-05",
+              "source_snapshot_id": "googl-2025-10k",
+              "evidence_ids": [
+                "ev-868cb2fb5f29b34e0f3e7eff"
+              ],
+              "qualifier_evidence_ids": [],
+              "question_evidence_ids": [],
+              "speaker": null,
+              "status": "candidate",
+              "worker_evidence_id": "ev-687678a9185fb1537f1e46f6",
+              "full_read": {
+                "artifact_id": "art-e14d816d31c3ede991e92eaf51685462",
+                "pointer": "/evidence_bundle/items/2/value",
+                "limit": 32
+              }
+            }
+          ],
+          "computed_facts": [],
+          "requirement_ids": [
+            "req-capex-2024",
+            "req-capex-2025"
+          ],
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "company_ids": [
+              "sec-0001652044"
+            ],
+            "source_snapshot_ids": [
+              "googl-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-02-05",
+            "include_candidates": true
+          },
+          "citations": [
+            {
+              "source_id": "ev-1fea69caacad3e422fa3c65b",
+              "evidence_id": "ev-1fea69caacad3e422fa3c65b",
+              "source_snapshot_id": "googl-2025-10k",
+              "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+              "index_id": "didx-d113d1d4ab51745c",
+              "block_id": "block-000774-67c9365e",
+              "text_hash": "67c9365e556483f996f437c0561a28db510cb415de5b9d21b4215c68793f606a",
+              "quote": "52,535",
+              "number_metadata": {
+                "value_decimal": "52535000000",
+                "unit": "USD",
+                "raw_value": "52,535",
+                "scale": 6,
+                "sign": "+",
+                "decimals": "-6",
+                "format": "ixt:num-dot-decimal"
+              },
+              "unit_xml": "<xbrli:unit id=\"usd\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+              "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+              "worker_evidence_id": "ev-8aef7e7638c48fc1a1133194",
+              "full_read": {
+                "artifact_id": "art-e14d816d31c3ede991e92eaf51685462",
+                "pointer": "/evidence_bundle/items/1/value",
+                "limit": 32
+              }
+            }
+          ],
+          "contexts": [],
+          "candidate_extracts": [],
+          "candidate_source_answers": [],
+          "body_read_status": {
+            "delivered_body": {
+              "ev-c471c412868600b8040f4a8a": [
+                "block-000770-2f8c99ac",
+                "block-000771-9faf493a",
+                "block-000772-76355f56",
+                "block-000773-cb5b3af4"
+              ]
+            },
+            "candidate_only": true
+          },
+          "reference_checks": [
+            {
+              "requirement_id": "req-capex-2024",
+              "program_check": "satisfied",
+              "gap_ids": [
+                "gap-40dd4d91f6ec22e24021acc4"
+              ]
+            },
+            {
+              "requirement_id": "req-capex-2025",
+              "program_check": "satisfied",
+              "gap_ids": [
+                "gap-97ce137b6a3f78fd0ae2115e"
+              ]
+            }
+          ]
+        },
+        "truncated": true,
+        "reads": [
+          {
+            "status": "limited",
+            "artifact_id": "art-cd42e5e22e7096c688cbd57043e91f3a",
+            "sha256": "835a6fe39810ce26ac08a2ce55e5b5ef691acaaa08d19520d02a794d70f113e8",
+            "scope_id": "scope-9971188484366854bf3045c2",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "pointer": "/citations",
+            "unit": "items",
+            "offset": 0,
+            "end_offset": 1,
+            "total_count": 2,
+            "returned_count": 1,
+            "bytes_returned": 935,
+            "next_cursor": {
+              "cursor_version": "run-artifact-cursor-v1",
+              "artifact_id": "art-cd42e5e22e7096c688cbd57043e91f3a",
+              "sha256": "835a6fe39810ce26ac08a2ce55e5b5ef691acaaa08d19520d02a794d70f113e8",
+              "scope_id": "scope-9971188484366854bf3045c2",
+              "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+              "pointer": "/citations",
+              "offset": 1
+            },
+            "gaps": []
+          },
+          {
+            "status": "item_too_large",
+            "artifact_id": "art-cd42e5e22e7096c688cbd57043e91f3a",
+            "sha256": "835a6fe39810ce26ac08a2ce55e5b5ef691acaaa08d19520d02a794d70f113e8",
+            "scope_id": "scope-9971188484366854bf3045c2",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "pointer": "/contexts",
+            "unit": "items",
+            "offset": 0,
+            "end_offset": 0,
+            "total_count": 1,
+            "returned_count": 0,
+            "bytes_returned": 2,
+            "next_cursor": {
+              "cursor_version": "run-artifact-cursor-v1",
+              "artifact_id": "art-cd42e5e22e7096c688cbd57043e91f3a",
+              "sha256": "835a6fe39810ce26ac08a2ce55e5b5ef691acaaa08d19520d02a794d70f113e8",
+              "scope_id": "scope-9971188484366854bf3045c2",
+              "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+              "pointer": "/contexts",
+              "offset": 0
+            },
+            "gaps": [
+              {
+                "reason": "item_too_large",
+                "pointer": "/contexts/0",
+                "required_bytes": 1101,
+                "next_action": "read a child pointer or increase max_bytes"
+              }
+            ]
+          },
+          {
+            "artifact_id": "art-cd42e5e22e7096c688cbd57043e91f3a",
+            "pointer": "/full_handoff_ref",
+            "status": "not_previewed",
+            "required_bytes": 700
+          },
+          {
+            "artifact_id": "art-cd42e5e22e7096c688cbd57043e91f3a",
+            "pointer": "/gaps",
+            "status": "not_previewed",
+            "required_bytes": 1552
+          }
+        ],
+        "unlisted_paths": 0,
+        "browse_pointer": ""
+      }
+    }
+  ],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 18,
+      "action": "read_context",
+      "status": "tool_returned"
+    },
+    {
+      "step": 19,
+      "action": "read_context",
+      "status": "tool_returned"
+    },
+    {
+      "step": 20,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 21,
+      "action": "read_context",
+      "status": "tool_returned"
+    },
+    {
+      "step": 22,
+      "action": "read_context",
+      "status": "tool_returned"
+    },
+    {
+      "step": 23,
+      "action": "read_source",
+      "status": "tool_returned"
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 3
+}

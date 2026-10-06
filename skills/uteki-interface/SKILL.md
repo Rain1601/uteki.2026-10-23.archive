@@ -7,7 +7,7 @@ description: Design and refine Uteki company research interfaces using Rain's es
 
 Read [the style guide](references/style-guide.md) before changing UI. It is the maintained design baseline; the current screenshot or latest user correction takes precedence over it.
 
-The intended product is a company research workspace: compact, calm, readable, with stable panels and trackpad-first browsing. Rain should not need to specify type sizes, spacing or animation mechanics repeatedly.
+The intended product is a company research workspace: compact, calm, readable, with stable panels, explicit click navigation and native scrolling for reading. Rain should not need to specify type sizes, spacing or animation mechanics repeatedly.
 
 Before editing, identify the page's main object and the existing component to reuse. Prefer shared tokens and a scoped component rule over another late CSS override. Do not redesign unrelated pages or treat styling as authorization to change research conclusions, adoption or data.
 

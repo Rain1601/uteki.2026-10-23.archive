@@ -9,12 +9,14 @@ import duckdb
 from .query_dataset import build_dataset
 from .query_service import QueryDataPort
 from .evidence_packaging import build_evidence_package
+from .agent_cli import register_agent_commands, run_agent_command
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, help="write a new JSON artifact; existing files are never overwritten")
     commands = parser.add_subparsers(dest="tool", required=True)
+    register_agent_commands(commands)
     build = commands.add_parser("build")
     build.add_argument("--repo", type=Path, default=Path(__file__).resolve().parents[4])
     build.add_argument("--destination", type=Path, required=True)
@@ -51,9 +53,13 @@ def main(argv=None):
     try:
         if args.out and args.out.exists():
             raise FileExistsError("output artifact exists")
-        if args.tool != "build" and args.out and args.out.resolve().is_relative_to(args.dataset.resolve()):
+        if args.tool not in {"build", "agent"} and args.out and args.out.resolve().is_relative_to(args.dataset.resolve()):
             raise ValueError("query outputs must be outside the immutable dataset")
-        if args.tool == "build":
+        if args.tool == 'agent':
+            if args.out:
+                raise ValueError('agent commands use --output; inspect writes its JSON response to stdout')
+            result = run_agent_command(args)
+        elif args.tool == "build":
             result = build_dataset(args.repo, args.destination, spec=args.spec)
         else:
             with QueryDataPort(args.dataset) as port:
@@ -93,7 +99,9 @@ def main(argv=None):
                 stream.write(output)
         else:
             print(output, end="")
-        return 0
+        if args.tool == 'agent' and args.agent_action == 'acquire':
+            return 0 if result.get('status') == 'completed' else 2
+        return 2 if args.tool == 'agent' and result.get('status') in {'failed', 'unavailable', 'cancelled'} else 0
     except (ValueError, KeyError, OSError, RuntimeError, duckdb.Error) as error:
         print(json.dumps({"status": "failed", "error_type": type(error).__name__, "message": str(error)}, ensure_ascii=False), file=sys.stderr)
         return 2

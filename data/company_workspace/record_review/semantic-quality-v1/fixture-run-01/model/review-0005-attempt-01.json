@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 5,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0005-input.json",
+    "sha256": "bd1840203f422ece03959e07dac79be063fa7a525e2ce1ba93e27882ba2fece7"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T10:06:27.708274+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-8a99da67ac4e25caa2f7d95b\",\n  \"checks\": [\n    {\n      \"axis\": \"comparability\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明 FY2024 收入原报告为 120，后因收入列报变更重述为 130，且只有重述后的 FY2024 金额与 FY2025 采用相同列报。因此，记录 sr-005-r1（FY2024 重述值 130）与 sr-005-r2（FY2025 值 148）在列报基础上可比，但原始报告值 120 不可比。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-005-r1\", \"sr-005-r2\"],\n          \"statement\": \"FY2024 重述收入 130 与 FY2025 收入 148 采用相同列报，可直接比较；原始报告值 120 因列报变更不可比。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-005\",\n              \"block_id\": \"b1\",\n              \"quote\": \"FY2024 revenue was originally reported as 120 and has been restated to 130 following a change in revenue presentation. Only the restated FY2024 amount uses the same presentation as FY2025.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-005-a1\",\n      \"verdict\": \"supported\",\n      \"reason\": \"源文本明确说明 FY2024 重述收入为 130，且只有重述后的金额与 FY2025 采用相同列报。记录 sr-005-r1 的值为 130,000,000，sr-005-r2 的值为 148,000,000，与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-005\",\n          \"block_id\": \"b1\",\n          \"quote\": \"FY2024 revenue was originally reported as 120 and has been restated to 130 following a change in revenue presentation. Only the restated FY2024 amount uses the same presentation as FY2025.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": []\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-8a99da67ac4e25caa2f7d95b\",\n  \"checks\": [\n    {\n      \"axis\": \"comparability\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明 FY2024 收入原报告为 120，后因收入列报变更重述为 130，且只有重述后的 FY2024 金额与 FY2025 采用相同列报。因此，记录 sr-005-r1（FY2024 重述值 130）与 sr-005-r2（FY2025 值 148）在列报基础上可比，但原始报告值 120 不可比。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-005-r1\", \"sr-005-r2\"],\n          \"statement\": \"FY2024 重述收入 130 与 FY2025 收入 148 采用相同列报，可直接比较；原始报告值 120 因列报变更不可比。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-005\",\n              \"block_id\": \"b1\",\n              \"quote\": \"FY2024 revenue was originally reported as 120 and has been restated to 130 following a change in revenue presentation. Only the restated FY2024 amount uses the same presentation as FY2025.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-005-a1\",\n      \"verdict\": \"supported\",\n      \"reason\": \"源文本明确说明 FY2024 重述收入为 130，且只有重述后的金额与 FY2025 采用相同列报。记录 sr-005-r1 的值为 130,000,000，sr-005-r2 的值为 148,000,000，与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-005\",\n          \"block_id\": \"b1\",\n          \"quote\": \"FY2024 revenue was originally reported as 120 and has been restated to 130 following a change in revenue presentation. Only the restated FY2024 amount uses the same presentation as FY2025.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": []\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "c4e1011f-93c0-44cd-97b5-9a97ee670bd3",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 525,
+      "prompt_tokens": 2368,
+      "total_tokens": 2893,
+      "prompt_tokens_details": {
+        "cached_tokens": 640
+      },
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1728
+    }
+  },
+  "elapsed_seconds": 5.886832082993351,
+  "ended_at": "2026-09-24T10:06:33.593689+00:00",
+  "calls": [
+    {
+      "path": "calls/86fa77e6-d192-4ec6-b736-fdd36794c09e-end.json",
+      "sha256": "371228886cec38eedef7ca5f167c433810c12e984ec8852a48496a3ad5e34868"
+    },
+    {
+      "path": "calls/86fa77e6-d192-4ec6-b736-fdd36794c09e-start.json",
+      "sha256": "df9604e644ae1b8d622a6dc6ffc0771ac0602b5faa33f6bd223d33fe0e5f867b"
+    }
+  ]
+}

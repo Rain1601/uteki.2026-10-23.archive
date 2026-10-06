@@ -26,7 +26,7 @@ class SourceBinding(Contract):
 
 class NormalizationInput(InputFile):
     source_snapshot_id: str = Field(min_length=1)
-    adapter: Literal["alphabet-financial-v1", "alphabet-call-reviewed-v1"]
+    adapter: Literal["alphabet-financial-v1", "alphabet-call-reviewed-v1", "us-gaap-inline-v1"]
 
 
 class DatasetBuildSpec(Contract):

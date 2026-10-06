@@ -1,0 +1,338 @@
+{
+  "status": "tool_returned",
+  "evidence_ids": [
+    "ev-04e89c6663a5772b619b0611",
+    "ev-154f5b538ddbf9e02b3b2f73"
+  ],
+  "result": {
+    "result_schema_version": "research-query-v0.4",
+    "query_id": "autonomous-4",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-02-05",
+    "candidate_data": true,
+    "status": "complete",
+    "completion_scope": "Resolved typed plan only; document match does not establish semantic completeness of the natural-language question.",
+    "records": [
+      {
+        "schema_version": "research-query-v0.4",
+        "record_id": "obs-1ee7bb58b50f03e0f72b12e6",
+        "record_type": "metric",
+        "entity_id": "sec-0001652044",
+        "metric_id": "operating_cash_flow",
+        "period": {
+          "kind": "year",
+          "start": "2024-01-01",
+          "end": "2024-12-31"
+        },
+        "period_resolution": "resolved",
+        "value_kind": "actual",
+        "value_decimal": "125299000000",
+        "upper_decimal": null,
+        "value_relation": "eq",
+        "unit": "USD",
+        "denominator": null,
+        "modality": null,
+        "accounting_basis": "reported_consolidated",
+        "dimensions": {},
+        "available_at": "2026-02-05",
+        "source_snapshot_id": "googl-2025-10k",
+        "evidence_ids": [
+          "ev-595bfccd9052e2692625ffbe"
+        ],
+        "qualifier_evidence_ids": [],
+        "question_evidence_ids": [],
+        "summary": "us-gaap:NetCashProvidedByUsedInOperatingActivities; reported inline XBRL fact",
+        "speaker": null,
+        "status": "candidate",
+        "origin": {
+          "artifact": "raw/googl-2025-10k.html",
+          "record_index": 11165,
+          "adapter": "us-gaap-inline-v1",
+          "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+          "context_ref": "c-28",
+          "raw_dimensions": {},
+          "entity_identifier": "0001652044"
+        },
+        "normalization_notes": [
+          "Exact standard concept mapping; dimensions are opaque, not interpreted as named segments.",
+          "Candidate source fact; not independently adopted."
+        ]
+      },
+      {
+        "schema_version": "research-query-v0.4",
+        "record_id": "obs-b8d3ac73ea8cbbe84ae10f92",
+        "record_type": "metric",
+        "entity_id": "sec-0001652044",
+        "metric_id": "operating_cash_flow",
+        "period": {
+          "kind": "year",
+          "start": "2025-01-01",
+          "end": "2025-12-31"
+        },
+        "period_resolution": "resolved",
+        "value_kind": "actual",
+        "value_decimal": "164713000000",
+        "upper_decimal": null,
+        "value_relation": "eq",
+        "unit": "USD",
+        "denominator": null,
+        "modality": null,
+        "accounting_basis": "reported_consolidated",
+        "dimensions": {},
+        "available_at": "2026-02-05",
+        "source_snapshot_id": "googl-2025-10k",
+        "evidence_ids": [
+          "ev-0028f0247cd624ef233825ab"
+        ],
+        "qualifier_evidence_ids": [],
+        "question_evidence_ids": [],
+        "summary": "us-gaap:NetCashProvidedByUsedInOperatingActivities; reported inline XBRL fact",
+        "speaker": null,
+        "status": "candidate",
+        "origin": {
+          "artifact": "raw/googl-2025-10k.html",
+          "record_index": 11170,
+          "adapter": "us-gaap-inline-v1",
+          "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+          "context_ref": "c-1",
+          "raw_dimensions": {},
+          "entity_identifier": "0001652044"
+        },
+        "normalization_notes": [
+          "Exact standard concept mapping; dimensions are opaque, not interpreted as named segments.",
+          "Candidate source fact; not independently adopted."
+        ]
+      }
+    ],
+    "selections": [
+      {
+        "request": {
+          "entity_id": "sec-0001652044",
+          "metric_id": "operating_cash_flow",
+          "period": {
+            "kind": "year",
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "value_kind": "actual"
+        },
+        "selection_id": "0e1d8f7077f05249bb046276",
+        "record_ids": [
+          "obs-1ee7bb58b50f03e0f72b12e6"
+        ],
+        "status": "matched",
+        "reason": "one_or_conflicting_observations",
+        "occurrence_count": 1
+      },
+      {
+        "request": {
+          "entity_id": "sec-0001652044",
+          "metric_id": "operating_cash_flow",
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "value_kind": "actual"
+        },
+        "selection_id": "2788fc6e633feff396e46b25",
+        "record_ids": [
+          "obs-b8d3ac73ea8cbbe84ae10f92"
+        ],
+        "status": "matched",
+        "reason": "one_or_conflicting_observations",
+        "occurrence_count": 1
+      }
+    ],
+    "computed_facts": [],
+    "documents": [],
+    "evidence": {
+      "ev-0028f0247cd624ef233825ab": {
+        "evidence_id": "ev-0028f0247cd624ef233825ab",
+        "source_snapshot_id": "googl-2025-10k",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "index_id": "didx-d113d1d4ab51745c",
+        "block_id": "block-000774-67c9365e",
+        "text_hash": "67c9365e556483f996f437c0561a28db510cb415de5b9d21b4215c68793f606a",
+        "quote": "164,713",
+        "dom_path": "/html/body/div[837]/table",
+        "fact_dom_path": "/html/body/div[837]/table/tr[20]/td[8]/span/ix:nonfraction",
+        "fact_id": "f-381",
+        "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "context_ref": "c-1",
+        "unit_ref": "usd",
+        "context_xml": "<xbrli:context id=\"c-1\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001652044</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2025-01-01</xbrli:startdate><xbrli:enddate>2025-12-31</xbrli:enddate></xbrli:period></xbrli:context>",
+        "unit_xml": "<xbrli:unit id=\"usd\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+        "number_metadata": {
+          "value_decimal": "164713000000",
+          "unit": "USD",
+          "raw_value": "164,713",
+          "scale": 6,
+          "sign": "+",
+          "decimals": "-6",
+          "format": "ixt:num-dot-decimal"
+        },
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "context_block_ids": [
+          "block-000774-67c9365e"
+        ]
+      },
+      "ev-595bfccd9052e2692625ffbe": {
+        "evidence_id": "ev-595bfccd9052e2692625ffbe",
+        "source_snapshot_id": "googl-2025-10k",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "index_id": "didx-d113d1d4ab51745c",
+        "block_id": "block-000774-67c9365e",
+        "text_hash": "67c9365e556483f996f437c0561a28db510cb415de5b9d21b4215c68793f606a",
+        "quote": "125,299",
+        "dom_path": "/html/body/div[837]/table",
+        "fact_dom_path": "/html/body/div[837]/table/tr[20]/td[5]/span/ix:nonfraction",
+        "fact_id": "f-380",
+        "concept": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "context_ref": "c-28",
+        "unit_ref": "usd",
+        "context_xml": "<xbrli:context id=\"c-28\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001652044</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2024-01-01</xbrli:startdate><xbrli:enddate>2024-12-31</xbrli:enddate></xbrli:period></xbrli:context>",
+        "unit_xml": "<xbrli:unit id=\"usd\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+        "number_metadata": {
+          "value_decimal": "125299000000",
+          "unit": "USD",
+          "raw_value": "125,299",
+          "scale": 6,
+          "sign": "+",
+          "decimals": "-6",
+          "format": "ixt:num-dot-decimal"
+        },
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "context_block_ids": [
+          "block-000774-67c9365e"
+        ]
+      }
+    },
+    "gaps": [],
+    "trace": [
+      {
+        "tool": "sql",
+        "sql": "SELECT payload FROM observations WHERE entity_id = ? AND metric_id = ? AND value_kind = ? AND period_kind = ? AND period_start IS NOT DISTINCT FROM ? AND period_end = ? AND source_snapshot_id IN (SELECT source_snapshot_id FROM sources WHERE available_at <= ? AND source_snapshot_id IN (?) AND company_id IN (?)) AND available_at <= ? AND status = 'candidate' ORDER BY record_id LIMIT 257",
+        "parameters": [
+          "sec-0001652044",
+          "operating_cash_flow",
+          "actual",
+          "year",
+          "2024-01-01",
+          "2024-12-31",
+          "2026-02-05",
+          "googl-2025-10k",
+          "sec-0001652044",
+          "2026-02-05"
+        ],
+        "returned_rows": 1,
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b"
+      },
+      {
+        "tool": "sql",
+        "sql": "SELECT payload FROM observations WHERE entity_id = ? AND metric_id = ? AND value_kind = ? AND period_kind = ? AND period_start IS NOT DISTINCT FROM ? AND period_end = ? AND source_snapshot_id IN (SELECT source_snapshot_id FROM sources WHERE available_at <= ? AND source_snapshot_id IN (?) AND company_id IN (?)) AND available_at <= ? AND status = 'candidate' ORDER BY record_id LIMIT 257",
+        "parameters": [
+          "sec-0001652044",
+          "operating_cash_flow",
+          "actual",
+          "year",
+          "2025-01-01",
+          "2025-12-31",
+          "2026-02-05",
+          "googl-2025-10k",
+          "sec-0001652044",
+          "2026-02-05"
+        ],
+        "returned_rows": 1,
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b"
+      }
+    ],
+    "execution_schema_version": "research-execution-v1",
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    }
+  },
+  "result_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-2d774c4580f560074905f7742ef57a40",
+    "kind": "tool_payload",
+    "path": "artifacts/art-2d774c4580f560074905f7742ef57a40.json",
+    "sha256": "7b3eb579f961de0a27de025b6490ebfd7e8dde254ff6c723d9dfab842f91d275",
+    "size_bytes": 9675,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    },
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "created_step": 4,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "preview_truncated": false,
+  "reads": [],
+  "receipt": {
+    "schema_version": "data-tool-receipt-v1",
+    "step": 4,
+    "action": "query",
+    "requirement_ids": [
+      "REQ1_OCF_2024_2025"
+    ],
+    "request_fingerprint": "398d899ca03cbea6e856210deb84d60cab56524bf1ac6b3b0d42e82fe60cc58f",
+    "status": "tool_returned",
+    "error_code": null,
+    "layer": "query",
+    "retryable": false,
+    "progress_delta": true,
+    "observation_bytes": 8896,
+    "execution_limited": false,
+    "preview_truncated": false
+  },
+  "full_output": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-12caf43b84279626db68b38312e234b6",
+    "kind": "tool_output",
+    "path": "artifacts/art-12caf43b84279626db68b38312e234b6.json",
+    "sha256": "bd9df510c470e59776477f3f5bda1d8d8447a9f749630bbce05d933a948b95d1",
+    "size_bytes": 10332,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    },
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "created_step": 4,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  }
+}

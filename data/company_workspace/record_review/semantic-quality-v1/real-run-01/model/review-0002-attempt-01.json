@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 2,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0002-input.json",
+    "sha256": "9934980abff2f0aab332e0a20d2144a212c02ccfa58a8948e1ffa7b802b30b51"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T10:04:41.013835+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-b71fb814025d8dcef099a688\",\n  \"checks\": [\n    {\n      \"axis\": \"additivity\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"Microsoft Cloud revenue is explicitly stated to be included in four product/service lines in the revenue table, so it is a subset and cannot be summed with those lines without double counting.\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"Microsoft Cloud revenue is included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services; therefore these records are not additive with those product lines.\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.\"\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"The raw XBRL dimension msft:MicrosoftCloudMember corresponds to the disclosed 'Microsoft Cloud' revenue category, which is a secondary product/service categorization, not a reportable segment.\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"The dimension msft:MicrosoftCloudMember represents the 'Microsoft Cloud' product/service offering, which is a secondary categorization and not one of the reportable segments (Productivity and Business Processes, Intelligent Cloud, More Personal Computing).\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively.\"\n            },\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001181-efcd150c\",\n              \"quote\": \"During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"assertions\": [],\n  \"limitations\": [\n    \"Only the opening and target neighborhood of Note 18 were supplied; cross-note references to Note 1 were not resolved.\",\n    \"No assertions were provided for review.\"\n  ]\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-b71fb814025d8dcef099a688\",\n  \"checks\": [\n    {\n      \"axis\": \"additivity\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"Microsoft Cloud revenue is explicitly stated to be included in four product/service lines in the revenue table, so it is a subset and cannot be summed with those lines without double counting.\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"Microsoft Cloud revenue is included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services; therefore these records are not additive with those product lines.\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.\"\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"The raw XBRL dimension msft:MicrosoftCloudMember corresponds to the disclosed 'Microsoft Cloud' revenue category, which is a secondary product/service categorization, not a reportable segment.\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"obs-f8e00a77890bcdeb3edd38a2\",\n            \"obs-0b93130590eaf7825ad22d22\",\n            \"obs-34467d4558b7878f6fb37d22\"\n          ],\n          \"statement\": \"The dimension msft:MicrosoftCloudMember represents the 'Microsoft Cloud' product/service offering, which is a secondary categorization and not one of the reportable segments (Productivity and Business Processes, Intelligent Cloud, More Personal Computing).\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001227-3bdf0315\",\n              \"quote\": \"Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively.\"\n            },\n            {\n              \"source_snapshot_id\": \"source-0019ae7ba0f6e3b63f944782\",\n              \"block_id\": \"block-001181-efcd150c\",\n              \"quote\": \"During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"assertions\": [],\n  \"limitations\": [\n    \"Only the opening and target neighborhood of Note 18 were supplied; cross-note references to Note 1 were not resolved.\",\n    \"No assertions were provided for review.\"\n  ]\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "a945053d-c554-42d0-ae78-e44d827ef52c",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 758,
+      "prompt_tokens": 18517,
+      "total_tokens": 19275,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "prompt_cache_hit_tokens": 0,
+      "prompt_cache_miss_tokens": 18517
+    }
+  },
+  "elapsed_seconds": 9.701235125015955,
+  "ended_at": "2026-09-24T10:04:50.714050+00:00",
+  "calls": [
+    {
+      "path": "calls/09b7b560-a8ea-4b10-81c2-84b2cc084b28-end.json",
+      "sha256": "b111b2eb6b2d4642869f167b1cfcd8cf010c5255ba0cf9b9d1e1c71cd6b9cb34"
+    },
+    {
+      "path": "calls/09b7b560-a8ea-4b10-81c2-84b2cc084b28-start.json",
+      "sha256": "0c949ba384bbe5778dec21fd8a0f8a3c760848b1262963ec4137635280cd5b39"
+    }
+  ]
+}

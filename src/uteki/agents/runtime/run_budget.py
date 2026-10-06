@@ -1,4 +1,4 @@
-"""Cross-process estimated USD reservations. Unknown charges fail closed."""
+"""Cross-process USD estimates; optional record-only limit, enforced charges fail closed."""
 from contextlib import contextmanager
 from decimal import Decimal
 import json
@@ -11,21 +11,30 @@ class BudgetExceeded(RuntimeError):
     pass
 
 
+class RequestEnvelopeTooLarge(BudgetExceeded):
+    """The local serialized-request capacity was exceeded, before reserving cost."""
+
+
 class RunBudget:
     def __init__(self, path, limit, *, enforce=True):
         if type(enforce) is not bool:
             raise ValueError('Budget enforcement must be a boolean')
         self.enforce = enforce
         self.path = Path(path)
-        limit = Decimal(str(limit))
-        if not limit.is_finite() or limit <= 0:
-            raise ValueError('Positive finite budget required')
+        if limit is None:
+            if enforce:
+                raise ValueError('An unlimited budget requires record-only mode')
+        else:
+            limit = Decimal(str(limit))
+            if not limit.is_finite() or limit <= 0:
+                raise ValueError('Positive finite budget required')
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self._transaction() as db:
             db.execute('CREATE TABLE IF NOT EXISTS config (id INTEGER PRIMARY KEY, usd TEXT)')
             db.execute('CREATE TABLE IF NOT EXISTS reservations (id TEXT PRIMARY KEY, reserved TEXT, actual TEXT, state TEXT)')
-            db.execute('INSERT OR IGNORE INTO config VALUES (1, ?)', (str(limit),))
-            if Decimal(db.execute('SELECT usd FROM config WHERE id=1').fetchone()[0]) != limit:
+            db.execute('INSERT OR IGNORE INTO config VALUES (1, ?)', (None if limit is None else str(limit),))
+            stored = db.execute('SELECT usd FROM config WHERE id=1').fetchone()[0]
+            if (None if stored is None else Decimal(stored)) != limit:
                 raise ValueError('Existing budget limit cannot be silently changed')
 
     @contextmanager
@@ -47,13 +56,14 @@ class RunBudget:
             raise ValueError('Positive finite reservation required')
         with self._transaction() as db:
             rows = db.execute('SELECT reserved, actual, state FROM reservations').fetchall()
-            if self.enforce and any(state == 'unknown' for _, _, state in rows):
-                raise BudgetExceeded('Prior request cost unknown; reconcile before continuing')
-            committed = sum((Decimal(actual if state == 'settled' else reserved)
-                             for reserved, actual, state in rows), Decimal(0))
-            limit = Decimal(db.execute('SELECT usd FROM config WHERE id=1').fetchone()[0])
-            if self.enforce and committed + amount > limit:
-                raise BudgetExceeded('Estimated budget exhausted including in-flight reservations')
+            if self.enforce:
+                if any(state == 'unknown' for _, _, state in rows):
+                    raise BudgetExceeded('Prior request cost unknown; reconcile before continuing')
+                committed = sum((Decimal(actual if state == 'settled' else reserved)
+                                 for reserved, actual, state in rows), Decimal(0))
+                limit = Decimal(db.execute('SELECT usd FROM config WHERE id=1').fetchone()[0])
+                if committed + amount > limit:
+                    raise BudgetExceeded('Estimated budget exhausted including in-flight reservations')
             token = str(uuid4())
             db.execute('INSERT INTO reservations VALUES (?, ?, NULL, ?)', (token, str(amount), 'reserved'))
             return token
@@ -83,8 +93,10 @@ class RunBudget:
                     'enforcement': 'enforced' if self.enforce else 'record_only'}
 
 
-def reserve_request(budget, pricing, args, kwargs):
+def reserve_request(budget, pricing, args, kwargs, *, max_request_bytes=400000):
     """Conservative text envelope estimate, not a provider-enforced billing cap."""
+    if type(max_request_bytes) is not int or max_request_bytes < 1:
+        raise ValueError('max_request_bytes must be a positive integer')
     if not pricing:
         raise BudgetExceeded('No price estimate available')
     settings = kwargs.get('model_settings', args[2] if len(args) > 2 else None)
@@ -102,8 +114,9 @@ def reserve_request(budget, pricing, args, kwargs):
             return obj.json_schema()
         return str(type(obj).__name__)
     size = len(json.dumps([args, kwargs], default=encode, ensure_ascii=False).encode())
-    if size > 400000:
-        raise BudgetExceeded('Request envelope too large; narrow context')
+    if size > max_request_bytes:
+        raise RequestEnvelopeTooLarge(
+            f'Request envelope is {size} bytes; configured capacity is {max_request_bytes} bytes')
     estimate = ((Decimal(size + 16000) * Decimal(pricing['input_per_million'])
                  + Decimal(maximum) * Decimal(pricing['output_per_million'])) / Decimal(1000000))
     return budget.reserve(estimate), str(estimate)

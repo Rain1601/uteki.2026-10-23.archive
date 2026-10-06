@@ -1,0 +1,91 @@
+{
+  "packet_id": "semantic-aa4720746321e988150df9da",
+  "checks": [
+    {
+      "axis": "comparability",
+      "status": "constraints_found",
+      "reason": "Note 1 明确说明前期分部信息已重述，而合并结果未变。该重述影响 2022 年 Sensors 分部的收入和营业利润记录，但不影响 2023 年记录。",
+      "constraints": [
+        {
+          "record_ids": [
+            "birch-disclosure-b-revenue-2022",
+            "birch-disclosure-b-operating_income-2022"
+          ],
+          "statement": "2022 年 Sensors 分部的收入和营业利润记录属于重述后的前期分部信息；合并结果未因此次重述而改变。",
+          "citations": [
+            {
+              "source_snapshot_id": "birch-disclosure-b",
+              "block_id": "note-1-detail",
+              "quote": "Prior-period segment information was recast. Consolidated results were unchanged."
+            }
+          ]
+        }
+      ],
+      "unresolved_questions": []
+    },
+    {
+      "axis": "allocation",
+      "status": "insufficient_evidence",
+      "reason": "Note 1 提及 See Note 4 for allocation methodology，但 Note 4 的内容未在提供的资料中给出，无法评估收入与营业利润的分配方法。",
+      "constraints": [],
+      "unresolved_questions": [
+        "Note 4 中关于分配方法的具体内容是什么？"
+      ]
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "statement-a",
+      "verdict": "supported",
+      "reason": "Note 1 明确说明前期分部信息已重述且合并结果未变，与断言一致。",
+      "citations": [
+        {
+          "source_snapshot_id": "birch-disclosure-b",
+          "block_id": "note-1-detail",
+          "quote": "Prior-period segment information was recast. Consolidated results were unchanged."
+        }
+      ]
+    },
+    {
+      "assertion_id": "statement-b",
+      "verdict": "insufficient_evidence",
+      "reason": "Note 1 仅提及 See Note 4 for allocation methodology，但未提供 Note 4 的内容，无法确认分配方法是否已提供。",
+      "citations": [
+        {
+          "source_snapshot_id": "birch-disclosure-b",
+          "block_id": "note-1-detail",
+          "quote": "See Note 4 for allocation methodology."
+        }
+      ]
+    }
+  ],
+  "context_claims": [
+    {
+      "object_id": "context-fe8527e0f5892f1f403ef791",
+      "status": "supplied"
+    },
+    {
+      "object_id": "context-249483499ccc46f048a1d823",
+      "status": "supplied"
+    },
+    {
+      "object_id": "context-5ee02c2a974e85cdb3390b27",
+      "status": "unresolved"
+    },
+    {
+      "object_id": "context-47ff9a5a4fa5699bd85bc4d8",
+      "status": "unresolved"
+    }
+  ],
+  "context_requests": [
+    {
+      "question": "请提供 Note 4 中关于分配方法的具体内容。",
+      "reviewed_block_ids": [
+        "note-1-detail"
+      ],
+      "reference_ids": [
+        "context-47ff9a5a4fa5699bd85bc4d8"
+      ]
+    }
+  ]
+}

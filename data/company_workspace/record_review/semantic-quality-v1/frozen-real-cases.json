@@ -1,0 +1,279 @@
+{
+  "schema_version": "semantic-review-real-cases-eval-v1",
+  "purpose": "Independent evaluator-only constraints; never include expected_constraints or this file in model inputs.",
+  "model_input_policy": "Runtime packets may contain selected record IDs, axes, frozen source blocks, raw DOM/context/unit and metric definitions. Expected verdicts, required quotes and rationales stay exclusively on evaluator side.",
+  "snapshot_id": "query-a80aa612c40a8ef6ca17e36a",
+  "dataset_manifest_sha256": "f6f744b31ead8ac85444c70e30259cf2823c51d737fee6656ae3ce0cfd3a4d43",
+  "input_references": [
+    "data/company_workspace/record_review/msft-fy2025/inputs-02",
+    "data/company_workspace/record_review/msft-fy2025/inputs-03"
+  ],
+  "cases": [
+    {
+      "case_id": "msft-fy2025-segment-semantics",
+      "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+      "record_ids": [
+        "obs-c9967bda56a0a08e2bdc7acf",
+        "obs-ea3fda8937394a153cf46072",
+        "obs-c624a7fd0eb02f1b95bda571",
+        "obs-d2acdf2c846eea79d969011b",
+        "obs-a853ba764b41a6d58faca6af",
+        "obs-7111bdf83f6d6de4c164383f",
+        "obs-a865449200586290da8b8463",
+        "obs-c9752a3daf7a4ed8acf5f613",
+        "obs-3fc0069337163d3cdf840f0e",
+        "obs-58b8e9bbcdbe0f65e5761bb4",
+        "obs-961d14430e22510f30de532b",
+        "obs-e52f53034ee84065bac78ca7",
+        "obs-0033610d10facc97d1d4f6fe",
+        "obs-b2476370393460b74b70a82d",
+        "obs-63f6779a0d713cba625784b1",
+        "obs-8db30fb8b8299551605a9c37",
+        "obs-281f43cdb444f0468b258378",
+        "obs-9bd36b9c21a22f94d9865d36",
+        "obs-71426abfd6e87ce682843e93",
+        "obs-4d14a06717f1d1c8a5cf4433",
+        "obs-3fd5ae6292a1f718212ba070",
+        "obs-d471c9f3d1f12b167e1eb773",
+        "obs-0ccf6d30b99cfa01728074db",
+        "obs-58b8edcdb583d0c1df1a56d7"
+      ],
+      "axes": [
+        "comparability",
+        "allocation",
+        "dimensions"
+      ],
+      "expected_constraints": [
+        {
+          "axis": "comparability",
+          "required_record_ids": [
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36"
+          ],
+          "source_quotes": [
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001182-b3eedf85",
+              "quote": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information.",
+              "text_hash": "b3eedf85b83657382fbf26fd50e029ba4d5aad257e880c636fb772135ab5cd43"
+            },
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-000817-00ca3208",
+              "quote": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes. Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025. These changes primarily impacted Note 8 – Goodwill, Note 12 – Unearned Revenue, and Note 18 – Segment Information and Geographic Data.",
+              "text_hash": "00ca320873c6aa6182d621143965a62b7fafee7673bd3ef6926ae2056d0aa17f"
+            }
+          ],
+          "rationale": "2023/2024 segment amounts are presented on the FY2025 recast segment basis. Do not equate them to the initially published historical segment amounts or infer that cross-report comparability is unchanged."
+        },
+        {
+          "axis": "comparability",
+          "required_record_ids": [
+            "obs-71426abfd6e87ce682843e93",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-d471c9f3d1f12b167e1eb773",
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-58b8edcdb583d0c1df1a56d7"
+          ],
+          "source_quotes": [
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-000818-3a2e0b27",
+              "quote": "The recast of prior period information had no impact on our consolidated balance sheets, consolidated income statements, or consolidated cash flows statements.",
+              "text_hash": "3a2e0b27db1433d902b9434c4ab5618da4e5088c418a401b9f15074e9dbe6278"
+            }
+          ],
+          "rationale": "Do not infer consolidated statement restatement from segment recasting: the note explicitly says the recast did not affect consolidated balance sheets, income statements or cash flow statements."
+        },
+        {
+          "axis": "allocation",
+          "required_record_ids": [
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-a865449200586290da8b8463",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36"
+          ],
+          "source_quotes": [
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001211-94df82c9",
+              "quote": "Revenue and costs are generally directly attributed to our segments. However, due to the integrated structure of our business, certain revenue recognized and costs incurred by one segment may benefit other segments. Revenue from certain contracts is allocated among the segments based on the relative value of the underlying products and services, which can include allocation based on actual prices charged, prices when sold separately, or estimated costs plus a profit margin. Cost of revenue is allocated in certain cases based on a relative revenue methodology. Operating expenses that are allocated primarily include those relating to marketing of products and services from which multiple segments benefit and are generally allocated based on relative gross margin.",
+              "text_hash": "94df82c9dadd15b39a835597847f63f5050b0b0da9a93e9c04e6980ebd184b34"
+            },
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001212-72e12aed",
+              "quote": "In addition, certain costs are incurred at a corporate level and allocated to our segments. These allocated costs generally include legal, including settlements and fines, information technology, human resources, finance, excise taxes, field selling, shared facilities services, customer service and support, and severance incurred as part of a corporate program. Each allocation is measured differently based on the specific facts and circumstances of the costs being allocated and is generally based on relative gross margin or relative headcount.",
+              "text_hash": "72e12aed108d1d77911c98947c8c0b2e450c50d6c8357790061251d0a3e40b12"
+            }
+          ],
+          "rationale": "Segment revenue/costs can include allocation across segments and corporate-cost allocation. These are management segment measures, not wholly standalone cash economics. Apply revenue allocation to revenue records and expense/corporate allocation to operating income records."
+        },
+        {
+          "axis": "dimensions",
+          "required_record_ids": [
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-a865449200586290da8b8463",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36",
+            "obs-71426abfd6e87ce682843e93",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-d471c9f3d1f12b167e1eb773",
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-58b8edcdb583d0c1df1a56d7"
+          ],
+          "source_quotes": [
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001181-efcd150c",
+              "quote": "In its operation of the business, management, including our chief operating decision maker (“CODM”), who is also our Chief Executive Officer, reviews certain financial information, including segmented internal profit and loss statements. The primary profitability measure used by the CODM to review segment operating results is operating income. The CODM uses operating income to allocate resources during our annual planning process and throughout the year, as well as to assess the performance of our segments, primarily by monitoring actual results compared to prior periods and expected results. During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.",
+              "text_hash": "efcd150c810bc715a97d3e59da4d44ef059f51e0a0d38a40339c8115ccfe851c"
+            },
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001217-90dfc72b",
+              "quote": "(In millions) Year Ended June 30, 2025 2024 2023 Productivity and Business Processes Revenue $ 120,810 $ 106,820 $ 94,151 Cost of revenue 22,422 19,611 17,202 Operating expenses 28,615 27,548 26,875 Operating Income $ 69,773 $ 59,661 $ 50,074 Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944 Cost of revenue 40,171 29,611 24,109 Operating expenses 21,505 20,040 20,424 Operating Income $ 44,589 $ 37,813 $ 28,411 More Personal Computing Revenue $ 54,649 $ 50,838 $ 44,820 Cost of revenue 25,238 24,892 24,552 Operating expenses 15,245 13,987 10,230 Operating Income $ 14,166 $ 11,959 $ 10,038 Total Revenue $ 281,724 $ 245,122 $ 211,915 Cost of revenue 87,831 74,114 65,863 Operating expenses 65,365 61,575 57,529 Operating Income $ 128,528 $ 109,433 $ 88,523",
+              "text_hash": "90dfc72b7d69537584af292e26e4d0a51b0c32548b675560c4bd0c970317bf09"
+            }
+          ],
+          "rationale": "Tie each fact DOM/context member to the visible segment row and period. Distinguish the three segment members from six dimensionless Total records. Do not create general taxonomy mappings from member-name spelling."
+        }
+      ],
+      "missing_source_boundaries": [
+        {
+          "kind": "cross_note_context",
+          "block_ids": [
+            "block-000816-8d9f4520",
+            "block-000817-00ca3208",
+            "block-000818-3a2e0b27"
+          ],
+          "action": "Add original Note 1 heading and explanatory paragraphs; current bounded Note 18 packets do not establish these full cross-note details."
+        },
+        {
+          "kind": "allocation_context",
+          "block_ids": [
+            "block-001211-94df82c9",
+            "block-001212-72e12aed",
+            "block-001228-76ee317f"
+          ],
+          "action": "Verify these actual source paragraphs are delivered, not merely original-fragment paths. The last paragraph limits segment assets and separate depreciation/amortization interpretation."
+        },
+        {
+          "kind": "historical_comparison_unavailable",
+          "block_ids": [],
+          "action": "Prior originally published filings and a numerical recast bridge are not established by this case; retain that gap instead of claiming complete cross-report reconciliation."
+        }
+      ]
+    },
+    {
+      "case_id": "msft-fy2025-cloud-overlap-semantics",
+      "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+      "record_ids": [
+        "obs-f8e00a77890bcdeb3edd38a2",
+        "obs-0b93130590eaf7825ad22d22",
+        "obs-34467d4558b7878f6fb37d22"
+      ],
+      "axes": [
+        "additivity",
+        "dimensions"
+      ],
+      "expected_constraints": [
+        {
+          "axis": "additivity",
+          "required_record_ids": [
+            "obs-f8e00a77890bcdeb3edd38a2",
+            "obs-0b93130590eaf7825ad22d22",
+            "obs-34467d4558b7878f6fb37d22"
+          ],
+          "source_quotes": [
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001227-3bdf0315",
+              "quote": "These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.",
+              "text_hash": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e"
+            }
+          ],
+          "rationale": "Microsoft Cloud is an overlapping grouping already included in the named product/service revenues. Do not add it to those lines or consolidated revenue as incremental revenue."
+        },
+        {
+          "axis": "dimensions",
+          "required_record_ids": [
+            "obs-f8e00a77890bcdeb3edd38a2",
+            "obs-0b93130590eaf7825ad22d22",
+            "obs-34467d4558b7878f6fb37d22"
+          ],
+          "source_quotes": [
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001227-3bdf0315",
+              "quote": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.",
+              "text_hash": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e"
+            },
+            {
+              "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+              "block_id": "block-001226-283de46e",
+              "quote": "(In millions) Year Ended June 30, 2025 2024 2023 Server products and cloud services $ 98,435 $ 79,828 $ 65,007 Microsoft 365 Commercial products and cloud services 87,767 76,969 66,949 Gaming 23,455 21,503 15,466 LinkedIn 17,812 16,372 14,989 Windows and Devices 17,314 17,026 17,147 Search and news advertising 13,878 12,306 12,125 Dynamics products and cloud services 7,827 6,831 5,796 Enterprise and partner services 7,760 7,594 7,900 Microsoft 365 Consumer products and cloud services 7,404 6,648 6,417 Other 72 45 119 Total $ 281,724 $ 245,122 $ 211,915",
+              "text_hash": "283de46ecdb49aaf06e035894a9b7cd920233aa2ff4c28f80764d1c768c259fb"
+            }
+          ],
+          "rationale": "Review the MicrosoftCloudMember context against the paragraph-defined grouping. It includes only the commercial portion of LinkedIn and cloud subsets; do not equate it to Intelligent Cloud, Azure alone, or the sum of complete product rows."
+        }
+      ],
+      "missing_source_boundaries": [
+        {
+          "kind": "complete_paragraph_and_preceding_table",
+          "block_ids": [
+            "block-001226-283de46e",
+            "block-001227-3bdf0315"
+          ],
+          "action": "Deliver the entire two-sentence cloud paragraph plus the full preceding product/service table and each fact context/unit/DOM. The overlap sentence is present in inputs-03 but was not explained by prior accepted opinions."
+        },
+        {
+          "kind": "component_breakdown_unavailable",
+          "block_ids": [],
+          "action": "These blocks do not quantify each cloud component or independently reconcile the cloud grouping to all product rows. Do not invent a decomposition or claim an independent component sum."
+        }
+      ]
+    }
+  ]
+}

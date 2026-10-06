@@ -1,0 +1,347 @@
+/* Swiss study A: an explicit, isolated presentation layer for the existing workspace. */
+:root {
+  --bg:#f4f5f6;
+  --paper:#fff;
+  --rail:#f0f2f4;
+  --ink:#17191c;
+  --muted:#616872;
+  --line:#d6dbe1;
+  --soft:#f3f5f7;
+  --accent:#1759e8;
+  --wash:#eaf0ff;
+  --green:#087f59;
+  --amber:#a35b00;
+  --radius:3px;
+  --entity-width:224px;
+  --font:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  --study-red:#da332b;
+  --study-rule:#17191c;
+}
+:root[data-theme=dark] {
+  --bg:#14171b;
+  --paper:#1a1e23;
+  --rail:#15191e;
+  --ink:#f2f4f7;
+  --muted:#a8b0bc;
+  --line:#3a424d;
+  --soft:#242a32;
+  --accent:#8cb2ff;
+  --wash:#263951;
+  --green:#70dbb1;
+  --amber:#edbb73;
+  --study-red:#ff7770;
+  --study-rule:#dce2eb;
+}
+body {font-size:14px;line-height:1.55;letter-spacing:0}
+button,input,select {letter-spacing:0}
+h1,h2,h3,strong {font-synthesis:none}
+.workspace {--entity-width:224px}
+.workarea {grid-template-rows:40px 72px 36px minmax(0,1fr)}
+.toolbar {padding:0 24px;background:var(--paper)}
+.toolbar-start {gap:16px;flex:1}
+.breadcrumb {gap:8px;font-size:11px}
+.toolbar .tools {gap:2px}
+.utility {border-radius:3px;font-size:11px;padding:5px 8px;min-height:28px}
+.study-version {display:inline-flex;align-items:center;gap:7px;flex-shrink:0;font-size:10px;font-weight:650;white-space:nowrap;line-height:1.4;letter-spacing:.01em}
+.study-version-mark {display:block;width:7px;height:7px;background:var(--study-red)}
+.study-version-return {font-weight:400;color:var(--muted);margin-left:4px}
+.study-version:hover .study-version-return {color:var(--accent)}
+
+/* Navigation is an indexing system; active selections have a stable edge. */
+.global-nav {padding:12px 8px;background:var(--paper);border-right:1px solid var(--study-rule)}
+.nav-brand {height:48px;margin-bottom:18px;padding:4px 8px}
+.nav-brand-name {font:600 25px/1 var(--font);letter-spacing:-.055em}
+.global-modes {gap:3px}
+.nav-item {height:42px;border-radius:3px;color:var(--muted)}
+.nav-item.active {background:var(--ink);color:var(--paper)}
+.nav-item.active:hover {background:var(--ink);color:var(--paper)}
+.nav-label {font-weight:500;font-size:12px}
+.nav-brand .nav-label {font-weight:600;font-size:25px}
+.entity-sidebar {padding:18px 12px 14px;background:var(--soft)}
+.entity-list-heading {padding:4px 6px 16px}
+.entity-list-heading h2 {font-size:15px;font-weight:650;letter-spacing:-.025em}
+.search {margin-bottom:14px;padding:7px 8px;border-radius:3px;background:var(--paper)}
+.entity-group {margin-bottom:3px}
+.entity-row {position:relative;border-radius:2px;border-left:2px solid transparent}
+.entity-row.selected,.entity-row.menu-open {background:var(--paper);border-left-color:var(--accent)}
+.entity-row:hover {background:var(--paper)}
+.entity-row .company-row {min-height:57px;padding:9px 8px;border-radius:0;gap:10px}
+.entity-row .company-copy strong {font-size:13px;font-weight:600}
+.company-copy small {font-size:11px;font-variant-numeric:tabular-nums}
+.count {font-size:11px;min-width:18px;height:18px;border-radius:3px;background:transparent}
+.entity-row.selected .count {background:var(--wash)}
+.entity-avatar,.hero-avatar {font-family:var(--font);font-weight:600;border-radius:3px}
+.entity-sidebar-footer {font-size:11px;margin-top:14px;padding-top:12px}
+.entity-flyout {border-radius:4px;box-shadow:0 10px 28px #00000016}
+.entity-child,.entity-menu-button {border-radius:3px}
+.flyout-heading strong {font-weight:600}
+
+/* A shared title baseline and compact secondary navigation across all entities. */
+.company-header {padding:12px 24px;gap:12px}
+.company-heading h1 {font-size:28px;font-weight:650;line-height:1.1;letter-spacing:-.045em}
+.company-heading p {margin-top:5px;font-size:11px}
+.company-summary {font-size:11px;line-height:1.5}
+.company-summary strong {font-weight:600}
+.content-nav {gap:26px;padding:0 24px;border-bottom-color:var(--study-rule)}
+.content-tab {font-size:12px;gap:6px}
+.content-tab.active {font-weight:650;border-bottom-color:var(--ink)}
+.content-tab small {font-size:10px;background:transparent;border-radius:2px}
+.content-tab.active small {background:var(--wash)}
+.content,.content[data-entity=company],.content[data-entity=company][data-view=overview],.content[data-entity=manager]:not([data-view=report]) {padding:20px 24px 32px}
+.company-overview,.page-inner,.manager-workspace,.item-workspace {max-width:none;margin:0}
+
+/* Institution: chart, holdings and allocation use one continuous reading plane. */
+.workspace[data-mode=institution] .workarea {grid-template-rows:40px 68px 0 minmax(0,1fr)}
+.workspace[data-mode=institution] .company-header {padding:12px 24px;align-items:center}
+.workspace[data-mode=institution] .company-heading h1 {font-size:30px;font-weight:650;letter-spacing:-.05em}
+.institution-heading {gap:16px}
+.institution-heading .simulation-label {font-size:10px;letter-spacing:0;border:1px solid var(--line);padding:3px 6px;background:transparent;border-radius:2px}
+.institution-header-meta {font-size:11px;font-variant-numeric:tabular-nums}
+.content[data-entity=institution] {padding:4px 24px 16px}
+.institution-dashboard {max-width:none;margin:0}
+.institution-performance {border-top:2px solid var(--study-rule);border-bottom:1px solid var(--study-rule);padding-top:14px;padding-bottom:8px;margin-bottom:20px}
+.institution-chart-controls {margin-bottom:10px;gap:20px}
+.institution-comparison-heading {align-items:baseline;gap:16px}
+.institution-comparison-heading h2 {font-size:20px;font-weight:650;line-height:1.3;letter-spacing:-.025em}
+.institution-comparison-heading p {font-size:11px}
+.institution-performance-actions {gap:12px}
+.institution-periods {background:transparent;border-radius:3px;padding:0;gap:2px}
+.institution-periods button {font-size:11px;padding:5px 10px;border-radius:2px}
+.institution-periods button[aria-pressed=true] {background:var(--ink);color:var(--paper);box-shadow:none}
+.allocation-history-open {font-size:11px;border-radius:3px;padding:5px 9px}
+.institution-agent-legend {gap:6px;margin-bottom:12px;align-items:stretch}
+.institution-agent-legend button {gap:9px;min-height:38px;padding:7px 12px;border-radius:2px;border-bottom:2px solid transparent}
+.institution-agent-legend button.is-selected {background:var(--soft);border-color:transparent;border-bottom-color:var(--agent-color)}
+.institution-agent-legend strong {font-size:15px;letter-spacing:-.025em;font-weight:600}
+.institution-agent-legend i {width:14px;height:3px;border-radius:0}
+.institution-benchmark-legend {font-size:11px;gap:7px}
+.institution-benchmark-legend strong {font-size:12px;font-weight:500}
+.institution-chart text {font-size:11px;font-variant-numeric:tabular-nums}
+.institution-chart .chart-grid {stroke-dasharray:none;stroke-width:.65;opacity:.75}
+.institution-chart .chart-zero {stroke:var(--muted);stroke-width:.85;opacity:.75}
+.institution-chart-note,.institution-section-note {font-size:11px;line-height:1.55}
+.institution-portfolio-layout {grid-template-columns:104px minmax(0,1fr);gap:24px}
+.portfolio-thumbnail-list {padding:2px;gap:10px}
+.portfolio-thumbnail {border-radius:3px;min-height:94px;padding:12px;border-color:var(--line)}
+.portfolio-thumbnail.is-selected {border-color:var(--agent-color);border-left-width:3px;background:var(--soft);box-shadow:none;padding-left:10px}
+.portfolio-thumbnail strong {font-size:13px;font-weight:650}
+.portfolio-thumbnail small {font-size:12px;font-weight:500;color:var(--ink)}
+.portfolio-step {border-radius:2px;min-height:22px}
+.portfolio-stage {min-height:340px;border:0;border-left:1px solid var(--line);border-radius:0;padding:0 0 0 24px;background:transparent}
+.portfolio-stage-heading {gap:16px;padding-bottom:12px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.portfolio-stage-heading .avatar {border-radius:3px;width:30px;height:30px;font-family:var(--font);font-size:15px;font-weight:600;background:var(--soft);border:0}
+.portfolio-stage-heading h3,.portfolio-stage-heading h2 {font-size:22px;font-weight:650;letter-spacing:-.035em}
+.portfolio-stage-heading h3>span {font-weight:400;color:var(--muted);font-size:13px;letter-spacing:0;margin-left:6px}
+.portfolio-stage-heading p {font-size:11px}
+.portfolio-stage-heading a {font-size:11px}
+.portfolio-stage-return {gap:8px;align-items:baseline}
+.portfolio-stage-return strong {font-size:28px;line-height:1.15;font-weight:600;letter-spacing:-.045em}
+.portfolio-stage-return small {font-size:11px}
+.portfolio-snapshot {font-size:11px;margin-bottom:12px;font-variant-numeric:tabular-nums}
+.institution-portfolio-body {grid-template-columns:minmax(220px,1.45fr) minmax(180px,1fr);gap:32px;align-items:center}
+.institution-holding-row {border-bottom:1px solid var(--line);border-radius:0;min-height:37px;padding:5px 6px 5px 0;gap:12px}
+.institution-holding-row:last-child {border-bottom:0}
+.holding-swatch {width:3px;height:18px;border-radius:0}
+.institution-company-link strong {font-size:13px;font-weight:550}
+.institution-company-link small {font-size:11px}
+.holding-weight {font-size:13px;font-weight:550;border-radius:2px}
+.holding-weight-bar {border-radius:0}
+.allocation-visual {width:min(100%,166px)}
+.allocation-center strong {font-size:30px;letter-spacing:-.05em;font-weight:550}
+.allocation-center span {font-size:11px}
+.institution-portfolio-value {gap:8px;margin-top:8px}
+.institution-portfolio-value strong {font-size:14px;font-weight:550}
+.allocation-palette-picker {gap:18px;margin-top:16px;padding-top:12px}
+.allocation-palette-options {gap:6px}
+.allocation-palette-option {padding:7px 8px;border-radius:3px;gap:8px}
+.allocation-palette-option[aria-pressed=true] {border-color:var(--line);background:var(--soft)}
+.allocation-palette-preview {width:28px;height:28px}
+.allocation-palette-name {font-size:11px;font-weight:550}
+.allocation-palette-name small {font-size:9px}
+.allocation-palette-description {font-size:10px;line-height:1.4}
+.institution-footer-note {font-size:10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+
+/* Company: compact section index beside one deliberately larger detail region. */
+.overview-heading {margin-bottom:16px;min-height:24px}
+.overview-heading h2 {font-size:20px;font-weight:650;letter-spacing:-.03em}
+.overview-heading span {font-size:11px}
+.overview-deck {grid-template-columns:180px minmax(0,1fr);gap:24px;border-top:2px solid var(--study-rule);padding-top:16px}
+.overview-sections {gap:0;padding:0;border-right:1px solid var(--line)}
+.overview-tab {padding:14px 16px 14px 12px;border-radius:0;border-left:2px solid transparent;border-bottom:1px solid var(--line);gap:6px}
+.overview-tab.is-active {background:var(--soft);color:var(--ink);border-left-color:var(--accent)}
+.overview-tab-top {font-weight:600;font-size:13px}
+.overview-tab-detail,.overview-tab.is-active .overview-tab-detail {font-size:11px;color:var(--muted);opacity:1}
+.overview-tab-count {font-size:12px;font-weight:600}
+.overview-stage {border:0;border-radius:0}
+.overview-panels {min-height:342px}
+.overview-module {padding:0 0 12px;border-radius:0;background:transparent}
+.overview-module-heading {padding-bottom:10px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+.overview-module-heading h2,.overview-module-heading h3 {font-size:22px;font-weight:600;letter-spacing:-.035em}
+.overview-count {background:transparent!important;color:var(--ink)!important;border-radius:0;font-size:20px;font-weight:500;padding:0}
+.overview-status {font-size:11px;margin-bottom:10px;padding-top:5px}
+.overview-item {padding:18px 0}
+.overview-item-title {font-size:15px;font-weight:500;line-height:1.7}
+.overview-item-meta {font-size:11px;margin-top:6px}
+.overview-controls {padding:9px 0;border-top:1px solid var(--study-rule)}
+.overview-switch-hint,.overview-position {font-size:11px}
+.overview-step {border-radius:2px}
+.overview-note {font-size:11px}
+.item-workspace {grid-template-columns:202px minmax(0,1fr);gap:24px}
+.directory-heading {border-top:2px solid var(--study-rule);padding-top:12px;margin-bottom:8px}
+.directory-heading h2 {font-size:16px;font-weight:600;letter-spacing:-.025em}
+.directory-description {font-size:11px;margin-bottom:14px}
+.directory-row {border-radius:0;border-left:2px solid transparent;padding:10px 8px;margin-bottom:3px}
+.directory-row.is-active,.directory-row[aria-current=page],.directory-row[aria-current=true] {border-left-color:var(--accent);background:var(--soft)}
+.directory-row-title {font-weight:550;font-size:12px}
+.directory-row-meta,.directory-row-state {font-size:11px;line-height:1.55}
+.item-detail {padding-top:0}
+.item-detail .reader,.detail-article {max-width:780px}
+.reader-nav {font-size:11px;margin-bottom:24px}
+.item-detail .report-title,.report-title {font-size:30px;font-weight:600;letter-spacing:-.04em;line-height:1.4}
+.report-subtitle {font-size:14px}
+.identity-line {font-size:11px;line-height:1.6}
+.report-abstract {border-top:2px solid var(--study-rule);padding:20px 0}
+.report-abstract span {font-size:11px}
+.report-section h2 {font-size:23px;font-weight:600;letter-spacing:-.025em}
+.report-section .kicker {font-size:11px}
+.report-section p,.report-section li {font-size:17px;line-height:1.85}
+.report-section th {font-size:11px;font-weight:550}
+.report-section td {font-size:14px}
+.citation,.version-control select,.notice,.empty,.plain-button,.detail-article blockquote {border-radius:3px}
+.detail-article>h2 {font-size:28px;line-height:1.4;font-weight:600;letter-spacing:-.04em}
+.detail-source-meta {border-top:2px solid var(--study-rule)}
+.detail-placeholder {align-items:flex-start;text-align:left;margin:0;padding:32px 24px;max-width:650px}
+.detail-placeholder h2 {font-size:24px;line-height:1.4;font-weight:600;letter-spacing:-.04em}
+.detail-placeholder-icon {border-radius:3px;margin-bottom:20px}
+.detail-placeholder p {max-width:440px}
+
+/* Manager: strong metric baselines, concise tables and explicit coverage columns. */
+.manager-summary {padding:0 0 18px;border-top:2px solid var(--study-rule);padding-top:16px;align-items:center}
+.manager-metrics {gap:24px 42px}
+.manager-metric>span,.manager-metric>small {font-size:11px}
+.manager-metric>strong {font-size:30px;line-height:1.2;font-weight:600;letter-spacing:-.045em}
+.manager-summary-identity {font-size:11px}
+.manager-summary-identity strong {font-size:12px;font-weight:550}
+.manager-allocation-band {padding:12px 0 16px;border-bottom-color:var(--study-rule)}
+.manager-weight-strip {height:7px;border-radius:0;gap:2px}
+.manager-weight-legend {gap:9px 20px}
+.manager-weight-item,.manager-weight-item strong {font-size:11px}
+.manager-section-head {margin:20px 0 12px}
+.manager-section-head h2 {font-size:20px;font-weight:600;letter-spacing:-.035em}
+.manager-section-head span {font-size:11px}
+.manager-filters {gap:2px;font-size:11px}
+.manager-filters button {border-radius:2px;padding:5px 9px}
+.manager-filters button[aria-pressed=true] {background:var(--ink);color:var(--paper)}
+.manager-table {font-size:13px}
+.manager-table th {background:transparent;border-top:1px solid var(--study-rule);border-bottom-color:var(--study-rule);height:34px;font-size:11px;font-weight:500}
+.manager-table td {padding-top:10px;padding-bottom:10px}
+.manager-table tbody tr {height:54px}
+.manager-subject strong {font-weight:550}
+.manager-subject small,.manager-row-state,.manager-row-links {font-size:11px}
+.manager-company-cell strong {font-weight:550}
+.manager-company-cell small {font-size:11px}
+.manager-coverage-groups {gap:24px;margin-top:18px}
+.manager-coverage-group-head {border-bottom:2px solid var(--stage-color);padding-bottom:12px;margin-bottom:0}
+.manager-coverage-group-head h3 {font-size:18px;font-weight:600;letter-spacing:-.025em}
+.manager-coverage-group-head h3>span {background:transparent;padding:0 4px;font-size:13px}
+.manager-coverage-group-head p {font-size:11px}
+.manager-coverage-group-body {gap:0}
+.manager-coverage-card {border:0;border-bottom:1px solid var(--line);border-radius:0;min-height:170px;padding:18px 0;gap:12px;background:transparent}
+.manager-coverage-reason {font-size:14px;line-height:1.75}
+.manager-coverage-date,.manager-coverage-footer,.manager-coverage-report-count {font-size:11px}
+.manager-coverage-empty {border-radius:0;border-width:0 0 1px;padding:18px 0}
+.manager-footnote {font-size:11px;max-width:100ch;margin-top:14px}
+.manager-pagination {font-size:11px;padding-top:12px}
+.manager-pagination button {font-size:11px;border-radius:2px}
+.manager-event-code {border-radius:2px}
+
+/* Existing chart event geometry and recorded-date allocation logic are untouched. */
+.investment-timeline-title h3 {font-size:11px;font-weight:600}
+.investment-kind-filter {background:transparent;border-radius:2px;padding:0;gap:2px}
+.investment-kind-filter button {font-size:11px;border-radius:2px;padding:4px 8px}
+.investment-kind-filter button[aria-pressed=true] {background:var(--soft);box-shadow:none}
+.investment-granularity select {font-size:11px;border-radius:2px}
+.investment-timeline-title small,.investment-marker,.investment-trade-marker {border-radius:3px}
+#investment-event-popover {border-radius:4px;box-shadow:0 12px 32px #00000020}
+.allocation-history-back,.allocation-history-simulation,.allocation-history-date {border-radius:2px}
+.allocation-history-holdings thead th {border-bottom-color:var(--study-rule);font-weight:500}
+.allocation-history-holdings tbody td,.allocation-history-holdings tbody th {padding-top:12px;padding-bottom:12px}
+.context-panel {background:var(--paper);border-left-color:var(--study-rule)}
+.panel-title {padding:16px 20px 13px}
+.panel-title h2 {font-size:14px;font-weight:600}
+.panel-body {padding:20px}
+.panel-body blockquote {border-radius:2px;border-left:2px solid var(--accent)}
+.panel-close {border-radius:2px}
+
+@container institution-content (max-width:900px) {
+  .institution-comparison-heading {gap:8px}
+  .portfolio-stage-return {flex-direction:column;gap:2px;align-items:flex-end}
+  .institution-portfolio-body {gap:20px}
+  .allocation-palette-picker {gap:10px}
+}
+@container institution-content (max-width:720px) {
+  .institution-portfolio-layout {grid-template-columns:88px minmax(0,1fr);gap:14px}
+  .portfolio-stage {padding-left:16px}
+  .institution-portfolio-body {grid-template-columns:minmax(170px,1.3fr) minmax(130px,1fr);gap:12px}
+  .allocation-visual {width:145px}
+  .institution-comparison-heading h2 {font-size:18px}
+  .portfolio-stage-heading h3 {font-size:19px}
+  .portfolio-stage-return strong {font-size:24px}
+}
+@container institution-content (max-width:520px) {
+  .institution-portfolio-layout {grid-template-columns:minmax(0,1fr)}
+  .portfolio-stage {border-left:0;border-top:1px solid var(--line);padding:16px 0 0}
+  .institution-portfolio-body {grid-template-columns:minmax(0,1fr)}
+  .portfolio-thumbnail {padding:8px;min-height:76px}
+  .institution-chart-controls {flex-wrap:wrap}
+  .institution-performance-actions {width:100%;justify-content:space-between}
+}
+@container company-content (max-width:660px) {
+  .item-workspace {grid-template-columns:160px minmax(0,1fr);gap:18px}
+  .overview-deck {grid-template-columns:150px minmax(0,1fr);gap:18px}
+  .overview-module-heading h3 {font-size:20px}
+  .item-detail .report-title,.detail-article>h2 {font-size:25px}
+}
+@container company-content (max-width:480px) {
+  .overview-deck,.item-workspace {grid-template-columns:minmax(0,1fr);gap:16px}
+  .overview-sections {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-right:0}
+  .overview-tab {padding:10px 12px}
+  .item-directory {position:static;max-height:220px;border-right:0;border-bottom:1px solid var(--line);padding:0 0 12px}
+}
+@media(max-width:1100px) {
+  .workspace {--entity-width:204px}
+  .toolbar .breadcrumb {display:none}
+  .manager-metrics {gap:20px 26px}
+  .manager-metric>strong {font-size:26px}
+}
+@media(max-width:860px) {
+  .workspace {--entity-width:190px}
+  .toolbar,.company-header,.workspace[data-mode=institution] .company-header {padding-left:20px;padding-right:20px}
+  .content,.content[data-entity=company],.content[data-entity=company][data-view=overview],.content[data-entity=manager]:not([data-view=report]),.content[data-entity=institution] {padding-left:20px;padding-right:20px}
+  .content-nav {padding:0 20px;gap:20px}
+  .company-heading h1,.workspace[data-mode=institution] .company-heading h1 {font-size:26px}
+  .institution-heading {gap:8px}
+  .institution-header-meta {font-size:10px}
+}
+@media(max-width:620px) {
+  .workspace {--entity-width:160px}
+  .study-version-return {display:none}
+  .toolbar {padding:0 12px}
+  .utility {padding:5px 6px;font-size:10px}
+  .company-header,.workspace[data-mode=institution] .company-header {padding-left:16px;padding-right:16px}
+  .content,.content[data-entity=company],.content[data-entity=company][data-view=overview],.content[data-entity=manager]:not([data-view=report]),.content[data-entity=institution] {padding-left:16px;padding-right:16px}
+  .entity-sidebar {padding-left:8px;padding-right:8px}
+  .entity-row .company-row {gap:7px;padding-left:6px}
+  .entity-row .company-copy strong {font-size:12px}
+  .entity-row .company-icon {width:26px;height:26px}
+  .institution-heading h1 {width:100%}
+  .company-heading h1,.workspace[data-mode=institution] .company-heading h1 {font-size:24px}
+  .institution-header-meta {white-space:normal;max-width:100px;text-align:right}
+  .study-version {font-size:9px;gap:5px}
+  .institution-portfolio-layout {gap:12px}
+  .manager-metric>strong {font-size:24px}
+  .manager-summary {padding-top:12px}
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {transition:none!important;animation:none!important;scroll-behavior:auto!important}
+}

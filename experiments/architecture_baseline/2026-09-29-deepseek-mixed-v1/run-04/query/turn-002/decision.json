@@ -1,0 +1,102 @@
+{
+  "action": "plan",
+  "delegation": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "REQ1_OCF_2024_2025",
+      "description": "Query Alphabet entity sec-0001652044 consolidated operating cash flow metric operating_cash_flow for calendar years 2024 and 2025 from source googl-2025-10k. Return exact USD values, periods, basis, entity and source citations."
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "REQ2_CAPEX_2024_2025",
+      "description": "Query Alphabet entity sec-0001652044 purchases of property and equipment cash payments metric capex_cash_payments for calendar years 2024 and 2025 from source googl-2025-10k. Return exact USD values, periods, basis, entity and source citations."
+    },
+    {
+      "kind": "information",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "REQ3_CAPEX_USES_NARRATIVE",
+      "description": "Identify and quote the exact original narrative or table language in Alphabet FY2025 10-K stating primary uses of capital expenditures, preserving source block IDs and context. Do not infer maintenance capital expenditures or AI investment returns."
+    },
+    {
+      "kind": "information",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "REQ4_VERIFY_SOURCE_BODIES",
+      "description": "Read the delivered Alphabet FY2025 10-K source blocks supporting REQ1 and REQ2 values plus REQ3 capex uses, and cite exact block IDs with extracted verbatim text. Query receipts alone do not establish source-body reading."
+    }
+  ],
+  "reason": "Plan established with explicit completion conditions. REQ1 and REQ2 are numeric query requirements for Alphabet consolidated operating cash flow and purchases of property and equipment cash payments for calendar years 2024 and 2025; REQ3 is an information requirement for primary capital expenditure uses; REQ4 ensures original source blocks are read and cited. Completion conditions: numeric requirements must return exact query records with entity, metric, period, basis and USD units; cited source blocks must be delivered and exact quotes extracted; REQ3 must have evidence references; no unresolved material gap remains. Next, delegate capex figure/period/basis verification to Worker using existing requirements, then main independently re-runs the query and reads cited source blocks.",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "arguments": null
+}

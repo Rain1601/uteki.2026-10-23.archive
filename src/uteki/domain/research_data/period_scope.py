@@ -23,13 +23,25 @@ _UNSUPPORTED = re.compile(
     r"|\d{4}\s*(?:[-/–—]|至|到|through|to)\s*\d", re.I)
 
 
-def explicit_periods(question):
+def explicit_periods(question, *, fiscal_periods=(), require_fiscal_mapping=False):
     """Return supported absolute periods mentioned literally in the question."""
+    question = re.sub(r"([1-9]\d{3})\s*财年", r"FY\1", question)
     if _UNSUPPORTED.search(question):
         return ()
     spans, periods = [], []
+    for match in re.finditer(r"\bFY\s*(?P<year>[1-9]\d{3})(?!\d|\.\d)(?:\s*Q(?P<quarter>[1-4]))?", question, re.I):
+        matches = {Period.model_validate(item['period']) for item in fiscal_periods
+                   if item.get('fiscal_year') == int(match['year'])
+                   and item.get('fiscal_quarter') == (int(match['quarter']) if match['quarter'] else None)}
+        if len(matches) == 1:
+            periods.append(next(iter(matches)))
+            spans.append(match.span())
+        elif require_fiscal_mapping or matches:
+            return ()
     for pattern in (_FORWARD, _REVERSE):
         for match in pattern.finditer(question):
+            if any(lo <= match.start() < hi or lo <= match.end()-1 < hi for lo, hi in spans):
+                continue
             year = int(match['year'])
             q = match['q'] or match['cq']
             quarter = int(q) if q.isdigit() else "一二三四".index(q) + 1

@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 2,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0002-input.json",
+    "sha256": "5a3bd2b527fde3cef5ed786dbc8dfc1c4e2e3c55225993c501a8fee7ef0bd5a3"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T11:13:00.203929+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-545ee1cfc10d8d858ff3259d\",\n  \"checks\": [\n    {\n      \"axis\": \"comparability\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"Note 1 明确说明前期分部信息已重述，而合并结果未变。该重述影响 2022 年分部收入与营业利润记录的可比性，但不影响 2023 年记录。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-b-revenue-2022\",\n            \"birch-disclosure-b-operating_income-2022\"\n          ],\n          \"statement\": \"2022 年 Sensors 分部收入与营业利润记录为前期分部信息重述后的数据，与原始报告金额不可直接比较；合并结果不受此重述影响。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-b\",\n              \"block_id\": \"note-1-detail\",\n              \"quote\": \"Note 1. Segment presentation changed. Prior-period segment information was recast. Consolidated results were unchanged.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    },\n    {\n      \"axis\": \"allocation\",\n      \"status\": \"insufficient_evidence\",\n      \"reason\": \"Note 1 提及 Note 4 包含分配方法，但 Note 4 内容未提供，无法评估收入与营业利润的分配约束。\",\n      \"constraints\": [],\n      \"unresolved_questions\": [\n        \"Note 4 中关于收入与营业利润的分配方法具体内容是什么？\"\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"statement-a\",\n      \"verdict\": \"supported\",\n      \"reason\": \"Note 1 明确说明前期分部信息已重述，合并结果未变，与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-b\",\n          \"block_id\": \"note-1-detail\",\n          \"quote\": \"Note 1. Segment presentation changed. Prior-period segment information was recast. Consolidated results were unchanged.\"\n        }\n      ]\n    },\n    {\n      \"assertion_id\": \"statement-b\",\n      \"verdict\": \"insufficient_evidence\",\n      \"reason\": \"Note 1 提及 Note 4，但未提供 Note 4 内容，无法确认分配方法是否未提供。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-b\",\n          \"block_id\": \"note-1-detail\",\n          \"quote\": \"See Note 4 for allocation methodology.\"\n        }\n      ]\n    }\n  ],\n  \"context_claims\": [\n    {\n      \"object_id\": \"context-fe8527e0f5892f1f403ef791\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-249483499ccc46f048a1d823\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-5ee02c2a974e85cdb3390b27\",\n      \"status\": \"unresolved\"\n    },\n    {\n      \"object_id\": \"context-47ff9a5a4fa5699bd85bc4d8\",\n      \"status\": \"unresolved\"\n    }\n  ],\n  \"context_requests\": [\n    {\n      \"question\": \"请提供 Note 4 的完整内容，以评估分配方法对收入与营业利润记录的影响。\",\n      \"reviewed_block_ids\": [\n        \"note-1-detail\"\n      ],\n      \"reference_ids\": [\n        \"context-47ff9a5a4fa5699bd85bc4d8\"\n      ]\n    }\n  ]\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-545ee1cfc10d8d858ff3259d\",\n  \"checks\": [\n    {\n      \"axis\": \"comparability\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"Note 1 明确说明前期分部信息已重述，而合并结果未变。该重述影响 2022 年分部收入与营业利润记录的可比性，但不影响 2023 年记录。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-b-revenue-2022\",\n            \"birch-disclosure-b-operating_income-2022\"\n          ],\n          \"statement\": \"2022 年 Sensors 分部收入与营业利润记录为前期分部信息重述后的数据，与原始报告金额不可直接比较；合并结果不受此重述影响。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-b\",\n              \"block_id\": \"note-1-detail\",\n              \"quote\": \"Note 1. Segment presentation changed. Prior-period segment information was recast. Consolidated results were unchanged.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    },\n    {\n      \"axis\": \"allocation\",\n      \"status\": \"insufficient_evidence\",\n      \"reason\": \"Note 1 提及 Note 4 包含分配方法，但 Note 4 内容未提供，无法评估收入与营业利润的分配约束。\",\n      \"constraints\": [],\n      \"unresolved_questions\": [\n        \"Note 4 中关于收入与营业利润的分配方法具体内容是什么？\"\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"statement-a\",\n      \"verdict\": \"supported\",\n      \"reason\": \"Note 1 明确说明前期分部信息已重述，合并结果未变，与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-b\",\n          \"block_id\": \"note-1-detail\",\n          \"quote\": \"Note 1. Segment presentation changed. Prior-period segment information was recast. Consolidated results were unchanged.\"\n        }\n      ]\n    },\n    {\n      \"assertion_id\": \"statement-b\",\n      \"verdict\": \"insufficient_evidence\",\n      \"reason\": \"Note 1 提及 Note 4，但未提供 Note 4 内容，无法确认分配方法是否未提供。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-b\",\n          \"block_id\": \"note-1-detail\",\n          \"quote\": \"See Note 4 for allocation methodology.\"\n        }\n      ]\n    }\n  ],\n  \"context_claims\": [\n    {\n      \"object_id\": \"context-fe8527e0f5892f1f403ef791\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-249483499ccc46f048a1d823\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-5ee02c2a974e85cdb3390b27\",\n      \"status\": \"unresolved\"\n    },\n    {\n      \"object_id\": \"context-47ff9a5a4fa5699bd85bc4d8\",\n      \"status\": \"unresolved\"\n    }\n  ],\n  \"context_requests\": [\n    {\n      \"question\": \"请提供 Note 4 的完整内容，以评估分配方法对收入与营业利润记录的影响。\",\n      \"reviewed_block_ids\": [\n        \"note-1-detail\"\n      ],\n      \"reference_ids\": [\n        \"context-47ff9a5a4fa5699bd85bc4d8\"\n      ]\n    }\n  ]\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "08f5d2f1-baf2-4a96-a326-58333088ebee",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 841,
+      "prompt_tokens": 4571,
+      "total_tokens": 5412,
+      "prompt_tokens_details": {
+        "cached_tokens": 1280
+      },
+      "prompt_cache_hit_tokens": 1280,
+      "prompt_cache_miss_tokens": 3291
+    }
+  },
+  "elapsed_seconds": 9.638962790952064,
+  "ended_at": "2026-09-24T11:13:09.841812+00:00",
+  "calls": [
+    {
+      "path": "calls/aa68da63-5384-403a-ac8b-b4752ccd58ed-end.json",
+      "sha256": "425b02bae3e03206baf75bce68ea460e77e07eac1c8eb19743f9a9726918e27c"
+    },
+    {
+      "path": "calls/aa68da63-5384-403a-ac8b-b4752ccd58ed-start.json",
+      "sha256": "f59ff3a533a41433ac0af7effda3a043710d9ab31cad62db272ddd98bb91f712"
+    }
+  ]
+}

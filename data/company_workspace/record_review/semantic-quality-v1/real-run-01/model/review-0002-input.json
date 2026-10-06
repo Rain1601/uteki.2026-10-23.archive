@@ -1,0 +1,3548 @@
+{
+  "packet": {
+    "schema_version": "semantic-review-input-v1",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-a80aa612c40a8ef6ca17e36a",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "source-0019ae7ba0f6e3b63f944782"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-09-24",
+      "include_candidates": true
+    },
+    "source": {
+      "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+      "company_id": "sec-0000789019",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+      "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+      "form": "10-K",
+      "period_end": "2025-06-30"
+    },
+    "context_completeness": "bounded; cross-note references not automatically resolved",
+    "output_schema": {
+      "$defs": {
+        "AssertionAssessment": {
+          "additionalProperties": false,
+          "properties": {
+            "assertion_id": {
+              "minLength": 1,
+              "title": "Assertion Id",
+              "type": "string"
+            },
+            "verdict": {
+              "enum": [
+                "supported",
+                "contradicted",
+                "insufficient_evidence"
+              ],
+              "title": "Verdict",
+              "type": "string"
+            },
+            "reason": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "citations": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/ReviewCitation"
+              },
+              "maxItems": 8,
+              "title": "Citations",
+              "type": "array"
+            }
+          },
+          "required": [
+            "assertion_id",
+            "verdict",
+            "reason"
+          ],
+          "title": "AssertionAssessment",
+          "type": "object"
+        },
+        "AxisCheck": {
+          "additionalProperties": false,
+          "properties": {
+            "axis": {
+              "enum": [
+                "comparability",
+                "allocation",
+                "additivity",
+                "dimensions",
+                "geography",
+                "value"
+              ],
+              "title": "Axis",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "constraints_found",
+                "none_found_in_context",
+                "insufficient_evidence"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "reason": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "constraints": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/SemanticConstraint"
+              },
+              "maxItems": 24,
+              "title": "Constraints",
+              "type": "array"
+            },
+            "unresolved_questions": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 12,
+              "title": "Unresolved Questions",
+              "type": "array"
+            }
+          },
+          "required": [
+            "axis",
+            "status",
+            "reason"
+          ],
+          "title": "AxisCheck",
+          "type": "object"
+        },
+        "ReviewCitation": {
+          "additionalProperties": false,
+          "properties": {
+            "source_snapshot_id": {
+              "title": "Source Snapshot Id",
+              "type": "string"
+            },
+            "block_id": {
+              "title": "Block Id",
+              "type": "string"
+            },
+            "quote": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Quote",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_snapshot_id",
+            "block_id",
+            "quote"
+          ],
+          "title": "ReviewCitation",
+          "type": "object"
+        },
+        "SemanticConstraint": {
+          "additionalProperties": false,
+          "properties": {
+            "record_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 24,
+              "minItems": 1,
+              "title": "Record Ids",
+              "type": "array"
+            },
+            "statement": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Statement",
+              "type": "string"
+            },
+            "citations": {
+              "items": {
+                "$ref": "#/$defs/ReviewCitation"
+              },
+              "maxItems": 8,
+              "minItems": 1,
+              "title": "Citations",
+              "type": "array"
+            }
+          },
+          "required": [
+            "record_ids",
+            "statement",
+            "citations"
+          ],
+          "title": "SemanticConstraint",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "packet_id": {
+          "minLength": 1,
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/AxisCheck"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Checks",
+          "type": "array"
+        },
+        "assertions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AssertionAssessment"
+          },
+          "maxItems": 24,
+          "title": "Assertions",
+          "type": "array"
+        },
+        "limitations": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 20,
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "packet_id",
+        "checks"
+      ],
+      "title": "SemanticAssessment",
+      "type": "object"
+    },
+    "records": [
+      {
+        "record": {
+          "schema_version": "research-query-v0.4",
+          "record_id": "obs-f8e00a77890bcdeb3edd38a2",
+          "record_type": "metric",
+          "entity_id": "sec-0000789019-dimensions-79523ac22b1db910",
+          "metric_id": "revenue",
+          "period": {
+            "kind": "year",
+            "start": "2024-07-01",
+            "end": "2025-06-30",
+            "basis": "source"
+          },
+          "period_resolution": "resolved",
+          "value_kind": "actual",
+          "value_decimal": "168900000000.0",
+          "upper_decimal": null,
+          "value_relation": "eq",
+          "unit": "USD",
+          "denominator": null,
+          "modality": null,
+          "accounting_basis": "reported_dimensioned",
+          "dimensions": {
+            "msft:ProductsOrServicesSecondaryCategorizationAxis": "msft:MicrosoftCloudMember"
+          },
+          "available_at": "2025-07-30",
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "evidence_ids": [
+            "ev-c292edc95e57be0985499818"
+          ],
+          "qualifier_evidence_ids": [],
+          "question_evidence_ids": [],
+          "summary": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax; reported inline XBRL fact",
+          "speaker": null,
+          "status": "candidate",
+          "origin": {
+            "artifact": "raw/source-0019ae7ba0f6e3b63f944782.html",
+            "record_index": 60939,
+            "adapter": "us-gaap-inline-v1",
+            "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+            "context_ref": "C_3f8fba20-842f-4031-8436-cb5041513574",
+            "raw_dimensions": {
+              "msft:ProductsOrServicesSecondaryCategorizationAxis": "msft:MicrosoftCloudMember"
+            },
+            "entity_identifier": "0000789019"
+          },
+          "normalization_notes": [
+            "Exact standard concept mapping; dimensions are opaque, not interpreted as named segments.",
+            "Candidate source fact; not independently adopted."
+          ]
+        },
+        "record_sha256": "9ba338c87b6f0bd1ec3df23ed3ff8431802602384bfb8dcea039cc9c07202072",
+        "evidence": {
+          "evidence_id": "ev-c292edc95e57be0985499818",
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "index_id": "didx-40686b92e38ffe14",
+          "block_id": "block-001227-3bdf0315",
+          "text_hash": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e",
+          "quote": "168.9",
+          "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+          "fact_dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]/span[2]/ix:nonfraction",
+          "fact_id": "F_b340ac54-b398-4ac6-81c4-35556ec98853",
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_ref": "C_3f8fba20-842f-4031-8436-cb5041513574",
+          "unit_ref": "U_USD",
+          "context_xml": "<xbrli:context id=\"C_3f8fba20-842f-4031-8436-cb5041513574\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier><xbrli:segment><xbrldi:explicitmember dimension=\"msft:ProductsOrServicesSecondaryCategorizationAxis\">msft:MicrosoftCloudMember</xbrldi:explicitmember></xbrli:segment></xbrli:entity><xbrli:period><xbrli:startdate>2024-07-01</xbrli:startdate><xbrli:enddate>2025-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "number_metadata": {
+            "value_decimal": "168900000000.0",
+            "unit": "USD",
+            "raw_value": "168.9",
+            "scale": 9,
+            "sign": "+",
+            "decimals": "-8",
+            "format": "ixt:num-dot-decimal"
+          },
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+          "context_block_ids": [
+            "block-001227-3bdf0315"
+          ]
+        }
+      },
+      {
+        "record": {
+          "schema_version": "research-query-v0.4",
+          "record_id": "obs-0b93130590eaf7825ad22d22",
+          "record_type": "metric",
+          "entity_id": "sec-0000789019-dimensions-79523ac22b1db910",
+          "metric_id": "revenue",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "period_resolution": "resolved",
+          "value_kind": "actual",
+          "value_decimal": "137700000000.0",
+          "upper_decimal": null,
+          "value_relation": "eq",
+          "unit": "USD",
+          "denominator": null,
+          "modality": null,
+          "accounting_basis": "reported_dimensioned",
+          "dimensions": {
+            "msft:ProductsOrServicesSecondaryCategorizationAxis": "msft:MicrosoftCloudMember"
+          },
+          "available_at": "2025-07-30",
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "evidence_ids": [
+            "ev-fa1461815b7e83b50b65c4e1"
+          ],
+          "qualifier_evidence_ids": [],
+          "question_evidence_ids": [],
+          "summary": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax; reported inline XBRL fact",
+          "speaker": null,
+          "status": "candidate",
+          "origin": {
+            "artifact": "raw/source-0019ae7ba0f6e3b63f944782.html",
+            "record_index": 60942,
+            "adapter": "us-gaap-inline-v1",
+            "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+            "context_ref": "C_60bc96db-4740-4eb8-aa85-12b4fb872991",
+            "raw_dimensions": {
+              "msft:ProductsOrServicesSecondaryCategorizationAxis": "msft:MicrosoftCloudMember"
+            },
+            "entity_identifier": "0000789019"
+          },
+          "normalization_notes": [
+            "Exact standard concept mapping; dimensions are opaque, not interpreted as named segments.",
+            "Candidate source fact; not independently adopted."
+          ]
+        },
+        "record_sha256": "d39ed0718c78a9ad972b46de4708c482a156fb61f7ea803b94c6823fae75473b",
+        "evidence": {
+          "evidence_id": "ev-fa1461815b7e83b50b65c4e1",
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "index_id": "didx-40686b92e38ffe14",
+          "block_id": "block-001227-3bdf0315",
+          "text_hash": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e",
+          "quote": "137.7",
+          "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+          "fact_dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]/span[4]/ix:nonfraction",
+          "fact_id": "F_cbf227a6-a658-485e-9483-256d4409686d",
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_ref": "C_60bc96db-4740-4eb8-aa85-12b4fb872991",
+          "unit_ref": "U_USD",
+          "context_xml": "<xbrli:context id=\"C_60bc96db-4740-4eb8-aa85-12b4fb872991\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier><xbrli:segment><xbrldi:explicitmember dimension=\"msft:ProductsOrServicesSecondaryCategorizationAxis\">msft:MicrosoftCloudMember</xbrldi:explicitmember></xbrli:segment></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "number_metadata": {
+            "value_decimal": "137700000000.0",
+            "unit": "USD",
+            "raw_value": "137.7",
+            "scale": 9,
+            "sign": "+",
+            "decimals": "-8",
+            "format": "ixt:num-dot-decimal"
+          },
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+          "context_block_ids": [
+            "block-001227-3bdf0315"
+          ]
+        }
+      },
+      {
+        "record": {
+          "schema_version": "research-query-v0.4",
+          "record_id": "obs-34467d4558b7878f6fb37d22",
+          "record_type": "metric",
+          "entity_id": "sec-0000789019-dimensions-79523ac22b1db910",
+          "metric_id": "revenue",
+          "period": {
+            "kind": "year",
+            "start": "2022-07-01",
+            "end": "2023-06-30",
+            "basis": "source"
+          },
+          "period_resolution": "resolved",
+          "value_kind": "actual",
+          "value_decimal": "111600000000.0",
+          "upper_decimal": null,
+          "value_relation": "eq",
+          "unit": "USD",
+          "denominator": null,
+          "modality": null,
+          "accounting_basis": "reported_dimensioned",
+          "dimensions": {
+            "msft:ProductsOrServicesSecondaryCategorizationAxis": "msft:MicrosoftCloudMember"
+          },
+          "available_at": "2025-07-30",
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "evidence_ids": [
+            "ev-13ed6079d4b7840bc893e442"
+          ],
+          "qualifier_evidence_ids": [],
+          "question_evidence_ids": [],
+          "summary": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax; reported inline XBRL fact",
+          "speaker": null,
+          "status": "candidate",
+          "origin": {
+            "artifact": "raw/source-0019ae7ba0f6e3b63f944782.html",
+            "record_index": 60945,
+            "adapter": "us-gaap-inline-v1",
+            "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+            "context_ref": "C_8bd5e644-7043-4314-b20c-096f4540689f",
+            "raw_dimensions": {
+              "msft:ProductsOrServicesSecondaryCategorizationAxis": "msft:MicrosoftCloudMember"
+            },
+            "entity_identifier": "0000789019"
+          },
+          "normalization_notes": [
+            "Exact standard concept mapping; dimensions are opaque, not interpreted as named segments.",
+            "Candidate source fact; not independently adopted."
+          ]
+        },
+        "record_sha256": "0a40bfbbbb09bd2ffc3601663ec878932490e260ddf79fd5d2e57f3533058cf1",
+        "evidence": {
+          "evidence_id": "ev-13ed6079d4b7840bc893e442",
+          "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+          "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "index_id": "didx-40686b92e38ffe14",
+          "block_id": "block-001227-3bdf0315",
+          "text_hash": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e",
+          "quote": "111.6",
+          "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+          "fact_dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]/span[6]/ix:nonfraction",
+          "fact_id": "F_37eb2f5f-9782-4baa-898a-2cff2a7ec96d",
+          "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+          "context_ref": "C_8bd5e644-7043-4314-b20c-096f4540689f",
+          "unit_ref": "U_USD",
+          "context_xml": "<xbrli:context id=\"C_8bd5e644-7043-4314-b20c-096f4540689f\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier><xbrli:segment><xbrldi:explicitmember dimension=\"msft:ProductsOrServicesSecondaryCategorizationAxis\">msft:MicrosoftCloudMember</xbrldi:explicitmember></xbrli:segment></xbrli:entity><xbrli:period><xbrli:startdate>2022-07-01</xbrli:startdate><xbrli:enddate>2023-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "number_metadata": {
+            "value_decimal": "111600000000.0",
+            "unit": "USD",
+            "raw_value": "111.6",
+            "scale": 9,
+            "sign": "+",
+            "decimals": "-8",
+            "format": "ixt:num-dot-decimal"
+          },
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+          "context_block_ids": [
+            "block-001227-3bdf0315"
+          ]
+        }
+      }
+    ],
+    "target_block_ids": [
+      "block-001227-3bdf0315"
+    ],
+    "source_blocks": [
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001180-cef2be87",
+        "text": "NOTE 18 — SEGMENT INFORMATION AND GEOGRAPHIC DATA",
+        "text_hash": "cef2be873281be3299cb5d4fe7e365958cd505a3592fab3065d71bf57bceacb9",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[1]",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001181-efcd150c",
+        "text": "In its operation of the business, management, including our chief operating decision maker (“CODM”), who is also our Chief Executive Officer, reviews certain financial information, including segmented internal profit and loss statements. The primary profitability measure used by the CODM to review segment operating results is operating income. The CODM uses operating income to allocate resources during our annual planning process and throughout the year, as well as to assess the performance of our segments, primarily by monitoring actual results compared to prior periods and expected results. During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.",
+        "text_hash": "efcd150c810bc715a97d3e59da4d44ef059f51e0a0d38a40339c8115ccfe851c",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[2]",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001182-b3eedf85",
+        "text": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information.",
+        "text_hash": "b3eedf85b83657382fbf26fd50e029ba4d5aad257e880c636fb772135ab5cd43",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[3]",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001183-352d4c96",
+        "text": "Our reportable segments are described below.",
+        "text_hash": "352d4c9695094536bfaee575b0ea75367d93f89b434e0a8256c31abc3d9ce269",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[4]",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001184-94a2e06c",
+        "text": "Productivity and Business Processes",
+        "text_hash": "94a2e06cbe413c1e0742016cfc2688049e77680cbbe06c7bdca7fa26fbcded88",
+        "type": "heading_candidate",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[5]",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001185-d993f813",
+        "text": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:",
+        "text_hash": "d993f813170ccba6b56ef55f21d23a571600f3e3997733ba6230381a8cdeb7b2",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[6]",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001186-4f8865ab",
+        "text": "•",
+        "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+        "type": "list_item",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[1]/span",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001187-7018adaa",
+        "text": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises.",
+        "text_hash": "7018adaab1771400d012d62f1d71beaaf43645407f6d794872fd87001e9c4bde",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[1]/div",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001188-4f8865ab",
+        "text": "•",
+        "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+        "type": "list_item",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[2]/span",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001189-61bd513b",
+        "text": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services.",
+        "text_hash": "61bd513b7ff69104bce0b7c1e0bdb29e8d8f9ada2b9b0d1368f2554de078f784",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[2]/div",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001190-4f8865ab",
+        "text": "•",
+        "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+        "type": "list_item",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[3]/span",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001191-13124fb7",
+        "text": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions.",
+        "text_hash": "13124fb73864f984aa690440624343f61d9931b2c234a3120641d0110adf30c3",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[3]/div",
+        "reported_page": 82
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001220-f89bf797",
+        "text": "(a)",
+        "text_hash": "f89bf797c3b1dda4ee48380783e5e979067686a6a9540c5a40e8d75ae5f3d199",
+        "type": "other",
+        "table": null,
+        "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/div/span",
+        "reported_page": 84
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001221-73695690",
+        "text": "Includes billings to OEMs and certain multinational organizations because of the nature of these businesses and the impracticability of determining the geographic source of the revenue.",
+        "text_hash": "7369569095374556277221a3615237e1b41902a995b4743084ad5d0205134dab",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/div/div",
+        "reported_page": 84
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001225-3895f129",
+        "text": "Revenue, classified by significant product and service offerings, was as follows:",
+        "text_hash": "3895f129f8bbca52974180f958a942a07d7c980123e62cde605fb1a12a67cddd",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[1]",
+        "reported_page": 85
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001226-283de46e",
+        "text": "(In millions) Year Ended June 30, 2025 2024 2023 Server products and cloud services $ 98,435 $ 79,828 $ 65,007 Microsoft 365 Commercial products and cloud services 87,767 76,969 66,949 Gaming 23,455 21,503 15,466 LinkedIn 17,812 16,372 14,989 Windows and Devices 17,314 17,026 17,147 Search and news advertising 13,878 12,306 12,125 Dynamics products and cloud services 7,827 6,831 5,796 Enterprise and partner services 7,760 7,594 7,900 Microsoft 365 Consumer products and cloud services 7,404 6,648 6,417 Other 72 45 119 Total $ 281,724 $ 245,122 $ 211,915",
+        "text_hash": "283de46ecdb49aaf06e035894a9b7cd920233aa2ff4c28f80764d1c768c259fb",
+        "type": "table",
+        "table": {
+          "row_count": 20,
+          "column_count": 13,
+          "cell_fields": [
+            "row",
+            "column",
+            "rowspan",
+            "colspan",
+            "is_header",
+            "text"
+          ],
+          "cells": [
+            [
+              0,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              3,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              1,
+              0,
+              1,
+              1,
+              false,
+              "(In millions)"
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              1,
+              2,
+              1,
+              10,
+              false,
+              ""
+            ],
+            [
+              1,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              2,
+              0,
+              1,
+              12,
+              false,
+              ""
+            ],
+            [
+              2,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              3,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              3,
+              1,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              3,
+              5,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              3,
+              9,
+              1,
+              3,
+              false,
+              ""
+            ],
+            [
+              3,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              0,
+              1,
+              1,
+              false,
+              "Year Ended June 30,"
+            ],
+            [
+              4,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              2,
+              1,
+              2,
+              false,
+              "2025"
+            ],
+            [
+              4,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              6,
+              1,
+              2,
+              false,
+              "2024"
+            ],
+            [
+              4,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              10,
+              1,
+              2,
+              false,
+              "2023"
+            ],
+            [
+              4,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              5,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              5,
+              1,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              5,
+              5,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              5,
+              9,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              6,
+              0,
+              1,
+              1,
+              false,
+              "Server products and cloud services"
+            ],
+            [
+              6,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              2,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              6,
+              3,
+              1,
+              1,
+              false,
+              "98,435"
+            ],
+            [
+              6,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              6,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              6,
+              7,
+              1,
+              1,
+              false,
+              "79,828"
+            ],
+            [
+              6,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              10,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              6,
+              11,
+              1,
+              1,
+              false,
+              "65,007"
+            ],
+            [
+              6,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              0,
+              1,
+              1,
+              false,
+              "Microsoft 365 Commercial products and cloud services"
+            ],
+            [
+              7,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              3,
+              1,
+              1,
+              false,
+              "87,767"
+            ],
+            [
+              7,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              7,
+              1,
+              1,
+              false,
+              "76,969"
+            ],
+            [
+              7,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              11,
+              1,
+              1,
+              false,
+              "66,949"
+            ],
+            [
+              7,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              0,
+              1,
+              1,
+              false,
+              "Gaming"
+            ],
+            [
+              8,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              3,
+              1,
+              1,
+              false,
+              "23,455"
+            ],
+            [
+              8,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              7,
+              1,
+              1,
+              false,
+              "21,503"
+            ],
+            [
+              8,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              11,
+              1,
+              1,
+              false,
+              "15,466"
+            ],
+            [
+              8,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              0,
+              1,
+              1,
+              false,
+              "LinkedIn"
+            ],
+            [
+              9,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              3,
+              1,
+              1,
+              false,
+              "17,812"
+            ],
+            [
+              9,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              7,
+              1,
+              1,
+              false,
+              "16,372"
+            ],
+            [
+              9,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              11,
+              1,
+              1,
+              false,
+              "14,989"
+            ],
+            [
+              9,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              0,
+              1,
+              1,
+              false,
+              "Windows and Devices"
+            ],
+            [
+              10,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              3,
+              1,
+              1,
+              false,
+              "17,314"
+            ],
+            [
+              10,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              7,
+              1,
+              1,
+              false,
+              "17,026"
+            ],
+            [
+              10,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              11,
+              1,
+              1,
+              false,
+              "17,147"
+            ],
+            [
+              10,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              0,
+              1,
+              1,
+              false,
+              "Search and news advertising"
+            ],
+            [
+              11,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              3,
+              1,
+              1,
+              false,
+              "13,878"
+            ],
+            [
+              11,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              7,
+              1,
+              1,
+              false,
+              "12,306"
+            ],
+            [
+              11,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              11,
+              1,
+              1,
+              false,
+              "12,125"
+            ],
+            [
+              11,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              0,
+              1,
+              1,
+              false,
+              "Dynamics products and cloud services"
+            ],
+            [
+              12,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              3,
+              1,
+              1,
+              false,
+              "7,827"
+            ],
+            [
+              12,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              7,
+              1,
+              1,
+              false,
+              "6,831"
+            ],
+            [
+              12,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              12,
+              11,
+              1,
+              1,
+              false,
+              "5,796"
+            ],
+            [
+              12,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              0,
+              1,
+              1,
+              false,
+              "Enterprise and partner services"
+            ],
+            [
+              13,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              3,
+              1,
+              1,
+              false,
+              "7,760"
+            ],
+            [
+              13,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              7,
+              1,
+              1,
+              false,
+              "7,594"
+            ],
+            [
+              13,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              13,
+              11,
+              1,
+              1,
+              false,
+              "7,900"
+            ],
+            [
+              13,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              0,
+              1,
+              1,
+              false,
+              "Microsoft 365 Consumer products and cloud services"
+            ],
+            [
+              14,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              3,
+              1,
+              1,
+              false,
+              "7,404"
+            ],
+            [
+              14,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              7,
+              1,
+              1,
+              false,
+              "6,648"
+            ],
+            [
+              14,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              14,
+              11,
+              1,
+              1,
+              false,
+              "6,417"
+            ],
+            [
+              14,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              0,
+              1,
+              1,
+              false,
+              "Other"
+            ],
+            [
+              15,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              3,
+              1,
+              1,
+              false,
+              "72"
+            ],
+            [
+              15,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              7,
+              1,
+              1,
+              false,
+              "45"
+            ],
+            [
+              15,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              15,
+              11,
+              1,
+              1,
+              false,
+              "119"
+            ],
+            [
+              15,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              0,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              16,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              16,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              3,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              17,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              18,
+              0,
+              1,
+              1,
+              false,
+              "Total"
+            ],
+            [
+              18,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              18,
+              2,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              18,
+              3,
+              1,
+              1,
+              false,
+              "281,724"
+            ],
+            [
+              18,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              18,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              18,
+              6,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              18,
+              7,
+              1,
+              1,
+              false,
+              "245,122"
+            ],
+            [
+              18,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              18,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              18,
+              10,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              18,
+              11,
+              1,
+              1,
+              false,
+              "211,915"
+            ],
+            [
+              18,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              3,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              19,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ]
+          ]
+        },
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/table",
+        "reported_page": 85
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001227-3bdf0315",
+        "text": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.",
+        "text_hash": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+        "reported_page": 85
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001228-76ee317f",
+        "text": "Assets are not allocated to segments for internal reporting presentations. A portion of amortization and depreciation is included with various other costs in an overhead allocation to each segment. It is impracticable for us to separately identify the amount of amortization and depreciation by segment that is included in the measure of segment profit or loss.",
+        "text_hash": "76ee317f3d6851e11f3a8a7904b60d135ca51048f3591e089e1b3f9eddd188a3",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[2]/ix:continuation/p",
+        "reported_page": 85
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001229-e2dcee9b",
+        "text": "Long-lived assets, excluding financial instruments and tax assets, classified by the location of the controlling statutory company and with countries over 10% of the total shown separately, were as follows:",
+        "text_hash": "e2dcee9b22f0c5f6063079404e4a7bdd92f7a7cb7834985ed30aaaddaf509b6c",
+        "type": "paragraph",
+        "table": null,
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[3]/ix:nonnumeric/p[1]",
+        "reported_page": 85
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001230-54600a26",
+        "text": "(In millions) June 30, 2025 2024 2023 United States $ 230,069 $ 186,106 $ 114,380 Other countries 141,833 115,263 72,859 Total $ 371,902 $ 301,369 $ 187,239",
+        "text_hash": "54600a26878eb2e8a29d576b706bcc3d989d13114cc15cbb4bc8e8a193f8e5e1",
+        "type": "table",
+        "table": {
+          "row_count": 12,
+          "column_count": 13,
+          "cell_fields": [
+            "row",
+            "column",
+            "rowspan",
+            "colspan",
+            "is_header",
+            "text"
+          ],
+          "cells": [
+            [
+              0,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              3,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              0,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              1,
+              0,
+              1,
+              1,
+              false,
+              "(In millions)"
+            ],
+            [
+              1,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              1,
+              2,
+              1,
+              10,
+              false,
+              ""
+            ],
+            [
+              1,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              2,
+              0,
+              1,
+              12,
+              false,
+              ""
+            ],
+            [
+              2,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              3,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              3,
+              1,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              3,
+              5,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              3,
+              9,
+              1,
+              3,
+              false,
+              ""
+            ],
+            [
+              3,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              0,
+              1,
+              1,
+              false,
+              "June 30,"
+            ],
+            [
+              4,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              2,
+              1,
+              2,
+              false,
+              "2025"
+            ],
+            [
+              4,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              6,
+              1,
+              2,
+              false,
+              "2024"
+            ],
+            [
+              4,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              4,
+              10,
+              1,
+              2,
+              false,
+              "2023"
+            ],
+            [
+              4,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              5,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              5,
+              1,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              5,
+              5,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              5,
+              9,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              6,
+              0,
+              1,
+              1,
+              false,
+              "United States"
+            ],
+            [
+              6,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              2,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              6,
+              3,
+              1,
+              1,
+              false,
+              "230,069"
+            ],
+            [
+              6,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              6,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              6,
+              7,
+              1,
+              1,
+              false,
+              "186,106"
+            ],
+            [
+              6,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              6,
+              10,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              6,
+              11,
+              1,
+              1,
+              false,
+              "114,380"
+            ],
+            [
+              6,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              0,
+              1,
+              1,
+              false,
+              "Other countries"
+            ],
+            [
+              7,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              3,
+              1,
+              1,
+              false,
+              "141,833"
+            ],
+            [
+              7,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              7,
+              1,
+              1,
+              false,
+              "115,263"
+            ],
+            [
+              7,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              7,
+              11,
+              1,
+              1,
+              false,
+              "72,859"
+            ],
+            [
+              7,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              0,
+              1,
+              4,
+              false,
+              ""
+            ],
+            [
+              8,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              8,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              3,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              9,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              0,
+              1,
+              1,
+              false,
+              "Total"
+            ],
+            [
+              10,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              2,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              10,
+              3,
+              1,
+              1,
+              false,
+              "371,902"
+            ],
+            [
+              10,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              6,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              10,
+              7,
+              1,
+              1,
+              false,
+              "301,369"
+            ],
+            [
+              10,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              10,
+              10,
+              1,
+              1,
+              false,
+              "$"
+            ],
+            [
+              10,
+              11,
+              1,
+              1,
+              false,
+              "187,239"
+            ],
+            [
+              10,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              0,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              1,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              2,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              3,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              4,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              5,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              6,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              7,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              8,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              9,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              10,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              11,
+              1,
+              1,
+              false,
+              ""
+            ],
+            [
+              11,
+              12,
+              1,
+              1,
+              false,
+              ""
+            ]
+          ]
+        },
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[3]/ix:nonnumeric/table",
+        "reported_page": 85
+      },
+      {
+        "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+        "block_id": "block-001234-efb5aa85",
+        "text": "REPORT OF INDEPENDENT REGISTERED PUBLIC ACCOUNTING FIRM",
+        "text_hash": "efb5aa85e83cd7ed38814934216675104664351264fd8d07dd0170d7961cceb6",
+        "type": "heading_candidate",
+        "table": null,
+        "dom_path": "/html/body/div[258]/p[1]",
+        "reported_page": 86
+      }
+    ],
+    "source_fragments": [
+      {
+        "block_id": "block-001180-cef2be87",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[1]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001180-cef2be87.html",
+        "original_fragment_sha256": "d3387d8759b500c7ba0dd0011813aca5aa217f3886d0ba8c7565bb792077637e",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001181-efcd150c",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[2]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001181-efcd150c.html",
+        "original_fragment_sha256": "80a4d6f7a5d42461ab213c553c5bf1765cdfbcbdcb90d025a56c29efe9b5b571",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001182-b3eedf85",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[3]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001182-b3eedf85.html",
+        "original_fragment_sha256": "09826d51bd0afb68c924c09c786208e7c75a0dfe283cb4a2b165b5fc916a3fb1",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001183-352d4c96",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[4]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001183-352d4c96.html",
+        "original_fragment_sha256": "38e696b4049934688659a6d49a38ada7953a190b512c7e0032b756bf7806f83a",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001184-94a2e06c",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[5]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001184-94a2e06c.html",
+        "original_fragment_sha256": "3b0f6277fdf5fc47110cc04b4c30c0a4fb35711a0b4ab098c53a32a84e9025a4",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001185-d993f813",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[6]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001185-d993f813.html",
+        "original_fragment_sha256": "542a91c801ef95de477fb2dd4004fd860909e7c482fde9a68001dc4da5c07446",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001186-4f8865ab",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[1]/span",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001186-4f8865ab.html",
+        "original_fragment_sha256": "8659e2ecca0ec42eed7df2285187a1721dfcd8cd6a5f5a6f37202a097c446d28",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001187-7018adaa",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[1]/div",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001187-7018adaa.html",
+        "original_fragment_sha256": "e5d052ddff3cc03ad2387a8a5fd0c90e316c42819924235fff71f2c4ee45ae34",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001188-4f8865ab",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[2]/span",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001188-4f8865ab.html",
+        "original_fragment_sha256": "8659e2ecca0ec42eed7df2285187a1721dfcd8cd6a5f5a6f37202a097c446d28",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001189-61bd513b",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[2]/div",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001189-61bd513b.html",
+        "original_fragment_sha256": "6ead052879a544ad919e71b5defaae00d41c589e6a04bb7b8b2e5a1636833121",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001190-4f8865ab",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[3]/span",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001190-4f8865ab.html",
+        "original_fragment_sha256": "8659e2ecca0ec42eed7df2285187a1721dfcd8cd6a5f5a6f37202a097c446d28",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001191-13124fb7",
+        "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[3]/div",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001191-13124fb7.html",
+        "original_fragment_sha256": "3a07fa40caf06aa2fe231ae33aca1cc7056620cb3cec1a5b78bdda1d2642156c",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001220-f89bf797",
+        "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/div/span",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001220-f89bf797.html",
+        "original_fragment_sha256": "e90f50a439524a7ac20add8f9be7e1b8eeba71987b907fa065a6dc6ffbe791e6",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001221-73695690",
+        "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/div/div",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001221-73695690.html",
+        "original_fragment_sha256": "19f62fd41407a2a005f83d499a5567b22dc86a4482120b210cadc182b6d94dc0",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001225-3895f129",
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[1]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001225-3895f129.html",
+        "original_fragment_sha256": "5c1cf4153604a187130cf9a49c4d033046091330d894b1139eb7250bd9f80d85",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001226-283de46e",
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/table",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001226-283de46e.html",
+        "original_fragment_sha256": "809911cb36f2bc5a597e7b33fc621760a261f3a8e6283655f2c385d95bbb5861",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001227-3bdf0315",
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001227-3bdf0315.html",
+        "original_fragment_sha256": "e2c9fbb86c0149d082f4a4e9b0a648b6b0bca363b7813ec26730de37a232552f",
+        "compact_html": "<p><span>Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $</span><span><ix:nonfraction id=\"F_b340ac54-b398-4ac6-81c4-35556ec98853\" contextref=\"C_3f8fba20-842f-4031-8436-cb5041513574\" name=\"us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax\" unitref=\"U_USD\" scale=\"9\" decimals=\"-8\" format=\"ixt:num-dot-decimal\">168.9</ix:nonfraction></span><span> billion, $</span><span><ix:nonfraction id=\"F_cbf227a6-a658-485e-9483-256d4409686d\" contextref=\"C_60bc96db-4740-4eb8-aa85-12b4fb872991\" name=\"us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax\" unitref=\"U_USD\" scale=\"9\" decimals=\"-8\" format=\"ixt:num-dot-decimal\">137.7</ix:nonfraction></span><span> billion, and $</span><span><ix:nonfraction id=\"F_37eb2f5f-9782-4baa-898a-2cff2a7ec96d\" contextref=\"C_8bd5e644-7043-4314-b20c-096f4540689f\" name=\"us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax\" unitref=\"U_USD\" scale=\"9\" decimals=\"-8\" format=\"ixt:num-dot-decimal\">111.6</ix:nonfraction></span><span> billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.</span></p>"
+      },
+      {
+        "block_id": "block-001228-76ee317f",
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[2]/ix:continuation/p",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001228-76ee317f.html",
+        "original_fragment_sha256": "28d3d1220fecc762d4259cd14cdcd1159e525c2e37d5f3442317f95094642876",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001229-e2dcee9b",
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[3]/ix:nonnumeric/p[1]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001229-e2dcee9b.html",
+        "original_fragment_sha256": "124ba759fdcf9270c101e8ab1330854fff11ebc9e198f5af5acd5358a0e3c71b",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001230-54600a26",
+        "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[3]/ix:nonnumeric/table",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001230-54600a26.html",
+        "original_fragment_sha256": "a705f7936761befa682d93d0c387e5e531c576fa329742a1c767544abf0a62fb",
+        "compact_html": null
+      },
+      {
+        "block_id": "block-001234-efb5aa85",
+        "dom_path": "/html/body/div[258]/p[1]",
+        "original_fragment_path": "evidence-002/original-fragments/source-0019ae7ba0f6e3b63f944782/block-001234-efb5aa85.html",
+        "original_fragment_sha256": "910c2b66189d595ea8a749ad19ae81fd7182e2bfd5c2693533b5cb19fbbd8026",
+        "compact_html": null
+      }
+    ],
+    "context_gaps": [
+      "note_exceeds_120_blocks; only its opening and target neighborhood supplied"
+    ],
+    "unresolved_note_references": [
+      "NOTE 18",
+      "Note 1"
+    ],
+    "metric_definitions": {
+      "revenue": {
+        "metric_id": "revenue",
+        "label": "revenue",
+        "unit": "USD",
+        "denominator": null,
+        "definition": "revenue",
+        "definition_version": "us-gaap-inline-v1",
+        "aggregation": "no_implicit_sum",
+        "aliases": [
+          "revenue"
+        ]
+      }
+    },
+    "source_origin": "frozen_dataset",
+    "axes": [
+      "additivity",
+      "dimensions"
+    ],
+    "assertions": [],
+    "additional_block_ids": [
+      "block-001226-283de46e",
+      "block-001227-3bdf0315"
+    ],
+    "packet_id": "semantic-b71fb814025d8dcef099a688"
+  },
+  "packet_sha256": "23f61feebecb9b220ab2e848145be22bc48fced1367197b967621ec0ffbb44c6",
+  "model_config_sha256": "868ccec4e3ee709d8a30e0ee94a39d2d031a803ad27456274ffc72371585dbc4",
+  "prompt_sha256": "976216f4eebce66324c4a5fc7f654a40414eec46379b6d02ee2f4c6c5c3333dc"
+}

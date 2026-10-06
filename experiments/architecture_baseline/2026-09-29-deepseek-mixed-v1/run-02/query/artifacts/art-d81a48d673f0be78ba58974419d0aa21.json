@@ -1,0 +1,742 @@
+{
+  "status": "evidence_ready",
+  "stop_reason": "host_reference_checks_passed",
+  "requirement_ids": [
+    "req-capex-2025",
+    "req-capex-2024"
+  ],
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-02-05",
+    "include_candidates": true
+  },
+  "worker_run": "turn-003/worker",
+  "results": {
+    "schema_version": "autonomous-result-v2",
+    "status": "evidence_ready",
+    "stop_reason": "host_reference_checks_passed",
+    "request": {
+      "agent_schema_version": "data-agent-query-v0.3",
+      "question": "仅依据选定的 Alphabet FY2025 10-K，核对 2024 年和 2025 年的合并经营现金流、购建固定资产的现金支出，并查找资本支出的主要用途。请自主制定有明确完成条件的取证计划，把购建固定资产现金支出的数值、期间及口径核对委派给 Worker；Worker 返回后，由主角色独立核验原文与查询结果。保留可追溯原始披露、单位、期间、会计口径及资料缺口。仅需读取支持这些问题的正文和表格，无需通读整份报表或整章。不得用摘要冒充已读原文，不得自行计算未注册公式，不推断维护性资本开支或 AI 投资回报。此次只验收取证分工，不作当前投资建议。",
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      }
+    },
+    "active_scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    },
+    "plan_origin": "model",
+    "plans": [
+      {
+        "version": 1,
+        "requirements": [
+          {
+            "kind": "query",
+            "query": {
+              "records": [
+                {
+                  "entity_id": "sec-0001652044",
+                  "metric_id": "capex_cash_payments",
+                  "period": {
+                    "kind": "year",
+                    "start": "2025-01-01",
+                    "end": "2025-12-31"
+                  },
+                  "value_kind": "actual"
+                }
+              ],
+              "documents": [],
+              "calculations": []
+            },
+            "source_id": null,
+            "node_id": null,
+            "requirement_id": "req-capex-2025",
+            "description": "取得 Alphabet Inc. 合并口径 2025 年度（截至 2025-12-31）购建固定资产所支付的现金，以美元为单位，保留单位、期间、会计口径及可追溯原始记录；不将负值重新解释为其他口径。"
+          },
+          {
+            "kind": "query",
+            "query": {
+              "records": [
+                {
+                  "entity_id": "sec-0001652044",
+                  "metric_id": "capex_cash_payments",
+                  "period": {
+                    "kind": "year",
+                    "start": "2024-01-01",
+                    "end": "2024-12-31"
+                  },
+                  "value_kind": "actual"
+                }
+              ],
+              "documents": [],
+              "calculations": []
+            },
+            "source_id": null,
+            "node_id": null,
+            "requirement_id": "req-capex-2024",
+            "description": "取得 Alphabet Inc. 合并口径 2024 年度（截至 2024-12-31）购建固定资产所支付的现金，以美元为单位，保留单位、期间、会计口径及可追溯原始记录；如 2024 年度无对应记录，则明确记录为缺口。"
+          }
+        ],
+        "origin": "model",
+        "reason": "Host-pinned delegation",
+        "fixed_by_host": true,
+        "skill_hashes": {
+          "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+          "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+          "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+        },
+        "sha256": "35f97388fada6b6de19f6901e343233fad48863a1553975112183d85d81a7ac2"
+      }
+    ],
+    "coverage": [
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req-capex-2025",
+        "description": "取得 Alphabet Inc. 合并口径 2025 年度（截至 2025-12-31）购建固定资产所支付的现金，以美元为单位，保留单位、期间、会计口径及可追溯原始记录；不将负值重新解释为其他口径。",
+        "evidence_ids": [
+          "ev-687678a9185fb1537f1e46f6"
+        ],
+        "gap_ids": [],
+        "semantic_review": "pending",
+        "query_scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "query_checks": [
+          {
+            "check_id": "records:d046d84f3cd17680523d2104",
+            "status": "satisfied",
+            "reason": "records_returned",
+            "detail": "sec-0001652044 / capex_cash_payments / 2025-01-01 — 2025-12-31：取得匹配记录。",
+            "record_ids": [
+              "obs-56ba2c019c541769c0cce851"
+            ],
+            "artifact_ids": [
+              "art-5e4d2f156b0731df882b7341"
+            ],
+            "event_sequences": [
+              2
+            ]
+          },
+          {
+            "check_id": "citations:obs-56ba2c019c541769c0cce851",
+            "status": "satisfied",
+            "reason": "source_citations_verified",
+            "detail": "记录及其条件、问答引用均已核验到原文。",
+            "record_ids": [
+              "obs-56ba2c019c541769c0cce851"
+            ],
+            "artifact_ids": [
+              "art-a960d8b03dbae5aea419ee0e"
+            ],
+            "event_sequences": [
+              2
+            ],
+            "remaining_count": 0
+          }
+        ],
+        "query_receipt_files": [
+          {
+            "path": "turn-002/query-receipt.json",
+            "sha256": "401a9c22929c6254aa3bf256993dc0bc114c43c3cbe6d976c5a786d85ce2dfdf"
+          }
+        ],
+        "program_check": "satisfied"
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req-capex-2024",
+        "description": "取得 Alphabet Inc. 合并口径 2024 年度（截至 2024-12-31）购建固定资产所支付的现金，以美元为单位，保留单位、期间、会计口径及可追溯原始记录；如 2024 年度无对应记录，则明确记录为缺口。",
+        "evidence_ids": [
+          "ev-ab92ca11037d639cc859c238"
+        ],
+        "gap_ids": [],
+        "semantic_review": "pending",
+        "query_scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "query_checks": [
+          {
+            "check_id": "records:2d6a4ae3dde68b3f46dfcc3d",
+            "status": "satisfied",
+            "reason": "records_returned",
+            "detail": "sec-0001652044 / capex_cash_payments / 2024-01-01 — 2024-12-31：取得匹配记录。",
+            "record_ids": [
+              "obs-a0343ddc7aedd6ae4e071851"
+            ],
+            "artifact_ids": [
+              "art-65669ccb76a6e08e34fc59bf"
+            ],
+            "event_sequences": [
+              3
+            ]
+          },
+          {
+            "check_id": "citations:obs-a0343ddc7aedd6ae4e071851",
+            "status": "satisfied",
+            "reason": "source_citations_verified",
+            "detail": "记录及其条件、问答引用均已核验到原文。",
+            "record_ids": [
+              "obs-a0343ddc7aedd6ae4e071851"
+            ],
+            "artifact_ids": [
+              "art-1319bb66529e30b20565251f"
+            ],
+            "event_sequences": [
+              3
+            ],
+            "remaining_count": 0
+          }
+        ],
+        "query_receipt_files": [
+          {
+            "path": "turn-003/query-receipt.json",
+            "sha256": "4eaf01d2e352fa25e248fcb9460ece2fff043291b171d40adefaef8a202cc8c8"
+          }
+        ],
+        "program_check": "satisfied"
+      }
+    ],
+    "gaps": [],
+    "evidence_bundle": {
+      "path": "evidence-bundle.json",
+      "bundle_id": "bundle-b5b4f2550829fa2a81a901e8",
+      "item_count": 4
+    },
+    "artifact_index": {
+      "path": "artifact-index.json",
+      "count": 18
+    },
+    "semantic_completeness": "not_evaluated",
+    "trace": [
+      {
+        "step": 1,
+        "action": "load_skill",
+        "status": "skill_loaded",
+        "consecutive_no_progress": 0,
+        "packet_bytes": 16020,
+        "receipt": "turn-001/receipt.json",
+        "skill_hashes": {
+          "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+          "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+          "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+        },
+        "feedback": "turn-001/feedback.json"
+      },
+      {
+        "step": 2,
+        "action": "query",
+        "status": "tool_returned",
+        "consecutive_no_progress": 0,
+        "packet_bytes": 24770,
+        "receipt": "turn-002/receipt.json",
+        "skill_hashes": {
+          "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+          "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+          "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+        },
+        "feedback": "turn-002/feedback.json"
+      },
+      {
+        "step": 3,
+        "action": "query",
+        "status": "tool_returned",
+        "consecutive_no_progress": 0,
+        "packet_bytes": 28251,
+        "receipt": "turn-003/receipt.json",
+        "skill_hashes": {
+          "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+          "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+          "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+        },
+        "feedback": "turn-003/feedback.json"
+      },
+      {
+        "step": 4,
+        "action": "invalid",
+        "status": "rejected",
+        "consecutive_no_progress": 1,
+        "packet_bytes": 30248,
+        "receipt": "turn-004/receipt.json",
+        "skill_hashes": {
+          "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+          "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+          "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+        },
+        "feedback": "turn-004/feedback.json"
+      },
+      {
+        "step": 5,
+        "action": "invalid",
+        "status": "rejected",
+        "consecutive_no_progress": 2,
+        "packet_bytes": 25198,
+        "receipt": "turn-005/receipt.json",
+        "skill_hashes": {
+          "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+          "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+          "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+        },
+        "feedback": "turn-005/feedback.json"
+      },
+      {
+        "step": 6,
+        "action": "finish",
+        "status": "evidence_ready",
+        "consecutive_no_progress": 3,
+        "packet_bytes": 25255,
+        "receipt": "turn-006/receipt.json",
+        "skill_hashes": {
+          "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+          "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+          "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+        },
+        "feedback": "turn-006/feedback.json"
+      }
+    ],
+    "role": "worker",
+    "worker_runs": [],
+    "pending_body_reads": [],
+    "decision_budget": {
+      "limit": 36,
+      "used": 9
+    },
+    "evidence_budget": {
+      "limit_bytes": 8000000,
+      "used_bytes": 6423
+    }
+  },
+  "evidence_bundle": {
+    "schema_version": "autonomous-evidence-manifest-v2",
+    "items": [
+      {
+        "evidence_id": "ev-687678a9185fb1537f1e46f6",
+        "kind": "record",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "sha256": "687678a9185fb1537f1e46f6341f99bf1dc2efa2d7d8fd7d72f4bcc953566727",
+        "artifact": {
+          "schema_version": "run-artifact-v1",
+          "artifact_id": "art-d6d47c73c60ba0ef3470a5fa089980eb",
+          "kind": "record",
+          "path": "artifacts/art-d6d47c73c60ba0ef3470a5fa089980eb.json",
+          "sha256": "33087962ef9b89a131ac24a05356aecc7c541260dac4708754ec29791a11ffbf",
+          "size_bytes": 1357,
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "company_ids": [
+              "sec-0001652044"
+            ],
+            "source_snapshot_ids": [
+              "googl-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-02-05",
+            "include_candidates": true
+          },
+          "scope_id": "scope-9971188484366854bf3045c2",
+          "created_step": 2,
+          "parent_ids": [],
+          "source_ids": [
+            "googl-2025-10k"
+          ],
+          "evidence_id": "ev-687678a9185fb1537f1e46f6"
+        },
+        "value": {
+          "schema_version": "research-query-v0.4",
+          "record_id": "obs-56ba2c019c541769c0cce851",
+          "record_type": "metric",
+          "entity_id": "sec-0001652044",
+          "metric_id": "capex_cash_payments",
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "period_resolution": "resolved",
+          "value_kind": "actual",
+          "value_decimal": "91447000000",
+          "upper_decimal": null,
+          "value_relation": "eq",
+          "unit": "USD",
+          "denominator": null,
+          "modality": null,
+          "accounting_basis": "reported_consolidated",
+          "dimensions": {},
+          "available_at": "2026-02-05",
+          "source_snapshot_id": "googl-2025-10k",
+          "evidence_ids": [
+            "ev-868cb2fb5f29b34e0f3e7eff"
+          ],
+          "qualifier_evidence_ids": [],
+          "question_evidence_ids": [],
+          "summary": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; reported inline XBRL fact",
+          "speaker": null,
+          "status": "candidate",
+          "origin": {
+            "artifact": "raw/googl-2025-10k.html",
+            "record_index": 11195,
+            "adapter": "us-gaap-inline-v1",
+            "concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+            "context_ref": "c-1",
+            "raw_dimensions": {},
+            "entity_identifier": "0001652044"
+          },
+          "normalization_notes": [
+            "Exact standard concept mapping; dimensions are opaque, not interpreted as named segments.",
+            "Candidate source fact; not independently adopted."
+          ]
+        }
+      },
+      {
+        "evidence_id": "ev-2f185f9e9d73206bc3281818",
+        "kind": "citation",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "sha256": "2f185f9e9d73206bc3281818d00978abbfd36aa5cbd7b311d557f9b410ba4091",
+        "artifact": {
+          "schema_version": "run-artifact-v1",
+          "artifact_id": "art-c6f2897c6a769ba3dc26c4549e147d24",
+          "kind": "citation",
+          "path": "artifacts/art-c6f2897c6a769ba3dc26c4549e147d24.json",
+          "sha256": "e67c8b474c5f505ab109632dda2427318526295cf8ed1b20093ede4093882f4b",
+          "size_bytes": 1413,
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "company_ids": [
+              "sec-0001652044"
+            ],
+            "source_snapshot_ids": [
+              "googl-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-02-05",
+            "include_candidates": true
+          },
+          "scope_id": "scope-9971188484366854bf3045c2",
+          "created_step": 2,
+          "parent_ids": [],
+          "source_ids": [
+            "googl-2025-10k"
+          ],
+          "evidence_id": "ev-2f185f9e9d73206bc3281818"
+        },
+        "value": {
+          "source_id": "ev-868cb2fb5f29b34e0f3e7eff",
+          "evidence_id": "ev-868cb2fb5f29b34e0f3e7eff",
+          "source_snapshot_id": "googl-2025-10k",
+          "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "index_id": "didx-d113d1d4ab51745c",
+          "block_id": "block-000774-67c9365e",
+          "text_hash": "67c9365e556483f996f437c0561a28db510cb415de5b9d21b4215c68793f606a",
+          "quote": "91,447",
+          "dom_path": "/html/body/div[837]/table",
+          "fact_dom_path": "/html/body/div[837]/table/tr[22]/td[8]/span/ix:nonfraction",
+          "fact_id": "f-384",
+          "concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "context_ref": "c-1",
+          "unit_ref": "usd",
+          "context_xml": "<xbrli:context id=\"c-1\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001652044</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2025-01-01</xbrli:startdate><xbrli:enddate>2025-12-31</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"usd\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "number_metadata": {
+            "value_decimal": "91447000000",
+            "unit": "USD",
+            "raw_value": "91,447",
+            "scale": 6,
+            "sign": "+",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "context_block_ids": [
+            "block-000774-67c9365e"
+          ]
+        }
+      },
+      {
+        "evidence_id": "ev-ab92ca11037d639cc859c238",
+        "kind": "record",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "sha256": "ab92ca11037d639cc859c2386bee6b64acbcaf56fb834da4e6e36bd3716766a8",
+        "artifact": {
+          "schema_version": "run-artifact-v1",
+          "artifact_id": "art-3005830acc68923fccd9c2a3d0f3a6ec",
+          "kind": "record",
+          "path": "artifacts/art-3005830acc68923fccd9c2a3d0f3a6ec.json",
+          "sha256": "4a5dd29dbf5dc127d07a8b0b33630700963331e44a24ac5d2fa6bb9c1e765261",
+          "size_bytes": 1358,
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "company_ids": [
+              "sec-0001652044"
+            ],
+            "source_snapshot_ids": [
+              "googl-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-02-05",
+            "include_candidates": true
+          },
+          "scope_id": "scope-9971188484366854bf3045c2",
+          "created_step": 3,
+          "parent_ids": [],
+          "source_ids": [
+            "googl-2025-10k"
+          ],
+          "evidence_id": "ev-ab92ca11037d639cc859c238"
+        },
+        "value": {
+          "schema_version": "research-query-v0.4",
+          "record_id": "obs-a0343ddc7aedd6ae4e071851",
+          "record_type": "metric",
+          "entity_id": "sec-0001652044",
+          "metric_id": "capex_cash_payments",
+          "period": {
+            "kind": "year",
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "period_resolution": "resolved",
+          "value_kind": "actual",
+          "value_decimal": "52535000000",
+          "upper_decimal": null,
+          "value_relation": "eq",
+          "unit": "USD",
+          "denominator": null,
+          "modality": null,
+          "accounting_basis": "reported_consolidated",
+          "dimensions": {},
+          "available_at": "2026-02-05",
+          "source_snapshot_id": "googl-2025-10k",
+          "evidence_ids": [
+            "ev-1fea69caacad3e422fa3c65b"
+          ],
+          "qualifier_evidence_ids": [],
+          "question_evidence_ids": [],
+          "summary": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment; reported inline XBRL fact",
+          "speaker": null,
+          "status": "candidate",
+          "origin": {
+            "artifact": "raw/googl-2025-10k.html",
+            "record_index": 11190,
+            "adapter": "us-gaap-inline-v1",
+            "concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+            "context_ref": "c-28",
+            "raw_dimensions": {},
+            "entity_identifier": "0001652044"
+          },
+          "normalization_notes": [
+            "Exact standard concept mapping; dimensions are opaque, not interpreted as named segments.",
+            "Candidate source fact; not independently adopted."
+          ]
+        }
+      },
+      {
+        "evidence_id": "ev-8aef7e7638c48fc1a1133194",
+        "kind": "citation",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-02-05",
+          "include_candidates": true
+        },
+        "sha256": "8aef7e7638c48fc1a113319419b13706fe8b70a191a212dceb1377ee5d1ec506",
+        "artifact": {
+          "schema_version": "run-artifact-v1",
+          "artifact_id": "art-7c8911f667547bb76b26f20dffcb6b03",
+          "kind": "citation",
+          "path": "artifacts/art-7c8911f667547bb76b26f20dffcb6b03.json",
+          "sha256": "b95b081e4ec77ffbbe01bcda67c86fd226f0dcc73a5227dbaee490aac682b7dd",
+          "size_bytes": 1415,
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "company_ids": [
+              "sec-0001652044"
+            ],
+            "source_snapshot_ids": [
+              "googl-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-02-05",
+            "include_candidates": true
+          },
+          "scope_id": "scope-9971188484366854bf3045c2",
+          "created_step": 3,
+          "parent_ids": [],
+          "source_ids": [
+            "googl-2025-10k"
+          ],
+          "evidence_id": "ev-8aef7e7638c48fc1a1133194"
+        },
+        "value": {
+          "source_id": "ev-1fea69caacad3e422fa3c65b",
+          "evidence_id": "ev-1fea69caacad3e422fa3c65b",
+          "source_snapshot_id": "googl-2025-10k",
+          "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "index_id": "didx-d113d1d4ab51745c",
+          "block_id": "block-000774-67c9365e",
+          "text_hash": "67c9365e556483f996f437c0561a28db510cb415de5b9d21b4215c68793f606a",
+          "quote": "52,535",
+          "dom_path": "/html/body/div[837]/table",
+          "fact_dom_path": "/html/body/div[837]/table/tr[22]/td[5]/span/ix:nonfraction",
+          "fact_id": "f-383",
+          "concept": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+          "context_ref": "c-28",
+          "unit_ref": "usd",
+          "context_xml": "<xbrli:context id=\"c-28\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001652044</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2024-01-01</xbrli:startdate><xbrli:enddate>2024-12-31</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"usd\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "number_metadata": {
+            "value_decimal": "52535000000",
+            "unit": "USD",
+            "raw_value": "52,535",
+            "scale": 6,
+            "sign": "+",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "context_block_ids": [
+            "block-000774-67c9365e"
+          ]
+        }
+      }
+    ],
+    "delivered_body": {},
+    "scope_history": [],
+    "candidate_only": true,
+    "semantic_completeness": "not_evaluated",
+    "bundle_id": "bundle-b5b4f2550829fa2a81a901e8"
+  },
+  "artifact_namespace": "worker_run",
+  "candidate_only": true,
+  "semantic_completeness": "not_evaluated",
+  "review_required": "Verify sources with parent tools; worker references do not satisfy parent coverage."
+}

@@ -1,0 +1,172 @@
+{
+  "schema_version": "semantic-review-result-v1",
+  "status": "assessed",
+  "source_origin": "synthetic_fixture",
+  "plan_origin": "model",
+  "packets_requested": 1,
+  "packets_assessed": 1,
+  "unassessed_packet_ids": [],
+  "assessments": [
+    {
+      "packet_id": "semantic-d2740666219ea633e8d0d2a0",
+      "checks": [
+        {
+          "axis": "value",
+          "status": "insufficient_evidence",
+          "reason": "源文本仅给出调整后利润为21（百万美元），并提及定义与调节表见附注4，但附注4未包含在提供的摘录中。因此无法验证该数值的构成、排除项或调节过程，也无法确认断言中“仅排除重组费用且无其他项目”的说法。",
+          "constraints": [
+            {
+              "record_ids": [
+                "sr-011-r1"
+              ],
+              "statement": "调整后利润为21（单位：百万美元），其定义和调节表见附注4，但附注4未包含在源摘录中。",
+              "citations": [
+                {
+                  "source_snapshot_id": "cedar-source-011",
+                  "block_id": "b1",
+                  "quote": "Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt."
+                }
+              ]
+            }
+          ],
+          "unresolved_questions": [
+            "附注4中调整后利润的定义和调节表是什么？",
+            "调整后利润具体排除了哪些项目？是否仅排除重组费用？"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "assertion_id": "sr-011-a1",
+          "verdict": "insufficient_evidence",
+          "reason": "断言声称FY2025调整后利润2100万美元仅排除重组费用且无其他项目。源文本仅给出调整后利润为21（百万美元），并提及定义与调节表见附注4，但附注4未包含在提供的摘录中。因此无法验证排除项的具体内容，也无法确认是否仅排除重组费用。",
+          "citations": [
+            {
+              "source_snapshot_id": "cedar-source-011",
+              "block_id": "b1",
+              "quote": "Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt."
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "源摘录未包含附注4，无法获取调整后利润的定义和调节表。",
+        "仅提供单一数值，缺乏构成明细，无法验证排除项。"
+      ]
+    }
+  ],
+  "failures": [],
+  "usage": {
+    "artifact_root": "/Users/bytedance/Documents/ChatGPT/uteki/data/company_workspace/record_review/semantic-quality-v1/fixture-run-02/model",
+    "path": "usage-0002.json",
+    "sha256": "972d0a36b44955c88a0cd8adca7de8715dacf181948cde9030bb1c6c3abed090",
+    "summary": {
+      "schema_version": "record-review-model-usage-v1",
+      "plan_origin": "model",
+      "provider": "deepseek",
+      "model": "deepseek-v4-pro",
+      "model_config_sha256": "eaf0b9cd328ce995c543d671fc1535ea71afa10349590c7b3cef39d29aaec44f",
+      "prompt_sha256": "ee95178b12f557b9f86236bd548c1b0ae7cf4f80d6f1c6ebb2c6f83ece3744ed",
+      "calls": {
+        "requests": 1,
+        "unknown_cost_requests": 0,
+        "known_estimated_usd": "0.0053658",
+        "actual_billed_usd": null,
+        "records": [
+          {
+            "call_id": "91951d8a-bf82-49c3-a6db-ff6f28c1eedb",
+            "stage": "record_review",
+            "provider": "deepseek",
+            "requested_model": "deepseek-v4-pro",
+            "actual_upstream_model": "deepseek-v4-pro",
+            "started_at": "2026-09-24T10:10:43.050556+00:00",
+            "pricing_snapshot": {
+              "provider": "deepseek",
+              "model": "deepseek-v4-pro",
+              "currency": "USD",
+              "input_per_million": "1.32",
+              "output_per_million": "3.96",
+              "cached_input_per_million": "0.044",
+              "source": "https://api-docs.deepseek.com/quick_start/pricing",
+              "checked_on": "2026-09-22",
+              "basis": "Peak list price estimate; no cache or off-peak discounts applied"
+            },
+            "actual_billed_usd": null,
+            "status": "succeeded",
+            "usage": {
+              "input_tokens": 2445,
+              "output_tokens": 540,
+              "total_tokens": 2985,
+              "input_tokens_details": {
+                "cached_tokens": 256
+              },
+              "output_tokens_details": null
+            },
+            "estimated_usd": "0.0053658",
+            "cost_basis": "uncached_list_price_estimate_not_bill",
+            "budget_reservation_id": "821c70ed-e61f-48e6-91d6-16cc343c09a9",
+            "reserved_usd": "0.09946332",
+            "response_id": "45b2fb5b-4747-425d-bcf1-9532e9847784",
+            "request_id": null,
+            "finish_reason": "stop",
+            "raw_usage": {
+              "completion_tokens": 540,
+              "prompt_tokens": 2445,
+              "total_tokens": 2985,
+              "prompt_tokens_details": {
+                "cached_tokens": 256
+              },
+              "prompt_cache_hit_tokens": 256,
+              "prompt_cache_miss_tokens": 2189
+            },
+            "ended_at": "2026-09-24T10:10:52.033794+00:00",
+            "elapsed_seconds": 8.98279687500326
+          }
+        ]
+      },
+      "shared_budget": {
+        "limit_usd": "5",
+        "estimated_spent_usd": "0.18525144",
+        "held_usd": "0.3091242",
+        "unknown_requests": 0,
+        "in_flight_requests": 1,
+        "requests": 16,
+        "actual_billed_usd": null,
+        "enforcement": "record_only"
+      },
+      "artifacts": [
+        {
+          "path": "calls/91951d8a-bf82-49c3-a6db-ff6f28c1eedb-end.json",
+          "sha256": "0e0d8026e7a4678636729b2f2b06bbf53732fa9e40df0b56273b9fd2353e163b"
+        },
+        {
+          "path": "calls/91951d8a-bf82-49c3-a6db-ff6f28c1eedb-start.json",
+          "sha256": "245da9fb0a15f090b03906329e400676096a6db9a9d274cdec147c840977899e"
+        },
+        {
+          "path": "model-config.json",
+          "sha256": "eaf0b9cd328ce995c543d671fc1535ea71afa10349590c7b3cef39d29aaec44f"
+        },
+        {
+          "path": "review-0001-attempt-01.json",
+          "sha256": "d9ad9953ec288e9566d0945a5b7e7289cfdae3e8d7c02dc989d0db54e563ae5c"
+        },
+        {
+          "path": "review-0001-input.json",
+          "sha256": "d00e8489e4e297fdfebbbcfcea8bd2bf7fd1466155dbab3ebe20e83d014ff0d3"
+        },
+        {
+          "path": "review-0001-parsed.json",
+          "sha256": "7106c3e6cc156fe4f69bb34bbe8f1c061987a187675c80bb51e7856d3977c37c"
+        }
+      ],
+      "business_validation": "not_evaluated"
+    }
+  },
+  "adoption": "unchanged_candidate",
+  "semantic_acceptance": "requires_independent_evaluation",
+  "limitations": [
+    "Cited model constraints are review opinions, not proof of complete extraction or truth.",
+    "Only explicitly selected records, axes and supplied source context are assessed."
+  ]
+}

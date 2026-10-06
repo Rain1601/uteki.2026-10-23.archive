@@ -1,0 +1,120 @@
+{
+  "status": "candidate_batch_generated",
+  "evidence_ids": [
+    "ev-540f4d4f2680d2fa87da1d4b"
+  ],
+  "semantic_completeness": "not_evaluated",
+  "result": {
+    "status": "candidate",
+    "task_id": "tsmc-fy2023-five-metric-candidates",
+    "batch_index": 0,
+    "catalog_id": "table-batches-3f4e633e7e0eaaa44e1996fa",
+    "method_id": "annual-financial-v2",
+    "method_sha256": "49a723e5f4493919e89a62b93563f354cef8cdccdddafb4131a06e0eca902493",
+    "run": {
+      "path": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-three-statements-main-agent-v1/query/turn-004/financial_extract",
+      "manifest_sha256": "97e80134f46580fd62c2b0912084b809ee8b7dc1b3c830546196f9127b603c4b"
+    },
+    "dataset": {
+      "path": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-three-statements-main-agent-v1/query/turn-004/financial_extract/extraction-01/dataset",
+      "snapshot_id": "query-direct-bf34a95733e156212a68b139",
+      "manifest_sha256": "8a16947f13c7bbb37504419547a24f9777be46f8f847fc1043a46629eb2400a2"
+    },
+    "raw_record_count": 3,
+    "normalized_record_count": 2,
+    "unresolved_count": 4,
+    "gaps": [
+      "Supplied batch contains only the consolidated statements of financial position heading, the '(In Millions of New Taiwan Dollars or U.S. Dollars)' caption and the current/noncurrent assets table (block-001124). No consolidated statements of comprehensive income (revenue, operating income) block was delivered.",
+      "Revenue for FY2023 and the presented comparative year FY2022 is not established in the supplied blocks; the income statement block is missing.",
+      "Operating income for FY2023 and FY2022 is not established in the supplied blocks; the income statement block is missing.",
+      "Operating cash flow (net cash provided by operating activities) for FY2023 and FY2022 is not established in the supplied blocks; the consolidated statements of cash flows block and its period captions are missing.",
+      "Cash purchases of property, plant and equipment for FY2023 and FY2022 are not established in the supplied blocks; the investing-activities section and its note references are not delivered.",
+      "The table is marked '(Continued)' (block-001125-2ea6a4cb, page F - 4), so the equity-and-liabilities portion of the same balance sheet and adjacent notes were not delivered in this batch.",
+      "No FY2021 comparative appears in the delivered table; the period catalog lists fy2021 but no FY2021 figures are present in these blocks.",
+      "The accounting framework wording (e.g., IFRS as endorsed in the R.O.C. or US GAAP) is not stated in the supplied blocks; accounting_basis is set to reported_consolidated based on the 'CONSOLIDATED STATEMENTS OF FINANCIAL POSITION' heading only.",
+      "Dashes ('-') appear in the delivered table (e.g., hedging financial assets, noncurrent FVTPL for 2022) and are not treated as zero.",
+      "Whether these consolidated financial statements are the original audited FY2023 statements or a re-presentation cannot be confirmed from the supplied blocks alone.",
+      "Neighbor selection does not establish sufficient headers or notes.",
+      "Unassigned prose and unselected source blocks remain outside completed batch coverage.",
+      "Returned candidates do not establish financial-package completeness or semantic acceptance.",
+      "Pending table batches: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]; unassigned parent blocks: 4."
+    ],
+    "adoption": "unchanged_candidate",
+    "semantic_acceptance": "not_evaluated",
+    "candidate_only": true,
+    "company_id": "sec-0001046179",
+    "source_snapshot_id": "source-6719837a8d24b2b7df359f29",
+    "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1"
+  },
+  "result_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-bbc56724f603690889cbf8c0253cf4c2",
+    "kind": "tool_payload",
+    "path": "artifacts/art-bbc56724f603690889cbf8c0253cf4c2.json",
+    "sha256": "fe0740e7cf201a93d230d1e232167eb8e18363d74cfdc44666e1a5e2b94f303d",
+    "size_bytes": 3700,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+      "company_ids": [
+        "sec-0001046179"
+      ],
+      "source_snapshot_ids": [
+        "source-6719837a8d24b2b7df359f29"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    },
+    "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+    "created_step": 4,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "preview_truncated": false,
+  "reads": [],
+  "receipt": {
+    "schema_version": "data-tool-receipt-v1",
+    "step": 4,
+    "action": "financial_extract",
+    "requirement_ids": [
+      "req-fs-balance-sheet-assets"
+    ],
+    "request_fingerprint": "3bb49f916dfac655e7792676e42dac8476fcfb25838903baa87dafdf2d58c541",
+    "status": "candidate_batch_generated",
+    "error_code": null,
+    "layer": "financial_extraction",
+    "retryable": false,
+    "progress_delta": true,
+    "observation_bytes": 4485,
+    "execution_limited": false,
+    "preview_truncated": false
+  },
+  "full_output": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-ed0d37f086c9b8e12949c024aac51ca0",
+    "kind": "tool_output",
+    "path": "artifacts/art-ed0d37f086c9b8e12949c024aac51ca0.json",
+    "sha256": "f52c7cb0a29de613bad51ec8eb254925ef418d49e740f318f5c6c2d0014c327b",
+    "size_bytes": 3942,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+      "company_ids": [
+        "sec-0001046179"
+      ],
+      "source_snapshot_ids": [
+        "source-6719837a8d24b2b7df359f29"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    },
+    "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+    "created_step": 4,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  }
+}

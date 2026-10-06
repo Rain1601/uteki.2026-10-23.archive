@@ -1,0 +1,503 @@
+{
+  "packet": {
+    "schema_version": "semantic-review-input-v2",
+    "source_origin": "synthetic_fixture",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "birch-disclosure-a-snapshot",
+      "company_ids": [
+        "sec-0000000678"
+      ],
+      "source_snapshot_ids": [
+        "birch-disclosure-a"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-03-01",
+      "include_candidates": true
+    },
+    "source": {
+      "source_snapshot_id": "birch-disclosure-a",
+      "company_id": "sec-0000000678",
+      "source_sha256": "011deb91fdea63cf483ef4e122778b0c066ec872ea0d7e5dfb12f979fe9fc502",
+      "source_url": "https://example.invalid/birch-disclosure-a"
+    },
+    "records": [
+      {
+        "record": {
+          "record_id": "birch-disclosure-a-revenue-2025",
+          "source_snapshot_id": "birch-disclosure-a",
+          "entity_id": "sec-0000000678",
+          "metric_id": "revenue",
+          "value_decimal": "20000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "dimensions": {}
+        },
+        "record_sha256": "34dbc6162147599a5fc79a7880d2d6bdd609f8173716b4ca487c46e2f5675567"
+      },
+      {
+        "record": {
+          "record_id": "birch-disclosure-a-revenue-2024",
+          "source_snapshot_id": "birch-disclosure-a",
+          "entity_id": "sec-0000000678",
+          "metric_id": "revenue",
+          "value_decimal": "20000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "dimensions": {}
+        },
+        "record_sha256": "18a4ba462f4d32d8baef33ddb06f3447c91026d109c07c0b47403cac8bb0abad"
+      },
+      {
+        "record": {
+          "record_id": "birch-disclosure-a-operating_income-2025",
+          "source_snapshot_id": "birch-disclosure-a",
+          "entity_id": "sec-0000000678",
+          "metric_id": "operating_income",
+          "value_decimal": "20000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "dimensions": {}
+        },
+        "record_sha256": "9abd56d6a9cf89c1e339ac748a60598a6f6739c328da9d7fb1f53a9241182127"
+      },
+      {
+        "record": {
+          "record_id": "birch-disclosure-a-operating_income-2024",
+          "source_snapshot_id": "birch-disclosure-a",
+          "entity_id": "sec-0000000678",
+          "metric_id": "operating_income",
+          "value_decimal": "20000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "dimensions": {}
+        },
+        "record_sha256": "4d595fdb48287df0cc28dce8b4178e67255971c66fc806253e501017c1b8c2c7"
+      }
+    ],
+    "record_anchors": {
+      "birch-disclosure-a-revenue-2025": {
+        "status": "located",
+        "source_snapshot_id": "birch-disclosure-a",
+        "block_id": "financial-table",
+        "start": 127,
+        "end": 140,
+        "text": "Revenue 20 20",
+        "kind": "table_row"
+      },
+      "birch-disclosure-a-revenue-2024": {
+        "status": "located",
+        "source_snapshot_id": "birch-disclosure-a",
+        "block_id": "financial-table",
+        "start": 127,
+        "end": 140,
+        "text": "Revenue 20 20",
+        "kind": "table_row"
+      },
+      "birch-disclosure-a-operating_income-2025": {
+        "status": "located",
+        "source_snapshot_id": "birch-disclosure-a",
+        "block_id": "financial-table",
+        "start": 141,
+        "end": 163,
+        "text": "Operating income 20 20",
+        "kind": "table_row"
+      },
+      "birch-disclosure-a-operating_income-2024": {
+        "status": "located",
+        "source_snapshot_id": "birch-disclosure-a",
+        "block_id": "financial-table",
+        "start": 141,
+        "end": 163,
+        "text": "Operating income 20 20",
+        "kind": "table_row"
+      }
+    },
+    "source_blocks": [
+      {
+        "source_snapshot_id": "birch-disclosure-a",
+        "block_id": "financial-table",
+        "text": "桦木 Birch Devices. Illustrative prior layout: Revenue 20 20.\nConsolidated actual annual results in USD millions. FY2025 FY2024.\nRevenue 20 20\nOperating income 20 20",
+        "text_hash": "d1f596aca5a22c3cfd4e983ceab70c9d4ddc6840c4cf45b8ad2d218f3047d3e8"
+      },
+      {
+        "source_snapshot_id": "birch-disclosure-a",
+        "block_id": "note-1-detail",
+        "text": "Note 1. Segment presentation changed. Prior-period segment information was recast. Consolidated results were unchanged. See Note 4 for allocation methodology.",
+        "text_hash": "1e2c609100b7573e45a78d454b02afdf2a4a578bf43dd9ff7123a1154352f1ed"
+      }
+    ],
+    "metric_definitions": {
+      "revenue": {
+        "definition": "Revenue in USD."
+      },
+      "operating_income": {
+        "definition": "Operating income in USD."
+      }
+    },
+    "axes": [
+      "dimensions",
+      "value"
+    ],
+    "assertions": [
+      {
+        "assertion_id": "all-values",
+        "record_ids": [
+          "birch-disclosure-a-revenue-2025",
+          "birch-disclosure-a-revenue-2024",
+          "birch-disclosure-a-operating_income-2025",
+          "birch-disclosure-a-operating_income-2024"
+        ],
+        "text": "All four selected consolidated values are USD 20 million in their displayed periods."
+      }
+    ],
+    "selection_warnings": [],
+    "output_schema": {
+      "$defs": {
+        "AssertionAssessmentV2": {
+          "additionalProperties": false,
+          "properties": {
+            "assertion_id": {
+              "minLength": 1,
+              "title": "Assertion Id",
+              "type": "string"
+            },
+            "verdict": {
+              "enum": [
+                "supported",
+                "contradicted",
+                "insufficient_evidence"
+              ],
+              "title": "Verdict",
+              "type": "string"
+            },
+            "reason": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "citations": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/SemanticCitationV2"
+              },
+              "maxItems": 8,
+              "title": "Citations",
+              "type": "array"
+            }
+          },
+          "required": [
+            "assertion_id",
+            "verdict",
+            "reason"
+          ],
+          "title": "AssertionAssessmentV2",
+          "type": "object"
+        },
+        "AxisCheckV2": {
+          "additionalProperties": false,
+          "properties": {
+            "axis": {
+              "enum": [
+                "comparability",
+                "allocation",
+                "additivity",
+                "dimensions",
+                "geography",
+                "value"
+              ],
+              "title": "Axis",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "constraints_found",
+                "none_found_in_context",
+                "insufficient_evidence"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "reason": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "constraints": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/SemanticConstraintV2"
+              },
+              "maxItems": 24,
+              "title": "Constraints",
+              "type": "array"
+            },
+            "unresolved_questions": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 12,
+              "title": "Unresolved Questions",
+              "type": "array"
+            }
+          },
+          "required": [
+            "axis",
+            "status",
+            "reason"
+          ],
+          "title": "AxisCheckV2",
+          "type": "object"
+        },
+        "ContextClaim": {
+          "additionalProperties": false,
+          "description": "Delivery state of a host-identified object, not an inference about a note.",
+          "properties": {
+            "object_id": {
+              "minLength": 1,
+              "title": "Object Id",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "supplied",
+                "not_supplied",
+                "unresolved"
+              ],
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "status"
+          ],
+          "title": "ContextClaim",
+          "type": "object"
+        },
+        "ContextRequest": {
+          "additionalProperties": false,
+          "description": "A model question; it never establishes that material was not delivered.",
+          "properties": {
+            "question": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Question",
+              "type": "string"
+            },
+            "reviewed_block_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 80,
+              "minItems": 1,
+              "title": "Reviewed Block Ids",
+              "type": "array"
+            },
+            "reference_ids": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 20,
+              "title": "Reference Ids",
+              "type": "array"
+            }
+          },
+          "required": [
+            "question",
+            "reviewed_block_ids"
+          ],
+          "title": "ContextRequest",
+          "type": "object"
+        },
+        "SemanticCitationV2": {
+          "additionalProperties": false,
+          "properties": {
+            "source_snapshot_id": {
+              "title": "Source Snapshot Id",
+              "type": "string"
+            },
+            "block_id": {
+              "title": "Block Id",
+              "type": "string"
+            },
+            "quote": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Quote",
+              "type": "string"
+            },
+            "source_start": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Source Start"
+            }
+          },
+          "required": [
+            "source_snapshot_id",
+            "block_id",
+            "quote"
+          ],
+          "title": "SemanticCitationV2",
+          "type": "object"
+        },
+        "SemanticConstraintV2": {
+          "additionalProperties": false,
+          "properties": {
+            "record_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 24,
+              "minItems": 1,
+              "title": "Record Ids",
+              "type": "array"
+            },
+            "statement": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Statement",
+              "type": "string"
+            },
+            "citations": {
+              "items": {
+                "$ref": "#/$defs/SemanticCitationV2"
+              },
+              "maxItems": 8,
+              "minItems": 1,
+              "title": "Citations",
+              "type": "array"
+            }
+          },
+          "required": [
+            "record_ids",
+            "statement",
+            "citations"
+          ],
+          "title": "SemanticConstraintV2",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "packet_id": {
+          "minLength": 1,
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/AxisCheckV2"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Checks",
+          "type": "array"
+        },
+        "assertions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AssertionAssessmentV2"
+          },
+          "maxItems": 24,
+          "title": "Assertions",
+          "type": "array"
+        },
+        "context_claims": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ContextClaim"
+          },
+          "maxItems": 80,
+          "title": "Context Claims",
+          "type": "array"
+        },
+        "context_requests": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ContextRequest"
+          },
+          "maxItems": 20,
+          "title": "Context Requests",
+          "type": "array"
+        }
+      },
+      "required": [
+        "packet_id",
+        "checks"
+      ],
+      "title": "SemanticAssessmentV2",
+      "type": "object"
+    },
+    "context_inventory": {
+      "objects": [
+        {
+          "object_id": "context-a7e1ac6636881b0e7101b0cc",
+          "kind": "source_block",
+          "source_snapshot_id": "birch-disclosure-a",
+          "block_id": "financial-table",
+          "status": "supplied"
+        },
+        {
+          "object_id": "context-815047662a325ac95f450f4d",
+          "kind": "source_block",
+          "source_snapshot_id": "birch-disclosure-a",
+          "block_id": "note-1-detail",
+          "status": "supplied"
+        },
+        {
+          "object_id": "context-a677cf3f9e722d78287f2ef6",
+          "kind": "source_reference",
+          "source_snapshot_id": "birch-disclosure-a",
+          "block_id": "note-1-detail",
+          "quote": "Note 1",
+          "start": 0,
+          "status": "unresolved"
+        },
+        {
+          "object_id": "context-b85a4e3abdc31ac49ffef58c",
+          "kind": "source_reference",
+          "source_snapshot_id": "birch-disclosure-a",
+          "block_id": "note-1-detail",
+          "quote": "Note 4",
+          "start": 124,
+          "status": "unresolved"
+        }
+      ],
+      "selection_warnings": [],
+      "boundary": "Selection warnings and unresolved references do not establish missing material."
+    },
+    "packet_id": "semantic-5120c777c863853e6aa280c5"
+  },
+  "packet_sha256": "d19ff553da40210235824efd6681e2d2ef608d5ec096d3398ae9036afed9527e",
+  "model_config_sha256": "72852030245fa4b277666fb0a1675ffe4ad0fc081586be49450b11190ae69957",
+  "prompt_sha256": "e024ba97334fae2fec00e506af54a0c9748e0dad7198ba733cc4edbc0897ace1"
+}

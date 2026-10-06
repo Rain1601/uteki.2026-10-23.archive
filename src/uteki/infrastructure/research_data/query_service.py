@@ -14,7 +14,9 @@ import threading
 import duckdb
 
 from uteki.agents.reading.document_reader import DocumentReader
-from uteki.domain.research_data.query_contract import DataQuery, RecordRequest, ResearchRecord, QueryResult, VERSION
+from uteki.domain.research_data.query_contract import (
+    DataQuery, RecordRequest, ResearchRecord, QueryResult, VERSION, SUPPORTED_VERSIONS, validate_period_version,
+)
 from uteki.domain.research_data.execution_scope import (
     EXECUTION_VERSION, ExecutionScope, ReadCursor, SearchCursor,
     SourceOutlineRequest, SourceReadRequest, SourceSearchRequest,
@@ -28,13 +30,34 @@ from .query_dataset import contained, load
 MAX_DOCUMENT_BYTES = 80000
 
 
+def compact_table_cells(result):
+    """Lossless wire projection: factor repeated cell keys out of large tables.
+
+    All cells, empty cells, text, row/column positions and spans are retained.
+    Heterogeneous cell schemas retain their original representation. The frozen
+    index and reader cache are never mutated.
+    """
+    blocks = []
+    for block in result["blocks"]:
+        table = block.get("table")
+        cells = table.get("cells") if isinstance(table, dict) else None
+        if cells and all(isinstance(cell, dict) and cell.keys() == cells[0].keys() for cell in cells):
+            fields = list(cells[0])
+            table = {**table, "cell_fields": fields,
+                     "cells": [[cell[field] for field in fields] for cell in cells]}
+            block = {**block, "table": table}
+        blocks.append(block)
+    return {**result, "blocks": blocks, "representation": "compact",
+            "table_encoding": "Each table.cells tuple maps positionally to table.cell_fields; all cells including empty cells are retained."}
+
+
 class QueryDataPort:
     def __init__(self, dataset: Path):
         self.dataset = dataset.resolve()
         self.manifest = load(self.dataset / "manifest.json")
-        if self.manifest["schema_version"] != VERSION:
+        if self.manifest["schema_version"] not in SUPPORTED_VERSIONS:
             raise ValueError(f"unsupported dataset schema version: {self.manifest['schema_version']}; "
-                             f"expected {VERSION}. Build a new dataset; preserve the historical snapshot.")
+                             f"expected {' or '.join(SUPPORTED_VERSIONS)}. Build a new dataset; preserve the historical snapshot.")
         for relative, expected in self.manifest["files"].items():
             if digest(contained(self.dataset, relative).read_bytes()) != expected:
                 raise ValueError("dataset integrity failure: " + relative)
@@ -57,6 +80,12 @@ class QueryDataPort:
                 entry["accounting_bases"].add(basis)
             self.entities = {key: {**value, "accounting_bases": sorted(value["accounting_bases"])}
                              for key, value in sorted(entities.items())}
+            for entity, payload in self._db.execute("SELECT entity_id, payload FROM observations").fetchall():
+                dimensions = json.loads(payload).get("dimensions", {})
+                if dimensions:
+                    entry = self.entities[entity].setdefault("reported_dimensions", [])
+                    if dimensions not in entry:
+                        entry.append(dimensions)
         except Exception:
             self._db.close()
             raise
@@ -96,10 +125,12 @@ class QueryDataPort:
         unknown = set(metric_ids) - self.metrics.keys()
         if unknown:
             raise ValueError("unknown metric IDs: " + ", ".join(sorted(unknown)))
-        return {"snapshot_id": self.snapshot_id, "schema_version": VERSION, "query": load(self.dataset / "schemas/query.schema.json"),
+        return {"snapshot_id": self.snapshot_id, "schema_version": self.manifest["schema_version"], "query": load(self.dataset / "schemas/query.schema.json"),
                 "record": load(self.dataset / "schemas/record.schema.json"), "result": load(self.dataset / "schemas/result.schema.json"),
                 "metrics": {k:v for k,v in self.metrics.items() if not metric_ids or k in metric_ids},
                 "entities": list(self.entities.values()),
+                "fiscal_periods": [{**p, "company_id": s["company_id"], "source_snapshot_id": s["source_snapshot_id"]}
+                                   for s in self.sources for p in s.get("fiscal_periods", [])],
                 "physical_tables": {name: [{"name": row[1], "type": row[2], "not_null": row[3], "primary_key": row[5]}
                     for row in self._db.execute(f"PRAGMA table_info('{name}')").fetchall()]
                     for name in ("observations", "sources", "evidence", "metric_definitions")},
@@ -205,7 +236,8 @@ class QueryDataPort:
             company = self.entities[request.entity_id]["company_id"]
             eligible_sources = {s["source_snapshot_id"] for s in self.sources
                                 if s["company_id"] == company and s["available_at"] <= str(query.knowledge_cutoff)
-                                and (request.value_kind != "actual" or s["form"] in ("10-K", "10-Q"))}
+                                and (request.value_kind != "actual" or s["form"] in
+                                     ("10-K", "10-Q", "20-F", "10-K/A", "10-Q/A", "20-F/A"))}
             matching_periods = {s["source_snapshot_id"] for s in self.sources if s["source_snapshot_id"] in eligible_sources
                                 and request.period and s["period_end"] == str(request.period.end)}
             if request.period:
@@ -346,6 +378,8 @@ class QueryDataPort:
 
     def query_data(self, request):
         query = request if isinstance(request, DataQuery) else DataQuery.model_validate(request)
+        for period in [r.period for r in query.records] + [p for c in query.calculations for p in c.periods]:
+            validate_period_version(period, self.manifest["schema_version"])
         if query.snapshot_id != self.snapshot_id:
             raise ValueError("snapshot mismatch")
         if query.source_policy_id != self.manifest["source_policy_id"]:
@@ -383,7 +417,8 @@ class QueryDataPort:
                             include_candidates=query.include_candidates)["evidence"])
         has_content = bool(all_records or computed or any(d["contexts"] for d in documents))
         status = "ambiguous" if any(g["reason"] == "ambiguous" for g in gaps) else "partial" if gaps and has_content else "unanswerable" if gaps else "complete"
-        return QueryResult(query_id=query.query_id, snapshot_id=self.snapshot_id, source_policy_id=query.source_policy_id,
+        return QueryResult(result_schema_version=self.manifest["schema_version"],
+                           query_id=query.query_id, snapshot_id=self.snapshot_id, source_policy_id=query.source_policy_id,
                            knowledge_cutoff=query.knowledge_cutoff, candidate_data=query.include_candidates, status=status,
                            completion_scope="Resolved typed plan only; document match does not establish semantic completeness of the natural-language question.",
                            records=tuple(ResearchRecord.model_validate(r) for r in all_records.values()),
@@ -424,19 +459,29 @@ class ScopedQueryDataPort(QueryDataPort):
         self.scope = scope
         self.scope_id = "scope-" + digest(scope.model_dump(mode="json"))[:24]
         # Entity roots are supplied by the selected source metadata. Child entities
-        # and their accounting bases must be observable inside the same cutoff.
+        # and their accounting bases/dimensions require permitted observations
+        # inside the same source and observation cutoff. Never copy the parent's
+        # entity catalog: one entity may occur in both selected and excluded sources.
         entities = {s["company_id"]: {"entity_id": s["company_id"], "company_id": s["company_id"],
                                       "accounting_bases": set()} for s in selected}
         clause, args = self._source_restriction("s.")
         rows = self._db.execute(
-            "SELECT DISTINCT o.entity_id, s.company_id, o.accounting_basis FROM observations o "
-            "JOIN sources s USING(source_snapshot_id) WHERE o.available_at <= ? AND s.available_at <= ?" + clause,
+            "SELECT o.entity_id, s.company_id, o.accounting_basis, o.payload FROM observations o "
+            "JOIN sources s USING(source_snapshot_id) WHERE o.available_at <= ? AND s.available_at <= ? "
+            "AND o.status = 'candidate'" + clause + " ORDER BY o.record_id",
             [scope.knowledge_cutoff, scope.knowledge_cutoff, *args]).fetchall()
-        for entity, company, basis in rows:
+        for entity, company, basis, payload in rows:
             entry = entities.setdefault(entity, {"entity_id": entity, "company_id": company, "accounting_bases": set()})
             if entry["company_id"] != company:
                 raise ValueError("entity belongs to multiple scoped companies")
+            if not scope.include_candidates:
+                continue
             entry["accounting_bases"].add(basis)
+            dimensions = json.loads(payload).get("dimensions", {})
+            if dimensions:
+                reported = entry.setdefault("reported_dimensions", [])
+                if dimensions not in reported:
+                    reported.append(dimensions)
         self.entities = {key: {**value, "accounting_bases": sorted(value["accounting_bases"])}
                          for key, value in sorted(entities.items())}
 
@@ -460,8 +505,24 @@ class ScopedQueryDataPort(QueryDataPort):
         if any(key not in fixed or str(value) != str(fixed[key]) for key, value in values.items()):
             raise ValueError("query headers cannot change the execution scope")
 
+    def discover_catalog(self, request):
+        """Bounded navigation view; frozen discover_data remains unchanged."""
+        from .query_catalog import discover_catalog
+        return discover_catalog(self, request)
+
+    def probe_schema(self, request):
+        """Bounded data semantics/examples, without full execution protocols."""
+        from .query_catalog import probe_schema
+        return probe_schema(self, request)
+
     def get_schema(self, metric_ids=()):
         result = super().get_schema(metric_ids)
+        result["fiscal_periods"] = [
+            {**period, "company_id": source["company_id"], "source_snapshot_id": source["source_snapshot_id"]}
+            for source in self.sources
+            if self.scope.include_candidates and date.fromisoformat(source["available_at"]) <= self.scope.knowledge_cutoff
+            for period in source.get("fiscal_periods", [])
+        ]
         result.update(self._header())
         result["output_contracts"] = {"evidence_package": EvidencePackage.model_json_schema(),
                                       "task_progress": ProgressSnapshot.model_json_schema(),
@@ -490,7 +551,8 @@ class ScopedQueryDataPort(QueryDataPort):
             [scope.knowledge_cutoff, scope.knowledge_cutoff, *args]).fetchall()
         visible = [s for s in self.sources if s["available_at"] <= str(scope.knowledge_cutoff)]
         return {**self._header(), "status": "candidate",
-                "sources": [{**s, "queryable": scope.include_candidates} for s in visible],
+                "sources": [{**{k: v for k, v in s.items() if k != "fiscal_periods" or scope.include_candidates},
+                             "queryable": scope.include_candidates} for s in visible],
                 "coverage": [{"entity_id": r[0], "metric_id": r[1], "period_kind": r[2],
                               "period_start": str(r[3]) if r[3] else None, "period_end": str(r[4]) if r[4] else None,
                               "value_kind": r[5], "occurrence_count": r[6],
@@ -593,6 +655,8 @@ class ScopedQueryDataPort(QueryDataPort):
         if start not in reader.positions:
             raise ValueError("unknown read block")
         result = reader.read(request.node_id, start, count=request.count)
+        if request.representation == "compact":
+            result = compact_table_cells(result)
         lo, hi = reader._range(request.node_id)
         returned_start = reader.positions[result["blocks"][0]["block_id"]]
         returned_end = reader.positions[result["blocks"][-1]["block_id"]] + 1
@@ -647,11 +711,12 @@ class ScopedQueryDataPort(QueryDataPort):
                 "gaps": [] if status == "matched" else [{"scope": "document_search", "reason": status,
                     "source_snapshot_id": source["source_snapshot_id"], "node_id": request.node_id}]}
 
-    def read_context(self, *, source_snapshot_id, block_id):
+    def read_context(self, *, source_snapshot_id, block_id, representation="full"):
         source = self._source(source_snapshot_id)
         blocked = self._blocked_source(source)
         if blocked:
             return self._empty(source, blocked)
         reader, _ = self._navigation(source)
         return self.read_source(SourceReadRequest(source_snapshot_id=source_snapshot_id,
-                                node_id=self._document_node(reader), start_block_id=block_id, count=1))
+                                node_id=self._document_node(reader), start_block_id=block_id, count=1,
+                                representation=representation))

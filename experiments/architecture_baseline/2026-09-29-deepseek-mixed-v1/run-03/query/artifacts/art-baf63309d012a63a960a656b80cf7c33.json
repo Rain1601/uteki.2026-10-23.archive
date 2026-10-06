@@ -1,0 +1,274 @@
+{
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2024-2025",
+      "description": "从选定的 Alphabet FY2025 10-K 查询 2024 年和 2025 年合并经营现金流 operating_cash_flow 的记录，保留单位、期间及会计口径。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2024-2025",
+      "description": "从选定的 Alphabet FY2025 10-K 查询 2024 年和 2025 年购建固定资产的现金支出 capex_cash_payments 的数值、期间及口径；此核对事项将委派给 Worker，Worker 返回后再由主角色独立核验。"
+    },
+    {
+      "kind": "information",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-main-uses",
+      "description": "在选定的 Alphabet FY2025 10-K 中查找并引用资本支出主要用途的原文，仅读取支持性正文或表格，并保留可追溯原始披露、单位、期间和会计口径。"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2024-2025",
+      "description": "从选定的 Alphabet FY2025 10-K 查询 2024 年和 2025 年合并经营现金流 operating_cash_flow 的记录，保留单位、期间及会计口径。",
+      "evidence_ids": [
+        "ev-04e89c6663a5772b619b0611",
+        "ev-154f5b538ddbf9e02b3b2f73"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:0e1d8f7077f05249bb046276",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / operating_cash_flow / 2024-01-01 — 2024-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-1ee7bb58b50f03e0f72b12e6"
+          ],
+          "artifact_ids": [
+            "art-ce6b8cee36d965fc855acef8"
+          ],
+          "event_sequences": [
+            4
+          ]
+        },
+        {
+          "check_id": "citations:obs-1ee7bb58b50f03e0f72b12e6",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-1ee7bb58b50f03e0f72b12e6"
+          ],
+          "artifact_ids": [
+            "art-058c27e13af7144b104dc1f3"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "records:2788fc6e633feff396e46b25",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / operating_cash_flow / 2025-01-01 — 2025-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-b8d3ac73ea8cbbe84ae10f92"
+          ],
+          "artifact_ids": [
+            "art-62a388a5b3811d6c9ee0d09d"
+          ],
+          "event_sequences": [
+            4
+          ]
+        },
+        {
+          "check_id": "citations:obs-b8d3ac73ea8cbbe84ae10f92",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-b8d3ac73ea8cbbe84ae10f92"
+          ],
+          "artifact_ids": [
+            "art-9fc6836667a81bd35d80b32e"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-004/query-receipt.json",
+          "sha256": "4b9431755eec66c88d60d9921486ca67ac5df4fd4c2f59ebaecd06a216800092"
+        }
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2024-2025",
+      "description": "从选定的 Alphabet FY2025 10-K 查询 2024 年和 2025 年购建固定资产的现金支出 capex_cash_payments 的数值、期间及口径；此核对事项将委派给 Worker，Worker 返回后再由主角色独立核验。",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "query_execution",
+          "status": "missing_evidence",
+          "reason": "query_not_returned",
+          "detail": "尚无本要求的成功查询与已校验证据包。"
+        }
+      ],
+      "query_receipt_files": []
+    },
+    {
+      "kind": "information",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-main-uses",
+      "description": "在选定的 Alphabet FY2025 10-K 中查找并引用资本支出主要用途的原文，仅读取支持性正文或表格，并保留可追溯原始披露、单位、期间和会计口径。",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending"
+    }
+  ],
+  "gaps": [],
+  "delegations": [],
+  "pending_body_reads": []
+}

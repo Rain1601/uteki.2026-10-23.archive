@@ -1,0 +1,112 @@
+{
+  "schema_version": "semantic-review-experiment-v1",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "requests": 18,
+  "response_statuses": {
+    "succeeded": 18
+  },
+  "upstream_models": {
+    "deepseek-v4-pro": 18
+  },
+  "usage": {
+    "input_tokens": 260290,
+    "output_tokens": 15995,
+    "known_estimated_usd": "0.40692300",
+    "unknown_cost_requests": 0,
+    "actual_billed_usd": null
+  },
+  "runs": [
+    {
+      "run": "real-run-01",
+      "status": "assessed",
+      "source_origin": "frozen_dataset",
+      "packets_assessed": 2,
+      "requests": 2,
+      "prompt_sha256": "976216f4eebce66324c4a5fc7f654a40414eec46379b6d02ee2f4c6c5c3333dc",
+      "result_sha256": "bd08ea6440584f3e0663f6be3ada5ac3be6c8aab6bd632e0f1cd40b30bdce957",
+      "manifest_sha256": "a358d1248222edbef3e1303bcaed4f0d7f624cd373e741e8e694320570336e02"
+    },
+    {
+      "run": "fixture-run-01",
+      "status": "assessed",
+      "source_origin": "synthetic_fixture",
+      "packets_assessed": 12,
+      "requests": 12,
+      "prompt_sha256": "976216f4eebce66324c4a5fc7f654a40414eec46379b6d02ee2f4c6c5c3333dc",
+      "result_sha256": "998dfda2c6cdf7db8a47f3af7b10ed6fa45db713142534f9aa1b98940bb5d938",
+      "manifest_sha256": "9e0dd7cbc112995b262fa975e9b0198bfdd402ef7747078c2db737f20c02815c"
+    },
+    {
+      "run": "real-run-02",
+      "status": "assessed",
+      "source_origin": "frozen_dataset",
+      "packets_assessed": 2,
+      "requests": 2,
+      "prompt_sha256": "ee95178b12f557b9f86236bd548c1b0ae7cf4f80d6f1c6ebb2c6f83ece3744ed",
+      "result_sha256": "4ec185cc75eee8f5765effefae2524d02cf86af71ba374837a0c8b3a44c71f20",
+      "manifest_sha256": "0c8b29e3714b1bc4cd931a19a186d5e0fbf60fa9346e20b021b7bae2dc0b555f"
+    },
+    {
+      "run": "fixture-run-02",
+      "status": "assessed",
+      "source_origin": "synthetic_fixture",
+      "packets_assessed": 1,
+      "requests": 1,
+      "prompt_sha256": "ee95178b12f557b9f86236bd548c1b0ae7cf4f80d6f1c6ebb2c6f83ece3744ed",
+      "result_sha256": "165401af900e0994f94d949fe0fdf13780e2585f9663489b2899ec80f509875c",
+      "manifest_sha256": "ae38d1628cfcac4d712161f43213ec45204600724a639f0b651e960c4fc175d2"
+    },
+    {
+      "run": "real-run-03",
+      "status": "assessed",
+      "source_origin": "frozen_dataset",
+      "packets_assessed": 1,
+      "requests": 1,
+      "prompt_sha256": "992db9d83d78cb58819e964e066270e3bc57e1443cdd2d2472cefb01fc5bfab8",
+      "result_sha256": "6321346134d531850ea5ae682cde73d3826d443912f526485618fb6f75dd1cee",
+      "manifest_sha256": "57716fefdebda00ed56e295372f06fba3a8726643bf98c59a0fc45fffca9f754"
+    }
+  ],
+  "controlled_replay": {
+    "same_packet_ids": true,
+    "same_model_and_output_schema": true,
+    "changed_model_input": "system prompt only on repeated cases",
+    "case_selection": "explicit review-selected records/source blocks; not autonomous discovery"
+  },
+  "fixture_benchmark": {
+    "first_pass": {
+      "passed": 11,
+      "total": 12
+    },
+    "targeted_retry": {
+      "passed": 1,
+      "total": 1,
+      "case_ids": [
+        "sr-011"
+      ]
+    },
+    "expected_sha256": "06e33a5104b7e11b26b461933c61b62bd17cc5bac6500172cea7ef84f0647321",
+    "latest_prompt_full_suite_run": false
+  },
+  "real_cases_latest": {
+    "segment": {
+      "status": "partial",
+      "run": "real-run-03"
+    },
+    "cloud": {
+      "status": "pass",
+      "run": "real-run-02"
+    }
+  },
+  "semantic_acceptance": "partial",
+  "adoption": "unchanged_candidate",
+  "offline_tests": 52,
+  "full_regression_run": false,
+  "archive": "data/company_workspace/record_review/semantic-quality-v1/",
+  "limitations": [
+    "Small known cases and a targeted retry do not establish generalization or full-suite performance of later prompts.",
+    "Total operating-income citation coverage and contradictory missing-context claims remain unresolved.",
+    "Numeric candidate records, original source files, historical runs and prior unknown costs remain unchanged."
+  ]
+}

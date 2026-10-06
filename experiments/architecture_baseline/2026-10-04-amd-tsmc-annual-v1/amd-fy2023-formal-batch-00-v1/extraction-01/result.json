@@ -1,0 +1,164 @@
+{
+  "schema_version": "direct-extraction-run-v1",
+  "strategy": "direct",
+  "status": "candidate",
+  "packet_id": "packet-7cea61bf56bc0be65a0fceb6",
+  "started_at": "2026-10-04T15:54:07.332117+00:00",
+  "plan_origin": "model",
+  "implementation": {
+    "implementation/research_data/direct_extraction.py": "7dd5c106e65bfcb29ae01e9a7c063b0056d200189f3689c93e1f7d41c34288c7",
+    "implementation/data_extraction/direct.py": "14961620b9a3c5832c1f6d645e62b5bd2db906e81f02193f6856ef02910c87a7",
+    "implementation/research_data/direct_normalization.py": "662f7f5063c8a8c093d7ad437e3be1a4b2c5a159a80b1e0aa34ed67e8b7dece9"
+  },
+  "semantic_acceptance": "not_evaluated",
+  "coverage": {
+    "block-000660-941a6235": "extraction_returned",
+    "block-000661-e5d76053": "extraction_returned",
+    "block-000662-48ffa2d3": "extraction_returned",
+    "block-000663-aab69576": "extraction_returned",
+    "block-000664-2fca346d": "extraction_returned"
+  },
+  "raw_record_count": 9,
+  "normalized_record_count": 9,
+  "validation": {
+    "normalization_version": "direct-normalization-v1",
+    "status": "partial",
+    "input_records": 9,
+    "normalized_records": 9,
+    "model_gaps": [
+      "Supplied batch contains only the Consolidated Statements of Operations (block-000662) with its headings; no Consolidated Balance Sheets, Consolidated Statements of Cash Flows, or equity/debt notes were delivered, so operating cash flow, cash purchases of property/plant/equipment, cash and cash equivalents, separately disclosed debt components, total debt, share capital and shares outstanding cannot be extracted from these blocks.",
+      "Cash and cash equivalents, short-term debt, long-term debt and total debt are point-in-time balances; no point-in-time (December 30, 2023 / December 31, 2022) balance sheet table was supplied. A precise gap is returned rather than a derived figure.",
+      "Shares outstanding is not presented in the supplied blocks. The only share quantities shown are weighted-average 'Shares used in per share calculation' (Basic 1,614 / 1,561 / 1,213; Diluted 1,625 / 1,571 / 1,229), which are not the same as shares outstanding and were not mapped to the shares_outstanding metric.",
+      "Basic and diluted earnings per share (0.53 / 0.85 / 2.61 and 0.53 / 0.84 / 2.57) are presented but are outside the requested core metric catalog and were not retained as mapped candidates.",
+      "The statement line is captioned only 'Net income'; whether it equals total net income including noncontrolling interests or is parent-attributable is not distinguished in the supplied blocks, and no noncontrolling interest line was delivered.",
+      "Balance-sheet parenthetical share-capital disclosures (e.g., par value, authorized/issued shares) and any restatement, restriction or definition notes accompanying the delivered table are in undelivered blocks and remain pending.",
+      "Comparative columns are presented for the years ended December 31, 2022 and December 25, 2021 per the source headers; fiscal-period catalog start dates for FY2022 and FY2021 are taken from the supplied catalog, not from the delivered table."
+    ],
+    "semantic_acceptance": "not_evaluated",
+    "adoption": "unchanged_candidate"
+  },
+  "unresolved_count": 0,
+  "projection_snapshot_id": "query-direct-a071f8fc5ba942d57a3c9334",
+  "dataset": {
+    "path": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/amd-fy2023-formal-batch-00-v1/extraction-01/dataset",
+    "snapshot_id": "query-direct-a071f8fc5ba942d57a3c9334",
+    "manifest_sha256": "a20339240396433f2f9c930370a899c4134ad5411de7a1819dcbd4a78cc5125a"
+  },
+  "usage": {
+    "artifact_root": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/amd-fy2023-formal-batch-00-v1/extraction-01/model",
+    "path": "usage-0002.json",
+    "sha256": "9a05ae6a13423fed32cdabd3192a14efe2b66ae9e8dd1d403622c3ae67fa1e1a",
+    "summary": {
+      "schema_version": "record-review-model-usage-v1",
+      "plan_origin": "model",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "reasoning_effort": "low",
+      "thinking_mode": "enabled",
+      "max_request_bytes": 2500000,
+      "model_config_sha256": "e60604c02c48d1c3bcb8e4b7be8ba4db8bd108261fb7c2355b01a1f2b40e1120",
+      "prompt_sha256": "92c685c655df1819fcae370bef133d082c4691eb9cb757dec0898716eabb92fc",
+      "calls": {
+        "requests": 1,
+        "unknown_cost_requests": 0,
+        "known_estimated_usd": "0.0112617",
+        "actual_billed_usd": null,
+        "records": [
+          {
+            "call_id": "b1f73c38-83c8-4111-8b72-b73b084d062b",
+            "stage": "record_review",
+            "provider": "deepseek",
+            "requested_model": "deepseek-flash",
+            "actual_upstream_model": "deepseek-flash",
+            "started_at": "2026-10-04T15:54:10.382158+00:00",
+            "pricing_snapshot": {
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "currency": "USD",
+              "input_per_million": "0.30",
+              "output_per_million": "1.20",
+              "cached_input_per_million": "0.006",
+              "source": "https://api-docs.deepseek.com/quick_start/pricing",
+              "checked_on": "2026-09-22",
+              "basis": "Peak list price estimate; no cache or off-peak discounts applied"
+            },
+            "actual_billed_usd": null,
+            "status": "succeeded",
+            "usage": {
+              "input_tokens": 17599,
+              "output_tokens": 4985,
+              "total_tokens": 22584,
+              "input_tokens_details": {
+                "cached_tokens": 0
+              },
+              "output_tokens_details": {
+                "reasoning_tokens": 1500
+              }
+            },
+            "estimated_usd": "0.0112617",
+            "cost_basis": "uncached_list_price_estimate_not_bill",
+            "budget_reservation_id": "12fbc9a9-c5ac-45da-9495-96ad0cf3175c",
+            "reserved_usd": "0.0415647",
+            "response_id": "991ec5ac-713d-47cf-a8d6-d322209dcf7a",
+            "request_id": null,
+            "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+            "finish_reason": "stop",
+            "raw_usage": {
+              "completion_tokens": 4985,
+              "prompt_tokens": 17599,
+              "total_tokens": 22584,
+              "completion_tokens_details": {
+                "reasoning_tokens": 1500
+              },
+              "prompt_tokens_details": {
+                "cached_tokens": 0
+              },
+              "prompt_cache_hit_tokens": 0,
+              "prompt_cache_miss_tokens": 17599
+            },
+            "ended_at": "2026-10-04T15:54:30.759775+00:00",
+            "elapsed_seconds": 20.377036416903138
+          }
+        ]
+      },
+      "shared_budget": {
+        "limit_usd": null,
+        "estimated_spent_usd": "0.56160510",
+        "held_usd": "0",
+        "unknown_requests": 0,
+        "in_flight_requests": 0,
+        "requests": 7,
+        "actual_billed_usd": null,
+        "enforcement": "record_only"
+      },
+      "artifacts": [
+        {
+          "path": "calls/b1f73c38-83c8-4111-8b72-b73b084d062b-end.json",
+          "sha256": "ba2e4575715aa6f49e3cf36059dd58da60c046fd54f8d1479735d3e107798f50"
+        },
+        {
+          "path": "calls/b1f73c38-83c8-4111-8b72-b73b084d062b-start.json",
+          "sha256": "c9c0f64cd0b915cad818845745dc1de3690e552fce5c1069a16a00e1d8b2efbc"
+        },
+        {
+          "path": "model-config.json",
+          "sha256": "e60604c02c48d1c3bcb8e4b7be8ba4db8bd108261fb7c2355b01a1f2b40e1120"
+        },
+        {
+          "path": "review-0001-attempt-01.json",
+          "sha256": "7028a381d51d7e9e1f33e23df2013042d7dac379174a59f24b10d4577a55fc0e"
+        },
+        {
+          "path": "review-0001-input.json",
+          "sha256": "14a3e01e4d5e0723aa407a2d4837d01006b077fe723e69f2e33b584a73b05bea"
+        },
+        {
+          "path": "review-0001-parsed.json",
+          "sha256": "a0029e5e73d414b86fadb6b7ef0773c2220a7b43e68ed77bc167dc196f9c9c1b"
+        }
+      ],
+      "business_validation": "not_evaluated"
+    }
+  },
+  "finished_at": "2026-10-04T15:54:30.949378+00:00"
+}

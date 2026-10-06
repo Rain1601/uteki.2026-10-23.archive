@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 1,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0001-input.json",
+    "sha256": "d00e8489e4e297fdfebbbcfcea8bd2bf7fd1466155dbab3ebe20e83d014ff0d3"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T10:10:43.042376+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-d2740666219ea633e8d0d2a0\",\n  \"checks\": [\n    {\n      \"axis\": \"value\",\n      \"status\": \"insufficient_evidence\",\n      \"reason\": \"源文本仅给出调整后利润为21（百万美元），并提及定义与调节表见附注4，但附注4未包含在提供的摘录中。因此无法验证该数值的构成、排除项或调节过程，也无法确认断言中“仅排除重组费用且无其他项目”的说法。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-011-r1\"],\n          \"statement\": \"调整后利润为21（单位：百万美元），其定义和调节表见附注4，但附注4未包含在源摘录中。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-011\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": [\n        \"附注4中调整后利润的定义和调节表是什么？\",\n        \"调整后利润具体排除了哪些项目？是否仅排除重组费用？\"\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-011-a1\",\n      \"verdict\": \"insufficient_evidence\",\n      \"reason\": \"断言声称FY2025调整后利润2100万美元仅排除重组费用且无其他项目。源文本仅给出调整后利润为21（百万美元），并提及定义与调节表见附注4，但附注4未包含在提供的摘录中。因此无法验证排除项的具体内容，也无法确认是否仅排除重组费用。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-011\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": [\n    \"源摘录未包含附注4，无法获取调整后利润的定义和调节表。\",\n    \"仅提供单一数值，缺乏构成明细，无法验证排除项。\"\n  ]\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-d2740666219ea633e8d0d2a0\",\n  \"checks\": [\n    {\n      \"axis\": \"value\",\n      \"status\": \"insufficient_evidence\",\n      \"reason\": \"源文本仅给出调整后利润为21（百万美元），并提及定义与调节表见附注4，但附注4未包含在提供的摘录中。因此无法验证该数值的构成、排除项或调节过程，也无法确认断言中“仅排除重组费用且无其他项目”的说法。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-011-r1\"],\n          \"statement\": \"调整后利润为21（单位：百万美元），其定义和调节表见附注4，但附注4未包含在源摘录中。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-011\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": [\n        \"附注4中调整后利润的定义和调节表是什么？\",\n        \"调整后利润具体排除了哪些项目？是否仅排除重组费用？\"\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-011-a1\",\n      \"verdict\": \"insufficient_evidence\",\n      \"reason\": \"断言声称FY2025调整后利润2100万美元仅排除重组费用且无其他项目。源文本仅给出调整后利润为21（百万美元），并提及定义与调节表见附注4，但附注4未包含在提供的摘录中。因此无法验证排除项的具体内容，也无法确认是否仅排除重组费用。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-011\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Adjusted profit: 21. See Note 4 for the definition and reconciliation of adjusted profit. Note 4 is not included in this source excerpt.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": [\n    \"源摘录未包含附注4，无法获取调整后利润的定义和调节表。\",\n    \"仅提供单一数值，缺乏构成明细，无法验证排除项。\"\n  ]\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "45b2fb5b-4747-425d-bcf1-9532e9847784",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 540,
+      "prompt_tokens": 2445,
+      "total_tokens": 2985,
+      "prompt_tokens_details": {
+        "cached_tokens": 256
+      },
+      "prompt_cache_hit_tokens": 256,
+      "prompt_cache_miss_tokens": 2189
+    }
+  },
+  "elapsed_seconds": 9.000739208015148,
+  "ended_at": "2026-09-24T10:10:52.041977+00:00",
+  "calls": [
+    {
+      "path": "calls/91951d8a-bf82-49c3-a6db-ff6f28c1eedb-end.json",
+      "sha256": "0e0d8026e7a4678636729b2f2b06bbf53732fa9e40df0b56273b9fd2353e163b"
+    },
+    {
+      "path": "calls/91951d8a-bf82-49c3-a6db-ff6f28c1eedb-start.json",
+      "sha256": "245da9fb0a15f090b03906329e400676096a6db9a9d274cdec147c840977899e"
+    }
+  ]
+}

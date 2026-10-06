@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Uteki · Swiss study A</title>
+  <link rel="stylesheet" href="./style.css?v=20261004-investment-timeline2">
+  <link rel="stylesheet" href="./institution.css?v=20261004-investment-timeline2">
+  <link rel="stylesheet" href="./allocation-history.css?v=20261004-investment-timeline2">
+  <link rel="stylesheet" href="./investment-events.css?v=20261004-investment-timeline2">
+  <link rel="stylesheet" href="./manager-workspace.css?v=20261004-investment-timeline2">
+  <link rel="stylesheet" href="./swiss-study.css?v=20261004-swiss-a">
+</head>
+<body>
+  <a class="skip-link" href="#content">跳到内容 / Skip to content</a>
+  <div id="workspace" class="workspace">
+    <aside id="global-nav" class="global-nav" aria-label="工作台导航 / Workspace navigation"></aside>
+    <aside id="sidebar" class="entity-sidebar" aria-label="对象列表 / Entity list"></aside>
+    <div id="workarea" class="workarea">
+      <header id="toolbar" class="toolbar"></header>
+      <div id="company-header" class="company-header"></div>
+      <nav id="content-nav" class="content-nav" aria-label="当前对象的栏目 / Current entity sections"></nav>
+      <div class="reading-layout">
+        <main id="content" class="content" tabindex="-1"><p class="loading">正在打开公司工作台…</p></main>
+        <aside id="context-panel" class="context-panel" hidden aria-label="研究上下文 / Research context"></aside>
+      </div>
+    </div>
+  </div>
+  <aside id="entity-flyout" class="entity-flyout" aria-label="内容目录 / Contents" hidden></aside>
+  <div id="investment-event-popover" class="investment-event-popover" role="dialog" aria-modal="false" aria-labelledby="investment-popover-title" hidden></div>
+  <div id="announcement" class="sr-only" role="status" aria-live="polite"></div>
+  <noscript>此交互样板需要启用 JavaScript。This interactive sample requires JavaScript.</noscript>
+  <script>
+    if (location.protocol === 'file:') {
+      const content = document.getElementById('content');
+      const note = document.createElement('p');
+      note.className = 'loading';
+      note.textContent = '请从本地预览打开工作台。Open the workspace in the local preview. ';
+      const link = document.createElement('a');
+      link.className = 'action-link';
+      link.href = 'http://127.0.0.1:8769/docs/design/company-workspace-swiss/' + location.hash;
+      link.textContent = '打开预览 / Open preview →';
+      note.append(link);
+      content.replaceChildren(note);
+    }
+  </script>
+  <script type="module" src="./app.mjs?v=20261004-investment-timeline2"></script>
+</body>
+</html>

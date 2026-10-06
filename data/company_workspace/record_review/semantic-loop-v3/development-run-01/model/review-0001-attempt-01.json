@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 1,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0001-input.json",
+    "sha256": "78e341786876a310a8ae3223dd4c074c4c703df9a13222580e393818c561c801"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T11:37:54.870592+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-1ec597f34c44d53d20a187f0\",\n  \"checks\": [\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"财务表明确标注为合并实际年度结果，且记录锚点位于该表内，因此所有选定记录均为合并口径。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\",\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"所有四个选定记录均来自合并实际年度结果表，属于合并口径。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Consolidated actual annual results in USD millions. FY2025 FY2024.\",\n              \"source_start\": null\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    },\n    {\n      \"axis\": \"value\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"财务表显示营业收入和营业利润在2025和2024财年均为20（百万美元），与记录值一致。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\"\n          ],\n          \"statement\": \"营业收入在2025和2024财年均为20百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Revenue 20 20\",\n              \"source_start\": 127\n            }\n          ]\n        },\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"营业利润在2025和2024财年均为20百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Operating income 20 20\",\n              \"source_start\": 141\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"all-values\",\n      \"verdict\": \"supported\",\n      \"reason\": \"财务表显示营业收入和营业利润在2025和2024财年均为20（百万美元），与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-a\",\n          \"block_id\": \"financial-table\",\n          \"quote\": \"Revenue 20 20\",\n          \"source_start\": 127\n        },\n        {\n          \"source_snapshot_id\": \"birch-disclosure-a\",\n          \"block_id\": \"financial-table\",\n          \"quote\": \"Operating income 20 20\",\n          \"source_start\": 141\n        }\n      ]\n    }\n  ],\n  \"context_claims\": [\n    {\n      \"object_id\": \"context-a7e1ac6636881b0e7101b0cc\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-815047662a325ac95f450f4d\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-a677cf3f9e722d78287f2ef6\",\n      \"status\": \"unresolved\"\n    },\n    {\n      \"object_id\": \"context-b85a4e3abdc31ac49ffef58c\",\n      \"status\": \"unresolved\"\n    }\n  ],\n  \"context_requests\": []\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-1ec597f34c44d53d20a187f0\",\n  \"checks\": [\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"财务表明确标注为合并实际年度结果，且记录锚点位于该表内，因此所有选定记录均为合并口径。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\",\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"所有四个选定记录均来自合并实际年度结果表，属于合并口径。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Consolidated actual annual results in USD millions. FY2025 FY2024.\",\n              \"source_start\": null\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    },\n    {\n      \"axis\": \"value\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"财务表显示营业收入和营业利润在2025和2024财年均为20（百万美元），与记录值一致。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\"\n          ],\n          \"statement\": \"营业收入在2025和2024财年均为20百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Revenue 20 20\",\n              \"source_start\": 127\n            }\n          ]\n        },\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"营业利润在2025和2024财年均为20百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Operating income 20 20\",\n              \"source_start\": 141\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"all-values\",\n      \"verdict\": \"supported\",\n      \"reason\": \"财务表显示营业收入和营业利润在2025和2024财年均为20（百万美元），与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-a\",\n          \"block_id\": \"financial-table\",\n          \"quote\": \"Revenue 20 20\",\n          \"source_start\": 127\n        },\n        {\n          \"source_snapshot_id\": \"birch-disclosure-a\",\n          \"block_id\": \"financial-table\",\n          \"quote\": \"Operating income 20 20\",\n          \"source_start\": 141\n        }\n      ]\n    }\n  ],\n  \"context_claims\": [\n    {\n      \"object_id\": \"context-a7e1ac6636881b0e7101b0cc\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-815047662a325ac95f450f4d\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-a677cf3f9e722d78287f2ef6\",\n      \"status\": \"unresolved\"\n    },\n    {\n      \"object_id\": \"context-b85a4e3abdc31ac49ffef58c\",\n      \"status\": \"unresolved\"\n    }\n  ],\n  \"context_requests\": []\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "ed20eaff-3dca-4828-9acd-66df750e2404",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 885,
+      "prompt_tokens": 4758,
+      "total_tokens": 5643,
+      "prompt_tokens_details": {
+        "cached_tokens": 1152
+      },
+      "prompt_cache_hit_tokens": 1152,
+      "prompt_cache_miss_tokens": 3606
+    }
+  },
+  "elapsed_seconds": 9.34944020799594,
+  "ended_at": "2026-09-24T11:38:04.219568+00:00",
+  "calls": [
+    {
+      "path": "calls/93a8530d-c3ca-4eff-9084-d80513815d65-end.json",
+      "sha256": "84f2353f2d0ceaba24525cfc5c7e88a3b6cd336a5d0138b2c6391fce1d121b1b"
+    },
+    {
+      "path": "calls/93a8530d-c3ca-4eff-9084-d80513815d65-start.json",
+      "sha256": "5d46e9702101d7078e327e9cc0260c9a1b4f0b926e3d79914ba8e226d96b2e78"
+    }
+  ]
+}

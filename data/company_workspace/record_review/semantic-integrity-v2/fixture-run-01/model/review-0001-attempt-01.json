@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 1,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0001-input.json",
+    "sha256": "683784361dd816b532c08881845a2a14e426df253bc507f3b58c65fb8d894b97"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T11:12:49.741865+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-5120c777c863853e6aa280c5\",\n  \"checks\": [\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"财务表明确标注为合并实际年度结果，且行标签为收入与营业利润，因此这些记录属于合并层面，无分部维度。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\",\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"这些记录为合并实际年度结果，不含分部维度。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Consolidated actual annual results in USD millions. FY2025 FY2024.\\nRevenue 20 20\\nOperating income 20 20\"\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"axis\": \"value\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"表格行显示收入与营业利润在 FY2025 和 FY2024 均为 20（百万美元），与记录值一致。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\"\n          ],\n          \"statement\": \"收入在 FY2025 和 FY2024 均为 20 百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Revenue 20 20\"\n            }\n          ]\n        },\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"营业利润在 FY2025 和 FY2024 均为 20 百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Operating income 20 20\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"all-values\",\n      \"verdict\": \"supported\",\n      \"reason\": \"财务表显示收入与营业利润在 FY2025 和 FY2024 均为 20（百万美元），与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-a\",\n          \"block_id\": \"financial-table\",\n          \"quote\": \"Revenue 20 20\\nOperating income 20 20\"\n        }\n      ]\n    }\n  ],\n  \"context_claims\": [\n    {\n      \"object_id\": \"context-a7e1ac6636881b0e7101b0cc\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-815047662a325ac95f450f4d\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-a677cf3f9e722d78287f2ef6\",\n      \"status\": \"unresolved\"\n    },\n    {\n      \"object_id\": \"context-b85a4e3abdc31ac49ffef58c\",\n      \"status\": \"unresolved\"\n    }\n  ],\n  \"context_requests\": []\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-5120c777c863853e6aa280c5\",\n  \"checks\": [\n    {\n      \"axis\": \"dimensions\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"财务表明确标注为合并实际年度结果，且行标签为收入与营业利润，因此这些记录属于合并层面，无分部维度。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\",\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"这些记录为合并实际年度结果，不含分部维度。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Consolidated actual annual results in USD millions. FY2025 FY2024.\\nRevenue 20 20\\nOperating income 20 20\"\n            }\n          ]\n        }\n      ]\n    },\n    {\n      \"axis\": \"value\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"表格行显示收入与营业利润在 FY2025 和 FY2024 均为 20（百万美元），与记录值一致。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-revenue-2025\",\n            \"birch-disclosure-a-revenue-2024\"\n          ],\n          \"statement\": \"收入在 FY2025 和 FY2024 均为 20 百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Revenue 20 20\"\n            }\n          ]\n        },\n        {\n          \"record_ids\": [\n            \"birch-disclosure-a-operating_income-2025\",\n            \"birch-disclosure-a-operating_income-2024\"\n          ],\n          \"statement\": \"营业利润在 FY2025 和 FY2024 均为 20 百万美元。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"birch-disclosure-a\",\n              \"block_id\": \"financial-table\",\n              \"quote\": \"Operating income 20 20\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"all-values\",\n      \"verdict\": \"supported\",\n      \"reason\": \"财务表显示收入与营业利润在 FY2025 和 FY2024 均为 20（百万美元），与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"birch-disclosure-a\",\n          \"block_id\": \"financial-table\",\n          \"quote\": \"Revenue 20 20\\nOperating income 20 20\"\n        }\n      ]\n    }\n  ],\n  \"context_claims\": [\n    {\n      \"object_id\": \"context-a7e1ac6636881b0e7101b0cc\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-815047662a325ac95f450f4d\",\n      \"status\": \"supplied\"\n    },\n    {\n      \"object_id\": \"context-a677cf3f9e722d78287f2ef6\",\n      \"status\": \"unresolved\"\n    },\n    {\n      \"object_id\": \"context-b85a4e3abdc31ac49ffef58c\",\n      \"status\": \"unresolved\"\n    }\n  ],\n  \"context_requests\": []\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "f4793bf2-5236-4750-997e-87f021d719b1",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 820,
+      "prompt_tokens": 4487,
+      "total_tokens": 5307,
+      "prompt_tokens_details": {
+        "cached_tokens": 896
+      },
+      "prompt_cache_hit_tokens": 896,
+      "prompt_cache_miss_tokens": 3591
+    }
+  },
+  "elapsed_seconds": 10.442432667012326,
+  "ended_at": "2026-09-24T11:13:00.183336+00:00",
+  "calls": [
+    {
+      "path": "calls/6c813967-850b-4cba-a1eb-a67cd9a5b9ea-end.json",
+      "sha256": "d803530cde4d22506f3f4188e212d4890725691666538dd0870bac1dfbfa6c2a"
+    },
+    {
+      "path": "calls/6c813967-850b-4cba-a1eb-a67cd9a5b9ea-start.json",
+      "sha256": "471504ddd7dad5441a17bd0504856dbbfd4195e6ceaed0f610182e5eef36d641"
+    }
+  ]
+}

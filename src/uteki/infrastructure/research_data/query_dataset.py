@@ -3,13 +3,16 @@ from __future__ import annotations
 
 import gzip
 import json
+import re
 from pathlib import Path
 import tempfile
 
 import duckdb
 
 from uteki.agents.reading.document_reader import DocumentReader
-from uteki.domain.research_data.query_contract import DataQuery, ResearchRecord, QueryResult, VERSION
+from uteki.domain.research_data.query_contract import (
+    DataQuery, ResearchRecord, QueryResult, VERSION, SOURCE_PERIOD_VERSION, export_query_schema, validate_period_version,
+)
 from .financial_records import digest
 from .adapters.alphabet_query import from_financial, from_prompt, metric_catalog
 from .query_inputs import DatasetBuildSpec
@@ -66,6 +69,8 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
 
         spec_path = contained(repo, spec)
         config = DatasetBuildSpec.model_validate_json(verified_input(str(spec_path.relative_to(repo))))
+        dataset_version = (SOURCE_PERIOD_VERSION if any(entry.adapter == "us-gaap-inline-v1" for entry in config.inputs)
+                           else VERSION)
         inventory = json.loads(verified_input(config.source_inventory.path, config.source_inventory.sha256))
         bindings = {s.source_snapshot_id: s for s in config.sources}
         inventory_ids = [s["source_snapshot_id"] for s in inventory["sources"]]
@@ -112,17 +117,34 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
                       "block_count": len(reader.blocks), "image_block_count": sum(b.get("type") == "image" for b in reader.blocks)}
             sources.append(source)
             readers[sid] = reader
-        records, evidence = [], {}
+        catalog = metric_catalog()
+        if any(entry.adapter == "us-gaap-inline-v1" for entry in config.inputs):
+            from .company_materialization import metric_catalog as generic_metric_catalog
+            catalog.update(generic_metric_catalog())
+        records, evidence, normalization_gaps = [], {}, []
         by_source = {s["source_snapshot_id"]: s for s in sources}
         for entry in config.inputs:
             relative = entry.path
-            data = json.loads(verified_input(relative, entry.sha256))
+            input_bytes = verified_input(relative, entry.sha256)
+            data = None if entry.adapter == "us-gaap-inline-v1" else json.loads(input_bytes)
             source, binding = by_source[entry.source_snapshot_id], bindings[entry.source_snapshot_id]
             blocks = {b["block_id"]: b for b in readers[entry.source_snapshot_id].blocks}
             if entry.adapter == "alphabet-financial-v1":
                 if source["form"] not in ("10-K", "10-Q") or data["source_snapshot_id"] != entry.source_snapshot_id:
                     raise ValueError("financial adapter source mismatch")
                 batches = [([from_financial(row, relative, company_id=binding.company_id)], data["evidence"]) for row in data["records"]]
+            elif entry.adapter == "us-gaap-inline-v1":
+                from .company_materialization import extract_inline_records
+                if digest(input_bytes) != source["source_sha256"] or not re.fullmatch(r"sec-\d+", binding.company_id):
+                    raise ValueError("generic inline adapter requires original HTML bytes and explicit SEC issuer")
+                reader = readers[entry.source_snapshot_id]
+                rows, refs, diagnostics, fiscal = extract_inline_records(input_bytes,
+                    {"source_id": entry.source_snapshot_id, "source_url": source["source_url"],
+                     "filed_at": source["available_at"], "period_end": source["period_end"], "mime_type": "text/html"},
+                    {"company_id": binding.company_id, "cik": binding.company_id[4:]}, reader.index, reader.blocks, relative)
+                source["fiscal_periods"] = fiscal
+                normalization_gaps.extend(diagnostics)
+                batches = [([ResearchRecord.model_validate(row) for row in rows], refs)]
             else:
                 if source["form"] != "EARNINGS_CALL":
                     raise ValueError("call adapter requires an earnings call")
@@ -143,20 +165,22 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
                     or ev["source_sha256"] != reader.manifest["source_sha256"] or ev["index_id"] != reader.index["index_id"]):
                 raise ValueError("invalid evidence/source binding")
         for record in records:
+            validate_period_version(record.period, dataset_version)
             if str(record.available_at) != by_source[record.source_snapshot_id]["available_at"]:
                 raise ValueError("record availability differs from its bound source")
             if any(eid not in evidence or evidence[eid]["source_snapshot_id"] != record.source_snapshot_id
                    for eid in record.evidence_ids + record.qualifier_evidence_ids + record.question_evidence_ids):
                 raise ValueError("record evidence is unbound")
-        rows = [r.model_dump(mode="json") for r in records]
-        normalization = {"adapter_version": VERSION, "rows": rows}
+        rows = [ResearchRecord.model_validate({**r.model_dump(mode="json"), "schema_version": dataset_version})
+                .model_dump(mode="json") for r in records]
+        normalization = {"adapter_version": dataset_version, "rows": rows}
         save(work / "records.json", normalization)
         save(work / "evidence.json", evidence)
         save(work / "sources.json", sources)
-        save(work / "metrics.json", metric_catalog())
-        save(work / "schemas/record.schema.json", ResearchRecord.model_json_schema())
-        save(work / "schemas/query.schema.json", DataQuery.model_json_schema())
-        save(work / "schemas/result.schema.json", QueryResult.model_json_schema())
+        save(work / "metrics.json", catalog)
+        save(work / "schemas/record.schema.json", export_query_schema(ResearchRecord, version=dataset_version))
+        save(work / "schemas/query.schema.json", export_query_schema(DataQuery, version=dataset_version))
+        save(work / "schemas/result.schema.json", export_query_schema(QueryResult, version=dataset_version))
         (work / "schema.sql").write_text(DDL)
         code_files = [Path(__file__), Path(__file__).with_name("query_inputs.py"),
                       Path(__file__).parent / "adapters/alphabet_query.py",
@@ -164,9 +188,14 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
                       Path(__file__).with_name("financial_records.py"),
                       repo / "src/uteki/agents/reading/document_reader.py", repo / "src/uteki/agents/reading/reading_groups.py",
                       repo / "src/uteki/domain/research_data/query_contract.py"]
+        if any(entry.adapter == "us-gaap-inline-v1" for entry in config.inputs):
+            code_files.append(Path(__file__).with_name("company_materialization.py"))
+        # Module paths can retain a repository symlink (for example /tmp on
+        # macOS); use the same physical root as repo for stable adapter identity.
+        code_files = [path.resolve() for path in code_files]
         code_hashes = {str(p.relative_to(repo)): digest(p.read_bytes()) for p in code_files}
-        identity = {"schema_version": VERSION, "input_hashes": input_hashes, "adapter_hashes": code_hashes,
-                    "records_sha256": digest(rows), "metric_definitions_sha256": digest(metric_catalog())}
+        identity = {"schema_version": dataset_version, "input_hashes": input_hashes, "adapter_hashes": code_hashes,
+                    "records_sha256": digest(rows), "metric_definitions_sha256": digest(catalog)}
         snapshot_id = "query-" + digest(identity)[:24]
         db = duckdb.connect(str(work / "research.duckdb"))
         try:
@@ -182,7 +211,7 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
                            s["form"], s["period_end"], s["available_at"], json.dumps(s)])
             for eid, ev in evidence.items():
                 db.execute("INSERT INTO evidence VALUES (?, ?, ?)", [eid, ev["source_snapshot_id"], json.dumps(ev)])
-            for key, metric in metric_catalog().items():
+            for key, metric in catalog.items():
                 db.execute("INSERT INTO metric_definitions VALUES (?, ?)", [key, json.dumps(metric)])
             db.execute("CHECKPOINT")
         finally:
@@ -191,7 +220,7 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
         result = {**identity, "snapshot_id": snapshot_id, "source_policy_id": "local-frozen-v1", "status": "candidate",
                   "database_engine": "duckdb", "database_version": duckdb.__version__, "files": files,
                   "record_count": len(rows), "source_count": len(sources), "evidence_count": len(evidence),
-                  "model_calls": 0, "excluded_sources": [s["source_snapshot_id"] for s in inventory["sources"] if not s["eligible_for_new_comparison"]],
+                  "model_calls": 0, "normalization_gaps": normalization_gaps, "excluded_sources": [s["source_snapshot_id"] for s in inventory["sources"] if not s["eligible_for_new_comparison"]],
                   "build_spec": config.model_dump(mode="json"),
                   "limits": ["Explicitly selected sources and adapters; not a full company database", "Date-level cutoff; not intraday point-in-time",
                              "Semantic records from adapted repeat 1 only; not independently approved", "No OCR/web/model planner or automatic adoption"]}

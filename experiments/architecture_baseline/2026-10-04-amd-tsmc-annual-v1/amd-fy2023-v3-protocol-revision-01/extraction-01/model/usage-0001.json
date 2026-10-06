@@ -1,0 +1,109 @@
+{
+  "schema_version": "record-review-model-usage-v1",
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "reasoning_effort": "low",
+  "thinking_mode": "enabled",
+  "max_request_bytes": 2500000,
+  "model_config_sha256": "2c96f08b16f461ded48246ecf04f449d0a9734a64e1f5bc4946dbecfcf9d68e2",
+  "prompt_sha256": "655555fae1c153c903263aca70b465cfc3d3c2368a7295ce0482ad871287f484",
+  "calls": {
+    "requests": 1,
+    "unknown_cost_requests": 0,
+    "known_estimated_usd": "0.0515259",
+    "actual_billed_usd": null,
+    "records": [
+      {
+        "call_id": "2b6d73c5-4769-4410-a540-9230514bd59d",
+        "stage": "record_review",
+        "provider": "deepseek",
+        "requested_model": "deepseek-flash",
+        "actual_upstream_model": "deepseek-flash",
+        "started_at": "2026-10-04T15:22:52.813296+00:00",
+        "pricing_snapshot": {
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "currency": "USD",
+          "input_per_million": "0.30",
+          "output_per_million": "1.20",
+          "cached_input_per_million": "0.006",
+          "source": "https://api-docs.deepseek.com/quick_start/pricing",
+          "checked_on": "2026-09-22",
+          "basis": "Peak list price estimate; no cache or off-peak discounts applied"
+        },
+        "actual_billed_usd": null,
+        "status": "failed_or_cancelled",
+        "usage": {
+          "input_tokens": 106217,
+          "output_tokens": 16384,
+          "total_tokens": 122601,
+          "input_tokens_details": {
+            "cached_tokens": 768
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 10415
+          }
+        },
+        "estimated_usd": "0.0515259",
+        "cost_basis": "uncached_list_price_estimate_not_bill",
+        "budget_reservation_id": "d36ae622-fa25-4f80-ba7c-f9ab1742cbb8",
+        "reserved_usd": "0.1171182",
+        "error_type": "ModelBehaviorError",
+        "http_status": null,
+        "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+        "response_id": "33f7d826-48f5-4445-8dbf-e9b9d5865f0c",
+        "request_id": null,
+        "finish_reason": "length",
+        "raw_usage": {
+          "completion_tokens": 16384,
+          "prompt_tokens": 106217,
+          "total_tokens": 122601,
+          "completion_tokens_details": {
+            "reasoning_tokens": 10415
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 768
+          },
+          "prompt_cache_hit_tokens": 768,
+          "prompt_cache_miss_tokens": 105449
+        },
+        "ended_at": "2026-10-04T15:23:54.652543+00:00",
+        "elapsed_seconds": 61.838250749977306
+      }
+    ]
+  },
+  "shared_budget": {
+    "limit_usd": null,
+    "estimated_spent_usd": "0.53558970",
+    "held_usd": "0",
+    "unknown_requests": 0,
+    "in_flight_requests": 0,
+    "requests": 5,
+    "actual_billed_usd": null,
+    "enforcement": "record_only"
+  },
+  "artifacts": [
+    {
+      "path": "calls/2b6d73c5-4769-4410-a540-9230514bd59d-end.json",
+      "sha256": "9607924538435369c202735bdb3dc157d435ed6f44a4d9b3df99b0a0dc9a7be4"
+    },
+    {
+      "path": "calls/2b6d73c5-4769-4410-a540-9230514bd59d-start.json",
+      "sha256": "f88ded269274926ca664c61656a2aa6ac3f7455c66245ed8b916d233d6867e93"
+    },
+    {
+      "path": "model-config.json",
+      "sha256": "2c96f08b16f461ded48246ecf04f449d0a9734a64e1f5bc4946dbecfcf9d68e2"
+    },
+    {
+      "path": "review-0001-attempt-01.json",
+      "sha256": "6ca59ae546d7a2b0514e4bdc5db942316ad38e6692f0179de6a34125e52502d3"
+    },
+    {
+      "path": "review-0001-input.json",
+      "sha256": "a084a5a64f707929f7d5f8710f7e73a1e41cfe76f6b4e50ae9b743fb3be26329"
+    }
+  ],
+  "business_validation": "not_evaluated"
+}

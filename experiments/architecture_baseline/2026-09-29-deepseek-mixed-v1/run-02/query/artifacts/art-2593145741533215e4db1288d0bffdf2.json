@@ -1,0 +1,116 @@
+{
+  "status": "planned",
+  "plan": {
+    "version": 1,
+    "requirements": [
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "operating_cash_flow",
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req-ocf-2025",
+        "description": "取得 Alphabet Inc. 合并口径 2025 年度（截至 2025-12-31）经营活动产生的现金流量净额，以美元为单位，保留单位、期间、会计口径及可追溯原始记录。"
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "operating_cash_flow",
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req-ocf-2024",
+        "description": "取得 Alphabet Inc. 合并口径 2024 年度（截至 2024-12-31）经营活动产生的现金流量净额，以美元为单位，保留单位、期间、会计口径及可追溯原始记录；如 2024 年度无对应记录，则明确记录为缺口。"
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req-capex-2025",
+        "description": "取得 Alphabet Inc. 合并口径 2025 年度（截至 2025-12-31）购建固定资产所支付的现金，以美元为单位，保留单位、期间、会计口径及可追溯原始记录；不将负值重新解释为其他口径。"
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req-capex-2024",
+        "description": "取得 Alphabet Inc. 合并口径 2024 年度（截至 2024-12-31）购建固定资产所支付的现金，以美元为单位，保留单位、期间、会计口径及可追溯原始记录；如 2024 年度无对应记录，则明确记录为缺口。"
+      },
+      {
+        "kind": "information",
+        "query": null,
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req-capex-uses",
+        "description": "在 Alphabet FY2025 10-K 中定位并原文引用资本支出的主要用途或构成说明，包括但不限于购买财产与设备、数据中心、服务器、办公设施、技术基础设施等披露；仅引用实际读取的正文或表格块，保留期间、单位、会计口径及未覆盖缺口。不得推断维护性资本开支或 AI 投资回报。"
+      }
+    ],
+    "reason": "建立明确取证要求：四项数值点分别以 registered query 计划获取，资本开支主要用途以原文引用证据获取；购建固定资产现金支出两项拟委派 Worker，返回后由主角色独立核验。",
+    "origin": "model",
+    "skill_hashes": {
+      "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+      "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+      "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+    },
+    "sha256": "30d93674de56afa6ef041a17f888cf75214551849139bd6ac000a59ef1e30dcb"
+  }
+}

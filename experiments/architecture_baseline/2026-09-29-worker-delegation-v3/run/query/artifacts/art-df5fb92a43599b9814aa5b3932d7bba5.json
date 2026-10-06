@@ -1,0 +1,48 @@
+{
+  "status": "planned",
+  "plan": {
+    "version": 1,
+    "requirements": [
+      {
+        "kind": "read_node",
+        "query": null,
+        "source_id": "acme-annual",
+        "node_id": "business",
+        "requirement_id": "business",
+        "description": "Read the complete business section."
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [],
+          "documents": [],
+          "calculations": [
+            {
+              "formula_id": "operating_margin",
+              "entity_id": "acme-services",
+              "periods": [
+                {
+                  "kind": "year",
+                  "start": "2031-01-01",
+                  "end": "2031-12-31"
+                }
+              ]
+            }
+          ]
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "numbers",
+        "description": "Verify calendar year 2031 operating margin."
+      }
+    ],
+    "reason": "Explicit synthetic acceptance task, not a model-generated plan.",
+    "origin": "scripted_fixture",
+    "skill_hashes": {
+      "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+      "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+      "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+    },
+    "sha256": "df91b4d0f664aaaa182e6f033659129bba9b37c94b2193efaec9649b934c44f8"
+  }
+}

@@ -1,0 +1,1943 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "仅依据选定的 Alphabet FY2025 10-K，核对 2024 年和 2025 年的合并经营现金流、购建固定资产的现金支出，并查找资本支出的主要用途。请自主制定有明确完成条件的取证计划，把购建固定资产现金支出的数值、期间及口径核对委派给 Worker；Worker 返回后，由主角色独立核验原文与查询结果。保留可追溯原始披露、单位、期间、会计口径及资料缺口。仅需读取支持这些问题的正文和表格，无需通读整份报表或整章。不得用摘要冒充已读原文，不得自行计算未注册公式，不推断维护性资本开支或 AI 投资回报。此次只验收取证分工，不作当前投资建议。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-02-05",
+    "include_candidates": true
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0001652044",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "goog:YouTubeAdvertisingRevenueMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "us-gaap:AllOtherSegmentsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ConsolidationItemsAxis": "us-gaap:OperatingSegmentsMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "goog:AmericasExcludingUnitedStatesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3d3534ee58538dd2",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3d3534ee58538dd2",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeAxis": "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeMember",
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:AccumulatedNetUnrealizedInvestmentGainLossMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-439d6f7254f42ebb",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-439d6f7254f42ebb",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeAxis": "us-gaap:ReclassificationOutOfAccumulatedOtherComprehensiveIncomeMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "capex_cash_payments",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Positive cash payments to acquire PPE; not total investment.",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "net_income",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "net_income",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "operating_cash_flow",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "operating_cash_flow",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "operating_income",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "operating_income",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "revenue",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "revenue",
+          "definition_version": "us-gaap-inline-v1",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-7d95f8d35723138498f123ab6c2e2b8e675d13bb9a7a1dae0fda631376a0f962",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "company_id": "sec-0001652044",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "document_id": "googl-2025-10k",
+          "index_id": "didx-d113d1d4ab51745c",
+          "index_folder": "indexes/googl-2025-10k",
+          "raw_file": "raw/googl-2025-10k.html",
+          "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "form": "10-K",
+          "period_end": "2025-12-31",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2026-02-05",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              }
+            }
+          ],
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes"
+          ],
+          "image_block_count": 2
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 913,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 10,
+        "total_count": 21,
+        "bytes_returned": 3948,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+          "scope_id": "scope-9971188484366854bf3045c2",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "f52047ae48ebf93aabbb651de919eab578f9baa6d8ad257e4d37bda50302f502",
+          "offset": 10,
+          "checksum": "f231f8a62d4dad009f1fc27b8b02a5d27ee26fa03cc11c1b04f11054a22252fe"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 1943,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "scope_id": "scope-9971188484366854bf3045c2",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 293,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_ocf_2025",
+      "description": "核对 Alphabet FY2025 10-K 中 2025 年度合并经营现金流金额。仅返回报告金额，注明单位 USD、期间和合并报表口径；不自行计算或调整。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_ocf_2024",
+      "description": "核对 Alphabet FY2025 10-K 中 2024 年度比较期间的合并经营现金流金额。若选定 10-K 只有 2025 期间映射或未返回 2024 记录，则保留为显式资料缺口；不推算、不替代。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_capex_2025",
+      "description": "核对 Alphabet FY2025 10-K 中 2025 年度购建固定资产的现金支出金额、期间及口径。此项数值期间口径核对委派给 Worker；主角色随后独立核验 query 结果和原文。仅采用报告金额，注明单位 USD 和合并报表口径。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_capex_2024",
+      "description": "核对 Alphabet FY2025 10-K 中 2024 年度比较期间的购建固定资产现金支出金额、期间及口径。此项数值期间口径核对委派给 Worker；主角色随后独立核验 query 结果和原文。若未返回 2024 记录则保留为显式资料缺口。"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req_capex_uses",
+      "description": "在选定 Alphabet FY2025 10-K 正文或表格中查找并直接引用资本支出（购建固定资产）的主要用途说明，包括相关年份或期间语境。必须读取所引用区块的实际原文后再提取，不把检索命中或摘要当作已读原文；不推断维护性资本开支或 AI 投资回报。"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_ocf_2025",
+      "description": "核对 Alphabet FY2025 10-K 中 2025 年度合并经营现金流金额。仅返回报告金额，注明单位 USD、期间和合并报表口径；不自行计算或调整。",
+      "evidence_ids": [
+        "ev-154f5b538ddbf9e02b3b2f73"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:2788fc6e633feff396e46b25",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / operating_cash_flow / 2025-01-01 — 2025-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-b8d3ac73ea8cbbe84ae10f92"
+          ],
+          "artifact_ids": [
+            "art-62a388a5b3811d6c9ee0d09d"
+          ],
+          "event_sequences": [
+            4
+          ]
+        },
+        {
+          "check_id": "citations:obs-b8d3ac73ea8cbbe84ae10f92",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-b8d3ac73ea8cbbe84ae10f92"
+          ],
+          "artifact_ids": [
+            "art-9fc6836667a81bd35d80b32e"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-004/query-receipt.json",
+          "sha256": "0e7e5f06266b4eaa653d626e4e02c40dd50fb00f842bde4fd7570ad479523063"
+        }
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_ocf_2024",
+      "description": "核对 Alphabet FY2025 10-K 中 2024 年度比较期间的合并经营现金流金额。若选定 10-K 只有 2025 期间映射或未返回 2024 记录，则保留为显式资料缺口；不推算、不替代。",
+      "evidence_ids": [
+        "ev-04e89c6663a5772b619b0611"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:0e1d8f7077f05249bb046276",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / operating_cash_flow / 2024-01-01 — 2024-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-1ee7bb58b50f03e0f72b12e6"
+          ],
+          "artifact_ids": [
+            "art-ce6b8cee36d965fc855acef8"
+          ],
+          "event_sequences": [
+            6
+          ]
+        },
+        {
+          "check_id": "citations:obs-1ee7bb58b50f03e0f72b12e6",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-1ee7bb58b50f03e0f72b12e6"
+          ],
+          "artifact_ids": [
+            "art-058c27e13af7144b104dc1f3"
+          ],
+          "event_sequences": [
+            6
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-006/query-receipt.json",
+          "sha256": "a2e6dc9fa11e7f65927698a1f11ebfb190916da973755c8bac643a55636aa762"
+        }
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_capex_2025",
+      "description": "核对 Alphabet FY2025 10-K 中 2025 年度购建固定资产的现金支出金额、期间及口径。此项数值期间口径核对委派给 Worker；主角色随后独立核验 query 结果和原文。仅采用报告金额，注明单位 USD 和合并报表口径。",
+      "evidence_ids": [
+        "ev-687678a9185fb1537f1e46f6"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:d046d84f3cd17680523d2104",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / capex_cash_payments / 2025-01-01 — 2025-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-56ba2c019c541769c0cce851"
+          ],
+          "artifact_ids": [
+            "art-5e4d2f156b0731df882b7341"
+          ],
+          "event_sequences": [
+            5
+          ]
+        },
+        {
+          "check_id": "citations:obs-56ba2c019c541769c0cce851",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-56ba2c019c541769c0cce851"
+          ],
+          "artifact_ids": [
+            "art-a960d8b03dbae5aea419ee0e"
+          ],
+          "event_sequences": [
+            5
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-005/query-receipt.json",
+          "sha256": "717243090f755587cc0083a8f821d7fdcd7f305cf350f8ff0bcf48b1849c4041"
+        }
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req_capex_2024",
+      "description": "核对 Alphabet FY2025 10-K 中 2024 年度比较期间的购建固定资产现金支出金额、期间及口径。此项数值期间口径核对委派给 Worker；主角色随后独立核验 query 结果和原文。若未返回 2024 记录则保留为显式资料缺口。",
+      "evidence_ids": [
+        "ev-ab92ca11037d639cc859c238"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:2d6a4ae3dde68b3f46dfcc3d",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / capex_cash_payments / 2024-01-01 — 2024-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-a0343ddc7aedd6ae4e071851"
+          ],
+          "artifact_ids": [
+            "art-65669ccb76a6e08e34fc59bf"
+          ],
+          "event_sequences": [
+            7
+          ]
+        },
+        {
+          "check_id": "citations:obs-a0343ddc7aedd6ae4e071851",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-a0343ddc7aedd6ae4e071851"
+          ],
+          "artifact_ids": [
+            "art-1319bb66529e30b20565251f"
+          ],
+          "event_sequences": [
+            7
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-007/query-receipt.json",
+          "sha256": "82a7c35e13ec7e8673d70c8bccb9bcbf81b47ee1d56cdc43a5a94cfb803075e6"
+        }
+      ]
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req_capex_uses",
+      "description": "在选定 Alphabet FY2025 10-K 正文或表格中查找并直接引用资本支出（购建固定资产）的主要用途说明，包括相关年份或期间语境。必须读取所引用区块的实际原文后再提取，不把检索命中或摘要当作已读原文；不推断维护性资本开支或 AI 投资回报。",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-c4af5bcd63e901a708cb7ef208cb81a5",
+    "kind": "run_state",
+    "path": "artifacts/art-c4af5bcd63e901a708cb7ef208cb81a5.json",
+    "sha256": "5f1dcde5a192c73250212436316e84eee202cc4fce7e308e0ab0e7ace8115638",
+    "size_bytes": 25156,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "include_candidates": true
+    },
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "created_step": 8,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-ff6e03d84aa96429d5ce8ee590469bbd",
+      "kind": "record",
+      "path": "artifacts/art-ff6e03d84aa96429d5ce8ee590469bbd.json",
+      "sha256": "61feae014aeb2ee878aa7735c2310a674927ce4803d61380204b80bbd6c6b9a8",
+      "size_bytes": 1358,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 4,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-154f5b538ddbf9e02b3b2f73"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-9129a25f8e429d657bcccd1dc901c8b4",
+      "kind": "citation",
+      "path": "artifacts/art-9129a25f8e429d657bcccd1dc901c8b4.json",
+      "sha256": "749c57b94ab8a97adc4580428452edb90161d8d021d872a584d75f3983059aae",
+      "size_bytes": 1416,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 4,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-e9b2a74bf7f71215bf46d448"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-d6d47c73c60ba0ef3470a5fa089980eb",
+      "kind": "record",
+      "path": "artifacts/art-d6d47c73c60ba0ef3470a5fa089980eb.json",
+      "sha256": "33087962ef9b89a131ac24a05356aecc7c541260dac4708754ec29791a11ffbf",
+      "size_bytes": 1357,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-687678a9185fb1537f1e46f6"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-c6f2897c6a769ba3dc26c4549e147d24",
+      "kind": "citation",
+      "path": "artifacts/art-c6f2897c6a769ba3dc26c4549e147d24.json",
+      "sha256": "e67c8b474c5f505ab109632dda2427318526295cf8ed1b20093ede4093882f4b",
+      "size_bytes": 1413,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-2f185f9e9d73206bc3281818"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-6b75eee338a5fed11ca051d231ddc1a1",
+      "kind": "record",
+      "path": "artifacts/art-6b75eee338a5fed11ca051d231ddc1a1.json",
+      "sha256": "5f6689f4f27c0e12c1802918cda0050dd079ce9553bbbc0823b061567d15f9aa",
+      "size_bytes": 1359,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 6,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-04e89c6663a5772b619b0611"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-64abbd5903a93fac1c9b9e5011cdc43c",
+      "kind": "citation",
+      "path": "artifacts/art-64abbd5903a93fac1c9b9e5011cdc43c.json",
+      "sha256": "4f50f4af003a177eb4dbbdfef97a58395e56d84a5fd52ce832715804add8c1d6",
+      "size_bytes": 1418,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 6,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-b81659386fe845eb0f5fc4d3"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-3005830acc68923fccd9c2a3d0f3a6ec",
+      "kind": "record",
+      "path": "artifacts/art-3005830acc68923fccd9c2a3d0f3a6ec.json",
+      "sha256": "4a5dd29dbf5dc127d07a8b0b33630700963331e44a24ac5d2fa6bb9c1e765261",
+      "size_bytes": 1358,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 7,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-ab92ca11037d639cc859c238"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-7c8911f667547bb76b26f20dffcb6b03",
+      "kind": "citation",
+      "path": "artifacts/art-7c8911f667547bb76b26f20dffcb6b03.json",
+      "sha256": "b95b081e4ec77ffbbe01bcda67c86fd226f0dcc73a5227dbaee490aac682b7dd",
+      "size_bytes": 1415,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 7,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-8aef7e7638c48fc1a1133194"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-ae5cb8a9067d656d7617e73b062ace63",
+    "sha256": "1bfff52234aa400f84aa304e357e2b87c650dcd78c1fb9cb5903521174fecd69",
+    "scope_id": "scope-9971188484366854bf3045c2",
+    "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 8,
+    "total_count": 8,
+    "returned_count": 8,
+    "bytes_returned": 5832,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "status": "tool_returned",
+    "evidence_ids": [],
+    "result": {
+      "index_id": "didx-d113d1d4ab51745c",
+      "status": "available",
+      "nodes": [
+        {
+          "node_id": "didx-d113d1d4ab51745c-document",
+          "parent_id": null,
+          "kind": "document",
+          "title": "googl-2025-10k",
+          "part_number": null,
+          "item_number": null,
+          "start_block_id": "block-000001-e3b0c442",
+          "end_block_id": "block-001338-64932fc7",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_1",
+          "reported_page": 2
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i",
+          "parent_id": "didx-d113d1d4ab51745c-document",
+          "kind": "part",
+          "title": "PART I",
+          "part_number": "I",
+          "item_number": null,
+          "start_block_id": "block-000060-495768bd",
+          "end_block_id": "block-000354-a3014a36",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_13",
+          "reported_page": 3
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i-item-1",
+          "parent_id": "didx-d113d1d4ab51745c-part-i",
+          "kind": "item",
+          "title": "BUSINESS",
+          "part_number": "I",
+          "item_number": "1",
+          "start_block_id": "block-000061-5c0c0c66",
+          "end_block_id": "block-000149-24a569d3",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_16",
+          "reported_page": 3
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i-item-1a",
+          "parent_id": "didx-d113d1d4ab51745c-part-i",
+          "kind": "item",
+          "title": "RISK FACTORS",
+          "part_number": "I",
+          "item_number": "1A",
+          "start_block_id": "block-000152-0346f09a",
+          "end_block_id": "block-000339-bdd6c4e8",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_43",
+          "reported_page": 9
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i-item-1b",
+          "parent_id": "didx-d113d1d4ab51745c-part-i",
+          "kind": "item",
+          "title": "UNRESOLVED STAFF COMMENTS",
+          "part_number": "I",
+          "item_number": "1B",
+          "start_block_id": "block-000340-66d297db",
+          "end_block_id": "block-000341-a3014a36",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_46",
+          "reported_page": 23
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i-item-1c",
+          "parent_id": "didx-d113d1d4ab51745c-part-i",
+          "kind": "item",
+          "title": "CYBERSECURITY",
+          "part_number": "I",
+          "item_number": "1C",
+          "start_block_id": "block-000342-81f22896",
+          "end_block_id": "block-000348-78ba5414",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_49",
+          "reported_page": 23
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i-item-2",
+          "parent_id": "didx-d113d1d4ab51745c-part-i",
+          "kind": "item",
+          "title": "PROPERTIES",
+          "part_number": "I",
+          "item_number": "2",
+          "start_block_id": "block-000349-00454a69",
+          "end_block_id": "block-000350-e2e60811",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_52",
+          "reported_page": 24
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i-item-3",
+          "parent_id": "didx-d113d1d4ab51745c-part-i",
+          "kind": "item",
+          "title": "LEGAL PROCEEDINGS",
+          "part_number": "I",
+          "item_number": "3",
+          "start_block_id": "block-000351-f4389f2c",
+          "end_block_id": "block-000352-737ca3b1",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_55",
+          "reported_page": 24
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-i-item-4",
+          "parent_id": "didx-d113d1d4ab51745c-part-i",
+          "kind": "item",
+          "title": "MINE SAFETY DISCLOSURES",
+          "part_number": "I",
+          "item_number": "4",
+          "start_block_id": "block-000353-04597531",
+          "end_block_id": "block-000354-a3014a36",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_58",
+          "reported_page": 24
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii",
+          "parent_id": "didx-d113d1d4ab51745c-document",
+          "kind": "part",
+          "title": "PART II",
+          "part_number": "II",
+          "item_number": null,
+          "start_block_id": "block-000357-87b6a3b1",
+          "end_block_id": "block-001281-a3014a36",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_61",
+          "reported_page": 25
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-5",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "MARKET FOR REGISTRANT’S COMMON EQUITY, RELATED STOCKHOLDER MATTERS, AND ISSUER PURCHASES OF EQUITY SECURITIES",
+          "part_number": "II",
+          "item_number": "5",
+          "start_block_id": "block-000358-801a524b",
+          "end_block_id": "block-000389-973caf7f",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_64",
+          "reported_page": 25
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-6",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "[Reserved]",
+          "part_number": "II",
+          "item_number": "6",
+          "start_block_id": "block-000390-6b264e21",
+          "end_block_id": "block-000390-6b264e21",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_67",
+          "reported_page": 27
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-7",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "MANAGEMENT’S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND RESULTS OF OPERATIONS",
+          "part_number": "II",
+          "item_number": "7",
+          "start_block_id": "block-000393-ddac7c96",
+          "end_block_id": "block-000674-066091ae",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_70",
+          "reported_page": 28
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-7a",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "QUANTITATIVE AND QUALITATIVE DISCLOSURES ABOUT MARKET RISK",
+          "part_number": "II",
+          "item_number": "7A",
+          "start_block_id": "block-000675-424c31fc",
+          "end_block_id": "block-000702-dd83fec8",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_184",
+          "reported_page": 41
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-8",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+          "part_number": "II",
+          "item_number": "8",
+          "start_block_id": "block-000705-d8fafffe",
+          "end_block_id": "block-001254-1d81d3bc",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_187",
+          "reported_page": 44
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-9",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "CHANGES IN AND DISAGREEMENTS WITH ACCOUNTANTS ON ACCOUNTING AND FINANCIAL DISCLOSURE",
+          "part_number": "II",
+          "item_number": "9",
+          "start_block_id": "block-001257-192d7e7c",
+          "end_block_id": "block-001258-903ea500",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_304",
+          "reported_page": 89
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-9a",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "CONTROLS AND PROCEDURES",
+          "part_number": "II",
+          "item_number": "9A",
+          "start_block_id": "block-001259-8dcaa824",
+          "end_block_id": "block-001268-06dca432",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_307",
+          "reported_page": 89
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-9b",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "OTHER INFORMATION",
+          "part_number": "II",
+          "item_number": "9B",
+          "start_block_id": "block-001269-f827e3e6",
+          "end_block_id": "block-001279-b29a991f",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_310",
+          "reported_page": 89
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-ii-item-9c",
+          "parent_id": "didx-d113d1d4ab51745c-part-ii",
+          "kind": "item",
+          "title": "DISCLOSURE REGARDING FOREIGN JURISDICTIONS THAT PREVENT INSPECTIONS",
+          "part_number": "II",
+          "item_number": "9C",
+          "start_block_id": "block-001280-4463e43b",
+          "end_block_id": "block-001281-a3014a36",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_316",
+          "reported_page": 90
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iii",
+          "parent_id": "didx-d113d1d4ab51745c-document",
+          "kind": "part",
+          "title": "PART III",
+          "part_number": "III",
+          "item_number": null,
+          "start_block_id": "block-001284-8867fe43",
+          "end_block_id": "block-001295-a52dc434",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_319",
+          "reported_page": 91
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iii-item-10",
+          "parent_id": "didx-d113d1d4ab51745c-part-iii",
+          "kind": "item",
+          "title": "DIRECTORS, EXECUTIVE OFFICERS, AND CORPORATE GOVERNANCE",
+          "part_number": "III",
+          "item_number": "10",
+          "start_block_id": "block-001285-331a649e",
+          "end_block_id": "block-001287-76d1af5b",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_322",
+          "reported_page": 91
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iii-item-11",
+          "parent_id": "didx-d113d1d4ab51745c-part-iii",
+          "kind": "item",
+          "title": "EXECUTIVE COMPENSATION",
+          "part_number": "III",
+          "item_number": "11",
+          "start_block_id": "block-001288-505bcd35",
+          "end_block_id": "block-001289-fd05653f",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_325",
+          "reported_page": 91
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iii-item-12",
+          "parent_id": "didx-d113d1d4ab51745c-part-iii",
+          "kind": "item",
+          "title": "SECURITY OWNERSHIP OF CERTAIN BENEFICIAL OWNERS AND MANAGEMENT AND RELATED STOCKHOLDER MATTERS",
+          "part_number": "III",
+          "item_number": "12",
+          "start_block_id": "block-001290-2870ee90",
+          "end_block_id": "block-001291-3bb0e435",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_328",
+          "reported_page": 91
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iii-item-13",
+          "parent_id": "didx-d113d1d4ab51745c-part-iii",
+          "kind": "item",
+          "title": "CERTAIN RELATIONSHIPS AND RELATED TRANSACTIONS, AND DIRECTOR INDEPENDENCE",
+          "part_number": "III",
+          "item_number": "13",
+          "start_block_id": "block-001292-136373bc",
+          "end_block_id": "block-001293-997b2851",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_331",
+          "reported_page": 91
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iii-item-14",
+          "parent_id": "didx-d113d1d4ab51745c-part-iii",
+          "kind": "item",
+          "title": "PRINCIPAL ACCOUNTANT FEES AND SERVICES",
+          "part_number": "III",
+          "item_number": "14",
+          "start_block_id": "block-001294-dd5ad323",
+          "end_block_id": "block-001295-a52dc434",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_334",
+          "reported_page": 91
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iv",
+          "parent_id": "didx-d113d1d4ab51745c-document",
+          "kind": "part",
+          "title": "PART IV",
+          "part_number": "IV",
+          "item_number": null,
+          "start_block_id": "block-001298-caa911f8",
+          "end_block_id": "block-001337-730cd280",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_337",
+          "reported_page": 92
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iv-item-15",
+          "parent_id": "didx-d113d1d4ab51745c-part-iv",
+          "kind": "item",
+          "title": "EXHIBITS, FINANCIAL STATEMENT SCHEDULES",
+          "part_number": "IV",
+          "item_number": "15",
+          "start_block_id": "block-001299-5a9baa0c",
+          "end_block_id": "block-001323-bc04fd1d",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_340",
+          "reported_page": 92
+        },
+        {
+          "node_id": "didx-d113d1d4ab51745c-part-iv-item-16",
+          "parent_id": "didx-d113d1d4ab51745c-part-iv",
+          "kind": "item",
+          "title": "FORM 10-K SUMMARY",
+          "part_number": "IV",
+          "item_number": "16",
+          "start_block_id": "block-001324-4c9fa19b",
+          "end_block_id": "block-001337-730cd280",
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_343",
+          "reported_page": 96
+        }
+      ],
+      "diagnostics": [],
+      "execution_schema_version": "research-execution-v1",
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-02-05",
+      "candidate_data": true,
+      "source": {
+        "source_snapshot_id": "googl-2025-10k",
+        "company_id": "sec-0001652044",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "document_id": "googl-2025-10k",
+        "index_id": "didx-d113d1d4ab51745c",
+        "index_folder": "indexes/googl-2025-10k",
+        "raw_file": "raw/googl-2025-10k.html",
+        "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "form": "10-K",
+        "period_end": "2025-12-31",
+        "declared_mime_type": "text/html",
+        "parsed_mime_type": "text/html",
+        "available_at": "2026-02-05",
+        "status": "candidate",
+        "fiscal_periods": [
+          {
+            "fiscal_year": 2025,
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            }
+          }
+        ],
+        "capabilities": [
+          "read_context",
+          "literal_search",
+          "source_bytes"
+        ],
+        "image_block_count": 2
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "company_id": "sec-0001652044",
+      "source_period_end": "2025-12-31",
+      "available_at": "2026-02-05",
+      "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+      "index_status": "candidate",
+      "coverage": "Document structure only; no body text has been read.",
+      "gaps": []
+    },
+    "result_artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-588825147ebe085baa6ee7e65e0b6c32",
+      "kind": "tool_payload",
+      "path": "artifacts/art-588825147ebe085baa6ee7e65e0b6c32.json",
+      "sha256": "eaddf6fd7ef207554d0684abde45be526c922c74087198c505cf079516d61011",
+      "size_bytes": 14422,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    },
+    "preview_truncated": false,
+    "reads": [],
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 9,
+      "action": "outline_source",
+      "requirement_ids": [
+        "req_capex_uses"
+      ],
+      "request_fingerprint": "cef7255c448e3aeea742f939020e1373fca644ecc9e2a2db0818c645dee6b9d4",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "reading",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 12994,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-6df9d4be126ef05d1420c4919b141b2e",
+      "kind": "tool_output",
+      "path": "artifacts/art-6df9d4be126ef05d1420c4919b141b2e.json",
+      "sha256": "2da7f378a6d954ab9e55f22ec626aa93d8849b25b2d4acd5255a12ee098b9a1b",
+      "size_bytes": 15295,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "scope_id": "scope-9971188484366854bf3045c2",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "d3fdb9b0f3343979cf674febb391bcb142b4ffd041bd20b129a6dbbc79168c48"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "d3fdb9b0f3343979cf674febb391bcb142b4ffd041bd20b129a6dbbc79168c48",
+    "content": "---\nname: data-agent-query\nversion: 5\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id for narrative source facts, quotations and original text/table verification. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": true,
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req_capex_uses",
+        "reason": "evidence_or_explicit_gap_required"
+      },
+      {
+        "requirement_id": "req_capex_uses",
+        "reason": "source_body_not_delivered"
+      }
+    ],
+    "semantic_completeness": "not_evaluated"
+  },
+  "retained_body": {
+    "items": [],
+    "omitted_count": 0,
+    "byte_limit": 12000
+  },
+  "source_leads": [
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-02-05",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000774-67c9365e",
+      "index_id": "didx-d113d1d4ab51745c",
+      "origin": "citation",
+      "requirement_ids": [
+        "req_capex_2024",
+        "req_capex_2025",
+        "req_ocf_2024",
+        "req_ocf_2025"
+      ],
+      "read_request": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000774-67c9365e"
+      },
+      "read_status": "located"
+    }
+  ],
+  "source_lead_count": 1,
+  "delegations": [
+    {
+      "path": "turn-003/worker",
+      "requirement_ids": [
+        "req_capex_2025",
+        "req_capex_2024"
+      ],
+      "status": "worker_failed",
+      "handoff_artifact_id": "art-05df5fab77142637d12ebbee25599e6a",
+      "full_handoff_artifact_id": "art-ae524b7ebe3ee281f9250373b59e51ef",
+      "result_status": "failed",
+      "findings_preview": {
+        "value": {
+          "status": "failed",
+          "stop_reason": "ModelBehaviorError",
+          "worker_run": "turn-003/worker",
+          "candidate_only": true,
+          "semantic_completeness": "not_evaluated",
+          "review_required": "Verify sources with parent tools; worker references do not satisfy parent coverage.",
+          "schema_version": "worker-handoff-summary-v1",
+          "records": [
+            {
+              "schema_version": "research-query-v0.4",
+              "record_id": "obs-56ba2c019c541769c0cce851",
+              "record_type": "metric",
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              },
+              "period_resolution": "resolved",
+              "value_kind": "actual",
+              "value_decimal": "91447000000",
+              "upper_decimal": null,
+              "value_relation": "eq",
+              "unit": "USD",
+              "denominator": null,
+              "modality": null,
+              "accounting_basis": "reported_consolidated",
+              "dimensions": {},
+              "available_at": "2026-02-05",
+              "source_snapshot_id": "googl-2025-10k",
+              "evidence_ids": [
+                "ev-868cb2fb5f29b34e0f3e7eff"
+              ],
+              "qualifier_evidence_ids": [],
+              "question_evidence_ids": [],
+              "speaker": null,
+              "status": "candidate",
+              "worker_evidence_id": "ev-687678a9185fb1537f1e46f6",
+              "full_read": {
+                "artifact_id": "art-ae524b7ebe3ee281f9250373b59e51ef",
+                "pointer": "/evidence_bundle/items/0/value",
+                "limit": 32
+              }
+            },
+            {
+              "schema_version": "research-query-v0.4",
+              "record_id": "obs-a0343ddc7aedd6ae4e071851",
+              "record_type": "metric",
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "period_resolution": "resolved",
+              "value_kind": "actual",
+              "value_decimal": "52535000000",
+              "upper_decimal": null,
+              "value_relation": "eq",
+              "unit": "USD",
+              "denominator": null,
+              "modality": null,
+              "accounting_basis": "reported_consolidated",
+              "dimensions": {},
+              "available_at": "2026-02-05",
+              "source_snapshot_id": "googl-2025-10k",
+              "evidence_ids": [
+                "ev-1fea69caacad3e422fa3c65b"
+              ],
+              "qualifier_evidence_ids": [],
+              "question_evidence_ids": [],
+              "speaker": null,
+              "status": "candidate",
+              "worker_evidence_id": "ev-ab92ca11037d639cc859c238",
+              "full_read": {
+                "artifact_id": "art-ae524b7ebe3ee281f9250373b59e51ef",
+                "pointer": "/evidence_bundle/items/2/value",
+                "limit": 32
+              }
+            }
+          ],
+          "computed_facts": [],
+          "requirement_ids": [
+            "req_capex_2025",
+            "req_capex_2024"
+          ],
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "company_ids": [
+              "sec-0001652044"
+            ],
+            "source_snapshot_ids": [
+              "googl-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-02-05",
+            "include_candidates": true
+          },
+          "citations": [
+            {
+              "source_id": "ev-868cb2fb5f29b34e0f3e7eff",
+              "evidence_id": "ev-868cb2fb5f29b34e0f3e7eff",
+              "source_snapshot_id": "googl-2025-10k",
+              "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+              "index_id": "didx-d113d1d4ab51745c",
+              "block_id": "block-000774-67c9365e",
+              "text_hash": "67c9365e556483f996f437c0561a28db510cb415de5b9d21b4215c68793f606a",
+              "quote": "91,447",
+              "number_metadata": {
+                "value_decimal": "91447000000",
+                "unit": "USD",
+                "raw_value": "91,447",
+                "scale": 6,
+                "sign": "+",
+                "decimals": "-6",
+                "format": "ixt:num-dot-decimal"
+              },
+              "unit_xml": "<xbrli:unit id=\"usd\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+              "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+              "worker_evidence_id": "ev-2f185f9e9d73206bc3281818",
+              "full_read": {
+                "artifact_id": "art-ae524b7ebe3ee281f9250373b59e51ef",
+                "pointer": "/evidence_bundle/items/1/value",
+                "limit": 32
+              }
+            }
+          ],
+          "contexts": [],
+          "candidate_extracts": [],
+          "body_read_status": {
+            "delivered_body": {
+              "ev-c471c412868600b8040f4a8a": [
+                "block-000770-2f8c99ac",
+                "block-000771-9faf493a",
+                "block-000772-76355f56",
+                "block-000773-cb5b3af4"
+              ]
+            },
+            "candidate_only": true
+          },
+          "reference_checks": [
+            {
+              "requirement_id": "req_capex_2025",
+              "program_check": "satisfied",
+              "gap_ids": [
+                "gap-a54d550be514474705de98ad"
+              ]
+            },
+            {
+              "requirement_id": "req_capex_2024",
+              "program_check": "satisfied",
+              "gap_ids": [
+                "gap-a98e415d3a4c447b80c2e0ad"
+              ]
+            }
+          ]
+        },
+        "truncated": true,
+        "reads": [
+          {
+            "status": "limited",
+            "artifact_id": "art-05df5fab77142637d12ebbee25599e6a",
+            "sha256": "72ec54d4f0225b9ba8e140834e5c29db984677617e00f8981f20920034eb65c4",
+            "scope_id": "scope-9971188484366854bf3045c2",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "pointer": "/citations",
+            "unit": "items",
+            "offset": 0,
+            "end_offset": 1,
+            "total_count": 2,
+            "returned_count": 1,
+            "bytes_returned": 935,
+            "next_cursor": {
+              "cursor_version": "run-artifact-cursor-v1",
+              "artifact_id": "art-05df5fab77142637d12ebbee25599e6a",
+              "sha256": "72ec54d4f0225b9ba8e140834e5c29db984677617e00f8981f20920034eb65c4",
+              "scope_id": "scope-9971188484366854bf3045c2",
+              "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+              "pointer": "/citations",
+              "offset": 1
+            },
+            "gaps": []
+          },
+          {
+            "status": "item_too_large",
+            "artifact_id": "art-05df5fab77142637d12ebbee25599e6a",
+            "sha256": "72ec54d4f0225b9ba8e140834e5c29db984677617e00f8981f20920034eb65c4",
+            "scope_id": "scope-9971188484366854bf3045c2",
+            "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+            "pointer": "/contexts",
+            "unit": "items",
+            "offset": 0,
+            "end_offset": 0,
+            "total_count": 1,
+            "returned_count": 0,
+            "bytes_returned": 2,
+            "next_cursor": {
+              "cursor_version": "run-artifact-cursor-v1",
+              "artifact_id": "art-05df5fab77142637d12ebbee25599e6a",
+              "sha256": "72ec54d4f0225b9ba8e140834e5c29db984677617e00f8981f20920034eb65c4",
+              "scope_id": "scope-9971188484366854bf3045c2",
+              "snapshot_id": "query-6eb88c0da9c3763cdc37431b",
+              "pointer": "/contexts",
+              "offset": 0
+            },
+            "gaps": [
+              {
+                "reason": "item_too_large",
+                "pointer": "/contexts/0",
+                "required_bytes": 1101,
+                "next_action": "read a child pointer or increase max_bytes"
+              }
+            ]
+          },
+          {
+            "artifact_id": "art-05df5fab77142637d12ebbee25599e6a",
+            "pointer": "/full_handoff_ref",
+            "status": "not_previewed",
+            "required_bytes": 700
+          },
+          {
+            "artifact_id": "art-05df5fab77142637d12ebbee25599e6a",
+            "pointer": "/gaps",
+            "status": "not_previewed",
+            "required_bytes": 1546
+          }
+        ],
+        "unlisted_paths": 0,
+        "browse_pointer": ""
+      }
+    }
+  ],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 4,
+      "action": "query",
+      "status": "tool_returned"
+    },
+    {
+      "step": 5,
+      "action": "query",
+      "status": "tool_returned"
+    },
+    {
+      "step": 6,
+      "action": "query",
+      "status": "tool_returned"
+    },
+    {
+      "step": 7,
+      "action": "query",
+      "status": "tool_returned"
+    },
+    {
+      "step": 8,
+      "action": "outline_source",
+      "status": "rejected"
+    },
+    {
+      "step": 9,
+      "action": "outline_source",
+      "status": "tool_returned"
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 20
+}

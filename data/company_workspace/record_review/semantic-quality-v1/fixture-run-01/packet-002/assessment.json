@@ -1,0 +1,41 @@
+{
+  "packet_id": "semantic-fd2b6309226248ae7ce0afab",
+  "checks": [
+    {
+      "axis": "value",
+      "status": "constraints_found",
+      "reason": "源文本明确区分了 FY2025 和 FY2024 的收入金额，且记录 sr-002-r1 的期间为 2024 年，因此该记录只能对应 FY2024 的 130 百万美元，而非 148 百万美元。",
+      "constraints": [
+        {
+          "record_ids": [
+            "sr-002-r1"
+          ],
+          "statement": "记录 sr-002-r1 的期间为 2024 年，其收入值必须为 130 百万美元，而不是 148 百万美元。",
+          "citations": [
+            {
+              "source_snapshot_id": "cedar-source-002",
+              "block_id": "b1",
+              "quote": "Revenue was 148 for FY2025 and 130 for FY2024."
+            }
+          ]
+        }
+      ],
+      "unresolved_questions": []
+    }
+  ],
+  "assertions": [
+    {
+      "assertion_id": "sr-002-a1",
+      "verdict": "contradicted",
+      "reason": "断言称 FY2024 收入为 148 百万美元，但源文本明确显示 FY2024 收入为 130 百万美元，148 百万美元对应 FY2025。",
+      "citations": [
+        {
+          "source_snapshot_id": "cedar-source-002",
+          "block_id": "b1",
+          "quote": "Revenue was 148 for FY2025 and 130 for FY2024."
+        }
+      ]
+    }
+  ],
+  "limitations": []
+}

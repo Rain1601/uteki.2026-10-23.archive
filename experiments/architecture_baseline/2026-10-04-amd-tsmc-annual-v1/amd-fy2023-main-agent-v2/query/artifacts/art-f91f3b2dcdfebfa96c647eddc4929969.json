@@ -1,0 +1,26 @@
+{
+  "status": "planned",
+  "plan": {
+    "version": 1,
+    "requirements": [
+      {
+        "kind": "financial_extract",
+        "query": null,
+        "source_id": null,
+        "node_id": null,
+        "financial_task_id": "amd-fy2023-core-candidates",
+        "batch_index": 2,
+        "requirement_id": "req-amd-fy2023-bs-candidates",
+        "description": "对已登记的 AMD FY2023 年报财务提取任务，选择包含现金、债务和股本信息的资产负债表批次 batch_index 2，调用注册的 annual-financial-v2 能力生成一次候选产物；保留表内披露的比较期间，未复核候选不作为正式事实。"
+      }
+    ],
+    "reason": "已查看 financial_tasks 目录。batch_index 2 为 Consolidated Balance Sheets 表块（block-000674-2ab954ba），其摘录从现金及现金等价物开始，并包含该资产负债表主体；该表在表内披露 December 30, 2023 与 December 31, 2022 比较期间。其他报表和后续批次保持待处理。",
+    "origin": "model",
+    "skill_hashes": {
+      "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+      "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+      "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+    },
+    "sha256": "2b8e9d19407c64a4e1151e411bb05140a6d925214203c5f3d97a0861a4317f81"
+  }
+}

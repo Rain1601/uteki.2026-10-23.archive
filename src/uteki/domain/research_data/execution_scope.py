@@ -58,6 +58,9 @@ class SourceReadRequest(SourceOutlineRequest):
     start_block_id: str | None = Field(default=None, min_length=1, max_length=300, pattern=r"\S")
     count: int = Field(default=8, ge=1, le=12)
     cursor: ReadCursor | None = None
+    # Preserve the canonical request bytes of legacy full reads and their hashes.
+    representation: Literal["full", "compact"] = Field(default="full", exclude_if=lambda value: value == "full",
+        description="compact preserves all table cells as tuples with cell_fields; no text or cells are omitted.")
 
 
 class SourceSearchRequest(SourceOutlineRequest):

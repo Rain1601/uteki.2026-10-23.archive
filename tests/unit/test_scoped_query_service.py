@@ -8,7 +8,7 @@ import duckdb
 from pydantic import ValidationError
 
 from uteki.domain.research_data.execution_scope import ExecutionScope, SourceSearchRequest
-from uteki.domain.research_data.query_contract import DataQuery, QueryResult, ResearchRecord, VERSION
+from uteki.domain.research_data.query_contract import DataQuery, QueryResult, ResearchRecord, VERSION, export_query_schema
 from uteki.infrastructure.research_data.financial_records import digest
 from uteki.infrastructure.research_data.query_dataset import DDL, save
 from uteki.infrastructure.research_data.query_service import QueryDataPort, ScopedQueryDataPort
@@ -18,7 +18,7 @@ def year(value):
     return {"kind": "year", "start": f"{value}-01-01", "end": f"{value}-12-31"}
 
 
-def make_scoped_dataset(folder):
+def make_scoped_dataset(folder, *, schema_metadata=False):
     """Small public-domain synthetic fixture, including colliding local block IDs."""
     sources = []
     for sid, company, form, end, available in (
@@ -53,6 +53,8 @@ def make_scoped_dataset(folder):
         sources.append({"source_snapshot_id": sid, "company_id": company, "form": form, "period_end": end,
                         "available_at": available, "index_id": index_id, "index_folder": "indexes/" + sid,
                         "source_sha256": digest(sid), "source_url": "https://example.invalid/" + sid})
+        if schema_metadata:
+            sources[-1]["fiscal_periods"] = [{"fiscal_year": int(end[:4]), "period": year(end[:4])}]
     metrics = {m: {"metric_id": m, "unit": "USD"} for m in ("revenue", "operating_income", "gross_profit")}
     db = duckdb.connect(str(folder / "research.duckdb"))
     db.execute(DDL)
@@ -75,19 +77,84 @@ def make_scoped_dataset(folder):
             period=year(period_year), value_kind="actual", value_decimal=value, value_relation="eq", unit="USD",
             accounting_basis="reported_segment", available_at=available, source_snapshot_id=sid,
             evidence_ids=(rid,), summary="Synthetic observation", origin={}).model_dump(mode="json")
+        if schema_metadata:
+            row["dimensions"] = {"issuer:BusinessAxis": sid + ":ServicesMember"}
         db.execute("INSERT INTO observations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                    [rid, entity, metric, "year", f"{period_year}-01-01", f"{period_year}-12-31", "actual", value,
                     None, "eq", "USD", "reported_segment", available, sid, "candidate", json.dumps(row)])
         db.execute("INSERT INTO evidence VALUES (?, ?, ?)",
                    [rid, sid, json.dumps({"evidence_id": rid, "source_snapshot_id": sid, "quote": value})])
+    if schema_metadata:
+        # Future extraction inside an already available source must not leak
+        # through either its accounting basis or its dimension labels.
+        payload = {**row, "record_id": "future-observation", "source_snapshot_id": "acme-annual",
+                   "period": year(2031), "value_decimal": "999", "available_at": "2033-01-01",
+                   "accounting_basis": "future-basis", "evidence_ids": ["future-observation"],
+                   "dimensions": {"issuer:BusinessAxis": "FutureObservationMember"}}
+        db.execute("INSERT INTO observations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                   ["future-observation", "acme-services", "revenue", "year", "2031-01-01", "2031-12-31",
+                    "actual", "999", None, "eq", "USD", "future-basis", "2033-01-01", "acme-annual",
+                    "candidate", json.dumps(payload)])
     db.close()
     save(folder / "sources.json", sources)
     save(folder / "metrics.json", metrics)
     for name, model in (("query", DataQuery), ("record", ResearchRecord), ("result", QueryResult)):
-        save(folder / f"schemas/{name}.schema.json", model.model_json_schema())
+        save(folder / f"schemas/{name}.schema.json", export_query_schema(model, version=VERSION))
     save(folder / "manifest.json", {"schema_version": VERSION, "snapshot_id": "synthetic-scoped-v1",
         "source_policy_id": "local-frozen-v1", "limits": ["Synthetic fixture; no extraction claims"],
         "files": {str(p.relative_to(folder)): digest(p.read_bytes()) for p in folder.rglob("*") if p.is_file()}})
+
+
+class ScopedSchemaMetadataTests(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.folder = Path(tmp.name)
+        make_scoped_dataset(self.folder, schema_metadata=True)
+        self.port = QueryDataPort(self.folder)
+        self.addCleanup(self.port.close)
+        self.scope = {"snapshot_id": self.port.snapshot_id, "company_ids": ["acme"],
+                      "source_snapshot_ids": ["acme-annual", "acme-future"],
+                      "source_policy_id": "local-frozen-v1", "knowledge_cutoff": "2032-06-01",
+                      "include_candidates": True}
+
+    def test_dimensions_and_fiscal_metadata_use_selected_available_sources(self):
+        schema = self.port.scoped(self.scope).get_schema()
+        child = next(e for e in schema["entities"] if e["entity_id"] == "acme-services")
+        self.assertEqual(child["reported_dimensions"], [{"issuer:BusinessAxis": "acme-annual:ServicesMember"}])
+        self.assertEqual(child["accounting_bases"], ["reported_segment"])
+        self.assertEqual(schema["fiscal_periods"], [{"fiscal_year": 2031, "period": year(2031),
+                         "company_id": "acme", "source_snapshot_id": "acme-annual"}])
+        self.assertEqual({e["company_id"] for e in schema["entities"]}, {"acme"})
+        # Ensure the excluded same-entity labels actually exist in the parent.
+        parent = next(e for e in self.port.get_schema()["entities"] if e["entity_id"] == "acme-services")
+        self.assertGreater(len(parent["reported_dimensions"]), 1)
+
+    def test_another_company_has_only_its_own_schema_metadata(self):
+        schema = self.port.scoped({**self.scope, "company_ids": ["other"],
+                                  "source_snapshot_ids": ["other-annual"]}).get_schema()
+        child = next(e for e in schema["entities"] if e["entity_id"] == "other-services")
+        self.assertEqual(child["reported_dimensions"], [{"issuer:BusinessAxis": "other-annual:ServicesMember"}])
+        self.assertEqual({p["source_snapshot_id"] for p in schema["fiscal_periods"]}, {"other-annual"})
+
+    def test_candidate_denial_preserves_source_identity_without_derived_metadata(self):
+        port = self.port.scoped({**self.scope, "include_candidates": False})
+        schema = port.get_schema()
+        self.assertEqual(schema["entities"], [
+            {"entity_id": "acme", "company_id": "acme", "accounting_bases": []},
+            {"entity_id": "acme-services", "company_id": "acme", "accounting_bases": []}])
+        self.assertEqual(schema["fiscal_periods"], [])
+        catalog = port.discover_data()
+        self.assertEqual([s["source_snapshot_id"] for s in catalog["sources"]], ["acme-annual"])
+        self.assertFalse(catalog["sources"][0]["queryable"])
+        self.assertNotIn("fiscal_periods", catalog["sources"][0])
+        self.assertTrue(all(c["status"] == "quality_filtered" for c in catalog["coverage"]))
+
+    def test_earlier_cutoff_and_nested_scope_cannot_restore_metadata(self):
+        port = self.port.scoped(self.scope).scoped({**self.scope, "knowledge_cutoff": "2032-01-31"})
+        self.assertEqual(port.get_schema()["fiscal_periods"], [])
+        self.assertEqual([e["entity_id"] for e in port.get_schema()["entities"]], ["acme"])
+        self.assertEqual(port.discover_data()["sources"], [])
 
 
 class ScopedQueryServiceTests(unittest.TestCase):
@@ -149,7 +216,7 @@ class ScopedQueryServiceTests(unittest.TestCase):
     def test_schema_and_discovery_are_scoped_without_changing_frozen_contracts(self):
         before = {str(p): digest(p.read_bytes()) for p in self.folder.rglob("*") if p.is_file()}
         schema = self.scoped.get_schema()
-        self.assertEqual(schema["query"], DataQuery.model_json_schema())
+        self.assertEqual(schema["query"], export_query_schema(DataQuery, version=VERSION))
         self.assertEqual(schema["schema_version"], "research-query-v0.3")
         self.assertEqual(schema["execution_schema_version"], "research-execution-v1")
         self.assertEqual({e["entity_id"] for e in schema["entities"]}, {"acme", "acme-services"})
@@ -157,6 +224,17 @@ class ScopedQueryServiceTests(unittest.TestCase):
         self.assertEqual({s["source_snapshot_id"] for s in discovery["sources"]}, {"acme-annual"})
         self.assertEqual(sum(c["occurrence_count"] for c in discovery["coverage"]), 3)
         self.assertEqual(before, {str(p): digest(p.read_bytes()) for p in self.folder.rglob("*") if p.is_file()})
+
+    def test_legacy_dataset_rejects_source_period_for_records_and_calculations(self):
+        source_period = {"kind": "year", "start": "2030-07-01", "end": "2031-06-30", "basis": "source"}
+        for changes in (
+            {"records": [{**self.record(), "period": source_period}]},
+            {"calculations": [{"formula_id": "operating_margin", "entity_id": "acme-services",
+                               "periods": [source_period]}]},
+        ):
+            for port in (self.port, self.scoped):
+                with self.subTest(changes=changes, port=type(port).__name__), self.assertRaises(ValueError):
+                    port.query_data(self.query(**changes))
 
     def test_query_headers_and_outside_entities_cannot_override_scope(self):
         for key, value in (("knowledge_cutoff", "2033-01-01"), ("include_candidates", False), ("snapshot_id", "wrong")):

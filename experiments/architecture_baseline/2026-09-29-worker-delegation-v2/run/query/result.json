@@ -1,0 +1,137 @@
+{
+  "schema_version": "autonomous-result-v2",
+  "status": "limited",
+  "stop_reason": "no_progress_limit",
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "Read the complete business section and verify operating margin for calendar 2031.",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "synthetic-scoped-v1",
+      "company_ids": [
+        "acme"
+      ],
+      "source_snapshot_ids": [
+        "acme-annual"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2032-05-01",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "synthetic-scoped-v1",
+    "company_ids": [
+      "acme"
+    ],
+    "source_snapshot_ids": [
+      "acme-annual"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2032-05-01",
+    "include_candidates": true
+  },
+  "plan_origin": "scripted_fixture",
+  "plans": [],
+  "coverage": [],
+  "gaps": [
+    {
+      "gap_id": "gap-ea00398edf22675c20fa50f9",
+      "reason": "plan_not_established",
+      "detail": null,
+      "requirement_ids": [],
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "synthetic-scoped-v1",
+        "company_ids": [
+          "acme"
+        ],
+        "source_snapshot_ids": [
+          "acme-annual"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2032-05-01",
+        "include_candidates": true
+      }
+    }
+  ],
+  "evidence_bundle": {
+    "path": "evidence-bundle.json",
+    "bundle_id": "bundle-f05ac8fac6330e812c415cb5",
+    "item_count": 0
+  },
+  "artifact_index": {
+    "path": "artifact-index.json",
+    "count": 4
+  },
+  "semantic_completeness": "not_evaluated",
+  "trace": [
+    {
+      "step": 1,
+      "action": "plan",
+      "status": "rejected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 4480,
+      "receipt": "turn-001/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+      },
+      "feedback": "turn-001/feedback.json"
+    },
+    {
+      "step": 2,
+      "action": "delegate",
+      "status": "rejected",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 9468,
+      "receipt": "turn-002/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+      },
+      "feedback": "turn-002/feedback.json"
+    },
+    {
+      "step": 3,
+      "action": "read_source",
+      "status": "rejected",
+      "consecutive_no_progress": 2,
+      "packet_bytes": 9473,
+      "receipt": "turn-003/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+      },
+      "feedback": "turn-003/feedback.json"
+    },
+    {
+      "step": 4,
+      "action": "query",
+      "status": "rejected",
+      "consecutive_no_progress": 3,
+      "packet_bytes": 9465,
+      "receipt": "turn-004/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "268078f398129b43dd28c84677ccc0754576599c5c56dc422ee1c0190f51b7b1"
+      },
+      "feedback": "turn-004/feedback.json"
+    }
+  ],
+  "role": "planner",
+  "worker_runs": [],
+  "decision_budget": {
+    "limit": 8,
+    "used": 4
+  },
+  "evidence_budget": {
+    "limit_bytes": 8000000,
+    "used_bytes": 0
+  }
+}

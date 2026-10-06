@@ -12,10 +12,12 @@ dependencies = ["lxml>=5,<7"]
 [project.optional-dependencies]
 analysis = ["openai-agents==0.22.2"]
 data = ["duckdb==1.5.5", "pydantic>=2.12,<3"]
+mcp = ["mcp==2.2.0"]
 
 [project.scripts]
 uteki-eval = "uteki_eval.cli:main"
 uteki-data = "uteki.infrastructure.research_data.query_cli:main"
+uteki-data-mcp = "uteki.interfaces.data_mcp.server:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

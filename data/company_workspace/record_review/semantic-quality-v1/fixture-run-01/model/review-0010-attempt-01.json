@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 10,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0010-input.json",
+    "sha256": "b3ac138d55a495165e04b07419c8c079f2ebb23a455d86d76f93920252df6480"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T10:06:54.806012+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-8e45cabee3e6eb9243838044\",\n  \"checks\": [\n    {\n      \"axis\": \"additivity\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明平台收入和订阅收入存在重叠，不能相加得出公司收入。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-010-r1\", \"sr-010-r2\"],\n          \"statement\": \"平台收入和订阅收入存在重叠，订阅收入中包含25（百万美元）已计入平台收入，因此不能将两者相加得出公司收入。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-010\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Subscription revenue includes 25 that is also included in platform revenue. These categories overlap and must not be added to derive company revenue.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-010-a1\",\n      \"verdict\": \"contradicted\",\n      \"reason\": \"断言声称将平台收入和订阅收入相加可得出公司2025财年收入1.45亿美元，但源文本明确说明这两类收入存在重叠，不能相加得出公司收入。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-010\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Subscription revenue includes 25 that is also included in platform revenue. These categories overlap and must not be added to derive company revenue.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": []\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-8e45cabee3e6eb9243838044\",\n  \"checks\": [\n    {\n      \"axis\": \"additivity\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明平台收入和订阅收入存在重叠，不能相加得出公司收入。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-010-r1\", \"sr-010-r2\"],\n          \"statement\": \"平台收入和订阅收入存在重叠，订阅收入中包含25（百万美元）已计入平台收入，因此不能将两者相加得出公司收入。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-010\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Subscription revenue includes 25 that is also included in platform revenue. These categories overlap and must not be added to derive company revenue.\"\n            }\n          ]\n        }\n      ],\n      \"unresolved_questions\": []\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-010-a1\",\n      \"verdict\": \"contradicted\",\n      \"reason\": \"断言声称将平台收入和订阅收入相加可得出公司2025财年收入1.45亿美元，但源文本明确说明这两类收入存在重叠，不能相加得出公司收入。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-010\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Subscription revenue includes 25 that is also included in platform revenue. These categories overlap and must not be added to derive company revenue.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": []\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "59425d95-6b98-4a65-b5bb-188abb503747",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 372,
+      "prompt_tokens": 2349,
+      "total_tokens": 2721,
+      "prompt_tokens_details": {
+        "cached_tokens": 640
+      },
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1709
+    }
+  },
+  "elapsed_seconds": 4.471210666990373,
+  "ended_at": "2026-09-24T10:06:59.276598+00:00",
+  "calls": [
+    {
+      "path": "calls/732952ad-5c36-4c54-95d9-e163c2ae6383-end.json",
+      "sha256": "9f3615bdb23229c80ebfa1e218eda5cb1c0361d58aa12d0fb191ebc32237af8d"
+    },
+    {
+      "path": "calls/732952ad-5c36-4c54-95d9-e163c2ae6383-start.json",
+      "sha256": "5e722b5d1be814505de54c73295717791a47545df2412775fa277943a274828c"
+    }
+  ]
+}

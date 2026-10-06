@@ -1,0 +1,51 @@
+{
+  "schema_version": "company-agent-result-v1",
+  "operation": "query",
+  "status": "partial",
+  "dataset": {
+    "path": "/Users/bytedance/Documents/ChatGPT/uteki/data/company_workspace/official-filing-preparations/tsmc-v2/dataset",
+    "manifest_sha256": "6874d0d218d60861be1b6a66d09975e19248973035fbc00379febea28e7a30f3",
+    "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+    "source_count": 3
+  },
+  "query_run": "query",
+  "gaps": [
+    {
+      "gap_id": "gap-5cb029806d06e059ecc28795",
+      "reason": "已收到候选提取批次 0（期末现金及现金等价物）、批次 3（营收与营业利润）、批次 9（经营活动净现金）的回执，均为候选，不能视为已复核正式事实。五项指标中的『购置不动产厂房设备现金支出』位于现金流量表投资活动批次 10，但本任务 max_new_batches=3 已全部用完，无法再执行第 4 个新批次。该指标作为显式缺口保留，留待后续任务或独立复核处理。",
+      "detail": null,
+      "requirement_ids": [
+        "req-fs-cash-flow-operating"
+      ],
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "company_ids": [
+          "sec-0001046179"
+        ],
+        "source_snapshot_ids": [
+          "source-6719837a8d24b2b7df359f29"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      }
+    }
+  ],
+  "workspace": "/Users/bytedance/Documents/ChatGPT/uteki/data/company_workspace",
+  "stop_reason": "host_reference_checks_passed",
+  "plan_origin": "model",
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+    "company_ids": [
+      "sec-0001046179"
+    ],
+    "source_snapshot_ids": [
+      "source-6719837a8d24b2b7df359f29"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-04",
+    "include_candidates": true
+  }
+}

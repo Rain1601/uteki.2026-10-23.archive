@@ -1,0 +1,11 @@
+{
+  "schema_version": "autonomous-visible-output-v1",
+  "decision": 1,
+  "attempt": 1,
+  "role": "planner",
+  "finish_reason": "stop",
+  "content": "{\n  \"action\": \"financial_extract\",\n  \"requirements\": [\n    {\n      \"requirement_id\": \"req-amd-fy2023-balance-sheet-extract\",\n      \"description\": \"Extract the AMD FY2023 10-K consolidated balance sheet batch containing cash, debt and equity information; preserve the table's actually disclosed comparative periods (December 30, 2023 and December 31, 2022). Candidate output only; other statements/batches remain pending.\",\n      \"kind\": \"financial_extract\",\n      \"source_id\": \"source-291485b98a75d8cfabe47571\",\n      \"financial_task_id\": \"amd-fy2023-core-candidates\",\n      \"batch_index\": 2\n    }\n  ],\n  \"requirement_ids\": [\n    \"req-amd-fy2023-balance-sheet-extract\"\n  ],\n  \"financial_extraction\": {\n    \"task_id\": \"amd-fy2023-core-candidates\",\n    \"batch_index\": 2\n  },\n  \"reason\": \"Selected batch_index 2 because its source_excerpt is the consolidated balance sheet starting with cash and cash equivalents and total assets; it contains the cash, debt and equity line items while preserving the table's disclosed December 30, 2023 and December 31, 2022 comparative periods. Using task default method annual-financial-v2. Other batches remain pending.\"\n}",
+  "content_chars": 1156,
+  "content_sha256": "ad28245685edfe612bf70a710a615ed12ee77f562f67cbc9b815c2a95c27b9ca",
+  "truncated": false
+}

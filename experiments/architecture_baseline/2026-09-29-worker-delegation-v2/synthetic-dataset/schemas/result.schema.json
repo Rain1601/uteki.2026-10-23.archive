@@ -1,0 +1,389 @@
+{
+  "$defs": {
+    "Period": {
+      "additionalProperties": false,
+      "description": "Calendar fiscal periods only; other fiscal calendars require a new adapter.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "quarter",
+            "ytd",
+            "year",
+            "instant"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start"
+        },
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "start",
+        "end"
+      ],
+      "title": "Period",
+      "type": "object"
+    },
+    "ResearchRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "research-query-v0.3",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "record_id": {
+          "title": "Record Id",
+          "type": "string"
+        },
+        "record_type": {
+          "enum": [
+            "metric",
+            "guidance",
+            "statement"
+          ],
+          "title": "Record Type",
+          "type": "string"
+        },
+        "entity_id": {
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "metric_id": {
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Period"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "period_resolution": {
+          "default": "resolved",
+          "enum": [
+            "resolved",
+            "unresolved",
+            "not_applicable"
+          ],
+          "title": "Period Resolution",
+          "type": "string"
+        },
+        "value_kind": {
+          "enum": [
+            "actual",
+            "management_guidance",
+            "attributed_statement"
+          ],
+          "title": "Value Kind",
+          "type": "string"
+        },
+        "value_decimal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value Decimal"
+        },
+        "upper_decimal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Upper Decimal"
+        },
+        "value_relation": {
+          "enum": [
+            "eq",
+            "approx",
+            "gt",
+            "gte",
+            "range",
+            "qualitative",
+            "unresolved"
+          ],
+          "title": "Value Relation",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        },
+        "denominator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Denominator"
+        },
+        "modality": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modality"
+        },
+        "accounting_basis": {
+          "title": "Accounting Basis",
+          "type": "string"
+        },
+        "dimensions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Dimensions",
+          "type": "object"
+        },
+        "available_at": {
+          "format": "date",
+          "title": "Available At",
+          "type": "string"
+        },
+        "source_snapshot_id": {
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "qualifier_evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Qualifier Evidence Ids",
+          "type": "array"
+        },
+        "question_evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Question Evidence Ids",
+          "type": "array"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "speaker": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speaker"
+        },
+        "status": {
+          "const": "candidate",
+          "default": "candidate",
+          "title": "Status",
+          "type": "string"
+        },
+        "origin": {
+          "additionalProperties": true,
+          "title": "Origin",
+          "type": "object"
+        },
+        "normalization_notes": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Normalization Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "record_id",
+        "record_type",
+        "entity_id",
+        "metric_id",
+        "period",
+        "value_kind",
+        "value_decimal",
+        "value_relation",
+        "unit",
+        "accounting_basis",
+        "available_at",
+        "source_snapshot_id",
+        "evidence_ids",
+        "summary",
+        "origin"
+      ],
+      "title": "ResearchRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "result_schema_version": {
+      "default": "research-query-v0.3",
+      "title": "Result Schema Version",
+      "type": "string"
+    },
+    "query_id": {
+      "title": "Query Id",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "source_policy_id": {
+      "title": "Source Policy Id",
+      "type": "string"
+    },
+    "knowledge_cutoff": {
+      "format": "date",
+      "title": "Knowledge Cutoff",
+      "type": "string"
+    },
+    "candidate_data": {
+      "title": "Candidate Data",
+      "type": "boolean"
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "partial",
+        "ambiguous",
+        "unanswerable",
+        "failed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "completion_scope": {
+      "title": "Completion Scope",
+      "type": "string"
+    },
+    "records": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ResearchRecord"
+      },
+      "title": "Records",
+      "type": "array"
+    },
+    "selections": {
+      "default": [],
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Selections",
+      "type": "array"
+    },
+    "computed_facts": {
+      "default": [],
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Computed Facts",
+      "type": "array"
+    },
+    "documents": {
+      "default": [],
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Documents",
+      "type": "array"
+    },
+    "evidence": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Evidence",
+      "type": "object"
+    },
+    "gaps": {
+      "default": [],
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Gaps",
+      "type": "array"
+    },
+    "trace": {
+      "default": [],
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Trace",
+      "type": "array"
+    }
+  },
+  "required": [
+    "query_id",
+    "snapshot_id",
+    "source_policy_id",
+    "knowledge_cutoff",
+    "candidate_data",
+    "status",
+    "completion_scope"
+  ],
+  "title": "QueryResult",
+  "type": "object"
+}

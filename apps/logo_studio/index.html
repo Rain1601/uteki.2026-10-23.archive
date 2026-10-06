@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f7fb">
+    <meta name="description" content="Uteki 蓝色与水墨雨滴的动态光影实验，支持亮色与暗色。From information to insight.">
+    <title>Uteki · 滴中见微</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="studio.css?v=ink-film-2">
+    <script src="color-flow-renderer.js?v=color-flow-2" defer></script>
+    <script src="texture-slide-renderer.js?v=texture-slide-2" defer></script>
+    <script src="ink-flow-renderer.js?v=ink-impact-1" defer></script>
+    <script src="formation-map.js?v=formation-2" defer></script>
+    <script src="impact-renderer.js?v=formation-6" defer></script>
+    <script src="studio.js?v=ink-film-2" defer></script>
+  </head>
+  <body class="is-original">
+    <header class="masthead">
+      <a class="brand" href="./" aria-label="Uteki">uteki<span class="brand-dot"></span></a>
+      <span class="page-name" data-i18n="pageName">流动的品牌</span>
+      <button class="language-button" id="language" type="button" aria-label="Switch to English">EN <span aria-hidden="true">↗</span></button>
+    </header>
+
+    <main class="studio">
+      <section class="stage" id="stage" aria-label="Logo 动态展示" tabindex="0">
+        <div class="stage-topline">
+          <span class="edition" data-i18n="edition">Uteki 动态标识</span>
+          <span class="live-state"><span id="state-dot" class="state-dot"></span><span id="state-label">原图</span></span>
+        </div>
+
+        <div class="brand-lockup" id="brand-lockup">
+          <div class="mark-area" id="mark-area" role="img" aria-label="Uteki 蓝色玻璃水滴">
+            <div class="mark-motion" id="mark-motion">
+              <div class="raster-crop mark-fallback" id="mark-fallback" aria-hidden="true">
+                <img src="assets/uteki-glass.jpeg" alt="" draggable="false">
+              </div>
+              <canvas id="logo" class="logo-canvas" aria-hidden="true"></canvas>
+            </div>
+          </div>
+          <div class="wordmark-group" id="wordmark-group">
+            <div class="raster-crop wordmark" id="wordmark" role="img" aria-label="uteki">
+              <img src="assets/uteki-glass.jpeg" alt="" draggable="false">
+            </div>
+            <p class="tagline">From information to insight</p>
+          </div>
+        </div>
+
+        <div class="motion-transport">
+          <button id="stage-play" type="button" aria-label="暂停动效">Ⅱ</button>
+          <input id="motion-progress" type="range" min="0" max="10" step="0.01" value="0" aria-label="动画进度">
+          <output id="motion-time" for="motion-progress">0.0 / 10 s</output>
+          <button id="stage-replay" type="button" aria-label="重新播放">↺</button>
+        </div>
+        <div class="stage-bottomline">
+          <p><span class="small-star" aria-hidden="true">✳</span><span data-i18n="stageHint">移动光标，让光随你流动</span></p>
+          <button class="focus-button" id="focus" type="button" aria-pressed="false"><span class="focus-icon" aria-hidden="true"></span><span data-i18n="focus">纯净欣赏</span></button>
+        </div>
+      </section>
+
+      <aside class="controls" aria-label="动效控制">
+        <div class="intro">
+          <p class="intro-note" data-i18n="introNote">一滴之间，万象浮现</p>
+          <h1 data-i18n="heading">滴中，见微。</h1>
+          <p class="intro-copy" data-i18n="introCopy">让信息流动，让洞察浮现。<br>给一滴蓝，一点呼吸的空间。</p>
+        </div>
+
+        <fieldset class="control-section material-section">
+          <legend data-i18n="materialLabel">质感</legend>
+          <div class="material-switch">
+            <button type="button" class="material-option is-selected" data-material="glass" aria-pressed="true"><span class="material-swatch glass-swatch" aria-hidden="true"></span><span data-i18n="glass">琉璃蓝</span></button>
+            <button type="button" class="material-option" data-material="silk" aria-pressed="false"><span class="material-swatch silk-swatch" aria-hidden="true"></span><span data-i18n="silk">丝绸蓝</span></button>
+            <button type="button" class="material-option" data-material="ink" aria-pressed="false"><span class="material-swatch ink-swatch" aria-hidden="true"></span><span data-i18n="ink">墨滴</span></button>
+          </div>
+        </fieldset>
+
+        <fieldset class="control-section theme-section">
+          <legend data-i18n="themeLabel">明暗</legend>
+          <div class="material-switch theme-switch">
+            <button type="button" class="material-option is-selected" data-theme="light" aria-pressed="true"><span aria-hidden="true">☀</span><span data-i18n="light">亮色 · 宣纸</span></button>
+            <button type="button" class="material-option" data-theme="dark" aria-pressed="false"><span aria-hidden="true">☾</span><span data-i18n="dark">暗色 · 夜墨</span></button>
+          </div>
+        </fieldset>
+
+        <fieldset class="control-section flow-section">
+          <legend data-i18n="viewLabel">效果</legend>
+          <div class="material-switch effect-switch">
+            <button type="button" class="material-option is-selected" data-view="original" aria-pressed="true"><span data-i18n="original">原图</span></button>
+            <button type="button" class="material-option" data-view="flow" aria-pressed="false"><span data-i18n="colorFlow">颜色流动</span></button>
+            <button type="button" class="material-option" data-view="slide" aria-pressed="false"><span data-i18n="textureSlide">纹理滑动</span></button>
+            <button type="button" class="material-option" data-view="impact" aria-pressed="false"><span data-i18n="impact">入水成形</span></button>
+          </div>
+          <p class="effect-description" id="effect-description" data-i18n="flowDescription">冰蓝与深蓝，从水滴尖端缓缓流向底部。</p>
+          <a class="storyboard-link" id="storyboard-link" href="assets/motion/blue-study.png" target="_blank" rel="noopener" data-i18n="storyboard">查看设计分镜 ↗</a>
+        </fieldset>
+
+        <div class="control-section tempo-section">
+          <div class="tempo-heading"><label for="strength" data-i18n="strengthLabel">变化幅度</label><output for="strength" id="strength-output">80%</output></div>
+          <input type="range" id="strength" min="0" max="1" step="0.05" value="0.8" aria-valuetext="80%">
+          <div class="tempo-caption"><span data-i18n="subtle">轻柔</span><span data-i18n="clearer">明显</span></div>
+        </div>
+
+        <div class="playback">
+          <button type="button" class="play-button" id="play" aria-pressed="false"><span class="play-icon is-playing" id="play-icon" aria-hidden="true"></span><span id="play-label">暂停动效</span></button>
+          <button type="button" class="replay-button" id="replay" aria-label="重新播放" title="重新播放"><span aria-hidden="true">↺</span></button>
+        </div>
+        <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+      </aside>
+    </main>
+
+    <footer class="footer"><p data-i18n="footerLine">在流动中，发现清晰。</p><span>Uteki — Motion collection</span></footer>
+    <noscript><p class="noscript-message">启用 JavaScript 以切换原图与颜色流动。Enable JavaScript to switch between original and color flow.</p></noscript>
+  </body>
+</html>

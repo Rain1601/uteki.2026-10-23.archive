@@ -1,0 +1,782 @@
+{
+  "date": "2026-10-04",
+  "scope": "研究；不采用样式，不修改产品。",
+  "product_and_technical_sources": {
+    "retrieved_on": "2026-10-04",
+    "scope": "Claude / Anthropic public financial services product and architecture research",
+    "repository_commit": "574ed3624aebd0418c7e96cd101262f30210ab26",
+    "repository_commit_date": "2026-09-21T21:10:41Z",
+    "sources": [
+      {
+        "id": "S01",
+        "title": "Claude financial services",
+        "url": "https://claude.com/solutions/financial-services",
+        "type": "official product overview + public demonstration",
+        "date": null,
+        "what_is_actually_visible": "四个业务入口；任务描述、输入附件和输出预览；另列产品入口与数据生态。",
+        "workflow": "输入文件/任务 → 财务产出预览 → 教程或产品入口。",
+        "visual_asset_or_demo_url": [
+          "https://assets.claude.ai/brand/artifacts/solutions/financial/v3/fsi-portfolio-reporting.html"
+        ],
+        "confidence": "high",
+        "limits": "营销页面中的产出样例；不等于统一的生产投资工作台。"
+      },
+      {
+        "id": "S02",
+        "title": "Q1 2026 Performance Summary",
+        "url": "https://assets.claude.ai/brand/artifacts/solutions/financial/v3/fsi-portfolio-reporting.html",
+        "type": "official hosted HTML artifact demo",
+        "date": null,
+        "what_is_actually_visible": "PowerPoint风格季度组合报告：收益、基准、超额、行业归因条形图及风险指标。",
+        "workflow": "持仓数据与基准 → 季度绩效汇报。",
+        "visual_asset_or_demo_url": [
+          "https://assets.claude.ai/brand/artifacts/solutions/financial/v3/fsi-portfolio-reporting.html"
+        ],
+        "confidence": "high",
+        "limits": "页面显示Q1 2026是样例期间，不是已核实发布日期；数字为展示样例，不是Claude实盘成绩。"
+      },
+      {
+        "id": "S03",
+        "title": "Claude for Financial Services",
+        "url": "https://www.anthropic.com/news/claude-for-financial-services",
+        "type": "official launch article with product screenshots",
+        "date": "2025-07-15",
+        "what_is_actually_visible": "官方价格走势+关键事件界面图、可比公司分析界面图；说明引用来源与数据连接。",
+        "workflow": "外部/内部数据 → 对话分析 → 图表、投研文档。",
+        "visual_asset_or_demo_url": [
+          "https://www-cdn.anthropic.com/images/4zrzovbb/website/8e5e04d55f4bcd660503514efdc3f3a1bf32694d-2880x1620.png",
+          "https://www-cdn.anthropic.com/images/4zrzovbb/website/57c89bc3582c7f3bce005f864c077bf7b015f626-2880x1620.png"
+        ],
+        "confidence": "high",
+        "limits": "发布时宣传界面，不是当前登录产品实测；文章注记2026-04-10修订。"
+      },
+      {
+        "id": "S04",
+        "title": "Advancing Claude for Financial Services",
+        "url": "https://www.anthropic.com/news/advancing-claude-for-financial-services",
+        "type": "official release + Excel sidebar screenshot",
+        "date": "2025-10-27",
+        "what_is_actually_visible": "Excel工作表旁的Claude侧栏；显示Acme Grille财务模型分析。",
+        "workflow": "读模型 → 对话解释/修改 → 单元格引用定位。",
+        "visual_asset_or_demo_url": [
+          "https://www-cdn.anthropic.com/images/4zrzovbb/website/450687b3c7a1189eb1a650ade77588c56ca01461-2560x1440.png",
+          "https://www.youtube.com/watch?v=a8PmR-fNQ_0"
+        ],
+        "confidence": "high",
+        "limits": "版本发布时状态；侧栏模式可借鉴，当前权限/套餐不能沿用旧版描述。"
+      },
+      {
+        "id": "S05",
+        "title": "Financial analysis workflows with Claude",
+        "url": "https://academy.claude.com/tutorials/financial-analysis-workflows-with-claude",
+        "type": "official step-by-step workflow tutorial",
+        "date": null,
+        "what_is_actually_visible": "三段式Retrieve/Analyze/Create提示示例；两页投资memo、六页可比分析PPT、组合dashboard的输出要求。",
+        "workflow": "公司memo / 行业比较 / 组合表现复盘。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high",
+        "limits": "教程描述可交付物结构，没有成品界面截图；不能把提示词要求当成功运行证据。"
+      },
+      {
+        "id": "S06",
+        "title": "Cowork and plugins for finance",
+        "url": "https://claude.com/blog/cowork-plugins-finance",
+        "type": "official workflow/product article",
+        "date": "2026-02-24",
+        "what_is_actually_visible": "跨Excel与PowerPoint工作流程说明、金融职能插件与数据连接分类。",
+        "workflow": "研究 → 更新模型 → 汇报演示；保留上下文。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high",
+        "limits": "产品发布说明；没有暴露跨应用context内部存储架构。"
+      },
+      {
+        "id": "S07",
+        "title": "Agents for financial services",
+        "url": "https://www.anthropic.com/news/finance-agents",
+        "type": "official launch + reference architecture description",
+        "date": "2026-05-05",
+        "what_is_actually_visible": "10类金融任务agent模板清单；插件与Managed Agents两类部署入口。",
+        "workflow": "任务型代理产生可审阅模型、备忘录、研究及运营文件。",
+        "visual_asset_or_demo_url": [
+          "https://github.com/anthropics/financial-services"
+        ],
+        "confidence": "high",
+        "limits": "模板是reference architecture；不代表一套统一自治投资产品。"
+      },
+      {
+        "id": "S08",
+        "title": "Claude for the financial industry — A practical deployment guide",
+        "url": "https://www-cdn.anthropic.com/files/4zrzovbb/website/34783bca828d7fa331f515ced26f1c9232151b2c.pdf",
+        "type": "official 20-page PDF guide",
+        "date": "2026-05-05",
+        "date_note": "日期来自发布该指南的官方blog；PDF自身未单独确认日期。",
+        "what_is_actually_visible": "PDF第4页三种使用入口、第6–7页产品矩阵；后续行业场景、部署路径及案例。",
+        "workflow": "Chat研究；Cowork跨应用执行；Code量化/工程；M365原位编辑；Platform嵌入自建系统。",
+        "visual_asset_or_demo_url": [
+          "https://www-cdn.anthropic.com/files/4zrzovbb/website/34783bca828d7fa331f515ced26f1c9232151b2c.pdf"
+        ],
+        "confidence": "high",
+        "limits": "产品分工与部署指导；不是内部系统设计图。",
+        "supporting_url": "https://claude.com/blog/deploying-claude-across-financial-services"
+      },
+      {
+        "id": "S09",
+        "title": "Claude for Financial Services teams: Putting agents to work",
+        "url": "https://anthropic.ondemand.goldcast.io/on-demand/74ae0fc7-f591-442f-8fe1-244f409c1fb5",
+        "type": "official hosted webinar recording + transcript",
+        "date": "2026-05-07",
+        "what_is_actually_visible": "公开录播页与转写/章节索引；本agent未播放或逐帧检查。",
+        "workflow": "模板选择、任务演示、自定义skill、跨应用上下文、插件部署。",
+        "visual_asset_or_demo_url": [
+          "https://anthropic.ondemand.goldcast.io/on-demand/74ae0fc7-f591-442f-8fe1-244f409c1fb5"
+        ],
+        "confidence": "high for metadata, frames unreviewed",
+        "limits": "章节时间来自公开索引，不是自行观看证明。注册页含未开放录播的模板文字，但单独Goldcast页可被检索。",
+        "chapters": [
+          {
+            "seconds": 400.255,
+            "label": "Claude Workflow Demo"
+          },
+          {
+            "seconds": 797.535,
+            "label": "Building Custom Skills"
+          },
+          {
+            "seconds": 2044.13,
+            "label": "Cross-Application Syncing"
+          },
+          {
+            "seconds": 2243.21,
+            "label": "FSI Agents Setup"
+          }
+        ],
+        "supporting_url": "https://www.anthropic.com/webinars/claude-for-financial-services-putting-agents-to-work"
+      },
+      {
+        "id": "S10",
+        "title": "Claude for Financial Advisors",
+        "url": "https://claude.com/blog/claude-for-financial-advisors",
+        "type": "official current product release + linked video",
+        "date": "2026-09-14",
+        "what_is_actually_visible": "客户会议准备、持仓偏离检查、会后整理等技能清单；CRM/托管/组合数据连接。",
+        "workflow": "汇集客户和组合信息 → 面向下一次会议的brief → 供顾问审阅。",
+        "visual_asset_or_demo_url": [
+          "https://www.youtube.com/embed/oMpb-u6HZBQ"
+        ],
+        "confidence": "high for release; video frames unreviewed",
+        "limits": "功能不是独立投资经理自动决策产品；视频链接由文章嵌入核验，但抓取视频失败。"
+      },
+      {
+        "id": "S11",
+        "title": "NBIM accelerates sovereign wealth management with enterprise-wide AI transformation",
+        "url": "https://claude.com/customers/nbim",
+        "type": "official customer case narrative",
+        "date": null,
+        "what_is_actually_visible": "真实客户的使用叙述和引语；多文档研究、数据质量、代码工具、内部MCP与人审。",
+        "workflow": "研究合成/文档/数据检验；Code给分析师和量化团队做内部工具。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high that case is official",
+        "limits": "客户自报效益；无公开内部产品截图，不能推定其投研UI长相或收益效果。"
+      },
+      {
+        "id": "S12",
+        "title": "Pictet turns weeks of work into hours with Claude Code",
+        "url": "https://claude.com/customers/pictet",
+        "type": "official customer case narrative",
+        "date": "2026-09-02",
+        "date_note": "日期来自官方客户索引，案例正文未显示。",
+        "what_is_actually_visible": "Pictet内部使用Code/Cowork、合规分析、原型和ML资产配置pipeline的叙述。",
+        "workflow": "内部业务过程与工程提效；输出进入人工工作流。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high that case is official",
+        "limits": "不是客户投资工作台演示；叙述本身说明先内用、分阶段部署。"
+      }
+    ],
+    "technical_sources": [
+      {
+        "id": "T01",
+        "title": "Financial-services public reference repository",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/README.md",
+        "type": "official reference code repository",
+        "date": "2026-09-21",
+        "what_is_actually_visible": "Agent、skill、command、connector和managed wrapper目录及职责。",
+        "workflow": "插件打包业务流程；Managed wrapper引用同源prompt/skills。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high, pinned source read",
+        "limits": "reference实现不是Anthropic生产后台；未部署运行。",
+        "files": [
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/managed-agent-cookbooks/README.md",
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/.mcp.json"
+        ]
+      },
+      {
+        "id": "T02",
+        "title": "Earnings Reviewer: prompt and Managed Agent manifests",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/agent-plugins/earnings-reviewer/agents/earnings-reviewer.md",
+        "type": "official workflow prompt + permission manifests",
+        "date": "2026-09-21",
+        "what_is_actually_visible": "Ticker+period输入；actual/consensus/filing→transcript分析→模型修订→QC→note草稿；reader、updater、writer工具权限拆分。",
+        "workflow": "财报事件 → 估值/模型与论点更新 → 研究产出审阅。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high, all linked files fetched at pinned commit",
+        "limits": "prompt的出处/审核要求不等于应用层已强制执行；未跑模型。",
+        "files": [
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/managed-agent-cookbooks/earnings-reviewer/agent.yaml",
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/managed-agent-cookbooks/earnings-reviewer/subagents/transcript-reader.yaml",
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/managed-agent-cookbooks/earnings-reviewer/subagents/model-updater.yaml",
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/managed-agent-cookbooks/earnings-reviewer/subagents/note-writer.yaml"
+        ]
+      },
+      {
+        "id": "T03",
+        "title": "Model-update, audit-xls, xlsx-author skills",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/agent-plugins/earnings-reviewer/skills/xlsx-author/SKILL.md",
+        "type": "official procedural skill source",
+        "date": "2026-09-21",
+        "what_is_actually_visible": "headless通过Python/openpyxl产出xlsx；在线Office模式可用excel工具；模型输入/公式/跨表引用分离及检查页；修订历史、variance、假设、来源要求。",
+        "workflow": "分析结论写入结构化模型和文档 → 定位可核对的计算与变更。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high for source content",
+        "limits": "这些是方法指令；xlsx-author要求Bash，但该note-writer manifest只开启Read/Write/Edit，参考组合存在待整合处，未验证端到端可运行。",
+        "files": [
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/agent-plugins/earnings-reviewer/skills/model-update/SKILL.md",
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/agent-plugins/earnings-reviewer/skills/audit-xls/SKILL.md"
+        ]
+      },
+      {
+        "id": "T04",
+        "title": "Reference deploy and cross-agent orchestration scripts",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/scripts/deploy-managed-agent.sh",
+        "type": "official reference code, static review",
+        "date": "2026-09-21",
+        "what_is_actually_visible": "部署内联prompt、上传skills、先建leaf agent再建主agent；编排读取session事件、解析handoff、allowlist/schema检验后steer到目标。",
+        "workflow": "定义业务角色 → 部署 → 接收运行事件 → 显式转交下一任务。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high for inspected source; no execution",
+        "limits": "orchestrate.py自称非生产；deploy脚本9–10行宣称schema wrapper，160行却删除output_schema，当前所读脚本未见wrapper实现。只能认定公开reference未证明端到端校验，不能推广为官方生产漏洞。",
+        "files": [
+          "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/scripts/orchestrate.py"
+        ]
+      },
+      {
+        "id": "T05",
+        "title": "Claude Managed Agents overview",
+        "url": "https://platform.claude.com/docs/en/managed-agents/overview",
+        "type": "official API/runtime documentation",
+        "date": null,
+        "what_is_actually_visible": "Agent、Environment、Session、Events四概念；配置harness、sandbox、文件/命令/MCP工具；SSE事件流和持久session。",
+        "workflow": "create agent → environment → session → event stream → steer/interrupt。",
+        "visual_asset_or_demo_url": [],
+        "confidence": "high for public documentation",
+        "limits": "Beta文档；不能倒推所有Claude Chat/Cowork内部都采用这个runtime。"
+      }
+    ],
+    "supplemental": [
+      {
+        "title": "Claude for Financial Services Keynote",
+        "url": "https://www.youtube.com/watch?v=5zd7m3Rh5B0",
+        "date": "2025-07-15",
+        "type": "official video; metadata verified, frames not reviewed"
+      },
+      {
+        "title": "How Claude is transforming financial services",
+        "url": "https://www.youtube.com/watch?v=a8PmR-fNQ_0",
+        "date": "2025-10-27",
+        "type": "official video; chapter09:30 solution discussion; frames not reviewed"
+      },
+      {
+        "title": "BCI financial-analysis webinar",
+        "url": "https://www.anthropic.com/webinars/bci-claude-financial-analysis",
+        "date": "2025-10-14",
+        "type": "official customer webinar registration page; recording availability unverified"
+      },
+      {
+        "title": "Best Practices: Claude for Excel and Claude for PowerPoint",
+        "url": "https://www.anthropic.com/webinars/best-practices-for-claude-in-excel-and-powerpoint",
+        "date": "2026-03-18",
+        "type": "official webinar registration page; video not played"
+      },
+      {
+        "title": "Equity Research plugin",
+        "url": "https://claude.com/marketplace/plugins/equity-research",
+        "date": null,
+        "type": "official marketplace entry; capability prompts, not executed run"
+      }
+    ],
+    "architecture_inference": [
+      "UI product surfaces are entry points, not separate investment agents.",
+      "Workflow identity and methods live in agent prompts/skills; plugins are installable bundles, not a new foundation model.",
+      "MCP configuration points to licensed provider endpoints; it does not prove provider internals or automatic data normalization.",
+      "Evidence traceability is requested per numeric claim and changed cell; this public reference does not expose a unified production evidence graph.",
+      "Formats are deliverables, including xlsx/docx/pptx; the official HTML financial demo is an output showcase, not an autonomous manager account."
+    ],
+    "unknowns": [
+      "Internal Claude Chat/Cowork scheduler and context transport implementation",
+      "Provider-side financial extraction/storage/normalization pipeline",
+      "End-to-end runtime enforcement of all prompt/skill requirements",
+      "Actual private client dashboard/report layouts beyond publicly shared images"
+    ],
+    "source_snapshot_manifest": "/tmp/uteki-anthropic-pinned/manifest.json"
+  },
+  "demo_research": {
+    "researched_at": "2026-10-04",
+    "scope": "Official Anthropic / Claude demos, video descriptions and published report/workflow examples",
+    "verification_note": "本轮未播放或逐帧查看视频，video_time 全部为 null。章节时间来自官方播放页元数据，只作为观看导航，不作为已看帧证据。网页正文、HTML样例文字和官方逐字稿已读取。",
+    "items": [
+      {
+        "title": "Q1 2026 Performance Summary",
+        "url": "https://assets.claude.ai/brand/artifacts/solutions/financial/v3/fsi-portfolio-reporting.html",
+        "type": "official_html_report_demo",
+        "visible_screen_or_output": "公开 HTML 展示 PowerPoint 报告页：组合收益、基准、超额收益三项在前；行业超额贡献及风险指标在后。",
+        "workflow": "资产管理季度业绩复盘 → 汇总表现 → 贡献分析 → 风险",
+        "verified_level": "HTML正文已读取；历史repo记录曾目视，本轮不复用为当前视觉验证",
+        "video_time": null,
+        "limitations": "官网宣传演示产物，不是完整金融终端，不是实盘业绩。未确认其余关联artifact地址。",
+        "uteki_takeaway": "成果页以一个主问题组织；先表现、再贡献与风险。",
+        "priority": 1
+      },
+      {
+        "title": "Claude for Financial Services: Putting agents to work",
+        "url": "https://www.anthropic.com/webinars/claude-for-financial-services-putting-agents-to-work",
+        "watch_url": "https://anthropic.ondemand.goldcast.io/on-demand/74ae0fc7-f591-442f-8fe1-244f409c1fb5",
+        "type": "official_video_with_transcript",
+        "published": "2026-05-07",
+        "visible_screen_or_output": "逐字稿明确演示 Cowork 财报分析、右上进度、Word 研报、Excel 实际数调整与 PowerPoint 同步；并包含虚构机构的品牌报告。",
+        "workflow": "明确公司与季度、补充分析重点 → 连接数据与财务模型 → 摘要和完整报告 → 跨文件更新",
+        "verified_level": "官方活动页、播放器逐字稿与章节元数据已读；未看视频帧",
+        "video_time": null,
+        "chapter_navigation": [
+          {
+            "time": "06:40",
+            "label": "工作流演示"
+          },
+          {
+            "time": "13:17",
+            "label": "自定义 Skill / 财报分析"
+          },
+          {
+            "time": "34:04",
+            "label": "Excel 与 PowerPoint 同步"
+          },
+          {
+            "time": "37:23",
+            "label": "FSI Agents 设置"
+          }
+        ],
+        "limitations": "章节标签是播放平台元数据；页面兼有旧注册提示与播放链接，不能据模板文案断言录像不可用。逐字稿含识别错字。",
+        "uteki_takeaway": "分析过程和成果分区；输出报告独立可打开；来源/数据改动与报告更新有清楚链路。",
+        "priority": 1
+      },
+      {
+        "title": "Best Practices: Claude for Excel and Claude for PowerPoint",
+        "url": "https://www.anthropic.com/webinars/best-practices-for-claude-in-excel-and-powerpoint",
+        "watch_url": "https://anthropic.ondemand.goldcast.io/on-demand/dfd8dc34-c59d-469e-aad2-3b093bd8ef86",
+        "type": "official_video_with_transcript",
+        "published": "2026-03-18",
+        "visible_screen_or_output": "逐字稿覆盖 Cowork 界面、分析工作流、Excel 集成、PowerPoint Skill 和跨文档操作。",
+        "workflow": "提供数据与模板 → 在原工作文件中分析 → 将结果移入演示文稿 → 继续局部修改",
+        "verified_level": "官方活动页与播放页逐字稿/章节已读；未看视频帧",
+        "video_time": null,
+        "chapter_navigation": [
+          {
+            "time": "09:55",
+            "label": "Cowork 界面概览"
+          },
+          {
+            "time": "26:09",
+            "label": "交互式工作流"
+          },
+          {
+            "time": "30:11",
+            "label": "Excel 集成"
+          },
+          {
+            "time": "44:23",
+            "label": "跨文档交互"
+          }
+        ],
+        "limitations": "本轮只核对公开文字和导航，未验证实际插件功能。",
+        "uteki_takeaway": "大内容区保持稳定，辅助助手处理上下文；修改目标应到具体单元格/段落/页。",
+        "priority": 1
+      },
+      {
+        "title": "Generating real-time credit intelligence with Claude",
+        "url": "https://www.youtube.com/watch?v=Y6wiWlcH5jM",
+        "type": "official_youtube_demo",
+        "published": "2025-11-14",
+        "visible_screen_or_output": "官方视频描述：针对 Walmart 2030 债券，联合 LSEG 曲线、Aiera 电话会和 Third Bridge 专家信息，形成有来源的信用判断。",
+        "workflow": "市场信号 → 并行取数与读材料 → 信用论点与证据",
+        "verified_level": "搜索返回官方 Anthropic 频道、发布日期和视频描述；直接页面 web fetch cache miss；未看帧",
+        "video_time": null,
+        "limitations": "不能依据描述断言具体画面布局、动作流畅度或引用准确率。",
+        "uteki_takeaway": "信息到论点的证据链值得研究，适合对照公司事件与关注点设计。",
+        "priority": 1
+      },
+      {
+        "title": "Claude for Financial Services Keynote",
+        "url": "https://www.youtube.com/watch?v=5zd7m3Rh5B0",
+        "type": "official_youtube_keynote",
+        "published": "2025-07-15",
+        "visible_screen_or_output": "官方发布会长视频；本轮只确认频道与活动信息，尚未定位产品演示画面。",
+        "workflow": "金融产品方案介绍与行业案例",
+        "verified_level": "官方频道视频描述已核对；未看帧",
+        "video_time": null,
+        "limitations": "没有可靠视频帧或精确演示起点，不能冒充已完成界面观察。",
+        "uteki_takeaway": "补充早期金融产品的演示与布局演进，优先级低于有逐字稿的工作流录像。",
+        "priority": 2
+      },
+      {
+        "title": "How Claude is transforming financial services",
+        "url": "https://www.youtube.com/watch?v=a8PmR-fNQ_0",
+        "type": "official_youtube_product_conversation",
+        "published": "2025-10-27",
+        "visible_screen_or_output": "Anthropic 金融产品负责人 Nick Lin 与 Applied AI 团队讨论金融工作流、Excel 和客户使用；更偏产品讲解。",
+        "workflow": "研究数据 → 分析 → 投资者交付物",
+        "verified_level": "官方频道视频描述与章节已核对；未看帧",
+        "video_time": null,
+        "chapter_navigation": [
+          {
+            "time": "09:30",
+            "label": "What is Claude for Financial Services?"
+          },
+          {
+            "time": "14:30",
+            "label": "子行业与集成方向"
+          }
+        ],
+        "limitations": "适合理解产品分工；不能替代真实页面截图或工作流录屏。",
+        "uteki_takeaway": "确认其设计围绕研究和交付物，并非仅一个独立看盘首页。",
+        "priority": 2
+      },
+      {
+        "title": "Update your financial model after earnings",
+        "url": "https://academy.claude.com/use-cases/update-your-financial-model-after-earnings",
+        "type": "official_workflow_with_output_example",
+        "visible_screen_or_output": "公开教程示例包含财报驱动简报、待核对假设和准确单元格引用；随后在 Excel 中调整，再在 PowerPoint 产出。",
+        "workflow": "新财报/电话会 → 对照旧模型 → 标出未经材料支持的假设 → 人工判断 → 更新模型与汇报",
+        "verified_level": "官方正文和示例输出已读取；未实际运行",
+        "video_time": null,
+        "limitations": "示例公司/数字是教学材料，不能当作真实投资建议或产品实测。",
+        "uteki_takeaway": "最接近 Uteki 的旧结论受到支持/反驳：将变化、受影响假设、证据和下一步放在一起。",
+        "priority": 1
+      },
+      {
+        "title": "Draft investment memos",
+        "url": "https://academy.claude.com/use-cases/draft-investment-memos",
+        "type": "official_report_workflow",
+        "visible_screen_or_output": "网页包含检索摘要、分析摘要与独立 memo 入口；描述 Word 报告的摘要、业务、竞争、估值及风险结构。",
+        "workflow": "确定公司与输出用途 → 多源数据 → 分析 → Word 投委会报告 → 核对引用/估值/转换演示",
+        "verified_level": "官方正文及示例输出已读；不是已下载的完整Word报告",
+        "video_time": null,
+        "limitations": "只见网页示例与格式说明，不能声称完整研报视觉样式已验证。部分连接器需授权/订阅。",
+        "uteki_takeaway": "报告要独立呈现；摘要与完整报告分层；证据追问应落到具体数字和原文。",
+        "priority": 1
+      },
+      {
+        "title": "Variance to exec slides",
+        "url": "https://academy.claude.com/use-cases/variance-exec-slides",
+        "type": "official_workflow_demo_page",
+        "visible_screen_or_output": "网页示例展示工作目录、输入文件、分析技能入口和计划任务卡；输出约定为三页：结果、驱动、展望。",
+        "workflow": "差异工作簿＋既有模板 → 解释主要变化 → 可编辑PPT → 重复工作保存为Skill/计划任务",
+        "verified_level": "官方正文与结构化演示文字已读取；未播放其示意动画",
+        "video_time": null,
+        "limitations": "偏企业财务，非股票投资工作台；可借鉴交付和信息层级，不能直接移植业务菜单。",
+        "uteki_takeaway": "主内容只显示决定理解的结果，支持明细进入备注/附层；持续任务和产物关系清晰。",
+        "priority": 2
+      },
+      {
+        "title": "Claude Skills for financial applications",
+        "url": "https://platform.claude.com/cookbook/skills-notebooks-02-skills-financial-applications",
+        "type": "official_code_and_output_specification",
+        "published": "2025-10-15",
+        "visible_screen_or_output": "官方代码教程定义 Excel 财务看板、组合分析、投委会 PPT、PDF 报告，以及多格式报告流水线。可读到布局和图表要求。",
+        "workflow": "结构化输入 → 带公式的分析文件 → 演示摘要 → PDF过程报告",
+        "verified_level": "官方代码/提示与输出规范已读；未执行API或生成文件",
+        "video_time": null,
+        "limitations": "代码中的输出要求不是实际产出质量验证；没有把示例打印的成功提示作为执行证据。",
+        "uteki_takeaway": "适合定义我们报告的字段/图表/导出契约，不宜当作已见到的界面图。",
+        "priority": 2
+      }
+    ],
+    "additional_leads": [
+      {
+        "title": "How finance teams use Claude Cowork",
+        "url": "https://www.anthropic.com/webinars/how-finance-teams-use-claude-cowork",
+        "watch_url": "https://anthropic.ondemand.goldcast.io/on-demand/bb248461-9b1b-489a-94f9-53ca3aeddc71",
+        "status": "官网活动说明已读，2026-06-02。覆盖预测、差异、月结、董事会材料，播放器页未返回可用正文。"
+      },
+      {
+        "title": "Claude for Financial Advisors demo",
+        "url": "https://claude.com/blog/claude-for-financial-advisors",
+        "watch_url": "https://www.youtube.com/watch?v=oMpb-u6HZBQ",
+        "status": "官网文章可读；视频URL来自repo已有9/30观察记录；本轮web直接打开cache miss，未重新核实帧。"
+      },
+      {
+        "title": "Financial industry practical deployment guide",
+        "url": "https://www-cdn.anthropic.com/files/4zrzovbb/website/34783bca828d7fa331f515ced26f1c9232151b2c.pdf",
+        "status": "20页官方PDF正文可读取。产品角色与真实使用案例值得参考，本轮未截图。"
+      },
+      {
+        "title": "Anthropic financial-services plugins",
+        "url": "https://github.com/anthropics/financial-services",
+        "status": "官方官网明确链接到此repo。已读角色、输入/输出、Skills和命令目录；可按需追踪报告模板，不是一个独立金融UI产品。"
+      }
+    ],
+    "source_access_gaps": [
+      "claude.com/solutions/financial-services 原始HTML用urllib公开读取被403；没有继续绕过或盲猜其他artifact地址。",
+      "YouTube direct web open 部分cache miss；搜索能核对官方视频描述，不代表已观看。",
+      "未登录Claude金融账户、未执行交易、未安装插件、未调用模型。"
+    ],
+    "focus_update": {
+      "requested_focus": "官方金融能力与技术架构；视觉素材只作工作流说明",
+      "primary_source": {
+        "title": "Claude for Financial Services teams: Putting agents to work",
+        "date": "2026-05-07",
+        "url": "https://anthropic.ondemand.goldcast.io/on-demand/74ae0fc7-f591-442f-8fe1-244f409c1fb5",
+        "official_entry": "https://www.anthropic.com/webinars/claude-for-financial-services-putting-agents-to-work",
+        "evidence_kind": "官方托管录播的转写与章节；不是已看视频帧"
+      },
+      "concrete_workflow": [
+        {
+          "step": "请求与补充上下文",
+          "confirmed": "Cowork 收到 Apple 财报分析请求后匹配机构的 earnings-analysis Skill，再问季度、当前评级和关注点，并让用户附模型。",
+          "transcript_location": "正文段落27–37；播放器章节13:17起（Building Custom Skills），只是导航，不声称每段精确起点。"
+        },
+        {
+          "step": "取得材料并应用机构方法",
+          "confirmed": "S&P Global 连接器提供公司实时资料；Skill 约定适用场景、任务步骤和报告要求，且可在机构内复用。",
+          "transcript_location": "段落29–34、43–48。"
+        },
+        {
+          "step": "摘要与完整报告",
+          "confirmed": "展示的结果为对话里的摘要和单独Word财报报告，含iPhone、China专题；演示者明确切到此前运行以展示产物。",
+          "transcript_location": "段落38–42；此处不是当前任务实时完成证据。"
+        },
+        {
+          "step": "数据与演示文稿联动",
+          "confirmed": "另一个Skill依据beat/miss工作簿制作可编辑PPT；Excel中改iPhone收入，Claude同时调整相关判断，随后通过会话请求更新对应PPT。",
+          "transcript_location": "段落60–69；34:04 Cross-Application Syncing章节为观看导航。"
+        },
+        {
+          "step": "用户审核边界",
+          "confirmed": "演示中用户给定分析重点、检查更改及输出。前段Sarah虚构pitch场景还明确描述删掉不合适的peer、改杠杆假设、核对方法、编辑发给客户的邮件。",
+          "transcript_location": "段落13–18；06:40 Claude Workflow Demo章节为导航。"
+        }
+      ],
+      "architecture_facts": [
+        {
+          "layer": "基础模型 → 平台 → 应用",
+          "confirmed": "录播把模型、API/工具/Managed Agents平台、Claude应用分层描述。",
+          "source": "同一官方录播段落7–9。"
+        },
+        {
+          "layer": "连接器、Skills、Subagents",
+          "confirmed": "连接器接资料/工具；Skills提供机构方法；子Agent是更大工作流构件。Skill描述先进入上下文，正文仅在匹配时加载。",
+          "source": "同一官方录播段落10、29–34。"
+        },
+        {
+          "layer": "Plugin是分发包装",
+          "confirmed": "录播说Plugin包装Skills、连接器、命令与工具以便在组织内分享；模板可运行在Cowork/Claude Code，也可部署Managed Agents。",
+          "source": "同一官方录播段落11、47–48、70–76。"
+        },
+        {
+          "layer": "异步多Agent执行",
+          "confirmed": "演示的估值审核场景按组合公司启动子Agent；每个子Agent读财务并做估值，用户在控制台观察和审核。属于演示场景，不是Uteki必需架构。",
+          "source": "同一官方录播段落20–23；10:43 Cloud Managed Agents章节导航。"
+        }
+      ],
+      "public_code_boundary": {
+        "url": "https://github.com/anthropics/financial-services",
+        "confirmed": "README区分Agents(system prompt+skills)、Skills、Commands、Connectors、Managed-agent wrappers；明确Cowork与Managed Agent引用同一方法目录。",
+        "not_verified": "下钻Earnings Reviewer目录时web被robots拒绝，未读模板实现、未执行代码。不能宣称内部生产服务或记忆/调度实现公开。"
+      },
+      "warnings": [
+        "官方演示将多个示例和预先完成的运行串联；Apple示例含不同季度，不能把它们合并成一次连续真实分析。",
+        "视频章节是播放器公开导航元数据；本轮未实看截图或帧。",
+        "正文转写把Claude识别成Cloud、把公司/数据源名称识别错，不把这些误写当作正式API名称。",
+        "可以借鉴显式输入范围、方法复用、来源连接、成果文件、变更联动与审核；不能推断持仓决策逻辑、自治权限或执行价格。"
+      ]
+    }
+  },
+  "code_research": {
+    "checked_date": "2026-10-04",
+    "repository": "https://github.com/anthropics/financial-services",
+    "commit": "574ed3624aebd0418c7e96cd101262f30210ab26",
+    "redirect_verified": "https://github.com/anthropics/financial-services-plugins redirects to current financial-services repo; not a second current package",
+    "scope": "Read-only primary-source inspection; no plugin install, provider auth, real financial run or output-quality test.",
+    "layers": [
+      {
+        "layer": "manifest",
+        "path": "plugins/vertical-plugins/equity-research/.claude-plugin/plugin.json",
+        "finding": "Name/version/description/author metadata, not an autonomous runtime."
+      },
+      {
+        "layer": "command",
+        "path": "plugins/vertical-plugins/equity-research/commands/initiate.md",
+        "finding": "Explicit slash action loads initiating-coverage skill and requires company input."
+      },
+      {
+        "layer": "skill",
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/SKILL.md",
+        "finding": "Markdown task methodology + prerequisites + output contracts; one task per request, explicit next task; references only loaded for selected step."
+      },
+      {
+        "layer": "connector",
+        "path": "plugins/vertical-plugins/financial-analysis/.mcp.json",
+        "finding": "Remote HTTP MCP provider endpoints; server internals/data schemas/auth/account subscriptions not implemented by this file."
+      },
+      {
+        "layer": "agent",
+        "path": "plugins/agent-plugins/model-builder/agents/model-builder.md",
+        "finding": "Role prompt, tool names, model-selection/audit workflow, skill list and review checkpoints; uses historicals/consensus/filings from providers."
+      }
+    ],
+    "example_chain": {
+      "initiation": "Company+ticker → filings/user financials → Task1 research.md & Task2 linked model.xlsx → Task3 valuation.md+model tabs → Task4 PNG charts ZIP → Task5 report.docx. Tasks are explicitly invoked and prerequisites inspected, not an auto scheduler.",
+      "earnings": "Company+quarter → release/10-Q/transcript/investor material/consensus with dates → beat/miss+guidance+thesis update → Python charts → DOCX report with linked citations; optional workbook update.",
+      "thesis": "Company+existing thesis+new evidence supplied by user → evidence date & pillar impact & conviction log → scorecard & catalyst calendar → Markdown/Word. Structured storage across sessions is an instruction but schema/store/runtime not supplied in skill."
+    },
+    "calculation": [
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/skills/dcf-model/SKILL.md",
+        "lines": "20-23,44-48,80-83,95-100",
+        "finding": "Office add-in writes Excel formulas via Office JS and uses native Excel calculation. Standalone xlsx uses Python/openpyxl then requires recalc.py; data priority MCP, supplied data, web. Not all calculations done in model text."
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/skills/xlsx-author/SKILL.md",
+        "lines": "8-17,32-42",
+        "finding": "Headless Managed mode writes Python script, executes via Bash, saves ./out/name.xlsx, returns path for orchestration layer; when live mcp__office__excel_* present prefer those."
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/skills/dcf-model/scripts/validate_dcf.py",
+        "lines": "28-29",
+        "finding": "Validation loads formula+cached-value workbooks, checks errors and DCF properties. This validates outputs; is not a complete finance engine."
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task4-chart-generation.md",
+        "lines": "205-218",
+        "finding": "Explicit Python matplotlib/seaborn/pandas/numpy/plotly chart generation instructions."
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task5-report-assembly.md",
+        "lines": "466-486",
+        "finding": "DOCX/XLSX skills load previous artifacts, insert figures/tables/hyperlinks and produce report."
+      }
+    ],
+    "boundaries": [
+      "No reusable Text2SQL execution service evidenced by reviewed files; MCP is a tool protocol, not proof of SQL.",
+      "No evidence here of proprietary frontier model internal architecture, training recipe, data-provider normalization implementation, or production UI backend.",
+      "thesis-tracker quarterly review and structured persistence are desired behavior instructions, not proof of autonomous schedule/database/memory service.",
+      "README describes staged analyst work for human sign-off, not autonomous trade execution; some older vertical templates contain rating/target/action output, which is draft analysis not broker API execution.",
+      "Per-skill limitations differ: initiating-coverage explicitly cannot chain all tasks, even though new named-agent wrappers support end-to-end workflow roles.",
+      "Current financial-analysis .mcp.json fails JSON parsing at line47 at this SHA. Treat as reference implementation and do not claim plug-and-play readiness. Source code instructions and live service quality are distinct."
+    ],
+    "files": [
+      {
+        "path": "README.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/README.md",
+        "line_count": 246
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/.claude-plugin/plugin.json",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/.claude-plugin/plugin.json",
+        "line_count": 8
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/commands/initiate.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/commands/initiate.md",
+        "line_count": 8
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/commands/thesis.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/commands/thesis.md",
+        "line_count": 8
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/thesis-tracker/SKILL.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/thesis-tracker/SKILL.md",
+        "line_count": 67
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/SKILL.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/initiating-coverage/SKILL.md",
+        "line_count": 783
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task1-company-research.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task1-company-research.md",
+        "line_count": 456
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task2-financial-modeling.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task2-financial-modeling.md",
+        "line_count": 665
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task3-valuation.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task3-valuation.md",
+        "line_count": 698
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task4-chart-generation.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task4-chart-generation.md",
+        "line_count": 920
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task5-report-assembly.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/initiating-coverage/references/task5-report-assembly.md",
+        "line_count": 1340
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/.mcp.json",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/.mcp.json",
+        "line_count": 51
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/.claude-plugin/plugin.json",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/.claude-plugin/plugin.json",
+        "line_count": 8
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/commands/earnings.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/commands/earnings.md",
+        "line_count": 140
+      },
+      {
+        "path": "plugins/vertical-plugins/equity-research/skills/earnings-analysis/SKILL.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/equity-research/skills/earnings-analysis/SKILL.md",
+        "line_count": 228
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/skills/xlsx-author/SKILL.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/xlsx-author/SKILL.md",
+        "line_count": 42
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/skills/clean-data-xls/SKILL.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/clean-data-xls/SKILL.md",
+        "line_count": 50
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/skills/dcf-model/SKILL.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/dcf-model/SKILL.md",
+        "line_count": 1264
+      },
+      {
+        "path": "plugins/vertical-plugins/financial-analysis/skills/dcf-model/scripts/validate_dcf.py",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/dcf-model/scripts/validate_dcf.py",
+        "line_count": 292
+      },
+      {
+        "path": "plugins/agent-plugins/model-builder/agents/model-builder.md",
+        "url": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/agent-plugins/model-builder/agents/model-builder.md",
+        "line_count": 34
+      }
+    ]
+  },
+  "root_verification": {
+    "screenshots": "本轮浏览器读取官方 landing 的 iframe 地址，打开四个 HTML 样例并截图；另截取发布图。",
+    "video": "官方转写与章节已读；未逐帧查看。",
+    "managed_agents": "本轮额外打开官方 overview，确认 Agent/Environment/Session/Events，及 scheduled execution 文档入口。"
+  }
+}

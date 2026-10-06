@@ -1,0 +1,67 @@
+{
+  "status": "planned",
+  "plan": {
+    "version": 1,
+    "requirements": [
+      {
+        "kind": "financial_extract",
+        "query": null,
+        "source_id": null,
+        "node_id": null,
+        "financial_task_id": "amd-fy2023-core-candidates",
+        "batch_index": 2,
+        "requirement_id": "req-amd-fy2023-bs-candidates",
+        "description": "对已登记的 AMD FY2023 年报财务提取任务，选择包含现金、债务和股本信息的资产负债表批次 batch_index 2，调用注册的 annual-financial-v2 能力生成一次候选产物；保留表内披露的比较期间，未复核候选不作为正式事实。"
+      }
+    ],
+    "reason": "已查看 financial_tasks 目录。batch_index 2 为 Consolidated Balance Sheets 表块（block-000674-2ab954ba），其摘录从现金及现金等价物开始，并包含该资产负债表主体；该表在表内披露 December 30, 2023 与 December 31, 2022 比较期间。其他报表和后续批次保持待处理。",
+    "origin": "model",
+    "skill_hashes": {
+      "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+      "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+      "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+    },
+    "sha256": "2b8e9d19407c64a4e1151e411bb05140a6d925214203c5f3d97a0861a4317f81"
+  },
+  "receipt": {
+    "schema_version": "data-tool-receipt-v1",
+    "step": 4,
+    "action": "plan",
+    "requirement_ids": [],
+    "request_fingerprint": "0ff1c8b8960064620e745c7e2381cae4cfba832b867e0bd2b182bfccfb049ad4",
+    "status": "planned",
+    "error_code": null,
+    "layer": "runtime",
+    "retryable": false,
+    "progress_delta": true,
+    "observation_bytes": 1252,
+    "execution_limited": false,
+    "preview_truncated": false
+  },
+  "full_output": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-f91f3b2dcdfebfa96c647eddc4929969",
+    "kind": "tool_output",
+    "path": "artifacts/art-f91f3b2dcdfebfa96c647eddc4929969.json",
+    "sha256": "d21940b6423389fbe425330d421a774484f1a6f4970680b9a3024599a789c9f5",
+    "size_bytes": 1395,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-596ae3d3697d9a1c2abbf86f",
+      "company_ids": [
+        "sec-0000002488"
+      ],
+      "source_snapshot_ids": [
+        "source-291485b98a75d8cfabe47571"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    },
+    "scope_id": "scope-1f7fe246372ff83ca50df905",
+    "created_step": 4,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "checked": "2026-10-04",
+  "scope": "Primary public documentation + pinned reference source inspection. No paid/authenticated data queries, installations, models, credentials, or Uteki changes.",
+  "headline": {
+    "status": "synthesis_from_evidence",
+    "text": "公开方案的数据能力来自金融数据商的结构化数据库、实体/期间/单位/来源处理，通过授权MCP/API进入Claude；Claude负责把用户问题组织为取数和分析步骤、执行工具/计算并生成可审阅产物。不能把整个数据层归为Anthropic自建或一个Text2SQL。"
+  },
+  "facts": [
+    {
+      "claim": "Earnings Reviewer把ticker+reporting period作为输入，明确用FactSet/Daloopa取actuals、consensus、10-Q/8-K及完整电话会；更新既有模型、单元格追溯来源、模型QC、输出note草稿与variance table，供人工review。",
+      "sources": [
+        "anthropic_earnings"
+      ]
+    },
+    {
+      "claim": "Daloopa MCP公开工具是先解析company_id，再发现series_ids，再按期间取值；文档检索则另走search_documents或discover_company_documents/get_document_content。",
+      "sources": [
+        "daloopa_tools"
+      ]
+    },
+    {
+      "claim": "Daloopa工具提示里的fundamentals字段包括value、quarterized_value、period、context、series_name、fundamental_id；这是该MCP文档接口，不是所有供应商共同schema。",
+      "sources": [
+        "daloopa_tools"
+      ]
+    },
+    {
+      "claim": "Daloopa REST v3示例更丰富：value_raw/value_normalized、unit/original_unit/conversion_factor、calendar_period/fiscal_period/fiscal_date、span、restated、document_id、filing_date、document_released_at、created_at/updated_at。MCP和REST字段名称/子集不同，不能混称。",
+      "sources": [
+        "daloopa_api_examples"
+      ]
+    },
+    {
+      "claim": "原始披露值到季度独立值的quarterization由Daloopa内部完成；span用于区分Quarterly/YTD/Annual，季度化与数量级单位转换是不同事情。",
+      "sources": [
+        "daloopa_units"
+      ]
+    },
+    {
+      "claim": "Daloopa自动tag先产生capture、人审后产生另一个capture，同一经济事实的fundamental_id可能改变；原始值与restated要分开，文档建议series_id+calendar_period+restated作为去重组，组内取最高id。该规则属该供应商当前视图，不等于不可变历史快照。",
+      "sources": [
+        "daloopa_identity"
+      ]
+    },
+    {
+      "claim": "FactSet官方Claude连接器公开具体工具包括FactSet_EntityReference、FactSet_Fundamentals、FactSet_EstimatesConsensus、FactSet_UnstructuredContent等；需登录。FactSet目录另列Knowledge Services负责问题到原生entity/date表达的enrichment。本轮没有公开完整工具参数/返回schema的实测。",
+      "sources": [
+        "factset_connector",
+        "factset_catalog"
+      ]
+    },
+    {
+      "claim": "S&P LLM-ready API提供确定性数据检索；SDK Ticker对象组合公司、证券和交易所交易实例，示例支持quarterly income statement的起止年季以及price history日期范围。",
+      "sources": [
+        "kensho_deterministic",
+        "kensho_sdk"
+      ]
+    },
+    {
+      "claim": "S&P另有Adaptive Retrieval服务，把query变成跨dataset检索任务；API query+可选allowed_datasets→schema_version+response，表包含schema.fields/data/sources/problems，source可到table/row/column/cell。它是另一产品入口，不能假设Anthropic当前earnings示例已用这个API。",
+      "sources": [
+        "kensho_adaptive",
+        "kensho_adaptive_contract"
+      ]
+    },
+    {
+      "claim": "DCF skill区分live Excel用Office JS写公式并由Excel重算，standalone xlsx用Python/openpyxl生成并要求recalc。数据返回后还有计算/校验层，不应直接靠文本心算。",
+      "sources": [
+        "dcf_compute"
+      ]
+    },
+    {
+      "claim": "金融连接器仍需有效数据商许可。Daloopa支持OAuth、API-key换token、X-API-KEY。Claude一般继承连接账户权限，shared credential则以该credential范围为界。S&P要求CIQ或LLM-ready订阅；不能认为Claude订阅自动含全部数据。",
+      "sources": [
+        "anthropic_finance",
+        "anthropic_connectors",
+        "daloopa_auth",
+        "kensho_licence"
+      ]
+    }
+  ],
+  "documented_example": {
+    "kind": "Documentation-derived illustrative sequence, not executed; no invented returned IDs or financial numbers.",
+    "request": "核对某公司指定季度收入和毛利率较上季的变化，并找管理层解释。",
+    "steps": [
+      {
+        "owner": "Claude/tool planner",
+        "call": "discover_companies(keyword=<user ticker>)",
+        "returns": "ticker/name/company_id/latest_quarter; resolve actual identity"
+      },
+      {
+        "owner": "Claude/tool planner",
+        "call": "discover_company_series(company_id=<returned ID>,keywords=[revenue,gross profit])",
+        "returns": "id/full_series_name; choose metrics based on available definition"
+      },
+      {
+        "owner": "Claude/tool planner + Daloopa",
+        "call": "get_company_fundamentals(company_id=<returned ID>,periods=<explicit provider period mapping>,series_ids=<discovered IDs>)",
+        "returns": "values + quarterly basis + series + period + fundamental_id"
+      },
+      {
+        "owner": "Claude/tool planner + Daloopa",
+        "call": "search_documents(keywords=<specific topic>,company_ids=[<returned ID>],periods=<same scoped periods>)",
+        "returns": "document_id/company_id/filing_type/period/context matches"
+      },
+      {
+        "owner": "Claude calculation tools",
+        "call": "Excel formulas or Python using returned scoped records",
+        "returns": "derived growth/margin with underlying input citation lineage, not a fabricated input"
+      },
+      {
+        "owner": "Claude report workflow",
+        "call": "update model + QC + report assembly",
+        "returns": "workbook/variance table/note draft with datapoint links and document links; human review"
+      }
+    ],
+    "citation_shapes": [
+      "https://daloopa.com/src/{fundamental_id}",
+      "https://marketplace.daloopa.com/document/{document_id}"
+    ]
+  },
+  "unknowns": [
+    "Anthropic线上产品是否将跨数据商结果写入统一持久财务库、证据图和永久报告版本账本，本轮公开源码/文档没有证明。",
+    "数据商OCR/抽取模型、人工审核完整流程、服务SLA和实际准确率未实测；市场准确率宣传不当作工程验证。",
+    "这些公开tool接口不是SQL接口；未见Anthropic金融repo实现统一Text2SQL引擎。底层供应商内部是否用SQL不可从MCP名称推断。",
+    "Daloopa source ID可追溯当次取数，但不是稳定业务主键，也不是自动point-in-time快照；长期可复现需保存具体返回与时间、来源版本。",
+    "不同文档/版本有字段与期间表述差异，生产对接必须读取实际tool schema和API版本，不假设所有供应商同一单位/财年定义。",
+    "我们读取官方文档示例，没有用真实账号跑earnings，不能宣称报告数值可靠性实测通过。"
+  ],
+  "uteki_proposals_not_implemented": [
+    "输入契约先明确公司/证券身份、财务期间、as-of截止、指标口径、允许来源；缺项/冲突不代填。",
+    "数据服务区分取已结构化数据、读原始文档、解析候选、执行确定性查询/计算；需要SQL时再用SQL，而不是一切Text2SQL。",
+    "返回“可计算事实包”：value+unit/currency+span/fiscal/calendar period+metric definition+source+retrieved/published time+restatement status+gap。",
+    "每个派生值保留输入证据与公式；原披露/人审更新/财报重述保留版本而非静默覆盖。",
+    "用一个小型验收例检查跨财年、YTD转季度、单位缩放、重述、供应商断连/无权限/无数据都被正确区分。",
+    "先验收一条earnings链路的可复现事实与引用，再扩公司/来源和后台长期追踪。"
+  ],
+  "sources": {
+    "anthropic_earnings": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/agent-plugins/earnings-reviewer/agents/earnings-reviewer.md",
+    "anthropic_mcp": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/.mcp.json",
+    "anthropic_connectors": "https://support.claude.com/en/articles/11176164-use-connectors-to-extend-claude-s-capabilities",
+    "anthropic_finance": "https://academy.claude.com/tutorials/getting-started-with-claude-for-financial-services",
+    "daloopa_tools": "https://docs.daloopa.com/docs/mcp-prompts",
+    "daloopa_mcp": "https://docs.daloopa.com/docs/daloopa-mcp",
+    "daloopa_api_examples": "https://docs.daloopa.com/docs/best-practices-for-using-the-daloopa-api",
+    "daloopa_units": "https://docs.daloopa.com/docs/understanding-units-quarterization",
+    "daloopa_identity": "https://docs.daloopa.com/docs/fundamental-uniqueness-restatements",
+    "daloopa_cache": "https://docs.daloopa.com/docs/caching-strategy",
+    "daloopa_periods": "https://docs.daloopa.com/docs/period-format-standards",
+    "daloopa_auth": "https://docs.daloopa.com/docs/mcp-authentication",
+    "factset_connector": "https://claude.com/connectors/factset",
+    "factset_catalog": "https://developer.factset.com/mcp-catalog",
+    "factset_tutorial": "https://academy.claude.com/tutorials/using-factset-for-comprehensive-financial-research",
+    "kensho_deterministic": "https://kensho.com/solutions/llm-ready-api",
+    "kensho_sdk": "https://docs.kensho.com/llmreadyapi/python-library/usage",
+    "kensho_adaptive": "https://docs.kensho.com/adaptive-retrieval/overview",
+    "kensho_adaptive_contract": "https://docs.kensho.com/adaptive-retrieval/api-guide",
+    "kensho_licence": "https://docs.kensho.com/agentskills",
+    "dcf_compute": "https://github.com/anthropics/financial-services/blob/574ed3624aebd0418c7e96cd101262f30210ab26/plugins/vertical-plugins/financial-analysis/skills/dcf-model/SKILL.md"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": "autonomous-visible-output-v1",
+  "decision": 1,
+  "attempt": 1,
+  "role": "planner",
+  "finish_reason": "stop",
+  "content": "{\n  \"action\": \"financial_extract\",\n  \"reason\": \"已查看已登记的 financial_tasks 表格目录。选择 batch_index=4：其 source_excerpt 明确以 Consolidated Statements of Cash Flows 的 Cash flows from operating activities 开头，属于合并现金流量表主体；batch_index=5 为补充现金流量信息，其余批次为利润表、综合收益表、资产负债表或权益表。按请求仅生成经营现金流与购置不动产厂房设备现金支出的候选批次，其他报表保持待处理。省略 method_id 以使用任务默认 annual-financial-v2。\",\n  \"requirements\": [\n    {\n      \"requirement_id\": \"req-amd-fy2023-cashflow-capex\",\n      \"description\": \"从 AMD FY2023 10-K 合并现金流量表中提取经营现金流和购置不动产厂房设备现金支出，保留表内实际披露的年度对比期间（2023-12-30、2022-12-31、2021-12-25）、现金流符号、USD 币种及报表尺度。本步骤仅生成候选批次，不视为已完成内容复核的正式事实。\",\n      \"kind\": \"financial_extract\",\n      \"financial_task_id\": \"amd-fy2023-cash-flow-candidates\",\n      \"batch_index\": 4,\n      \"source_id\": null,\n      \"node_id\": null,\n      \"query\": null\n    }\n  ],\n  \"requirement_ids\": [\"req-amd-fy2023-cashflow-capex\"],\n  \"financial_extraction\": {\n    \"task_id\": \"amd-fy2023-cash-flow-candidates\",\n    \"batch_index\": 4,\n    \"method_id\": null\n  }\n}",
+  "content_chars": 975,
+  "content_sha256": "d60e1e4dcd8eda1c60e7ec8bcf6796017f78877c0ebe93ad51aab93c8dd2d9e7",
+  "truncated": false
+}

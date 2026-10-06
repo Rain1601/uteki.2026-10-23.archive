@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2024",
+      "description": "核对 Alphabet FY2025 10-K 合并现金流量表中 2024年度经营活动产生的现金净额，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-ocf-2025",
+      "description": "核对 Alphabet FY2025 10-K 合并现金流量表中 2025年度经营活动产生的现金净额，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2024",
+      "description": "核对 Alphabet FY2025 10-K 中购建固定资产的现金支出 2024年度数值、期间及会计口径，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "req-capex-2025",
+      "description": "核对 Alphabet FY2025 10-K 中购建固定资产的现金支出 2025年度数值、期间及会计口径，报告口径为合并口径，单位美元。"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req-source-cashflow",
+      "description": "仅读取 Alphabet FY2025 10-K 中支持 2024/2025 合并经营现金流与购建固定资产现金支出的原始现金流量表正文或表格，核对数值、单位、期间与合并口径，不要求通读整章。"
+    },
+    {
+      "kind": "source_answer",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "req-capex-uses",
+      "description": "查找 Alphabet FY2025 10-K 中资本支出主要用途的披露类别，仅依据原文陈述，不推断维护性资本开支或 AI 投资回报。"
+    }
+  ],
+  "reason": "确立取证分工：数值采用 kind=query 的注册记录查询，并保留 source_evidence 原件核对与 source_answer 对资本支出主要用途的叙事取证。先建立明确要求，再委派购建固定资产现金支出核对给 Worker。",
+  "origin": "model",
+  "skill_hashes": {
+    "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+    "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+    "query": "882a036b94693ed5d406d9e5c4b51fbe00d1a5d943a1a2436bd26bed97a1e420"
+  },
+  "sha256": "e660e8bd9a9e6212c9a03f5fd9ad478b347011b46cea3044b5331d2c811b237b"
+}

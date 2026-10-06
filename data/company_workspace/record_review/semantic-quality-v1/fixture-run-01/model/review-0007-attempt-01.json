@@ -1,0 +1,45 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 7,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "deepseek",
+  "model": "deepseek-v4-pro",
+  "request": {
+    "path": "review-0007-input.json",
+    "sha256": "864a65bfdbe5d684f596a26d4fd525cef1f9add906e67020f9328958108c247b"
+  },
+  "status": "json_returned",
+  "started_at": "2026-09-24T10:06:39.781410+00:00",
+  "raw_text": "{\n  \"packet_id\": \"semantic-59d6589fc35aba5a8e807c77\",\n  \"checks\": [\n    {\n      \"axis\": \"allocation\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明 Components 分部经营利润包含分摊的公司成本，且该指标不代表独立经营业务的结果。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-007-r1\"],\n          \"statement\": \"Components 分部经营利润包含按分部收入分摊的公司成本 9 百万美元，该指标不代表独立经营业务的结果。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-007\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Components segment operating income was 42, including 9 of allocated corporate costs. The allocation is based on segment revenue. This measure does not represent the operating income of an independent standalone business.\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-007-a1\",\n      \"verdict\": \"supported\",\n      \"reason\": \"源文本明确说明 Components 分部经营利润为 42 百万美元，包含分摊的公司成本，且该指标不代表独立经营业务的结果，与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-007\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Components segment operating income was 42, including 9 of allocated corporate costs. The allocation is based on segment revenue. This measure does not represent the operating income of an independent standalone business.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": []\n}",
+  "response_text": "{\n  \"packet_id\": \"semantic-59d6589fc35aba5a8e807c77\",\n  \"checks\": [\n    {\n      \"axis\": \"allocation\",\n      \"status\": \"constraints_found\",\n      \"reason\": \"源文本明确说明 Components 分部经营利润包含分摊的公司成本，且该指标不代表独立经营业务的结果。\",\n      \"constraints\": [\n        {\n          \"record_ids\": [\"sr-007-r1\"],\n          \"statement\": \"Components 分部经营利润包含按分部收入分摊的公司成本 9 百万美元，该指标不代表独立经营业务的结果。\",\n          \"citations\": [\n            {\n              \"source_snapshot_id\": \"cedar-source-007\",\n              \"block_id\": \"b1\",\n              \"quote\": \"Components segment operating income was 42, including 9 of allocated corporate costs. The allocation is based on segment revenue. This measure does not represent the operating income of an independent standalone business.\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"assertions\": [\n    {\n      \"assertion_id\": \"sr-007-a1\",\n      \"verdict\": \"supported\",\n      \"reason\": \"源文本明确说明 Components 分部经营利润为 42 百万美元，包含分摊的公司成本，且该指标不代表独立经营业务的结果，与断言一致。\",\n      \"citations\": [\n        {\n          \"source_snapshot_id\": \"cedar-source-007\",\n          \"block_id\": \"b1\",\n          \"quote\": \"Components segment operating income was 42, including 9 of allocated corporate costs. The allocation is based on segment revenue. This measure does not represent the operating income of an independent standalone business.\"\n        }\n      ]\n    }\n  ],\n  \"limitations\": []\n}",
+  "response_metadata": {
+    "actual_upstream_model": "deepseek-v4-pro",
+    "response_id": "ab9539c1-452a-47b0-8fd8-b2366c7f577b",
+    "request_id": null,
+    "finish_reason": "stop",
+    "raw_usage": {
+      "completion_tokens": 378,
+      "prompt_tokens": 2188,
+      "total_tokens": 2566,
+      "prompt_tokens_details": {
+        "cached_tokens": 640
+      },
+      "prompt_cache_hit_tokens": 640,
+      "prompt_cache_miss_tokens": 1548
+    }
+  },
+  "elapsed_seconds": 4.497897166002076,
+  "ended_at": "2026-09-24T10:06:44.278681+00:00",
+  "calls": [
+    {
+      "path": "calls/12fa9144-037e-449d-9f52-867647cde4c9-end.json",
+      "sha256": "c951bc2658c6e661ad812c9bf74c77a43905bec934ea580f52ba8501b483956e"
+    },
+    {
+      "path": "calls/12fa9144-037e-449d-9f52-867647cde4c9-start.json",
+      "sha256": "e790429fb5868e7f0952787e7893774baf0fec7cd10e038735ebf390e15c99fa"
+    }
+  ]
+}

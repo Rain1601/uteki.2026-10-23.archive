@@ -1,0 +1,85 @@
+{
+  "schema_version": "semantic-independent-notes-v3",
+  "evaluation_only": true,
+  "run_result_sha256": "5077b214516263a18f3457f0de45ba64a470229356d06ac9e98eed7869048f78",
+  "expected_sha256": "eda2f137167755ec21157e514d36ef4d1a731af60e2bb2326e460c11b5a8a032",
+  "cases": {
+    "sv2-001": {
+      "attempts": {
+        "1": {
+          "status": "fail",
+          "explanation": "All four values and periods, and the supported assertion label, agree with the source. The dimensions constraint covering all four records cites only the consolidated heading and omits both actual row anchors. Evidence on the separate value axis and assertion cannot satisfy this constraint-local requirement.",
+          "findings": [
+            {
+              "location": "checks.0.constraints.0.citations",
+              "kind": "record_evidence_coverage",
+              "source_blocks": [
+                "financial-table"
+              ],
+              "evidence": "Consolidated actual annual results in USD millions. FY2025 FY2024.",
+              "missing_rows": [
+                "Revenue 20 20",
+                "Operating income 20 20"
+              ]
+            }
+          ]
+        }
+      },
+      "critics": {
+        "1": {
+          "status": "not_run",
+          "issues": [],
+          "missed_requirements": [],
+          "explanation": "The proposal failed the host coverage contract before a critic request; no critic semantic performance can be inferred."
+        }
+      },
+      "final": {
+        "status": "fail",
+        "explanation": "Not accepted. Only one proposal was authorized for this transfer case and the local row-coverage requirement failed."
+      }
+    },
+    "sv2-002": {
+      "attempts": {
+        "1": {
+          "status": "fail",
+          "explanation": "Both assertion verdicts, historical FY2022 record set, supplied Note 1 detail and unresolved reference statuses match the fixed case. Free-text reasons still assert that Note 4 contents were not supplied and then say delivery cannot be confirmed. The frozen rubric forbids turning an unresolved reference into a verified missing-material claim. The bounded excerpt contains no allocation methodology, which supports insufficiency, but it does not justify this contradictory delivery-state wording.",
+          "findings": [
+            {
+              "location": "checks.1.reason",
+              "kind": "forbidden_missing_material_inference",
+              "evidence": "Note 4 的内容未在提供的资料中给出",
+              "source_blocks": [
+                "note-1-detail"
+              ],
+              "boundary": "Unresolved Note 4 reference is not an absence proof. This finding does not claim methodology exists in the supplied excerpt or that the issuer lacks it."
+            },
+            {
+              "location": "assertions.1.reason",
+              "kind": "internal_delivery_state_inconsistency",
+              "evidence": "未提供 Note 4 的内容，无法确认分配方法是否已提供。",
+              "boundary": "The reason asserts non-delivery before stating delivery cannot be confirmed."
+            }
+          ]
+        }
+      },
+      "critics": {
+        "1": {
+          "status": "pass",
+          "issues": [],
+          "false_positive_count": 0,
+          "false_negative_case": true,
+          "missed_requirements": [
+            "forbidden_missing_material_inference",
+            "internal_delivery_state_consistency"
+          ],
+          "explanation": "The valid critic returned pass with zero issues, missing the contradictory/unverified absence claims in checks.1.reason and assertions.1.reason. No false-positive issue was emitted; zero is an observed count, not evidence of critic specificity."
+        }
+      },
+      "final": {
+        "status": "fail",
+        "explanation": "Accepted by the host and critic but fails the unchanged forbidden-missing-material requirement under independent review. This is a critic false pass, not a fixture pass."
+      }
+    }
+  },
+  "boundary": "Independent source review only; no model call, expectation edit or prompt tuning."
+}

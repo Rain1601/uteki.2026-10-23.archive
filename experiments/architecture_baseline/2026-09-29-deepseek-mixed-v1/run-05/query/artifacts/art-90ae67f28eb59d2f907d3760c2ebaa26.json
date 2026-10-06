@@ -1,0 +1,116 @@
+{
+  "status": "planned",
+  "plan": {
+    "version": 1,
+    "requirements": [
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "operating_cash_flow",
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req_ocf_2025",
+        "description": "核对 Alphabet FY2025 10-K 中 2025 年度合并经营现金流金额。仅返回报告金额，注明单位 USD、期间和合并报表口径；不自行计算或调整。"
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "operating_cash_flow",
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req_ocf_2024",
+        "description": "核对 Alphabet FY2025 10-K 中 2024 年度比较期间的合并经营现金流金额。若选定 10-K 只有 2025 期间映射或未返回 2024 记录，则保留为显式资料缺口；不推算、不替代。"
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req_capex_2025",
+        "description": "核对 Alphabet FY2025 10-K 中 2025 年度购建固定资产的现金支出金额、期间及口径。此项数值期间口径核对委派给 Worker；主角色随后独立核验 query 结果和原文。仅采用报告金额，注明单位 USD 和合并报表口径。"
+      },
+      {
+        "kind": "query",
+        "query": {
+          "records": [
+            {
+              "entity_id": "sec-0001652044",
+              "metric_id": "capex_cash_payments",
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "value_kind": "actual"
+            }
+          ],
+          "documents": [],
+          "calculations": []
+        },
+        "source_id": null,
+        "node_id": null,
+        "requirement_id": "req_capex_2024",
+        "description": "核对 Alphabet FY2025 10-K 中 2024 年度比较期间的购建固定资产现金支出金额、期间及口径。此项数值期间口径核对委派给 Worker；主角色随后独立核验 query 结果和原文。若未返回 2024 记录则保留为显式资料缺口。"
+      },
+      {
+        "kind": "source_evidence",
+        "query": null,
+        "source_id": "googl-2025-10k",
+        "node_id": null,
+        "requirement_id": "req_capex_uses",
+        "description": "在选定 Alphabet FY2025 10-K 正文或表格中查找并直接引用资本支出（购建固定资产）的主要用途说明，包括相关年份或期间语境。必须读取所引用区块的实际原文后再提取，不把检索命中或摘要当作已读原文；不推断维护性资本开支或 AI 投资回报。"
+      }
+    ],
+    "reason": "建立可验收的取证分工：数值项由 query 需求返回明确 USD 金额、期间及合并报表口径；2024 年若选定 10-K 未给出可查询映射则记为显式缺口，不推断。委派 Worker 核对购建固定资产现金支出的数值、期间与口径；Worker 返回后主角色将用 query 独立核验并读取原文正文/表格。资本支出主要用途用 source_evidence 需求读取并引用原文，不推断维护性资本开支或 AI 投资回报，不读取整章。",
+    "origin": "model",
+    "skill_hashes": {
+      "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+      "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+      "query": "d3fdb9b0f3343979cf674febb391bcb142b4ffd041bd20b129a6dbbc79168c48"
+    },
+    "sha256": "5300cb72958d1ebb43c0b96157548ddf7e4c132425041d028d29eee8fc26a2aa"
+  }
+}

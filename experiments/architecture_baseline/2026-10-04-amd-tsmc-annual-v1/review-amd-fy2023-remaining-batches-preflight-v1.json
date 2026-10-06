@@ -1,0 +1,2661 @@
+{
+  "schema_version": "independent-batch-preflight-review-v1",
+  "review_id": "amd-fy2023-remaining-batches-preflight-v1",
+  "created_at": "2026-10-04T16:12:33.186203+00:00",
+  "reviewer": "Codex independent source reviewer",
+  "status": "held_out_source_review_only",
+  "isolation": "Expected values in this file are for post-extraction review only. Never pass this file or its expected values to planner, extractor, normalizer, production method configuration, or the job input.",
+  "model_calls": 0,
+  "network_calls": 0,
+  "production_or_historical_files_modified": false,
+  "source_binding": {
+    "company_id": "sec-0000002488",
+    "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+    "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+    "dataset_manifest_sha256": "dce57a5a5b94c2f8b2a3fa99c9b4a05cff5dc811d4afc5c77968bd2f686831d8",
+    "parent_packet_id": "packet-7e5b36aa0b61b57adf5501fb",
+    "catalog_id": "table-batches-4e1e014fe27860eb09b9e7f1"
+  },
+  "input_hashes": [
+    {
+      "path": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/amd-fy2023-formal-batch-00-v1/parent-packet.json",
+      "sha256": "a0586cfa8eb8d0c9ca4757567039528c8d0982459f1b8fcf1cf91e206a464d3f"
+    },
+    {
+      "path": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/amd-fy2023-formal-batch-00-v1/batch-catalog.json",
+      "sha256": "8e66ab3b0462d41098a0331d37aaefa8968c82a4d060c1560d3c109910a841fb"
+    },
+    {
+      "path": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/independent-review-amd-fy2023-v2.json",
+      "sha256": "07814561302ebd02ffa7b6a8456af6ae026917e6141109a5a30fc68e02cb640e"
+    },
+    {
+      "path": "data/company_workspace/official-filing-preparations/amd-v2/dataset/raw/source-291485b98a75d8cfabe47571.html",
+      "sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808"
+    },
+    {
+      "path": "data/company_workspace/official-filing-preparations/amd-v2/dataset/indexes/source-291485b98a75d8cfabe47571/blocks.jsonl",
+      "sha256": "c60436e60d4aad9cd08aeeab1136d975d84963e4381f3106598686c2d44b14cd"
+    }
+  ],
+  "recommended_canary": {
+    "batch_index": 2,
+    "table_block_id": "block-000674-2ab954ba",
+    "reason": "New primary statement exercises instant dates, cash versus investments, current versus noncurrent net debt, shares versus USD capital stock, and an explicitly unresolved dash. Input remains a single moderate-size table.",
+    "source_scope": {
+      "batch_index": 2,
+      "table_block_id": "block-000674-2ab954ba",
+      "table_ordinal": 674,
+      "block_ids": [
+        "block-000672-941a6235",
+        "block-000673-9be1aa03",
+        "block-000674-2ab954ba",
+        "block-000675-aab69576",
+        "block-000676-7688b6ef"
+      ],
+      "source_text_characters": 1678,
+      "full_blocks_json_bytes": 26802
+    },
+    "after_this": "Batch 4 cash-flow table; batch 5 is separate supplemental disclosure and cannot be assumed included in batch 4."
+  },
+  "review_method": {
+    "baseline_used": "independent-review-amd-fy2023-v2.json",
+    "baseline_recheck": "Re-read selected balance-sheet and cash-flow rows at their raw-HTML DOM paths; confirm each reused fact inline ID, attributes, value text and issuer context against the frozen raw source. Record raw row strings and context provenance separately.",
+    "baseline_selected_fact_count": 22,
+    "not_claimed": [
+      "Whole-table completeness",
+      "Debt-note principal/maturity review",
+      "Full annual-report acceptance",
+      "Adoption or normalization success"
+    ]
+  },
+  "source_tables": [
+    {
+      "batch_index": 2,
+      "table_block_id": "block-000674-2ab954ba",
+      "source_text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+      "reported_page": 56,
+      "dom_path": "/html/body/div[727]/table",
+      "scope": "Selected review rows only; this is not a full-table review.",
+      "packet_exposes_inline_fixed_zero_marker": false,
+      "header_from_packet": "December 30,2023December 31,2022 (In millions, except par value amounts)ASSETSCurrent assets:Cash and cash equivalents$3",
+      "source_rows": [
+        {
+          "row_index_zero_based": 5,
+          "source_row_text": "Cash and cash equivalents $ 3,933 $ 4,835",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-113"
+              },
+              "text": "3,933",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-114"
+              },
+              "text": "4,835",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 6,
+          "source_row_text": "Short-term investments 1,840 1,020",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:ShortTermInvestments",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-115"
+              },
+              "text": "1,840",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:ShortTermInvestments",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-116"
+              },
+              "text": "1,020",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 25,
+          "source_row_text": "Current portion of long-term debt, net 751 —",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:ShortTermBorrowings",
+                "scale": "6",
+                "id": "f-149"
+              },
+              "text": "751",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:ShortTermBorrowings",
+                "format": "ixt:fixed-zero",
+                "scale": "6",
+                "id": "f-150"
+              },
+              "text": "—",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 28,
+          "source_row_text": "Long-term debt, net of current portion 1,717 2,467",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:LongTermDebtNoncurrent",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-155"
+              },
+              "text": "1,717",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:LongTermDebtNoncurrent",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-156"
+              },
+              "text": "2,467",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 35,
+          "source_row_text": "Common stock, par value $ 0.01 ; shares authorized: 2,250 ; shares issued: 1,663 and 1,645 ; shares outstanding: 1,616 and 1,612 17 16",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usdPerShare",
+                "contextref": "c-5",
+                "decimals": "INF",
+                "name": "us-gaap:CommonStockParOrStatedValuePerShare",
+                "scale": "0",
+                "id": "f-166"
+              },
+              "text": "0.01",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usdPerShare",
+                "contextref": "c-8",
+                "decimals": "INF",
+                "name": "us-gaap:CommonStockParOrStatedValuePerShare",
+                "scale": "0",
+                "id": "f-167"
+              },
+              "text": "0.01",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockSharesAuthorized",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-168"
+              },
+              "text": "2,250",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockSharesAuthorized",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-169"
+              },
+              "text": "2,250",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockSharesIssued",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-170"
+              },
+              "text": "1,663",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockSharesIssued",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-171"
+              },
+              "text": "1,645",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockSharesOutstanding",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-172"
+              },
+              "text": "1,616",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockSharesOutstanding",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-173"
+              },
+              "text": "1,612",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockValue",
+                "scale": "6",
+                "id": "f-174"
+              },
+              "text": "17",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:CommonStockValue",
+                "scale": "6",
+                "id": "f-175"
+              },
+              "text": "16",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 37,
+          "source_row_text": "Treasury stock, at cost (shares held: 47 and 33 ) ( 4,514 ) ( 3,099 )",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:TreasuryStockCommonShares",
+                "scale": "6",
+                "id": "f-178"
+              },
+              "text": "47",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "shares",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:TreasuryStockCommonShares",
+                "scale": "6",
+                "id": "f-179"
+              },
+              "text": "33",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:TreasuryStockValue",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-180"
+              },
+              "text": "4,514",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:TreasuryStockValue",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-181"
+              },
+              "text": "3,099",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch_index": 4,
+      "table_block_id": "block-000686-a6e8806b",
+      "source_text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+      "reported_page": 58,
+      "dom_path": "/html/body/div[741]/table",
+      "scope": "Selected review rows only; this is not a full-table review.",
+      "packet_exposes_inline_fixed_zero_marker": false,
+      "header_from_packet": "Year EndedDecember 30,2023December 31,2022December 25,2021(In millions)Cash flows from operating activities:Net income$8",
+      "source_rows": [
+        {
+          "row_index_zero_based": 25,
+          "source_row_text": "Net cash provided by operating activities 1,667 3,565 3,521",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-313"
+              },
+              "text": "1,667",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-314"
+              },
+              "text": "3,565",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-315"
+              },
+              "text": "3,521",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 27,
+          "source_row_text": "Purchases of property and equipment ( 546 ) ( 450 ) ( 301 )",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+                "scale": "6",
+                "id": "f-316"
+              },
+              "text": "546",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+                "scale": "6",
+                "id": "f-317"
+              },
+              "text": "450",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+                "scale": "6",
+                "id": "f-318"
+              },
+              "text": "301",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 34,
+          "source_row_text": "Net cash provided by (used in) investing activities ( 1,423 ) 1,999 ( 686 )",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "sign": "-",
+                "name": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-337"
+              },
+              "text": "1,423",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "name": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-338"
+              },
+              "text": "1,999",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:NetCashProvidedByUsedInInvestingActivities",
+                "scale": "6",
+                "id": "f-339"
+              },
+              "text": "686",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 36,
+          "source_row_text": "Proceeds from debt, net of issuance costs — 991 —",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "name": "us-gaap:ProceedsFromShortTermDebt",
+                "format": "ixt:fixed-zero",
+                "scale": "6",
+                "id": "f-340"
+              },
+              "text": "—",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "name": "us-gaap:ProceedsFromShortTermDebt",
+                "scale": "6",
+                "id": "f-341"
+              },
+              "text": "991",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:ProceedsFromShortTermDebt",
+                "format": "ixt:fixed-zero",
+                "scale": "6",
+                "id": "f-342"
+              },
+              "text": "—",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 37,
+          "source_row_text": "Repayment of debt — ( 312 ) —",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "name": "us-gaap:RepaymentsOfDebt",
+                "format": "ixt:fixed-zero",
+                "scale": "6",
+                "id": "f-343"
+              },
+              "text": "—",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "name": "us-gaap:RepaymentsOfDebt",
+                "scale": "6",
+                "id": "f-344"
+              },
+              "text": "312",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:RepaymentsOfDebt",
+                "format": "ixt:fixed-zero",
+                "scale": "6",
+                "id": "f-345"
+              },
+              "text": "—",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 42,
+          "source_row_text": "Net cash used in financing activities ( 1,146 ) ( 3,264 ) ( 1,895 )",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "sign": "-",
+                "name": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-358"
+              },
+              "text": "1,146",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "sign": "-",
+                "name": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-359"
+              },
+              "text": "3,264",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:NetCashProvidedByUsedInFinancingActivities",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-360"
+              },
+              "text": "1,895",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 43,
+          "source_row_text": "Net increase (decrease) in cash and cash equivalents ( 902 ) 2,300 940",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "sign": "-",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+                "scale": "6",
+                "id": "f-361"
+              },
+              "text": "902",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-362"
+              },
+              "text": "2,300",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalentsPeriodIncreaseDecreaseIncludingExchangeRateEffect",
+                "scale": "6",
+                "id": "f-363"
+              },
+              "text": "940",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 44,
+          "source_row_text": "Cash and cash equivalents at beginning of year 4,835 2,535 1,595",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-364"
+              },
+              "text": "4,835",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-49",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-365"
+              },
+              "text": "2,535",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2021-12-25"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-53",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-366"
+              },
+              "text": "1,595",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2020-12-26"
+              }
+            }
+          ]
+        },
+        {
+          "row_index_zero_based": 45,
+          "source_row_text": "Cash and cash equivalents at end of year $ 3,933 $ 4,835 $ 2,535",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-5",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-367"
+              },
+              "text": "3,933",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-8",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-368"
+              },
+              "text": "4,835",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-49",
+                "decimals": "-6",
+                "name": "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents",
+                "format": "ixt:num-dot-decimal",
+                "scale": "6",
+                "id": "f-369"
+              },
+              "text": "2,535",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "instant": "2021-12-25"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch_index": 5,
+      "table_block_id": "block-000689-aefae171",
+      "source_text_hash": "aefae171ffd47e99393915187276a8a0654d890253f513a6899e350d72bcf94b",
+      "reported_page": 59,
+      "dom_path": "/html/body/div[744]/table",
+      "scope": "Selected review rows only; this is not a full-table review.",
+      "packet_exposes_inline_fixed_zero_marker": false,
+      "header_from_packet": "Advanced Micro Devices, Inc.Consolidated Statements of Cash FlowsYear EndedDecember 30,2023December 31,2022December 25,2",
+      "source_rows": [
+        {
+          "row_index_zero_based": 10,
+          "source_row_text": "Purchases of property and equipment, accrued but not paid $ 106 $ 157 $ 72",
+          "inline_facts": [
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-1",
+                "decimals": "-6",
+                "name": "us-gaap:CapitalExpendituresIncurredButNotYetPaid",
+                "scale": "6",
+                "id": "f-376"
+              },
+              "text": "106",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2023-01-01",
+                "enddate": "2023-12-30"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-6",
+                "decimals": "-6",
+                "name": "us-gaap:CapitalExpendituresIncurredButNotYetPaid",
+                "scale": "6",
+                "id": "f-377"
+              },
+              "text": "157",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2021-12-26",
+                "enddate": "2022-12-31"
+              }
+            },
+            {
+              "attributes": {
+                "unitref": "usd",
+                "contextref": "c-7",
+                "decimals": "-6",
+                "name": "us-gaap:CapitalExpendituresIncurredButNotYetPaid",
+                "scale": "6",
+                "id": "f-378"
+              },
+              "text": "72",
+              "source_context": {
+                "issuer_cik": "0000002488",
+                "startdate": "2020-12-27",
+                "enddate": "2021-12-25"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "selected_baseline_expected_facts": [
+    {
+      "review_fact_id": "operating_cash_flow-fy2023",
+      "metric": "operating_cash_flow",
+      "scope": "consolidated",
+      "source_label": "Net cash provided by operating activities",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-1",
+        "source_html": "<xbrli:context id=\"c-1\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-01-01</xbrli:startdate><xbrli:enddate>2023-12-30</xbrli:enddate></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "duration",
+        "start": "2023-01-01",
+        "end": "2023-12-30",
+        "weeks": 52
+      },
+      "source_display": "1,667",
+      "source_display_unit": "millions",
+      "value_in_millions": 1667,
+      "normalized_value": 1667000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-313",
+        "unitref": "usd",
+        "contextref": "c-1",
+        "decimals": "-6",
+        "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "1,667"
+      },
+      "evidence": {
+        "block_id": "block-000686-a6e8806b",
+        "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "dom_path": "/html/body/div[741]/table",
+        "reported_page": 58,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "row_index_zero_based": 25,
+        "source_cells": [
+          {
+            "text": "Net cash provided by operating activities",
+            "row": 25,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "1,667",
+            "row": 25,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "3,565",
+            "row": 25,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "3,521",
+            "row": 25,
+            "column": 15,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Net cash provided by operating activities 1,667   3,565   3,521  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "operating_cash_flow-fy2022",
+      "metric": "operating_cash_flow",
+      "scope": "consolidated",
+      "source_label": "Net cash provided by operating activities",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-6",
+        "source_html": "<xbrli:context id=\"c-6\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2021-12-26</xbrli:startdate><xbrli:enddate>2022-12-31</xbrli:enddate></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "duration",
+        "start": "2021-12-26",
+        "end": "2022-12-31",
+        "weeks": 53
+      },
+      "source_display": "3,565",
+      "source_display_unit": "millions",
+      "value_in_millions": 3565,
+      "normalized_value": 3565000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-314",
+        "unitref": "usd",
+        "contextref": "c-6",
+        "decimals": "-6",
+        "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "3,565"
+      },
+      "evidence": {
+        "block_id": "block-000686-a6e8806b",
+        "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "dom_path": "/html/body/div[741]/table",
+        "reported_page": 58,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "row_index_zero_based": 25,
+        "source_cells": [
+          {
+            "text": "Net cash provided by operating activities",
+            "row": 25,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "1,667",
+            "row": 25,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "3,565",
+            "row": 25,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "3,521",
+            "row": 25,
+            "column": 15,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Net cash provided by operating activities 1,667   3,565   3,521  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "operating_cash_flow-fy2021",
+      "metric": "operating_cash_flow",
+      "scope": "consolidated",
+      "source_label": "Net cash provided by operating activities",
+      "period": {
+        "fiscal_year": 2021,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-7",
+        "source_html": "<xbrli:context id=\"c-7\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2020-12-27</xbrli:startdate><xbrli:enddate>2021-12-25</xbrli:enddate></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "duration",
+        "start": "2020-12-27",
+        "end": "2021-12-25",
+        "weeks": 52
+      },
+      "source_display": "3,521",
+      "source_display_unit": "millions",
+      "value_in_millions": 3521,
+      "normalized_value": 3521000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-315",
+        "unitref": "usd",
+        "contextref": "c-7",
+        "decimals": "-6",
+        "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "3,521"
+      },
+      "evidence": {
+        "block_id": "block-000686-a6e8806b",
+        "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "dom_path": "/html/body/div[741]/table",
+        "reported_page": 58,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "row_index_zero_based": 25,
+        "source_cells": [
+          {
+            "text": "Net cash provided by operating activities",
+            "row": 25,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "1,667",
+            "row": 25,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "3,565",
+            "row": 25,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "3,521",
+            "row": 25,
+            "column": 15,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Net cash provided by operating activities 1,667   3,565   3,521  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "capex_cash_payments-fy2023",
+      "metric": "capex_cash_payments",
+      "scope": "consolidated",
+      "source_label": "Purchases of property and equipment",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-1",
+        "source_html": "<xbrli:context id=\"c-1\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-01-01</xbrli:startdate><xbrli:enddate>2023-12-30</xbrli:enddate></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "duration",
+        "start": "2023-01-01",
+        "end": "2023-12-30",
+        "weeks": 52
+      },
+      "source_display": "546",
+      "source_display_unit": "millions",
+      "value_in_millions": 546,
+      "normalized_value": 546000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-316",
+        "unitref": "usd",
+        "contextref": "c-1",
+        "decimals": "-6",
+        "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+        "scale": "6",
+        "text": "546"
+      },
+      "evidence": {
+        "block_id": "block-000686-a6e8806b",
+        "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "dom_path": "/html/body/div[741]/table",
+        "reported_page": 58,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "row_index_zero_based": 27,
+        "source_cells": [
+          {
+            "text": "Purchases of property and equipment",
+            "row": 27,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "(546)",
+            "row": 27,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(450)",
+            "row": 27,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(301)",
+            "row": 27,
+            "column": 15,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Purchases of property and equipment ( 546 ) ( 450 ) ( 301 )"
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "reported_cash_flow_sign": "outflow",
+      "signed_display_value_in_millions": -546,
+      "normalization_note": "The statement shows parentheses as a cash outflow. The reviewed capex_cash_payments amount is the positive cash-payment magnitude; inline payment facts are also positive."
+    },
+    {
+      "review_fact_id": "capex_cash_payments-fy2022",
+      "metric": "capex_cash_payments",
+      "scope": "consolidated",
+      "source_label": "Purchases of property and equipment",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-6",
+        "source_html": "<xbrli:context id=\"c-6\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2021-12-26</xbrli:startdate><xbrli:enddate>2022-12-31</xbrli:enddate></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "duration",
+        "start": "2021-12-26",
+        "end": "2022-12-31",
+        "weeks": 53
+      },
+      "source_display": "450",
+      "source_display_unit": "millions",
+      "value_in_millions": 450,
+      "normalized_value": 450000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-317",
+        "unitref": "usd",
+        "contextref": "c-6",
+        "decimals": "-6",
+        "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+        "scale": "6",
+        "text": "450"
+      },
+      "evidence": {
+        "block_id": "block-000686-a6e8806b",
+        "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "dom_path": "/html/body/div[741]/table",
+        "reported_page": 58,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "row_index_zero_based": 27,
+        "source_cells": [
+          {
+            "text": "Purchases of property and equipment",
+            "row": 27,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "(546)",
+            "row": 27,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(450)",
+            "row": 27,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(301)",
+            "row": 27,
+            "column": 15,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Purchases of property and equipment ( 546 ) ( 450 ) ( 301 )"
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "reported_cash_flow_sign": "outflow",
+      "signed_display_value_in_millions": -450,
+      "normalization_note": "The statement shows parentheses as a cash outflow. The reviewed capex_cash_payments amount is the positive cash-payment magnitude; inline payment facts are also positive."
+    },
+    {
+      "review_fact_id": "capex_cash_payments-fy2021",
+      "metric": "capex_cash_payments",
+      "scope": "consolidated",
+      "source_label": "Purchases of property and equipment",
+      "period": {
+        "fiscal_year": 2021,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-7",
+        "source_html": "<xbrli:context id=\"c-7\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2020-12-27</xbrli:startdate><xbrli:enddate>2021-12-25</xbrli:enddate></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "duration",
+        "start": "2020-12-27",
+        "end": "2021-12-25",
+        "weeks": 52
+      },
+      "source_display": "301",
+      "source_display_unit": "millions",
+      "value_in_millions": 301,
+      "normalized_value": 301000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-318",
+        "unitref": "usd",
+        "contextref": "c-7",
+        "decimals": "-6",
+        "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+        "scale": "6",
+        "text": "301"
+      },
+      "evidence": {
+        "block_id": "block-000686-a6e8806b",
+        "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "dom_path": "/html/body/div[741]/table",
+        "reported_page": 58,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "row_index_zero_based": 27,
+        "source_cells": [
+          {
+            "text": "Purchases of property and equipment",
+            "row": 27,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "(546)",
+            "row": 27,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(450)",
+            "row": 27,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(301)",
+            "row": 27,
+            "column": 15,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Purchases of property and equipment ( 546 ) ( 450 ) ( 301 )"
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "reported_cash_flow_sign": "outflow",
+      "signed_display_value_in_millions": -301,
+      "normalization_note": "The statement shows parentheses as a cash outflow. The reviewed capex_cash_payments amount is the positive cash-payment magnitude; inline payment facts are also positive."
+    },
+    {
+      "review_fact_id": "cash_and_cash_equivalents-fy2023",
+      "metric": "cash_and_cash_equivalents",
+      "scope": "consolidated",
+      "source_label": "Cash and cash equivalents",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "3,933",
+      "source_display_unit": "millions",
+      "value_in_millions": 3933,
+      "normalized_value": 3933000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-113",
+        "unitref": "usd",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "3,933"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 5,
+        "source_cells": [
+          {
+            "text": "Cash and cash equivalents",
+            "row": 5,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 5,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "3,933",
+            "row": 5,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 5,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "4,835",
+            "row": 5,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Cash and cash equivalents $ 3,933   $ 4,835  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "cash_and_cash_equivalents-fy2022",
+      "metric": "cash_and_cash_equivalents",
+      "scope": "consolidated",
+      "source_label": "Cash and cash equivalents",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "4,835",
+      "source_display_unit": "millions",
+      "value_in_millions": 4835,
+      "normalized_value": 4835000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-114",
+        "unitref": "usd",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "4,835"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 5,
+        "source_cells": [
+          {
+            "text": "Cash and cash equivalents",
+            "row": 5,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 5,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "3,933",
+            "row": 5,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 5,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "4,835",
+            "row": 5,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Cash and cash equivalents $ 3,933   $ 4,835  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "current_portion_long_term_debt_net-fy2023",
+      "metric": "current_portion_long_term_debt_net",
+      "scope": "consolidated",
+      "source_label": "Current portion of long-term debt, net",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "751",
+      "source_display_unit": "millions",
+      "value_in_millions": 751,
+      "normalized_value": 751000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-149",
+        "unitref": "usd",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:ShortTermBorrowings",
+        "scale": "6",
+        "text": "751"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 25,
+        "source_cells": [
+          {
+            "text": "Current portion of long-term debt, net",
+            "row": 25,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "751",
+            "row": 25,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "—",
+            "row": 25,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Current portion of long-term debt, net 751   —  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "current_portion_long_term_debt_net-fy2022",
+      "metric": "current_portion_long_term_debt_net",
+      "scope": "consolidated",
+      "source_label": "Current portion of long-term debt, net",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "—",
+      "source_display_unit": "millions",
+      "value_in_millions": 0,
+      "normalized_value": 0,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-150",
+        "unitref": "usd",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:ShortTermBorrowings",
+        "format": "ixt:fixed-zero",
+        "scale": "6",
+        "text": "—"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 25,
+        "source_cells": [
+          {
+            "text": "Current portion of long-term debt, net",
+            "row": 25,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "751",
+            "row": 25,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "—",
+            "row": 25,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Current portion of long-term debt, net 751   —  "
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "Displayed em dash is explicitly tagged ixt:fixed-zero in this source, so zero is supported; no missing-value default is applied."
+    },
+    {
+      "review_fact_id": "long_term_debt_net_of_current_portion-fy2023",
+      "metric": "long_term_debt_net_of_current_portion",
+      "scope": "consolidated",
+      "source_label": "Long-term debt, net of current portion",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "1,717",
+      "source_display_unit": "millions",
+      "value_in_millions": 1717,
+      "normalized_value": 1717000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-155",
+        "unitref": "usd",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:LongTermDebtNoncurrent",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "1,717"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 28,
+        "source_cells": [
+          {
+            "text": "Long-term debt, net of current portion",
+            "row": 28,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "1,717",
+            "row": 28,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "2,467",
+            "row": 28,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Long-term debt, net of current portion 1,717   2,467  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "long_term_debt_net_of_current_portion-fy2022",
+      "metric": "long_term_debt_net_of_current_portion",
+      "scope": "consolidated",
+      "source_label": "Long-term debt, net of current portion",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "2,467",
+      "source_display_unit": "millions",
+      "value_in_millions": 2467,
+      "normalized_value": 2467000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-156",
+        "unitref": "usd",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:LongTermDebtNoncurrent",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "2,467"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 28,
+        "source_cells": [
+          {
+            "text": "Long-term debt, net of current portion",
+            "row": 28,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "1,717",
+            "row": 28,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "2,467",
+            "row": 28,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Long-term debt, net of current portion 1,717   2,467  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "common_stock_carrying_value-fy2023",
+      "metric": "common_stock_carrying_value",
+      "scope": "consolidated",
+      "source_label": "Common stock",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "17",
+      "source_display_unit": "millions",
+      "value_in_millions": 17,
+      "normalized_value": 17000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-174",
+        "unitref": "usd",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockValue",
+        "scale": "6",
+        "text": "17"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "common_stock_carrying_value-fy2022",
+      "metric": "common_stock_carrying_value",
+      "scope": "consolidated",
+      "source_label": "Common stock",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "16",
+      "source_display_unit": "millions",
+      "value_in_millions": 16,
+      "normalized_value": 16000000,
+      "normalized_unit": "USD",
+      "inline_fact": {
+        "id": "f-175",
+        "unitref": "usd",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockValue",
+        "scale": "6",
+        "text": "16"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source"
+    },
+    {
+      "review_fact_id": "common_shares_issued-fy2023",
+      "metric": "common_shares_issued",
+      "scope": "consolidated",
+      "source_label": "shares issued",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "1,663",
+      "source_display_unit": "millions",
+      "value_in_millions": 1663,
+      "normalized_value": 1663000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-170",
+        "unitref": "shares",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockSharesIssued",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "1,663"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    },
+    {
+      "review_fact_id": "common_shares_issued-fy2022",
+      "metric": "common_shares_issued",
+      "scope": "consolidated",
+      "source_label": "shares issued",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "1,645",
+      "source_display_unit": "millions",
+      "value_in_millions": 1645,
+      "normalized_value": 1645000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-171",
+        "unitref": "shares",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockSharesIssued",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "1,645"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    },
+    {
+      "review_fact_id": "common_shares_outstanding-fy2023",
+      "metric": "common_shares_outstanding",
+      "scope": "consolidated",
+      "source_label": "shares outstanding",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "1,616",
+      "source_display_unit": "millions",
+      "value_in_millions": 1616,
+      "normalized_value": 1616000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-172",
+        "unitref": "shares",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockSharesOutstanding",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "1,616"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    },
+    {
+      "review_fact_id": "common_shares_outstanding-fy2022",
+      "metric": "common_shares_outstanding",
+      "scope": "consolidated",
+      "source_label": "shares outstanding",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "1,612",
+      "source_display_unit": "millions",
+      "value_in_millions": 1612,
+      "normalized_value": 1612000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-173",
+        "unitref": "shares",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockSharesOutstanding",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "1,612"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    },
+    {
+      "review_fact_id": "common_shares_authorized-fy2023",
+      "metric": "common_shares_authorized",
+      "scope": "consolidated",
+      "source_label": "shares authorized",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "2,250",
+      "source_display_unit": "millions",
+      "value_in_millions": 2250,
+      "normalized_value": 2250000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-168",
+        "unitref": "shares",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockSharesAuthorized",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "2,250"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    },
+    {
+      "review_fact_id": "common_shares_authorized-fy2022",
+      "metric": "common_shares_authorized",
+      "scope": "consolidated",
+      "source_label": "shares authorized",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "2,250",
+      "source_display_unit": "millions",
+      "value_in_millions": 2250,
+      "normalized_value": 2250000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-169",
+        "unitref": "shares",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:CommonStockSharesAuthorized",
+        "format": "ixt:num-dot-decimal",
+        "scale": "6",
+        "text": "2,250"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 35,
+        "source_cells": [
+          {
+            "text": "Common stock, par value $0.01; shares authorized: 2,250; shares issued: 1,663 and 1,645; shares outstanding: 1,616 and 1,612",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "17",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "16",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Common stock, par value $ 0.01 ; shares authorized:  2,250 ; shares issued:  1,663  and  1,645 ; shares outstanding:  1,616  and  1,612 17   16  "
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    },
+    {
+      "review_fact_id": "treasury_shares_held-fy2023",
+      "metric": "treasury_shares_held",
+      "scope": "consolidated",
+      "source_label": "Treasury stock / shares held",
+      "period": {
+        "fiscal_year": 2023,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-5",
+        "source_html": "<xbrli:context id=\"c-5\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2023-12-30</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2023-12-30"
+      },
+      "source_display": "47",
+      "source_display_unit": "millions",
+      "value_in_millions": 47,
+      "normalized_value": 47000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-178",
+        "unitref": "shares",
+        "contextref": "c-5",
+        "decimals": "-6",
+        "name": "us-gaap:TreasuryStockCommonShares",
+        "scale": "6",
+        "text": "47"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 37,
+        "source_cells": [
+          {
+            "text": "Treasury stock, at cost (shares held: 47 and 33)",
+            "row": 37,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "(4,514)",
+            "row": 37,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(3,099)",
+            "row": 37,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Treasury stock, at cost (shares held:  47  and  33 ) ( 4,514 ) ( 3,099 )"
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    },
+    {
+      "review_fact_id": "treasury_shares_held-fy2022",
+      "metric": "treasury_shares_held",
+      "scope": "consolidated",
+      "source_label": "Treasury stock / shares held",
+      "period": {
+        "fiscal_year": 2022,
+        "issuer_cik": "0000002488",
+        "source_context_id": "c-8",
+        "source_html": "<xbrli:context id=\"c-8\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000002488</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:instant>2022-12-31</xbrli:instant></xbrli:period></xbrli:context>",
+        "basis": "source_exact_dates",
+        "type": "instant",
+        "end": "2022-12-31"
+      },
+      "source_display": "33",
+      "source_display_unit": "millions",
+      "value_in_millions": 33,
+      "normalized_value": 33000000,
+      "normalized_unit": "shares",
+      "inline_fact": {
+        "id": "f-179",
+        "unitref": "shares",
+        "contextref": "c-8",
+        "decimals": "-6",
+        "name": "us-gaap:TreasuryStockCommonShares",
+        "scale": "6",
+        "text": "33"
+      },
+      "evidence": {
+        "block_id": "block-000674-2ab954ba",
+        "text_hash": "2ab954ba413a715be89db1bafd97fc8ec04c74734c05775e815690db71c4397c",
+        "dom_path": "/html/body/div[727]/table",
+        "reported_page": 56,
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_121",
+        "row_index_zero_based": 37,
+        "source_cells": [
+          {
+            "text": "Treasury stock, at cost (shares held: 47 and 33)",
+            "row": 37,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 3,
+            "is_header": false
+          },
+          {
+            "text": "(4,514)",
+            "row": 37,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "(3,099)",
+            "row": 37,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          }
+        ],
+        "row_text_from_source_html": "Treasury stock, at cost (shares held:  47  and  33 ) ( 4,514 ) ( 3,099 )"
+      },
+      "review_status": "independently_verified_from_frozen_source",
+      "normalization_note": "The statement uses millions of shares. Period-end share counts and period weighted-average share counts are distinct metrics."
+    }
+  ],
+  "canary_acceptance": [
+    {
+      "check": "source_scope",
+      "expectation": "Every candidate, quote and normalized record must stay within the selected company, frozen source, batch blocks and allowed catalog. Other sources or batches do not prove coverage."
+    },
+    {
+      "check": "period_type",
+      "expectation": "Balance-sheet observations use instant_2023-12-30 or instant_2022-12-31, not the annual flow periods. The balance sheet supplies two comparative columns, not three."
+    },
+    {
+      "check": "cash_scope",
+      "expectation": "Cash and cash equivalents exclude the separately presented short-term investments; do not silently sum the two."
+    },
+    {
+      "check": "debt_basis",
+      "expectation": "Preserve reported net current portion and noncurrent portion. Do not relabel their sum as principal or lease-inclusive debt. Unsupported exact metric mapping stays unresolved."
+    },
+    {
+      "check": "zero_evidence",
+      "expectation": "The FY2022 current-debt dash is zero in raw inline metadata, but that marker is absent from the delivered block. Missing numeric interpretation is a legitimate gap here; do not treat reviewer-only metadata as model-visible evidence."
+    },
+    {
+      "check": "share_dimensions",
+      "expectation": "USD common-stock carrying value, USD-per-share par value, issued shares, outstanding shares and treasury shares remain distinct. Millions scale does not apply to the par value. Do not substitute weighted-average shares from another table."
+    },
+    {
+      "check": "comparative_coverage",
+      "expectation": "Retain both supported comparative columns or report actual omission; a prose statement that items were retained is not an extracted fact."
+    },
+    {
+      "check": "normalization_boundary",
+      "expectation": "Source-correct candidate facts can remain unmapped. A numeric literal, alias or unit failure cannot be repaired by inserting held-out expected values."
+    },
+    {
+      "check": "publication",
+      "expectation": "Program-check pass, independent source-match and adoption remain separate; no automatic adoption."
+    }
+  ],
+  "cash_flow_followup_cautions": [
+    "Fiscal flows use source dates 2023-01-01..2023-12-30, 2021-12-26..2022-12-31 and 2020-12-27..2021-12-25; the middle year is 53 weeks.",
+    "Capex appears as parenthesized outflow in the presented table, while its inline PaymentsToAcquirePropertyPlantAndEquipment concept is a positive payment magnitude. Preserve displayed sign first; any magnitude conversion needs an explicit rule and lineage.",
+    "Supplemental accrued-but-unpaid PPE is a noncash disclosure in batch 5. It cannot replace or be silently added to cash purchases in batch 4.",
+    "Cash at beginning/end is an instant fact even inside a flow statement. The current catalog lacks the 2021-12-25 and 2020-12-26 instant periods; report the gap rather than map those balances to annual durations.",
+    "Debt proceeds and repayment are cash-flow transactions, not closing debt balances.",
+    "The same source has original inline fixed-zero metadata for several dashes. Delivered table text alone does not expose that metadata."
+  ],
+  "reviewed_expected_facts_summary": {
+    "balance_sheet_baseline_facts": 16,
+    "cash_flow_baseline_facts": 6,
+    "selected_raw_tables": 3,
+    "raw_selected_row_count": 16
+  },
+  "remaining_gaps": [
+    "No model output for the new batch has been inspected or graded yet.",
+    "Only selected rows were independently verified; table and report completeness remain open.",
+    "Parent packet contains 11 table batches plus 24 unassigned prose blocks; selecting one new batch does not close remaining coverage."
+  ]
+}

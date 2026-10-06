@@ -1,0 +1,567 @@
+{
+  "packet": {
+    "schema_version": "semantic-review-input-v3",
+    "source_origin": "synthetic_fixture",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "northstar-disclosure-b-snapshot",
+      "company_ids": [
+        "sec-0000000791"
+      ],
+      "source_snapshot_ids": [
+        "northstar-disclosure-b"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2024-09-01",
+      "include_candidates": true
+    },
+    "source": {
+      "source_snapshot_id": "northstar-disclosure-b",
+      "company_id": "sec-0000000791",
+      "source_sha256": "920f00f070a48ee75d7848323c8131e2ea63b3067fb779da30b1d016518fe968",
+      "source_url": "https://example.invalid/northstar/northstar-disclosure-b"
+    },
+    "source_blocks": [
+      {
+        "source_snapshot_id": "northstar-disclosure-b",
+        "block_id": "statement",
+        "text": "Northstar Medtech annual segment and consolidated disclosures. Amounts in USD millions. FY2024 covers July 1, 2023 through June 30, 2024. FY2023 covers July 1, 2022 through June 30, 2023. Columns: FY2024 FY2023.\nSensors segment revenue 55 50\nConsolidated revenue 100 90\nAdjusted cash earnings 8 7",
+        "text_hash": "0f937c1256aaf88008ea06124ca70ff17dd1238377fbbd30379f94af17ba6f8f"
+      },
+      {
+        "source_snapshot_id": "northstar-disclosure-b",
+        "block_id": "note-detail",
+        "text": "Note 2. Effective July 1, 2023, the Sensors segment presentation changed. FY2023 Sensors segment revenue was recast to USD 50 million for comparability with FY2024. FY2024 segment revenue was already prepared under the new presentation. This segment presentation change did not affect the consolidated financial statements for either FY2024 or FY2023. Adjusted cash earnings is a company-defined measure; see Note 7 for its definition and reconciliation.",
+        "text_hash": "67deeab463481c5486eeb99f08fbfb81c5802df2c26c87ba0007b1b09caa1bd0"
+      }
+    ],
+    "records": [
+      {
+        "record": {
+          "record_id": "northstar-disclosure-b-seg24",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "entity_id": "sec-0000000791",
+          "metric_id": "revenue",
+          "value_decimal": "55000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "dimensions": {
+            "segment": "Sensors"
+          },
+          "status": "candidate"
+        },
+        "record_sha256": "9dd6fb27af0ad6187c84f555093142675b6d49ac0bf223c10abfaafc99a8ed75"
+      },
+      {
+        "record": {
+          "record_id": "northstar-disclosure-b-seg23",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "entity_id": "sec-0000000791",
+          "metric_id": "revenue",
+          "value_decimal": "50000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2022-07-01",
+            "end": "2023-06-30",
+            "basis": "source"
+          },
+          "dimensions": {
+            "segment": "Sensors"
+          },
+          "status": "candidate"
+        },
+        "record_sha256": "c518238285e38922257bdff494b0d65634941a982a7e218e120ab70cb0d976d2"
+      },
+      {
+        "record": {
+          "record_id": "northstar-disclosure-b-total24",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "entity_id": "sec-0000000791",
+          "metric_id": "revenue",
+          "value_decimal": "100000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "dimensions": {},
+          "status": "candidate"
+        },
+        "record_sha256": "4039e0a622f53ab06dd62a0a527b3db9116ec2c46455417d1f32e2e72fd06d5c"
+      },
+      {
+        "record": {
+          "record_id": "northstar-disclosure-b-total23",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "entity_id": "sec-0000000791",
+          "metric_id": "revenue",
+          "value_decimal": "90000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2022-07-01",
+            "end": "2023-06-30",
+            "basis": "source"
+          },
+          "dimensions": {},
+          "status": "candidate"
+        },
+        "record_sha256": "610060a8a796e3ee8739110354afd44a2fb6fc3e90daf82d3af003f6d322e1b2"
+      },
+      {
+        "record": {
+          "record_id": "northstar-disclosure-b-ace24",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "entity_id": "sec-0000000791",
+          "metric_id": "adjusted_cash_earnings",
+          "value_decimal": "8000000",
+          "unit": "USD",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "dimensions": {},
+          "status": "candidate"
+        },
+        "record_sha256": "033a4a6085b7ff684161df1c1a7c9db0d3ae1383fc58fb50b82aa9ddfeb13415"
+      }
+    ],
+    "record_anchors": {
+      "northstar-disclosure-b-seg24": {
+        "status": "located",
+        "source_snapshot_id": "northstar-disclosure-b",
+        "block_id": "statement",
+        "start": 212,
+        "end": 241,
+        "text": "Sensors segment revenue 55 50",
+        "kind": "table_row"
+      },
+      "northstar-disclosure-b-seg23": {
+        "status": "located",
+        "source_snapshot_id": "northstar-disclosure-b",
+        "block_id": "statement",
+        "start": 212,
+        "end": 241,
+        "text": "Sensors segment revenue 55 50",
+        "kind": "table_row"
+      },
+      "northstar-disclosure-b-total24": {
+        "status": "located",
+        "source_snapshot_id": "northstar-disclosure-b",
+        "block_id": "statement",
+        "start": 242,
+        "end": 269,
+        "text": "Consolidated revenue 100 90",
+        "kind": "table_row"
+      },
+      "northstar-disclosure-b-total23": {
+        "status": "located",
+        "source_snapshot_id": "northstar-disclosure-b",
+        "block_id": "statement",
+        "start": 242,
+        "end": 269,
+        "text": "Consolidated revenue 100 90",
+        "kind": "table_row"
+      },
+      "northstar-disclosure-b-ace24": {
+        "status": "located",
+        "source_snapshot_id": "northstar-disclosure-b",
+        "block_id": "statement",
+        "start": 270,
+        "end": 296,
+        "text": "Adjusted cash earnings 8 7",
+        "kind": "table_row"
+      }
+    },
+    "metric_definitions": {
+      "revenue": {
+        "metric_id": "revenue",
+        "unit": "USD",
+        "definition": "Revenue in USD for the explicitly identified consolidated or segment entity."
+      },
+      "adjusted_cash_earnings": {
+        "metric_id": "adjusted_cash_earnings",
+        "unit": "USD",
+        "definition": "Issuer-defined adjusted cash earnings in USD. The metric name does not specify which adjustments are included; issuer reconciliation is required."
+      }
+    },
+    "axes": [
+      "comparability",
+      "dimensions",
+      "value"
+    ],
+    "assertions": [
+      {
+        "assertion_id": "statement-a",
+        "record_ids": [
+          "northstar-disclosure-b-seg23"
+        ],
+        "text": "FY2023 Sensors segment revenue of USD 50 million is presented on the recast basis for comparison with FY2024."
+      },
+      {
+        "assertion_id": "statement-b",
+        "record_ids": [
+          "northstar-disclosure-b-total24",
+          "northstar-disclosure-b-total23"
+        ],
+        "text": "This segment presentation change also changed the FY2024 and FY2023 consolidated revenue amounts."
+      },
+      {
+        "assertion_id": "statement-c",
+        "record_ids": [
+          "northstar-disclosure-b-ace24"
+        ],
+        "text": "Reported FY2024 adjusted cash earnings were USD 8 million."
+      },
+      {
+        "assertion_id": "statement-d",
+        "record_ids": [
+          "northstar-disclosure-b-ace24"
+        ],
+        "text": "The FY2024 adjusted cash earnings measure excludes only depreciation and no other items."
+      }
+    ],
+    "selection_warnings": [],
+    "output_schema": {
+      "$defs": {
+        "AssertionAssessmentV2": {
+          "additionalProperties": false,
+          "properties": {
+            "assertion_id": {
+              "minLength": 1,
+              "title": "Assertion Id",
+              "type": "string"
+            },
+            "verdict": {
+              "enum": [
+                "supported",
+                "contradicted",
+                "insufficient_evidence"
+              ],
+              "title": "Verdict",
+              "type": "string"
+            },
+            "reason": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "citations": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/SemanticCitationV2"
+              },
+              "maxItems": 8,
+              "title": "Citations",
+              "type": "array"
+            }
+          },
+          "required": [
+            "assertion_id",
+            "verdict",
+            "reason"
+          ],
+          "title": "AssertionAssessmentV2",
+          "type": "object"
+        },
+        "AxisCheckV2": {
+          "additionalProperties": false,
+          "properties": {
+            "axis": {
+              "enum": [
+                "comparability",
+                "allocation",
+                "additivity",
+                "dimensions",
+                "geography",
+                "value"
+              ],
+              "title": "Axis",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "constraints_found",
+                "none_found_in_context",
+                "insufficient_evidence"
+              ],
+              "title": "Status",
+              "type": "string"
+            },
+            "reason": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Reason",
+              "type": "string"
+            },
+            "constraints": {
+              "default": [],
+              "items": {
+                "$ref": "#/$defs/SemanticConstraintV2"
+              },
+              "maxItems": 24,
+              "title": "Constraints",
+              "type": "array"
+            },
+            "unresolved_questions": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 12,
+              "title": "Unresolved Questions",
+              "type": "array"
+            }
+          },
+          "required": [
+            "axis",
+            "status",
+            "reason"
+          ],
+          "title": "AxisCheckV2",
+          "type": "object"
+        },
+        "ContextClaim": {
+          "additionalProperties": false,
+          "description": "Delivery state of a host-identified object, not an inference about a note.",
+          "properties": {
+            "object_id": {
+              "minLength": 1,
+              "title": "Object Id",
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "supplied",
+                "not_supplied",
+                "unresolved"
+              ],
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          "required": [
+            "object_id",
+            "status"
+          ],
+          "title": "ContextClaim",
+          "type": "object"
+        },
+        "ContextRequest": {
+          "additionalProperties": false,
+          "description": "A model question; it never establishes that material was not delivered.",
+          "properties": {
+            "question": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Question",
+              "type": "string"
+            },
+            "reviewed_block_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 80,
+              "minItems": 1,
+              "title": "Reviewed Block Ids",
+              "type": "array"
+            },
+            "reference_ids": {
+              "default": [],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 20,
+              "title": "Reference Ids",
+              "type": "array"
+            }
+          },
+          "required": [
+            "question",
+            "reviewed_block_ids"
+          ],
+          "title": "ContextRequest",
+          "type": "object"
+        },
+        "SemanticCitationV2": {
+          "additionalProperties": false,
+          "properties": {
+            "source_snapshot_id": {
+              "title": "Source Snapshot Id",
+              "type": "string"
+            },
+            "block_id": {
+              "title": "Block Id",
+              "type": "string"
+            },
+            "quote": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Quote",
+              "type": "string"
+            },
+            "source_start": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Source Start"
+            }
+          },
+          "required": [
+            "source_snapshot_id",
+            "block_id",
+            "quote"
+          ],
+          "title": "SemanticCitationV2",
+          "type": "object"
+        },
+        "SemanticConstraintV2": {
+          "additionalProperties": false,
+          "properties": {
+            "record_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 24,
+              "minItems": 1,
+              "title": "Record Ids",
+              "type": "array"
+            },
+            "statement": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "title": "Statement",
+              "type": "string"
+            },
+            "citations": {
+              "items": {
+                "$ref": "#/$defs/SemanticCitationV2"
+              },
+              "maxItems": 8,
+              "minItems": 1,
+              "title": "Citations",
+              "type": "array"
+            }
+          },
+          "required": [
+            "record_ids",
+            "statement",
+            "citations"
+          ],
+          "title": "SemanticConstraintV2",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "packet_id": {
+          "minLength": 1,
+          "title": "Packet Id",
+          "type": "string"
+        },
+        "checks": {
+          "items": {
+            "$ref": "#/$defs/AxisCheckV2"
+          },
+          "maxItems": 6,
+          "minItems": 1,
+          "title": "Checks",
+          "type": "array"
+        },
+        "assertions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AssertionAssessmentV2"
+          },
+          "maxItems": 24,
+          "title": "Assertions",
+          "type": "array"
+        },
+        "context_claims": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ContextClaim"
+          },
+          "maxItems": 80,
+          "title": "Context Claims",
+          "type": "array"
+        },
+        "context_requests": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ContextRequest"
+          },
+          "maxItems": 20,
+          "title": "Context Requests",
+          "type": "array"
+        }
+      },
+      "required": [
+        "packet_id",
+        "checks"
+      ],
+      "title": "SemanticAssessmentV2",
+      "type": "object"
+    },
+    "context_inventory": {
+      "objects": [
+        {
+          "object_id": "context-6102778ef31f9cd31e4dd548",
+          "kind": "source_block",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "block_id": "statement",
+          "status": "supplied"
+        },
+        {
+          "object_id": "context-b1e226a01c39de11c9c647e9",
+          "kind": "source_block",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "block_id": "note-detail",
+          "status": "supplied"
+        },
+        {
+          "object_id": "context-1e7a4baa14af35643f080a94",
+          "kind": "source_reference",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "block_id": "note-detail",
+          "quote": "Note 2",
+          "start": 0,
+          "status": "unresolved"
+        },
+        {
+          "object_id": "context-b219d6df9a2f051927a59dab",
+          "kind": "source_reference",
+          "source_snapshot_id": "northstar-disclosure-b",
+          "block_id": "note-detail",
+          "quote": "Note 7",
+          "start": 409,
+          "status": "unresolved"
+        }
+      ],
+      "selection_warnings": [],
+      "boundary": "Selection warnings and unresolved references do not establish missing material."
+    },
+    "packet_id": "semantic-65cd4a38dafb2b899e44b777"
+  },
+  "packet_sha256": "5b98235b6a3112232c5f87d37897045bc589250df86b581c264da583ee6c7cd8",
+  "model_config_sha256": "a7cc0cb92953e1c748963ac6f145f53b18f732732681f0f06dc901d02b62bc23",
+  "prompt_sha256": "fef766dd9322b6c59bc25022cd5f9f06962928e8d9e11e33732a876e7b706eef"
+}

@@ -47,10 +47,13 @@ def write_record(path, record):
 
 class MeteredModel(Model):
     """Non-streaming SDK adapter. Persist a start event before any network work."""
-    def __init__(self, inner, folder, stage, provider, model, pricing, budget=None):
+    def __init__(self, inner, folder, stage, provider, model, pricing, budget=None, *, max_request_bytes=400000):
+        if type(max_request_bytes) is not int or max_request_bytes < 1:
+            raise ValueError('max_request_bytes must be a positive integer')
         self.inner, self.folder, self.stage = inner, Path(folder), stage
         self.provider, self.model, self.pricing = provider, model, pricing
         self.budget = budget
+        self.max_request_bytes = max_request_bytes
         self.folder.mkdir(exist_ok=True)
 
     async def get_response(self, *args, **kwargs):
@@ -58,7 +61,8 @@ class MeteredModel(Model):
         reserved_usd = None
         if self.budget is not None:
             from uteki.agents.runtime.run_budget import reserve_request
-            reservation, reserved_usd = reserve_request(self.budget, self.pricing, args, kwargs)
+            reservation, reserved_usd = reserve_request(
+                self.budget, self.pricing, args, kwargs, max_request_bytes=self.max_request_bytes)
         call_id = str(uuid4())
         record = dict(call_id=call_id, stage=self.stage, provider=self.provider,
                       requested_model=self.model, actual_upstream_model=None,

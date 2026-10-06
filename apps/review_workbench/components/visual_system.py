@@ -33,7 +33,7 @@ def workbench_page(area):
 
 
 def add_navigation(page):
-    header = '<nav id="site-navigation" aria-label="Global navigation"><a class="site-brand" href="/">Uteki</a><a href="/" data-global-page="home"><span lang="zh">主页</span><span lang="en">Home</span></a><a href="/companies" data-global-page="companies"><span lang="zh">公司</span><span lang="en">Companies</span></a></nav>'
+    header = '<nav id="site-navigation" aria-label="Global navigation"><a class="site-brand" href="/">Uteki</a><a href="/" data-global-page="home"><span lang="zh">主页</span><span lang="en">Home</span></a><a href="/companies" data-global-page="companies"><span lang="zh">公司</span><span lang="en">Companies</span></a><a href="/evaluation" data-global-page="evaluation"><span lang="zh">数据评估</span><span lang="en">Data evaluation</span></a></nav>'
     header += ("""<script>""" + asset_text('global_navigation.js') + """</script>""")
     match = re.search(r'<body\b[^>]*>', page, re.I)
     if not match: return page

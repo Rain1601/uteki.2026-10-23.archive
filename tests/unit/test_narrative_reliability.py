@@ -1,10 +1,13 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from dataclasses import dataclass
+from decimal import Decimal
 import json
 import os
 from pathlib import Path
 import sys
+import sqlite3
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -128,6 +131,48 @@ class ReliabilityTests(unittest.TestCase):
         self.assertEqual(observed.summary()['enforcement'], 'record_only')
         with self.assertRaises(BudgetExceeded):
             budget.reserve('.01')
+
+    def test_unlimited_record_only_preserves_large_and_unknown_costs_across_reopens(self):
+        path = self.root/'unlimited.sqlite'
+        first = RunBudget(path, None, enforce=False)
+        unknown = first.reserve('1e30')
+        first.settle(unknown, None)
+        second = RunBudget(path, None, enforce=False)
+        settled = second.reserve('1e40')
+        second.settle(settled, '1234567890')
+        summary = first.summary()
+        self.assertIsNone(summary['limit_usd'])
+        self.assertEqual(summary['enforcement'], 'record_only')
+        self.assertEqual(summary['requests'], 2)
+        self.assertEqual(summary['unknown_requests'], 1)
+        self.assertEqual(Decimal(summary['held_usd']), Decimal('1e30'))
+        self.assertEqual(Decimal(summary['estimated_spent_usd']), Decimal('1234567890'))
+        self.assertIsNone(summary['actual_billed_usd'])
+        self.assertEqual(RunBudget(path, None, enforce=False).summary(), summary)
+        with closing(sqlite3.connect(path)) as connection:
+            self.assertIsNone(connection.execute('SELECT usd FROM config WHERE id=1').fetchone()[0])
+
+    def test_existing_ledger_cannot_change_between_finite_and_unlimited(self):
+        for existing, proposed in (('1', None), (None, '1'), ('1', '2')):
+            with self.subTest(existing=existing, proposed=proposed):
+                path = self.root/f'budget-{existing}-{proposed}.sqlite'
+                budget = RunBudget(path, existing, enforce=False)
+                token = budget.reserve('.25')
+                budget.settle(token, '.1')
+                before = budget.summary()
+                with self.assertRaisesRegex(ValueError, 'cannot be silently changed'):
+                    RunBudget(path, proposed, enforce=False)
+                self.assertEqual(budget.summary(), before)
+
+    def test_unlimited_enforced_budget_rejected_before_filesystem_or_database_io(self):
+        path = self.root/'not-created/budget.sqlite'
+        with patch('uteki.agents.runtime.run_budget.Path.mkdir') as mkdir, \
+                patch('uteki.agents.runtime.run_budget.sqlite3.connect') as connect:
+            with self.assertRaisesRegex(ValueError, 'record-only'):
+                RunBudget(path, None, enforce=True)
+            mkdir.assert_not_called()
+            connect.assert_not_called()
+        self.assertFalse(path.parent.exists())
 
     def _run_fake(self, repair_valid=True):
         cited = Paragraph(text='A conditional claim', kind='inference', citations=[

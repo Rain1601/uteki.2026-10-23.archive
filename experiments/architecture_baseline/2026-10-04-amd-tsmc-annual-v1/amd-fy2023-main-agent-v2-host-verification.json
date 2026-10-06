@@ -1,0 +1,226 @@
+{
+  "schema_version": "main-agent-host-verification-v1",
+  "checked_at": "2026-10-04T16:33:18.031370+00:00",
+  "run_id": "amd-fy2023-main-agent-v2",
+  "run_manifest_sha256": "83a654f8a8d46fd62dc8e3cde6481b2a59bc2619f4e335a2f565c892d40d33b3",
+  "batch_manifest_sha256": "30ed99783f5f8ab30c63cd7372fbc46c7430a73fd64a2ddd9c7a80e1afb2055f",
+  "child_manifest_sha256": "a04cc57e50752a663570fd7cbf67e5bdcedcd4b3355daf8ed6d6da3822c89ccc",
+  "engineering_checks": {
+    "frozen_file_hashes": 140,
+    "actual_skill_and_system_instructions": "passed",
+    "normalizer_replay": "passed",
+    "db_payload_match": "payload_matches_normalized",
+    "exact_evidence_spans": 7,
+    "baseline_and_scope_unchanged": true,
+    "shared_model_ledger": "passed",
+    "receipt_counts_and_refs": "passed",
+    "implementation_declaration": "known_path_collision"
+  },
+  "implementation_findings": [
+    {
+      "path": "implementation/research_data/direct_extraction.py",
+      "declared_sha256": "7dd5c106e65bfcb29ae01e9a7c063b0056d200189f3689c93e1f7d41c34288c7",
+      "stored_sha256": "75cbf80187f894f4e8ec724e506755db0d60c04d049d29d65bd9c5636ae5b53d",
+      "reason": "domain and infrastructure same-name files collided in legacy archive path; historical record is unchanged."
+    }
+  ],
+  "trace": [
+    {
+      "step": 1,
+      "action": "invalid",
+      "status": "rejected"
+    },
+    {
+      "step": 2,
+      "action": "load_skill",
+      "status": "skill_loaded"
+    },
+    {
+      "step": 3,
+      "action": "invalid",
+      "status": "rejected"
+    },
+    {
+      "step": 4,
+      "action": "plan",
+      "status": "planned"
+    },
+    {
+      "step": 5,
+      "action": "financial_extract",
+      "status": "candidate_batch_generated"
+    },
+    {
+      "step": 6,
+      "action": "finish",
+      "status": "candidate_ready"
+    }
+  ],
+  "counts": {
+    "raw": 10,
+    "normalized": 3,
+    "program_diagnostics": 12,
+    "api_calls": 7,
+    "planner_api_calls": 6,
+    "extractor_api_calls": 1
+  },
+  "selection": {
+    "task_type": "annual_financial_extraction",
+    "method_id": "annual-financial-v2",
+    "origin": "task_profile_default",
+    "reason": "No method override supplied; selected the task profile default."
+  },
+  "batch_index": 2,
+  "estimated_usd": "0.17045820",
+  "cost_basis": "sum of stored list-price estimates, not actual bill; historical shared ledger retained",
+  "model_calls": [
+    {
+      "call_id": "1d136091-f475-4363-bc8c-5adfa9334765",
+      "requested_model": "deepseek-v4-pro",
+      "actual_upstream_model": "deepseek-v4-pro",
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 16653,
+        "output_tokens": 1442,
+        "total_tokens": 18095,
+        "input_tokens_details": {
+          "cached_tokens": 8320
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1249
+        }
+      },
+      "estimated_usd": "0.02769228",
+      "elapsed_seconds": 17.467959042056464,
+      "finish_reason": "stop"
+    },
+    {
+      "call_id": "2a954e52-def8-46e8-9455-c0e514e588b3",
+      "requested_model": "deepseek-v4-pro",
+      "actual_upstream_model": "deepseek-v4-pro",
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 13114,
+        "output_tokens": 2122,
+        "total_tokens": 15236,
+        "input_tokens_details": {
+          "cached_tokens": 768
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2085
+        }
+      },
+      "estimated_usd": "0.0257136",
+      "elapsed_seconds": 23.752465792000294,
+      "finish_reason": "stop"
+    },
+    {
+      "call_id": "60abf66c-d710-4ee6-ba76-12bcd2b01771",
+      "requested_model": "deepseek-v4-pro",
+      "actual_upstream_model": "deepseek-v4-pro",
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 15411,
+        "output_tokens": 564,
+        "total_tokens": 15975,
+        "input_tokens_details": {
+          "cached_tokens": 256
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 430
+        }
+      },
+      "estimated_usd": "0.02257596",
+      "elapsed_seconds": 7.045820415951312,
+      "finish_reason": "stop"
+    },
+    {
+      "call_id": "7e3dbf0b-f864-447a-9906-3bf38e622ecb",
+      "requested_model": "deepseek-v4-pro",
+      "actual_upstream_model": "deepseek-v4-pro",
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 15981,
+        "output_tokens": 1174,
+        "total_tokens": 17155,
+        "input_tokens_details": {
+          "cached_tokens": 8832
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 866
+        }
+      },
+      "estimated_usd": "0.02574396",
+      "elapsed_seconds": 13.345251249964349,
+      "finish_reason": "stop"
+    },
+    {
+      "call_id": "7ed46df2-499e-4a52-9f32-f126545e4c6b",
+      "requested_model": "deepseek-v4-pro",
+      "actual_upstream_model": "deepseek-v4-pro",
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 12514,
+        "output_tokens": 2936,
+        "total_tokens": 15450,
+        "input_tokens_details": {
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 2639
+        }
+      },
+      "estimated_usd": "0.02814504",
+      "elapsed_seconds": 33.43198820797261,
+      "finish_reason": "stop"
+    },
+    {
+      "call_id": "c425647f-b002-443c-aa72-05ac1f9d889a",
+      "requested_model": "deepseek-v4-pro",
+      "actual_upstream_model": "deepseek-v4-pro",
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 14647,
+        "output_tokens": 1767,
+        "total_tokens": 16414,
+        "input_tokens_details": {
+          "cached_tokens": 8832
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1522
+        }
+      },
+      "estimated_usd": "0.02633136",
+      "elapsed_seconds": 17.709756791009568,
+      "finish_reason": "stop"
+    },
+    {
+      "call_id": "f78eef0d-7ca4-463d-8f10-a0f2ff6d2cdc",
+      "requested_model": "deepseek-flash",
+      "actual_upstream_model": "deepseek-flash",
+      "status": "succeeded",
+      "usage": {
+        "input_tokens": 17492,
+        "output_tokens": 7507,
+        "total_tokens": 24999,
+        "input_tokens_details": {
+          "cached_tokens": 3712
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 3330
+        }
+      },
+      "estimated_usd": "0.014256",
+      "elapsed_seconds": 26.185612250003032,
+      "finish_reason": "stop"
+    }
+  ],
+  "semantic_acceptance": "separate_independent_review_required",
+  "adoption": "unchanged_candidate",
+  "limits": [
+    "Earlier real-model selected blocks and source period catalog were explicitly reused; full-report selection is not integrated in the main agent.",
+    "candidate_ready establishes candidate generation, not complete package, correct semantics or adoption.",
+    "Record-review stage name in extractor transport is historical reuse; no extra independent reviewer model ran.",
+    "Historical implementation hash declaration has one path collision; stored manifest itself is valid."
+  ]
+}

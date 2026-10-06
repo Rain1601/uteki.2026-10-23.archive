@@ -1,0 +1,225 @@
+{
+  "schema_version": "autonomous-result-v2",
+  "status": "candidate_ready",
+  "stop_reason": "host_reference_checks_passed",
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "此前对合并现金流量表经营活动页的候选提取，明确报告投资活动续页尚未交付。因此购置不动产厂房设备的现金支出尚无候选。请从该同一年度材料已登记的表格目录中自主选择现金流投资活动续表，执行一次财务提取，保留TWD原币种、原尺度、流出符号和所有呈报年度比较期间。只需生成独立候选并说明实际计数与缺口；不重复经营活动页或已完成的其他报表。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+      "company_ids": [
+        "sec-0001046179"
+      ],
+      "source_snapshot_ids": [
+        "source-6719837a8d24b2b7df359f29"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+    "company_ids": [
+      "sec-0001046179"
+    ],
+    "source_snapshot_ids": [
+      "source-6719837a8d24b2b7df359f29"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-04",
+    "include_candidates": true
+  },
+  "plan_origin": "model",
+  "plans": [
+    {
+      "version": 1,
+      "requirements": [
+        {
+          "kind": "financial_extract",
+          "query": null,
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": "tsmc-fy2023-investing-continuation",
+          "batch_index": 10,
+          "requirement_id": "fin-investing-ppe-continuation",
+          "description": "Execute one financial extraction from TSMC FY2023 consolidated cash-flow investing activities continuation table batch 10 to generate an independent candidate for cash purchases of property, plant and equipment, preserving TWD currency, original presentation scale, signed outflow source numerals, and all reported annual comparative periods."
+        }
+      ],
+      "reason": "Selected batch_index 10 because its source_excerpt contains the consolidated statement of cash flows investing activities section, including Acquisitions of Property, plant and equipment; this matches the requested continuation table without repeating the operating activities page.",
+      "origin": "model",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "sha256": "748cfff76f79deddbf48f3e4d946d4d17083dcfb2d4a3a56a29f8cadcd8f0bbd"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "financial_extract",
+      "query": null,
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": "tsmc-fy2023-investing-continuation",
+      "batch_index": 10,
+      "requirement_id": "fin-investing-ppe-continuation",
+      "description": "Execute one financial extraction from TSMC FY2023 consolidated cash-flow investing activities continuation table batch 10 to generate an independent candidate for cash purchases of property, plant and equipment, preserving TWD currency, original presentation scale, signed outflow source numerals, and all reported annual comparative periods.",
+      "evidence_ids": [
+        "ev-df594bcebd5b042e40574968"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "financial_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+        "company_ids": [
+          "sec-0001046179"
+        ],
+        "source_snapshot_ids": [
+          "source-6719837a8d24b2b7df359f29"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "catalog_id": "table-batches-23370e8814482510f524c3b6",
+      "financial_source_id": "source-6719837a8d24b2b7df359f29",
+      "program_check": "candidate_batch_generated"
+    }
+  ],
+  "gaps": [],
+  "evidence_bundle": {
+    "path": "evidence-bundle.json",
+    "bundle_id": "bundle-cd7ecf7d3dc8b57260386355",
+    "item_count": 1
+  },
+  "artifact_index": {
+    "path": "artifact-index.json",
+    "count": 13
+  },
+  "semantic_completeness": "not_evaluated",
+  "trace": [
+    {
+      "step": 1,
+      "action": "load_skill",
+      "status": "skill_loaded",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 23542,
+      "receipt": "turn-001/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-001/feedback.json"
+    },
+    {
+      "step": 2,
+      "action": "invalid",
+      "status": "rejected",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 40425,
+      "receipt": "turn-002/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-002/feedback.json"
+    },
+    {
+      "step": 3,
+      "action": "plan",
+      "status": "planned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 33074,
+      "receipt": "turn-003/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-003/feedback.json"
+    },
+    {
+      "step": 4,
+      "action": "financial_extract",
+      "status": "candidate_batch_generated",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 35723,
+      "receipt": "turn-004/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-004/feedback.json"
+    },
+    {
+      "step": 5,
+      "action": "finish",
+      "status": "candidate_ready",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 39028,
+      "receipt": "turn-005/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-005/feedback.json"
+    }
+  ],
+  "role": "planner",
+  "worker_runs": [],
+  "financial_extractions": [
+    {
+      "evidence_id": "ev-df594bcebd5b042e40574968",
+      "artifact": {
+        "schema_version": "run-artifact-v1",
+        "artifact_id": "art-f6133e96d42a155df76dd729a2a4c7d6",
+        "kind": "candidate_financial_extraction",
+        "path": "artifacts/art-f6133e96d42a155df76dd729a2a4c7d6.json",
+        "sha256": "63e2a353c24546cde0240f7df4901801426f2a689369887016e30093c168df17",
+        "size_bytes": 2929,
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+          "company_ids": [
+            "sec-0001046179"
+          ],
+          "source_snapshot_ids": [
+            "source-6719837a8d24b2b7df359f29"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-04",
+          "include_candidates": true
+        },
+        "scope_id": "scope-0b43b04ef97747fc7b516e0c",
+        "created_step": 4,
+        "parent_ids": [],
+        "source_ids": [
+          "source-6719837a8d24b2b7df359f29"
+        ],
+        "evidence_id": "ev-df594bcebd5b042e40574968"
+      },
+      "task_id": "tsmc-fy2023-investing-continuation",
+      "batch_index": 10,
+      "candidate_only": true,
+      "adoption": "unchanged_candidate"
+    }
+  ],
+  "pending_body_reads": [],
+  "decision_budget": {
+    "limit": 10,
+    "used": 5
+  },
+  "evidence_budget": {
+    "limit_bytes": 8000000,
+    "used_bytes": 3184
+  }
+}

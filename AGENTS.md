@@ -76,6 +76,31 @@ answer side questions and resume unless the user stops or replaces the task.
   "This isn't about X. It's about Y.", invented compound labels, vague
   qualifiers, and unnecessary descriptions of what will not change.
 
+### Explanation formats and user understanding
+
+Adapted from the Karpathy passage supplied by the user: help the user understand
+and oversee model outputs, and choose the format that makes the subject easiest
+to inspect.
+
+- Write with the clarity of a softened ASD-STE100 style: short sentences,
+  familiar words, explicit subjects, consistent terms, and one main idea at a
+  time. Treat this as writing guidance, not a claim of formal compliance with
+  the standard; apply the same clarity in Chinese and English.
+- For architecture, workflows, and implementation comparisons, include a
+  readable diagram directly in the Codex reply. Give each diagram one question
+  and one level of detail; keep responsibility boundaries distinct from execution
+  order. Mark implemented, proposed, and unverified behavior clearly, and link
+  important claims to the inspected source.
+- When exploration, controls, or progressive disclosure materially improve
+  understanding, create a focused HTML explainer or interactive visualization.
+  Keep the main conclusion and a useful overview in the reply as well.
+- Use a custom explainer video when requested or when motion and narration add
+  clear value. Follow existing authorization and resource constraints for any
+  external services or paid generation.
+- Match the artifact to the task. Simple answers can stay in text; do not turn
+  every reply into a webpage or video. Judge explanations by how easily the user
+  can understand the behavior, check the evidence, and make a decision.
+
 ### Subagent delegation
 
 - When collaboration tools are available and delegating independent work could
@@ -150,15 +175,21 @@ answer side questions and resume unless the user stops or replaces the task.
 
 ## Frontend design
 
-For frontend styling, layout, new pages, and interaction design, read and apply
-`~/.codex/skills/frontend-design/SKILL.md` before making changes (expand `~` to
-the current user's home directory). Official source:
+Use `frontend-design` only when the user explicitly names it for the task. Do
+not load or apply it automatically merely because work involves styling,
+layout, pages, charts, or interaction design. When explicitly requested, read
+`~/.codex/skills/frontend-design/SKILL.md` (expand `~` to the current user's
+home directory). If unavailable, ask for its location rather than pretending
+it was applied. Official source:
 https://github.com/anthropics/skills/tree/main/skills/frontend-design.
-This is a user-supplied skill; if unavailable, ask for its location rather than
-pretending it was applied. Preserve the approved product behavior and real data.
 
-Create a compact visual plan, review it against the specific research workflow,
-then implement and verify data structure and code behavior. Keep the companies list unchanged unless
+Start from the concrete problem: identify the audience, the question or task
+the view must support, the available evidence, and an observable acceptance
+example. Resolve material uncertainty with the user, compare suitable
+representations, and then create a compact visual plan. Do not let a preset
+style or skill replace this reasoning. Preserve approved product behavior and
+real data, then implement and verify data structure and code behavior.
+Keep the companies list unchanged unless
 the user explicitly includes it. Keep UI bilingual, evidence traceable, and
 snapshot/adoption rules intact. No model calls or deployment for styling work.
 

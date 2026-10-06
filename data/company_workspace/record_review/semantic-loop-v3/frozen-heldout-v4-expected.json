@@ -1,0 +1,158 @@
+{
+  "schema_version": "semantic-review-expected-v4-independent",
+  "cases": {
+    "sv4-001": {
+      "checks": {
+        "dimensions": {
+          "allowed_statuses": [
+            "constraints_found"
+          ]
+        },
+        "value": {
+          "allowed_statuses": [
+            "constraints_found",
+            "none_found_in_context",
+            "insufficient_evidence"
+          ]
+        }
+      },
+      "assertions": {
+        "statement-a": "supported",
+        "statement-b": "supported",
+        "statement-c": "contradicted",
+        "statement-d": "insufficient_evidence"
+      },
+      "constraint_record_coverage": {
+        "dimensions": [
+          "harbor-source-a-gp22",
+          "harbor-source-a-gp21",
+          "harbor-source-a-rd22",
+          "harbor-source-a-rd21",
+          "harbor-source-a-ocf22",
+          "harbor-source-a-aocf22"
+        ]
+      },
+      "assertion_evidence": {
+        "statement-a": {
+          "record_ids": [
+            "harbor-source-a-gp22"
+          ],
+          "quote_anchors": [
+            "Gross profit 27 27"
+          ]
+        },
+        "statement-b": {
+          "record_ids": [
+            "harbor-source-a-rd22"
+          ],
+          "quote_anchors": [
+            "Research and development expense 27 27"
+          ]
+        },
+        "statement-c": {
+          "quote_anchors": [
+            "Add back those payments to reported operating cash flow: 18 + 4 = 22"
+          ]
+        },
+        "statement-d": {
+          "definition_not_established_by_supplied_source": true
+        }
+      },
+      "negative_cases": [
+        "The illustrative duplicate gross-profit row must not be used as the actual record anchor.",
+        "Gross profit and research expense are different records even when numbers coincide.",
+        "Expenses already paid are added back under this definition; subtraction is not the reconciliation.",
+        "Do not infer other issuers' definitions from this issuer's metric name."
+      ]
+    },
+    "sv4-002": {
+      "checks": {
+        "comparability": {
+          "allowed_statuses": [
+            "constraints_found"
+          ]
+        },
+        "dimensions": {
+          "allowed_statuses": [
+            "constraints_found"
+          ]
+        },
+        "value": {
+          "allowed_statuses": [
+            "constraints_found",
+            "none_found_in_context",
+            "insufficient_evidence"
+          ]
+        }
+      },
+      "assertions": {
+        "statement-a": "supported",
+        "statement-b": "contradicted",
+        "statement-c": "supported",
+        "statement-d": "insufficient_evidence"
+      },
+      "constraint_record_coverage": {
+        "dimensions": [
+          "juniper-source-b-east21",
+          "juniper-source-b-east20",
+          "juniper-source-b-total21",
+          "juniper-source-b-total20",
+          "juniper-source-b-adj21"
+        ]
+      },
+      "comparability_constraints": {
+        "historical_recast": {
+          "record_ids": [
+            "juniper-source-b-east20"
+          ],
+          "quote_anchors": [
+            "The FY2020 East segment revenue amount of USD 68 million has been retrospectively recast"
+          ]
+        },
+        "consolidated_exception": {
+          "record_ids": [
+            "juniper-source-b-total21",
+            "juniper-source-b-total20"
+          ],
+          "quote_anchors": [
+            "did not affect consolidated financial statements for either FY2021 or FY2020"
+          ]
+        }
+      },
+      "assertion_evidence": {
+        "statement-a": {
+          "record_ids": [
+            "juniper-source-b-east20"
+          ],
+          "quote_anchors": [
+            "East segment revenue 73 68",
+            "The FY2020 East segment revenue amount of USD 68 million has been retrospectively recast"
+          ]
+        },
+        "statement-b": {
+          "quote_anchors": [
+            "FY2021 is reported directly on the new boundary and is not a retrospectively recast period."
+          ]
+        },
+        "statement-c": {
+          "record_ids": [
+            "juniper-source-b-total21",
+            "juniper-source-b-total20"
+          ],
+          "quote_anchors": [
+            "Consolidated revenue 120 110",
+            "did not affect consolidated financial statements for either FY2021 or FY2020"
+          ]
+        },
+        "statement-d": {
+          "definition_not_established_by_supplied_source": true
+        }
+      },
+      "negative_cases": [
+        "FY2021 must not be included in the retrospective-recast record set.",
+        "The consolidated exception is bounded to the two supplied fiscal periods.",
+        "An unresolved Note 9 reference does not establish adjustment items or document delivery state."
+      ]
+    }
+  }
+}

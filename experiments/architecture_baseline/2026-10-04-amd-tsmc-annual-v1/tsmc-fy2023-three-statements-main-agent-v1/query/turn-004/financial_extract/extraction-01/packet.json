@@ -1,0 +1,5197 @@
+{
+  "schema_version": "direct-extraction-packet-v1",
+  "company_id": "sec-0001046179",
+  "source": {
+    "source_snapshot_id": "source-6719837a8d24b2b7df359f29",
+    "company_id": "sec-0001046179",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1046179/000119312524099840/d592628d20f.htm",
+    "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+    "document_id": "source-6719837a8d24b2b7df359f29",
+    "index_id": "didx-225c084ca00067b9",
+    "index_folder": "indexes/source-6719837a8d24b2b7df359f29",
+    "raw_file": "raw/source-6719837a8d24b2b7df359f29.html",
+    "raw_file_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+    "form": "20-F",
+    "period_end": "2023-12-31",
+    "declared_mime_type": "text/html",
+    "parsed_mime_type": "text/html",
+    "available_at": "2024-04-18",
+    "status": "candidate",
+    "fiscal_periods": [],
+    "capabilities": [
+      "read_context",
+      "literal_search",
+      "source_bytes",
+      "html_table_structure"
+    ],
+    "stage_coverage": {
+      "schema_version": "source-stage-coverage-v1",
+      "original": {
+        "status": "hash_verified",
+        "byte_count": 7294361,
+        "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1"
+      },
+      "reading": {
+        "status": "indexed",
+        "parser_version": "sec-source-blocks-v0.1.7",
+        "block_count": 1929,
+        "block_type_counts": {
+          "heading_candidate": 378,
+          "page_marker": 80,
+          "paragraph": 965,
+          "table": 506
+        },
+        "index_diagnostic_count": 1
+      },
+      "tables": {
+        "status": "structure_parsed",
+        "table_node_count": 506,
+        "tables_with_cells": 506,
+        "tables_without_cells": 0,
+        "cell_count": 67764,
+        "layout_role_counts": {
+          "table_of_contents": 1,
+          "unclassified": 505
+        },
+        "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+        "financial_table_semantics": "not_evaluated"
+      },
+      "numeric": {
+        "status": "no_supported_records",
+        "record_count": 0,
+        "evidence_count": 0,
+        "gap_count": 3163,
+        "adapter": "us-gaap-inline-v1",
+        "supported_taxonomy": "US_GAAP",
+        "supported_currencies": [
+          "USD"
+        ],
+        "supported_metric_ids": [
+          "capex_cash_payments",
+          "net_income",
+          "operating_cash_flow",
+          "operating_income",
+          "revenue",
+          "revenue_including_assessed_tax"
+        ],
+        "period_support": "complete_month_boundaries_only",
+        "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+        "financial_package_completeness": "not_evaluated",
+        "semantic_review": "not_evaluated",
+        "adoption": "candidate"
+      }
+    },
+    "image_block_count": 0
+  },
+  "task": {
+    "instruction": "Find the original consolidated financial statements for FY2023 and extract reported revenue, operating income, operating cash flow, cash purchases of property plant and equipment, and ending cash and cash equivalents. Retain all presented annual comparative periods. Prioritize complete original consolidated financial-statement tables over rounded management summaries. Preserve reporting currency, scale, signed cash outflows and source period contexts. Do not substitute net investing cash flow or capital expenditure guidance for cash PP&E purchases. Use the explicitly selected reporting currency TWD. Preserve source scale, signed numeral and all presented annual comparatives. Candidates require independent source review.\nExecution scope: only the explicitly delivered table batch and its nearby context. Other batches, unassigned prose and undelivered source blocks remain pending. Keep missing context as a gap; do not interpret undelivered metrics as absent from the filing.",
+    "company_id": "sec-0001046179",
+    "source_snapshot_ids": [
+      "source-6719837a8d24b2b7df359f29"
+    ],
+    "knowledge_cutoff": "2026-10-04"
+  },
+  "knowledge_cutoff": "2026-10-04",
+  "dataset_snapshot_id": "query-8e8f160d14c69ef43b5ec59b",
+  "dataset_manifest_sha256": "6874d0d218d60861be1b6a66d09975e19248973035fbc00379febea28e7a30f3",
+  "blocks": [
+    {
+      "block_id": "block-001122-e478aee6",
+      "ordinal": 1122,
+      "type": "heading_candidate",
+      "text": "CONSOLIDATED STATEMENTS OF FINANCIAL POSITION",
+      "text_hash": "e478aee69cc10b4c09c660e4549cdf8ea4815965f2a49363c4f0da06e38846e2",
+      "source_anchor": null,
+      "dom_path": "/html/body/div[89]/div/div[1]/div/div[2]/div",
+      "reported_page": null,
+      "style_signature": [
+        [
+          "font-weight",
+          "bold"
+        ]
+      ],
+      "table": null,
+      "image_asset_id": null,
+      "layout_role": null
+    },
+    {
+      "block_id": "block-001123-de1719a9",
+      "ordinal": 1123,
+      "type": "heading_candidate",
+      "text": "(In Millions of New Taiwan Dollars or U.S. Dollars)",
+      "text_hash": "de1719a9916dbd0e402524c99efe6b6364819615e5579ae63bea3d4071c479a4",
+      "source_anchor": null,
+      "dom_path": "/html/body/div[89]/div/div[1]/div/div[3]/div",
+      "reported_page": null,
+      "style_signature": [
+        [
+          "font-weight",
+          "bold"
+        ]
+      ],
+      "table": null,
+      "image_asset_id": null,
+      "layout_role": null
+    },
+    {
+      "block_id": "block-001124-d8a3ba3f",
+      "ordinal": 1124,
+      "type": "table",
+      "text": "Notes December 31, 2022 December 31, 2023 NT$ NT$ US$ (Note 3) ASSETS CURRENT ASSETS Cash and cash equivalents 7 $ 1,342,814.1 $ 1,465,427.8 $ 47,858.5 Financial assets at fair value through profit or loss 8 1,070.4 924.6 30.2 Financial assets at fair value through other comprehensive income 9 122,998.5 154,530.8 5,046.7 Financial assets at amortized cost 10 94,600.2 66,761.2 2,180.3 Hedging financial assets 11 2.3 - - Notes and accounts receivable, net 12 229,755.9 201,313.9 6,574.6 Receivables from related parties 34 1,584.0 624.4 20.4 Other receivables from related parties 34 69.0 71.9 2.3 Inventories 6, 13 221,149.1 250,997.1 8,197.2 Other financial assets 35 25,964.4 27,158.8 887.0 Other current assets 12,888.8 26,222.4 856.4 Total current assets 2,052,896.7 2,194,032.9 71,653.6 NONCURRENT ASSETS Financial assets at fair value through profit or loss 8 - 13,417.5 438.2 Financial assets at fair value through other comprehensive income 9 6,159.2 7,208.7 235.4 Financial assets at amortized cost 10 35,127.2 79,199.4 2,586.5 Investments accounted for using equity method 14 27,321.7 29,442.0 961.5 Property, plant and equipment 6, 15 2,693,837.0 3,064,475.0 100,080.9 Right-of-use assets 6, 16 41,914.0 40,424.7 1,320.2 Intangible assets 6, 17 25,999.2 22,766.7 743.5 Deferred income tax assets 6, 26 69,185.9 64,175.8 2,095.9 Refundable deposits 4,467.1 7,044.5 230.1 Other noncurrent assets 7,551.1 10,009.4 326.9 Total noncurrent assets 2,911,562.4 3,338,163.7 109,019.1 TOTAL $ 4,964,459.1 $ 5,532,196.6 $ 180,672.7",
+      "text_hash": "d8a3ba3f3e593eaa7998e3bf80397803eda5a2a84601b53d1395767119e2f7ab",
+      "source_anchor": null,
+      "dom_path": "/html/body/div[89]/div/div[1]/div/table",
+      "reported_page": null,
+      "style_signature": [
+        [
+          "font-family",
+          "times new roman"
+        ],
+        [
+          "font-size",
+          "8pt"
+        ]
+      ],
+      "table": {
+        "row_count": 42,
+        "column_count": 15,
+        "cells": [
+          {
+            "text": "",
+            "row": 0,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 0,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 1,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 1,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Notes",
+            "row": 1,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 1,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "December 31, 2022",
+            "row": 1,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 1,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 1,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "December 31, 2023",
+            "row": 1,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 6,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 1,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "NT$",
+            "row": 2,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "NT$",
+            "row": 2,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "US$",
+            "row": 2,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 2,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "(Note 3)",
+            "row": 3,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 3,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 4,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 4,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 4,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 4,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 4,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "ASSETS",
+            "row": 5,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 5,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 6,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 6,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 6,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 6,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 6,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "CURRENT ASSETS",
+            "row": 7,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 7,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Cash and cash equivalents",
+            "row": 8,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "7",
+            "row": 8,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 8,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "1,342,814.1",
+            "row": 8,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$ 1,465,427.8",
+            "row": 8,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 8,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "47,858.5",
+            "row": 8,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 8,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Financial assets at fair value through profit or loss",
+            "row": 9,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "8",
+            "row": 9,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "1,070.4",
+            "row": 9,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "924.6",
+            "row": 9,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "30.2",
+            "row": 9,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 9,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Financial assets at fair value through other comprehensive income",
+            "row": 10,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "9",
+            "row": 10,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "122,998.5",
+            "row": 10,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "154,530.8",
+            "row": 10,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "5,046.7",
+            "row": 10,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 10,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Financial assets at amortized cost",
+            "row": 11,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "10",
+            "row": 11,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "94,600.2",
+            "row": 11,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "66,761.2",
+            "row": 11,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2,180.3",
+            "row": 11,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 11,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Hedging financial assets",
+            "row": 12,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "11",
+            "row": 12,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2.3",
+            "row": 12,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "-",
+            "row": 12,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "-",
+            "row": 12,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 12,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Notes and accounts receivable, net",
+            "row": 13,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "12",
+            "row": 13,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "229,755.9",
+            "row": 13,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "201,313.9",
+            "row": 13,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "6,574.6",
+            "row": 13,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 13,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Receivables from related parties",
+            "row": 14,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "34",
+            "row": 14,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "1,584.0",
+            "row": 14,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "624.4",
+            "row": 14,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "20.4",
+            "row": 14,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 14,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Other receivables from related parties",
+            "row": 15,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "34",
+            "row": 15,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "69.0",
+            "row": 15,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "71.9",
+            "row": 15,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2.3",
+            "row": 15,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 15,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Inventories",
+            "row": 16,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "6, 13",
+            "row": 16,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "221,149.1",
+            "row": 16,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "250,997.1",
+            "row": 16,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "8,197.2",
+            "row": 16,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 16,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Other financial assets",
+            "row": 17,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "35",
+            "row": 17,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "25,964.4",
+            "row": 17,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "27,158.8",
+            "row": 17,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "887.0",
+            "row": 17,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 17,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Other current assets",
+            "row": 18,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "12,888.8",
+            "row": 18,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "26,222.4",
+            "row": 18,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "856.4",
+            "row": 18,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 18,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 19,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 20,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 20,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 20,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 20,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 20,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "Total current assets",
+            "row": 21,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2,052,896.7",
+            "row": 21,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2,194,032.9",
+            "row": 21,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "71,653.6",
+            "row": 21,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 21,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 22,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 23,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 23,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 23,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 23,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 23,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "NONCURRENT ASSETS",
+            "row": 24,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 24,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Financial assets at fair value through profit or loss",
+            "row": 25,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "8",
+            "row": 25,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "-",
+            "row": 25,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "13,417.5",
+            "row": 25,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "438.2",
+            "row": 25,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 25,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Financial assets at fair value through other comprehensive income",
+            "row": 26,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "9",
+            "row": 26,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "6,159.2",
+            "row": 26,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "7,208.7",
+            "row": 26,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "235.4",
+            "row": 26,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 26,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Financial assets at amortized cost",
+            "row": 27,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "10",
+            "row": 27,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "35,127.2",
+            "row": 27,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "79,199.4",
+            "row": 27,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2,586.5",
+            "row": 27,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 27,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Investments accounted for using equity method",
+            "row": 28,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "14",
+            "row": 28,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "27,321.7",
+            "row": 28,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "29,442.0",
+            "row": 28,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "961.5",
+            "row": 28,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 28,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Property, plant and equipment",
+            "row": 29,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "6, 15",
+            "row": 29,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2,693,837.0",
+            "row": 29,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "3,064,475.0",
+            "row": 29,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "100,080.9",
+            "row": 29,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 29,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Right-of-use assets",
+            "row": 30,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "6, 16",
+            "row": 30,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "41,914.0",
+            "row": 30,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "40,424.7",
+            "row": 30,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "1,320.2",
+            "row": 30,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 30,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Intangible assets",
+            "row": 31,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "6, 17",
+            "row": 31,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "25,999.2",
+            "row": 31,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "22,766.7",
+            "row": 31,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "743.5",
+            "row": 31,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 31,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Deferred income tax assets",
+            "row": 32,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "6, 26",
+            "row": 32,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "69,185.9",
+            "row": 32,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "64,175.8",
+            "row": 32,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2,095.9",
+            "row": 32,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 32,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Refundable deposits",
+            "row": 33,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "4,467.1",
+            "row": 33,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "7,044.5",
+            "row": 33,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "230.1",
+            "row": 33,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 33,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "Other noncurrent assets",
+            "row": 34,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "7,551.1",
+            "row": 34,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "10,009.4",
+            "row": 34,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "326.9",
+            "row": 34,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 34,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 35,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 36,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 36,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 36,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 36,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 36,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "Total noncurrent assets",
+            "row": 37,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "2,911,562.4",
+            "row": 37,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "3,338,163.7",
+            "row": 37,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "109,019.1",
+            "row": 37,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 37,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 38,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 39,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 39,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 2,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 39,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 39,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 39,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 4,
+            "is_header": false
+          },
+          {
+            "text": "TOTAL",
+            "row": 40,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 40,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "4,964,459.1",
+            "row": 40,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 40,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "5,532,196.6",
+            "row": 40,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "$",
+            "row": 40,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "180,672.7",
+            "row": 40,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 40,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 0,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 1,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 2,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 5,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 6,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 9,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 10,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 13,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": "",
+            "row": 41,
+            "column": 14,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          }
+        ]
+      },
+      "image_asset_id": null,
+      "layout_role": null
+    },
+    {
+      "block_id": "block-001125-2ea6a4cb",
+      "ordinal": 1125,
+      "type": "paragraph",
+      "text": "(Continued)",
+      "text_hash": "2ea6a4cb227a4ebe3bf9ef4838e593c75b966f841061c93415efb8265af4d967",
+      "source_anchor": null,
+      "dom_path": "/html/body/div[89]/div/div[1]/div/div[6]",
+      "reported_page": null,
+      "style_signature": [
+        [
+          "font-family",
+          "times new roman"
+        ],
+        [
+          "font-size",
+          "8pt"
+        ],
+        [
+          "margin-top",
+          "0pt"
+        ],
+        [
+          "text-align",
+          "right"
+        ]
+      ],
+      "table": null,
+      "image_asset_id": null,
+      "layout_role": null
+    },
+    {
+      "block_id": "block-001126-334c9693",
+      "ordinal": 1126,
+      "type": "paragraph",
+      "text": "F - 4",
+      "text_hash": "334c9693a3e0d4e46ad2d0d9106d5bfd8edcfd5d1ae4785a1c642b479a189c85",
+      "source_anchor": null,
+      "dom_path": "/html/body/div[89]/div/div[1]/div/div[8]",
+      "reported_page": null,
+      "style_signature": [
+        [
+          "font-family",
+          "times new roman"
+        ],
+        [
+          "font-size",
+          "11pt"
+        ],
+        [
+          "margin-top",
+          "0pt"
+        ],
+        [
+          "text-align",
+          "center"
+        ]
+      ],
+      "table": null,
+      "image_asset_id": null,
+      "layout_role": null
+    }
+  ],
+  "entity_catalog": [
+    {
+      "entity_id": "sec-0001046179",
+      "company_id": "sec-0001046179",
+      "source_snapshot_id": "source-6719837a8d24b2b7df359f29",
+      "label": "Taiwan Semiconductor Manufacturing Company Limited",
+      "aliases": [
+        "Taiwan Semiconductor Manufacturing Company Limited",
+        "TSM",
+        "Consolidated",
+        "Company",
+        "Group"
+      ]
+    }
+  ],
+  "metric_catalog": {
+    "capex_cash_payments": {
+      "metric_id": "capex_cash_payments",
+      "label": "Cash purchases of property plant and equipment",
+      "aliases": [
+        "Purchases of property, plant and equipment",
+        "Payments for property, plant and equipment",
+        "Acquisitions of property, plant and equipment"
+      ],
+      "unit": "TWD",
+      "definition_version": "annual-core-v1",
+      "aggregation": "no_implicit_sum"
+    },
+    "net_income": {
+      "metric_id": "net_income",
+      "label": "net_income",
+      "unit": "USD",
+      "denominator": null,
+      "definition": "net_income",
+      "definition_version": "us-gaap-inline-v1",
+      "aggregation": "no_implicit_sum",
+      "aliases": [
+        "net_income"
+      ]
+    },
+    "operating_cash_flow": {
+      "metric_id": "operating_cash_flow",
+      "label": "Operating cash flow",
+      "aliases": [
+        "Net cash provided by operating activities",
+        "Net cash generated from operating activities",
+        "Net cash from operating activities"
+      ],
+      "unit": "TWD",
+      "definition_version": "annual-core-v1",
+      "aggregation": "no_implicit_sum"
+    },
+    "operating_income": {
+      "metric_id": "operating_income",
+      "label": "Operating income",
+      "aliases": [
+        "Operating income (loss)",
+        "Income from operations",
+        "Operating profit",
+        "Operating income"
+      ],
+      "unit": "TWD",
+      "definition_version": "annual-core-v1",
+      "aggregation": "no_implicit_sum"
+    },
+    "revenue": {
+      "metric_id": "revenue",
+      "label": "Revenue",
+      "aliases": [
+        "Net revenue",
+        "Net revenues",
+        "Net sales",
+        "Revenue",
+        "Revenues"
+      ],
+      "unit": "TWD",
+      "definition_version": "annual-core-v1",
+      "aggregation": "no_implicit_sum"
+    },
+    "revenue_including_assessed_tax": {
+      "metric_id": "revenue_including_assessed_tax",
+      "label": "revenue_including_assessed_tax",
+      "unit": "USD",
+      "denominator": null,
+      "definition": "revenue_including_assessed_tax",
+      "definition_version": "us-gaap-inline-v1",
+      "aggregation": "no_implicit_sum",
+      "aliases": [
+        "revenue_including_assessed_tax"
+      ]
+    },
+    "cash_and_equivalents": {
+      "metric_id": "cash_and_equivalents",
+      "label": "Cash and cash equivalents",
+      "aliases": [
+        "Cash and cash equivalents"
+      ],
+      "unit": "TWD",
+      "definition_version": "annual-core-v1",
+      "aggregation": "no_implicit_sum"
+    }
+  },
+  "period_catalog": [
+    {
+      "period_id": "fy2021",
+      "label": "For the year ended December 31, 2021",
+      "aliases": [
+        "FY2021",
+        "Year ended December 31, 2021"
+      ],
+      "period": {
+        "kind": "year",
+        "start": "2021-01-01",
+        "end": "2021-12-31",
+        "basis": "source"
+      },
+      "company_id": "sec-0001046179",
+      "source_snapshot_id": "source-6719837a8d24b2b7df359f29"
+    },
+    {
+      "period_id": "fy2022",
+      "label": "For the year ended December 31, 2022",
+      "aliases": [
+        "FY2022",
+        "Year ended December 31, 2022"
+      ],
+      "period": {
+        "kind": "year",
+        "start": "2022-01-01",
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "company_id": "sec-0001046179",
+      "source_snapshot_id": "source-6719837a8d24b2b7df359f29"
+    },
+    {
+      "period_id": "fy2023",
+      "label": "For the year ended December 31, 2023",
+      "aliases": [
+        "FY2023",
+        "Year ended December 31, 2023"
+      ],
+      "period": {
+        "kind": "year",
+        "start": "2023-01-01",
+        "end": "2023-12-31",
+        "basis": "source"
+      },
+      "company_id": "sec-0001046179",
+      "source_snapshot_id": "source-6719837a8d24b2b7df359f29"
+    },
+    {
+      "period_id": "instant-2022-12-31",
+      "label": "As of December 31, 2022",
+      "aliases": [
+        "2022-12-31",
+        "December 31, 2022"
+      ],
+      "period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "company_id": "sec-0001046179",
+      "source_snapshot_id": "source-6719837a8d24b2b7df359f29"
+    },
+    {
+      "period_id": "instant-2023-12-31",
+      "label": "As of December 31, 2023",
+      "aliases": [
+        "2023-12-31",
+        "December 31, 2023"
+      ],
+      "period": {
+        "kind": "instant",
+        "start": null,
+        "end": "2023-12-31",
+        "basis": "source"
+      },
+      "company_id": "sec-0001046179",
+      "source_snapshot_id": "source-6719837a8d24b2b7df359f29"
+    }
+  ],
+  "coverage": {
+    "selected_blocks": [
+      "block-001122-e478aee6",
+      "block-001123-de1719a9",
+      "block-001124-d8a3ba3f",
+      "block-001125-2ea6a4cb",
+      "block-001126-334c9693"
+    ],
+    "document_block_count": 1929,
+    "recall_completeness": "not_evaluated"
+  },
+  "record_schema_version": "research-query-v0.5",
+  "output_schema": {
+    "$defs": {
+      "DraftEvidence": {
+        "additionalProperties": false,
+        "properties": {
+          "block_id": {
+            "minLength": 1,
+            "title": "Block Id",
+            "type": "string"
+          },
+          "quote": {
+            "minLength": 1,
+            "title": "Quote",
+            "type": "string"
+          },
+          "occurrence_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Occurrence Id"
+          }
+        },
+        "required": [
+          "block_id",
+          "quote"
+        ],
+        "title": "DraftEvidence",
+        "type": "object"
+      },
+      "DraftRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "draft_id": {
+            "minLength": 1,
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "financial",
+              "guidance",
+              "statement"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "entity": {
+            "minLength": 1,
+            "title": "Entity",
+            "type": "string"
+          },
+          "entity_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Entity Id"
+          },
+          "metric": {
+            "minLength": 1,
+            "title": "Metric",
+            "type": "string"
+          },
+          "metric_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Metric Id"
+          },
+          "period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Period"
+          },
+          "period_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Period Id"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Value"
+          },
+          "upper": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Upper"
+          },
+          "value_relation": {
+            "enum": [
+              "eq",
+              "range",
+              "approx",
+              "gt",
+              "gte",
+              "qualitative",
+              "unresolved"
+            ],
+            "title": "Value Relation",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Unit"
+          },
+          "denominator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Denominator"
+          },
+          "accounting_basis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Accounting Basis"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Speaker"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/$defs/DraftEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "qualifiers": {
+            "items": {
+              "$ref": "#/$defs/DraftEvidence"
+            },
+            "title": "Qualifiers",
+            "type": "array"
+          },
+          "question_refs": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Question Refs",
+            "type": "array"
+          },
+          "unresolved_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Unresolved Fields",
+            "type": "array"
+          }
+        },
+        "required": [
+          "draft_id",
+          "kind",
+          "entity",
+          "metric",
+          "value_relation",
+          "summary"
+        ],
+        "title": "DraftRecord",
+        "type": "object"
+      },
+      "DraftRelation": {
+        "additionalProperties": false,
+        "properties": {
+          "relation_id": {
+            "minLength": 1,
+            "title": "Relation Id",
+            "type": "string"
+          },
+          "relation_type": {
+            "minLength": 1,
+            "title": "Relation Type",
+            "type": "string"
+          },
+          "record_ids": {
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Record Ids",
+            "type": "array"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/$defs/DraftEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          }
+        },
+        "required": [
+          "relation_id",
+          "relation_type",
+          "record_ids",
+          "description"
+        ],
+        "title": "DraftRelation",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "records": {
+        "items": {
+          "$ref": "#/$defs/DraftRecord"
+        },
+        "title": "Records",
+        "type": "array"
+      },
+      "relations": {
+        "items": {
+          "$ref": "#/$defs/DraftRelation"
+        },
+        "title": "Relations",
+        "type": "array"
+      },
+      "gaps": {
+        "items": {
+          "type": "string"
+        },
+        "title": "Gaps",
+        "type": "array"
+      }
+    },
+    "title": "DirectExtraction",
+    "type": "object"
+  },
+  "packet_id": "packet-9dca3559cbb67d783abe23ed"
+}

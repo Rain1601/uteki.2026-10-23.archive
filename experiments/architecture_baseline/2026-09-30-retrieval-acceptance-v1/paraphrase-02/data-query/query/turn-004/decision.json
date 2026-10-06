@@ -1,0 +1,99 @@
+{
+  "action": "plan",
+  "delegation": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [
+    "r-ocf-fy2024-fy2025",
+    "r-capex-cash-fy2024-fy2025",
+    "r-ppe-capex-narrative"
+  ],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "operating_cash_flow",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "r-ocf-fy2024-fy2025",
+      "description": "Query Alphabet FY2025 10-K for consolidated net cash provided by operating activities for fiscal years 2024 and 2025, reported actual, USD, no manual arithmetic."
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "capex_cash_payments",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "r-capex-cash-fy2024-fy2025",
+      "description": "Query Alphabet FY2025 10-K for cash payments to acquire property and equipment for fiscal years 2024 and 2025 as reported in the cash flow statement, reported actual, USD; also identify period and accounting basis."
+    },
+    {
+      "kind": "source_answer",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "requirement_id": "r-ppe-capex-narrative",
+      "description": "Using the selected Alphabet FY2025 10-K, identify the major categories in which Alphabet invested in long-lived physical assets (property and equipment purchases), correlate the original table line for purchases of property and equipment with the narrative categories, and separate reported actual amounts from forward-looking statements. Read the relevant complete paragraphs and tables; do not treat search previews as read."
+    }
+  ],
+  "reason": "修正上一版计划：数值要求使用 kind=query 且仅在 QueryPlan 中限定主体、指标与期间；文字/类别问题使用 kind=source_answer 且只提供 source_id，不提供 node_id。先建立三项要求：两项查询分别覆盖 FY2024/FY2025 经营活动现金流与购置物业和设备现金支出，一项 source_answer 覆盖长期实物资产投入的主要类别及与原文表格的对应。",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

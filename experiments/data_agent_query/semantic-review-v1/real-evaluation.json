@@ -1,0 +1,695 @@
+{
+  "schema_version": "semantic-review-independent-evaluation-v1",
+  "evaluation_only": true,
+  "method": "Independent source-grounded review against frozen real-cases.json; no additional model call and no mutation of model output.",
+  "result_path": "data/company_workspace/record_review/semantic-quality-v1/real-run-01/result.json",
+  "result_sha256": "bd08ea6440584f3e0663f6be3ada5ac3be6c8aab6bd632e0f1cd40b30bdce957",
+  "expected_cases_path": "experiments/data_agent_query/semantic-review-v1/real-cases.json",
+  "expected_cases_sha256": "1e6b6c2d6101c2a8f4aeb0843435abedb4ecb843c0c0b6bd77d3f7b95915549a",
+  "overall_status": "partial",
+  "status_rule": "pass requires every frozen expected constraint to be supported with appropriate affected-record scope; partial means useful supported constraints coexist with unresolved or failed items. Individual false statements are fail.",
+  "engineering_tests": {
+    "command": "python -m unittest tests.unit.test_semantic_review",
+    "tests": 11,
+    "status": "pass",
+    "scope": "Offline identity/hash/source/DOM/citation/coverage contracts, not semantic accuracy."
+  },
+  "cases": [
+    {
+      "case_id": "msft-fy2025-segment-semantics",
+      "packet_id": "semantic-adfbc9928037dd3e58803a45",
+      "status": "partial",
+      "expected_constraint_results": [
+        {
+          "expected_constraint_index": 0,
+          "axis": "comparability",
+          "status": "partial",
+          "required_record_ids": [
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36"
+          ],
+          "actual_record_ids": [
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-281f43cdb444f0468b258378",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-961d14430e22510f30de532b",
+            "obs-9bd36b9c21a22f94d9865d36",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-a865449200586290da8b8463",
+            "obs-b2476370393460b74b70a82d",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-ea3fda8937394a153cf46072"
+          ],
+          "missing_record_ids": [],
+          "extra_record_ids": [
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-a865449200586290da8b8463",
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-d2acdf2c846eea79d969011b"
+          ],
+          "reason": "The recast is recognized and correctly cited, but the statement says 2023/2024 while its affected IDs include six 2025 segment records. Comparability is established only for the stated segment basis, not every economic dimension.",
+          "model_evidence": [
+            {
+              "record_ids": [
+                "obs-c9967bda56a0a08e2bdc7acf",
+                "obs-ea3fda8937394a153cf46072",
+                "obs-c624a7fd0eb02f1b95bda571",
+                "obs-d2acdf2c846eea79d969011b",
+                "obs-a853ba764b41a6d58faca6af",
+                "obs-7111bdf83f6d6de4c164383f",
+                "obs-a865449200586290da8b8463",
+                "obs-c9752a3daf7a4ed8acf5f613",
+                "obs-3fc0069337163d3cdf840f0e",
+                "obs-58b8e9bbcdbe0f65e5761bb4",
+                "obs-961d14430e22510f30de532b",
+                "obs-e52f53034ee84065bac78ca7",
+                "obs-0033610d10facc97d1d4f6fe",
+                "obs-b2476370393460b74b70a82d",
+                "obs-63f6779a0d713cba625784b1",
+                "obs-8db30fb8b8299551605a9c37",
+                "obs-281f43cdb444f0468b258378",
+                "obs-9bd36b9c21a22f94d9865d36"
+              ],
+              "statement": "2023和2024财年的分部收入与营业利润已按2025财年的分部构成进行重述，因此这些记录与2025财年分部数据可比，但不代表原报告期间的分部数据。",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-000817-00ca3208",
+                  "quote": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes. Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025."
+                },
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001182-b3eedf85",
+                  "quote": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "expected_constraint_index": 1,
+          "axis": "comparability",
+          "status": "pass",
+          "required_record_ids": [
+            "obs-71426abfd6e87ce682843e93",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-d471c9f3d1f12b167e1eb773",
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-58b8edcdb583d0c1df1a56d7"
+          ],
+          "actual_record_ids": [
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-58b8edcdb583d0c1df1a56d7",
+            "obs-71426abfd6e87ce682843e93",
+            "obs-d471c9f3d1f12b167e1eb773"
+          ],
+          "missing_record_ids": [],
+          "extra_record_ids": [],
+          "reason": "The six dimensionless totals are separated from segment recasting and cite the explicit consolidated-statements exception. Read original basis only as no impact from this recast, not proof no other historical changes ever occurred.",
+          "model_evidence": [
+            {
+              "record_ids": [
+                "obs-71426abfd6e87ce682843e93",
+                "obs-4d14a06717f1d1c8a5cf4433",
+                "obs-3fd5ae6292a1f718212ba070",
+                "obs-d471c9f3d1f12b167e1eb773",
+                "obs-0ccf6d30b99cfa01728074db",
+                "obs-58b8edcdb583d0c1df1a56d7"
+              ],
+              "statement": "合并收入与营业利润不受分部重述影响，各期间保持原报告口径。",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-000818-3a2e0b27",
+                  "quote": "The recast of prior period information had no impact on our consolidated balance sheets, consolidated income statements, or consolidated cash flows statements."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "expected_constraint_index": 2,
+          "axis": "allocation",
+          "status": "partial",
+          "required_record_ids": [
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-a865449200586290da8b8463",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36"
+          ],
+          "actual_record_ids": [
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-281f43cdb444f0468b258378",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-961d14430e22510f30de532b",
+            "obs-9bd36b9c21a22f94d9865d36",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-a865449200586290da8b8463",
+            "obs-b2476370393460b74b70a82d",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-ea3fda8937394a153cf46072"
+          ],
+          "missing_record_ids": [],
+          "extra_record_ids": [],
+          "reason": "All 18 segment records are covered, but one combined statement assigns revenue-allocation and corporate-cost-allocation language to the same IDs. The expected contract requires distinguishing revenue allocation from expense/corporate allocation affecting operating income.",
+          "model_evidence": [
+            {
+              "record_ids": [
+                "obs-c9967bda56a0a08e2bdc7acf",
+                "obs-ea3fda8937394a153cf46072",
+                "obs-c624a7fd0eb02f1b95bda571",
+                "obs-d2acdf2c846eea79d969011b",
+                "obs-a853ba764b41a6d58faca6af",
+                "obs-7111bdf83f6d6de4c164383f",
+                "obs-a865449200586290da8b8463",
+                "obs-c9752a3daf7a4ed8acf5f613",
+                "obs-3fc0069337163d3cdf840f0e",
+                "obs-58b8e9bbcdbe0f65e5761bb4",
+                "obs-961d14430e22510f30de532b",
+                "obs-e52f53034ee84065bac78ca7",
+                "obs-0033610d10facc97d1d4f6fe",
+                "obs-b2476370393460b74b70a82d",
+                "obs-63f6779a0d713cba625784b1",
+                "obs-8db30fb8b8299551605a9c37",
+                "obs-281f43cdb444f0468b258378",
+                "obs-9bd36b9c21a22f94d9865d36"
+              ],
+              "statement": "分部收入与营业利润包含基于相对价值、实际价格或成本加成等方法的分部间分配，以及基于相对毛利或相对员工人数的公司层面成本分配，因此不能视为独立经营实体的直接结果。",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001211-94df82c9",
+                  "quote": "Revenue and costs are generally directly attributed to our segments. However, due to the integrated structure of our business, certain revenue recognized and costs incurred by one segment may benefit other segments. Revenue from certain contracts is allocated among the segments based on the relative value of the underlying products and services, which can include allocation based on actual prices charged, prices when sold separately, or estimated costs plus a profit margin. Cost of revenue is allocated in certain cases based on a relative revenue methodology. Operating expenses that are allocated primarily include those relating to marketing of products and services from which multiple segments benefit and are generally allocated based on relative gross margin."
+                },
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001212-72e12aed",
+                  "quote": "In addition, certain costs are incurred at a corporate level and allocated to our segments. These allocated costs generally include legal, including settlements and fines, information technology, human resources, finance, excise taxes, field selling, shared facilities services, customer service and support, and severance incurred as part of a corporate program. Each allocation is measured differently based on the specific facts and circumstances of the costs being allocated and is generally based on relative gross margin or relative headcount."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "expected_constraint_index": 3,
+          "axis": "dimensions",
+          "status": "fail",
+          "required_record_ids": [
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-a865449200586290da8b8463",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36",
+            "obs-71426abfd6e87ce682843e93",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-d471c9f3d1f12b167e1eb773",
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-58b8edcdb583d0c1df1a56d7"
+          ],
+          "actual_record_ids": [
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-281f43cdb444f0468b258378",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-58b8edcdb583d0c1df1a56d7",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-71426abfd6e87ce682843e93",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-961d14430e22510f30de532b",
+            "obs-9bd36b9c21a22f94d9865d36",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-a865449200586290da8b8463",
+            "obs-b2476370393460b74b70a82d",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-d471c9f3d1f12b167e1eb773",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-ea3fda8937394a153cf46072"
+          ],
+          "missing_record_ids": [],
+          "extra_record_ids": [],
+          "reason": "The three six-record segment-member groups are correct and all six totals are separately identified. However the totals constraint says consolidated basis rather than segment sum, an unsupported exclusivity contradicted by the disclosed table arithmetic.",
+          "model_evidence": [
+            {
+              "record_ids": [
+                "obs-c9967bda56a0a08e2bdc7acf",
+                "obs-ea3fda8937394a153cf46072",
+                "obs-c624a7fd0eb02f1b95bda571",
+                "obs-d2acdf2c846eea79d969011b",
+                "obs-a853ba764b41a6d58faca6af",
+                "obs-7111bdf83f6d6de4c164383f"
+              ],
+              "statement": "维度成员 msft:ProductivityAndBusinessProcessesMember 对应披露分部“Productivity and Business Processes”。",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001181-efcd150c",
+                  "quote": "During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing."
+                },
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001217-90dfc72b",
+                  "quote": "Productivity and Business Processes Revenue $ 120,810 $ 106,820 $ 94,151"
+                }
+              ]
+            },
+            {
+              "record_ids": [
+                "obs-a865449200586290da8b8463",
+                "obs-c9752a3daf7a4ed8acf5f613",
+                "obs-3fc0069337163d3cdf840f0e",
+                "obs-58b8e9bbcdbe0f65e5761bb4",
+                "obs-961d14430e22510f30de532b",
+                "obs-e52f53034ee84065bac78ca7"
+              ],
+              "statement": "维度成员 msft:IntelligentCloudMember 对应披露分部“Intelligent Cloud”。",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001181-efcd150c",
+                  "quote": "During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing."
+                },
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001217-90dfc72b",
+                  "quote": "Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944"
+                }
+              ]
+            },
+            {
+              "record_ids": [
+                "obs-0033610d10facc97d1d4f6fe",
+                "obs-b2476370393460b74b70a82d",
+                "obs-63f6779a0d713cba625784b1",
+                "obs-8db30fb8b8299551605a9c37",
+                "obs-281f43cdb444f0468b258378",
+                "obs-9bd36b9c21a22f94d9865d36"
+              ],
+              "statement": "维度成员 msft:MorePersonalComputingMember 对应披露分部“More Personal Computing”。",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001181-efcd150c",
+                  "quote": "During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing."
+                },
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001217-90dfc72b",
+                  "quote": "More Personal Computing Revenue $ 54,649 $ 50,838 $ 44,820"
+                }
+              ]
+            },
+            {
+              "record_ids": [
+                "obs-71426abfd6e87ce682843e93",
+                "obs-4d14a06717f1d1c8a5cf4433",
+                "obs-3fd5ae6292a1f718212ba070",
+                "obs-d471c9f3d1f12b167e1eb773",
+                "obs-0ccf6d30b99cfa01728074db",
+                "obs-58b8edcdb583d0c1df1a56d7"
+              ],
+              "statement": "无维度成员的总计记录对应合并报表口径，而非分部合计。",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001217-90dfc72b",
+                  "quote": "Total Revenue $ 281,724 $ 245,122 $ 211,915"
+                },
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-000818-3a2e0b27",
+                  "quote": "The recast of prior period information had no impact on our consolidated balance sheets, consolidated income statements, or consolidated cash flows statements."
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "model_constraint_results": [
+        {
+          "axis": "comparability",
+          "constraint_index": 0,
+          "status": "partial",
+          "record_ids": [
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-a865449200586290da8b8463",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36"
+          ],
+          "statement": "2023和2024财年的分部收入与营业利润已按2025财年的分部构成进行重述，因此这些记录与2025财年分部数据可比，但不代表原报告期间的分部数据。",
+          "citation_block_ids": [
+            "block-000817-00ca3208",
+            "block-001182-b3eedf85"
+          ]
+        },
+        {
+          "axis": "comparability",
+          "constraint_index": 1,
+          "status": "pass",
+          "record_ids": [
+            "obs-71426abfd6e87ce682843e93",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-d471c9f3d1f12b167e1eb773",
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-58b8edcdb583d0c1df1a56d7"
+          ],
+          "statement": "合并收入与营业利润不受分部重述影响，各期间保持原报告口径。",
+          "citation_block_ids": [
+            "block-000818-3a2e0b27"
+          ]
+        },
+        {
+          "axis": "allocation",
+          "constraint_index": 0,
+          "status": "partial",
+          "record_ids": [
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f",
+            "obs-a865449200586290da8b8463",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7",
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36"
+          ],
+          "statement": "分部收入与营业利润包含基于相对价值、实际价格或成本加成等方法的分部间分配，以及基于相对毛利或相对员工人数的公司层面成本分配，因此不能视为独立经营实体的直接结果。",
+          "citation_block_ids": [
+            "block-001211-94df82c9",
+            "block-001212-72e12aed"
+          ]
+        },
+        {
+          "axis": "dimensions",
+          "constraint_index": 0,
+          "status": "pass",
+          "record_ids": [
+            "obs-c9967bda56a0a08e2bdc7acf",
+            "obs-ea3fda8937394a153cf46072",
+            "obs-c624a7fd0eb02f1b95bda571",
+            "obs-d2acdf2c846eea79d969011b",
+            "obs-a853ba764b41a6d58faca6af",
+            "obs-7111bdf83f6d6de4c164383f"
+          ],
+          "statement": "维度成员 msft:ProductivityAndBusinessProcessesMember 对应披露分部“Productivity and Business Processes”。",
+          "citation_block_ids": [
+            "block-001181-efcd150c",
+            "block-001217-90dfc72b"
+          ]
+        },
+        {
+          "axis": "dimensions",
+          "constraint_index": 1,
+          "status": "pass",
+          "record_ids": [
+            "obs-a865449200586290da8b8463",
+            "obs-c9752a3daf7a4ed8acf5f613",
+            "obs-3fc0069337163d3cdf840f0e",
+            "obs-58b8e9bbcdbe0f65e5761bb4",
+            "obs-961d14430e22510f30de532b",
+            "obs-e52f53034ee84065bac78ca7"
+          ],
+          "statement": "维度成员 msft:IntelligentCloudMember 对应披露分部“Intelligent Cloud”。",
+          "citation_block_ids": [
+            "block-001181-efcd150c",
+            "block-001217-90dfc72b"
+          ]
+        },
+        {
+          "axis": "dimensions",
+          "constraint_index": 2,
+          "status": "pass",
+          "record_ids": [
+            "obs-0033610d10facc97d1d4f6fe",
+            "obs-b2476370393460b74b70a82d",
+            "obs-63f6779a0d713cba625784b1",
+            "obs-8db30fb8b8299551605a9c37",
+            "obs-281f43cdb444f0468b258378",
+            "obs-9bd36b9c21a22f94d9865d36"
+          ],
+          "statement": "维度成员 msft:MorePersonalComputingMember 对应披露分部“More Personal Computing”。",
+          "citation_block_ids": [
+            "block-001181-efcd150c",
+            "block-001217-90dfc72b"
+          ]
+        },
+        {
+          "axis": "dimensions",
+          "constraint_index": 3,
+          "status": "fail",
+          "record_ids": [
+            "obs-71426abfd6e87ce682843e93",
+            "obs-4d14a06717f1d1c8a5cf4433",
+            "obs-3fd5ae6292a1f718212ba070",
+            "obs-d471c9f3d1f12b167e1eb773",
+            "obs-0ccf6d30b99cfa01728074db",
+            "obs-58b8edcdb583d0c1df1a56d7"
+          ],
+          "statement": "无维度成员的总计记录对应合并报表口径，而非分部合计。",
+          "citation_block_ids": [
+            "block-001217-90dfc72b",
+            "block-000818-3a2e0b27"
+          ]
+        }
+      ],
+      "arithmetic_counterexample": {
+        "source_block_id": "block-001217-90dfc72b",
+        "unit": "USD millions",
+        "revenue": {
+          "2025": {
+            "segments": [
+              120810,
+              106265,
+              54649
+            ],
+            "total": 281724
+          },
+          "2024": {
+            "segments": [
+              106820,
+              87464,
+              50838
+            ],
+            "total": 245122
+          },
+          "2023": {
+            "segments": [
+              94151,
+              72944,
+              44820
+            ],
+            "total": 211915
+          }
+        },
+        "operating_income": {
+          "2025": {
+            "segments": [
+              69773,
+              44589,
+              14166
+            ],
+            "total": 128528
+          },
+          "2024": {
+            "segments": [
+              59661,
+              37813,
+              11959
+            ],
+            "total": 109433
+          },
+          "2023": {
+            "segments": [
+              50074,
+              28411,
+              10038
+            ],
+            "total": 88523
+          }
+        }
+      }
+    },
+    {
+      "case_id": "msft-fy2025-cloud-overlap-semantics",
+      "packet_id": "semantic-b71fb814025d8dcef099a688",
+      "status": "pass",
+      "expected_constraint_results": [
+        {
+          "expected_constraint_index": 0,
+          "axis": "additivity",
+          "status": "pass",
+          "required_record_ids": [
+            "obs-f8e00a77890bcdeb3edd38a2",
+            "obs-0b93130590eaf7825ad22d22",
+            "obs-34467d4558b7878f6fb37d22"
+          ],
+          "actual_record_ids": [
+            "obs-0b93130590eaf7825ad22d22",
+            "obs-34467d4558b7878f6fb37d22",
+            "obs-f8e00a77890bcdeb3edd38a2"
+          ],
+          "missing_record_ids": [],
+          "extra_record_ids": [],
+          "model_evidence": [
+            {
+              "record_ids": [
+                "obs-f8e00a77890bcdeb3edd38a2",
+                "obs-0b93130590eaf7825ad22d22",
+                "obs-34467d4558b7878f6fb37d22"
+              ],
+              "statement": "Microsoft Cloud revenue is included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services; therefore these records are not additive with those product lines.",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001227-3bdf0315",
+                  "quote": "These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above."
+                }
+              ]
+            }
+          ],
+          "reason": "Explicit included-in constraint prevents adding cloud revenue to the named product lines, with correct three-record scope."
+        },
+        {
+          "expected_constraint_index": 1,
+          "axis": "dimensions",
+          "status": "pass",
+          "required_record_ids": [
+            "obs-f8e00a77890bcdeb3edd38a2",
+            "obs-0b93130590eaf7825ad22d22",
+            "obs-34467d4558b7878f6fb37d22"
+          ],
+          "actual_record_ids": [
+            "obs-0b93130590eaf7825ad22d22",
+            "obs-34467d4558b7878f6fb37d22",
+            "obs-f8e00a77890bcdeb3edd38a2"
+          ],
+          "missing_record_ids": [],
+          "extra_record_ids": [],
+          "model_evidence": [
+            {
+              "record_ids": [
+                "obs-f8e00a77890bcdeb3edd38a2",
+                "obs-0b93130590eaf7825ad22d22",
+                "obs-34467d4558b7878f6fb37d22"
+              ],
+              "statement": "The dimension msft:MicrosoftCloudMember represents the 'Microsoft Cloud' product/service offering, which is a secondary categorization and not one of the reportable segments (Productivity and Business Processes, Intelligent Cloud, More Personal Computing).",
+              "citations": [
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001227-3bdf0315",
+                  "quote": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively."
+                },
+                {
+                  "source_snapshot_id": "source-0019ae7ba0f6e3b63f944782",
+                  "block_id": "block-001181-efcd150c",
+                  "quote": "During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing."
+                }
+              ]
+            }
+          ],
+          "reason": "Uses the exact composition sentence, including only commercial LinkedIn, and distinguishes Microsoft Cloud from the three reportable segments. Together with additivity it avoids equating this grouping to complete product-line totals."
+        }
+      ],
+      "limitations": [
+        "Only the opening and target neighborhood of Note 18 were supplied; cross-note references to Note 1 were not resolved.",
+        "No assertions were provided for review."
+      ]
+    }
+  ],
+  "boundaries": [
+    "Two source-grounded cases only; not Gold coverage of all 102 records or extraction recall.",
+    "No assertions were supplied; assertion-validation reasoning was not tested by these real calls.",
+    "Cloud component values and an independent reconciliation bridge remain unavailable.",
+    "Segment historical originally reported filings were not independently reconciled.",
+    "All original candidate records and model opinions remain unchanged; no automatic adoption."
+  ]
+}

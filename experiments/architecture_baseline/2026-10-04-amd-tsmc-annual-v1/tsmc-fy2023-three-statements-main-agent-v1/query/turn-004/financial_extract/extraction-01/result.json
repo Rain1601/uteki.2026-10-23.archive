@@ -1,0 +1,168 @@
+{
+  "schema_version": "direct-extraction-run-v1",
+  "strategy": "direct",
+  "status": "candidate",
+  "packet_id": "packet-9dca3559cbb67d783abe23ed",
+  "started_at": "2026-10-04T18:00:01.059615+00:00",
+  "plan_origin": "model",
+  "implementation": {
+    "implementation/uteki/infrastructure/research_data/direct_extraction.py": "9410346182e9fb0c13c3f9578f363cd1fc575c23e3e0cb995d3152497025e99b",
+    "implementation/uteki/agents/data_extraction/direct.py": "14961620b9a3c5832c1f6d645e62b5bd2db906e81f02193f6856ef02910c87a7",
+    "implementation/uteki/infrastructure/research_data/direct_normalization.py": "662f7f5063c8a8c093d7ad437e3be1a4b2c5a159a80b1e0aa34ed67e8b7dece9",
+    "implementation/uteki/domain/research_data/direct_extraction.py": "7dd5c106e65bfcb29ae01e9a7c063b0056d200189f3689c93e1f7d41c34288c7"
+  },
+  "semantic_acceptance": "not_evaluated",
+  "coverage": {
+    "block-001122-e478aee6": "extraction_returned",
+    "block-001123-de1719a9": "extraction_returned",
+    "block-001124-d8a3ba3f": "extraction_returned",
+    "block-001125-2ea6a4cb": "extraction_returned",
+    "block-001126-334c9693": "extraction_returned"
+  },
+  "raw_record_count": 3,
+  "normalized_record_count": 2,
+  "validation": {
+    "normalization_version": "direct-normalization-v1",
+    "status": "partial",
+    "input_records": 3,
+    "normalized_records": 2,
+    "model_gaps": [
+      "Supplied batch contains only the consolidated statements of financial position heading, the '(In Millions of New Taiwan Dollars or U.S. Dollars)' caption and the current/noncurrent assets table (block-001124). No consolidated statements of comprehensive income (revenue, operating income) block was delivered.",
+      "Revenue for FY2023 and the presented comparative year FY2022 is not established in the supplied blocks; the income statement block is missing.",
+      "Operating income for FY2023 and FY2022 is not established in the supplied blocks; the income statement block is missing.",
+      "Operating cash flow (net cash provided by operating activities) for FY2023 and FY2022 is not established in the supplied blocks; the consolidated statements of cash flows block and its period captions are missing.",
+      "Cash purchases of property, plant and equipment for FY2023 and FY2022 are not established in the supplied blocks; the investing-activities section and its note references are not delivered.",
+      "The table is marked '(Continued)' (block-001125-2ea6a4cb, page F - 4), so the equity-and-liabilities portion of the same balance sheet and adjacent notes were not delivered in this batch.",
+      "No FY2021 comparative appears in the delivered table; the period catalog lists fy2021 but no FY2021 figures are present in these blocks.",
+      "The accounting framework wording (e.g., IFRS as endorsed in the R.O.C. or US GAAP) is not stated in the supplied blocks; accounting_basis is set to reported_consolidated based on the 'CONSOLIDATED STATEMENTS OF FINANCIAL POSITION' heading only.",
+      "Dashes ('-') appear in the delivered table (e.g., hedging financial assets, noncurrent FVTPL for 2022) and are not treated as zero.",
+      "Whether these consolidated financial statements are the original audited FY2023 statements or a re-presentation cannot be confirmed from the supplied blocks alone."
+    ],
+    "semantic_acceptance": "not_evaluated",
+    "adoption": "unchanged_candidate"
+  },
+  "unresolved_count": 4,
+  "projection_snapshot_id": "query-direct-bf34a95733e156212a68b139",
+  "dataset": {
+    "path": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-three-statements-main-agent-v1/query/turn-004/financial_extract/extraction-01/dataset",
+    "snapshot_id": "query-direct-bf34a95733e156212a68b139",
+    "manifest_sha256": "8a16947f13c7bbb37504419547a24f9777be46f8f847fc1043a46629eb2400a2"
+  },
+  "usage": {
+    "artifact_root": "/Users/bytedance/Documents/ChatGPT/uteki/experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-three-statements-main-agent-v1/query/turn-004/financial_extract/extraction-01/model",
+    "path": "usage-0002.json",
+    "sha256": "241521f35fdc79ed084746dc59072d7093bc4cbc1762ea127df8401600b5e778",
+    "summary": {
+      "schema_version": "record-review-model-usage-v1",
+      "plan_origin": "model",
+      "provider": "deepseek",
+      "model": "deepseek-flash",
+      "reasoning_effort": "low",
+      "thinking_mode": "enabled",
+      "max_request_bytes": 400000,
+      "model_config_sha256": "eb1f8f983d5885b23d49b10a20227fae77c45add74318e5dcc6d422b486e4f48",
+      "prompt_sha256": "92c685c655df1819fcae370bef133d082c4691eb9cb757dec0898716eabb92fc",
+      "calls": {
+        "requests": 1,
+        "unknown_cost_requests": 0,
+        "known_estimated_usd": "0.0120036",
+        "actual_billed_usd": null,
+        "records": [
+          {
+            "call_id": "4bb977d5-61eb-43c7-b4c2-aab9d407189b",
+            "stage": "record_review",
+            "provider": "deepseek",
+            "requested_model": "deepseek-flash",
+            "actual_upstream_model": "deepseek-flash",
+            "started_at": "2026-10-04T18:00:01.073817+00:00",
+            "pricing_snapshot": {
+              "provider": "deepseek",
+              "model": "deepseek-flash",
+              "currency": "USD",
+              "input_per_million": "0.30",
+              "output_per_million": "1.20",
+              "cached_input_per_million": "0.006",
+              "source": "https://api-docs.deepseek.com/quick_start/pricing",
+              "checked_on": "2026-09-22",
+              "basis": "Peak list price estimate; no cache or off-peak discounts applied"
+            },
+            "actual_billed_usd": null,
+            "status": "succeeded",
+            "usage": {
+              "input_tokens": 28732,
+              "output_tokens": 2820,
+              "total_tokens": 31552,
+              "input_tokens_details": {
+                "cached_tokens": 3840
+              },
+              "output_tokens_details": {
+                "reasoning_tokens": 935
+              }
+            },
+            "estimated_usd": "0.0120036",
+            "cost_basis": "uncached_list_price_estimate_not_bill",
+            "budget_reservation_id": "9de01c40-98e6-40dd-aa09-e2a371f3a0a4",
+            "reserved_usd": "0.0505626",
+            "response_id": "e0ded62f-9722-4f00-b030-42ae8dc9ef7a",
+            "request_id": null,
+            "system_fingerprint": "aeb56401ca74e127821c4f9126dcb669",
+            "finish_reason": "stop",
+            "raw_usage": {
+              "completion_tokens": 2820,
+              "prompt_tokens": 28732,
+              "total_tokens": 31552,
+              "completion_tokens_details": {
+                "reasoning_tokens": 935
+              },
+              "prompt_tokens_details": {
+                "cached_tokens": 3840
+              },
+              "prompt_cache_hit_tokens": 3840,
+              "prompt_cache_miss_tokens": 24892
+            },
+            "ended_at": "2026-10-04T18:00:11.842370+00:00",
+            "elapsed_seconds": 10.768198417034
+          }
+        ]
+      },
+      "shared_budget": {
+        "limit_usd": null,
+        "estimated_spent_usd": "1.53439056",
+        "held_usd": "0.86635428",
+        "unknown_requests": 2,
+        "in_flight_requests": 0,
+        "requests": 33,
+        "actual_billed_usd": null,
+        "enforcement": "record_only"
+      },
+      "artifacts": [
+        {
+          "path": "calls/4bb977d5-61eb-43c7-b4c2-aab9d407189b-end.json",
+          "sha256": "01218326643aec25a39dd6357d832e3a9670489e617a550cff67deae21f2695e"
+        },
+        {
+          "path": "calls/4bb977d5-61eb-43c7-b4c2-aab9d407189b-start.json",
+          "sha256": "5633fe8aaef6a4c4d1ec011c77982d6e87fc1022abb6d4868d32e98fecef852e"
+        },
+        {
+          "path": "model-config.json",
+          "sha256": "eb1f8f983d5885b23d49b10a20227fae77c45add74318e5dcc6d422b486e4f48"
+        },
+        {
+          "path": "review-0001-attempt-01.json",
+          "sha256": "405f4a0dde6545e22104d4bc12d88494b71aab53755485ff31b0c99b7ab78407"
+        },
+        {
+          "path": "review-0001-input.json",
+          "sha256": "9108fd4a9419a26b47090f88d345edb35181a006d4c4542e11cc5209e8f3a657"
+        },
+        {
+          "path": "review-0001-parsed.json",
+          "sha256": "072b62b9ee5e1bc1a1b72c814b2b2b5d90f7c2f9ba4d14394d76560fe07ddfeb"
+        }
+      ],
+      "business_validation": "not_evaluated"
+    }
+  },
+  "finished_at": "2026-10-04T18:00:12.042784+00:00"
+}

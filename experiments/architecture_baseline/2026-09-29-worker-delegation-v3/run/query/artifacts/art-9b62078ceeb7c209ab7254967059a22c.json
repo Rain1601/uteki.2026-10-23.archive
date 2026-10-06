@@ -1,0 +1,113 @@
+{
+  "requirements": [
+    {
+      "kind": "read_node",
+      "query": null,
+      "source_id": "acme-annual",
+      "node_id": "business",
+      "requirement_id": "business",
+      "description": "Read the complete business section."
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [],
+        "documents": [],
+        "calculations": [
+          {
+            "formula_id": "operating_margin",
+            "entity_id": "acme-services",
+            "periods": [
+              {
+                "kind": "year",
+                "start": "2031-01-01",
+                "end": "2031-12-31"
+              }
+            ]
+          }
+        ]
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "numbers",
+      "description": "Verify calendar year 2031 operating margin."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "read_node",
+      "query": null,
+      "source_id": "acme-annual",
+      "node_id": "business",
+      "requirement_id": "business",
+      "description": "Read the complete business section.",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "inventory_snapshot_id": "synthetic-scoped-v1",
+      "inventory_index_id": "index-acme-annual",
+      "inventory_status": "available",
+      "required_block_ids": [
+        "b0",
+        "b1",
+        "b2"
+      ],
+      "returned_block_ids": [],
+      "unread_block_ids": [
+        "b0",
+        "b1",
+        "b2"
+      ]
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [],
+        "documents": [],
+        "calculations": [
+          {
+            "formula_id": "operating_margin",
+            "entity_id": "acme-services",
+            "periods": [
+              {
+                "kind": "year",
+                "start": "2031-01-01",
+                "end": "2031-12-31"
+              }
+            ]
+          }
+        ]
+      },
+      "source_id": null,
+      "node_id": null,
+      "requirement_id": "numbers",
+      "description": "Verify calendar year 2031 operating margin.",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "synthetic-scoped-v1",
+        "company_ids": [
+          "acme"
+        ],
+        "source_snapshot_ids": [
+          "acme-annual"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2032-05-01",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "query_execution",
+          "status": "missing_evidence",
+          "reason": "query_not_returned",
+          "detail": "尚无本要求的成功查询与已校验证据包。"
+        }
+      ],
+      "query_receipt_files": []
+    }
+  ],
+  "gaps": []
+}

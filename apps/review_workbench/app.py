@@ -318,7 +318,7 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
 
         def do_POST(self):
             path = urlparse(self.path).path
-            if path not in {'/api/research-archive', '/api/research-annotations'}:
+            if path not in {'/api/research-archive', '/api/research-annotations', '/api/data-workspace/state'}:
                 self.send_error(404); return
             host = self.headers.get('Host', '')
             origin = self.headers.get('Origin')
@@ -335,6 +335,15 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
                 data = json.loads(self.rfile.read(length))
                 if not isinstance(data, dict):
                     raise ArchiveError('Expected a JSON object')
+                if path == '/api/data-workspace/state':
+                    from apps.review_workbench.data.workspace_state import update_state, WorkspaceConflictError
+                    try:
+                        self.archive_json(update_state(ROOT, data))
+                    except WorkspaceConflictError as error:
+                        self.archive_json({'error': str(error)}, 409)
+                    except OSError:
+                        self.archive_json({'error': 'Workspace display state could not be saved'}, 503)
+                    return
                 snapshot_id = data.pop('snapshot_id')
                 action = data.pop('action')
                 revision = data.pop('expected_revision')
@@ -366,6 +375,87 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
                 self.send_header('Cache-Control', 'no-store')
                 self.end_headers()
                 self.wfile.write(body)
+            if path in {'/data-workspace', '/data-workspace/source', '/data-workspace/source-meta'}:
+                from apps.review_workbench.pages.data_workspace import render_data_workspace
+                from apps.review_workbench.pages.source_preview import load_source_preview, PREVIEW_CSP
+                selection = parse_qs(parsed.query, keep_blank_values=True)
+                try:
+                    if path == '/data-workspace':
+                        send(render_data_workspace(ROOT, selection))
+                    else:
+                        result = load_source_preview(ROOT, selection)
+                        if path.endswith('/source-meta'):
+                            self.archive_json({k: v for k, v in result.items() if k not in {'content', 'headers'}})
+                        else:
+                            self.send_response(200)
+                            self.send_header('Content-Type', result['mime_type'] + ('; charset=utf-8' if result['mime_type'].startswith('text/') else ''))
+                            self.send_header('Content-Length', str(len(result['content'])))
+                            for name, value in result['headers'].items():
+                                self.send_header(name, value)
+                            self.end_headers()
+                            self.wfile.write(result['content'])
+                except (KeyError, TypeError, ValueError, OSError) as error:
+                    status = 503 if isinstance(error, OSError) else 400
+                    if path.endswith('/source-meta'):
+                        self.archive_json({'error': str(error)}, status)
+                    else:
+                        from apps.review_workbench.pages.data_workspace import shell, empty
+                        from apps.review_workbench.components.site_navigation import bi, e
+                        content = empty('当前选择无法读取，请返回公司目录重新选择。', 'This selection is unavailable. Return to the company list and choose again.')
+                        content += '<details><summary>' + bi('问题详情', 'Details') + '</summary><p>' + e(error) + '</p></details><a href="/data-workspace">' + bi('返回公司目录', 'Company list') + '</a>'
+                        payload = shell(content, '', {'selection': {}, 'revision': 0}).encode() if path == '/data-workspace' else ('<!doctype html><meta charset="utf-8">' + content).encode()
+                        self.send_response(status)
+                        self.send_header('Content-Type', 'text/html; charset=utf-8')
+                        self.send_header('Content-Length', str(len(payload)))
+                        self.send_header('Cache-Control', 'no-store')
+                        if path != '/data-workspace':
+                            self.send_header('Content-Security-Policy', PREVIEW_CSP)
+                            self.send_header('X-Content-Type-Options', 'nosniff')
+                        self.end_headers()
+                        self.wfile.write(payload)
+                return True
+            if path == '/extractions':
+                from apps.review_workbench.pages.direct_extractions import render_direct_extractions
+                from apps.review_workbench.components.site_navigation import bi, page
+                try:
+                    send(render_direct_extractions(ROOT, parse_qs(parsed.query, keep_blank_values=True)))
+                except (KeyError, ValueError, OSError) as error:
+                    send(page('抽取产物不可用', '<h1>' + bi('抽取产物不可用', 'Extraction artifacts unavailable')
+                              + '</h1><p>' + html.escape(str(error)) + '</p><a href="/extractions">'
+                              + bi('返回运行目录', 'Return to runs') + '</a>'))
+                return True
+            if path in {'/evaluation', '/evaluation/source'}:
+                from apps.review_workbench.pages.data_evaluation import render_evaluation
+                from apps.review_workbench.data.evaluation_artifacts import load_raw_source
+                selection = parse_qs(parsed.query, keep_blank_values=True)
+                try:
+                    if path == '/evaluation':
+                        send(render_evaluation(ROOT, selection))
+                    else:
+                        if set(selection) != {'dataset', 'source'} or any(len(v) != 1 or not v[0].strip() for v in selection.values()):
+                            raise ValueError('Explicit dataset and source required')
+                        raw = load_raw_source(ROOT, selection['dataset'][0], selection['source'][0])
+                        mime = raw['mime_type']
+                        safe_type = mime if mime in {'text/html', 'application/pdf', 'text/plain'} else 'application/octet-stream'
+                        self.send_response(200)
+                        self.send_header('Content-Type', safe_type + ('; charset=utf-8' if safe_type.startswith('text/') else ''))
+                        self.send_header('Content-Length', str(len(raw['content'])))
+                        self.send_header('Content-Security-Policy', "sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src data:; form-action 'none'; base-uri 'none'")
+                        self.send_header('X-Content-Type-Options', 'nosniff')
+                        self.send_header('Cache-Control', 'no-store')
+                        self.end_headers()
+                        self.wfile.write(raw['content'])
+                except (KeyError, ValueError, OSError) as error:
+                    from apps.review_workbench.components.site_navigation import bi, page
+                    message = page('评估内容不可用', '<h1>' + bi('评估内容不可用', 'Evaluation content unavailable') + '</h1><p>' + html.escape(str(error)) + '</p><a href="/evaluation">' + bi('返回数据选择', 'Return to dataset selection') + '</a>')
+                    body = message.encode()
+                    self.send_response(400 if isinstance(error, (KeyError, ValueError)) else 503)
+                    self.send_header('Content-Type', 'text/html; charset=utf-8')
+                    self.send_header('Content-Length', str(len(body)))
+                    self.send_header('Cache-Control', 'no-store')
+                    self.end_headers()
+                    self.wfile.write(body)
+                return True
             if path == '/':
                 from apps.review_workbench.pages.attention_dashboard import render_dashboard
                 send(render_dashboard(load_json(COMPANY_UNIVERSE_DATA), archive.list()))

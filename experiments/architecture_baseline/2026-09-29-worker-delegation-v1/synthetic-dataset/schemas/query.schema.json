@@ -1,0 +1,245 @@
+{
+  "$defs": {
+    "CalculationRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "formula_id": {
+          "enum": [
+            "operating_margin",
+            "revenue_yoy",
+            "operating_income_yoy",
+            "operating_margin_delta_pp"
+          ],
+          "title": "Formula Id",
+          "type": "string"
+        },
+        "entity_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "periods": {
+          "items": {
+            "$ref": "#/$defs/Period"
+          },
+          "maxItems": 2,
+          "minItems": 1,
+          "title": "Periods",
+          "type": "array"
+        }
+      },
+      "required": [
+        "formula_id",
+        "entity_id",
+        "periods"
+      ],
+      "title": "CalculationRequest",
+      "type": "object"
+    },
+    "DocumentRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "company_id": {
+          "description": "Explicit company identifier from source discovery; no default company.",
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "form": {
+          "enum": [
+            "10-K",
+            "10-Q",
+            "EARNINGS_CALL"
+          ],
+          "title": "Form",
+          "type": "string"
+        },
+        "period_end": {
+          "format": "date",
+          "title": "Period End",
+          "type": "string"
+        },
+        "phrase": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Phrase",
+          "type": "string"
+        },
+        "limit": {
+          "default": 2,
+          "maximum": 4,
+          "minimum": 1,
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "company_id",
+        "form",
+        "period_end",
+        "phrase"
+      ],
+      "title": "DocumentRequest",
+      "type": "object"
+    },
+    "Period": {
+      "additionalProperties": false,
+      "description": "Calendar fiscal periods only; other fiscal calendars require a new adapter.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "quarter",
+            "ytd",
+            "year",
+            "instant"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start"
+        },
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "start",
+        "end"
+      ],
+      "title": "Period",
+      "type": "object"
+    },
+    "RecordRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "metric_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Period"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "value_kind": {
+          "default": "actual",
+          "enum": [
+            "actual",
+            "management_guidance",
+            "attributed_statement"
+          ],
+          "title": "Value Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_id",
+        "metric_id",
+        "period"
+      ],
+      "title": "RecordRequest",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "query_id": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Query Id",
+      "type": "string"
+    },
+    "question": {
+      "default": "",
+      "maxLength": 4000,
+      "title": "Question",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "source_policy_id": {
+      "const": "local-frozen-v1",
+      "default": "local-frozen-v1",
+      "title": "Source Policy Id",
+      "type": "string"
+    },
+    "knowledge_cutoff": {
+      "format": "date",
+      "title": "Knowledge Cutoff",
+      "type": "string"
+    },
+    "include_candidates": {
+      "default": false,
+      "title": "Include Candidates",
+      "type": "boolean"
+    },
+    "records": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/RecordRequest"
+      },
+      "maxItems": 16,
+      "title": "Records",
+      "type": "array"
+    },
+    "documents": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/DocumentRequest"
+      },
+      "maxItems": 4,
+      "title": "Documents",
+      "type": "array"
+    },
+    "calculations": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/CalculationRequest"
+      },
+      "maxItems": 8,
+      "title": "Calculations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "query_id",
+    "snapshot_id",
+    "knowledge_cutoff"
+  ],
+  "title": "DataQuery",
+  "type": "object"
+}

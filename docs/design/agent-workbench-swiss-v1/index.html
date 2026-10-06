@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN" data-preview-style="engineering">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+    <title>Uteki · 后台瑞士排版预览</title>
+    <link rel="icon" href="../company-workspace-v2/assets/uteki-drop.png" type="image/png">
+    <link rel="stylesheet" href="./style.css?v=20261004-swiss1">
+  </head>
+  <body class="swiss-preview">
+    <header class="preview-bar" aria-label="独立视觉预览" data-preview-shell>
+      <div class="preview-identity"><strong data-preview-copy="title">后台排版预览</strong><span data-preview-copy="scope">同一组演示任务</span></div>
+      <div class="preview-controls" role="group" aria-label="排版方案" data-preview-options>
+        <button type="button" data-preview-variant="engineering" aria-pressed="true" data-preview-copy="engineering">工程阅读型</button>
+        <button type="button" data-preview-variant="editorial" aria-pressed="false" data-preview-copy="editorial">编辑排版型</button>
+      </div>
+      <a class="baseline-link" href="../agent-workbench-v1/?v=20261004-agents1" target="_blank" rel="noopener noreferrer" data-preview-copy="baseline">打开现版对照</a>
+      <span class="sr-only" aria-live="polite" data-preview-announcement></span>
+    </header>
+    <div id="app">
+      <main class="loading-state">
+        <h1>Uteki Agent 工作台</h1>
+        <p>正在载入同一组本地演示任务。</p>
+        <p>请通过本地 HTTP 服务打开此页面。</p>
+        <noscript>此交互预览需要 JavaScript。</noscript>
+      </main>
+    </div>
+    <!-- Reuse the existing controller, renderer, state model and named demo data. -->
+    <script type="module" src="../agent-workbench-v1/app.mjs?v=20261004-agents1"></script>
+    <script type="module" src="./preview.mjs?v=20261004-swiss1"></script>
+  </body>
+</html>

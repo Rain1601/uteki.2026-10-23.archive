@@ -1,0 +1,586 @@
+{
+  "schema_version": "semantic-review-input-v3",
+  "source_origin": "synthetic_fixture",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "harbor-source-a-snapshot",
+    "company_ids": [
+      "sec-0000000902"
+    ],
+    "source_snapshot_ids": [
+      "harbor-source-a"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2023-03-01",
+    "include_candidates": true
+  },
+  "source": {
+    "source_snapshot_id": "harbor-source-a",
+    "company_id": "sec-0000000902",
+    "source_sha256": "b207f8654b2b8787028d9f6ae10df9cbbe4182a37bc710ebef07257701ac85d4",
+    "source_url": "https://example.invalid/fixtures/harbor-source-a"
+  },
+  "source_blocks": [
+    {
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "statement",
+      "text": "Harbor Grid Systems. An illustrative worksheet repeats Gross profit 27 27 and is not the reported table. Consolidated annual statements, USD millions. FY2022: January 1 through December 31, 2022. FY2021: January 1 through December 31, 2021. Columns: FY2022 FY2021.\nGross profit 27 27\nResearch and development expense 27 27\nReported operating cash flow 18 17\nAdjusted operating cash flow 22 19",
+      "text_hash": "98788afda1590dc82c8cd8f6f6e3ccff62401d2ac025f4df5b5189af40613f9f"
+    },
+    {
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "notes",
+      "text": "Note 5. For FY2022, adjusted operating cash flow removes the effect of USD 4 million of one-time environmental remediation payments already included in reported operating cash outflows. Add back those payments to reported operating cash flow: 18 + 4 = 22 (USD millions). There are no other FY2022 adjustments to this measure. The issuer does not provide other companies' non-GAAP definitions in this excerpt.",
+      "text_hash": "616eb5ca4ff08d8ae1868bbba1ae5febe2141b98f683a5c95e8b30c1c592c0a0"
+    }
+  ],
+  "records": [
+    {
+      "record": {
+        "record_id": "harbor-source-a-gp22",
+        "source_snapshot_id": "harbor-source-a",
+        "entity_id": "sec-0000000902",
+        "metric_id": "gross_profit",
+        "value_decimal": "27000000",
+        "unit": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2022-01-01",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "dimensions": {},
+        "status": "candidate"
+      },
+      "record_sha256": "bf8357d248f5a33adaa8bf63e05c801c7c2b2183776111e420baa3b8a7dcb281"
+    },
+    {
+      "record": {
+        "record_id": "harbor-source-a-gp21",
+        "source_snapshot_id": "harbor-source-a",
+        "entity_id": "sec-0000000902",
+        "metric_id": "gross_profit",
+        "value_decimal": "27000000",
+        "unit": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2021-01-01",
+          "end": "2021-12-31",
+          "basis": "source"
+        },
+        "dimensions": {},
+        "status": "candidate"
+      },
+      "record_sha256": "5d34ff5ddbbe428aafde68f03c35012c5ba8ec523b58be0365d93562e5e7cd6f"
+    },
+    {
+      "record": {
+        "record_id": "harbor-source-a-rd22",
+        "source_snapshot_id": "harbor-source-a",
+        "entity_id": "sec-0000000902",
+        "metric_id": "research_development_expense",
+        "value_decimal": "27000000",
+        "unit": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2022-01-01",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "dimensions": {},
+        "status": "candidate"
+      },
+      "record_sha256": "9e02f1e424ab41625e20fb98d9edc4c7de1fc77feb894b0220a06de4a50bba5f"
+    },
+    {
+      "record": {
+        "record_id": "harbor-source-a-rd21",
+        "source_snapshot_id": "harbor-source-a",
+        "entity_id": "sec-0000000902",
+        "metric_id": "research_development_expense",
+        "value_decimal": "27000000",
+        "unit": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2021-01-01",
+          "end": "2021-12-31",
+          "basis": "source"
+        },
+        "dimensions": {},
+        "status": "candidate"
+      },
+      "record_sha256": "63bd706f44e0e167a1586ceab8bae3467f53bc402f1d3673cd2d298a71c6b309"
+    },
+    {
+      "record": {
+        "record_id": "harbor-source-a-ocf22",
+        "source_snapshot_id": "harbor-source-a",
+        "entity_id": "sec-0000000902",
+        "metric_id": "operating_cash_flow",
+        "value_decimal": "18000000",
+        "unit": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2022-01-01",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "dimensions": {},
+        "status": "candidate"
+      },
+      "record_sha256": "89022dff9d42787cbe04b53bd293101e8d604f017c3b0ce196bcbdb62de6e45c"
+    },
+    {
+      "record": {
+        "record_id": "harbor-source-a-aocf22",
+        "source_snapshot_id": "harbor-source-a",
+        "entity_id": "sec-0000000902",
+        "metric_id": "adjusted_operating_cash_flow",
+        "value_decimal": "22000000",
+        "unit": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2022-01-01",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "dimensions": {},
+        "status": "candidate"
+      },
+      "record_sha256": "e7f5884630378ff17f517e41d469cf5122d0925718bb4f80514125b2e4d9fb03"
+    }
+  ],
+  "record_anchors": {
+    "harbor-source-a-gp22": {
+      "status": "located",
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "statement",
+      "start": 265,
+      "end": 283,
+      "text": "Gross profit 27 27",
+      "kind": "table_row"
+    },
+    "harbor-source-a-gp21": {
+      "status": "located",
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "statement",
+      "start": 265,
+      "end": 283,
+      "text": "Gross profit 27 27",
+      "kind": "table_row"
+    },
+    "harbor-source-a-rd22": {
+      "status": "located",
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "statement",
+      "start": 284,
+      "end": 322,
+      "text": "Research and development expense 27 27",
+      "kind": "table_row"
+    },
+    "harbor-source-a-rd21": {
+      "status": "located",
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "statement",
+      "start": 284,
+      "end": 322,
+      "text": "Research and development expense 27 27",
+      "kind": "table_row"
+    },
+    "harbor-source-a-ocf22": {
+      "status": "located",
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "statement",
+      "start": 323,
+      "end": 357,
+      "text": "Reported operating cash flow 18 17",
+      "kind": "table_row"
+    },
+    "harbor-source-a-aocf22": {
+      "status": "located",
+      "source_snapshot_id": "harbor-source-a",
+      "block_id": "statement",
+      "start": 358,
+      "end": 392,
+      "text": "Adjusted operating cash flow 22 19",
+      "kind": "table_row"
+    }
+  },
+  "metric_definitions": {
+    "gross_profit": {
+      "metric_id": "gross_profit",
+      "unit": "USD",
+      "definition": "Consolidated gross profit in USD, a distinct metric from research expense."
+    },
+    "research_development_expense": {
+      "metric_id": "research_development_expense",
+      "unit": "USD",
+      "definition": "Research and development expense in USD."
+    },
+    "operating_cash_flow": {
+      "metric_id": "operating_cash_flow",
+      "unit": "USD",
+      "definition": "Reported cash flow from operating activities in USD."
+    },
+    "adjusted_operating_cash_flow": {
+      "metric_id": "adjusted_operating_cash_flow",
+      "unit": "USD",
+      "definition": "Issuer-defined operating cash flow after the disclosed period-specific adjustments; not a standardized cross-company measure."
+    }
+  },
+  "axes": [
+    "dimensions",
+    "value"
+  ],
+  "assertions": [
+    {
+      "assertion_id": "statement-a",
+      "record_ids": [
+        "harbor-source-a-gp22"
+      ],
+      "text": "FY2022 consolidated gross profit was USD 27 million."
+    },
+    {
+      "assertion_id": "statement-b",
+      "record_ids": [
+        "harbor-source-a-rd22"
+      ],
+      "text": "FY2022 research and development expense was USD 27 million."
+    },
+    {
+      "assertion_id": "statement-c",
+      "record_ids": [
+        "harbor-source-a-ocf22",
+        "harbor-source-a-aocf22"
+      ],
+      "text": "The FY2022 adjusted operating cash flow of USD 22 million is calculated by subtracting remediation payments of USD 4 million from reported operating cash flow of USD 18 million."
+    },
+    {
+      "assertion_id": "statement-d",
+      "record_ids": [
+        "harbor-source-a-aocf22"
+      ],
+      "text": "The issuer's FY2022 adjusted operating cash flow uses the same adjustment definition as every other company reporting adjusted operating cash flow."
+    }
+  ],
+  "selection_warnings": [],
+  "output_schema": {
+    "$defs": {
+      "AssertionAssessmentV2": {
+        "additionalProperties": false,
+        "properties": {
+          "assertion_id": {
+            "minLength": 1,
+            "title": "Assertion Id",
+            "type": "string"
+          },
+          "verdict": {
+            "enum": [
+              "supported",
+              "contradicted",
+              "insufficient_evidence"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "citations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SemanticCitationV2"
+            },
+            "maxItems": 8,
+            "title": "Citations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "assertion_id",
+          "verdict",
+          "reason"
+        ],
+        "title": "AssertionAssessmentV2",
+        "type": "object"
+      },
+      "AxisCheckV2": {
+        "additionalProperties": false,
+        "properties": {
+          "axis": {
+            "enum": [
+              "comparability",
+              "allocation",
+              "additivity",
+              "dimensions",
+              "geography",
+              "value"
+            ],
+            "title": "Axis",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "constraints_found",
+              "none_found_in_context",
+              "insufficient_evidence"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "constraints": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SemanticConstraintV2"
+            },
+            "maxItems": 24,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "unresolved_questions": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Unresolved Questions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "axis",
+          "status",
+          "reason"
+        ],
+        "title": "AxisCheckV2",
+        "type": "object"
+      },
+      "ContextClaim": {
+        "additionalProperties": false,
+        "description": "Delivery state of a host-identified object, not an inference about a note.",
+        "properties": {
+          "object_id": {
+            "minLength": 1,
+            "title": "Object Id",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "supplied",
+              "not_supplied",
+              "unresolved"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "object_id",
+          "status"
+        ],
+        "title": "ContextClaim",
+        "type": "object"
+      },
+      "ContextRequest": {
+        "additionalProperties": false,
+        "description": "A model question; it never establishes that material was not delivered.",
+        "properties": {
+          "question": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Question",
+            "type": "string"
+          },
+          "reviewed_block_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 80,
+            "minItems": 1,
+            "title": "Reviewed Block Ids",
+            "type": "array"
+          },
+          "reference_ids": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Reference Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "question",
+          "reviewed_block_ids"
+        ],
+        "title": "ContextRequest",
+        "type": "object"
+      },
+      "SemanticCitationV2": {
+        "additionalProperties": false,
+        "properties": {
+          "source_snapshot_id": {
+            "title": "Source Snapshot Id",
+            "type": "string"
+          },
+          "block_id": {
+            "title": "Block Id",
+            "type": "string"
+          },
+          "quote": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Quote",
+            "type": "string"
+          },
+          "source_start": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Start"
+          }
+        },
+        "required": [
+          "source_snapshot_id",
+          "block_id",
+          "quote"
+        ],
+        "title": "SemanticCitationV2",
+        "type": "object"
+      },
+      "SemanticConstraintV2": {
+        "additionalProperties": false,
+        "properties": {
+          "record_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 24,
+            "minItems": 1,
+            "title": "Record Ids",
+            "type": "array"
+          },
+          "statement": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Statement",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/$defs/SemanticCitationV2"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Citations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "record_ids",
+          "statement",
+          "citations"
+        ],
+        "title": "SemanticConstraintV2",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "packet_id": {
+        "minLength": 1,
+        "title": "Packet Id",
+        "type": "string"
+      },
+      "checks": {
+        "items": {
+          "$ref": "#/$defs/AxisCheckV2"
+        },
+        "maxItems": 6,
+        "minItems": 1,
+        "title": "Checks",
+        "type": "array"
+      },
+      "assertions": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/AssertionAssessmentV2"
+        },
+        "maxItems": 24,
+        "title": "Assertions",
+        "type": "array"
+      },
+      "context_claims": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/ContextClaim"
+        },
+        "maxItems": 80,
+        "title": "Context Claims",
+        "type": "array"
+      },
+      "context_requests": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/ContextRequest"
+        },
+        "maxItems": 20,
+        "title": "Context Requests",
+        "type": "array"
+      }
+    },
+    "required": [
+      "packet_id",
+      "checks"
+    ],
+    "title": "SemanticAssessmentV2",
+    "type": "object"
+  },
+  "context_inventory": {
+    "objects": [
+      {
+        "object_id": "context-b331f84a9b96f2a6a51ea264",
+        "kind": "source_block",
+        "source_snapshot_id": "harbor-source-a",
+        "block_id": "statement",
+        "status": "supplied"
+      },
+      {
+        "object_id": "context-7ed3169ae03296e5dc800990",
+        "kind": "source_block",
+        "source_snapshot_id": "harbor-source-a",
+        "block_id": "notes",
+        "status": "supplied"
+      },
+      {
+        "object_id": "context-919ae7863b8878de65f93aca",
+        "kind": "source_reference",
+        "source_snapshot_id": "harbor-source-a",
+        "block_id": "notes",
+        "quote": "Note 5",
+        "start": 0,
+        "status": "unresolved"
+      }
+    ],
+    "selection_warnings": [],
+    "boundary": "Selection warnings and unresolved references do not establish missing material."
+  },
+  "packet_id": "semantic-3d287cc1ae965c00242dfabf"
+}

@@ -1,0 +1,304 @@
+{
+  "source": {
+    "source_snapshot_id": "cedar-source-009",
+    "company_id": "sec-0000000456",
+    "source_url": "https://example.invalid/cedar/sr-009",
+    "source_sha256": "0e8767f5fd0e0ee3b15b3c8c50ec72a49ec52401bf3429f1a5ed86c8aefdc48e"
+  },
+  "source_blocks": [
+    {
+      "source_snapshot_id": "cedar-source-009",
+      "block_id": "b1",
+      "text": "Cedar Instruments FY2025 revenue note. Amounts in USD millions. Platform revenue was 80 and subscription revenue was 65. Subscription revenue includes 25 that is also included in platform revenue. These categories overlap and must not be added to derive company revenue.",
+      "text_hash": "0e8767f5fd0e0ee3b15b3c8c50ec72a49ec52401bf3429f1a5ed86c8aefdc48e"
+    }
+  ],
+  "records": [
+    {
+      "record": {
+        "record_id": "sr-009-r1",
+        "source_snapshot_id": "cedar-source-009",
+        "entity_id": "sec-0000000456",
+        "metric_id": "revenue",
+        "value_decimal": "80000000",
+        "unit": "USD",
+        "currency": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2025-01-01",
+          "end": "2025-12-31",
+          "basis": "calendar"
+        },
+        "dimensions": {
+          "category": "Platform"
+        },
+        "adoption_status": "candidate"
+      },
+      "record_sha256": "83867b4855f2f4fdb333f66cef5bf1a13b519d43bd7d4b1c17899bda2f4dce24"
+    },
+    {
+      "record": {
+        "record_id": "sr-009-r2",
+        "source_snapshot_id": "cedar-source-009",
+        "entity_id": "sec-0000000456",
+        "metric_id": "revenue",
+        "value_decimal": "65000000",
+        "unit": "USD",
+        "currency": "USD",
+        "period": {
+          "kind": "year",
+          "start": "2025-01-01",
+          "end": "2025-12-31",
+          "basis": "calendar"
+        },
+        "dimensions": {
+          "category": "Subscription"
+        },
+        "adoption_status": "candidate"
+      },
+      "record_sha256": "2fa13d1a4e50b63b7697e73a11c5b4b7f3b559aef6632df3ace67531090cc42f"
+    }
+  ],
+  "metric_definitions": {
+    "revenue": {
+      "metric_id": "revenue",
+      "definition": "Recognized revenue in USD, before any proposed aggregation across overlapping categories.",
+      "unit": "USD"
+    }
+  },
+  "axes": [
+    "additivity"
+  ],
+  "assertions": [
+    {
+      "assertion_id": "sr-009-a1",
+      "record_ids": [
+        "sr-009-r1",
+        "sr-009-r2"
+      ],
+      "text": "Platform revenue was USD 80 million and subscription revenue was USD 65 million; these are separate disclosed category amounts and are not an additive company total."
+    }
+  ],
+  "context_gaps": [],
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "cedar-snapshot-009",
+    "company_ids": [
+      "sec-0000000456"
+    ],
+    "source_snapshot_ids": [
+      "cedar-source-009"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-03-01",
+    "include_candidates": true
+  },
+  "source_origin": "synthetic_fixture",
+  "schema_version": "semantic-review-input-v1",
+  "output_schema": {
+    "$defs": {
+      "AssertionAssessment": {
+        "additionalProperties": false,
+        "properties": {
+          "assertion_id": {
+            "minLength": 1,
+            "title": "Assertion Id",
+            "type": "string"
+          },
+          "verdict": {
+            "enum": [
+              "supported",
+              "contradicted",
+              "insufficient_evidence"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "citations": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/ReviewCitation"
+            },
+            "maxItems": 8,
+            "title": "Citations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "assertion_id",
+          "verdict",
+          "reason"
+        ],
+        "title": "AssertionAssessment",
+        "type": "object"
+      },
+      "AxisCheck": {
+        "additionalProperties": false,
+        "properties": {
+          "axis": {
+            "enum": [
+              "comparability",
+              "allocation",
+              "additivity",
+              "dimensions",
+              "geography",
+              "value"
+            ],
+            "title": "Axis",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "constraints_found",
+              "none_found_in_context",
+              "insufficient_evidence"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "reason": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "constraints": {
+            "default": [],
+            "items": {
+              "$ref": "#/$defs/SemanticConstraint"
+            },
+            "maxItems": 24,
+            "title": "Constraints",
+            "type": "array"
+          },
+          "unresolved_questions": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Unresolved Questions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "axis",
+          "status",
+          "reason"
+        ],
+        "title": "AxisCheck",
+        "type": "object"
+      },
+      "ReviewCitation": {
+        "additionalProperties": false,
+        "properties": {
+          "source_snapshot_id": {
+            "title": "Source Snapshot Id",
+            "type": "string"
+          },
+          "block_id": {
+            "title": "Block Id",
+            "type": "string"
+          },
+          "quote": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Quote",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_snapshot_id",
+          "block_id",
+          "quote"
+        ],
+        "title": "ReviewCitation",
+        "type": "object"
+      },
+      "SemanticConstraint": {
+        "additionalProperties": false,
+        "properties": {
+          "record_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 24,
+            "minItems": 1,
+            "title": "Record Ids",
+            "type": "array"
+          },
+          "statement": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Statement",
+            "type": "string"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/$defs/ReviewCitation"
+            },
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Citations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "record_ids",
+          "statement",
+          "citations"
+        ],
+        "title": "SemanticConstraint",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "packet_id": {
+        "minLength": 1,
+        "title": "Packet Id",
+        "type": "string"
+      },
+      "checks": {
+        "items": {
+          "$ref": "#/$defs/AxisCheck"
+        },
+        "maxItems": 6,
+        "minItems": 1,
+        "title": "Checks",
+        "type": "array"
+      },
+      "assertions": {
+        "default": [],
+        "items": {
+          "$ref": "#/$defs/AssertionAssessment"
+        },
+        "maxItems": 24,
+        "title": "Assertions",
+        "type": "array"
+      },
+      "limitations": {
+        "default": [],
+        "items": {
+          "type": "string"
+        },
+        "maxItems": 20,
+        "title": "Limitations",
+        "type": "array"
+      }
+    },
+    "required": [
+      "packet_id",
+      "checks"
+    ],
+    "title": "SemanticAssessment",
+    "type": "object"
+  },
+  "packet_id": "semantic-9881dda305ae2103d9652eb0"
+}

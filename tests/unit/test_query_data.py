@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import subprocess
 import shutil
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -68,7 +69,8 @@ class QueryDataTests(unittest.TestCase):
         document = self.port.get_schema()["query"]["$defs"]["DocumentRequest"]
         self.assertIn("company_id", document["required"])
         self.assertNotIn("default", document["properties"]["company_id"])
-        self.assertEqual(self.port.get_schema()["query"], DataQuery.model_json_schema())
+        from uteki.domain.research_data.query_contract import VERSION, export_query_schema
+        self.assertEqual(self.port.get_schema()["query"], export_query_schema(DataQuery, version=VERSION))
 
     def test_document_company_missing_or_blank_rejected_before_retrieval(self):
         document = {"form": "EARNINGS_CALL", "period_end": "2025-12-31", "phrase": "just over half"}
@@ -280,7 +282,7 @@ class QueryDataTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             request = Path(tmp) / "request.json"
             request.write_text(json.dumps(q))
-            process = subprocess.run([str(ROOT/".venv/bin/python"), "scripts/query_research_data.py", "query", "--dataset", str(self.dataset), "--request", str(request)], cwd=ROOT, capture_output=True, text=True)
+            process = subprocess.run([sys.executable, "scripts/query_research_data.py", "query", "--dataset", str(self.dataset), "--request", str(request)], cwd=ROOT, capture_output=True, text=True)
             self.assertEqual(process.returncode, 0, process.stderr)
             self.assertEqual(json.loads(process.stdout), self.port.query_data(q))
 

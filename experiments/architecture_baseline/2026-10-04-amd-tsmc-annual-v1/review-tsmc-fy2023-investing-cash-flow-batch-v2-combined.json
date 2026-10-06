@@ -1,0 +1,566 @@
+{
+  "schema_version": "canary-combined-review-v1",
+  "run_id": "tsmc-fy2023-investing-cash-flow-batch-v2",
+  "company_id": "sec-0001046179",
+  "source_snapshot_id": "source-6719837a8d24b2b7df359f29",
+  "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+  "reviewer": "Codex independent frozen-source review",
+  "created_at": "2026-10-04T18:13:10.468588+00:00",
+  "inputs": {
+    "manifest_json_sha256": "91bc35cd513cb02a627622d624c036bd2e9f59f41d7de991f7a9b5f2a17935bd",
+    "job_json_sha256": "f9b41d5065acd90abcfb1c6fd520782adb7690c1fc1ce490cb9e6039c82c9253",
+    "packet_json_sha256": "e8a6cd63a6443f36fee87e166a16d3a3647cbb6629c40fbe481cc5997c3d4626",
+    "extraction_json_sha256": "49a5a324096fb5c51ea4a1b1f7705a2f0b3b0a5fd44f7b876dfbb3d002572c92",
+    "normalized_json_sha256": "82c1bb86cd38b2c5e0dddd712e29265a7daf97b6a05903eb7a173d7d21d53a1b",
+    "dataset/manifest_json_sha256": "990a30ae2a7b5587cb9947dffc96ca1cdf4e1761e7f134a5439e9f8ceab5182c",
+    "dataset/research_duckdb_sha256": "0ef1c83232783da257fbfbf8c288c0b401b059a0bc1fe667fd2f29a638dcb44c",
+    "dataset_manifest_sha256": "6874d0d218d60861be1b6a66d09975e19248973035fbc00379febea28e7a30f3",
+    "source_period_contexts": {
+      "path": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-discovery-v3/source-period-contexts.json",
+      "sha256": "036d49587aa3aab9d0725e368ada140a72d1e060cb1ad6efaa864ea24f2f8841"
+    },
+    "run_manifest_sha256": "91bc35cd513cb02a627622d624c036bd2e9f59f41d7de991f7a9b5f2a17935bd",
+    "packet_sha256": "e8a6cd63a6443f36fee87e166a16d3a3647cbb6629c40fbe481cc5997c3d4626",
+    "extraction_sha256": "49a5a324096fb5c51ea4a1b1f7705a2f0b3b0a5fd44f7b876dfbb3d002572c92"
+  },
+  "review_method": {
+    "basis": "Original HTML acquisition-vs-disposal row hierarchy, actual cell pairs including closing parentheses, IFRS XBRL amount/period/unit, quotes and database payloads.",
+    "held_out_answer_or_mcp_gold_used": false,
+    "extraction_inputs_changed": false
+  },
+  "summary": {
+    "raw_drafts": 3,
+    "raw_numeric_values_source_supported": 3,
+    "normalized_db_rows_source_supported": 3,
+    "raw_drafts_with_exact_quotes": 3,
+    "normalization_unresolved_diagnostics": 0,
+    "core_value_scope_matched": 3,
+    "wrong_reported_amount_or_period_or_unit_found": 0,
+    "whole_table_extracted": false,
+    "whole_table_complete": false,
+    "whole_annual_report_accepted": false,
+    "whole_filing_approved": false,
+    "parent_agent_loop_complete": false,
+    "adoption": "unchanged_candidate"
+  },
+  "facts": [
+    {
+      "draft_id": "draft-e50c6a3b550bb4f4ee7c07be",
+      "record_id": "direct-8e8b8e8780cde0cbee413c3e",
+      "verdict": "value_scope_matched",
+      "rationale": "原始 F - 11 现金流量表 row 9 位于 'Acquisitions of:' 下，XBRL 为购买 PP&E 的投资活动支付额；原文 TWD 百万数值 (839,195.7 )、2021-01-01 至 2021-12-31 及负现金流出符号受到支持。同表 row15 的同名行是处置收入，row20 是补助收入，均未作为本条支出。保留购买总支出，未净扣处置/补助、未替代投资现金流净额或资本预算。规范化入库值与源数值按百万转换一致。",
+      "metric_id": "capex_cash_payments",
+      "period_id": "fy2021",
+      "actual_period": {
+        "kind": "year",
+        "start": "2021-01-01",
+        "end": "2021-12-31",
+        "basis": "source"
+      },
+      "raw_value": "(839,195.7 )",
+      "source_literal_with_cell_spacing": "(839,195.7 )",
+      "raw_unit": "TWD_millions",
+      "normalized_value_decimal": "-839195700000.0",
+      "normalized_unit": "TWD",
+      "normalization_status": "candidate_in_db",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-001173-c0043817",
+      "source_block_ids": [
+        "block-001173-c0043817"
+      ],
+      "source_support": {
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1046179/000119312524099840/d592628d20f.htm",
+        "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+        "block_id": "block-001173-c0043817",
+        "text_hash": "c00438174e30238e348502b34319768aa3ead38a0edec149eab28511214754a4",
+        "dom_path": "/html/body/div[96]/div/div[1]/div/table",
+        "printed_page_label": "F - 11",
+        "section_heading_cell": {
+          "text": "Acquisitions of:",
+          "row": 5,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "is_header": false
+        },
+        "row_label_cell": {
+          "text": "Property, plant and equipment",
+          "row": 9,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "is_header": false
+        },
+        "value_cells": [
+          {
+            "text": "(839,195.7",
+            "row": 9,
+            "column": 3,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": ")",
+            "row": 9,
+            "column": 4,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          }
+        ],
+        "period_header_cell": {
+          "text": "2021",
+          "row": 1,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 2,
+          "is_header": false
+        },
+        "currency_header_cell": {
+          "text": "NT$",
+          "row": 2,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 2,
+          "is_header": false
+        },
+        "unit_caption": {
+          "block_id": "block-001172-de1719a9",
+          "text": "(In Millions of New Taiwan Dollars or U.S. Dollars)"
+        },
+        "inline_fact_for_reviewer_only": {
+          "name": "ifrs-full:PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+          "contextref": "P01_01_2021To12_31_2021",
+          "unitref": "Unit_TWD",
+          "decimals": "-5",
+          "scale": "6",
+          "format": "ixt:num-dot-decimal",
+          "id": "ixv-97771",
+          "text": "839,195.7"
+        },
+        "xbrl_context_for_reviewer_only": {
+          "source_html": "<xbrli:context id=\"P01_01_2021To12_31_2021\"> <xbrli:entity> <xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001046179</xbrli:identifier> </xbrli:entity> <xbrli:period> <xbrli:startdate>2021-01-01</xbrli:startdate> <xbrli:enddate>2021-12-31</xbrli:enddate> </xbrli:period> </xbrli:context>",
+          "catalog_entry": {
+            "context_id": "P01_01_2021To12_31_2021",
+            "dom_path": "/html/body/div[1]/ix:header/ix:resources/xbrli:context[3]",
+            "entity_cik": "0001046179",
+            "identifier_scheme": "http://www.sec.gov/CIK",
+            "period": {
+              "startdate": "2021-01-01",
+              "enddate": "2021-12-31"
+            }
+          }
+        },
+        "source_precision": {
+          "xbrl_decimals": "-5",
+          "note": "Reported one-decimal millions; base-unit conversion does not increase precision."
+        },
+        "mapping_boundary": "Acquisitions row in this exact frozen table/input; bare PP&E label also appears under disposal and is not a general acquisition alias."
+      },
+      "quotes": [
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "CASH FLOWS FROM INVESTING ACTIVITIES",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "Acquisitions of:",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "Property, plant and equipment (839,195.7 )",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "2021 2022 2023 NT$ NT$ NT$ US$",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001172-de1719a9",
+          "quote": "(In Millions of New Taiwan Dollars or U.S. Dollars)",
+          "exact_match": true
+        },
+        {
+          "role": "qualifiers",
+          "block_id": "block-001174-2ea6a4cb",
+          "quote": "(Continued)",
+          "exact_match": true
+        }
+      ],
+      "engineering_issues": [],
+      "adoption": "unchanged_candidate",
+      "reviewer_scope": "Reported candidate cash-acquisition amount, original sign, currency, scale, actual period, acquisition-section row and exact evidence; no whole-filing approval or adoption."
+    },
+    {
+      "draft_id": "draft-09d13a38c6a26f19c6e85251",
+      "record_id": "direct-8576fd8bd0d6f2425b66c173",
+      "verdict": "value_scope_matched",
+      "rationale": "原始 F - 11 现金流量表 row 9 位于 'Acquisitions of:' 下，XBRL 为购买 PP&E 的投资活动支付额；原文 TWD 百万数值 (1,082,672.1 )、2022-01-01 至 2022-12-31 及负现金流出符号受到支持。同表 row15 的同名行是处置收入，row20 是补助收入，均未作为本条支出。保留购买总支出，未净扣处置/补助、未替代投资现金流净额或资本预算。规范化入库值与源数值按百万转换一致。",
+      "metric_id": "capex_cash_payments",
+      "period_id": "fy2022",
+      "actual_period": {
+        "kind": "year",
+        "start": "2022-01-01",
+        "end": "2022-12-31",
+        "basis": "source"
+      },
+      "raw_value": "(1,082,672.1 )",
+      "source_literal_with_cell_spacing": "(1,082,672.1 )",
+      "raw_unit": "TWD_millions",
+      "normalized_value_decimal": "-1082672100000.0",
+      "normalized_unit": "TWD",
+      "normalization_status": "candidate_in_db",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-001173-c0043817",
+      "source_block_ids": [
+        "block-001173-c0043817"
+      ],
+      "source_support": {
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1046179/000119312524099840/d592628d20f.htm",
+        "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+        "block_id": "block-001173-c0043817",
+        "text_hash": "c00438174e30238e348502b34319768aa3ead38a0edec149eab28511214754a4",
+        "dom_path": "/html/body/div[96]/div/div[1]/div/table",
+        "printed_page_label": "F - 11",
+        "section_heading_cell": {
+          "text": "Acquisitions of:",
+          "row": 5,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "is_header": false
+        },
+        "row_label_cell": {
+          "text": "Property, plant and equipment",
+          "row": 9,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "is_header": false
+        },
+        "value_cells": [
+          {
+            "text": "(1,082,672.1",
+            "row": 9,
+            "column": 7,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": ")",
+            "row": 9,
+            "column": 8,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          }
+        ],
+        "period_header_cell": {
+          "text": "2022",
+          "row": 1,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "is_header": false
+        },
+        "currency_header_cell": {
+          "text": "NT$",
+          "row": 2,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "is_header": false
+        },
+        "unit_caption": {
+          "block_id": "block-001172-de1719a9",
+          "text": "(In Millions of New Taiwan Dollars or U.S. Dollars)"
+        },
+        "inline_fact_for_reviewer_only": {
+          "name": "ifrs-full:PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+          "contextref": "P01_01_2022To12_31_2022",
+          "unitref": "Unit_TWD",
+          "decimals": "-5",
+          "scale": "6",
+          "format": "ixt:num-dot-decimal",
+          "id": "ixv-97772",
+          "text": "1,082,672.1"
+        },
+        "xbrl_context_for_reviewer_only": {
+          "source_html": "<xbrli:context id=\"P01_01_2022To12_31_2022\"> <xbrli:entity> <xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001046179</xbrli:identifier> </xbrli:entity> <xbrli:period> <xbrli:startdate>2022-01-01</xbrli:startdate> <xbrli:enddate>2022-12-31</xbrli:enddate> </xbrli:period> </xbrli:context>",
+          "catalog_entry": {
+            "context_id": "P01_01_2022To12_31_2022",
+            "dom_path": "/html/body/div[1]/ix:header/ix:resources/xbrli:context[2]",
+            "entity_cik": "0001046179",
+            "identifier_scheme": "http://www.sec.gov/CIK",
+            "period": {
+              "startdate": "2022-01-01",
+              "enddate": "2022-12-31"
+            }
+          }
+        },
+        "source_precision": {
+          "xbrl_decimals": "-5",
+          "note": "Reported one-decimal millions; base-unit conversion does not increase precision."
+        },
+        "mapping_boundary": "Acquisitions row in this exact frozen table/input; bare PP&E label also appears under disposal and is not a general acquisition alias."
+      },
+      "quotes": [
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "CASH FLOWS FROM INVESTING ACTIVITIES",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "Acquisitions of:",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "Property, plant and equipment (839,195.7 ) (1,082,672.1 )",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "2021 2022 2023 NT$ NT$ NT$ US$",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001172-de1719a9",
+          "quote": "(In Millions of New Taiwan Dollars or U.S. Dollars)",
+          "exact_match": true
+        },
+        {
+          "role": "qualifiers",
+          "block_id": "block-001174-2ea6a4cb",
+          "quote": "(Continued)",
+          "exact_match": true
+        }
+      ],
+      "engineering_issues": [],
+      "adoption": "unchanged_candidate",
+      "reviewer_scope": "Reported candidate cash-acquisition amount, original sign, currency, scale, actual period, acquisition-section row and exact evidence; no whole-filing approval or adoption."
+    },
+    {
+      "draft_id": "draft-b237ef8dd442d9cc43f062fa",
+      "record_id": "direct-fbb833687d08c02f081a740d",
+      "verdict": "value_scope_matched",
+      "rationale": "原始 F - 11 现金流量表 row 9 位于 'Acquisitions of:' 下，XBRL 为购买 PP&E 的投资活动支付额；原文 TWD 百万数值 (949,816.8 )、2023-01-01 至 2023-12-31 及负现金流出符号受到支持。同表 row15 的同名行是处置收入，row20 是补助收入，均未作为本条支出。保留购买总支出，未净扣处置/补助、未替代投资现金流净额或资本预算。规范化入库值与源数值按百万转换一致。",
+      "metric_id": "capex_cash_payments",
+      "period_id": "fy2023",
+      "actual_period": {
+        "kind": "year",
+        "start": "2023-01-01",
+        "end": "2023-12-31",
+        "basis": "source"
+      },
+      "raw_value": "(949,816.8 )",
+      "source_literal_with_cell_spacing": "(949,816.8 )",
+      "raw_unit": "TWD_millions",
+      "normalized_value_decimal": "-949816800000.0",
+      "normalized_unit": "TWD",
+      "normalization_status": "candidate_in_db",
+      "value_matches": true,
+      "same_statement_table": true,
+      "exact_quotes": true,
+      "source_block_id": "block-001173-c0043817",
+      "source_block_ids": [
+        "block-001173-c0043817"
+      ],
+      "source_support": {
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1046179/000119312524099840/d592628d20f.htm",
+        "source_sha256": "8ab4ee8c621d4d7bc804d08bd5cfe494b91dc09a63a4c7decfad4e5f8b9961c1",
+        "block_id": "block-001173-c0043817",
+        "text_hash": "c00438174e30238e348502b34319768aa3ead38a0edec149eab28511214754a4",
+        "dom_path": "/html/body/div[96]/div/div[1]/div/table",
+        "printed_page_label": "F - 11",
+        "section_heading_cell": {
+          "text": "Acquisitions of:",
+          "row": 5,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "is_header": false
+        },
+        "row_label_cell": {
+          "text": "Property, plant and equipment",
+          "row": 9,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "is_header": false
+        },
+        "value_cells": [
+          {
+            "text": "(949,816.8",
+            "row": 9,
+            "column": 11,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          },
+          {
+            "text": ")",
+            "row": 9,
+            "column": 12,
+            "rowspan": 1,
+            "colspan": 1,
+            "is_header": false
+          }
+        ],
+        "period_header_cell": {
+          "text": "2023",
+          "row": 1,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 6,
+          "is_header": false
+        },
+        "currency_header_cell": {
+          "text": "NT$",
+          "row": 2,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 2,
+          "is_header": false
+        },
+        "unit_caption": {
+          "block_id": "block-001172-de1719a9",
+          "text": "(In Millions of New Taiwan Dollars or U.S. Dollars)"
+        },
+        "inline_fact_for_reviewer_only": {
+          "name": "ifrs-full:PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities",
+          "contextref": "P01_01_2023To12_31_2023",
+          "unitref": "Unit_TWD",
+          "decimals": "-5",
+          "scale": "6",
+          "format": "ixt:num-dot-decimal",
+          "id": "ixv-97773",
+          "text": "949,816.8"
+        },
+        "xbrl_context_for_reviewer_only": {
+          "source_html": "<xbrli:context id=\"P01_01_2023To12_31_2023\"> <xbrli:entity> <xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0001046179</xbrli:identifier> </xbrli:entity> <xbrli:period> <xbrli:startdate>2023-01-01</xbrli:startdate> <xbrli:enddate>2023-12-31</xbrli:enddate> </xbrli:period> </xbrli:context>",
+          "catalog_entry": {
+            "context_id": "P01_01_2023To12_31_2023",
+            "dom_path": "/html/body/div[1]/ix:header/ix:resources/xbrli:context[1]",
+            "entity_cik": "0001046179",
+            "identifier_scheme": "http://www.sec.gov/CIK",
+            "period": {
+              "startdate": "2023-01-01",
+              "enddate": "2023-12-31"
+            }
+          }
+        },
+        "source_precision": {
+          "xbrl_decimals": "-5",
+          "note": "Reported one-decimal millions; base-unit conversion does not increase precision."
+        },
+        "mapping_boundary": "Acquisitions row in this exact frozen table/input; bare PP&E label also appears under disposal and is not a general acquisition alias."
+      },
+      "quotes": [
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "CASH FLOWS FROM INVESTING ACTIVITIES",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "Acquisitions of:",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "Property, plant and equipment (839,195.7 ) (1,082,672.1 ) (949,816.8 )",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001173-c0043817",
+          "quote": "2021 2022 2023 NT$ NT$ NT$ US$",
+          "exact_match": true
+        },
+        {
+          "role": "evidence",
+          "block_id": "block-001172-de1719a9",
+          "quote": "(In Millions of New Taiwan Dollars or U.S. Dollars)",
+          "exact_match": true
+        },
+        {
+          "role": "qualifiers",
+          "block_id": "block-001174-2ea6a4cb",
+          "quote": "(Continued)",
+          "exact_match": true
+        }
+      ],
+      "engineering_issues": [],
+      "adoption": "unchanged_candidate",
+      "reviewer_scope": "Reported candidate cash-acquisition amount, original sign, currency, scale, actual period, acquisition-section row and exact evidence; no whole-filing approval or adoption."
+    }
+  ],
+  "relations": [
+    {
+      "relation_id": "relation-c8872586013e0ec254765b87",
+      "record_ids": [
+        "draft-e50c6a3b550bb4f4ee7c07be",
+        "draft-09d13a38c6a26f19c6e85251",
+        "draft-b237ef8dd442d9cc43f062fa"
+      ],
+      "verdict": "supported",
+      "rationale": "候选 ID 对应同一购置 PP&E 现金流行的不同年度；不代表相加或同一期。"
+    }
+  ],
+  "coverage_findings": [
+    {
+      "id": "acquisition-scope-and-sign",
+      "verdict": "scope_note",
+      "rationale": "仅限投资现金流表 Acquisitions of 下的 PP&E 行，保留负支出符号。同名处置收入、政府补助及投资现金流净额是不同事项；不得混为通用 CapEx。",
+      "source_block_ids": [
+        "block-001173-c0043817"
+      ]
+    }
+  ],
+  "lineage": {
+    "parent_run_id": "tsmc-fy2023-investing-continuation-main-agent-v1",
+    "model_batch_selection": {
+      "path": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-investing-continuation-main-agent-v1/query/turn-004/decision.json",
+      "sha256": "87557d0c9461df1732d2856785cea00f58ca22a1155648e5fdbdaf6072411cb6"
+    },
+    "batch_index": 10,
+    "selected_table_block_id": "block-001173-c0043817",
+    "child_result": {
+      "path": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/tsmc-fy2023-investing-cash-flow-batch-v2/extraction-01/result.json",
+      "sha256": "4a41fb203e21ac00bb126d1d1434c80de90340db55f4d8d409db4c61f48b5896"
+    },
+    "closure_statement": "原父 Agent 已选择投资现金流续页批次10；本子运行结果及本次审阅不代表父 Agent 闭环或整份报表采纳。"
+  },
+  "limits": [
+    "No adoption or baseline changes.",
+    "No whole-report completeness acceptance.",
+    "Reported signs and precision retained.",
+    "Mapping applies only to acquisition-section row evidence, not any bare PP&E label."
+  ],
+  "adoption": "unchanged_candidate",
+  "overall": "selected_candidate_values_reviewed_with_explicit_scope_limits"
+}
