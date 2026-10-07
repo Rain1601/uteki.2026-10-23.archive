@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Filing brief acceptance example — proposed, not production API",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "presentation_status",
+    "coverage",
+    "company_id",
+    "source_snapshot_id",
+    "package_id",
+    "report_period_end",
+    "selected_block_ids",
+    "sentences",
+    "gaps"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "filing-brief-example-v1"
+    },
+    "presentation_status": {
+      "const": "design_example"
+    },
+    "coverage": {
+      "const": "partial"
+    },
+    "company_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "package_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "report_period_end": {
+      "type": "string",
+      "minLength": 1
+    },
+    "selected_block_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "sentences": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "zh",
+          "en",
+          "evidence_block_ids"
+        ],
+        "properties": {
+          "zh": {
+            "type": "string",
+            "minLength": 1
+          },
+          "en": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_block_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

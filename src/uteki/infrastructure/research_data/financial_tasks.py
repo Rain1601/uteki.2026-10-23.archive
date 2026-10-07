@@ -181,7 +181,7 @@ class FinancialTaskGateway:
     def catalog(self):
         return deepcopy(self._catalog)
 
-    async def extract(self, arguments, *, scope, output):
+    async def extract(self, arguments, *, scope, output, observation_context=None):
         if ExecutionScope.model_validate(scope) != self.scope:
             raise ValueError('financial extraction active scope must exactly match its registered execution scope')
         if (not isinstance(arguments, dict) or not {'task_id', 'batch_index'} <= set(arguments)
@@ -204,6 +204,10 @@ class FinancialTaskGateway:
             if key in self._receipts:
                 receipt = self._receipts[key]
                 _verify_files(Path(receipt['run']['path']), receipt['run']['manifest_sha256'])
+                if observation_context:
+                    observation_context.guard()
+                    observation_context.publish(Path(receipt['run']['path'])/'manifest.json',
+                        kind='reused_extraction_manifest', reused=True)
                 return deepcopy(receipt)
             if self._started[task_id] >= item['max_new_batches']:
                 raise ValueError('registered financial task new-batch allowance exhausted')
@@ -218,7 +222,7 @@ class FinancialTaskGateway:
                 result = await run_extraction_batch(self.dataset, deepcopy(item['job']), output,
                     task_profile=item['task_profile'], method_root=item['method_root'], batch_index=batch_index,
                     method_id=method_id, model_config=deepcopy(self.model_config), credentials_root=self.credentials_root,
-                    model_call=self.model_call)
+                    model_call=self.model_call, observation_context=observation_context)
             except BaseException as error:
                 # Batch input validation can fail before the runner creates its
                 # directory. Retain that attempted execution without altering a

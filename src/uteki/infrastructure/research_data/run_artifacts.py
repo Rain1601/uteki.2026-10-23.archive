@@ -136,8 +136,9 @@ class ArtifactReadProgress:
 
 
 class ArtifactStore:
-    def __init__(self, root, *, refs=()):
+    def __init__(self, root, *, refs=(), observation_context=None):
         self.root = Path(root).resolve()
+        self.observation_context = observation_context
         self.refs = {r.artifact_id: r for r in (ArtifactRef.model_validate(v) for v in refs)}
         for ref in self.refs.values():
             self._validate_ref(ref)
@@ -169,6 +170,9 @@ class ArtifactStore:
             scope_id='scope-' + digest(scope.model_dump(mode='json'))[:24], created_step=step,
             parent_ids=parent_ids, source_ids=source_ids, evidence_id=evidence_id)
         self.refs[aid] = ref
+        if self.observation_context:
+            self.observation_context.for_step(step).publish(path, kind=kind, artifact_id=aid,
+                scope=scope.model_dump(mode='json'), parent_ids=list(parent_ids), source_ids=list(source_ids))
         return ref.model_dump(mode='json')
 
     def load(self, artifact_id):

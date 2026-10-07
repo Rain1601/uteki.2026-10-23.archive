@@ -1,3 +1,5 @@
+> **2026-10-06：旧页面已退役。** 本目录不再提供独立页面；旧页面及其专用代码、测试已删除。当前使用 [Swiss C 投研前台](../company-workspace-swiss-c/README.md) 和 [真实数据工作台](../../../apps/review_workbench/README.md)。以下文字保留为历史记录，其中旧启动命令与页面链接不再适用。保留的原始素材、来源记录和冻结版本仅用于追溯。
+
 # 统一实体工作台样板 v2
 
 预览：[机构投资总览](http://127.0.0.1:8769/docs/design/company-workspace-v2/?v=20261004-investment-timeline2#/institution/uteki?view=overview) · [公司入口](http://127.0.0.1:8769/docs/design/company-workspace-v2/?v=20261004-investment-timeline2#/company/alphabet?view=overview) · [Agent 详情](http://127.0.0.1:8769/docs/design/company-workspace-v2/?v=20261004-investment-timeline2#/manager/north?view=overview)。

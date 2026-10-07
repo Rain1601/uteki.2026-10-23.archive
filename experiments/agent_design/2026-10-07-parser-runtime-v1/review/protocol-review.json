@@ -1,0 +1,1472 @@
+{
+  "schema_version": "protocol-review-v1",
+  "review_kind": "offline_trace_audit",
+  "review_date": "2026-10-07",
+  "reviewer": "Codex independent protocol review",
+  "new_model_calls": 0,
+  "source_runs_modified": false,
+  "scope": "Only the two completed real Sonnet native Messages runs: cashflow-source-r2 and business-source. Earlier failed cashflow-source run is excluded.",
+  "definitions": {
+    "invalid_json": "Saved visible text fails strict json.loads; not every invalid_model_decision is this class.",
+    "local_pydantic_or_business_schema_failure": "JSON parses, but a local AutonomousDecision/nested-model validator rejects it before a host action.",
+    "host_action_precondition_rejection": "A typed decision was returned; host rejects a missing requirement association before tool execution.",
+    "redundant_navigation": "Successful navigation repeated identical already available content with no progress.",
+    "productive_under_current_protocol": "Accepted setup, planning, evidence acquisition, packaging or finish step that advanced this observed run. This is not a proven minimum number of calls."
+  },
+  "totals": {
+    "model_calls": 29,
+    "classification_counts": {
+      "productive_under_current_protocol": 18,
+      "local_pydantic_or_business_schema_failure": 3,
+      "invalid_json": 2,
+      "host_action_precondition_rejection": 5,
+      "redundant_navigation": 1
+    },
+    "estimated_usd_by_classification": {
+      "productive_under_current_protocol": "0.749032",
+      "local_pydantic_or_business_schema_failure": "0.119574",
+      "invalid_json": "0.070562",
+      "host_action_precondition_rejection": "0.200944",
+      "redundant_navigation": "0.03532"
+    },
+    "estimated_usd_total": "1.175432",
+    "rejected_or_redundant_calls": 11,
+    "rejected_or_redundant_estimated_usd": "0.426400",
+    "rejected_or_redundant_cost_fraction": "0.3628",
+    "input_tokens": 556421,
+    "output_tokens": 6259,
+    "actual_billed_usd": null
+  },
+  "observations": [
+    "Both runs show the same early pattern: query skill; plan without reason; repaired plan; JSON formatting failure; outline without requirement_ids; repaired outline. This repetition supports a protocol-communication hypothesis rather than a source-specific retrieval failure.",
+    "Five typed tool decisions omit requirement_ids. Current wire schema defaults this field to an empty array, while the host requires a nonempty existing association for these tool actions.",
+    "Two plan decisions omit reason. The JSON Schema makes reason optional; the requirement is expressed only in a local cross-field validator. The current prompt says to revise with a reason but does not explicitly restate this for the initial plan.",
+    "The cash-flow artifact has 2038 text characters. The current limit of 1000 forces three model-driven reads, including a final page of only 38 characters. All pages fit well below the effective 12000-byte response budget.",
+    "The complete table grid remains in the saved parsed output, but this run chose the /blocks/4/text representation. Do not describe the run as having verified row/column coordinates.",
+    "All inspected calls have end_turn and known usage; these failures are not output-token truncation. Cache-read counters are zero in both runs.",
+    "evidence_ready denotes host reference and body-delivery checks. This audit does not establish financial accuracy, answer completeness, or model benchmark quality."
+  ],
+  "prioritized_minimum_protocol_changes": [
+    {
+      "priority": 1,
+      "proposal": "Add a short action-contract table to the planner instruction: initial plan and gap require a nonblank reason; source/query/extract/answer actions require existing requirement_ids. Include one valid source-action example using an explicitly supplied requirement ID.",
+      "evidence_turns": [
+        "cashflow-source-r2:2,5,7,10",
+        "business-source:2,5,8"
+      ],
+      "preserve": "Do not fill in a missing requirement ID automatically or weaken host scope validation.",
+      "hypothesis": "This may prevent seven rejected calls seen here; actual savings are unverified and are not a counterfactual cost claim."
+    },
+    {
+      "priority": 2,
+      "proposal": "Improve allowlisted nested-schema feedback: identify artifact_read.limit and its known maximum 1000; expose an exact bounded continuation request when pagination is needed.",
+      "evidence_turns": [
+        "cashflow-source-r2:13"
+      ],
+      "preserve": "Read schema-owned field names and limits only; do not echo arbitrary rejected content or private validation context.",
+      "hypothesis": "More specific feedback may reduce repair turns; requires a new budgeted repeat to measure."
+    },
+    {
+      "priority": 3,
+      "proposal": "Separate text character-page capacity from array item count, while preserving max_bytes, frozen artifact identity and full-body delivery accounting. The 2038-character table is a concrete acceptance case for one bounded text read.",
+      "evidence_turns": [
+        "cashflow-source-r2:11,12,14,15"
+      ],
+      "preserve": "Do not drop the final characters or mark partial delivery complete merely to shorten the run.",
+      "hypothesis": "Could remove two text-pagination decisions in this specific trace; packet budgeting and model behavior still require a budgeted replay."
+    },
+    {
+      "priority": 4,
+      "proposal": "If formatting failures persist, trial a reduced, closed decision wire schema through native output_config.format; record AIHubMix degradation headers and continue full host validation.",
+      "evidence_turns": [
+        "cashflow-source-r2:4",
+        "business-source:4"
+      ],
+      "preserve": "Do not silently strip Markdown/prose or execute a recovered embedded JSON object; do not send the existing large schema unchanged.",
+      "hypothesis": "Constrained output could prevent formatting failures, but gateway support, schema compilation and latency/cost require a small budgeted compatibility run."
+    }
+  ],
+  "required_followup_validation": {
+    "authorization": "No new model run was made in this audit. A new explicit run and shared cost budget are required to test the following hypotheses.",
+    "offline_first": [
+      "Fixture checks for missing plan reason, missing requirement IDs, nested limit feedback and full 2038-character text delivery.",
+      "Retain rejection of cross-source references and incomplete body delivery."
+    ],
+    "budgeted_model_comparison": [
+      "Replay the same two source-bound tasks under a new prompt/config version; preserve these runs.",
+      "Record invalid JSON, local validation, host rejection, duplicate navigation, input/output/cache tokens, elapsed time and estimated cost separately.",
+      "Review exact quotations and declared gaps; faster completion alone is not a quality pass."
+    ]
+  },
+  "runs": [
+    {
+      "run": "cashflow-source-r2",
+      "result_status": "evidence_ready",
+      "stop_reason": "host_reference_checks_passed",
+      "model_calls": 17,
+      "classification_counts": {
+        "productive_under_current_protocol": 10,
+        "local_pydantic_or_business_schema_failure": 2,
+        "invalid_json": 1,
+        "host_action_precondition_rejection": 3,
+        "redundant_navigation": 1
+      },
+      "estimated_usd_by_classification": {
+        "productive_under_current_protocol": "0.407078",
+        "local_pydantic_or_business_schema_failure": "0.081164",
+        "invalid_json": "0.035148",
+        "host_action_precondition_rejection": "0.126192",
+        "redundant_navigation": "0.03532"
+      },
+      "estimated_usd_total": "0.684902",
+      "input_tokens_total": 325791,
+      "output_tokens_total": 3332,
+      "unknown_cost_requests": 0,
+      "turns": [
+        {
+          "turn": 1,
+          "classification": "productive_under_current_protocol",
+          "note": "Load the required query skill.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "load_skill",
+          "host_receipt_status": "skill_loaded",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.026314",
+          "input_tokens": 13062,
+          "output_tokens": 19,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0001-attempt-01.json",
+              "sha256": "2243cdfb54a8f92dbd3005735be325a7450fd3850731d6ff25f19bd328969708"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0001-01-output.json",
+              "sha256": "c1be071e20da52eb9712e59d754f8288a623496368a460e6a2bdc22ca3047513"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-001/receipt.json",
+              "sha256": "aa125b2bdc173cdb90a6ed11c156f30a288a8e3e5b6dea5e0219e39ac50aa905"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-001/feedback.json",
+              "sha256": "3f171ceb99c844b385b79960c7e79411857455d25b005fff4fdc84eb8c301dfd"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/c8da4a5f-bb3a-4d5a-9845-b4e02dffc0e1-end.json",
+              "sha256": "979582384e550c628da94f386cc72ef78b843dffa9afb6cad91aca52c50e6abf"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-001/decision.json",
+              "sha256": "7445473a18fc4e20296980622a31d58b9ec19cb35d8bfe93d9a15d3d75650ad5"
+            }
+          ],
+          "requirement_ids": []
+        },
+        {
+          "turn": 2,
+          "classification": "local_pydantic_or_business_schema_failure",
+          "note": "Valid JSON; plan lacks the nonblank reason required by a local model validator.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "invalid_model_decision",
+          "host_action": "invalid",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.0386",
+          "input_tokens": 18585,
+          "output_tokens": 143,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0002-attempt-01.json",
+              "sha256": "53f82210f73473fc64019db166b9f8e9bc863f22dda4cf93fcdebfe89caaecb5"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0002-01-output.json",
+              "sha256": "18e99a4bc2ef16b85250c32aacb10b82ec5467ed4502c5d0c328e475d161e89f"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-002/receipt.json",
+              "sha256": "e663072a2987befafd282e88167d556815ae7ea2e3210da784b1304114b2fae6"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-002/feedback.json",
+              "sha256": "3c2365d3c173b0a1030e7609c3fea3bd8bae77e8bdc121aa3913d8e9954f360e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/c6a26f6c-7e6a-4e8e-bf45-349cc764cff8-end.json",
+              "sha256": "dfd611cd4247db9213edc40cac8c19b3a8f52565c0563a55c2722a117d394d87"
+            }
+          ],
+          "validation": [
+            {
+              "type": "value_error",
+              "location": [],
+              "rule": "action_requires_reason",
+              "suggestion": "For action=plan or action=gap provide a nonblank reason."
+            }
+          ],
+          "host_feedback_reason": "invalid_model_decision; visible_output=decision-0002-01-output.json; validation=[{\"type\": \"value_error\", \"location\": [], \"rule\": \"action_requires_reason\", \"suggestion\": \"For action=plan or action=gap provide a nonblank reason.\"}]"
+        },
+        {
+          "turn": 3,
+          "classification": "productive_under_current_protocol",
+          "note": "Create the source_evidence requirement.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "plan",
+          "host_receipt_status": "planned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.035196",
+          "input_tokens": 16238,
+          "output_tokens": 272,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0003-attempt-01.json",
+              "sha256": "1ba2adc304957ed941e5a0a47b3bc24c7dad53d91aa6d49939567e044b2f4764"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0003-01-output.json",
+              "sha256": "d419a8ef4b3927375965a7c894263c899ea2e8d6da49def9ee01568968e4cc6e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-003/receipt.json",
+              "sha256": "aa236abafcd2d09324a31bb1aa21af0a8f5d79639a59ccc06979360a94c4cb0e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-003/feedback.json",
+              "sha256": "96454a171ad6b1f38f0969b457fa3b2299fa3d365e6e7fb709c081849530e40e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/cc794f40-c605-48ae-b872-e8860053a3a7-end.json",
+              "sha256": "3132398316293267de4c012b434d5572caf5610a7e7682a177acc14644f50134"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-003/decision.json",
+              "sha256": "8bb179d140427ab9db02196308ab45a833595ccb025be50a34164657a9fc78d4"
+            }
+          ],
+          "requirement_ids": []
+        },
+        {
+          "turn": 4,
+          "classification": "invalid_json",
+          "note": "JSON object followed by trailing Markdown fence; strict JSON decoding fails.",
+          "json_syntax_valid": false,
+          "local_model_decision_status": "invalid_model_decision",
+          "host_action": "invalid",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.035148",
+          "input_tokens": 17324,
+          "output_tokens": 50,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0004-attempt-01.json",
+              "sha256": "9b5a924c05c2666ad3d25ae759e6ac43c7af47a3dca49ae9bae328e25db3ee52"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0004-01-output.json",
+              "sha256": "0e358f94980d43b814d091166024d774fc644bf274186238fdf39b7499abd239"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-004/receipt.json",
+              "sha256": "548cc161b461b199d891517033feedbbc7ecbd0fb278f15148c268098858039e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-004/feedback.json",
+              "sha256": "88cee0c6faabe267a83019ab160d22e1e5515e2ee26fffb9faa1b7d1965f0c15"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/38d13329-f471-49d9-a5e5-894edf015965-end.json",
+              "sha256": "3d394dddb1b2accde3e28a11398ed9600d42de9dcc2bf27faa0a5ea0b0fe9d23"
+            }
+          ],
+          "validation": [
+            {
+              "type": "json_invalid",
+              "location": [],
+              "rule": "single_json_object",
+              "suggestion": "Return exactly one valid JSON object; no prose, Markdown fences, or multiple concatenated JSON objects."
+            }
+          ],
+          "host_feedback_reason": "invalid_model_decision; visible_output=decision-0004-01-output.json; validation=[{\"type\": \"json_invalid\", \"location\": [], \"rule\": \"single_json_object\", \"suggestion\": \"Return exactly one valid JSON object; no prose, Markdown fences, or multiple concatenated JSON objects.\"}]"
+        },
+        {
+          "turn": 5,
+          "classification": "host_action_precondition_rejection",
+          "note": "Locally valid decision; host rejects outline without existing requirement_ids before tool execution.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "outline_source",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.034364",
+          "input_tokens": 16952,
+          "output_tokens": 46,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0005-attempt-01.json",
+              "sha256": "15de50c42774ec65eca357fb49c7f4afee3fc4e2f0b2954991781148427687d6"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0005-01-output.json",
+              "sha256": "68f91b8a4e21b15ae96d0275f788963c2f122dae0fb20e1b048ecba3dcf95cc7"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-005/receipt.json",
+              "sha256": "099a43b52d95043eb315462f12912d5e0b1f4a0b3e424b64728bd40208388dca"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-005/feedback.json",
+              "sha256": "0298a1cb7880928d3d5f3b46bf47670f38b4e1ebc5655a7b52956e033bcb0bd8"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/51baf7aa-4328-4c32-b01c-1e33ecfaa99c-end.json",
+              "sha256": "00a1e460f55a284c22875412ea337d3cd44d1276ee04a8430ee35518b5de6ea6"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-005/decision.json",
+              "sha256": "a50b177629973d40663d3424fd51c3a91ddb9fa97fa829ff4b9f33533f0fba2f"
+            }
+          ],
+          "host_feedback_reason": "tool action must reference existing requirements",
+          "requirement_ids": []
+        },
+        {
+          "turn": 6,
+          "classification": "productive_under_current_protocol",
+          "note": "Retrieve the legal outline with the requirement attached.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "outline_source",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.034918",
+          "input_tokens": 16874,
+          "output_tokens": 117,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0006-attempt-01.json",
+              "sha256": "744db281f0fb0bc1c8f4671d511eb115ddbe64467e6d8eaf55a74907e4a80966"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0006-01-output.json",
+              "sha256": "e202e29fcd53fa769de4897d843365013aaa03b06b55ba2a995cf53e89911628"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-006/receipt.json",
+              "sha256": "8f81b2fd4a1f7b4ed351cbdf1f729e1f9574484ec241cd929ce332cdd5fb6796"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-006/feedback.json",
+              "sha256": "b0bdce4bfe7cfdf5c9db58d4504f0c6f59eac4119dd842ea87f07b7918f2349a"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/ce0c938d-f041-4736-b7f5-2223c2d6b8da-end.json",
+              "sha256": "cf466cb79a74d4be5054b55ca4a13a86fbc22b4962b8816f861cd4ba8f751bf3"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-006/decision.json",
+              "sha256": "94b3da531c9064b63bd37cbdc7f7345d839456252649407bd111a7d472ba8079"
+            }
+          ],
+          "requirement_ids": [
+            "req-cashflow-ocf-evidence"
+          ]
+        },
+        {
+          "turn": 7,
+          "classification": "host_action_precondition_rejection",
+          "note": "Locally valid search decision; host rejects missing requirement_ids.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "search_source",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.051608",
+          "input_tokens": 24954,
+          "output_tokens": 170,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0007-attempt-01.json",
+              "sha256": "4187dc4c7a5905a0b7e93be15fa638e10f065899404bae575e620980df5e3603"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0007-01-output.json",
+              "sha256": "6d86fddc390683a337a6143db2cff4797420289d7a922c7324bf8cad0288b4b1"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-007/receipt.json",
+              "sha256": "fe3894d21cf763ea6d58ee187f53cc605361992e38c667df7579da5388037c11"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-007/feedback.json",
+              "sha256": "e4abcb8e18e26e516804386c64db010d43c5dfdefbacb0d407d5b79c9683f1e4"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/cc3cee1a-04b5-4c28-b4be-d0d430f829a7-end.json",
+              "sha256": "40e668dbc75eb3524ea3ca701d4a41f518daed7cfae3b19c4f75c6ed872d7bed"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-007/decision.json",
+              "sha256": "8786af110fdbb2280145681b44689ca21847e7f4001c082fb6b1fdbb4a5c1166"
+            }
+          ],
+          "host_feedback_reason": "tool action must reference existing requirements",
+          "requirement_ids": []
+        },
+        {
+          "turn": 8,
+          "classification": "redundant_navigation",
+          "note": "Same outline request as turn 6, no new progress; navigation was already available.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "outline_source",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.03532",
+          "input_tokens": 16895,
+          "output_tokens": 153,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0008-attempt-01.json",
+              "sha256": "379f8acdc1fed066c30531c47f96e978074a7d2e5d88a67901581deb9d985bf6"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0008-01-output.json",
+              "sha256": "db3eefdba123ebb15dc206056536aafd8f5de2d3895aba3845f50161b50f2b1e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-008/receipt.json",
+              "sha256": "b3cfd713f5582a1680a0e683122b969ab25bb198ae26e58adc2c32e5ac9afffa"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-008/feedback.json",
+              "sha256": "96cfb56119a6fd8a69f5e6c5551615ef36de2d8b9f517941f48ec6a5d71d0a19"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/b8f197e7-1110-4646-bee2-dd054c686cc6-end.json",
+              "sha256": "8c378bc9fdde2d6e004988ac0cfd8acd213d1b149c34a531678dc2018537035a"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-008/decision.json",
+              "sha256": "94b3da531c9064b63bd37cbdc7f7345d839456252649407bd111a7d472ba8079"
+            }
+          ],
+          "requirement_ids": [
+            "req-cashflow-ocf-evidence"
+          ]
+        },
+        {
+          "turn": 9,
+          "classification": "productive_under_current_protocol",
+          "note": "Locate the cash-flow table using source-scoped literal search.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "search_source",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.052046",
+          "input_tokens": 24953,
+          "output_tokens": 214,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0009-attempt-01.json",
+              "sha256": "83d28c6b65765f24e8dbb0582fdaf3fc818cd3718ca368cd1e813032162bbe3d"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0009-01-output.json",
+              "sha256": "cb2889c5bd0ebfef6962f3d41f42f2feeebecdea8a17036ff849b131fed2928e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-009/receipt.json",
+              "sha256": "b0cb4f9e18e94890c6d13dc67a319af728713691035c4cc74f0671c474a10f97"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-009/feedback.json",
+              "sha256": "f516a669a074ce6105e8f05a22b7ae7004864e1017d005e6f176433a8228c3da"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/7907861d-10da-4a6b-a789-4bd7c93006b0-end.json",
+              "sha256": "72f828067756949db205492298ff46ceac92b99cf9c3f05e089f7889229fac66"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-009/decision.json",
+              "sha256": "6314a78353186c6c221e4d16cd711a8d2b924dabc03d86fa82f152876d69bd09"
+            }
+          ],
+          "requirement_ids": [
+            "req-cashflow-ocf-evidence"
+          ]
+        },
+        {
+          "turn": 10,
+          "classification": "host_action_precondition_rejection",
+          "note": "Locally valid read_context decision; host rejects missing requirement_ids.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_context",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.04022",
+          "input_tokens": 19650,
+          "output_tokens": 92,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0010-attempt-01.json",
+              "sha256": "0e1742cf3711d8e3808637b26da3be4a52602acd9ca3d224e33ca807504ccbba"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0010-01-output.json",
+              "sha256": "d6d39a09f53ec253c361076ebe3bf1e00f503175db7fb729d6946cbd3d401b86"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-010/receipt.json",
+              "sha256": "5070e606106a2723e3b110f9151144f3ab7c03175be69780cd29065a0d0c5752"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-010/feedback.json",
+              "sha256": "be15233f899ef3dbef207fb35354fcf10e58148bb00ac2efa15feae243ea377b"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/1cfbdcee-47eb-4b91-85a9-9b6819cf4d17-end.json",
+              "sha256": "e4f49aa1356da55a33d738b11fc691ef2df7acac2083b3184e3a277729c91c0d"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-010/decision.json",
+              "sha256": "631d77b70082d4eb403f79c922f6334879ecfc3396a004d34a1359d2020fee3b"
+            }
+          ],
+          "host_feedback_reason": "tool action must reference existing requirements",
+          "requirement_ids": []
+        },
+        {
+          "turn": 11,
+          "classification": "productive_under_current_protocol",
+          "note": "Read context around the located table. Preview delivers title/context blocks but omits requested table text; full output is saved.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_context",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": true,
+          "estimated_usd": "0.036076",
+          "input_tokens": 17218,
+          "output_tokens": 164,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0011-attempt-01.json",
+              "sha256": "fe63cbe412708ecf2cc5a4320b1d9632a890445aebb81fa0b338dfc690faa447"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0011-01-output.json",
+              "sha256": "c6ba1dd47b242e79dfd6a5659f73223855c3d3793a2ade73dc57c4e4b8a54aee"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-011/receipt.json",
+              "sha256": "3b031b8275cec5e98d6ba3166ba22f289667d6829e4729870f6fcd543cfdf98f"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-011/feedback.json",
+              "sha256": "d4abbf920d01e0b743c19d4cb6c9d0f14a590b6d99e46fca21ce80a5c914b348"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/6540a08a-1952-4d4a-a31f-09a0d9716bd5-end.json",
+              "sha256": "5ec2aa37869c74a54d24061cbdcc5a740d09129a993c91c66d48ecfa313b02fb"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-011/decision.json",
+              "sha256": "531e326cfd2d06835336ca94c6e79f5d507f4830b8b64d08f078d0fb9f6d84f3"
+            }
+          ],
+          "requirement_ids": [
+            "req-cashflow-ocf-evidence"
+          ]
+        },
+        {
+          "turn": 12,
+          "classification": "productive_under_current_protocol",
+          "note": "Deliver table text characters [0,1000), within the current artifact limit.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_artifact",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.047952",
+          "input_tokens": 23166,
+          "output_tokens": 162,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0012-attempt-01.json",
+              "sha256": "2ea0fe521d3114c2ee8ad83a4f9fc4cc249bece82b25e2940ae60a1342aac4b5"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0012-01-output.json",
+              "sha256": "8c9443ea6d7b4e888889fa0a0029db97756464d3edb1575f69ec22f8c599b675"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-012/receipt.json",
+              "sha256": "7a98ebd5faa2c055b08c0c5548fb654a54e4edf496e891d0abfcb02c21c7a390"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-012/feedback.json",
+              "sha256": "bcfc59cf35f7240955a08012e0e730faf7856790f2f13e88edb785875e288183"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/b0a87115-f93d-4ad9-a920-5899f764fc17-end.json",
+              "sha256": "9c2c4ef161f53090419e1ce3170f53dd331b4c5ebe536e9fd1520d5edcf682f6"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-012/decision.json",
+              "sha256": "4203cbfc4517f7a4c7e9648b83ad550457a69d0d8440b916eb9a39a44f22ca15"
+            }
+          ],
+          "requirement_ids": [],
+          "text_page": {
+            "offset": 0,
+            "end_offset": 1000,
+            "returned_count": 1000,
+            "total_count": 2038,
+            "unit": "characters",
+            "bytes_returned": 1008,
+            "effective_max_bytes": 12000
+          }
+        },
+        {
+          "turn": 13,
+          "classification": "local_pydantic_or_business_schema_failure",
+          "note": "Valid JSON; artifact_read.limit=1100 violates the Pydantic limit of 1000. Safe feedback masks nested field name as <field>.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "invalid_model_decision",
+          "host_action": "invalid",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.042564",
+          "input_tokens": 20487,
+          "output_tokens": 159,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0013-attempt-01.json",
+              "sha256": "841566e856cc0dda2d95f701f70ea01229a4ce531f8a7e09a3e655758225e66b"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0013-01-output.json",
+              "sha256": "a7990bb356f0245f41b91170e38e5d05cd460ab2e53a05c0d41281e7d782c11a"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-013/receipt.json",
+              "sha256": "6a4909832b1f575c185ce13c2102bcde12c6be5ad126d1d8a964e18153ab450d"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-013/feedback.json",
+              "sha256": "7eec0409612265dd8c337810f4404ed518dcfb53b4c687ac356347db97851183"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/14245705-1ac6-4c48-9ccb-f094735c9658-end.json",
+              "sha256": "bafe353654ca3501200f9ea04451e1f2b050f47a9d9a3aafe8185dc0926a5545"
+            }
+          ],
+          "validation": [
+            {
+              "type": "less_than_equal",
+              "location": [
+                "artifact_read",
+                "<field>"
+              ]
+            }
+          ],
+          "host_feedback_reason": "invalid_model_decision; visible_output=decision-0013-01-output.json; validation=[{\"type\": \"less_than_equal\", \"location\": [\"artifact_read\", \"<field>\"]}]"
+        },
+        {
+          "turn": 14,
+          "classification": "productive_under_current_protocol",
+          "note": "Deliver table text characters [1000,2000).",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_artifact",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.040564",
+          "input_tokens": 18972,
+          "output_tokens": 262,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0014-attempt-01.json",
+              "sha256": "9b43b31f7858a74760c481c54f20c0ff784ddac844b6a5deae47e972e2b04a39"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0014-01-output.json",
+              "sha256": "ee544e7c4dd230fca27fea3901f6456174ac10e20ae3c42a935a6cc604de8d65"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-014/receipt.json",
+              "sha256": "b2dff5768b2a4c826b25fee48713de07d6fbfd223ba852d8d496d97331e1b206"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-014/feedback.json",
+              "sha256": "77cdcd65cad7e758df648a733b31ae4323598deb71bb2f773116d24d3a4c913c"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/6d09926f-4b3e-4f58-a182-f56d395d93c1-end.json",
+              "sha256": "06ec830326bdcc36f1c6d7a37c68efc04b5c49a92bdd1e7424bb145fd12d7af4"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-014/decision.json",
+              "sha256": "03507e9b4aa4083132b5ca6b51b1619008ef38162067561058d59adb8830c8ce"
+            }
+          ],
+          "requirement_ids": [],
+          "text_page": {
+            "offset": 1000,
+            "end_offset": 2000,
+            "returned_count": 1000,
+            "total_count": 2038,
+            "unit": "characters",
+            "bytes_returned": 1022,
+            "effective_max_bytes": 12000
+          }
+        },
+        {
+          "turn": 15,
+          "classification": "productive_under_current_protocol",
+          "note": "Deliver remaining 38 characters [2000,2038).",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_artifact",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.0429",
+          "input_tokens": 20535,
+          "output_tokens": 183,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0015-attempt-01.json",
+              "sha256": "2bc66e4bc3ac205125cf4da7efb7adbb2c0162fed84c93dd73ea6fc03423b654"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0015-01-output.json",
+              "sha256": "d0a7b53191e9d9e9fa805f3a232ef897e87586e0f4d2bf15a2183777764977b8"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-015/receipt.json",
+              "sha256": "1a5eddca52c822547005c9fc38e1efca7b6c7915046ed5b5a9c646485aed117e"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-015/feedback.json",
+              "sha256": "d0f0a4b09116014e1a386f06278667ca75acfb82ea7389d9c4b2035c652739be"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/e6098f9e-850d-4e73-b2c9-8c251df96151-end.json",
+              "sha256": "fefac101ba8f35636f931bc7433d11eef0b942f50de20b3a0bd2c55d1089d1a0"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-015/decision.json",
+              "sha256": "b7614356c6a9e41064f6ad6ed7bd9919db67ab2124f14ae399d7d359ff5588e5"
+            }
+          ],
+          "requirement_ids": [],
+          "text_page": {
+            "offset": 2000,
+            "end_offset": 2038,
+            "returned_count": 38,
+            "total_count": 2038,
+            "unit": "characters",
+            "bytes_returned": 40,
+            "effective_max_bytes": 12000
+          }
+        },
+        {
+          "turn": 16,
+          "classification": "productive_under_current_protocol",
+          "note": "Register three exact source extracts: title, period/unit heading, and operating cash-flow row.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "extract",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.048654",
+          "input_tokens": 20867,
+          "output_tokens": 692,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0016-attempt-01.json",
+              "sha256": "f7c7922606e09d80d3d1501aec7ae75036e898ffa74ef6ba55ffe5cbe4889dc6"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0016-01-output.json",
+              "sha256": "40b8ec059cd988513279c74fefa919ccefb0a80fbcea2fee3b1976603b69b568"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-016/receipt.json",
+              "sha256": "4c0f60916cd5e215d074acf1afab8a3a92fef1eae58c3198cc48c244e92b6591"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-016/feedback.json",
+              "sha256": "3bdc26fd97515340a4696e449ec28426060aca8149f960b64b19f8b99b0cb641"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/367e0777-ac78-40ac-8448-a2fd8e5c95ea-end.json",
+              "sha256": "92a108107e5b6867b9d9c8d83d00b33deecd73b74c4039acaaad779912f32d9b"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-016/decision.json",
+              "sha256": "53913843fde301afa857b59f78f5a81eeef7c117719c18c6c820a3a22d740981"
+            }
+          ],
+          "requirement_ids": [
+            "req-cashflow-ocf-evidence"
+          ]
+        },
+        {
+          "turn": 17,
+          "classification": "productive_under_current_protocol",
+          "note": "Finish after host reference/body-delivery checks. This is not a semantic-quality judgment.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "finish",
+          "host_receipt_status": "evidence_ready",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.042458",
+          "input_tokens": 19059,
+          "output_tokens": 434,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0017-attempt-01.json",
+              "sha256": "bcdc13c4ec4a31402bf5e4b7cf1e95213702087a49b1575cb89db00986f04254"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/decision-0017-01-output.json",
+              "sha256": "51cd2ccce181dfe6568660250156cb4c0911f740658a87b6f3924268e96e8d05"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-017/receipt.json",
+              "sha256": "4b7a7bf3060e1620f7ed3fd2c2f19e74a5e73c3baa340c8ac7b25e419ad8d0da"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-017/feedback.json",
+              "sha256": "da3795b1bfc95543635e4aaa9b94bc6e579e3656349bdc6ad1366dd74fbf2a4c"
+            },
+            {
+              "path": "runs/cashflow-source-r2/model/calls/d4727a0f-e3d8-437a-bf29-2874864d160a-end.json",
+              "sha256": "e1e77e8b753a45757dc8d28caabb66e4cd9de0fadfab7c5d6399abbaf5ef2a40"
+            },
+            {
+              "path": "runs/cashflow-source-r2/query/turn-017/decision.json",
+              "sha256": "9836f92a19139fe20247b06ce5fee9d625e5ae5d67b15da60c67d6142f7beca0"
+            }
+          ],
+          "requirement_ids": []
+        }
+      ],
+      "result_evidence": [
+        {
+          "path": "runs/cashflow-source-r2/query/result.json",
+          "sha256": "9b48713770b98e56b52d79a482a3cb483597c1814340e797d54df81ec585865c"
+        },
+        {
+          "path": "runs/cashflow-source-r2/model-usage.json",
+          "sha256": "788b43fb02633b645157be922eea278ff0f57de21754451a8893cef0b56446ac"
+        },
+        {
+          "path": "runs/cashflow-source-r2/model/model-config.json",
+          "sha256": "1d1538b3bc17e21edb6fe2908f86dde9982e34a33700e1f428c4aaea68409fba"
+        }
+      ]
+    },
+    {
+      "run": "business-source",
+      "result_status": "evidence_ready",
+      "stop_reason": "host_reference_checks_passed",
+      "model_calls": 12,
+      "classification_counts": {
+        "productive_under_current_protocol": 8,
+        "local_pydantic_or_business_schema_failure": 1,
+        "invalid_json": 1,
+        "host_action_precondition_rejection": 2
+      },
+      "estimated_usd_by_classification": {
+        "productive_under_current_protocol": "0.341954",
+        "local_pydantic_or_business_schema_failure": "0.03841",
+        "invalid_json": "0.035414",
+        "host_action_precondition_rejection": "0.074752"
+      },
+      "estimated_usd_total": "0.490530",
+      "input_tokens_total": 230630,
+      "output_tokens_total": 2927,
+      "unknown_cost_requests": 0,
+      "turns": [
+        {
+          "turn": 1,
+          "classification": "productive_under_current_protocol",
+          "note": "Load the required query skill.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "load_skill",
+          "host_receipt_status": "skill_loaded",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.026284",
+          "input_tokens": 13047,
+          "output_tokens": 19,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0001-attempt-01.json",
+              "sha256": "34e7d3b7af3ab298424c02771cb3bad98bb7647043ff1c7c7a60de101c65df6d"
+            },
+            {
+              "path": "runs/business-source/model/decision-0001-01-output.json",
+              "sha256": "c1be071e20da52eb9712e59d754f8288a623496368a460e6a2bdc22ca3047513"
+            },
+            {
+              "path": "runs/business-source/query/turn-001/receipt.json",
+              "sha256": "aa125b2bdc173cdb90a6ed11c156f30a288a8e3e5b6dea5e0219e39ac50aa905"
+            },
+            {
+              "path": "runs/business-source/query/turn-001/feedback.json",
+              "sha256": "3f171ceb99c844b385b79960c7e79411857455d25b005fff4fdc84eb8c301dfd"
+            },
+            {
+              "path": "runs/business-source/model/calls/a01b9d7e-9b93-4686-b0c4-943fbb639e9e-end.json",
+              "sha256": "ed33d9b1d24f7fc38566d55d79c99ac8223fa0e8291eedc185ae833b3033eb11"
+            },
+            {
+              "path": "runs/business-source/query/turn-001/decision.json",
+              "sha256": "7445473a18fc4e20296980622a31d58b9ec19cb35d8bfe93d9a15d3d75650ad5"
+            }
+          ],
+          "requirement_ids": []
+        },
+        {
+          "turn": 2,
+          "classification": "local_pydantic_or_business_schema_failure",
+          "note": "Valid JSON; plan lacks the required nonblank reason.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "invalid_model_decision",
+          "host_action": "invalid",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.03841",
+          "input_tokens": 18570,
+          "output_tokens": 127,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0002-attempt-01.json",
+              "sha256": "6e5e7505e5404ede62222d0a28e13fafb60b051299a2eb17d8ea53748b4b0744"
+            },
+            {
+              "path": "runs/business-source/model/decision-0002-01-output.json",
+              "sha256": "2557c0100829b5ace9a01403d6efaac0e99cadc565c33801946711c1819f2e51"
+            },
+            {
+              "path": "runs/business-source/query/turn-002/receipt.json",
+              "sha256": "e663072a2987befafd282e88167d556815ae7ea2e3210da784b1304114b2fae6"
+            },
+            {
+              "path": "runs/business-source/query/turn-002/feedback.json",
+              "sha256": "3c2365d3c173b0a1030e7609c3fea3bd8bae77e8bdc121aa3913d8e9954f360e"
+            },
+            {
+              "path": "runs/business-source/model/calls/f2b8983a-58af-43ec-ac48-cff9e29eec46-end.json",
+              "sha256": "f6d500fa1f6650c8e368a4faec021b3a6c78e02942f18b11664bd6baf25cb620"
+            }
+          ],
+          "validation": [
+            {
+              "type": "value_error",
+              "location": [],
+              "rule": "action_requires_reason",
+              "suggestion": "For action=plan or action=gap provide a nonblank reason."
+            }
+          ],
+          "host_feedback_reason": "invalid_model_decision; visible_output=decision-0002-01-output.json; validation=[{\"type\": \"value_error\", \"location\": [], \"rule\": \"action_requires_reason\", \"suggestion\": \"For action=plan or action=gap provide a nonblank reason.\"}]"
+        },
+        {
+          "turn": 3,
+          "classification": "productive_under_current_protocol",
+          "note": "Create the source_answer requirement.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "plan",
+          "host_receipt_status": "planned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.034616",
+          "input_tokens": 16223,
+          "output_tokens": 217,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0003-attempt-01.json",
+              "sha256": "c62406c7903e706a2834be226f06571cbdaff780139eb7511d2f5c6ce1fa30ee"
+            },
+            {
+              "path": "runs/business-source/model/decision-0003-01-output.json",
+              "sha256": "be4640eb071808e9f3a1785bf22c96882b812b1d996dbdaf1047c52069ef26b6"
+            },
+            {
+              "path": "runs/business-source/query/turn-003/receipt.json",
+              "sha256": "e5fc8c15e19a4014771b6e4d341d347e93b011a64947ccb398bae083e2f941ab"
+            },
+            {
+              "path": "runs/business-source/query/turn-003/feedback.json",
+              "sha256": "5be1c61ed70f58fb3206f455599df1cc5762ae7bd6173964cdcdcf882157a9fc"
+            },
+            {
+              "path": "runs/business-source/model/calls/226f4ba2-3f10-42a2-a57d-c85f3ac55d9b-end.json",
+              "sha256": "8f66f136d6da24fc48788e55cddfae14e6cf201baaf759c5257df3cbcc2c2cc3"
+            },
+            {
+              "path": "runs/business-source/query/turn-003/decision.json",
+              "sha256": "4ee9164d0ca2314b6d13c623e83424519c525bc63e94fed6abfb1598ce6cb3c0"
+            }
+          ],
+          "requirement_ids": []
+        },
+        {
+          "turn": 4,
+          "classification": "invalid_json",
+          "note": "A JSON object is followed by a Markdown fence, prose, and a second JSON object; JSON decoding fails.",
+          "json_syntax_valid": false,
+          "local_model_decision_status": "invalid_model_decision",
+          "host_action": "invalid",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.035414",
+          "input_tokens": 17172,
+          "output_tokens": 107,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0004-attempt-01.json",
+              "sha256": "21df0eac673e45dd77dc40e172ce5a2325a6697a7ba91447d4880d184c8ce619"
+            },
+            {
+              "path": "runs/business-source/model/decision-0004-01-output.json",
+              "sha256": "92acf1caa339cc635f197b1fcc38242004e86a3099d3db4a997772faae5f67ab"
+            },
+            {
+              "path": "runs/business-source/query/turn-004/receipt.json",
+              "sha256": "548cc161b461b199d891517033feedbbc7ecbd0fb278f15148c268098858039e"
+            },
+            {
+              "path": "runs/business-source/query/turn-004/feedback.json",
+              "sha256": "88cee0c6faabe267a83019ab160d22e1e5515e2ee26fffb9faa1b7d1965f0c15"
+            },
+            {
+              "path": "runs/business-source/model/calls/bd6f75cb-5743-4af1-aefe-d5771494d8e1-end.json",
+              "sha256": "4571ca2e60b760c3acfce55c19b90e0c8bd172a6a495c64a579a6f0bdfdcd686"
+            }
+          ],
+          "validation": [
+            {
+              "type": "json_invalid",
+              "location": [],
+              "rule": "single_json_object",
+              "suggestion": "Return exactly one valid JSON object; no prose, Markdown fences, or multiple concatenated JSON objects."
+            }
+          ],
+          "host_feedback_reason": "invalid_model_decision; visible_output=decision-0004-01-output.json; validation=[{\"type\": \"json_invalid\", \"location\": [], \"rule\": \"single_json_object\", \"suggestion\": \"Return exactly one valid JSON object; no prose, Markdown fences, or multiple concatenated JSON objects.\"}]"
+        },
+        {
+          "turn": 5,
+          "classification": "host_action_precondition_rejection",
+          "note": "Locally valid outline decision; host rejects missing requirement_ids.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "outline_source",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.03418",
+          "input_tokens": 16860,
+          "output_tokens": 46,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0005-attempt-01.json",
+              "sha256": "3aec22e9c545b48908fc97ab4483036a1d0392acf8d0996e726058b7a2c05048"
+            },
+            {
+              "path": "runs/business-source/model/decision-0005-01-output.json",
+              "sha256": "68f91b8a4e21b15ae96d0275f788963c2f122dae0fb20e1b048ecba3dcf95cc7"
+            },
+            {
+              "path": "runs/business-source/query/turn-005/receipt.json",
+              "sha256": "099a43b52d95043eb315462f12912d5e0b1f4a0b3e424b64728bd40208388dca"
+            },
+            {
+              "path": "runs/business-source/query/turn-005/feedback.json",
+              "sha256": "0298a1cb7880928d3d5f3b46bf47670f38b4e1ebc5655a7b52956e033bcb0bd8"
+            },
+            {
+              "path": "runs/business-source/model/calls/c0ffd230-b3d3-4049-bdc9-04a75bb23e04-end.json",
+              "sha256": "f58823bade557e1bffdc1809e9d34202e0dfac154ed9002ac47c201f0463506c"
+            },
+            {
+              "path": "runs/business-source/query/turn-005/decision.json",
+              "sha256": "a50b177629973d40663d3424fd51c3a91ddb9fa97fa829ff4b9f33533f0fba2f"
+            }
+          ],
+          "host_feedback_reason": "tool action must reference existing requirements",
+          "requirement_ids": []
+        },
+        {
+          "turn": 6,
+          "classification": "productive_under_current_protocol",
+          "note": "Retrieve legal outline with the requirement attached.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "outline_source",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.034544",
+          "input_tokens": 16782,
+          "output_tokens": 98,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0006-attempt-01.json",
+              "sha256": "359426ec42d7114d4f1d9f53c085d25afe0006e18e0f80ac1e0dfe74c2d22bc8"
+            },
+            {
+              "path": "runs/business-source/model/decision-0006-01-output.json",
+              "sha256": "4842b7317bf6644c44d3789a319b46daae279933c36ede1a2d5f3aacfd666378"
+            },
+            {
+              "path": "runs/business-source/query/turn-006/receipt.json",
+              "sha256": "bab519b05f17e603f9972cd2712a59fd53efedbf431069235d9bf19c7f0c9758"
+            },
+            {
+              "path": "runs/business-source/query/turn-006/feedback.json",
+              "sha256": "a7277369ed64af7c7a2f054ff94ccdb32d43e4b0c11faa07257a65d25bf56d95"
+            },
+            {
+              "path": "runs/business-source/model/calls/fa3c297d-8d0e-49e8-9942-c2b03a99386d-end.json",
+              "sha256": "140847e98aaf3498e26fa0458a817f0c218f2f9a46302cdad200a8525ee6fa7c"
+            },
+            {
+              "path": "runs/business-source/query/turn-006/decision.json",
+              "sha256": "481ccecc20ad8b4eb5652fb861e4cac8bec9f090dd6e2d6df954fa26b20f6b2a"
+            }
+          ],
+          "requirement_ids": [
+            "req-segments"
+          ]
+        },
+        {
+          "turn": 7,
+          "classification": "productive_under_current_protocol",
+          "note": "Locate reportable-segment text by source-scoped literal search.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "search_source",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.051366",
+          "input_tokens": 24853,
+          "output_tokens": 166,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0007-attempt-01.json",
+              "sha256": "5c1c2a92df5af8eaab675d95a062c9f3b1eb7b56ed4c8c1836928c9e950013b3"
+            },
+            {
+              "path": "runs/business-source/model/decision-0007-01-output.json",
+              "sha256": "570ab15e4166dd343aa2858dbc9f2904830fa1318b066cdded38fa83a237b0cc"
+            },
+            {
+              "path": "runs/business-source/query/turn-007/receipt.json",
+              "sha256": "92cbbffcf0f5943fa2316b9ca0543326577e522ab40b2621454260bf796a43c3"
+            },
+            {
+              "path": "runs/business-source/query/turn-007/feedback.json",
+              "sha256": "d0327ed607009d2b7c8886ff393748d71bbc1f7e5b41cad6d5dc28570e982e38"
+            },
+            {
+              "path": "runs/business-source/model/calls/c3cb014a-2d70-4809-aeda-a156bfe78bb2-end.json",
+              "sha256": "6af0bab5793f543496fa902e3e4ec52142faf17d97b51298c6f93c12f0f0cdff"
+            },
+            {
+              "path": "runs/business-source/query/turn-007/decision.json",
+              "sha256": "793066ae6fb050364d74d5999ef9d95316b2f5350938a15b734d746af9eb4de9"
+            }
+          ],
+          "requirement_ids": [
+            "req-segments"
+          ]
+        },
+        {
+          "turn": 8,
+          "classification": "host_action_precondition_rejection",
+          "note": "Locally valid read_context decision; host rejects missing requirement_ids.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_context",
+          "host_receipt_status": "rejected",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.040572",
+          "input_tokens": 19761,
+          "output_tokens": 105,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0008-attempt-01.json",
+              "sha256": "aff628d380b5df03eeacce0e2535232b2cd8f03f3d172de17d0621ee6de0270f"
+            },
+            {
+              "path": "runs/business-source/model/decision-0008-01-output.json",
+              "sha256": "337ef6361f2cfbf79ad77a60c0e4f309d0dabed97e4ebf5c0a66c73f75dce8f9"
+            },
+            {
+              "path": "runs/business-source/query/turn-008/receipt.json",
+              "sha256": "26b4e9a322f1abd6ee9c90e90fc0e2a3ff2043022cf8891d29e55517dce0d2f4"
+            },
+            {
+              "path": "runs/business-source/query/turn-008/feedback.json",
+              "sha256": "eb68a1bbc1f5f050c8aebd1bd41c987e90c3e33c1beb1ffd4800e80a870903ab"
+            },
+            {
+              "path": "runs/business-source/model/calls/587bc2ef-369c-44c0-85a7-34bc813f2937-end.json",
+              "sha256": "047a5332b0e01383e5f637404143289c52abf4bbdd13e990af02caf7f7a61777"
+            },
+            {
+              "path": "runs/business-source/query/turn-008/decision.json",
+              "sha256": "c412edb8c0572e71bacc4f91d78d03c65f8044d90809e3ab0cbf812d49aa8e46"
+            }
+          ],
+          "host_feedback_reason": "tool action must reference existing requirements",
+          "requirement_ids": []
+        },
+        {
+          "turn": 9,
+          "classification": "productive_under_current_protocol",
+          "note": "Read the segment introduction and complete four-item list, blocks 72–76.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_context",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.036208",
+          "input_tokens": 17394,
+          "output_tokens": 142,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0009-attempt-01.json",
+              "sha256": "cd64b8bae68e75330a159318eae7573dab87847b45f6ce1254cc9ec5d2721a92"
+            },
+            {
+              "path": "runs/business-source/model/decision-0009-01-output.json",
+              "sha256": "876053462a5b25ab14255ff790ac6ca1a608bc0f7e59d0e7e07b887fbea2b322"
+            },
+            {
+              "path": "runs/business-source/query/turn-009/receipt.json",
+              "sha256": "fa546b31f867b25ffb90b8f90892ce875880ab216d9cae7bede84f56108c0305"
+            },
+            {
+              "path": "runs/business-source/query/turn-009/feedback.json",
+              "sha256": "3efccae2049f5c14637b89fe27594d8a91e47a350f6f5de336ff339a858d091f"
+            },
+            {
+              "path": "runs/business-source/model/calls/dd1348fc-02cd-40ba-b91b-ec2ba818a5b2-end.json",
+              "sha256": "3dd5de3b7108b1b7138e3e4e8a726faef1e882ce8c5cd1cb4973cf99cd1d4d6a"
+            },
+            {
+              "path": "runs/business-source/query/turn-009/decision.json",
+              "sha256": "82197e7b66639b7b6debee52a8b5e1d5dfd9f920803e36796d8431cd92d068a0"
+            }
+          ],
+          "requirement_ids": [
+            "req-segments"
+          ]
+        },
+        {
+          "turn": 10,
+          "classification": "productive_under_current_protocol",
+          "note": "Read the adjacent All Other paragraph, block 77.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "read_context",
+          "host_receipt_status": "tool_returned",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.04923",
+          "input_tokens": 23975,
+          "output_tokens": 128,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0010-attempt-01.json",
+              "sha256": "3a0b1876b176fbfd538f88349f347affdf19edf8a3c8f71c070d7154e8c3985a"
+            },
+            {
+              "path": "runs/business-source/model/decision-0010-01-output.json",
+              "sha256": "8bc49745d163e5ae08d0aaf9fd09a1b13c356c106099a25441343b3da614a522"
+            },
+            {
+              "path": "runs/business-source/query/turn-010/receipt.json",
+              "sha256": "97b242747575eb3f8832968370b0b7bb26b3fd4a4ca92c8940072aca7174f473"
+            },
+            {
+              "path": "runs/business-source/query/turn-010/feedback.json",
+              "sha256": "5ee0b12a48e7214aa22da3422778cb2b815a9fcae8415e2ae3c2fb0d2d0b6126"
+            },
+            {
+              "path": "runs/business-source/model/calls/2a7155a2-1478-46f2-90aa-a084a4e1f292-end.json",
+              "sha256": "0687cb788582e59af01ea6e5d88022f2b753129e70177bfde27c00e6cba2f14f"
+            },
+            {
+              "path": "runs/business-source/query/turn-010/decision.json",
+              "sha256": "a80846b670335aa514aa15b72a587ea164dd7e1b4cb9aac42a7f1c5bd958a412"
+            }
+          ],
+          "requirement_ids": [
+            "req-segments"
+          ]
+        },
+        {
+          "turn": 11,
+          "classification": "productive_under_current_protocol",
+          "note": "Store six candidate narrative claims with exact source quotations and declared coverage.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "answer",
+          "host_receipt_status": "candidate_answer_recorded",
+          "host_progress_delta": true,
+          "preview_truncated": false,
+          "estimated_usd": "0.063694",
+          "input_tokens": 23042,
+          "output_tokens": 1761,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0011-attempt-01.json",
+              "sha256": "f9f03a3e25f3588d5075f4a771d78b4be33f20e255fb5fded15efb7b3d827f63"
+            },
+            {
+              "path": "runs/business-source/model/decision-0011-01-output.json",
+              "sha256": "0235f05090acbe62edc6b353d447a177e549b177a5388f3abfe9c22298e3ac2b"
+            },
+            {
+              "path": "runs/business-source/query/turn-011/receipt.json",
+              "sha256": "c5840467bdaac85f919391bbe59b37f8545ac25d7202de88b2474d13513931e2"
+            },
+            {
+              "path": "runs/business-source/query/turn-011/feedback.json",
+              "sha256": "3c23d5ba6d3eaea509c1422eabf5e2b2dacd4b0e25d64a2324807156924b6aa5"
+            },
+            {
+              "path": "runs/business-source/model/calls/2f7a5595-ae6a-4e5e-afc0-e7d6f44b37cd-end.json",
+              "sha256": "7d7fbc09cdc7f6d5782db2c1ae5ba1810a76424376da61fd8ca9555b5ad5de72"
+            },
+            {
+              "path": "runs/business-source/query/turn-011/decision.json",
+              "sha256": "bd9044cc3d93664e113ad701914157bdc87f00e430a33ee4fb55a705419df0b4"
+            }
+          ],
+          "requirement_ids": [
+            "req-segments"
+          ]
+        },
+        {
+          "turn": 12,
+          "classification": "productive_under_current_protocol",
+          "note": "Finish after host reference checks; semantic completeness remains unevaluated.",
+          "json_syntax_valid": true,
+          "local_model_decision_status": "decision_returned",
+          "host_action": "finish",
+          "host_receipt_status": "evidence_ready",
+          "host_progress_delta": false,
+          "preview_truncated": false,
+          "estimated_usd": "0.046012",
+          "input_tokens": 22951,
+          "output_tokens": 11,
+          "cache_read_input_tokens": 0,
+          "evidence": [
+            {
+              "path": "runs/business-source/model/decision-0012-attempt-01.json",
+              "sha256": "2edeb885d991cdcb54f46cce10284b1a297e4dc441c7856e5eee98cc1973f8bb"
+            },
+            {
+              "path": "runs/business-source/model/decision-0012-01-output.json",
+              "sha256": "5896167fb4fea7a801e4982d7261459f5bf0f14c17b7897ee6ed9b86030aac64"
+            },
+            {
+              "path": "runs/business-source/query/turn-012/receipt.json",
+              "sha256": "1ebddac4afc40dbdd716d3f82f927f7bda562a808ada4b5c50b0678d50761c61"
+            },
+            {
+              "path": "runs/business-source/query/turn-012/feedback.json",
+              "sha256": "72f6db44b13e0d101b5cbcdc96e5d076f4b1ca4bf9fe2cfb2cb1fa543986f120"
+            },
+            {
+              "path": "runs/business-source/model/calls/d787fc14-e477-4f9b-b3ad-7fbac0c8c19a-end.json",
+              "sha256": "93a60c289c34b2c0dffe2ab8bbdb0abcfcd75a3637ce7ccf18479c293128dff4"
+            },
+            {
+              "path": "runs/business-source/query/turn-012/decision.json",
+              "sha256": "fbbd7c9525c9efd3bad6805a6e22e7ec555a442a4524ad4365eed1826cbff407"
+            }
+          ],
+          "requirement_ids": []
+        }
+      ],
+      "result_evidence": [
+        {
+          "path": "runs/business-source/query/result.json",
+          "sha256": "b377c973dcce773c110417b521ed638f6e9edaf19a82fc890dd4a5a004472dd9"
+        },
+        {
+          "path": "runs/business-source/model-usage.json",
+          "sha256": "0fdea54f33680f45dff2ef9320a2f299a22ffed5ad656930745b95dc5366a642"
+        },
+        {
+          "path": "runs/business-source/model/model-config.json",
+          "sha256": "868930453cac2a7681d048e88faf92fcbe13f6f3b3e435ddd71b7717b9fd40f2"
+        }
+      ]
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import time
 
 from agents import Agent, AgentOutputSchema, ModelSettings, Runner, RunConfig
 from agents.exceptions import ModelBehaviorError
+from agents.retry import ModelRetrySettings
 from openai import AsyncOpenAI, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError
 from pydantic import ValidationError
 
@@ -18,12 +19,28 @@ from uteki.agents.runtime.call_costs import MeteredModel, pricing_snapshot, summ
 from uteki.agents.runtime.local_credentials import load_provider_key
 from uteki.agents.runtime.model_factory import model_adapter
 from uteki.agents.runtime.run_budget import RunBudget, BudgetExceeded
+from uteki.agents.runtime.strict_json import StrictJSONError, parse_json_object
 from uteki.infrastructure.research_data.financial_records import digest
 from .artifacts import write_new
+from .decision_protocol import DECISION_PROTOCOL_VERSION
 from .autonomous import AUTONOMOUS_PROMPT, AUTONOMOUS_PROMPT_VERSION, WORKER_PROMPT, AutonomousDecision
 
 
 VISIBLE_OUTPUT_CHAR_LIMIT = 128000
+
+
+def reasoning_configuration(provider, model, reasoning_effort):
+    """Select an explicit, supported provider profile without changing business scope."""
+    native = provider == 'aihubmix' and model in {'claude-sonnet-5-5', 'claude-opus-5-5'}
+    if native:
+        if not isinstance(reasoning_effort, str) or reasoning_effort not in {'low', 'medium', 'high'}:
+            raise ValueError('Native Claude requires explicit reasoning effort: low, medium, high')
+        return reasoning_effort, 'adaptive', True
+    if reasoning_effort is not None and (not isinstance(reasoning_effort, str)
+            or provider != 'deepseek' or reasoning_effort not in {'none', 'low', 'high', 'max'}):
+        raise ValueError('Explicit reasoning effort is supported only for DeepSeek or registered native Claude models')
+    effort = (reasoning_effort or 'none') if provider == 'deepseek' else None
+    return effort, 'enabled' if effort not in {None, 'none'} else 'disabled', False
 
 # Match only contract-owned literal messages. Never echo an exception message,
 # context or rejected input into the next model packet.
@@ -74,6 +91,13 @@ _DECISION_RULE_HINTS = {
     'Value error, plan and gap require a reason': (
         'action_requires_reason',
         'For action=plan or action=gap provide a nonblank reason.'),
+    'Value error, selected action requires requirement_ids': (
+        'action_requires_requirements',
+        'Provide nonempty requirement_ids using existing IDs from the packet requirements. '
+        'Do not create new IDs during a tool action.'),
+    'Value error, requirement_ids must be unique': (
+        'unique_requirement_ids',
+        'Each existing requirement ID may appear only once in requirement_ids.'),
     'Value error, arguments belong to acquisition or materialization': (
         'arguments_action_scope',
         'arguments is allowed only for action=acquire or action=materialize.'),
@@ -90,7 +114,12 @@ _DECISION_RULE_HINTS = {
 def _decision_validation_hints(content):
     """Report structure and allowlisted repairs without arbitrary validation text."""
     try:
-        AutonomousDecision.model_validate_json(content)
+        AutonomousDecision.model_validate(parse_json_object(content))
+    except StrictJSONError as error:
+        return [{'type': 'json_invalid', 'location': [], 'rule': 'single_json_object',
+                 'code': error.code,
+                 'suggestion': 'Return exactly one valid JSON object; no prose, Markdown fences, '
+                               'duplicate keys, NaN, Infinity or multiple concatenated JSON objects.'}]
     except ValidationError as error:
         fields = set(AutonomousDecision.model_fields)
         hints = []
@@ -99,6 +128,10 @@ def _decision_validation_hints(content):
                     'location': [part if type(part) is int or part in fields else '<field>'
                                  for part in item['loc'][:8]]}
             repair = _DECISION_RULE_HINTS.get(item['msg']) if item['type'] == 'value_error' else None
+            if item['loc'] == ('artifact_read', 'limit'):
+                repair = ('artifact_page_limit',
+                          'artifact_read.limit must be an integer from 1 to 1000. '
+                          'Use pending_body_reads.read_request exactly, then continue with its next offset or cursor.')
             if item['type'] == 'json_invalid':
                 repair = ('single_json_object',
                           'Return exactly one valid JSON object; no prose, Markdown fences, '
@@ -148,11 +181,9 @@ class SdkAutonomousPlanner:
         if role not in {'planner', 'worker'}:
             raise ValueError('Role must be planner or worker')
         prompt = AUTONOMOUS_PROMPT if role == 'planner' else WORKER_PROMPT
-        if reasoning_effort is not None and (not isinstance(reasoning_effort, str)
-                or provider != 'deepseek' or reasoning_effort not in {'none', 'low', 'high', 'max'}):
-            raise ValueError('Explicit reasoning effort is supported only for DeepSeek: none, low, high, max')
-        effort = (reasoning_effort or 'none') if provider == 'deepseek' else None
-        thinking = 'enabled' if effort not in {None, 'none'} else 'disabled'
+        effort, thinking, native = reasoning_configuration(provider, model, reasoning_effort)
+        if native and max_retries != 0:
+            raise ValueError('Native Claude currently requires explicit retries disabled')
         if not isinstance(budget, RunBudget):
             raise ValueError('An explicit shared RunBudget is required')
         if max_requests_total is not None and (type(max_requests_total) is not int or max_requests_total < 1):
@@ -178,6 +209,7 @@ class SdkAutonomousPlanner:
         credential_origin = load_provider_key(credentials_root, provider)
         self.output.mkdir(parents=True, exist_ok=False)
         self._clients = []
+        self._native_model = None
         factory = client_factory or AsyncOpenAI
         def create_client(**kwargs):
             # model_factory disables hidden SDK retries; keep that contract exact.
@@ -189,19 +221,28 @@ class SdkAutonomousPlanner:
             client = factory(**kwargs)
             self._clients.append(client)
             return client
-        inner = model_adapter(model, provider, client_factory=create_client)
+        if native:
+            from uteki.agents.runtime.claude_messages import ClaudeMessagesModel
+            inner = self._native_model = ClaudeMessagesModel(model, timeout_seconds=request_timeout,
+                reasoning_effort=effort, client_factory=client_factory)
+            settings = ModelSettings(max_tokens=max_tokens, retry=ModelRetrySettings(max_retries=0))
+        else:
+            inner = model_adapter(model, provider, client_factory=create_client)
+            settings = ModelSettings(max_tokens=max_tokens, temperature=None if thinking == 'enabled' else 0, store=False,
+                extra_body={'thinking': {'type': thinking}, 'reasoning_effort': effort} if provider == 'deepseek' else None)
         self._model = MeteredModel(inner, self.output/'calls', f'autonomous_{role}_decision', provider, model, pricing, self._capped_budget)
         self._agent = Agent(name='AutonomousDataPlanner' if role == 'planner' else 'BoundedDataWorker', instructions=prompt, model=self._model,
             output_type=AgentOutputSchema(AutonomousDecision, strict_json_schema=False),
-            model_settings=ModelSettings(max_tokens=max_tokens, temperature=None if thinking == 'enabled' else 0, store=False,
-                extra_body={'thinking': {'type': thinking}, 'reasoning_effort': effort} if provider == 'deepseek' else None))
+            model_settings=settings)
         self._config = {'schema_version': 'autonomous-model-config-v1', 'plan_origin': self.plan_origin, 'role': role,
             'provider': provider, 'model': model, 'prompt': prompt, 'prompt_version': AUTONOMOUS_PROMPT_VERSION,
-            'prompt_sha256': digest(prompt),
+            'prompt_sha256': digest(prompt), 'decision_protocol_version': DECISION_PROTOCOL_VERSION,
+            'strict_visible_json': provider == 'deepseek' or native,
             'decision_schema': AutonomousDecision.model_json_schema(), 'pricing_snapshot': deepcopy(pricing),
             'strict_provider_schema': False, 'local_output_validation': 'AutonomousDecision',
             'max_tokens': max_tokens, 'request_timeout': request_timeout, 'max_retries': max_retries,
-            'reasoning_effort': effort, 'thinking_mode': thinking if provider == 'deepseek' else None,
+            'reasoning_effort': effort, 'thinking_mode': thinking if provider == 'deepseek' or native else None,
+            'api_format': 'anthropic_messages' if native else 'chat_completions',
             'provider_sdk_retries': 0, 'max_requests_total': max_requests_total,
             'budget_ledger': str(budget.path.resolve()), 'budget_policy': 'enforced' if budget.enforce else 'record_only',
             'credential_origin': credential_origin, 'budget_at_start': budget.summary()}
@@ -239,7 +280,7 @@ class SdkAutonomousPlanner:
         write_new(path, value)
         return {'artifact_root': str(self.output), 'path': path.name, 'sha256': digest(path.read_bytes()), 'summary': value}
 
-    async def decide(self, packet):
+    async def decide(self, packet, *, observation_context=None):
         async with self._lock:
             if self._closed:
                 raise ValueError('Planner is closed')
@@ -251,7 +292,7 @@ class SdkAutonomousPlanner:
             for attempt in range(self._config['max_retries'] + 1):
                 # A failed reservation can happen before the adapter is invoked.
                 # Do not attribute a previous call's response to this attempt.
-                if self._config['provider'] == 'deepseek':
+                if self._config['provider'] == 'deepseek' or self._native_model is not None:
                     self._model.inner.response_text = None
                     self._model.inner.response_metadata = None
                 before = set((self.output/'calls').glob('*.json'))
@@ -262,8 +303,17 @@ class SdkAutonomousPlanner:
                     'started_at': datetime.now(timezone.utc).isoformat(), 'status': 'started'}
                 retry = False
                 try:
-                    result = await asyncio.wait_for(Runner.run(self._agent, encoded, max_turns=1,
+                    agent = self._agent
+                    if observation_context:
+                        observation_context.guard()
+                        agent = agent.clone(model=self._model.with_observation(observation_context.for_attempt(attempt + 1)))
+                    result = await asyncio.wait_for(Runner.run(agent, encoded, max_turns=1,
                         run_config=RunConfig(tracing_disabled=True)), timeout=self._config['request_timeout'])
+                    # Validate the original text too: an SDK parser can silently
+                    # collapse duplicate keys before final_output is available.
+                    content = getattr(self._model.inner, 'response_text', None)
+                    if self._config['provider'] == 'deepseek' or self._native_model is not None:
+                        parse_json_object(content)
                     decision = AutonomousDecision.model_validate(result.final_output)
                     record['status'] = 'decision_returned'
                     return decision
@@ -272,8 +322,9 @@ class SdkAutonomousPlanner:
                                   error_type=type(error).__name__)
                     metadata = getattr(self._model.inner, 'response_metadata', None) or {}
                     content = getattr(self._model.inner, 'response_text', None)
-                    if (isinstance(error, ModelBehaviorError) and self._config['provider'] == 'deepseek'
-                            and metadata.get('finish_reason') == 'stop'
+                    if (isinstance(error, (ModelBehaviorError, ValidationError, StrictJSONError))
+                            and (self._config['provider'] == 'deepseek' or self._native_model is not None)
+                            and metadata.get('stop_reason', metadata.get('finish_reason')) in {'stop', 'end_turn'}
                             and isinstance(content, str)):
                         # A normal stop with empty/whitespace text is an invalid
                         # decision, too. Let the host spend its next bounded turn
@@ -286,11 +337,11 @@ class SdkAutonomousPlanner:
                     if not retry: raise
                 finally:
                     content = getattr(self._model.inner, 'response_text', None)
-                    if self._config['provider'] == 'deepseek' and isinstance(content, str):
+                    if (self._config['provider'] == 'deepseek' or self._native_model is not None) and isinstance(content, str):
                         metadata = getattr(self._model.inner, 'response_metadata', None) or {}
                         write_new(output_path, {'schema_version': 'autonomous-visible-output-v1',
                             'decision': self._decisions, 'attempt': attempt + 1, 'role': self._config['role'],
-                            'finish_reason': metadata.get('finish_reason'),
+                            'finish_reason': metadata.get('stop_reason', metadata.get('finish_reason')),
                             'content': content[:VISIBLE_OUTPUT_CHAR_LIMIT], 'content_chars': len(content),
                             'content_sha256': digest(content), 'truncated': len(content) > VISIBLE_OUTPUT_CHAR_LIMIT})
                         record['visible_output'] = self._references([output_path])[0]
@@ -298,6 +349,11 @@ class SdkAutonomousPlanner:
                     record['calls'] = self._references(set((self.output/'calls').glob('*.json')) - before)
                     write_new(self.output/f'decision-{self._decisions:04d}-attempt-{attempt + 1:02d}.json', record)
                     self.snapshot_usage()
+                    if observation_context:
+                        observation_context.publish(self.output/f'decision-{self._decisions:04d}-attempt-{attempt + 1:02d}.json',
+                            kind='model_attempt', owned_by_context=True)
+                        if output_path.exists():
+                            observation_context.publish(output_path, kind='model_visible_output', owned_by_context=True)
 
     async def aclose(self):
         async with self._lock:
@@ -305,3 +361,5 @@ class SdkAutonomousPlanner:
                 self._closed = True
                 for client in self._clients:
                     await client.close()
+                if self._native_model is not None:
+                    await self._native_model.aclose()

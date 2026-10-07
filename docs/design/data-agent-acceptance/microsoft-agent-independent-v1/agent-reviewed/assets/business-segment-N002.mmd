@@ -1,0 +1,44 @@
+flowchart LR
+  accTitle: Selected filing business structure
+  accDescr: Solid edges are explicit source assertions. Dashed edges are derived. Unknown relations are omitted; absent edges do not imply independence.
+  N000["MICROSOFT CORPORATION"]:::company
+  N002["Intelligent Cloud"]:::reportable_segment
+  N020["Server products and cloud services"]:::offering_group
+  N021["Azure and other cloud services"]:::offering_group
+  N022["Azure"]:::business
+  N023["Azure AI Foundry"]:::business
+  N025["GitHub cloud services"]:::business
+  N027["Nuance Healthcare cloud services"]:::business
+  N028["Server products"]:::offering_group
+  N029["SQL Server"]:::business
+  N030["Windows Server"]:::business
+  N031["Visual Studio"]:::business
+  N032["System Center"]:::business
+  N033["Enterprise and partner services"]:::offering_group
+  N034["Enterprise Support Services"]:::business
+  N035["Industry Solutions"]:::business
+  N036["Nuance professional services"]:::business
+  N037["Microsoft Partner Network"]:::business
+  N038["Learning Experience"]:::business
+  classDef company fill:#263c46,color:#fff,stroke:#263c46,stroke-width:1.5px
+  classDef reportable_segment fill:#e4eef2,color:#203c49,stroke:#91aeba,stroke-width:1px
+  classDef business fill:#eaf1e9,color:#2b4432,stroke:#a4b8a7,stroke-width:1px
+  classDef offering_group fill:#fff,color:#302c26,stroke:#c9c2b7,stroke-width:1px
+  N000 -->|"包含"| N002
+  N002 -->|"报告中列示"| N020
+  N002 -->|"报告中列示"| N033
+  N020 -->|"包含"| N021
+  N021 -->|"包含"| N022
+  N021 -->|"包含"| N025
+  N021 -->|"包含"| N027
+  N022 -.->|"包含"| N023
+  N020 -->|"包含"| N028
+  N028 -->|"包含"| N029
+  N028 -->|"包含"| N030
+  N028 -->|"包含"| N031
+  N028 -->|"包含"| N032
+  N033 -->|"包含"| N034
+  N033 -->|"包含"| N035
+  N033 -->|"包含"| N036
+  N033 -->|"包含"| N037
+  N033 -->|"包含"| N038

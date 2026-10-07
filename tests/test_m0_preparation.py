@@ -106,7 +106,7 @@ class M0ReviewPackageTests(unittest.TestCase):
         document = parse_sec_html(source["document_id"], source["source_url"], raw)
         paragraph = document.paragraphs[89]
         candidate = {
-            "schema_version": "old-schema-version", "company_id": "alphabet",
+            "schema_version": "business-map-v0.1", "company_id": "alphabet",
             "document_id": document.id, "summary": "Synthetic evidence-review fixture.",
             "businesses": [{"id": "alphabet", "name": "Alphabet", "kind": "company",
                             "description": "Synthetic fixture", "evidence_ids": ["e-platforms"],
@@ -179,6 +179,8 @@ class M0ReviewPackageTests(unittest.TestCase):
             self.assertEqual((self.legacy / name).read_bytes(), originals[name])
             self.assertEqual((self.output / "legacy_inputs" / name).read_bytes(), originals[name])
         business = self.read("business_map.json")
+        self.assertEqual(business["schema_version"], "m0-review-business-map-v1")
+        self.assertNotEqual(business["schema_version"], json.loads(originals["business_map.json"])["schema_version"])
         self.assertEqual(business["businesses"][0]["review_status"], "candidate")
         self.assertEqual(business["metadata"]["benchmark_version"], manifest["package_id"])
         self.assertEqual(business["metadata"]["gold_status"], "not_frozen")

@@ -5,6 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
+from uteki.agents.reading.document_reader import DocumentReader
+from uteki.infrastructure.document_sources.parsed_package import EXPORT, PARSER, verify_parsed_package
 from uteki.infrastructure.research_data.company_materialization import materialize_sources
 from uteki.infrastructure.research_data.financial_records import digest
 from uteki.infrastructure.research_data.query_service import QueryDataPort
@@ -42,6 +44,67 @@ class CompanyMaterializationTests(unittest.TestCase):
     def scope(self, manifest):
         return {'snapshot_id':manifest['snapshot_id'],'company_ids':['sec-0000000123'],'source_snapshot_ids':['issuer-annual'],
                 'source_policy_id':'local-frozen-v1','knowledge_cutoff':'2025-09-01','include_candidates':True}
+
+    def test_new_dataset_registers_complete_reproducible_package_and_preserves_original(self):
+        run = self.run_source()
+        original = (self.root/'source.html').read_bytes()
+        original_metadata = json.dumps(run, sort_keys=True)
+        manifest = materialize_sources(run, self.root, self.root/'dataset')
+        materialize_sources(run, self.root, self.root/'elsewhere/replay')
+        source, = json.loads((self.root/'dataset/sources.json').read_text())
+        ref = source['parsed_package']
+        self.assertEqual(ref['export_version'], EXPORT)
+        self.assertEqual(ref['semantic_review'], 'not_reviewed')
+        self.assertIn('parsed_document_package', source['capabilities'])
+        folder = self.root/'dataset'/source['index_folder']
+        replay = self.root/'elsewhere/replay'/source['index_folder']
+        first = {p.relative_to(folder).as_posix(): p.read_bytes() for p in folder.rglob('*') if p.is_file()}
+        second = {p.relative_to(replay).as_posix(): p.read_bytes() for p in replay.rglob('*') if p.is_file()}
+        self.assertEqual(first, second)
+        self.assertEqual(verify_parsed_package(folder)['files_verified'], 15)
+        for name, content in first.items():
+            self.assertEqual(manifest['files'][source['index_folder']+'/'+name], digest(content))
+        self.assertEqual(ref['manifest_sha256'], digest((folder/'manifest.json').read_bytes()))
+        self.assertEqual(self.root/'dataset'/ref['source_path'], folder/'source.json')
+        self.assertEqual(self.root/'dataset'/ref['document_path'], folder/'document.html')
+        metadata = json.loads((folder/'source.json').read_bytes())
+        self.assertEqual((metadata['company_id'], metadata['report_period_end'], metadata['available_at']),
+                         ('sec-0000000123', '2025-06-30', '2025-08-01'))
+        reader = DocumentReader(folder)
+        root = next(n for n in reader.outline()['nodes'] if n['kind']=='document')
+        self.assertTrue(reader.search(root['node_id'], 'business description')['hits'])
+        self.assertEqual((self.root/'source.html').read_bytes(), original)
+        self.assertEqual(json.dumps(run, sort_keys=True), original_metadata)
+
+    def test_report_period_is_required_and_unknown_form_never_gets_a_fallback(self):
+        for i, changes in enumerate(({'period_end': None}, {'period_end': ''}, {'form': 'UNSUPPORTED'})):
+            with self.subTest(changes=changes):
+                destination = self.root/f'missing-{i}'
+                manifest = materialize_sources(self.run_source(**changes), self.root, destination)
+                self.assertEqual(manifest['source_count'], 0)
+                self.assertTrue(any(g['layer']=='indexing' for g in manifest['gaps']))
+                self.assertFalse((destination/'indexes/issuer-annual').exists())
+
+    def test_supported_quarter_amendment_and_updates_keep_explicit_scope(self):
+        for i, (form, period) in enumerate((('10-Q', '2025-03-31'), ('20-F/A', '2024-12-31'),
+                                          ('8-K', None), ('OFFICIAL_UPDATE', None))):
+            with self.subTest(form=form):
+                raw = b'<html><body><p>Independent report text without tagged numerical facts.</p></body></html>'
+                run = self.run_source(raw, form=form, period_end=period, company_id='sec-0000000987')
+                run['company'] = {'company_id': 'sec-0000000987', 'cik': '0000000987'}
+                destination = self.root/f'supported-{i}'
+                manifest = materialize_sources(run, self.root, destination)
+                self.assertEqual((manifest['source_count'], manifest['record_count']), (1, 0))
+                metadata = json.loads((destination/'indexes/issuer-annual/source.json').read_bytes())
+                self.assertEqual((metadata['company_id'], metadata['form_type'], metadata['report_period_end']),
+                                 ('sec-0000000987', form, period))
+
+    def test_conflicting_source_metadata_rejected_without_publishing(self):
+        for i, changes in enumerate(({'company_id': 'sec-0000000987'}, {'company_id': None},
+                                     {'sha256': '0'*64})):
+            with self.subTest(changes=changes), self.assertRaisesRegex(ValueError, 'mismatch|conflict'):
+                materialize_sources(self.run_source(**changes), self.root, self.root/f'conflict-{i}')
+            self.assertFalse((self.root/f'conflict-{i}').exists())
 
     def test_fiscal_year_query_has_real_source_quote_and_scaled_values(self):
         manifest=materialize_sources(self.run_source(),self.root,self.root/'dataset')
@@ -261,7 +324,7 @@ class CompanyMaterializationTests(unittest.TestCase):
         coverage = source['stage_coverage']
         blocks = [json.loads(line) for line in (self.root/'dataset'/source['index_folder']/'blocks.jsonl').read_text().splitlines()]
         self.assertEqual(coverage['original']['source_sha256'], digest(raw))
-        self.assertEqual(coverage['reading']['parser_version'], 'sec-source-blocks-v0.1.7')
+        self.assertEqual(coverage['reading']['parser_version'], PARSER)
         self.assertEqual(coverage['reading']['block_count'], len(blocks))
         self.assertEqual(coverage['tables']['table_node_count'], 2)
         self.assertEqual(coverage['tables']['tables_with_cells'], 2)

@@ -1,0 +1,1417 @@
+{
+  "schema_version": "business-map-independent-review-v1",
+  "status": "needs_revision",
+  "binding": {
+    "trace_id": "run-8cd94f26b6ce452a88094f4e9fde646d",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "skill_sha256": "9baa6616f36095abc27b5de81cd6e9070beb509c97d6add7fade888b743904d0",
+    "business_map_sha256": "a12a545e6d4d41a1507a3b012a9c4cf254b01e3e9261d1871512271682d74ada",
+    "result_sha256": "10bb9fa1ff981c1f2e97afc9ac1a56da2575fdbc803983190c6960dcfc07a482",
+    "request_sha256": "4a472a5cd933663d4f38a552757a86f395e11d2f11281b0350e8de7d5bc94ed0"
+  },
+  "criteria_sha256": "942588a74d89170e3485276ed0cf421310108c65c7433c69855ff2c46d6e4e41",
+  "prior_review_sha256": "b9063f146caa7ee88557b32777c3246677fa52969179dc30780c7e7c12bde8c5",
+  "summary": "Devices新增客户范围已修，M365和Windows边界更明确，已知收入驱动恢复可读；仍有精确claim缺引文、已知内容堆入unknown和工作室/用户生态未承接，尚未整体验收通过。",
+  "review_method": "只读实际critic-revision-02候选、完整冻结原文、critic-revision-01和Opus03九项意见。检验实际差异，不以patch索引认定解决。仅评审侧，不馈送执行；回归非holdout。",
+  "separate_statuses": {
+    "execution_ownership": "system_sonnet_object_patch_with_deterministic_application",
+    "structural_contract": "passed",
+    "source_literal_quotes": "passed",
+    "selected_stage_semantic_fidelity": "needs_revision",
+    "coverage_v2_model_self_audit": "no_accepted_fresh_audit_for_this_candidate",
+    "independent_opus_recheck": "opus04_preflight_only_not_executed_at_review_time",
+    "final_acceptance": "not_granted"
+  },
+  "checks": [
+    {
+      "id": "CR2-01",
+      "label": "真实修订与冻结材料",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000086-935d6090"
+      ],
+      "observation": "系统模型13项对象补丁完成；19节点、16关系、68产品属性、7客户属性、8收入相关项、10个unknown。完整协议及摘录存在性校验通过，工程投影无变化。全部103块源包与上一轮逐字节一致。",
+      "note": "机器声称覆盖9项critic索引不等于9项语义已解决。"
+    },
+    {
+      "id": "CR2-02",
+      "label": "Devices客户范围修正",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000171-f62e3835",
+        "block-000183-dcc9edaa"
+      ],
+      "observation": "设备制造商从Devices客户字段移除，关系放进description；准确保留“许多”“现有或潜在”“微软伙伴与客户”“未限定Devices客户”。claim同时引用Devices竞争句和伙伴/客户句，修复上一轮扩大范围及缺第一句的问题。",
+      "note": "此通过仅针对新加制造商关系。Surface客户仍实际是原文目标受益者，字段定义边界未统一。"
+    },
+    {
+      "id": "CR2-03",
+      "label": "M365及Server cloud范围",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000101-67803298",
+        "block-000120-c34f7245"
+      ],
+      "observation": "Commercial description首先按完整组构成定义，再明确平台定义与整组是否同范围未知。Server cloud description补齐Server products/CALs/其他本地产品原句。GitHub/Nuance旧错误整体边未恢复，已知云子集继续保留组合属性。",
+      "note": "这里接受明确标示歧义，不把未知身份硬判为两个或同一个对象。"
+    },
+    {
+      "id": "CR2-04",
+      "label": "Windows整体和OEM边界",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000146-c641cfcd",
+        "block-000152-fc098ac9"
+      ],
+      "observation": "Windows and Devices属性已限定OEM授权范围，description另说明Commercial云/本地在PBP，概念边界改善。仍有claim证据不全：description引用093只有两个云/本地短语，没有M365 Commercial宿主；产品项含“预装”，该项引用仅OS总体目的和OEM授权短语，未含OEM预装句。",
+      "note": "原文完整块可支持修复，当前精确claim引用尚未充分。不得把“报告未在此列示”解读为经济上没有任何交集。"
+    },
+    {
+      "id": "CR2-05",
+      "label": "角色和收费表述改善但字段不一致",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000103-a597bcd9",
+        "block-000110-99cc951e",
+        "block-000127-93a9159b",
+        "block-000132-f2659d3c"
+      ],
+      "observation": "Azure及培训对象明确标为用户/受众/接受者，未伪装为已确认付费客户；Consumer保留代词指向歧义。Dynamics不再把收入驱动直接称计费方式，但仍将自认“非明确计费机制”的段落放在explicit monetization；Consumer也主要是需求/收入影响描述。",
+      "note": "角色限定减少误导，但customers和monetization字段语义未统一。Dynamics新文本增加PowerApps/PowerAutomate，当前该claim引文截止Dynamics365，未含两名称；其他字段有引用不能补足该claim。"
+    },
+    {
+      "id": "CR2-06",
+      "label": "已知收入驱动移入unknown",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000152-fc098ac9",
+        "block-000154-a1c5160e",
+        "block-000156-e790ef4f",
+        "block-000158-1090a836",
+        "block-000160-8913045d",
+        "block-000162-2bcabf98",
+        "block-000164-56fa5ed0",
+        "block-000166-82fed103",
+        "block-000168-c54d4db7",
+        "block-000170-548ff342"
+      ],
+      "observation": "新增unknown逐项恢复Windows OEM收入驱动清单，已知内容可读，不再完全消失；未知的是各因素定量影响/具体幅度。该条把事实清单整体放在reason_unanswered，仅写块号，没有逐项claim证据，不等于完成结构化提取。",
+      "note": "应区分已知因素与未知影响；不能因unknown文字变长宣布覆盖通过。收入清单没有新增模型期望值。"
+    },
+    {
+      "id": "CR2-07",
+      "label": "未放置提及与遗漏边界",
+      "status": "gap",
+      "source_block_ids": [
+        "block-000101-67803298",
+        "block-000112-7c427d3a",
+        "block-000113-bc876fa1",
+        "block-000128-edef168d",
+        "block-000176-a1bfeea9",
+        "block-000177-a6560323",
+        "block-000178-51f06755"
+      ],
+      "observation": "新增unplaced unknown保留Defender、Office竞争定位、M365新市场及Azure芯片伙伴文字；Azure AI引用也扩展到伙伴。但芯片伙伴的存在已知，不能把缺少跨节点边当作该事实未知。第一方工作室和Gaming玩家/伙伴生态仍没有属性/明确unknown承接，176/177/178说明却继续称已保留。",
+      "note": "Defender具体归属、Nuance方案是否同Healthcare属真实歧义；已知事实不能只因当前字段不合适而统称unknown。"
+    },
+    {
+      "id": "CR2-08",
+      "label": "覆盖说明与最终验收状态",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000112-7c427d3a",
+        "block-000113-bc876fa1",
+        "block-000128-edef168d",
+        "block-000176-a1bfeea9",
+        "block-000177-a6560323",
+        "block-000178-51f06755"
+      ],
+      "observation": "112/113说明已改成对应unknown而非已成属性，152也指出收入驱动去向，确有改善。其余内部能力/用户生态的过时说明尚存；未执行本候选的新Opus04复核，也没有本候选完整覆盖审计通过结果。",
+      "note": "这份是聚焦独立源文检查，不是全量语义审计或跨公司完成证据。"
+    }
+  ],
+  "artifacts": {
+    "raw_response_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/critic-revision-02/response.txt",
+    "raw_response_sha256": "239e500c6d333dfcbc6d36fa2fc52f9b9c418ac70e49b8346810eff7cef9d097",
+    "draft_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/critic-revision-02/draft.json",
+    "draft_sha256": "a53cf19928c0660b1e832e508010408fb9caf544185a168c4658e24cdab6cd54",
+    "patch_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/critic-revision-02/patch.json",
+    "patch_sha256": "36a789ddf86faf6ad1e82f1e87341fa5e6c8256ed5ccf0ea62230fd64615e805",
+    "diff_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/critic-revision-02/diff.json",
+    "diff_sha256": "86db117d3af41a7db09f888534bedccda4b7b5d001b8080a66f5e95516ca85b5",
+    "opus03_review_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/opus-critic-03/review.json",
+    "opus03_review_sha256": "e7798cab31baf9fcaef6af1cbab196782fcb55fa1a518e513f030d72b481bfe9"
+  },
+  "actual_changes": {
+    "before": {
+      "nodes": 19,
+      "relationships": 16,
+      "products_services": 68,
+      "customers": 8,
+      "monetization": 8,
+      "unknowns": 8,
+      "field_claims": 122,
+      "claim_excerpts": 132,
+      "audit_targets": 138
+    },
+    "after": {
+      "nodes": 19,
+      "relationships": 16,
+      "products_services": 68,
+      "customers": 7,
+      "monetization": 8,
+      "unknowns": 10,
+      "field_claims": 121,
+      "claim_excerpts": 139,
+      "audit_targets": 137
+    },
+    "source_packet_unchanged": true,
+    "relationships_unchanged": true,
+    "projection": {
+      "schema_version": "business-evidence-index-projection-v2",
+      "output_contract_version": "business-draft-v2",
+      "source_packet_sha256": "f809be2286695dd112071298462fea67de06b667cb114dca3e4740507246b170",
+      "original_sha256": "c7d951a6e9f7547ce754052a86a5c6bd09b0fba7f5d554bea9aa122649f647c0",
+      "projected_sha256": "c7d951a6e9f7547ce754052a86a5c6bd09b0fba7f5d554bea9aa122649f647c0",
+      "changes": [],
+      "claims_and_excerpts_unchanged": true,
+      "semantic_acceptance": "not_evaluated"
+    },
+    "changed_business_fields": [
+      {
+        "node_id": "m365_commercial",
+        "field": "description",
+        "before": "面向组织的AI驱动业务与生产力解决方案平台,整合Office、Windows、Microsoft 365 Copilot和Enterprise Mobility + Security(源文对该平台的定义段落位于本业务线标题之下)。",
+        "after": "业务线,含Microsoft 365 Commercial cloud(包括Microsoft 365 Commercial、Enterprise Mobility + Security、Windows Commercial的云部分、Power BI按用户部分、Exchange、SharePoint、Microsoft Teams、Microsoft 365 Security and Compliance、Microsoft 365 Copilot)及Microsoft 365 Commercial products(Windows Commercial本地部署与Office本地授权)。源文将“Microsoft 365 Commercial”定义为整合Office、Windows、Microsoft 365 Copilot和Enterprise Mobility + Security的AI驱动业务与生产力解决方案平台;该平台定义是否即指整条业务线,源文未明确(见unk_m365_commercial_scope)。"
+      },
+      {
+        "node_id": "m365_commercial",
+        "field": "claim_evidence",
+        "before": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial products and cloud services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000101-67803298",
+                "quote": "Microsoft 365 Commercial is an AI-powered business and productivity solutions platform that brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security to help organizations empower their employees."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial products and cloud services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot"
+              },
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+              },
+              {
+                "block_id": "block-000101-67803298",
+                "quote": "Microsoft 365 Commercial is an AI-powered business and productivity solutions platform that brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security to help organizations empower their employees."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "m365_consumer",
+        "field": "monetization",
+        "before": [
+          {
+            "description": "Outlook.com与OneDrive的通信与存储需求(影响Microsoft 365 Consumer云收入)源文称主要由订阅和广告驱动;Consumer订阅是收入形式之一。",
+            "basis": "explicit",
+            "evidence_block_ids": [
+              "block-000103-a597bcd9"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "description": "源文称Microsoft 365 Consumer云收入受Outlook.com与OneDrive通信与存储需求影响,该需求“largely driven by subscriptions and advertising”(指代对象为需求还是收入,源文语法上未明确);另称云收入受向Microsoft 365 Consumer订阅持续转移的影响。",
+            "basis": "explicit",
+            "evidence_block_ids": [
+              "block-000103-a597bcd9"
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "m365_consumer",
+        "field": "claim_evidence",
+        "before": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "Microsoft 365 Consumer products and cloud services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "Microsoft 365 Consumer is designed to increase personal productivity and creativity through a range of products and services."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "Microsoft 365 Consumer subscriptions"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "Office licensed on-premises"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "other consumer services"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 3,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "communication and storage through Outlook.com and OneDrive"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 4,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "communication and storage through Outlook.com and OneDrive"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 5,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "Office Consumer products revenue"
+              }
+            ]
+          },
+          {
+            "field": "monetization",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "Microsoft 365 Consumer cloud revenue is also affected by the demand for communication and storage through Outlook.com and OneDrive, which is largely driven by subscriptions and advertising."
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "Microsoft 365 Consumer products and cloud services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "Microsoft 365 Consumer is designed to increase personal productivity and creativity through a range of products and services."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "Microsoft 365 Consumer subscriptions"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "Office licensed on-premises"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000095-61bd513b",
+                "quote": "other consumer services"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 3,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "communication and storage through Outlook.com and OneDrive"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 4,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "communication and storage through Outlook.com and OneDrive"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 5,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "Office Consumer products revenue"
+              }
+            ]
+          },
+          {
+            "field": "monetization",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "Microsoft 365 Consumer cloud revenue is also affected by the demand for communication and storage through Outlook.com and OneDrive, which is largely driven by subscriptions and advertising."
+              },
+              {
+                "block_id": "block-000103-a597bcd9",
+                "quote": "the continued shift from Office licensed on-premises to Microsoft 365 Consumer subscriptions"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "dynamics",
+        "field": "monetization",
+        "before": [
+          {
+            "description": "按授权用户数和消耗的应用数量产生收入。",
+            "basis": "explicit",
+            "evidence_block_ids": [
+              "block-000110-99cc951e"
+            ]
+          }
+        ],
+        "after": [
+          {
+            "description": "源文称Dynamics收入由授权用户数和消耗的应用数量、每用户平均收入的扩张,以及向Dynamics 365(含Power Apps和Power Automate等低代码平台)的持续转移所驱动;这些是收入驱动因素,源文未明确具体计费方式。",
+            "basis": "explicit",
+            "evidence_block_ids": [
+              "block-000110-99cc951e"
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "dynamics",
+        "field": "claim_evidence",
+        "before": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000109-5aca154a",
+                "quote": "Dynamics Products and Cloud Services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "Dynamics provides cloud-based and on-premises business solutions for financial management, enterprise resource planning (“ERP”), customer relationship management (“CRM”), and supply chain management, as well as agentic AI and other low code application development platforms"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000099-da3d48eb",
+                "quote": "Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000099-da3d48eb",
+                "quote": "on-premises ERP and CRM applications"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "including our low code development platforms, such as Power Apps and Power Automate"
+              }
+            ]
+          },
+          {
+            "field": "customers",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "for small and medium businesses, large organizations, and divisions of global enterprises"
+              }
+            ]
+          },
+          {
+            "field": "monetization",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "Dynamics revenue is driven by the number of users licensed and applications consumed"
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000109-5aca154a",
+                "quote": "Dynamics Products and Cloud Services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "Dynamics provides cloud-based and on-premises business solutions for financial management, enterprise resource planning (“ERP”), customer relationship management (“CRM”), and supply chain management, as well as agentic AI and other low code application development platforms"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000099-da3d48eb",
+                "quote": "Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000099-da3d48eb",
+                "quote": "on-premises ERP and CRM applications"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "including our low code development platforms, such as Power Apps and Power Automate"
+              }
+            ]
+          },
+          {
+            "field": "customers",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "for small and medium businesses, large organizations, and divisions of global enterprises"
+              }
+            ]
+          },
+          {
+            "field": "monetization",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000110-99cc951e",
+                "quote": "Dynamics revenue is driven by the number of users licensed and applications consumed, expansion of average revenue per user, and the continued shift to Dynamics 365"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "server_cloud",
+        "field": "description",
+        "before": "Intelligent Cloud下的服务器产品与云服务业务线,包含云与AI消费型服务及本地部署服务器产品。",
+        "after": "Intelligent Cloud下的服务器产品与云服务业务线,包含云与AI消费型服务,以及Server products(含SQL Server、Windows Server、Visual Studio、System Center、相关CALs及其他本地部署产品)。"
+      },
+      {
+        "node_id": "server_cloud",
+        "field": "claim_evidence",
+        "before": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000126-60d9b18e",
+                "quote": "Server Products and Cloud Services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "virtual desktop offerings"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 3,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "cloud and AI consumption-based services"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 4,
+            "excerpts": [
+              {
+                "block_id": "block-000140-4045a828",
+                "quote": "Our database, business intelligence, and data warehousing solutions offerings compete with products from providers in the data and analytics industry."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 5,
+            "excerpts": [
+              {
+                "block_id": "block-000140-4045a828",
+                "quote": "Our system management solutions compete with server management and server virtualization platform providers."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 6,
+            "excerpts": [
+              {
+                "block_id": "block-000140-4045a828",
+                "quote": "Our products for software developers compete against offerings from major technology providers, as well as open source alternatives."
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000126-60d9b18e",
+                "quote": "Server Products and Cloud Services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "virtual desktop offerings"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 3,
+            "excerpts": [
+              {
+                "block_id": "block-000120-c34f7245",
+                "quote": "cloud and AI consumption-based services"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 4,
+            "excerpts": [
+              {
+                "block_id": "block-000140-4045a828",
+                "quote": "Our database, business intelligence, and data warehousing solutions offerings compete with products from providers in the data and analytics industry."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 5,
+            "excerpts": [
+              {
+                "block_id": "block-000140-4045a828",
+                "quote": "Our system management solutions compete with server management and server virtualization platform providers."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 6,
+            "excerpts": [
+              {
+                "block_id": "block-000140-4045a828",
+                "quote": "Our products for software developers compete against offerings from major technology providers, as well as open source alternatives."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "azure",
+        "field": "customers",
+        "before": [
+          "开发者、IT专业人员和企业"
+        ],
+        "after": [
+          "源文所述服务对象(用户/受众):开发者、IT专业人员和企业(源文未将其明确界定为付费客户类别)"
+        ]
+      },
+      {
+        "node_id": "azure",
+        "field": "claim_evidence",
+        "before": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "Azure is a comprehensive set of cloud services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000128-edef168d",
+                "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI."
+              },
+              {
+                "block_id": "block-000128-edef168d",
+                "quote": "We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000128-edef168d",
+                "quote": "Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 3,
+            "excerpts": [
+              {
+                "block_id": "block-000134-9ca2b5c6",
+                "quote": "Our Azure Security offerings include our cloud security solution and security information and event management solution"
+              }
+            ]
+          },
+          {
+            "field": "customers",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications"
+              }
+            ]
+          },
+          {
+            "field": "monetization",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services."
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "Azure is a comprehensive set of cloud services"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000128-edef168d",
+                "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI."
+              },
+              {
+                "block_id": "block-000128-edef168d",
+                "quote": "We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000128-edef168d",
+                "quote": "Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 3,
+            "excerpts": [
+              {
+                "block_id": "block-000134-9ca2b5c6",
+                "quote": "Our Azure Security offerings include our cloud security solution and security information and event management solution"
+              }
+            ]
+          },
+          {
+            "field": "customers",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications"
+              }
+            ]
+          },
+          {
+            "field": "monetization",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000127-93a9159b",
+                "quote": "Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "enterprise_partner_services",
+        "field": "customers",
+        "before": [
+          "开发者和IT专业人员(培训与认证)"
+        ],
+        "after": [
+          "培训与认证的接受对象:开发者和IT专业人员(源文未明确其是否为付费客户类别)"
+        ]
+      },
+      {
+        "node_id": "windows_devices",
+        "field": "description",
+        "before": "包含Windows OEM授权(OEM渠道销售的Windows Pro与非Pro授权)及Devices(Surface和PC配件)的业务线。",
+        "after": "包含Windows OEM授权(OEM渠道销售的Windows Pro与非Pro授权)及Devices(Surface和PC配件)的业务线。Windows Commercial的云部分和本地部署部分在源文中归入Microsoft 365 Commercial(生产力与业务流程分部),不在本业务线的列示范围内。"
+      },
+      {
+        "node_id": "windows_devices",
+        "field": "products_services",
+        "before": [
+          "Windows OEM licensing",
+          "Devices(Surface和PC配件)",
+          "Windows操作系统(旨在跨设备提供一致的体验、应用和信息)"
+        ],
+        "after": [
+          "Windows OEM licensing",
+          "Devices(Surface和PC配件)",
+          "Windows操作系统(在本业务线中指通过OEM渠道授权并预装的部分;源文称其旨在跨设备提供一致的体验、应用和信息)"
+        ]
+      },
+      {
+        "node_id": "windows_devices",
+        "field": "claim_evidence",
+        "before": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000151-1473b22a",
+                "quote": "Windows and Devices"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel)"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Devices, comprising Surface and PC accessories"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000152-fc098ac9",
+                "quote": "The Windows operating system is designed to deliver a more personal computing experience for users by enabling consistency of experience, applications, and information across their devices."
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000151-1473b22a",
+                "quote": "Windows and Devices"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories."
+              },
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "the cloud portion of Windows Commercial"
+              },
+              {
+                "block_id": "block-000093-7018adaa",
+                "quote": "Windows Commercial on-premises"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel)"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Devices, comprising Surface and PC accessories"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 2,
+            "excerpts": [
+              {
+                "block_id": "block-000152-fc098ac9",
+                "quote": "The Windows operating system is designed to deliver a more personal computing experience for users by enabling consistency of experience, applications, and information across their devices."
+              },
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "devices",
+        "field": "description",
+        "before": "微软设计并销售的设备,如Surface(含Copilot+ PC)和PC配件,使人们和组织借助Windows及集成的微软产品与服务连接重要的人和内容。",
+        "after": "微软设计并销售的设备,如Surface(含Copilot+ PC)和PC配件,使人们和组织借助Windows及集成的微软产品与服务连接重要的人和内容。源文称Devices面临来自各类计算机、平板和硬件制造商的竞争,这些制造商中许多(包括Windows OEM)同时也是微软现有或潜在的合作伙伴和客户(未限定为Devices的客户)。"
+      },
+      {
+        "node_id": "devices",
+        "field": "customers",
+        "before": [
+          "组织、学生和消费者(Surface)",
+          "设备制造商(含Windows OEM)既是Devices的竞争对手,也是现有或潜在合作伙伴和客户"
+        ],
+        "after": [
+          "组织、学生和消费者(Surface)"
+        ]
+      },
+      {
+        "node_id": "devices",
+        "field": "claim_evidence",
+        "before": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Devices, comprising Surface and PC accessories"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "We design and sell devices, such as Surface (including Copilot+ PCs) and PC accessories."
+              },
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "Our devices are designed to enable people and organizations to connect to the people and content that matter most using Windows and integrated Microsoft products and services."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "Surface (including Copilot+ PCs)"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "PC accessories"
+              }
+            ]
+          },
+          {
+            "field": "customers",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "Surface is designed to help organizations, students, and consumers be more productive."
+              }
+            ]
+          },
+          {
+            "field": "customers",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000183-dcc9edaa",
+                "quote": "Many of these manufacturers are also current or potential partners and customers, including our Windows OEMs."
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "field": "name",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000146-c641cfcd",
+                "quote": "Devices, comprising Surface and PC accessories"
+              }
+            ]
+          },
+          {
+            "field": "description",
+            "item_index": null,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "We design and sell devices, such as Surface (including Copilot+ PCs) and PC accessories."
+              },
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "Our devices are designed to enable people and organizations to connect to the people and content that matter most using Windows and integrated Microsoft products and services."
+              },
+              {
+                "block_id": "block-000183-dcc9edaa",
+                "quote": "Devices face competition from various computer, tablet, and hardware manufacturers"
+              },
+              {
+                "block_id": "block-000183-dcc9edaa",
+                "quote": "Many of these manufacturers are also current or potential partners and customers, including our Windows OEMs."
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "Surface (including Copilot+ PCs)"
+              }
+            ]
+          },
+          {
+            "field": "products_services",
+            "item_index": 1,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "PC accessories"
+              }
+            ]
+          },
+          {
+            "field": "customers",
+            "item_index": 0,
+            "excerpts": [
+              {
+                "block_id": "block-000171-f62e3835",
+                "quote": "Surface is designed to help organizations, students, and consumers be more productive."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "unknowns_added": [
+      {
+        "id": "unk_windows_oem_revenue_factors",
+        "question": "Windows OEM收入受哪些因素影响,这些因素各自的影响方向与幅度如何?",
+        "reason_unanswered": "源文在块152-170列出了影响Windows OEM收入的因素:计算设备市场销量、按外形与屏幕尺寸划分的设备组合、发达市场与增长市场的设备需求差异、AI PC品类增长、Windows与出货设备的搭载率、消费者/中小企业/大型企业的客户组合、OEM渠道库存变化、定价变化与促销以及本地系统构建商向大型跨国OEM转移带来的价格差异和不同Windows版本的定价、设备零部件供应链限制、盗版。这些是收入驱动因素而非计费机制,不适合作为monetization项;源文未给出影响方向或幅度,故作为未解决事项保留。",
+        "related_business_ids": [
+          "windows_oem"
+        ]
+      },
+      {
+        "id": "unk_unplaced_offering_mentions",
+        "question": "以下源文提及内容应归属哪些业务节点:Microsoft Defender for Endpoint、Azure AI的芯片制造商合作关系、Office的竞争定位描述、Microsoft 365 Commercial的目标新市场与增长驱动?",
+        "reason_unanswered": "块113仅在竞争段落中提及Microsoft Defender for Endpoint,源文未说明其业务线归属;块128提到Azure AI硬件含定制芯片及与芯片制造商的合作关系,但未说明其与其他节点的结构关系;块112称微软以安全、集成、行业化、易用的生产力协作工具与服务参与Office竞争,但未明确该描述对应的具体业务节点;块101提到的新用户市场(一线员工、中小企业、增长市场)及AI增强功能增长驱动,未明确是否限于“Microsoft 365 Commercial”组件还是整条业务线(见unk_m365_commercial_scope)。图谱未将这些内容归入任何节点,以避免错误归属。",
+        "related_business_ids": [
+          "m365_commercial",
+          "azure"
+        ]
+      }
+    ],
+    "block_disposition_changes": [
+      {
+        "before": {
+          "block_id": "block-000112-7c427d3a",
+          "disposition": "used",
+          "reason": "竞争段落中涉及微软自有Office工具与服务,作为属性保留;竞争对手类别不作为业务节点。"
+        },
+        "after": {
+          "block_id": "block-000112-7c427d3a",
+          "disposition": "context",
+          "reason": "竞争段落;其中微软对Office竞争定位的描述未写入任何节点属性(见unk_unplaced_offering_mentions),竞争对手类别不作为业务节点。"
+        }
+      },
+      {
+        "before": {
+          "block_id": "block-000113-bc876fa1",
+          "disposition": "used",
+          "reason": "竞争段落中涉及微软自有Windows与Microsoft Defender for Endpoint,作为属性保留;竞争对手不作为业务节点。"
+        },
+        "after": {
+          "block_id": "block-000113-bc876fa1",
+          "disposition": "context",
+          "reason": "竞争段落;其中提到的Microsoft Defender for Endpoint未归入任何业务节点(见unk_defender_segment与unk_unplaced_offering_mentions),竞争对手类别不作为业务节点;Windows自身已在Windows and Devices节点保留。"
+        }
+      },
+      {
+        "before": {
+          "block_id": "block-000152-fc098ac9",
+          "disposition": "used",
+          "reason": "Windows OEM描述与收入驱动。"
+        },
+        "after": {
+          "block_id": "block-000152-fc098ac9",
+          "disposition": "used",
+          "reason": "Windows OEM描述(授权数量影响收入)已写入windows_oem节点;其后列出的其他收入影响因素(块154-170)保留于unk_windows_oem_revenue_factors。"
+        }
+      }
+    ]
+  },
+  "execution_input_allowed": false,
+  "model_api_calls_by_reviewer": 0,
+  "limitations": [
+    "Focused source review, not an all-claims or all-mentions semantic pass.",
+    "New source information is not needed for identified quote omissions: full relevant blocks are already frozen.",
+    "Unknown entries have no per-claim excerpt binding in the current contract; narrative preservation does not establish structured fact completeness.",
+    "No browser review, API call, code change or candidate edit."
+  ]
+}

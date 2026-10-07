@@ -1,0 +1,249 @@
+{
+  "schema_version": "business-granularity-initial-content-review-v1",
+  "status": "initial_raw_response_needs_revision",
+  "final_acceptance": false,
+  "candidate_published": false,
+  "review_target": "generation-01 raw response only; protocol repair and later candidates not read",
+  "reviewer": "Codex delegated source reviewer",
+  "review_isolation": "evaluation_only_not_execution_feedback",
+  "execution_input_allowed": false,
+  "evaluation_kind": "regression_not_holdout",
+  "model_api_calls": 0,
+  "source_scope": {
+    "company_id": "sec-0000789019",
+    "document_id": "msft-2025-10k",
+    "period_end": "2025-06-30",
+    "selected_blocks": 103,
+    "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6"
+  },
+  "binding": {
+    "raw_response_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/generation-01/response.txt",
+    "raw_response_sha256": "7e9fa22622d90543a9c7ac065e08cf30864fe6e407cd2d8a1d3491c87ee9ed88",
+    "source_packet_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/generation-01/source_packet.json",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "acceptance_path": "experiments/agent_design/2026-10-08-business-granularity-v2/evaluation/acceptance-v1.json",
+    "acceptance_sha256": "942588a74d89170e3485276ed0cf421310108c65c7433c69855ff2c46d6e4e41"
+  },
+  "counts": {
+    "nodes": 19,
+    "kinds": {
+      "company": 1,
+      "reportable_segment": 3,
+      "business": 15
+    },
+    "relationships": 19,
+    "unknown_relationships": 1,
+    "products_services": 52,
+    "customers": 12,
+    "monetization": 9,
+    "claim_excerpts_checked": 114
+  },
+  "literal_source_check": "All supplied claim excerpt strings occur in their bound frozen blocks after existing whitespace normalization; this is not entailment or completeness.",
+  "protocol_status": "Not publishable: validate_draft first fails business_claim_not_in_node_evidence; separate monetization evidence-index mismatch also observed.",
+  "acceptance_checks": [
+    {
+      "id": "MS-01",
+      "verdict": "pass_for_inspected_main_structure"
+    },
+    {
+      "id": "MS-02",
+      "verdict": "needs_improvement"
+    },
+    {
+      "id": "MS-03",
+      "verdict": "needs_improvement"
+    },
+    {
+      "id": "MS-04",
+      "verdict": "needs_revision"
+    },
+    {
+      "id": "MS-05",
+      "verdict": "partial"
+    },
+    {
+      "id": "MS-06",
+      "verdict": "partial"
+    },
+    {
+      "id": "MS-07",
+      "verdict": "needs_revision"
+    },
+    {
+      "id": "MS-08",
+      "verdict": "needs_revision"
+    }
+  ],
+  "findings": [
+    {
+      "id": "ICR-01",
+      "severity": "positive",
+      "acceptance_ids": [
+        "MS-01",
+        "MS-05"
+      ],
+      "candidate_targets": [
+        "businesses"
+      ],
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000097-13124fb7",
+        "block-000099-da3d48eb",
+        "block-000120-c34f7245",
+        "block-000122-c07a987e",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "observation": "三个报告分部及九个主要构成全部可定位；细项转为52条产品/服务属性，并保留12条客户及9条收入相关描述。相比旧79节点，19节点粒度更接近业务阅读，但节点减少不是质量通过证据。Teams、SQL Server、CALs、Surface/PC accessories、Xbox Game Pass均仍可定位。"
+    },
+    {
+      "id": "ICR-02",
+      "severity": "needs_improvement",
+      "acceptance_ids": [
+        "MS-02"
+      ],
+      "candidate_targets": [
+        "businesses[id=m365_commercial].name/description",
+        "businesses[id=m365_consumer].name/description"
+      ],
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000101-67803298",
+        "block-000103-a597bcd9"
+      ],
+      "observation": "Commercial节点名为products and cloud services整体分组，定义却直接套用Microsoft 365 Commercial平台；云/本地产品在属性中分开，避免了旧图整个平台属于自己云子集的边，但没有清楚声明业务组与平台的范围是否等同。Consumer也用组名承接平台定义。按原文语境可能可读，独立身份范围仍需明确，不能仅据名称宣布等同。"
+    },
+    {
+      "id": "ICR-03",
+      "severity": "needs_improvement",
+      "acceptance_ids": [
+        "MS-03"
+      ],
+      "candidate_targets": [
+        "businesses[id=azure].products_services[1]",
+        "businesses[id=azure].products_services[2]"
+      ],
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d"
+      ],
+      "observation": "Azure保留独立身份、客户及消费型收费，AI Foundry为可定位属性且名字正确；但AI Foundry属性只有名称，定义只留在引用中，不利于下游直接消费。Azure AI属性把公司主语We的AI硬件组合归到Azure，并且该属性claim摘录省去前句Azure AI offerings主语；属于范围与引用充分性待核，不能仅靠同段邻接确定硬件归属。"
+    },
+    {
+      "id": "ICR-04",
+      "severity": "blocking_semantic",
+      "acceptance_ids": [
+        "MS-04"
+      ],
+      "candidate_targets": [
+        "relationships[source_id=github,target_id=server_cloud]",
+        "relationships[source_id=nuance_healthcare,target_id=server_cloud]"
+      ],
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "observation": "GitHub和Nuance Healthcare整体定义明确包含cloud与on-premises。两条part_of边却以整体节点作source，而description/rationale明确说仅cloud部分成立。derived只表示推断，不能把整体端点缩成云子集。这会让消费方沿关系错误理解整个对象归属；原文未知虽记录于unknowns，未修复边端点的范围矛盾。"
+    },
+    {
+      "id": "ICR-05",
+      "severity": "needs_improvement",
+      "acceptance_ids": [
+        "MS-05",
+        "MS-06"
+      ],
+      "candidate_targets": [
+        "businesses[id=server_cloud].products_services[0]",
+        "businesses[id=m365_commercial].products_services[0]",
+        "businesses[id=search_news].products_services[0]"
+      ],
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000093-7018adaa",
+        "block-000180-c75c41bb"
+      ],
+      "observation": "部分折叠过粗：server_cloud属性值仅Azure and other cloud services，GitHub/Nuance云子集、virtual desktop等只出现在引文中；Microsoft 365一条属性塞入多项成员。没有要求每项建节点，但属性与子对象定位粒度须说明，不能用整段原文存在当作每项已结构化。Microsoft Copilot独立数字伴侣定义也未进入字段，仅Bing和Copilot名称出现。"
+    },
+    {
+      "id": "ICR-06",
+      "severity": "needs_improvement",
+      "acceptance_ids": [
+        "MS-06"
+      ],
+      "candidate_targets": [
+        "businesses[id=m365_commercial].customers",
+        "businesses[id=m365_commercial].monetization[0]",
+        "businesses[id=windows_oem].monetization[0]",
+        "businesses[id=gaming].customers[1]",
+        "businesses[id=search_news].customers[0]"
+      ],
+      "source_block_ids": [
+        "block-000101-67803298",
+        "block-000108-ec73690d",
+        "block-000110-99cc951e",
+        "block-000127-93a9159b",
+        "block-000152-fc098ac9",
+        "block-000178-51f06755",
+        "block-000180-c75c41bb"
+      ],
+      "observation": "Azure、LinkedIn、Dynamics等客户和消费/订阅机制有据，较空列表显著改善。但Commercial客户仍为空，原文明示organizations及frontline workers/small and medium businesses；客户unknown笼统称少数产品线以外未给出类别不充分。Gaming把developer/partner ecosystem记为客户，Search把广告受众记为customers（虽注明受众），需区分用户/客户/合作伙伴。多项monetization实际是ARPU、安装量、市场等收入驱动，不全是收费机制，Windows OEM长列表尤其混合。"
+    },
+    {
+      "id": "ICR-07",
+      "severity": "blocking_coverage",
+      "acceptance_ids": [
+        "MS-07"
+      ],
+      "candidate_targets": [
+        "block_disposition[block_id=block-000113-bc876fa1]"
+      ],
+      "source_block_ids": [
+        "block-000113-bc876fa1",
+        "block-000134-9ca2b5c6"
+      ],
+      "observation": "Defender for Endpoint原文在竞争段落中作为自有产品出现，本稿没有节点、属性或具体未知，且将整块not_used并称未产生独立业务事实，导致漏项。反例是Azure Security成功保留为Azure属性：问题在语义筛选不一致，不是原文没给。"
+    },
+    {
+      "id": "ICR-08",
+      "severity": "blocking_evidence",
+      "acceptance_ids": [
+        "MS-08"
+      ],
+      "candidate_targets": [
+        "businesses[id=windows_oem].monetization[0]",
+        "businesses[id=github].description",
+        "businesses[id=nuance_healthcare].description",
+        "businesses[id=linkedin].description",
+        "businesses[id=enterprise_partner_services].description",
+        "businesses[id=devices].description",
+        "businesses[id=search_news].monetization[0]"
+      ],
+      "source_block_ids": [
+        "block-000130-8d7ff1f7",
+        "block-000108-ec73690d",
+        "block-000132-f2659d3c",
+        "block-000152-fc098ac9",
+        "block-000154-a1c5160e",
+        "block-000171-f62e3835",
+        "block-000180-c75c41bb"
+      ],
+      "observation": "逐声明引文多处只覆盖长声明的一部分。GitHub/Nuance定义含云与本地，description claim只引平台/行业句；LinkedIn描述含免费与货币化但引文未包含该句；Enterprise服务定义含培训而description摘录未包含；Devices定义含连接人与内容而只引设计销售句。Windows OEM长收费描述列多种驱动，claim仅引OEM数量和定价两段，且冗余evidence索引与claim块不一致。Search变现声明后半增长驱动也未在该claim引文中。原块中多数内容存在，问题是单条claim支撑不完整，不应统称幻觉。"
+    }
+  ],
+  "generic_observations_for_future_design": [
+    "A derived relation still links its full endpoints; a cloud-qualified rationale cannot silently narrow a whole-business endpoint.",
+    "Attribute presence and source string matches are not semantic coverage; independently check scope, sufficient definition and host identity.",
+    "Keep disclosed customers, users and partners distinct; income drivers do not automatically describe a billing mechanism.",
+    "A full long claim needs all relevant exact excerpts even if the complete block is linked elsewhere."
+  ],
+  "limitations": [
+    "No new candidate after protocol repair read; do not treat these findings as the repaired final result.",
+    "Reviewer already knows historical companies and failures; not a blind evaluation or unseen-company holdout.",
+    "No browser rendering reviewed.",
+    "Findings are confined to evaluation; do not inject case-specific findings/answers into pending independent execution."
+  ]
+}

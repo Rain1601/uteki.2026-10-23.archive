@@ -1,0 +1,110 @@
+{
+  "scope": "Selected HTML 10-K contract/consumer checks only",
+  "model_calls": 0,
+  "semantic_acceptance": "not_evaluated_by_this_audit",
+  "checks": [
+    {
+      "kind": "parsed_package",
+      "source": {
+        "path": "experiments/agent_design/2026-10-08-acquisition-reuse-v1/msft/dataset/indexes/msft-2025-10k/source.json",
+        "sha256": "e768d7d8f96d1fa6394713bcbf5741a1f13f4be4928b967604e292405d947adc"
+      },
+      "manifest": {
+        "path": "experiments/agent_design/2026-10-08-acquisition-reuse-v1/msft/dataset/indexes/msft-2025-10k/manifest.json",
+        "sha256": "112f5e6f7b109f4e3b42e43f87da484920055665d9a5418d287bdca77c8eda94"
+      },
+      "checks": {
+        "files_verified": 15,
+        "blocks_verified": 1401,
+        "cells_verified": 19065
+      },
+      "consumer": "DocumentReader.outline/read",
+      "quality": "candidate; not_reviewed"
+    },
+    {
+      "kind": "parsed_package",
+      "source": {
+        "path": "experiments/agent_design/2026-10-08-acquisition-reuse-v1/googl/dataset/indexes/googl-2025-10k/source.json",
+        "sha256": "06dd69ea53319ea11830064aebcb7f53c9b7f254ab5a3f9f4f83693cd51e448f"
+      },
+      "manifest": {
+        "path": "experiments/agent_design/2026-10-08-acquisition-reuse-v1/googl/dataset/indexes/googl-2025-10k/manifest.json",
+        "sha256": "468b4a4e7afd55dbc04ffc5bebccf3c264f838c6f478ae0a2e88f1223ced7a89"
+      },
+      "checks": {
+        "files_verified": 15,
+        "blocks_verified": 1338,
+        "cells_verified": 10015
+      },
+      "consumer": "DocumentReader.outline/read",
+      "quality": "candidate; not_reviewed"
+    },
+    {
+      "kind": "parsed_package",
+      "source": {
+        "path": "experiments/agent_design/2026-10-08-acquisition-reuse-v1/amd/preparation/dataset/indexes/source-291485b98a75d8cfabe47571/source.json",
+        "sha256": "206d8cef55c5db8ea94558a658c4b8346800d9ff8346a11613d09b56a0e8d982"
+      },
+      "manifest": {
+        "path": "experiments/agent_design/2026-10-08-acquisition-reuse-v1/amd/preparation/dataset/indexes/source-291485b98a75d8cfabe47571/manifest.json",
+        "sha256": "c46ca2e5d4e2a65b92acaed2ab655f0ac7e7d361a2d997425d7c42400f03d8f9"
+      },
+      "checks": {
+        "files_verified": 15,
+        "blocks_verified": 1184,
+        "cells_verified": 7429
+      },
+      "consumer": "DocumentReader.outline/read",
+      "quality": "candidate; not_reviewed"
+    },
+    {
+      "kind": "financial_candidates",
+      "artifact": {
+        "path": "experiments/agent_design/2026-10-08-required-facts-completion-v1/run-03-normalized/normalized.json",
+        "sha256": "f0307869381eabe5167ec40ae90e0f88d0576ee6e3d579e00f0111330c69e1cc"
+      },
+      "consumer": "ResearchRecord validation + read-only SQL",
+      "records": 6,
+      "quality": "candidate; selected six facts checked previously; not whole report"
+    },
+    {
+      "kind": "filing_brief",
+      "artifact": {
+        "path": "experiments/agent_design/2026-10-07-filing-brief-v1/run-04/revision/brief.json",
+        "sha256": "e3f05f9d3d25197e9587c2340705a84d0c51ffc3fac266d87b15a35b2e0ffc4b"
+      },
+      "consumer": "validated bilingual Markdown + evidence HTML",
+      "checks": {
+        "items": 22,
+        "blocks": 103,
+        "gaps": 2,
+        "location_checks": "passed",
+        "semantic_acceptance": "not_evaluated"
+      },
+      "quality": "candidate; independent review needs_revision; final model review not run"
+    },
+    {
+      "kind": "business_graph",
+      "artifact": {
+        "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-09/revision/business_map.json",
+        "sha256": "90940b73b98bb0962fd0c30f5bc4fab93683e923d79f0847cb8f7fba5d485982"
+      },
+      "draft": {
+        "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-09/revision/draft.json",
+        "sha256": "ec48f02eff0e39153be3e1554aab043aeb0e771e234fa0fff367295ee1af483d"
+      },
+      "consumer": "validate_draft + Mermaid",
+      "nodes": 79,
+      "rendered_edges": 86,
+      "explicit_unresolved": 0,
+      "quality": "candidate; graph-only; content review needs_revision"
+    }
+  ],
+  "consumer_checks": "passed",
+  "exclusions": [
+    "PDF",
+    "20-F",
+    "full-report extraction quality",
+    "unseen-company model generalization"
+  ]
+}

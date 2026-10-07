@@ -128,7 +128,7 @@ def main():
         'max_corrected_edge_rgb_error_recomposited_on_white': edge_error,
         'generated_candidate': 'uteki-drop.generated-candidate.png',
         'generated_candidate_use': 'Audit only. Not a page asset.',
-        'reproduction': 'python3 docs/design/company-workspace-v2/assets/extract-uteki-drop.py',
+        'reproduction': 'python3 docs/design/company-workspace-swiss-c/assets/extract-uteki-drop.py',
     }
     SOURCE_NOTE.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps(metadata, ensure_ascii=False, indent=2))

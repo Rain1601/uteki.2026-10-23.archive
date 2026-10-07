@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Claude 对话 · Uteki</title>
+  <link rel="stylesheet" href="./chat.css">
+  <script src="./chat.js" defer></script>
+</head>
+<body>
+  <div class="dialogue-shell">
+    <aside class="sidebar" aria-label="会话目录与配置">
+      <header class="sidebar-heading">
+        <span class="eyebrow">UTEKI / LOCAL</span>
+        <h1>Claude 对话</h1>
+        <p>同一上下文，持续讨论 <span lang="en">Continuous conversation</span></p>
+        <p id="model-label" class="model-label">模型加载中</p>
+        <p id="connection-status" class="connection-status" role="status">正在连接本机服务…</p>
+      </header>
+      <nav class="rounds" aria-label="历史轮次">
+        <div class="rounds-heading"><span>对话轮次</span><span id="turn-count">—</span></div>
+        <ol id="turn-list"></ol>
+      </nav>
+      <section class="settings" aria-label="配置与累计额度">
+        <div class="budget-overview"><span>剩余额度 <small>USD · 估算</small></span><strong id="remaining-budget">—</strong></div>
+        <details id="configuration-panel">
+          <summary>下一次请求配置与额度 <span lang="en">Next request configuration</span></summary>
+          <dl id="configuration-values" class="configuration-values"></dl>
+          <dl class="budget-values">
+            <div><dt>累计估算</dt><dd id="spent-budget">—</dd></div>
+            <div><dt>预留额度</dt><dd id="held-budget">—</dd></div>
+            <div><dt>总上限</dt><dd id="limit-budget">—</dd></div>
+          </dl>
+          <p class="next-reservation">下一次至少预留 <strong id="next-reservation">—</strong><small>随输入变动 · USD 估算</small></p>
+          <form id="budget-form">
+            <label for="budget-limit">修改总上限 <span lang="en">USD</span></label>
+            <div class="budget-editor"><input id="budget-limit" inputmode="decimal" autocomplete="off" placeholder="输入美元金额" required><button id="save-budget" type="submit" disabled>保存</button></div>
+          </form>
+          <p class="budget-note">以上配置用于下一次请求，历史轮次可能不同。费用是本机估算，非供应商账单。更改额度不改变模型配置。</p>
+        </details>
+      </section>
+    </aside>
+    <main class="conversation">
+      <header class="conversation-heading">
+        <div><h2>完整对话 <span lang="en">Conversation</span></h2><p>保留原文与格式；长问答可展开，复制始终包含全文。</p></div>
+        <button id="refresh" class="quiet-button" type="button">刷新</button>
+      </header>
+      <div class="history-wrap">
+        <section id="history" class="history" tabindex="0" aria-label="完整消息历史">
+          <div id="thread" class="thread"><p id="empty-message" class="empty-message">正在加载对话历史…</p></div>
+        </section>
+        <button id="latest" class="latest-button" type="button" hidden>有更新 · 查看最新消息 ↓</button>
+      </div>
+      <footer class="composer">
+        <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+        <form id="message-form">
+          <label for="message-input">你 <span lang="en">Manual message</span></label>
+          <textarea id="message-input" rows="4" placeholder="继续与 Claude 讨论…" spellcheck="false"></textarea>
+          <div class="composer-actions"><span id="composer-hint">Enter 换行 · ⌘ / Ctrl + Enter 发送</span><button id="send-message" class="primary-button" type="submit" disabled>发送给 Claude</button></div>
+        </form>
+      </footer>
+    </main>
+  </div>
+  <noscript>此本机对话窗口需要启用 JavaScript 才能读取历史和发送消息。</noscript>
+</body>
+</html>

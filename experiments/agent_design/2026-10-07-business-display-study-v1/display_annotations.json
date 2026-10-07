@@ -1,0 +1,47 @@
+{
+  "schema_version": "business-display-study-annotations-v1",
+  "binding": {
+    "company_id": "nvidia",
+    "document_id": "nvidia-fy2025-annual-report-10k",
+    "period_end": "2025-01-26",
+    "business_map_sha256": "bcebbd790caa9bb59be5de9a8a1ada0d31f8800d58a37bb68f2fcb6739f84ddd",
+    "semantic_review_sha256": "ab65f58e456849d43658726a72a7a4dee3f57ea55a028349303295fafaf60675"
+  },
+  "purpose": "本例展示审阅注记；不回写模型节点或关系，也不作为通用推断识别算法。",
+  "market_excerpts": {
+    "mkt_data_center": "NVIDIA Data Center 平台加速 AI、数据分析、图形和科学计算等高算力负载",
+    "mkt_gaming": "游戏平台以 GPU 和软件提升游戏画质与体验",
+    "mkt_professional_visualization": "NVIDIA 与独立软件开发商合作,针对 NVIDIA GPU 优化,服务设计制造和数字内容创作等专业工作流。",
+    "mkt_automotive": "提供从云端到车端的自动驾驶平台方案,以 DRIVE Hyperion 品牌提供端到端自动驾驶解决方案"
+  },
+  "inferred_relationships": [
+    {
+      "source_id": "drive_hyperion",
+      "target_id": "seg_compute_networking",
+      "kind": "reported_under",
+      "review_check_id": "NV-08",
+      "note": "待确认：原候选将 DRIVE Hyperion 与 Compute & Networking 的归属说明为两处文字结合推断。保留原边，以本例注记提醒，未改为原文明示。"
+    },
+    {
+      "source_id": "rtx_workstation_gpus",
+      "target_id": "mkt_professional_visualization",
+      "kind": "part_of",
+      "review_check_id": "NV-08",
+      "note": "待确认：原候选说明该市场归属来自相邻段落语境，非逐句直接声明。"
+    },
+    {
+      "source_id": "omniverse",
+      "target_id": "mkt_professional_visualization",
+      "kind": "part_of",
+      "review_check_id": "NV-08",
+      "note": "待确认：原候选说明该市场归属来自段落位置。"
+    }
+  ],
+  "node_warnings": [
+    {
+      "business_id": "geforce_gpus",
+      "review_check_id": "NV-03",
+      "note": "分组待修正：原候选把与 GeForce 并列的游戏主机 SoC / 开发服务放进了 GeForce GPU 节点。本页保留原候选文字，不把该分组当成已核定产品层级。"
+    }
+  ]
+}

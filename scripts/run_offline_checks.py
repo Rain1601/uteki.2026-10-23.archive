@@ -17,6 +17,7 @@ CORE_TESTS = (
     "tests.test_evaluator",
     "tests.test_m0_preparation",
     "tests.test_offline_checks",
+    "tests.test_transfer_local_state",
     "tests.test_research_archive_ui",
     "tests.test_research_workflow_smoke",
     "tests.test_visual_system",
@@ -25,13 +26,38 @@ CORE_TESTS = (
     "tests.unit.test_annual_context",
     "tests.unit.test_annual_narrative_runner",
     "tests.unit.test_archive_rerun",
-    "tests.unit.test_attention_dashboard",
+    "tests.unit.test_agent_runs_history.HistoricalRunsTests",
+    "tests.unit.test_agent_runs_live",
+    "tests.unit.test_agent_runs_page",
+    "tests.unit.test_agent_run_results.AgentResultTests",
+    "tests.unit.test_agent_run_results.LiveResultIntegrationTests",
+    "tests.unit.test_agent_results_page",
+    "tests.unit.test_agent_result_routes",
+    "tests.unit.test_run_scores",
+    "tests.unit.test_run_observation",
+    "tests.unit.test_observation_relocation",
+    "tests.unit.test_workspace_routes.WorkspaceRoutesTests.test_root_redirects_to_unselected_data_workspace",
     "tests.unit.test_business_map_agent",
+    "tests.unit.test_business_coverage_contract",
+    "tests.unit.test_business_coverage_contract_v2",
+    "tests.unit.test_business_coverage_diagnostics",
+    "tests.unit.test_business_coverage_run",
+    "tests.unit.test_business_coverage_recovery",
+    "tests.unit.test_business_coverage_continuation",
+    "tests.unit.test_business_evidence_projection",
+    "tests.unit.test_business_granularity_run",
+    "tests.unit.test_business_semantic_critic",
+    "tests.unit.test_business_critic_revision",
+    "tests.unit.test_bounded_retry",
+    "tests.unit.test_coverage_audit",
+    "tests.unit.test_acquisition_catalog_coverage",
     "tests.unit.test_business_map_models.BusinessMapModelTests.test_rejects_unknown_evidence_reference",
     "tests.unit.test_business_map_models.BusinessMapModelTests.test_accepts_consistent_map",
     "tests.unit.test_business_map_models.BusinessMapModelTests.test_pilot_matches_domain_contract",
     "tests.unit.test_business_map_models.BusinessMapModelTests.test_benchmark_candidate_matches_domain_contract",
     "tests.unit.test_call_costs",
+    "tests.unit.test_model_configuration",
+    "tests.unit.test_model_trial_registration",
     "tests.unit.test_context_regression.ContextRegressionTests.test_compound_not_list",
     "tests.unit.test_evidence_math.EvidenceMathTests.test_numeric_cells_not_permissive_text",
     "tests.unit.test_hypothesis_contract",
@@ -57,6 +83,9 @@ CORE_TESTS = (
 # Documentation for the deliberate boundary; --integration uses unchanged
 # unittest discovery, so these tests keep their original assertions and skips.
 LOCAL_DATA_TESTS = {
+    "test_reproducibility_pilot": "explicit frozen AMD source blocks and pre-registered pilot references",
+    "test_agent_run_results.FrozenResultIntegrationTests": "explicit frozen AMD model trials and historical runs",
+    "test_agent_runs_history.FrozenAMDIntegrationTests": "explicitly registered AMD parent/query/batch/direct manifests and source dataset",
     "test_analysis_comparison": "document-reader experiment manifest and pinned source indexes",
     "test_annual_report_view": "frozen hypothesis experiment, answers and evidence",
     "test_cloud_analysis": "approved Google Cloud research release and analysis runs",
@@ -82,7 +111,7 @@ LOCAL_DATA_TESTS = {
     "test_sec_document_index.AlphabetDocumentIndexIntegrationTests": "frozen Alphabet source and index",
 }
 
-JAVASCRIPT_TESTS = ("tests/revision_demo.test.cjs",)
+JAVASCRIPT_TESTS = ("tests/revision_demo.test.cjs", "tests/agent_runs.test.cjs", "tests/agent_results.test.cjs")
 
 
 def run_check(label: str, command: list[str]) -> int:

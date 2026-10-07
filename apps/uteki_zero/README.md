@@ -1,3 +1,7 @@
+> **2026-10-06：旧页面已退役。** 本目录不再提供独立页面；旧页面及其专用代码、测试已删除。当前使用 [Swiss C 投研前台](../../docs/design/company-workspace-swiss-c/README.md) 和 [真实数据工作台](../review_workbench/README.md)。以下文字保留为历史记录，其中旧启动命令与页面链接不再适用。保留的原始素材、来源记录和冻结版本仅用于追溯。
+
+当前前台仍使用本目录的 `catalog.mjs`、`research.mjs`、`brands.mjs`、公司图标与注册表；相关数据测试及品牌导入工具继续维护。
+
 # Uteki 报告工作台原型
 
 本版按确认的双入口结构组织研究：公司与 Manager 多对多；每份报告只属于一家公司与一位 Manager，同一组合可以有主报告和多份专题，各自维护版本。公司入口按 Manager 分组，Manager 入口按公司分组。主入口保持不变；[第 1 阶段阅读样板](reader-v1.html)与[早期工作台](legacy.html)独立保留。

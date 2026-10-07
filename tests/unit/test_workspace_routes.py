@@ -58,6 +58,16 @@ class WorkspaceRoutesTests(unittest.TestCase):
     def post(self, **kwargs):
         return self.request('/api/data-workspace/state', method='POST', **kwargs)
 
+    def test_root_redirects_to_unselected_data_workspace(self):
+        with patch.object(data_workspace, 'render_data_workspace') as render:
+            for path in ('/', '/?history=all'):
+                response = self.request(path)
+                self.assertEqual(response['status'], 303)
+                self.assertEqual(response['headers']['Location'], '/agent-results')
+                self.assertEqual(response['headers']['Cache-Control'], 'no-store')
+                self.assertEqual(response['body'], b'')
+            render.assert_not_called()
+
     def test_page_dispatch_preserves_explicit_and_blank_query_scope(self):
         with patch.object(data_workspace, 'render_data_workspace', return_value='<h1>Workspace</h1>') as render:
             response = self.request('/data-workspace?dataset=cedar-2031&source=cedar-source&tab=financials')

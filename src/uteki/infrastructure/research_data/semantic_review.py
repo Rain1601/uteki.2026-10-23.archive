@@ -200,6 +200,10 @@ def validate_dataset_binding(packet, dataset, *, artifact_root=None):
     source = sources.get(packet['source']['source_snapshot_id'])
     if source is None or any(source.get(k) != v for k, v in packet['source'].items()):
         raise ValueError('semantic source differs from frozen dataset')
+    index = json.loads(contained(dataset, source['index_folder']+'/index.json').read_text())
+    if ('parser_version' in packet and packet['parser_version'] != index['parser_version']) or (
+            index['parser_version'] == 'sec-source-blocks-v0.1.12' and 'parser_version' not in packet):
+        raise ValueError('semantic parser version differs from frozen dataset')
     raw = contained(dataset, source['raw_file']).read_bytes()
     if digest(raw) != source['source_sha256']:
         raise ValueError('semantic original hash mismatch')

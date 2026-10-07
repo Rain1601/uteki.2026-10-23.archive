@@ -1,6 +1,24 @@
 # Uteki Beta
 
+换机器继续开发：先读 [2026-10-08交接入口](docs/MACHINE_HANDOFF.zh-CN.md)，包含安装、启动、私密状态恢复、当前Todo和费用边界。
+
 An evaluation-driven AI investment research system.
+
+## Active workspaces · 2026-10-06
+
+| Interface | Local entry | Responsibility |
+| --- | --- | --- |
+| Investor frontend (Swiss C) | <http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/> | Company, Manager, report, portfolio and risk views; currently named simulated data |
+| Real data workbench | <http://127.0.0.1:8765/data-workspace> | Original materials, financial candidates, evidence, versions and processing records |
+
+These are the two maintained interfaces. Other standalone UI prototypes have
+been retired. Shared report fixtures, company icons, original brand assets and
+frozen historical records remain. The workbench's source, evaluation, extraction
+and report-review routes remain supporting tools. The old attention homepage
+has been removed; `/` redirects to `/data-workspace` with HTTP 303. See the
+[code overview and boundaries](docs/CODE_OVERVIEW.zh-CN.md).
+Both interfaces and the Python backend stay in this repository; a shared API
+connecting Swiss C to real published artifacts is a future integration step.
 
 ## Current code handoff · 2026-10-06
 
@@ -88,14 +106,12 @@ or complete the M0 evaluation gates.
 
 ## Research workbench
 
-The local workbench now opens on an attention dashboard: pending reports,
-recorded research updates from the last seven days, priority companies and
-the remaining watchlist. Company-added dates are not available in the current
-watchlist, so the dashboard explicitly marks that coverage gap. These are
-research updates, not live market alerts. Daily viewed marks remain local to
-the browser and do not approve reports.
+The local workbench opens at `/data-workspace`: select a company, a frozen
+dataset and a material to inspect originals, financial candidates, evidence,
+display versions and saved processing records. Missing outputs remain explicit.
 
-Navigation: **Home → Companies → Company research → Reports**. Company pages
+Company and report review remain supporting workflows under `/companies`.
+Navigation: **Companies → Company research → Reports**. Company pages
 prioritize reading and editing analysis; source materials, document indexes
 and structured business/financial data provide supporting evidence. Human
 and agent edits retain separate revisions and do not overwrite or automatically
@@ -119,8 +135,8 @@ restoring the inputs, launch the workbench:
 PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 --port 8765
 ```
 
-Open `http://127.0.0.1:8765/`. Startup now checks required inputs before
-creating review state or starting the server. Use `--check` for a read-only
+Open `http://127.0.0.1:8765/data-workspace`. Startup checks required inputs
+before creating review state or starting the server. Use `--check` for a read-only
 preflight. Full local regression remains available with
 `.venv/bin/python scripts/run_offline_checks.py --integration`.
 Selected public-source materials, indexes, Data Agent snapshots and saved query

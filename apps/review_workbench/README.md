@@ -2,9 +2,89 @@
 
 Run from the repository root with `PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app`.
 
+The backend has two main pages: [Results](http://127.0.0.1:8765/agent-results)
+and [Process](http://127.0.0.1:8765/agent-runs). `/`, `/companies`, and the
+unselected `/data-workspace` return HTTP 303 to Results. Explicit data selections,
+source readers, financial matrices and report review remain artifact detail tools.
+The dated sections below retain their original implementation and check records.
+Their references to static Agent Workbench demos are historical; those standalone
+pages have been retired.
+
+## Results, model comparison and reviews (2026-10-06)
+
+Each result has the same root Trace ID as its process. Results show saved outputs,
+model/provider/reasoning settings, known token usage and estimated cost. Each
+process step shows its associated calls; provider Request ID and Response ID stay
+call-level and remain unknown when absent. Configuration is inspected, not edited
+or executed by these pages.
+
+Select a second result for side-by-side inspection. A controlled comparison
+requires identical pinned input, task, source scope and output contract; different
+reasoning settings can be compared but do not imply equal inference compute.
+`model-trials-v1.json` registers the existing Sonnet/DeepSeek small experiment as
+two single-call traces, not complete Agent executions. Sonnet has six facts and
+short analysis; DeepSeek hit its output cap with no visible answer.
+
+Four independent human scores (accuracy, coverage, analysis, evidence) use 0–5
+or unscored, with reviewer and notes. GET/POST `/api/agent-results/<trace>/scores`
+uses local same-origin access; writes also require `X-Uteki-Request: 1` and JSON.
+Scores are stored separately in ignored `data/review_workbench/agent-result-scores-v1.json`,
+bound to Trace ID, revision and output hash. Changed bindings return 409. History
+is retained; nothing is adopted and no model is called. The first version has no
+automatic ranking, model execution controls or authentication beyond local access.
+
+## Agent execution and artifacts (2026-10-06)
+
+Open [Agent runs](http://127.0.0.1:8765/agent-runs) for saved steps, child tasks,
+input/output artifacts and per-call usage. The page is read-only: browsing does
+not invoke a model, start or retry a task, or adopt candidates. Child runs expand
+inside the selected root run. Existing financial/source links appear only when
+their registrations have been verified.
+
+Two real historical runs are registered in
+[`agent-runs-v1.json`](../../data/evaluation_views/agent-runs-v1.json):
+
+| Run ID | Saved behavior |
+| --- | --- |
+| `amd-fy2023-main-agent-v2-parent` | 6 parent decisions, including rejections at steps 1 and 3; step 5 links one extraction task. 7 unique model calls; `candidate_ready`, semantic completeness not evaluated. |
+| `amd-fy2023-cash-flow-main-agent-v2-parent` | 7 parent decisions and one extraction task; 8 unique model calls. Stopped at `no_progress_limit`; remaining gaps stay visible. |
+
+Historical viewing works with the ordinary startup command. For live monitoring,
+configure the same observation directory in the Data CLI and workbench, and allow
+the parent directory containing the actual new run outputs:
+
+```bash
+PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app \
+  --host 127.0.0.1 --port 8765 \
+  --observation-root "$HOME/.local/state/uteki/observations" \
+  --observation-output-root "$HOME/.local/state/uteki/runs"
+```
+
+Both workbench flags are required together; repeat `--observation-output-root`
+for another explicitly allowed output parent. `agent query`, `agent extract`
+and `agent extract-batch` accept `--observation-root`. Their `--output` must be a
+new child directory of an allowed output parent. Observation storage must stay
+outside business outputs and frozen datasets; paths containing symlinks are
+rejected. See [CLI monitoring and import instructions](../../docs/DATA_AGENT_CLI.zh-CN.md#执行监控与历史导入2026-10-06).
+
+Each local execution tree has one writer process. The visible page polls every
+2 seconds, pauses while hidden, and stops after the root terminal and remaining
+events have been read. A heartbeat overdue by 15 seconds means monitoring is
+interrupted, not that the model failed or stopped billing. There is no automatic
+resume or multi-host scheduling. Known usage is separated from missing usage;
+an unconfirmed recorded zero is not confirmed zero consumption. Costs are saved
+estimates, not provider bills. Root-only and whole-tree totals are distinct.
+
+For another supported historical query, prepare an explicit registration spec
+and run `./.venv/bin/python scripts/import_agent_run.py --spec /absolute/path/new-run-spec.json`.
+The importer validates the pinned layers and source scope, adds a new registration
+and summary, and leaves frozen run files unchanged. Existing IDs cannot be replaced.
+The dated trace limitations below describe earlier iterations; the current
+execution view adds the registered parent traces and opt-in live monitoring.
+
 ## Company-first data workspace (2026-10-05)
 
-Open [the data workspace](http://127.0.0.1:8765/data-workspace). Select a company,
+Historical implementation: use an explicit data-artifact link from Results. Select a company,
 then a material. The same window offers original reading, financial data,
 sections/tables, filing-brief status and saved processing records. The material
 list supports reporting-year ordering, type grouping and filters. Selecting a
@@ -34,9 +114,9 @@ editing, new human scoring, reruns and adoption are outside this view.
 
 ## Company materials and outputs (2026-10-05)
 
-Open [the real data workspace](http://127.0.0.1:8765/evaluation), choose a
-company, then choose a report. The material page groups the saved original,
-section contents, passages and HTML tables, separate financial extraction
+This iteration introduced the [material inspector](http://127.0.0.1:8765/evaluation),
+now a supporting tool. Choose a company, then choose a report. The material page
+groups the saved original, section contents, passages and HTML tables, separate financial extraction
 versions, filing brief status, and the recorded extraction process. Each
 version lists the actual extracted metrics and links its numbers to evidence
 and saved review. Technical IDs, diagnostics and storage paths are expandable.

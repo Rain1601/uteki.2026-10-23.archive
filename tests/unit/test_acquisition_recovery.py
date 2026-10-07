@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from urllib.error import HTTPError
 
-from uteki.infrastructure.document_sources.company_acquisition import prepare_sources
+from uteki.infrastructure.document_sources.company_acquisition import prepare_sources, TICKERS
 from tests.unit.test_filing_integrity import filing
 
 
@@ -42,6 +42,42 @@ class AcquisitionRecoveryTests(unittest.TestCase):
 
     def run_sources(self):
         return prepare_sources(self.config, self.root, fetch=self.fetch, clock=lambda: self.current)
+
+    def test_ticker_resolution_reuses_verified_originals_and_crash_receipts(self):
+        self.config.pop('cik')
+        self.responses[TICKERS] = json.dumps({'0': {'ticker': 'OTHER', 'cik_str': 98765}}).encode()
+        first = self.run_sources()
+        self.assertEqual(first['status'], 'completed')
+        frozen_manifest = (self.root/first['manifest_path']).read_bytes()
+        self.calls.clear()
+        second = self.run_sources()
+        self.assertEqual(self.calls, [TICKERS, self.metadata])
+        self.assertEqual({d['acquisition'] for d in second['documents']}, {'reused_verified'})
+        self.assertEqual((self.root/first['manifest_path']).read_bytes(), frozen_manifest)
+        # A missing final manifest simulates a process crash after receipts.
+        for manifest in self.root.glob('source-runs/*/manifest.json'):
+            manifest.unlink()
+        self.calls.clear()
+        third = self.run_sources()
+        self.assertEqual(self.calls, [TICKERS, self.metadata])
+        self.assertEqual({d['acquisition'] for d in third['documents']}, {'reused_verified'})
+        self.assertEqual({d['period_end'] for d in third['documents']}, {'2023-12-31', '2024-12-31'})
+
+    def test_ticker_resolution_rejects_other_issuer_cache_before_reuse(self):
+        first = self.run_sources()
+        # Poison only the cache receipt identity, while retaining matching URLs
+        # and otherwise valid source bytes. It must not be considered for reuse.
+        for path in self.root.glob('source-runs/**/*.json'):
+            value = json.loads(path.read_text())
+            value['company']['cik'] = '0000011111'
+            path.write_text(json.dumps(value))
+        self.config.pop('cik')
+        self.responses[TICKERS] = json.dumps({'0': {'ticker': 'OTHER', 'cik_str': 98765}}).encode()
+        self.calls.clear()
+        second = self.run_sources()
+        self.assertEqual(second['status'], 'completed')
+        self.assertEqual(self.calls, [TICKERS, self.metadata, *self.urls])
+        self.assertEqual({d['acquisition'] for d in second['documents']}, {'downloaded'})
 
     def test_retry_after_survives_new_invocation_and_only_defers_its_url(self):
         self.responses[self.urls[0]] = HTTPError(self.urls[0], 429, 'Too Many Requests', {'Retry-After': '61'}, None)

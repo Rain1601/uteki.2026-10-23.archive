@@ -1,0 +1,220 @@
+{
+  "schema_version": "microsoft-draft-semantic-review-v1",
+  "status": "failed",
+  "draft_path": "experiments/agent_design/2026-10-07-microsoft-clean-reextract-v1/run-01/response.txt",
+  "draft_sha256": "835ec04aef0df22268b9ef5dea3cb8c0271046e90b2a113e80f632e8213372ee",
+  "counts": {
+    "nodes": 19,
+    "edges": 18,
+    "unknowns": 7
+  },
+  "scope": "Review of raw draft only; contract materialization failed. This is not accepted artifact or full all-fields certification.",
+  "checks": [
+    {
+      "id": "R01",
+      "label": "三个报告分部与主要业务",
+      "status": "pass",
+      "classification": "grounded_inference",
+      "observation": "三个报告分部和 PBP 四条、IC 两条、MPC 三条主业务均已提取并连接；仍非全产品图。",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000091-d993f813",
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000097-13124fb7",
+        "block-000099-da3d48eb",
+        "block-000118-5e917062",
+        "block-000120-c34f7245",
+        "block-000122-c07a987e",
+        "block-000144-6e0ae0c4",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R02",
+      "label": "Azure AI / Foundry / Security 粒度",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "三者仅写入 Azure.products_services，未保留可单独引用的身份与关系。Foundry 是具名平台，定义充足；把是否可作独立业务对象当 unknown 是建模判断未完成。",
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d",
+        "block-000134-9ca2b5c6"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R03",
+      "label": "GitHub 云子集边",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "github 端点定义为含云及本地的整体，edge.description/rationale 却仅断言 GitHub 云服务属于产品服务组。端点范围与断言范围不一致；需云子集身份或相同精度的关系。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R04",
+      "label": "Nuance Healthcare 云子集边",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "nuance_healthcare 同样整体节点承担仅云服务范围的边；不能以 rationale 的局部限定修复全实体 part_of 语义。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R05",
+      "label": "Azure and other cloud services 组合",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "该原文明示组只在 server_cloud.products_services，未保留结构身份。其 GitHub/Nuance 云子集、虚拟桌面和其他服务范围因此不能完整追踪。",
+      "source_block_ids": [
+        "block-000120-c34f7245"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R06",
+      "label": "逐字段摘录覆盖",
+      "status": "needs_improvement",
+      "classification": "needs_evidence",
+      "observation": "五处复合描述有事实但引文切片不足：Azure描述的AI；GitHub/Nuance描述的云+本地；Windows OEM描述的OEM购买预装；Search描述的组成清单。Windows monetization 同时存在多个证据块与单段摘录不一致。须核对完整复合主张而不是仅有摘录即Pass。",
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000130-8d7ff1f7",
+        "block-000146-c641cfcd",
+        "block-000150-9577a591",
+        "block-000152-fc098ac9",
+        "block-000154-a1c5160e",
+        "block-000156-e790ef4f",
+        "block-000158-1090a836",
+        "block-000160-8913045d",
+        "block-000162-2bcabf98",
+        "block-000164-56fa5ed0",
+        "block-000166-82fed103",
+        "block-000168-c54d4db7",
+        "block-000170-548ff342",
+        "block-000180-c75c41bb"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_github_nuance_onprem",
+      "label": "GitHub/Nuance 本地会计归类",
+      "status": "gap",
+      "classification": "not_disclosed",
+      "observation": "具体本地产品的精确报告行归类在所选业务章节未交代。全文检索及 Note18 只重复云组和云/本地范围，没有在检查处找到精确本地归组。保留具体缺口，不扩大成整个GitHub无归属。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "supplemental_source_block_ids": [
+        "block-000564-5a5acdbe",
+        "block-001200-c34f7245",
+        "block-001226-283de46e"
+      ]
+    },
+    {
+      "id": "U-unk_m365_windows_overlap",
+      "label": "Windows Commercial 与 OEM 边界",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "已有商业云/本地与 OEM 授权渠道的明示范围，可以先回答高层划分。仅许可证 SKU、重叠计费等更细边界未给出；当前问法把已知划分也称未知，过宽。",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000146-c641cfcd",
+        "block-000152-fc098ac9"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_m365_office_overlap",
+      "label": "Office 商业与消费者范围",
+      "status": "gap",
+      "classification": "not_disclosed",
+      "observation": "商业/消费者范围可从所属组及用途回答。更细 Office 本地 SKU 或授权组合边界本章节未列出，unknown需缩窄为细粒度未给信息，不能说两个业务无法区分。",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000101-67803298",
+        "block-000103-a597bcd9"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_azure_ai_security_scope",
+      "label": "AI 平台是否独立对象",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "业务图对象不要求单独财报分部或独立收入项。命名平台已有定义，保持对象身份并审阅有据关系属于本任务；该unknown不是源材料缺事实的充分理由。",
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d",
+        "block-000134-9ca2b5c6"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_rel_azure_enterprise_link",
+      "label": "服务对具体 Azure 业务的支持边",
+      "status": "gap",
+      "classification": "needs_evidence",
+      "observation": "原文明确服务部署管理 Microsoft server/desktop/Nuance 方案，并未逐一列对 Azure 产品的支持边。可保留具体边待补证，不影响把两者挂入同一分部。",
+      "source_block_ids": [
+        "block-000132-f2659d3c"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_copilot_scope",
+      "label": "两个 Copilot 的关系",
+      "status": "gap",
+      "classification": "not_disclosed",
+      "observation": "二者在本章节业务归属已分别列示，可回答各自范围；是否同一产品体系/底层整合关系没有在所选段落证明，应仅保留后半问题。",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000101-67803298",
+        "block-000150-9577a591",
+        "block-000180-c75c41bb"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_competitor_nodes",
+      "label": "竞对是否作为节点",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "这是输出模型设计选择，不是报告未披露事实。竞争段落可在独立竞对结构承载；不能作为公司业务图的事实未决事项，也无需虚构公司内部节点。",
+      "source_block_ids": [
+        "block-000112-7c427d3a",
+        "block-000115-aeccb0a6",
+        "block-000134-9ca2b5c6",
+        "block-000142-3e738e53",
+        "block-000184-afc0d8c4",
+        "block-000185-09fe5a44"
+      ],
+      "supplemental_source_block_ids": []
+    }
+  ],
+  "no_model_calls": true,
+  "supplemental_review_path": "experiments/agent_design/2026-10-07-microsoft-clean-reextract-v1/evaluation/full-report-supplemental-review-v1.json",
+  "binding": {
+    "response_sha256": "835ec04aef0df22268b9ef5dea3cb8c0271046e90b2a113e80f632e8213372ee",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "request_sha256": "ca4123d6ada4644b7195cbf135215ee08aa30a25cfc7b571c532e0552c8a1480"
+  },
+  "failure_scope": [
+    "contract_materialization",
+    "semantic_scope_consistency",
+    "required_platform_granularity",
+    "claim_quote_coverage"
+  ]
+}

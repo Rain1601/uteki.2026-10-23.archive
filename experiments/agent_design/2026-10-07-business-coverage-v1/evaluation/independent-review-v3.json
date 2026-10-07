@@ -1,0 +1,195 @@
+{
+  "schema_version": "business-map-independent-review-v1",
+  "status": "needs_revision",
+  "binding": {
+    "trace_id": "run-0660a3c49d8848f194fc46ec0cbcc90f",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "skill_sha256": "005b9d1802e66f83411c16114886ff3124586094b73e070dd6b59d22cb582169",
+    "business_map_sha256": "90940b73b98bb0962fd0c30f5bc4fab93683e923d79f0847cb8f7fba5d485982",
+    "result_sha256": "8e9be4e1a6cd4458d0fa96ee740d25b64a96f7892409d1d4f84507fbfb6aec36",
+    "request_sha256": "7b4c840b79361060ea76700f718e4e63262112fde3af074a7702c9301ad8b419"
+  },
+  "criteria_sha256": "8b0ae49f04ebec2b28b9482a1ab14921664ea1963e59d1bb1093b40dc100fa0a",
+  "prior_review_sha256": "12444e5c864296a39e1326e3db0abad4b571573665e9b5b03e4e6100bda0fd39",
+  "summary": "本轮系统原答直接生成79节点86关系，移除Windows整体范围错误及Nuance强行对应，补提CAL。仍有多处逐字段精确引文不全；部分关系的报告集合/产品身份及审阅强度需进一步明确。内容仍未通过，23→19不是质量得分。",
+  "review_method": "Codex事后比较两版原答，回读全部改动节点/关系及相关原文，复查上轮已知问题和重点未变声明。没有把本报告输入执行模型。这是开发回归，不是盲测或全图所有子句独立认证。",
+  "separate_statuses": {
+    "execution_ownership": "system_agent",
+    "structural_contract": "passed",
+    "selected_stage_semantic_fidelity": "needs_revision"
+  },
+  "checks": [
+    {
+      "label": "Windows整体与商业子集",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000152-fc098ac9"
+      ],
+      "observation": "已移除整体Windows属于商业平台的边。商业云/本地子集分别关联Windows整体；新描述只保留引文支持的跨设备体验。本项核对这一处已知范围错误，不代表所有Windows关系全部认证。"
+    },
+    {
+      "label": "Nuance服务与Healthcare对应关系",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000122-c07a987e",
+        "block-000130-8d7ff1f7",
+        "block-000132-f2659d3c"
+      ],
+      "observation": "先前从父组用途推到具体子服务、再连至Healthcare的支持边已删除。候选将对应关系列为未知，没有补造关系。Nuance专业服务描述本身的引文仍有下项缺口。"
+    },
+    {
+      "label": "Client Access Licenses补提",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000129-264fa06b"
+      ],
+      "observation": "CAL节点、服务器组归属、SQL Server/Windows Server访问权和收入随关联服务器产品报告的说明，均可在完整精确引文中核对。"
+    },
+    {
+      "label": "LinkedIn · 字段引文",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000108-ec73690d"
+      ],
+      "observation": "仍含“免费服务”。完整源块支持，但description的两段精确引文均略去这部分；未修复字段引用缺口。",
+      "inspected_claim": "连接全球专业人士的平台,提供免费服务及Talent、Marketing、Premium Subscriptions和Sales Solutions等变现解决方案。",
+      "inspected_excerpts": [
+        {
+          "block_id": "block-000108-ec73690d",
+          "quote": "LinkedIn connects the world’s professionals to make them more productive and successful"
+        },
+        {
+          "block_id": "block-000108-ec73690d",
+          "quote": "LinkedIn offers monetized solutions designed to offer AI-enabled insights and productivity: Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions"
+        }
+      ]
+    },
+    {
+      "label": "Surface · 字段引文",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000171-f62e3835"
+      ],
+      "observation": "仍含Copilot+ PC；description引文只解释生产力用途，另一个字段的名称引文不能代替description自身的证据。",
+      "inspected_claim": "微软设计的设备产品,含Copilot+ PC,旨在帮助组织、学生和消费者提高生产力。",
+      "inspected_excerpts": [
+        {
+          "block_id": "block-000171-f62e3835",
+          "quote": "Surface is designed to help organizations, students, and consumers be more productive."
+        }
+      ]
+    },
+    {
+      "label": "Nuance professional services · 字段引文",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000122-c07a987e"
+      ],
+      "observation": "仍声称企业服务组归属，但description引文只是列表中间三项名称，缺列表主语。",
+      "inspected_claim": "企业与合作伙伴服务组中列出的Nuance专业服务。",
+      "inspected_excerpts": [
+        {
+          "block_id": "block-000122-c07a987e",
+          "quote": "Industry Solutions, Nuance professional services, Microsoft Partner Network"
+        }
+      ]
+    },
+    {
+      "label": "Office · 字段引文",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000101-67803298",
+        "block-000112-7c427d3a"
+      ],
+      "observation": "新版文字改为“微软提供生产力与协作工具和服务”，description仍只引平台产品列表，未补上该能力依据及主语。",
+      "inspected_claim": "Microsoft 365 Commercial平台整合的产品之一;微软提供生产力与协作工具和服务。",
+      "inspected_excerpts": [
+        {
+          "block_id": "block-000101-67803298",
+          "quote": "brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security"
+        }
+      ]
+    },
+    {
+      "label": "Microsoft 365 · 字段引文",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000087-44aabdcd"
+      ],
+      "observation": "新增整体身份有原文提及，但描述中的2025财年时点不在所选精确引文中；完整源块有该时间。",
+      "inspected_claim": "整体Microsoft 365;其商业组成部分于2025财年被并入生产力与业务流程分部。",
+      "inspected_excerpts": [
+        {
+          "block_id": "block-000087-44aabdcd",
+          "quote": "bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment"
+        }
+      ]
+    },
+    {
+      "label": "Azure AI offerings · 字段引文",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000128-edef168d"
+      ],
+      "observation": "description仍从We offer起引，未包含前句Azure AI主语。全文可解释其语境，字段精确引用缺失前文。",
+      "inspected_claim": "Azure AI产品组合,提供大规模AI超算能力、AI云服务和硬件。",
+      "inspected_excerpts": [
+        {
+          "block_id": "block-000128-edef168d",
+          "quote": "We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware"
+        }
+      ]
+    },
+    {
+      "label": "Microsoft 365 Commercial · 字段引文",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000101-67803298"
+      ],
+      "observation": "description提到AI驱动的商业与生产力平台，但该字段只引用brings together及产品列表，平台定义在另一个字段的引文中。",
+      "inspected_claim": "整合Office、Windows、Microsoft 365 Copilot和Enterprise Mobility + Security的AI驱动商业与生产力解决方案平台。",
+      "inspected_excerpts": [
+        {
+          "block_id": "block-000101-67803298",
+          "quote": "brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security"
+        }
+      ]
+    },
+    {
+      "label": "平台身份与报告云服务集合",
+      "status": "gap",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000101-67803298"
+      ],
+      "observation": "原文确实把Microsoft 365 Commercial列入Commercial cloud；模型自检同时质疑平台整体是否等同于这里的列项。需明确产品平台、披露集合和组成边的范围，不能仅因同名就判定等同，也不能仅因提到Windows就认定它全是本地产品。暂不把自检意见当成确定事实。"
+    },
+    {
+      "label": "合理推断与真正缺陷分开",
+      "status": "gap",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000134-9ca2b5c6",
+        "block-000176-a1bfeea9"
+      ],
+      "observation": "最终自检对部分已标derived的关系仍以“属于推断”为由判partial。需按主张强度、完整端点及原文支持逐条判断；19项自检待处理项不能直接称19项确定事实错误。"
+    },
+    {
+      "label": "通用产品类别及未决事项",
+      "status": "gap",
+      "source_block_ids": [
+        "block-000132-f2659d3c",
+        "block-000140-4045a828"
+      ],
+      "observation": "模型保留Nuance方案对应和未具名产品类别映射为未知。程序仍将这些映射计为缺口；需要区分应表示的类别节点、确实缺依据的对应关系和可接受的明确未知。未以自动补名消除缺口。"
+    }
+  ],
+  "limitations": [
+    "语义检查为定向复核，未认证所有244项。",
+    "产品、客户、赚钱方式详细属性仍未提取；所选103块不是整份报告。",
+    "没有进行浏览器视觉验收。",
+    "19项为模型/程序自检待处理项，独立确认的引用缺口与待审议推断分开。"
+  ]
+}

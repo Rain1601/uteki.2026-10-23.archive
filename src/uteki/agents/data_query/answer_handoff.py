@@ -24,8 +24,8 @@ Check the ORIGINAL QUESTION, not merely the author's requirement list. Check omi
 full enumerations and their introductions/qualifiers, units, period columns, accounting basis,
 and actual disclosures versus forward-looking statements. Candidate completeness is unverified.
 Review every fact_id and requirement_id exactly once. Return the specified JSON schema.
-Review every source_snapshot_id in source_checks. All indexed text is delivered; image contents
-are NOT read. Explicitly decide whether the delivered text suffices for this question, with
+Review every source_snapshot_id in source_checks. Indexed text is delivered except any explicitly
+listed repeated navigation; image contents are NOT read. Explicitly decide whether the delivered text suffices for this question, with
 supporting text evidence. If charts/images or omitted non-text material might be necessary,
 use requires_more_source_content; do not infer that an unread image is irrelevant.
 Use source_snapshot_id, block_id and short exact quotes only from source_documents.
@@ -105,17 +105,27 @@ def _source_documents(port, scope, max_packet_bytes):
         if len(roots) != 1:
             raise ValueError('content review requires exactly one explicit document root')
         request = {'source_snapshot_id': sid, 'node_id': roots[0]['node_id'], 'count': 12}
-        blocks, seen, nontext = [], set(), []
+        blocks, seen, nontext, omitted_navigation, seen_cursors = [], set(), [], [], set()
         while True:
             page = port.read_source(request)
             if page.get('status') == 'context_too_large' and request['count'] > 1:
                 request = {**request, 'count': max(1, request['count'] // 2)}
                 continue
-            if page.get('status') != 'read' or page.get('gaps'):
+            omitted = page.get('omitted_block_ids', [])
+            layout_only = (page.get('status') == 'layout_only' and not page.get('blocks')
+                           and bool(omitted) and page.get('not_disclosed') is False)
+            if (page.get('status') != 'read' and not layout_only) or page.get('gaps'):
                 raise ValueError('full source body unavailable for content review: ' + str(page.get('status')))
+            if not isinstance(omitted, list) or any(not isinstance(bid, str) or not bid for bid in omitted):
+                raise ValueError('invalid navigation omission metadata')
+            if set(omitted) & {b['block_id'] for b in page['blocks']}:
+                raise ValueError('source block cannot be both delivered and omitted')
             new = [b for b in page['blocks'] if b['block_id'] not in seen]
-            if not new:
+            new_omissions = [bid for bid in omitted if bid not in seen]
+            if not new and not new_omissions:
                 raise ValueError('source pagination made no progress')
+            seen.update(new_omissions)
+            omitted_navigation.extend(new_omissions)
             for block in new:
                 seen.add(block['block_id'])
                 value = {k: block[k] for k in ('block_id', 'type', 'text', 'table', 'reported_page') if k in block}
@@ -129,11 +139,19 @@ def _source_documents(port, scope, max_packet_bytes):
                 blocks.append(value)
             if not page.get('next_cursor'):
                 break
+            cursor_key = json.dumps(page['next_cursor'], sort_keys=True)
+            if cursor_key in seen_cursors:
+                raise ValueError('source pagination repeated a cursor')
+            seen_cursors.add(cursor_key)
             request = {**request, 'cursor': page['next_cursor']}
+        if not blocks:
+            raise ValueError('no indexed body delivered for content review')
         documents.append({'source_snapshot_id': sid, 'index_id': outline['index_id'],
             'source_sha256': outline['source_sha256'], 'company_id': outline['company_id'],
             'source_url': outline.get('source_url'), 'source_period_end': outline.get('source_period_end'),
-            'available_at': outline['available_at'], 'coverage': 'full_indexed_text',
+            'available_at': outline['available_at'],
+            'coverage': 'full_indexed_text_except_repeated_navigation' if omitted_navigation else 'full_indexed_text',
+            **({'omitted_navigation_block_ids': omitted_navigation} if omitted_navigation else {}),
             'nontext_gaps': nontext, 'blocks': blocks})
     return documents
 

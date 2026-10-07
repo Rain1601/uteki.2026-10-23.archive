@@ -1,0 +1,81 @@
+{
+  "schema_version": "source-packet-model-view-manifest-v1",
+  "purpose": "Remove repeated provenance metadata from model input; preserve every selected text block and table cell.",
+  "original_packet_path": "experiments/agent_design/2026-10-07-nvidia-business-revenue-v1/input/source_packet.json",
+  "original_packet_sha256": "1a14a18f9deaea0079b1798b564817365c8c9709051456dbd1c230233f600852",
+  "model_view_path": "experiments/agent_design/2026-10-07-nvidia-business-revenue-v1/input/source_packet-model-view.json",
+  "model_view_sha256": "293492436e6afab06ae014912a4a0723d738f7d65edbb5ac051fc8f4788c42bc",
+  "source_html_path": "experiments/agent_design/2026-10-07-nvidia-business-revenue-v1/input/source.html",
+  "source_html_sha256": "c979ab6ebbfa0a680593429f17fd1d50a753f10d6dc9d2708c53758ba54e2bfd",
+  "original_pdf_path": "experiments/agent_design/2026-10-07-business-map-mermaid-v1/nvidia/source.pdf",
+  "original_pdf_sha256": "757b344ab62ba282f6e44e0702e8ce5f190d88fb23b5e0a2beaf4cb277a395cc",
+  "scope": {
+    "company_id": "nvidia",
+    "document_id": "nvidia-fy2025-annual-report-10k",
+    "period_end": "2025-01-26",
+    "requested_period_label": "Jan 26, 2025",
+    "financial_currency": "USD",
+    "financial_unit": "million"
+  },
+  "counts": {
+    "blocks": 62,
+    "tables": 2,
+    "cells": 100
+  },
+  "removed_block_fields": {
+    "original_source_path": 62,
+    "original_source_sha256": 62,
+    "origin_text_source_local_path": 60,
+    "origin_text_source_sha256": 60
+  },
+  "removed_common_provenance": {
+    "original_source_path": [
+      "experiments/agent_design/2026-10-07-business-map-mermaid-v1/nvidia/source.pdf"
+    ],
+    "original_source_sha256": [
+      "757b344ab62ba282f6e44e0702e8ce5f190d88fb23b5e0a2beaf4cb277a395cc"
+    ],
+    "origin_text_source_local_path": [
+      "experiments/agent_design/2026-10-07-business-map-mermaid-v1/nvidia/source.html"
+    ],
+    "origin_text_source_sha256": [
+      "47daa32ef7787e4d705d55cb2209b383edc2a6a504fbb7cc995ec431bdaaa24b"
+    ]
+  },
+  "removed_cell_fields": {
+    "pdf_words": 100
+  },
+  "added_cell_fields": {
+    "pdf_label_x_min": 12
+  },
+  "added_field_definition": "For nonempty row-label cells only: exact minimum original PDF word xMin coordinate, preserving indentation after word-level coordinate arrays are omitted. No hierarchy or subtotal label is inferred.",
+  "retained": "Every top-level field; every remaining block field; every table field and row/cell ID list; every cell field except pdf_words. This includes all source text, HTML paths, text hashes, row/column/span, table cells, years, units, per-cell pdf_bbox and scope evidence.",
+  "verification": {
+    "top_level_fields_equal": true,
+    "block_fields_equal_except_declared_removals": true,
+    "table_fields_equal": true,
+    "cell_fields_equal_except_declared_removals_and_exact_coordinate_summary": true,
+    "all_selected_text_preserved": true,
+    "all_html_locators_and_hashes_unchanged": true,
+    "period_and_unit_context_unchanged": true,
+    "host_verify_packet": "passed",
+    "original_packet_unchanged": true
+  },
+  "sizes": {
+    "original_file_bytes": 184086,
+    "model_view_file_bytes": 134120,
+    "original_compact_packet_bytes": 131397,
+    "model_view_compact_packet_bytes": 99494,
+    "compact_packet_bytes_saved": 31903,
+    "compact_packet_saving_percent": 24.28,
+    "old_request_bytes": 162352,
+    "request_with_only_model_view_replacement_bytes": 128691,
+    "request_size_note": "In-memory comparison using the prior request with only its user packet replaced; not a newly dispatched request or a new measured Token count."
+  },
+  "limitations": [
+    "Full provenance stays in original frozen packet; model view does not replace source archival data.",
+    "This changes request input representation; a recovery using this view is not byte-identical to the prior NVIDIA request.",
+    "Smaller bytes do not establish the cause of the previous pre-header transport failure.",
+    "No model call, no change to shared runner, and no semantic content or output answer added."
+  ]
+}

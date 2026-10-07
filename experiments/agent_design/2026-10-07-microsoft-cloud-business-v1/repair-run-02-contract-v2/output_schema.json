@@ -1,0 +1,737 @@
+{
+  "$defs": {
+    "BlockDispositionDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "block_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Block Id",
+          "type": "string"
+        },
+        "disposition": {
+          "enum": [
+            "used",
+            "context",
+            "layout_noise",
+            "not_used"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "disposition",
+        "reason"
+      ],
+      "title": "BlockDispositionDraft",
+      "type": "object"
+    },
+    "BusinessClaimDraft": {
+      "additionalProperties": false,
+      "description": "A pointer to one populated field, not a duplicate editable statement.",
+      "properties": {
+        "field": {
+          "enum": [
+            "name",
+            "description",
+            "products_services",
+            "customers",
+            "monetization"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "item_index": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Item Index"
+        },
+        "excerpts": {
+          "items": {
+            "$ref": "#/$defs/EvidenceExcerptDraft"
+          },
+          "minItems": 1,
+          "title": "Excerpts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "field",
+        "item_index",
+        "excerpts"
+      ],
+      "title": "BusinessClaimDraft",
+      "type": "object"
+    },
+    "BusinessNode": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "const": "business",
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "products_services": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Products Services",
+          "type": "array"
+        },
+        "customers": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Customers",
+          "type": "array"
+        },
+        "monetization": {
+          "items": {
+            "$ref": "#/$defs/MonetizationDraft"
+          },
+          "title": "Monetization",
+          "type": "array"
+        },
+        "evidence_block_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Block Ids",
+          "type": "array"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "enum": [
+                "market",
+                "application_platform"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Role"
+        },
+        "claim_evidence": {
+          "items": {
+            "$ref": "#/$defs/BusinessClaimDraft"
+          },
+          "minItems": 1,
+          "title": "Claim Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "description",
+        "evidence_block_ids",
+        "claim_evidence"
+      ],
+      "title": "BusinessNode",
+      "type": "object"
+    },
+    "CompanyNode": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "const": "company",
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "products_services": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Products Services",
+          "type": "array"
+        },
+        "customers": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Customers",
+          "type": "array"
+        },
+        "monetization": {
+          "items": {
+            "$ref": "#/$defs/MonetizationDraft"
+          },
+          "title": "Monetization",
+          "type": "array"
+        },
+        "evidence_block_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Block Ids",
+          "type": "array"
+        },
+        "role": {
+          "default": null,
+          "title": "Role",
+          "type": "null"
+        },
+        "claim_evidence": {
+          "items": {
+            "$ref": "#/$defs/BusinessClaimDraft"
+          },
+          "minItems": 1,
+          "title": "Claim Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "description",
+        "evidence_block_ids",
+        "claim_evidence"
+      ],
+      "title": "CompanyNode",
+      "type": "object"
+    },
+    "EvidenceExcerptDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "block_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Block Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "quote"
+      ],
+      "title": "EvidenceExcerptDraft",
+      "type": "object"
+    },
+    "MonetizationDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "basis": {
+          "enum": [
+            "explicit",
+            "unknown"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "evidence_block_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "title": "Evidence Block Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "description",
+        "basis",
+        "evidence_block_ids"
+      ],
+      "title": "MonetizationDraft",
+      "type": "object"
+    },
+    "OfferingGroupNode": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "const": "offering_group",
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "products_services": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Products Services",
+          "type": "array"
+        },
+        "customers": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Customers",
+          "type": "array"
+        },
+        "monetization": {
+          "items": {
+            "$ref": "#/$defs/MonetizationDraft"
+          },
+          "title": "Monetization",
+          "type": "array"
+        },
+        "evidence_block_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Block Ids",
+          "type": "array"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "const": "offering_group",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Role"
+        },
+        "claim_evidence": {
+          "items": {
+            "$ref": "#/$defs/BusinessClaimDraft"
+          },
+          "minItems": 1,
+          "title": "Claim Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "description",
+        "evidence_block_ids",
+        "claim_evidence"
+      ],
+      "title": "OfferingGroupNode",
+      "type": "object"
+    },
+    "RelationshipDraftV2": {
+      "additionalProperties": false,
+      "properties": {
+        "source_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "reported_under",
+            "part_of",
+            "supports"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_block_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "title": "Evidence Block Ids",
+          "type": "array"
+        },
+        "basis": {
+          "enum": [
+            "explicit",
+            "derived",
+            "unknown"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        },
+        "excerpts": {
+          "items": {
+            "$ref": "#/$defs/EvidenceExcerptDraft"
+          },
+          "title": "Excerpts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "kind",
+        "description",
+        "evidence_block_ids",
+        "basis",
+        "rationale",
+        "excerpts"
+      ],
+      "title": "RelationshipDraftV2",
+      "type": "object"
+    },
+    "SegmentNode": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "const": "reportable_segment",
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "products_services": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Products Services",
+          "type": "array"
+        },
+        "customers": {
+          "items": {
+            "minLength": 1,
+            "pattern": "\\S",
+            "type": "string"
+          },
+          "title": "Customers",
+          "type": "array"
+        },
+        "monetization": {
+          "items": {
+            "$ref": "#/$defs/MonetizationDraft"
+          },
+          "title": "Monetization",
+          "type": "array"
+        },
+        "evidence_block_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Block Ids",
+          "type": "array"
+        },
+        "role": {
+          "default": null,
+          "title": "Role",
+          "type": "null"
+        },
+        "claim_evidence": {
+          "items": {
+            "$ref": "#/$defs/BusinessClaimDraft"
+          },
+          "minItems": 1,
+          "title": "Claim Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "description",
+        "evidence_block_ids",
+        "claim_evidence"
+      ],
+      "title": "SegmentNode",
+      "type": "object"
+    },
+    "UnknownDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "question": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Question",
+          "type": "string"
+        },
+        "reason_unanswered": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Reason Unanswered",
+          "type": "string"
+        },
+        "related_business_ids": {
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "title": "Related Business Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "reason_unanswered",
+        "related_business_ids"
+      ],
+      "title": "UnknownDraft",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Expose legal kind/role pairs in both JSON Schema and runtime validation.\n\nThese variants constrain structural classification, not source truth. A valid\npair still needs independent semantic review; never coerce a conflicting pair.",
+  "properties": {
+    "schema_version": {
+      "const": "business-draft-v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "company_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+      "title": "Company Id",
+      "type": "string"
+    },
+    "document_id": {
+      "maxLength": 200,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+      "title": "Document Id",
+      "type": "string"
+    },
+    "period_end": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Period End",
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Summary",
+      "type": "string"
+    },
+    "relationship_absence": {
+      "const": "unknown",
+      "title": "Relationship Absence",
+      "type": "string"
+    },
+    "businesses": {
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/CompanyNode"
+          },
+          {
+            "$ref": "#/$defs/SegmentNode"
+          },
+          {
+            "$ref": "#/$defs/BusinessNode"
+          },
+          {
+            "$ref": "#/$defs/OfferingGroupNode"
+          }
+        ]
+      },
+      "minItems": 1,
+      "title": "Businesses",
+      "type": "array"
+    },
+    "relationships": {
+      "items": {
+        "$ref": "#/$defs/RelationshipDraftV2"
+      },
+      "title": "Relationships",
+      "type": "array"
+    },
+    "unknowns": {
+      "items": {
+        "$ref": "#/$defs/UnknownDraft"
+      },
+      "title": "Unknowns",
+      "type": "array"
+    },
+    "block_disposition": {
+      "items": {
+        "$ref": "#/$defs/BlockDispositionDraft"
+      },
+      "minItems": 1,
+      "title": "Block Disposition",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "company_id",
+    "document_id",
+    "period_end",
+    "source_sha256",
+    "summary",
+    "relationship_absence",
+    "businesses",
+    "relationships",
+    "unknowns",
+    "block_disposition"
+  ],
+  "title": "BusinessOnlyDraftV2",
+  "type": "object"
+}

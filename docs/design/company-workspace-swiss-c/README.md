@@ -1,5 +1,11 @@
 # Uteki 前台基线 C · 机构首页
 
+## 2026-10-06 · 收敛为两套实际界面
+
+用户确认保留本前台与真实研究工作台，并删除其他旧页面及不再使用的代码。本前台移除页面蓝图和旧版对照跳转；公司、Manager、报告、证据、组合决策与风险功能保留。Uteki Zero 目录中的报告样本、品牌解析和公司图标仍被本前台引用，继续保留。旧版原型不再提供独立页面；下文旧版对照链接属于历史记录。冻结副本 `docs/design/baselines/`、品牌封版与原始资料保持不变。
+
+前后端保持同一仓库，职责分开；未来通过明确接口接入真实已发布研究产物。本轮只清理页面与导航，没有实现该接口、改变模拟身份或接入账户。检查记录见 [FRONTEND_DESIGN.md](../../FRONTEND_DESIGN.md)。
+
 ## 2026-10-06 · 持续风险跟踪
 
 [Field 风险跟踪](http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/?v=20261006-risk1#/manager/field?view=risks&risk=field-delivery-chain&status=all) · [North 待复核](http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/?v=20261006-risk1#/manager/north?view=risks&risk=north-shared-growth&status=needs_review) · [首页风险摘要](http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/?v=20261006-risk1#/institution/uteki?view=overview)

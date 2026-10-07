@@ -1,0 +1,153 @@
+{
+  "$defs": {
+    "ClaimCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "item_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Item Id",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "supported",
+            "partial",
+            "unsupported",
+            "scope_mismatch",
+            "translation_mismatch",
+            "uncertain"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "item_id",
+        "verdict",
+        "rationale"
+      ],
+      "title": "ClaimCheck",
+      "type": "object"
+    },
+    "CoverageCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "block_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Block Id",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "adequate",
+            "material_omission",
+            "uncertain"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "verdict",
+        "rationale"
+      ],
+      "title": "CoverageCheck",
+      "type": "object"
+    },
+    "GapCheck": {
+      "additionalProperties": false,
+      "properties": {
+        "gap_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "supported",
+            "unsupported_absence",
+            "scope_mismatch",
+            "uncertain"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "gap_id",
+        "verdict",
+        "rationale"
+      ],
+      "title": "GapCheck",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "filing-brief-review-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "brief_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Brief Sha256",
+      "type": "string"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/ClaimCheck"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "coverage": {
+      "items": {
+        "$ref": "#/$defs/CoverageCheck"
+      },
+      "title": "Coverage",
+      "type": "array"
+    },
+    "gaps": {
+      "items": {
+        "$ref": "#/$defs/GapCheck"
+      },
+      "title": "Gaps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "brief_sha256",
+    "claims",
+    "coverage",
+    "gaps"
+  ],
+  "title": "Review",
+  "type": "object"
+}

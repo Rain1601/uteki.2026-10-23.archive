@@ -44,7 +44,7 @@ class WorkspaceCheckTests(unittest.TestCase):
     def test_invalid_company_json_is_distinguished_from_missing_data(self):
         path = self.write_json(COMPANIES, {})
         path.write_text("{invalid", encoding="utf-8")
-        check = self.check_named("Home and company list / 主页与公司名单")
+        check = self.check_named("Company list / 公司名单")
         self.assertEqual(check["status"], "invalid")
         self.assertIn("JSONDecodeError", check["detail"])
         self.assertFalse((self.root / "data/research_archive").exists())

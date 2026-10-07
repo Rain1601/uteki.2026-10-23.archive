@@ -1,0 +1,99 @@
+{
+  "ids": {
+    "msft": "N000",
+    "intelligent_cloud": "N001",
+    "server_products_and_cloud_services": "N002",
+    "azure_and_other_cloud_services": "N003",
+    "azure": "N004",
+    "azure_ai": "N005",
+    "azure_ai_foundry": "N006",
+    "azure_security": "N007",
+    "github": "N008",
+    "nuance_healthcare": "N009",
+    "server_products": "N010",
+    "enterprise_and_partner_services": "N011"
+  },
+  "labels": {
+    "msft": "Microsoft Corporation",
+    "intelligent_cloud": "Intelligent Cloud",
+    "server_products_and_cloud_services": "Server Products and Cloud Services",
+    "azure_and_other_cloud_services": "Azure and other cloud services",
+    "azure": "Azure",
+    "azure_ai": "Azure AI",
+    "azure_ai_foundry": "Azure AI Foundry",
+    "azure_security": "Azure Security",
+    "github": "GitHub",
+    "nuance_healthcare": "Nuance Healthcare",
+    "server_products": "Server products",
+    "enterprise_and_partner_services": "Enterprise and Partner Services"
+  },
+  "edges": [
+    {
+      "index": 0,
+      "id": "R01",
+      "basis": "explicit",
+      "kind": "reported_under",
+      "domain_source": "intelligent_cloud",
+      "domain_target": "msft",
+      "source": "N000",
+      "target": "N001",
+      "label": "R01 · 报告列示 / Reports · 明示"
+    },
+    {
+      "index": 1,
+      "id": "R02",
+      "basis": "explicit",
+      "kind": "part_of",
+      "domain_source": "server_products_and_cloud_services",
+      "domain_target": "intelligent_cloud",
+      "source": "N001",
+      "target": "N002",
+      "label": "R02 · 包含 / Includes · 明示"
+    },
+    {
+      "index": 2,
+      "id": "R03",
+      "basis": "explicit",
+      "kind": "part_of",
+      "domain_source": "enterprise_and_partner_services",
+      "domain_target": "intelligent_cloud",
+      "source": "N001",
+      "target": "N011",
+      "label": "R03 · 包含 / Includes · 明示"
+    },
+    {
+      "index": 3,
+      "id": "R04",
+      "basis": "explicit",
+      "kind": "part_of",
+      "domain_source": "azure_and_other_cloud_services",
+      "domain_target": "server_products_and_cloud_services",
+      "source": "N002",
+      "target": "N003",
+      "label": "R04 · 包含 / Includes · 明示"
+    },
+    {
+      "index": 4,
+      "id": "R05",
+      "basis": "derived",
+      "kind": "part_of",
+      "domain_source": "server_products",
+      "domain_target": "server_products_and_cloud_services",
+      "source": "N002",
+      "target": "N010",
+      "label": "R05 · 包含 / Includes · 推断"
+    },
+    {
+      "index": 5,
+      "id": "R06",
+      "basis": "derived",
+      "kind": "part_of",
+      "domain_source": "azure",
+      "domain_target": "azure_and_other_cloud_services",
+      "source": "N003",
+      "target": "N004",
+      "label": "R06 · 包含 / Includes · 推断"
+    }
+  ],
+  "unresolved": []
+}

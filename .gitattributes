@@ -1,4 +1,9 @@
 # Keep source documents and images out of line-based code diffs.
+# Frozen evidence and experiment manifests bind original bytes. Never normalize
+# their line endings during add/checkout, including on another operating system.
+data/** -text
+experiments/** -text
+benchmarks/** -text
 *.pdf binary
 *.gz binary
 *.png binary

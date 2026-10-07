@@ -1,0 +1,1004 @@
+{
+  "schema_version": "microsoft-clean-independent-review-criteria-v1",
+  "created_at": "2026-10-07T13:37:52.719874+00:00",
+  "purpose": "review_only_do_not_include_in_extraction_request",
+  "independence": {
+    "new_model_output_read": false,
+    "new_model_request_read": false,
+    "prior_conversation_context_known": true,
+    "criteria_basis": "Read all 103 frozen source blocks before drafting criteria; prior Codex audit later inspected as context, not a strict blinded baseline."
+  },
+  "source_packet": "experiments/agent_design/2026-10-07-microsoft-input-audit-v1/clean-source-packet.json",
+  "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+  "source_sha256_verified": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+  "scope": {
+    "company_id": "sec-0000789019",
+    "document_id": "msft-2025-10k",
+    "period_end": "2025-06-30",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm"
+  },
+  "selection": "Item 1. Business / Operating Segments (all three segments)",
+  "criteria": [
+    {
+      "id": "C01",
+      "title": "范围、期间和三个分部",
+      "group": "scope",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000006-456ca5cf",
+        "block-000008-f2b16ab3",
+        "block-000086-935d6090",
+        "block-000087-44aabdcd"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000006-456ca5cf",
+          "quote": "For the Fiscal Year Ended June 30, 2025 OR ☐ TRANSITION REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934 For the Transition Period From to"
+        },
+        {
+          "block_id": "block-000008-f2b16ab3",
+          "quote": "MICROSOFT CORPORATION"
+        },
+        {
+          "block_id": "block-000086-935d6090",
+          "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses."
+        },
+        {
+          "block_id": "block-000087-44aabdcd",
+          "quote": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes."
+        }
+      ],
+      "acceptance_requirements": [
+        "明确 Microsoft Corporation、FY2025 / 2025-06-30、所选 Operating Segments 章节。",
+        "三个报告分部均有独立身份与公司层关系；采用 FY2025 调整后的分部范围。",
+        "不把本章节覆盖写成微软全部产品、完整 10-K 或当前官网全景。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C02",
+      "title": "Productivity and Business Processes 四条主线",
+      "group": "PBP",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000091-d993f813",
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000097-13124fb7",
+        "block-000099-da3d48eb"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000091-d993f813",
+          "quote": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:"
+        },
+        {
+          "block_id": "block-000093-7018adaa",
+          "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+        },
+        {
+          "block_id": "block-000095-61bd513b",
+          "quote": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services."
+        },
+        {
+          "block_id": "block-000097-13124fb7",
+          "quote": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions."
+        },
+        {
+          "block_id": "block-000099-da3d48eb",
+          "quote": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications."
+        }
+      ],
+      "acceptance_requirements": [
+        "Microsoft 365 Commercial、Microsoft 365 Consumer、LinkedIn、Dynamics 四类均可在业务结构中辨识。",
+        "四类连接到正确报告分部；不混入 More Personal Computing 或 Intelligent Cloud。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C03",
+      "title": "Microsoft 365 Commercial 云与本地范围",
+      "group": "PBP",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000101-67803298"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000093-7018adaa",
+          "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+        },
+        {
+          "block_id": "block-000101-67803298",
+          "quote": "Microsoft 365 Commercial is an AI-powered business and productivity solutions platform that brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security to help organizations empower their employees. Growth depends on our ability to reach new users in new markets such as frontline workers, small and medium businesses, and growth markets, as well as add AI-enabled tools, features, and agentic scenarios to our core product and service offerings across communication, collaboration, analytics, security, compliance, and other AI business productivity categories. Microsoft 365 Commercial revenue is mainly affected by a combination of continued installed base growth and average revenue per user expansion, as well as the continued shift from Office licensed on-premises to Microsoft 365."
+        }
+      ],
+      "acceptance_requirements": [
+        "区分 Microsoft 365 Commercial cloud 与 Commercial products 本地范围，不能把全部 Commercial 归成云。",
+        "保留 Microsoft 365 Copilot、Enterprise Mobility + Security、Windows Commercial、Office 等核心组成或产品详情。",
+        "Windows Commercial cloud / on-premises 属 PBP，不能因 Windows 品牌统一归入消费 Windows OEM 分部。",
+        "Microsoft 365 Copilot 与消费 Microsoft Copilot 保持范围区别。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C04",
+      "title": "Microsoft 365 Consumer",
+      "group": "PBP",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000095-61bd513b",
+        "block-000103-a597bcd9"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000095-61bd513b",
+          "quote": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services."
+        },
+        {
+          "block_id": "block-000103-a597bcd9",
+          "quote": "Microsoft 365 Consumer is designed to increase personal productivity and creativity through a range of products and services. Growth depends on our ability to reach new users, add value to our core product set with new features including AI tools, and continue to expand our product and service offerings into new markets. Microsoft 365 Consumer cloud revenue and Office Consumer products revenue is mainly affected by the percentage of customers that buy Office with their new devices and the continued shift from Office licensed on-premises to Microsoft 365 Consumer subscriptions. Microsoft 365 Consumer cloud revenue is also affected by the demand for communication and storage through Outlook.com and OneDrive, which is largely driven by subscriptions and advertising."
+        }
+      ],
+      "acceptance_requirements": [
+        "保留订阅、Office 本地和其他消费者服务的业务范围。",
+        "Outlook.com / OneDrive 可以作为详情，不要求每个细项都成主图节点；不虚构产品级收入。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C05",
+      "title": "LinkedIn",
+      "group": "PBP",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000097-13124fb7",
+        "block-000108-ec73690d"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000097-13124fb7",
+          "quote": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions."
+        },
+        {
+          "block_id": "block-000108-ec73690d",
+          "quote": "LinkedIn connects the world’s professionals to make them more productive and successful and transforms the way companies hire, market, sell, and learn. In addition to LinkedIn’s free services, LinkedIn offers monetized solutions designed to offer AI-enabled insights and productivity: Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions. Growth will depend on our ability to increase LinkedIn member engagement on the platform and our ability to continue offering insight and AI-enabled services that provide value for our members and customers. LinkedIn revenue is mainly affected by demand from enterprises and professionals for subscriptions to Talent Solutions, Sales Solutions, and Premium Subscriptions offerings, as well as member engagement and the quality of the sponsored content delivered to those members to drive Marketing Solutions."
+        }
+      ],
+      "acceptance_requirements": [
+        "保留专业人士网络与企业招聘、营销、销售、学习用途。",
+        "Talent Solutions、Marketing Solutions、Premium Subscriptions、Sales Solutions 四类在详情或图中可找。",
+        "不能将全部 LinkedIn 赚钱方式简化成订阅，Marketing Solutions 需保留赞助内容/营销范围。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C06",
+      "title": "Dynamics",
+      "group": "PBP",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000099-da3d48eb",
+        "block-000110-99cc951e"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000099-da3d48eb",
+          "quote": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications."
+        },
+        {
+          "block_id": "block-000110-99cc951e",
+          "quote": "Dynamics provides cloud-based and on-premises business solutions for financial management, enterprise resource planning (“ERP”), customer relationship management (“CRM”), and supply chain management, as well as agentic AI and other low code application development platforms, for small and medium businesses, large organizations, and divisions of global enterprises. Dynamics revenue is driven by the number of users licensed and applications consumed, expansion of average revenue per user, and the continued shift to Dynamics 365, a unified set of cloud-based intelligent business applications, including our low code development platforms, such as Power Apps and Power Automate."
+        }
+      ],
+      "acceptance_requirements": [
+        "区分云端 Dynamics 365 与本地 ERP/CRM。",
+        "Power Apps、Power Automate 为低代码平台且出现在 Dynamics 365 范围；ERP、CRM 等领域与产品身份不混淆。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C07",
+      "title": "Intelligent Cloud 两条主线",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000118-5e917062",
+        "block-000120-c34f7245",
+        "block-000122-c07a987e"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000118-5e917062",
+          "quote": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:"
+        },
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000122-c07a987e",
+          "quote": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience."
+        }
+      ],
+      "acceptance_requirements": [
+        "Server products and cloud services 与 Enterprise and partner services 两组完整。",
+        "两组连接到 Intelligent Cloud；产品服务组不冒充额外报告分部。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C08",
+      "title": "Server products and cloud services 的云/服务器结构",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000120-c34f7245"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        }
+      ],
+      "acceptance_requirements": [
+        "Azure and other cloud services 与 Server products 均可辨识为不同范围。",
+        "Azure and other cloud services 不等于 Azure 单一业务；GitHub/Nuance 云服务不能被遗漏。",
+        "Server products 包含 SQL Server、Windows Server、Visual Studio、System Center、CALs 等，至少在详情可查。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C09",
+      "title": "Azure 本体与产品能力",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000127-93a9159b"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000127-93a9159b",
+          "quote": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use Azure through our global network of datacenters for computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning. Azure enables customers to devote more resources to development and use of applications that benefit their organizations, rather than managing on-premises hardware and software. Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services."
+        }
+      ],
+      "acceptance_requirements": [
+        "Azure 为综合云服务集合，保留计算、网络、存储、应用、AI 等能力及开发者/IT/企业客户。",
+        "Azure 在结构中有关系路径，不是仅在产品列表提到。",
+        "Azure→云服务组合可用命名及上下文建立推断，需标 derived 并说明前提；不得声称此处逐字独立会计归属披露。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C10",
+      "title": "Azure AI",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000127-93a9159b",
+          "quote": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use Azure through our global network of datacenters for computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning. Azure enables customers to devote more resources to development and use of applications that benefit their organizations, rather than managing on-premises hardware and software. Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services."
+        },
+        {
+          "block_id": "block-000128-edef168d",
+          "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        }
+      ],
+      "acceptance_requirements": [
+        "Azure AI 必须能在图或可展开子图中定位，保留 AI 计算/模型/硬件等范围。",
+        "Azure 提供 AI、紧接着专门 Azure AI 段落可支持其与 Azure 的有据推断；需要对该关系分析，不得无说明孤立。",
+        "若以 derived 建边，说明名称、相邻定义和能力范围，不能只写同段故归属。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C11",
+      "title": "Azure AI Foundry",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000128-edef168d"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000128-edef168d",
+          "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        }
+      ],
+      "acceptance_requirements": [
+        "名称保留 Azure AI Foundry，不能误称 Factory。",
+        "定义为开发者设计、定制、管理 AI 应用和 agents 的统一平台。",
+        "关系分析应把其与 Azure AI / Azure 上下文联系起来，可采用合理 derived 包含关系或明确角色关联；不能把它和 Azure 整体无解释并列。",
+        "材料未逐字给出正式产品组织树，可保留细粒度边依据限制；这不等于没有业务上下文。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C12",
+      "title": "Azure Security",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000134-9ca2b5c6"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000134-9ca2b5c6",
+          "quote": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition."
+        }
+      ],
+      "acceptance_requirements": [
+        "保留 Azure Security 云安全与 SIEM 范围。",
+        "Competition 小节中确有产品定义，不能当噪声过滤。",
+        "可按 Our Azure Security offerings 名称及云语境连接 Azure，区别品牌业务关系与独立会计归属；不能凭空具体化成未在材料出现的产品名。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C13",
+      "title": "GitHub 整体与云子集",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000130-8d7ff1f7",
+          "quote": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry."
+        }
+      ],
+      "acceptance_requirements": [
+        "GitHub 整体是开发者协作平台，含 cloud 和 on-premises。",
+        "GitHub cloud services 是 Azure and other cloud services 原文明示组成，应有可查的结构关系。",
+        "必须同时表达云服务子集与 GitHub 整体的同源身份/范围关系；不能把 GitHub 整体直接等同云子集。",
+        "原文未列出 GitHub 本地产品的精确财务归类；可留这一具体缺口，不可借此把整个 GitHub 业务留作无关系。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C14",
+      "title": "Nuance Healthcare 整体与云子集",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000130-8d7ff1f7",
+          "quote": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry."
+        }
+      ],
+      "acceptance_requirements": [
+        "保留 Nuance Healthcare 医疗 AI、云及本地范围。",
+        "Nuance Healthcare cloud services 明确在云服务组；云子集与整体要区分。",
+        "Nuance professional services 在 Enterprise and partner services，不能并作全部 Nuance Healthcare 或全部医疗云服务。",
+        "本地产品的精确财务归属不可凭类比猜测。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C15",
+      "title": "Enterprise and partner services",
+      "group": "IC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000122-c07a987e",
+        "block-000132-f2659d3c"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000122-c07a987e",
+          "quote": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience."
+        },
+        {
+          "block_id": "block-000132-f2659d3c",
+          "quote": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience, assist customers in developing, deploying, and managing Microsoft server solutions, Microsoft desktop solutions, and Nuance conversational AI and ambient intelligent solutions, along with providing training and certification to developers and IT professionals on various Microsoft products."
+        }
+      ],
+      "acceptance_requirements": [
+        "Enterprise Support Services、Industry Solutions、Nuance professional services、Microsoft Partner Network、Learning Experience 在详情可查。",
+        "准确解释帮助部署/管理 Microsoft 与 Nuance 解决方案、培训认证等用途。",
+        "不要把支持对象误作其产品所有权或收入构成。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C16",
+      "title": "More Personal Computing 三条主线",
+      "group": "MPC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000144-6e0ae0c4",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000144-6e0ae0c4",
+          "quote": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:"
+        },
+        {
+          "block_id": "block-000146-c641cfcd",
+          "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories."
+        },
+        {
+          "block_id": "block-000148-2f215a60",
+          "quote": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services."
+        },
+        {
+          "block_id": "block-000150-9577a591",
+          "quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates."
+        }
+      ],
+      "acceptance_requirements": [
+        "Windows and Devices、Gaming、Search and news advertising 均在该分部有结构位置。",
+        "Search and news advertising 虽含 advertising 字样，仍是原文明确经营业务，不能因收入/业务分图而删掉。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C17",
+      "title": "Windows and Devices",
+      "group": "MPC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000146-c641cfcd",
+        "block-000152-fc098ac9",
+        "block-000171-f62e3835"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000146-c641cfcd",
+          "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories."
+        },
+        {
+          "block_id": "block-000152-fc098ac9",
+          "quote": "The Windows operating system is designed to deliver a more personal computing experience for users by enabling consistency of experience, applications, and information across their devices. Windows OEM revenue is impacted significantly by the number of Windows operating system licenses purchased by OEMs, which they pre-install on the devices they sell. In addition to computing device market volume, Windows OEM revenue is impacted by:"
+        },
+        {
+          "block_id": "block-000171-f62e3835",
+          "quote": "We design and sell devices, such as Surface (including Copilot+ PCs) and PC accessories. Our devices are designed to enable people and organizations to connect to the people and content that matter most using Windows and integrated Microsoft products and services. Surface is designed to help organizations, students, and consumers be more productive. Growth in Devices is dependent on total PC shipments, the ability to attract new customers, our product roadmap, and expanding into new categories."
+        }
+      ],
+      "acceptance_requirements": [
+        "Windows OEM licensing 与 Devices 范围均可查；Surface / PC accessories 保留。",
+        "避免将所有 Windows、商业 Microsoft 365 Windows 版本与此处 OEM 许可混为一体。",
+        "Surface Copilot+ PCs 不等于消费 Copilot 服务或 Microsoft 365 Copilot。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C18",
+      "title": "Gaming 和 Xbox",
+      "group": "MPC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000148-2f215a60",
+        "block-000176-a1bfeea9",
+        "block-000177-a6560323",
+        "block-000178-51f06755"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000148-2f215a60",
+          "quote": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services."
+        },
+        {
+          "block_id": "block-000176-a1bfeea9",
+          "quote": "Microsoft is expanding how billions of people globally access and play video games on PC, console, mobile, and cloud. Our game content is developed through a collection of first-party studios creating iconic and differentiated gaming experiences. We continue to invest in gaming studios and content to expand our intellectual property roadmap and leverage new content creators. These unique gaming experiences are the cornerstone of Xbox Game Pass, a subscription service and gaming community with access to a curated library of first- and third-party titles."
+        },
+        {
+          "block_id": "block-000177-a6560323",
+          "quote": "The gamer remains at the heart of the Xbox ecosystem. We are identifying new opportunities to attract gamers across a variety of different end points through our first- and third-party content and business diversification across subscriptions, ads, and digital stores. We’ve seen new devices from third-party manufacturers along with key PC and mobile end points that help us empower gamers to play in a way that is most convenient to them. We are focused on growing the platform and expanding to new ecosystems to engage as many gamers as possible."
+        },
+        {
+          "block_id": "block-000178-51f06755",
+          "quote": "Xbox enables people to connect and share online gaming experiences that are accessible on Xbox consoles, Windows-enabled devices, and other devices. Xbox is designed to benefit users by providing access to a network of certified applications and services and to benefit our developer and partner ecosystems by providing access to a large customer base. Xbox revenue is mainly affected by subscriptions and sales of first- and third-party content, as well as advertising. Growth of our Gaming business is determined by the overall active user base through Xbox enabled content, availability of games, providing exclusive game content that gamers seek, the computational power and reliability of the devices used to access our content and services, and the ability to create new experiences."
+        }
+      ],
+      "acceptance_requirements": [
+        "Xbox hardware 与 content/services 皆覆盖。",
+        "Game Pass、Cloud Gaming、第一方/第三方内容在结构或详情可查；PC/console/mobile/cloud 是触达范围，不是自动新报告分部。",
+        "收费包括订阅、内容销售、广告，不可归为单一订阅业务。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C19",
+      "title": "Search and news advertising",
+      "group": "MPC",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000150-9577a591",
+        "block-000180-c75c41bb"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000150-9577a591",
+          "quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates."
+        },
+        {
+          "block_id": "block-000180-c75c41bb",
+          "quote": "Our Search and news advertising business is designed to deliver relevant search, native, and display advertising to a global audience. Microsoft Copilot is a digital companion designed to inform, entertain, and inspire. Our Microsoft Edge browser and Bing search engine with Copilot are key tools to enable user acquisition and engagement, while our technology platform enables accelerated delivery of digital advertising solutions. In addition to first-party tools, we have several partnerships with companies through which we provide and monetize search offerings. Growth depends on our ability to attract new users, understand intent, and match intent with relevant content on advertising offerings."
+        }
+      ],
+      "acceptance_requirements": [
+        "Bing and Copilot、Microsoft News、Microsoft Edge、第三方 affiliates 在范围内。",
+        "Copilot 为 digital companion，Bing/Edge 用于获客参与，不能写为它们所有收入只有广告。",
+        "与 Microsoft 365 Copilot、Surface Copilot+ PC 保持主体范围。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C20",
+      "title": "竞对证据边界",
+      "group": "cross_cutting",
+      "priority": "conditional",
+      "source_block_ids": [
+        "block-000112-7c427d3a",
+        "block-000113-bc876fa1",
+        "block-000114-0cdf0fbd",
+        "block-000115-aeccb0a6",
+        "block-000116-338416e5",
+        "block-000134-9ca2b5c6",
+        "block-000135-0320c8fa",
+        "block-000136-cb770dd8",
+        "block-000140-4045a828",
+        "block-000142-3e738e53",
+        "block-000182-1b83cff4",
+        "block-000183-dcc9edaa",
+        "block-000184-afc0d8c4",
+        "block-000185-09fe5a44"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000112-7c427d3a",
+          "quote": "Competitors to Office include software and global application vendors, web-based and mobile application companies, AI-first application companies, as well as local application developers. We compete by providing secure, integrated industry-specific, and easy-to-use productivity and collaboration tools and services that create comprehensive solutions and work well with technologies our customers already have both on-premises or in the cloud."
+        },
+        {
+          "block_id": "block-000113-bc876fa1",
+          "quote": "Windows faces competition from various software products and from alternative platforms and devices. Microsoft Defender for Endpoint competes with endpoint security solution providers."
+        },
+        {
+          "block_id": "block-000114-0cdf0fbd",
+          "quote": "Our Enterprise Mobility + Security offerings compete with products from a range of competitors including identity vendors, security solution vendors, and numerous other security point solution vendors."
+        },
+        {
+          "block_id": "block-000115-aeccb0a6",
+          "quote": "LinkedIn faces competition from online professional networks; recruiting, talent management, and human resource services companies; job boards; companies that provide learning and development products and services; online and offline outlets that generate revenue from advertisers and marketers; and online and offline outlets for companies with lead generation and customer intelligence and insights."
+        },
+        {
+          "block_id": "block-000116-338416e5",
+          "quote": "Dynamics competes with cloud-based and on-premises business solution providers."
+        },
+        {
+          "block_id": "block-000134-9ca2b5c6",
+          "quote": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition."
+        },
+        {
+          "block_id": "block-000135-0320c8fa",
+          "quote": "Our server products face competition from a wide variety of server operating systems and applications offered by companies with a range of market approaches. Vertically integrated computer manufacturers offer their own versions of the Unix operating system preinstalled on server hardware and nearly all computer manufacturers offer server hardware for the Linux operating system."
+        },
+        {
+          "block_id": "block-000136-cb770dd8",
+          "quote": "We compete to provide enterprise-wide computing and point solutions with numerous commercial software vendors that offer solutions and middleware technology platforms, software applications for connectivity, security, hosting, database, and e-business servers."
+        },
+        {
+          "block_id": "block-000140-4045a828",
+          "quote": "Our database, business intelligence, and data warehousing solutions offerings compete with products from providers in the data and analytics industry. Our system management solutions compete with server management and server virtualization platform providers. Our products for software developers compete against offerings from major technology providers, as well as open source alternatives."
+        },
+        {
+          "block_id": "block-000142-3e738e53",
+          "quote": "Our Enterprise and partner services business competes with a wide range of companies that provide strategy and business planning, application development, and infrastructure services, including multinational consulting firms and small niche businesses focused on specific technologies."
+        },
+        {
+          "block_id": "block-000182-1b83cff4",
+          "quote": "Windows faces competition from various software products and from alternative platforms and devices. We believe Windows competes effectively by giving customers choice, value, flexibility, security, an easy-to-use interface, and compatibility with a broad range of hardware and software applications, including those that enable productivity."
+        },
+        {
+          "block_id": "block-000183-dcc9edaa",
+          "quote": "Devices face competition from various computer, tablet, and hardware manufacturers who offer a unique combination of high-quality industrial design and innovative technologies across various price points. Many of these manufacturers are also current or potential partners and customers, including our Windows OEMs."
+        },
+        {
+          "block_id": "block-000184-afc0d8c4",
+          "quote": "Xbox and our cloud gaming services face competition from various online gaming ecosystems and game streaming services. We also compete with other providers of entertainment services such as video streaming platforms. Our gaming platform competes with other console platforms. We believe our gaming platform is effectively positioned against, and uniquely differentiated from, competitive products and services based on significant innovation in hardware architecture, user interface, developer tools, online gaming and entertainment services, and continued strong content from our own first-party game franchises as well as other digital content offerings."
+        },
+        {
+          "block_id": "block-000185-09fe5a44",
+          "quote": "Our Search and news advertising business competes with search engines, and a wide array of websites, social platforms, and portals that provide content and online offerings to end users."
+        }
+      ],
+      "acceptance_requirements": [
+        "若输出竞对信息，保留 Microsoft 为披露者、对应业务、FY2025 范围、确切原文。",
+        "本片段主要披露竞对类型而非具名公司，不得补写熟悉的公司名为报告明示。",
+        "合作伙伴/客户与竞争可能重叠，不从原文推出互斥关系或反向竞对陈述。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C21",
+      "title": "具名重要对象关系完整性",
+      "group": "relations",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000093-7018adaa",
+        "block-000120-c34f7245",
+        "block-000128-edef168d",
+        "block-000130-8d7ff1f7",
+        "block-000134-9ca2b5c6",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000086-935d6090",
+          "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses."
+        },
+        {
+          "block_id": "block-000093-7018adaa",
+          "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+        },
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000128-edef168d",
+          "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        },
+        {
+          "block_id": "block-000130-8d7ff1f7",
+          "quote": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry."
+        },
+        {
+          "block_id": "block-000134-9ca2b5c6",
+          "quote": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition."
+        },
+        {
+          "block_id": "block-000146-c641cfcd",
+          "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories."
+        },
+        {
+          "block_id": "block-000148-2f215a60",
+          "quote": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services."
+        },
+        {
+          "block_id": "block-000150-9577a591",
+          "quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates."
+        }
+      ],
+      "acceptance_requirements": [
+        "逐节点检查是否有连接至公司/分部/上层业务或有明确范围限制。",
+        "原文有可用结构证据却完全孤立，记 extraction_omission 或 unresolved_analysis，不能以字段 Pass 覆盖。",
+        "关系可采用多视图/交叉关系，不强制统一树，不固定节点总数。",
+        "derived 须有足够上下文和限定；没有记录边不等于业务独立。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C22",
+      "title": "原文引用与主张一致",
+      "group": "evidence",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000093-7018adaa",
+        "block-000120-c34f7245",
+        "block-000128-edef168d",
+        "block-000130-8d7ff1f7",
+        "block-000134-9ca2b5c6"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000086-935d6090",
+          "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses."
+        },
+        {
+          "block_id": "block-000093-7018adaa",
+          "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+        },
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000128-edef168d",
+          "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        },
+        {
+          "block_id": "block-000130-8d7ff1f7",
+          "quote": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry."
+        },
+        {
+          "block_id": "block-000134-9ca2b5c6",
+          "quote": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition."
+        }
+      ],
+      "acceptance_requirements": [
+        "抽查所有核心节点定义和关系：引用确实蕴含所说主体、范围及强度。",
+        "引文存在、字段齐全与语义正确分开记录。",
+        "页面节点能到原文的固定块；整份报告链接不是唯一出处。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C23",
+      "title": "未决事项逐条分类",
+      "group": "unknowns",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000088-8339c382",
+        "block-000120-c34f7245",
+        "block-000128-edef168d",
+        "block-000130-8d7ff1f7"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000088-8339c382",
+          "quote": "Additional information on our operating segments and geographic and product information is contained in Note 18 – Segment Information and Geographic Data of the Notes to Financial Statements (Part II, Item 8 of this Form 10-K)."
+        },
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000128-edef168d",
+          "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        },
+        {
+          "block_id": "block-000130-8d7ff1f7",
+          "quote": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry."
+        }
+      ],
+      "acceptance_requirements": [
+        "每个 unknown 标明材料已答但提取遗漏、合理上下文尚未分析、所选章节未披露、范围外待补材料，或前提错误。",
+        "仅对本片段核验时不能宣称整份报告未披露。",
+        "原文 Note 18 指向额外财务章节，未读取不是财报没有。",
+        "不得把关系推断空间全部压成未知；也不能把正式组织结构不明确掩饰成确定包含。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C24",
+      "title": "图上可见与覆盖一致",
+      "group": "presentation",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000093-7018adaa",
+        "block-000120-c34f7245",
+        "block-000128-edef168d",
+        "block-000130-8d7ff1f7",
+        "block-000134-9ca2b5c6",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000086-935d6090",
+          "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses."
+        },
+        {
+          "block_id": "block-000093-7018adaa",
+          "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+        },
+        {
+          "block_id": "block-000120-c34f7245",
+          "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "block_id": "block-000128-edef168d",
+          "quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        },
+        {
+          "block_id": "block-000130-8d7ff1f7",
+          "quote": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry."
+        },
+        {
+          "block_id": "block-000134-9ca2b5c6",
+          "quote": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition."
+        },
+        {
+          "block_id": "block-000146-c641cfcd",
+          "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories."
+        },
+        {
+          "block_id": "block-000148-2f215a60",
+          "quote": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services."
+        },
+        {
+          "block_id": "block-000150-9577a591",
+          "quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates."
+        }
+      ],
+      "acceptance_requirements": [
+        "三个分部与每个重要具名对象在图或显式可展开子图可见，不能只藏在文字详情后声称完整图。",
+        "业务/收入分开；短标签对应稳定实体 ID，不因布局合并整体与子集。",
+        "保留源文入口和固定索引入口；小屏必须可缩放或滚动以阅读。"
+      ],
+      "status": "not_reviewed"
+    },
+    {
+      "id": "C25",
+      "title": "收入与精确财务分解不越界",
+      "group": "financial_scope",
+      "priority": "required",
+      "source_block_ids": [
+        "block-000088-8339c382",
+        "block-000101-67803298",
+        "block-000103-a597bcd9",
+        "block-000108-ec73690d",
+        "block-000110-99cc951e",
+        "block-000127-93a9159b",
+        "block-000129-264fa06b",
+        "block-000178-51f06755"
+      ],
+      "source_excerpts": [
+        {
+          "block_id": "block-000088-8339c382",
+          "quote": "Additional information on our operating segments and geographic and product information is contained in Note 18 – Segment Information and Geographic Data of the Notes to Financial Statements (Part II, Item 8 of this Form 10-K)."
+        },
+        {
+          "block_id": "block-000101-67803298",
+          "quote": "Microsoft 365 Commercial is an AI-powered business and productivity solutions platform that brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security to help organizations empower their employees. Growth depends on our ability to reach new users in new markets such as frontline workers, small and medium businesses, and growth markets, as well as add AI-enabled tools, features, and agentic scenarios to our core product and service offerings across communication, collaboration, analytics, security, compliance, and other AI business productivity categories. Microsoft 365 Commercial revenue is mainly affected by a combination of continued installed base growth and average revenue per user expansion, as well as the continued shift from Office licensed on-premises to Microsoft 365."
+        },
+        {
+          "block_id": "block-000103-a597bcd9",
+          "quote": "Microsoft 365 Consumer is designed to increase personal productivity and creativity through a range of products and services. Growth depends on our ability to reach new users, add value to our core product set with new features including AI tools, and continue to expand our product and service offerings into new markets. Microsoft 365 Consumer cloud revenue and Office Consumer products revenue is mainly affected by the percentage of customers that buy Office with their new devices and the continued shift from Office licensed on-premises to Microsoft 365 Consumer subscriptions. Microsoft 365 Consumer cloud revenue is also affected by the demand for communication and storage through Outlook.com and OneDrive, which is largely driven by subscriptions and advertising."
+        },
+        {
+          "block_id": "block-000108-ec73690d",
+          "quote": "LinkedIn connects the world’s professionals to make them more productive and successful and transforms the way companies hire, market, sell, and learn. In addition to LinkedIn’s free services, LinkedIn offers monetized solutions designed to offer AI-enabled insights and productivity: Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions. Growth will depend on our ability to increase LinkedIn member engagement on the platform and our ability to continue offering insight and AI-enabled services that provide value for our members and customers. LinkedIn revenue is mainly affected by demand from enterprises and professionals for subscriptions to Talent Solutions, Sales Solutions, and Premium Subscriptions offerings, as well as member engagement and the quality of the sponsored content delivered to those members to drive Marketing Solutions."
+        },
+        {
+          "block_id": "block-000110-99cc951e",
+          "quote": "Dynamics provides cloud-based and on-premises business solutions for financial management, enterprise resource planning (“ERP”), customer relationship management (“CRM”), and supply chain management, as well as agentic AI and other low code application development platforms, for small and medium businesses, large organizations, and divisions of global enterprises. Dynamics revenue is driven by the number of users licensed and applications consumed, expansion of average revenue per user, and the continued shift to Dynamics 365, a unified set of cloud-based intelligent business applications, including our low code development platforms, such as Power Apps and Power Automate."
+        },
+        {
+          "block_id": "block-000127-93a9159b",
+          "quote": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use Azure through our global network of datacenters for computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning. Azure enables customers to devote more resources to development and use of applications that benefit their organizations, rather than managing on-premises hardware and software. Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services."
+        },
+        {
+          "block_id": "block-000129-264fa06b",
+          "quote": "Our server products are designed to make IT professionals, developers, and their systems more productive and efficient. Server software is integrated server infrastructure and middleware designed to support software applications built on the Windows Server operating system. This includes the server platform, database, business intelligence, storage, management and operations, virtualization, service-oriented architecture platform, security, and identity software. We also license standalone and software development lifecycle tools for software architects, developers, testers, and project managers. Server products revenue is mainly affected by purchases through volume licensing programs, licenses sold to OEMs, and retail packaged products. CALs provide access rights to certain server products, including SQL Server and Windows Server, and revenue is reported along with the associated server product."
+        },
+        {
+          "block_id": "block-000178-51f06755",
+          "quote": "Xbox enables people to connect and share online gaming experiences that are accessible on Xbox consoles, Windows-enabled devices, and other devices. Xbox is designed to benefit users by providing access to a network of certified applications and services and to benefit our developer and partner ecosystems by providing access to a large customer base. Xbox revenue is mainly affected by subscriptions and sales of first- and third-party content, as well as advertising. Growth of our Gaming business is determined by the overall active user base through Xbox enabled content, availability of games, providing exclusive game content that gamers seek, the computational power and reliability of the devices used to access our content and services, and the ability to create new experiences."
+        }
+      ],
+      "acceptance_requirements": [
+        "当前输入无数值表，可表达有据赚钱方式，不应编造业务收入金额、占比或产品级收入。",
+        "原文各类 mainly affected / driven by 为驱动因素，不能全部改写成唯一收费方式。",
+        "Azure AI Foundry、Security、GitHub、Nuance 精确金额/分母的缺口只写所选章节未提供；财务问题另查 Note 18。"
+      ],
+      "status": "not_reviewed"
+    }
+  ],
+  "unknown_classification_cases": [
+    {
+      "id": "U01",
+      "question": "Azure 是否属于 Azure and other cloud services？",
+      "classification": "grounded_inference_available",
+      "judgment": "组合名称加后续 Azure 定义支持业务范围推断。允许有据 derived；将其完全孤立属于分析缺口，不等于所选材料没有 Azure。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000127-93a9159b"
+      ]
+    },
+    {
+      "id": "U02",
+      "question": "Azure AI、Foundry、Security 为什么孤立？",
+      "classification": "unresolved_analysis_if_unlinked",
+      "judgment": "原文具名能力和平台定义齐全，须分析上下文层级。精确正式层级不是逐字披露；可用限定推断，不得把仅此局限升级为没有业务关系。",
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d",
+        "block-000134-9ca2b5c6"
+      ]
+    },
+    {
+      "id": "U03",
+      "question": "GitHub/Nuance 整体是否全部包含在云组？",
+      "classification": "false_premise_if_whole_equals_cloud",
+      "judgment": "原文明确同时含云和本地，云子集可明示定位。整体等于云组是范围错误。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ]
+    },
+    {
+      "id": "U04",
+      "question": "GitHub/Nuance 本地部署业务精确计入哪条财务线？",
+      "classification": "not_stated_in_selected_section",
+      "judgment": "所选章节未明确其本地子项的精确会计归类。只声明本章节限制，不宣称整个 10-K 没有。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ]
+    },
+    {
+      "id": "U05",
+      "question": "各个 AI/GitHub/Nuance 子项收入有多少？",
+      "classification": "outside_selected_evidence",
+      "judgment": "本输入无数值表，且指向 Note 18。需要读取财务章节；即使读取后仍可能没有产品单列，不能提前称公司未披露。",
+      "source_block_ids": [
+        "block-000088-8339c382",
+        "block-000120-c34f7245",
+        "block-000127-93a9159b",
+        "block-000130-8d7ff1f7"
+      ]
+    },
+    {
+      "id": "U06",
+      "question": "Azure AI Factory 是什么？",
+      "classification": "name_correction",
+      "judgment": "此输入的正确名字是 Azure AI Foundry。不能补造 Azure AI Factory；Azure Data Factory 不在所选块中。",
+      "source_block_ids": [
+        "block-000128-edef168d"
+      ]
+    },
+    {
+      "id": "U07",
+      "question": "能否据此画微软所有业务产品？",
+      "classification": "scope_limit",
+      "judgment": "三个经营分部描述使用 primarily comprises；此输入能覆盖报告该章节的主要业务，不代表所有产品、内部组织或官网最新范围。",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000091-d993f813",
+        "block-000118-5e917062",
+        "block-000144-6e0ae0c4"
+      ]
+    },
+    {
+      "id": "U08",
+      "question": "报告是否明确 Azure AI 和 Security 互为父子？",
+      "classification": "not_stated_in_selected_section",
+      "judgment": "材料分别描述两类 offerings，无依据把 Security 归入 AI 或反向。各自与 Azure 品牌/业务可作限定推断；同品牌不等于同产品。",
+      "source_block_ids": [
+        "block-000128-edef168d",
+        "block-000134-9ca2b5c6"
+      ]
+    }
+  ],
+  "pass_policy": {
+    "blocking": "Source-faithfulness error, material missing main business, wrong whole/subset mapping, unsupported parentage, or important node left without any explained relationship.",
+    "not_blocking": "No fixed node count, no required specific string IDs, no mandatory single tree; a concise legitimate representation with equivalent semantic coverage can pass.",
+    "separate_statuses": [
+      "contract_valid",
+      "evidence_quote_present",
+      "semantic_fidelity",
+      "coverage_complete_for_selected_section",
+      "relationships_explained",
+      "visible_diagram",
+      "user_visual_acceptance"
+    ],
+    "full_report_non_disclosure_claim_allowed": false
+  }
+}

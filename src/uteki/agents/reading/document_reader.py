@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 from uteki.agents.reading.reading_groups import build_reading_groups, VERSION
+from uteki.infrastructure.document_sources.sec_index import NAVIGATION_PARSERS
 
 
 def sha(data):
@@ -43,12 +44,30 @@ class DocumentReader:
         n = self.nodes[node_id]
         return self.positions[n['start_block_id']], self.positions[n['end_block_id']] + 1
 
+    @property
+    def filter_navigation(self):
+        return self.index.get('parser_version') in NAVIGATION_PARSERS
+
+    def _omitted(self, block):
+        return self.filter_navigation and block.get('layout_role') == 'repeated_navigation'
+
+    def _omission_metadata(self, blocks, *, limit=None):
+        if not self.filter_navigation:
+            return {}
+        omitted = [b['block_id'] for b in blocks if self._omitted(b)]
+        if not omitted:
+            return {}
+        return {'omitted_block_ids': omitted[:limit], 'omitted_block_count': len(omitted),
+                'omitted_ids_truncated': limit is not None and len(omitted) > limit,
+                'omission_reason': 'Verified repeated contents links; original blocks remain in the parsed package.'}
+
     def search(self, node_id, query, offset=0, limit=8):
         """Case-insensitive literal phrase search, in source order, not relevance ranking."""
         if not query.strip() or offset < 0 or not 1 <= limit <= 20:
             raise ValueError('Nonempty query, offset >= 0, limit 1..20 required')
         start, end = self._range(node_id)
-        hits = [b for b in self.blocks[start:end] if query.casefold() in b['text'].casefold()]
+        matching = [b for b in self.blocks[start:end] if query.casefold() in b['text'].casefold()]
+        hits = [b for b in matching if not self._omitted(b)]
         previews = []
         for b in hits[offset:offset + limit]:
             pos = b['text'].casefold().find(query.casefold())
@@ -57,7 +76,8 @@ class DocumentReader:
                              **({k:b[k] for k in ('pdf_page','speaker','speaker_role','exchange_id')} if 'pdf_page' in b else {}),
                              'preview': b['text'][max(0, pos - 80):pos + 240]})
         return {'index_id': self.index['index_id'], 'node_id': node_id, 'total': len(hits),
-                'hits': previews, 'next_offset': offset + limit if offset + limit < len(hits) else None}
+                'hits': previews, 'next_offset': offset + limit if offset + limit < len(hits) else None,
+                **self._omission_metadata(matching, limit=12)}
 
     def read(self, node_id, start_block_id, count=8):
         """Full blocks; explicit continuation, never silently truncate a table or paragraph."""
@@ -69,10 +89,11 @@ class DocumentReader:
             raise ValueError('Block outside selected node')
         end = min(start + count, hi)
         eligible_groups = []
+        layout_only = all(self._omitted(b) for b in self.blocks[start:end])
         for group in self.groups:
             gs = self.positions[group['block_ids'][0]]
             ge = self.positions[group['block_ids'][-1]] + 1
-            if lo <= gs and ge <= hi:
+            if not layout_only and lo <= gs and ge <= hi:
                 eligible_groups.append((group, gs, ge))
         # A later group can expand into an earlier one (for example, a table
         # note introducing a list). Reach the complete overlapping context
@@ -85,10 +106,15 @@ class DocumentReader:
             if (start, end) == previous_range:
                 break
         matched_groups = [group for group, gs, ge in eligible_groups if gs < end and ge > start]
+        if self.filter_navigation:
+            matched_groups = [{**group, 'block_ids': [bid for bid in group['block_ids']
+                               if not self._omitted(self.blocks[self.positions[bid]])]} for group in matched_groups]
+            matched_groups = [group for group in matched_groups if group['block_ids']]
         return {'index_id': self.index['index_id'], 'node_id': node_id,
                 'reading_group_version': VERSION, 'reading_groups': matched_groups,
                 'expansion_note': 'Complete list/table/turn/Q&A context may exceed requested count; original blocks unchanged.',
-                'blocks': self.blocks[start:end],
+                'blocks': [b for b in self.blocks[start:end] if not self._omitted(b)],
+                **self._omission_metadata(self.blocks[start:end]),
                 'previous_block_id': self.blocks[start - 1]['block_id'] if start > lo else None,
                 'next_block_id': self.blocks[end]['block_id'] if end < hi else None,
                 'context_note': 'Check preceding heading/introduction and following list continuation; tables retain cells and XBRL.'}

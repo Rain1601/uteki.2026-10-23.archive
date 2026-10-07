@@ -1,0 +1,95 @@
+{
+  "schema_version": "business-coverage-run-v1",
+  "status": "candidate",
+  "execution_mode": "authorized_single_coverage_continuation",
+  "max_calls": 4,
+  "max_revisions": 1,
+  "max_inventory_contract_repairs": 1,
+  "retry_policy": {
+    "max_attempts_per_stage": 2,
+    "transient_only": true,
+    "unknown_cost": "retain_full_reservation"
+  },
+  "independent_evaluation": false,
+  "semantic_acceptance": "not_evaluated",
+  "input_run": "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01",
+  "input_trace_id": "run-40b2b39d02bf4915b53cedbf80ff23e7",
+  "candidate_path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-09/revision",
+  "candidate_sha256": "82aff2bcc317d6b8eb8ca9913f7154b7cd4531a7c87dae11ecfe41331e5a17b3",
+  "original_candidate_preserved": true,
+  "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+  "skill_sha256": "005b9d1802e66f83411c16114886ff3124586094b73e070dd6b59d22cb582169",
+  "attempts": [
+    {
+      "mode": "inventory",
+      "status": "completed",
+      "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-06/inventory",
+      "trace_id": "run-3089d2c377a14f9eb4ee3c59d0aff534",
+      "reused_stage_response": {
+        "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-05/inventory",
+        "response_sha256": "98774abbb370e438b81033dee0d3314ae4c353d20ade6b2799748ac1e1378423",
+        "validated_inventory_artifact": true,
+        "reason": "resume_own_model_output_without_regeneration"
+      },
+      "budget_after_stage": {
+        "limit_usd": "3",
+        "estimated_spent_usd": "0.921798",
+        "held_usd": "0.38341",
+        "unknown_requests": 1,
+        "in_flight_requests": 0,
+        "requests": 7,
+        "actual_billed_usd": null,
+        "enforcement": "enforced"
+      }
+    },
+    {
+      "mode": "revision",
+      "status": "candidate",
+      "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-09/revision",
+      "trace_id": "run-0660a3c49d8848f194fc46ec0cbcc90f",
+      "validation": "passed",
+      "counts": {
+        "business_nodes": 79,
+        "business_relationships": 86,
+        "evidence_fragments": 37,
+        "unknowns": 4
+      },
+      "artifacts_sha256": {
+        "business_map.json": "90940b73b98bb0962fd0c30f5bc4fab93683e923d79f0847cb8f7fba5d485982",
+        "evidence.html": "1ec80c7bc5c8485755ffe1bcf612cb7adc7d4d2fc50bd0831be9fad5f15f3dba"
+      }
+    },
+    {
+      "mode": "audit_final",
+      "status": "completed",
+      "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-09/audit_final",
+      "trace_id": "run-4d155e2f5e14450792634bab91cb30d1",
+      "self_check_status": "needs_revision"
+    }
+  ],
+  "stop_reason": "final_self_audit_needs_revision",
+  "self_check_status": "needs_revision",
+  "final_audit_candidate_sha256": "82aff2bcc317d6b8eb8ca9913f7154b7cd4531a7c87dae11ecfe41331e5a17b3",
+  "budget": {
+    "limit_usd": "5",
+    "estimated_spent_usd": "3.135980",
+    "held_usd": "0.38341",
+    "unknown_requests": 1,
+    "in_flight_requests": 0,
+    "requests": 11,
+    "actual_billed_usd": null,
+    "enforcement": "enforced"
+  },
+  "estimated_spent_usd": "3.135980",
+  "unknown_requests": 1,
+  "in_flight_requests": 0,
+  "budget_path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-06/budget.sqlite",
+  "prior_failed_run": "experiments/agent_design/2026-10-07-business-coverage-v1/run-07",
+  "recovery_error_type": "RequestEnvelopeTooLarge",
+  "prior_run": "experiments/agent_design/2026-10-07-business-coverage-v1/run-08",
+  "input_candidate_path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-08/revision",
+  "input_candidate_sha256": "9faaa38fb77d36649af2d8e348fda15a070bd3aac4226f053d8cafe4bf20562f",
+  "input_audit_path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-08/audit_final/audit.json",
+  "input_audit_sha256": "92fba3b7dacd3d034e1482e46fc8cae01d44b90ac311739a326c42449c92bcc0",
+  "authorization_sha256": "a24a6e3258dc1926dbb909246113156f644ba53971298a33e084cf6562dce92c"
+}

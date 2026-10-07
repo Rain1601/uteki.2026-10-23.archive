@@ -1,0 +1,125 @@
+{
+  "schema_version": "microsoft-draft-semantic-review-v1",
+  "status": "failed_semantic_acceptance",
+  "stage": "business_identity_and_relationships",
+  "draft_path": "experiments/agent_design/2026-10-07-microsoft-clean-reextract-v1/run-03-graph/response.txt",
+  "binding": {
+    "response_sha256": "bb51af06156e90a5b9047d23187cf085cd74f5d206887ef657844353503b82d9",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "request_sha256": "049d3fd5e281da3c7a26d766db954239451d236507c1f34cde27c8b8fb93f5ba"
+  },
+  "counts": {
+    "nodes": 27,
+    "edges": 26,
+    "unknowns": 3
+  },
+  "checks": [
+    {
+      "id": "G01",
+      "label": "三分部与主业务",
+      "status": "pass",
+      "classification": "grounded_inference",
+      "observation": "三个分部及主要业务组在图对象阶段保留。",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000097-13124fb7",
+        "block-000099-da3d48eb",
+        "block-000120-c34f7245",
+        "block-000122-c07a987e",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "G02",
+      "label": "Foundry 有独立身份",
+      "status": "pass",
+      "classification": "grounded_inference",
+      "observation": "Foundry已成为具名平台节点，连接Azure标derived；基于128的AI平台语境与127的Azure云服务范围可接受。其明确AI中间层仍缺。",
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "G03",
+      "label": "AI / Security / 云组合遗漏",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "Azure AI、Azure Security、Azure and other cloud services及GitHub/Nuance云子集未单独表达，重要关系范围仍未讲清。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000128-edef168d",
+        "block-000134-9ca2b5c6"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "G04",
+      "label": "GitHub/Nuance边端点范围",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "当前整体节点的边说明仅适用于云子集，标derived不修复端点范围错配。若要整体→广义Server products and cloud services，可另用126标题至130完整描述的章节结构做限定推断；当前并未这样论证。不能把整体挂狭义云组。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000126-60d9b18e",
+        "block-000130-8d7ff1f7",
+        "block-000131-155cf0a6"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "G05",
+      "label": "属性阶段边界",
+      "status": "pass",
+      "classification": "input_not_covered",
+      "observation": "products_services/customers/monetization为空是本轮显式stage范围。不能称完整业务数据抽取通过或据此说原文无这些字段。",
+      "source_block_ids": [
+        "block-000086-935d6090"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_m365_commercial_subparts",
+      "label": "M365内部层级",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "93已明确Commercial cloud及其产品、Commercial products及本地组成。需先表达已知层级，再限缩未决为更细交叉边界；本阶段未建模不是披露未知。",
+      "source_block_ids": [
+        "block-000093-7018adaa"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_windows_commercial_placement",
+      "label": "Windows商业/OEM",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "93与146已提供商业云/本地及OEM渠道的报告划分，高层边界不能称未说明。产品许可互通等细边界才可能缺材料。",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000146-c641cfcd",
+        "block-000152-fc098ac9"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U-unk_edge_bing_membership",
+      "label": "Bing/Edge/News定义",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "180明确Edge为browser、Bing为search engine；当前声称只在列表命名/没有Bing定义错误。Microsoft News仅列表命名，需单独区分。",
+      "source_block_ids": [
+        "block-000150-9577a591",
+        "block-000180-c75c41bb"
+      ],
+      "supplemental_source_block_ids": []
+    }
+  ],
+  "method_note": "Review-driven next revision may cite observed source omissions. Such a revision is not an independent blinded run. Empty detailed properties are stage scope, not failure."
+}

@@ -1,7 +1,9 @@
 """Local per-request ledger. Estimates are never presented as provider bills."""
 from dataclasses import asdict
+from copy import copy
 from datetime import datetime, timezone
 from decimal import Decimal
+import hashlib
 import json
 import html
 from pathlib import Path
@@ -9,6 +11,8 @@ import time
 from uuid import uuid4
 
 from agents.models.interface import Model
+
+from .model_configuration import capture_model_configuration
 
 
 def pricing_snapshot(provider, model):
@@ -22,6 +26,14 @@ def pricing_snapshot(provider, model):
                 'source': 'https://api-docs.deepseek.com/quick_start/pricing',
                 'checked_on': '2026-09-22',
                 'basis': 'Peak list price estimate; no cache or off-peak discounts applied'}
+    if provider == 'aihubmix' and model in ('claude-opus-5-5', 'claude-sonnet-5-5'):
+        input_rate, output_rate = ('4', '20') if model == 'claude-opus-5-5' else ('2', '10')
+        return {'provider': provider, 'model': model, 'currency': 'USD',
+                'input_per_million': input_rate, 'output_per_million': output_rate,
+                'cached_input_per_million': '0.2',
+                'source': 'https://aihubmix.com/model/' + model,
+                'checked_on': '2026-10-06',
+                'basis': 'Uncached public list price estimate; excludes cache discounts, cache-writing charges, fees and account discounts'}
     if (provider, model) != ('aihubmix', 'gpt-5.4-mini'):
         return None
     return {'provider': provider, 'model': model, 'currency': 'USD',
@@ -39,6 +51,40 @@ def estimate(usage, pricing):
                 + Decimal(usage['output_tokens']) * Decimal(pricing['output_per_million'])) / Decimal(1000000))
 
 
+def estimate_anthropic_usage(usage, pricing):
+    """Anthropic input excludes cache reads; unsupported charges stay unknown."""
+    if not isinstance(usage, dict) or not pricing:
+        return None
+    if any(isinstance(name, str) and 'cache' in name.lower()
+           and name not in ('cache_read_input_tokens', 'cache_creation_input_tokens', 'cache_creation')
+           for name in usage):
+        return None
+    for name in ('input_tokens', 'output_tokens'):
+        if type(usage.get(name)) is not int or usage[name] < 0:
+            return None
+    for name in ('cache_read_input_tokens', 'cache_creation_input_tokens'):
+        if name in usage and (type(usage[name]) is not int or usage[name] < 0):
+            return None
+    # This adapter sends no cache controls or server tools; their rates are not
+    # part of its registered price snapshot. Never silently omit such charges.
+    if usage.get('cache_creation_input_tokens', 0):
+        return None
+    for name in ('cache_creation', 'server_tool_use'):
+        if name in usage and (not isinstance(usage[name], dict)
+                or any(type(n) is not int or n != 0 for n in usage[name].values())):
+            return None
+    try:
+        rates = [Decimal(str(pricing[name])) for name in ('input_per_million', 'output_per_million')]
+        cached = usage.get('cache_read_input_tokens', 0)
+        cache_rate = Decimal(str(pricing['cached_input_per_million'])) if cached else Decimal(0)
+        if not all(rate.is_finite() and rate >= 0 for rate in (*rates, cache_rate)):
+            return None
+        return str((Decimal(usage['input_tokens']) * rates[0]
+                    + Decimal(usage['output_tokens']) * rates[1] + Decimal(cached) * cache_rate) / Decimal(1000000))
+    except (ArithmeticError, ValueError, TypeError, KeyError):
+        return None
+
+
 def write_record(path, record):
     with Path(path).open('x', encoding='utf-8') as f:
         json.dump(record, f, ensure_ascii=False, indent=2,
@@ -47,31 +93,89 @@ def write_record(path, record):
 
 class MeteredModel(Model):
     """Non-streaming SDK adapter. Persist a start event before any network work."""
-    def __init__(self, inner, folder, stage, provider, model, pricing, budget=None, *, max_request_bytes=400000):
+    def __init__(self, inner, folder, stage, provider, model, pricing, budget=None, *, max_request_bytes=400000, observation_context=None):
         if type(max_request_bytes) is not int or max_request_bytes < 1:
             raise ValueError('max_request_bytes must be a positive integer')
         self.inner, self.folder, self.stage = inner, Path(folder), stage
         self.provider, self.model, self.pricing = provider, model, pricing
         self.budget = budget
+        self.observation_context = observation_context
         self.max_request_bytes = max_request_bytes
         self.folder.mkdir(exist_ok=True)
 
+    def with_observation(self, context):
+        model = copy(self)
+        model.observation_context = context
+        return model
+
     async def get_response(self, *args, **kwargs):
+        observation = self.observation_context
+        if observation:
+            observation.guard()
+        native = getattr(self.inner, 'native_usage_format', None) == 'anthropic_messages'
+        settings = kwargs.get('model_settings', args[2] if len(args) > 2 else None)
+        request_metadata = {}
+        if native:
+            # Native settings are validated before a reservation or request.
+            self.inner.response_metadata = None
+            self.inner.response_text = None
+            configuration = self.inner.request_configuration(*args, **kwargs)
+            if (configuration['fields']['provider']['value'] != self.provider
+                    or configuration['fields']['model']['value'] != self.model):
+                raise ValueError('Native adapter and meter provider/model must match')
+            raw = self.inner.request_body(*args, **kwargs)
+            request_metadata = {'request_sha256': hashlib.sha256(raw).hexdigest(), 'request_bytes': len(raw)}
+            # Reserve from the actual body, including the schema instruction.
+            # reserve_request adds its usual 16k overhead and output bound.
+            reserve_args, reserve_kwargs = (), {'input': raw.decode('utf-8'), 'model_settings': settings}
+        else:
+            configuration = capture_model_configuration(self.provider, self.model, self.inner, args, kwargs)
+            reserve_args, reserve_kwargs = args, kwargs
         reservation = None
         reserved_usd = None
         if self.budget is not None:
             from uteki.agents.runtime.run_budget import reserve_request
             reservation, reserved_usd = reserve_request(
-                self.budget, self.pricing, args, kwargs, max_request_bytes=self.max_request_bytes)
+                self.budget, self.pricing, reserve_args, reserve_kwargs, max_request_bytes=self.max_request_bytes,
+                serialized_body=raw if native else None)
+        extra_body = getattr(settings, 'extra_body', None)
+        reasoning_effort = extra_body.get('reasoning_effort') if isinstance(extra_body, dict) else None
+        if native:
+            reasoning_effort = configuration['fields']['reasoning_effort']['value']
         call_id = str(uuid4())
         record = dict(call_id=call_id, stage=self.stage, provider=self.provider,
-                      requested_model=self.model, actual_upstream_model=None,
+                      requested_model=self.model, actual_upstream_model=None, reasoning_effort=reasoning_effort,
                       started_at=datetime.now(timezone.utc).isoformat(),
                       pricing_snapshot=self.pricing, actual_billed_usd=None,
                       status='started', usage=None, estimated_usd=None,
+                      usage_presence='unknown', usage_source='sdk_normalized',
+                      configuration_snapshot=configuration,
                       cost_basis='uncached_list_price_estimate_not_bill',
                       budget_reservation_id=reservation, reserved_usd=reserved_usd)
-        write_record(self.folder/(call_id+'-start.json'), record)
+        if native:
+            record.update(request_metadata, usage_source='provider_raw',
+                          cost_basis='anthropic_raw_input_output_cache_read_public_price_estimate_not_bill')
+        start_path = self.folder/(call_id+'-start.json')
+        try:
+            write_record(start_path, record)
+            if observation:
+                ref = observation.publish(start_path, kind='model_call_start', owned_by_context=True)
+                observation.emit('model_call.started', call_id=call_id, record_ref=ref,
+                    role=observation.role, decision_index=observation.decision_index,
+                    attempt=observation.attempt, stage=self.stage, provider=self.provider,
+                    requested_model=self.model, reasoning_effort=reasoning_effort)
+                observation.guard()
+        except BaseException as error:
+            # No provider invocation has happened: release only this known-unsent reservation.
+            record.update(status='locally_blocked', dispatch_status='not_sent',
+                error_type=type(error).__name__, ended_at=datetime.now(timezone.utc).isoformat(),
+                elapsed_seconds=0, estimated_usd='0', usage_presence='absent', usage_source='host_not_sent')
+            try:
+                write_record(self.folder/(call_id+'-end.json'), record)
+            finally:
+                if self.budget is not None and reservation is not None:
+                    self.budget.settle(reservation, '0')
+            raise
         started = time.monotonic()
         try:
             inner = self.inner
@@ -83,6 +187,10 @@ class MeteredModel(Model):
                           response_id=response.response_id,
                           request_id=getattr(response, 'request_id', None))
             record['estimated_usd'] = estimate(record['usage'], self.pricing)
+            # ChatCompletions SDK defaults missing usage to zeros. Without raw
+            # provider evidence these zeros cannot settle a billable request.
+            if self.provider != 'deepseek' and not any(record['usage'].get(k) for k in ('input_tokens', 'output_tokens')):
+                record.update(usage=None, estimated_usd=None)
             return response
         except BaseException as exc:
             # No exception messages, headers, inputs or credentials in this ledger.
@@ -90,7 +198,30 @@ class MeteredModel(Model):
                           http_status=getattr(exc, 'status_code', None))
             raise
         finally:
-            if self.provider == 'deepseek':
+            if native:
+                metadata = getattr(self.inner, 'response_metadata', None) or {}
+                # Adapter metadata is allowlisted; never merge arbitrary errors,
+                # response bodies or header dictionaries into the ledger.
+                for key in ('actual_upstream_model', 'response_id', 'request_id', 'stop_reason',
+                            'raw_usage', 'usage_presence', 'dispatch_status', 'http_status',
+                            'visible_text_secret_redacted', 'transport_error_type', 'transport_phase',
+                            'headers_received', 'headers_received_elapsed_seconds',
+                            'first_event_elapsed_seconds', 'stream_complete', 'stream_event_count',
+                            'stream_error_type', 'provider_error_type'):
+                    if key in metadata:
+                        record[key] = metadata[key]
+                raw_usage = metadata.get('raw_usage')
+                known = metadata.get('usage_presence') == 'reported'
+                record.update(usage_source='provider_raw', usage=None, estimated_usd=None)
+                if known:
+                    record['usage'] = {'input_tokens': raw_usage['input_tokens'],
+                        'output_tokens': raw_usage['output_tokens'],
+                        'cache_read_input_tokens': raw_usage.get('cache_read_input_tokens', 0),
+                        'cache_creation_input_tokens': raw_usage.get('cache_creation_input_tokens', 0)}
+                    record['estimated_usd'] = estimate_anthropic_usage(raw_usage, self.pricing)
+                if metadata.get('dispatch_status') == 'not_sent':
+                    record.update(estimated_usd='0', usage_presence='absent', usage_source='host_not_sent')
+            elif self.provider == 'deepseek':
                 metadata = getattr(self.inner, 'response_metadata', None)
                 if metadata:
                     record.update(metadata)
@@ -99,6 +230,7 @@ class MeteredModel(Model):
                 # missing/malformed usage object must not settle at SDK zeros.
                 counters = (raw.get('prompt_tokens'), raw.get('completion_tokens'))
                 if all(type(n) is int and n >= 0 for n in counters):
+                    record.update(usage_presence='reported', usage_source='provider_raw')
                     record['usage'] = {
                         'input_tokens': counters[0], 'output_tokens': counters[1],
                         'total_tokens': raw.get('total_tokens'),
@@ -108,12 +240,27 @@ class MeteredModel(Model):
                     }
                     record['estimated_usd'] = estimate(record['usage'], self.pricing)
                 else:
-                    record.update(usage=None, estimated_usd=None)
-            record.update(ended_at=datetime.now(timezone.utc).isoformat(),
+                    record.update(usage=None, estimated_usd=None,
+                                  usage_presence='absent' if metadata and metadata.get('raw_usage') is None else 'unknown',
+                                  usage_source='provider_raw')
+            record.update(configuration_snapshot=configuration,
+                          ended_at=datetime.now(timezone.utc).isoformat(),
                           elapsed_seconds=time.monotonic()-started)
-            write_record(self.folder/(call_id+'-end.json'), record)
-            if self.budget is not None:
-                self.budget.settle(reservation, record['estimated_usd'])
+            end_path = self.folder/(call_id+'-end.json')
+            try:
+                write_record(end_path, record)
+            finally:
+                # Observation failure must never bypass existing accounting cleanup.
+                if self.budget is not None:
+                    self.budget.settle(reservation, record['estimated_usd'])
+            if observation:
+                ref = observation.publish(end_path, kind='model_call_end', owned_by_context=True)
+                observation.emit('model_call.finished', call_id=call_id, record_ref=ref,
+                    role=observation.role, decision_index=observation.decision_index,
+                    attempt=observation.attempt, stage=self.stage, provider=self.provider,
+                    requested_model=self.model, reasoning_effort=reasoning_effort, status=record['status'])
+                if record['status'] == 'succeeded':
+                    observation.guard()
 
     async def stream_response(self, *args, **kwargs):
         raise NotImplementedError('Streaming metering is not implemented; use non-streaming runner')

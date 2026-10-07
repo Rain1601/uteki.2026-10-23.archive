@@ -1,0 +1,38 @@
+/* Agent engineering views share the workbench tokens and native reading. */
+body[data-workbench="agent-runs"]{margin:0}
+.ar-workspace{display:grid;grid-template-columns:156px 280px minmax(460px,1fr);min-height:calc(100vh - 65px)}
+.ar-agents,.ar-directory{padding:20px 16px;border-right:1px solid var(--line2);min-width:0;background:var(--paper)}
+.ar-agents h2,.ar-directory h2{font-size:15px;margin:0 0 16px}
+.ar-agent{display:block;padding:10px 8px;margin:2px 0;text-decoration:none;color:var(--ink);border-radius:6px}
+.ar-agent small{display:block;color:var(--muted);font-size:12px}
+.ar-agent[aria-current],.ar-run[aria-current]{background:var(--selected)}
+.ar-directory-search{display:block;margin-bottom:12px}
+.ar-directory-search input{width:100%;box-sizing:border-box}
+.ar-run{display:block;padding:12px 8px;border-bottom:1px solid var(--line2);text-decoration:none;color:var(--ink);overflow-wrap:anywhere}
+.ar-run strong,.ar-run small{display:block}.ar-run small{color:var(--muted);font-size:12px;margin-top:5px}
+.ar-main{padding:22px 28px 40px;min-width:0;background:var(--surface)}
+.ar-toolbar,.ar-heading,.ar-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.ar-toolbar{margin-bottom:16px;color:var(--muted)}
+.ar-toolbar button,.ar-controls button,.ar-main button,.ar-directory button{padding:6px 10px;background:var(--paper);border:1px solid var(--line2);color:var(--ink)}
+.ar-heading h1{font-size:25px;margin:0}.ar-task{margin:8px 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.ar-meta{display:flex;gap:8px 20px;flex-wrap:wrap;color:var(--muted);margin:8px 0 16px;font-size:12px}
+.ar-meta a{color:var(--accent);overflow-wrap:anywhere}#ar-model-summary{font-size:13px;color:var(--muted)}#ar-model-summary p{margin:6px 0}.ar-step-models{padding:4px 12px;border-left:2px solid var(--accent);margin:12px 0;overflow-wrap:anywhere}.ar-step-models small{display:block;color:var(--muted);margin-top:5px}
+.ar-statuses{display:flex;gap:8px 24px;flex-wrap:wrap;margin:16px 0}.ar-statuses div{min-width:100px}.ar-statuses dt{font-size:12px;color:var(--muted)}.ar-statuses dd{margin:3px 0 0;overflow-wrap:anywhere}
+.ar-tabs{display:flex;gap:20px;border-bottom:1px solid var(--line2);margin:20px 0}.ar-tabs a{color:var(--muted);text-decoration:none;padding:8px 0}.ar-tabs a[aria-current]{color:var(--accent);border-bottom:2px solid var(--accent)}
+.ar-process{display:grid;grid-template-columns:minmax(180px,30%) minmax(260px,1fr);gap:20px}
+.ar-process:has(>.ar-steps[hidden]){grid-template-columns:1fr}
+.ar-process-mode button[aria-pressed="true"]{background:var(--selected);color:var(--accent)}
+.ar-timing-row{display:grid;grid-template-columns:minmax(140px,30%) minmax(180px,1fr);gap:8px 16px;align-items:center;margin:14px 0}.ar-timing-row button{text-align:left}.ar-timing-row small{grid-column:1/-1;color:var(--muted);font-variant-numeric:tabular-nums}.ar-interval{position:relative;height:12px;background:var(--line2);overflow:hidden}.ar-interval span{position:absolute;height:100%;min-width:2px;background:var(--accent)}
+#ar-child-detail{padding:16px;margin-bottom:16px;border:1px solid var(--line2);border-radius:6px}#ar-child-detail h2{font-size:16px;overflow-wrap:anywhere}
+.ar-steps{list-style:none;margin:0;padding:0}.ar-step{border-bottom:1px solid var(--line2);padding:10px 4px}.ar-step button{width:100%;text-align:left;border:0;background:transparent}.ar-step button[aria-current]{background:var(--selected)}.ar-step small{display:block;color:var(--muted)}
+.ar-inspector{border-left:1px solid var(--line2);padding-left:20px;min-width:0}.ar-inspector h2{font-size:18px;margin:0 0 12px}
+.ar-main pre{font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;padding:12px;background:var(--wash);border-radius:6px;max-height:65vh;overflow:auto}
+.ar-main details{margin:10px 0}.ar-main summary{padding:6px 0}.ar-empty{padding:24px 0;color:var(--muted)}
+.ar-table-scroll{overflow:auto}.ar-table{border-collapse:collapse;width:100%;font-size:13px}.ar-table th,.ar-table td{border-bottom:1px solid var(--line2);padding:10px 8px;text-align:left;vertical-align:top}.ar-table th{font-weight:500;color:var(--muted);white-space:nowrap}.ar-table .ar-number{text-align:right;font-variant-numeric:tabular-nums}.ar-table td{overflow-wrap:anywhere}
+.ar-notice{color:var(--muted);font-size:12px;padding:8px 0}.ar-error{color:var(--warning)}.ar-link{color:var(--accent)}
+.ar-tokens{display:grid;gap:12px;margin:20px 0}.ar-token-row{display:grid;grid-template-columns:minmax(100px,170px) minmax(120px,1fr) minmax(70px,100px);gap:12px;align-items:center}.ar-token-bar{height:8px;background:var(--line);border-radius:3px;overflow:hidden}.ar-token-bar span{display:block;height:100%;background:var(--accent)}.ar-token-row output{text-align:right;font-variant-numeric:tabular-nums}
+.ar-scope{overflow-wrap:anywhere}.ar-more{margin-top:14px}.ar-main [hidden],.ar-directory [hidden],.ar-agents [hidden]{display:none!important}
+.model-call-record{margin:14px 0;padding:12px 0;border-top:1px solid var(--line2);min-width:0}.model-call-label{font-size:12px;color:var(--muted);overflow-wrap:anywhere;margin:0 0 8px}.model-call-timing dl{display:flex;gap:10px 22px;flex-wrap:wrap;margin:8px 0}.model-call-timing dt{font-size:11px;color:var(--muted)}.model-call-timing dd{font-size:12px;margin:4px 0 0;font-variant-numeric:tabular-nums}.model-call-timing details{font-size:11px;color:var(--muted);overflow-wrap:anywhere}.model-call-snapshot{font-size:12px;margin-top:12px}.model-call-snapshot summary{padding:5px 0}.model-call-note,.model-call-hash{font-size:11px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}.model-call-table-scroll{overflow:auto}.model-call-table{font-size:11px;border-collapse:collapse;width:100%}.model-call-table th,.model-call-table td{border-bottom:1px solid var(--line2);padding:7px 6px;text-align:left;vertical-align:top;overflow-wrap:anywhere}.model-call-table th{color:var(--muted);font-weight:500}.model-call-table td:first-child{white-space:nowrap}
+html[lang="en"] .ar-workspace [lang="zh"],html:not([lang="en"]) .ar-workspace [lang="en"]{display:none}
+@media(max-width:1080px){.ar-workspace{grid-template-columns:140px 240px minmax(420px,1fr);overflow-x:auto}.ar-main{padding:20px}.ar-process{grid-template-columns:1fr}.ar-inspector{border-left:0;border-top:1px solid var(--line2);padding:18px 0 0}}
+@media(prefers-reduced-motion:reduce){.ar-workspace *{transition:none!important;scroll-behavior:auto!important}}

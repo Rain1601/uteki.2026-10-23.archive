@@ -1,0 +1,84 @@
+{
+  "schema_version": "official-product-enrichment-v1",
+  "binding": {
+    "company_id": "nvidia",
+    "document_id": "nvidia-fy2025-annual-report-10k",
+    "period_end": "2025-01-26",
+    "business_map_sha256": "bcebbd790caa9bb59be5de9a8a1ada0d31f8800d58a37bb68f2fcb6739f84ddd"
+  },
+  "provenance": {
+    "method": "codex_manual_web_review",
+    "model_api_calls": 0
+  },
+  "entities": [
+    {
+      "business_id": "nvidia_ai_enterprise",
+      "official_links": [
+        {
+          "id": "nvidia-ai-enterprise-product",
+          "url": "https://www.nvidia.com/en-us/data-center/products/ai-enterprise/",
+          "final_url": "https://www.nvidia.com/en-us/data-center/products/ai-enterprise/",
+          "title": "产品官网 / Product overview",
+          "role": "product",
+          "publisher": "NVIDIA Corporation",
+          "official_status": "verified",
+          "availability": "readable",
+          "checked_at": "2026-10-07T08:13:05Z",
+          "published_at": null,
+          "verification": {
+            "publisher_basis": "NVIDIA 官方年报附带的股东材料将 www.nvidia.com/proxy 列为公司材料入口；本页面位于同一 www.nvidia.com 主机，使用 NVIDIA 公司导航并明确列出 NVIDIA AI Enterprise。公司入口依据位于项目文件 experiments/agent_design/2026-10-07-business-map-mermaid-v1/nvidia/source.html，DOM /html/body/section[15]/p[7]，该派生文件 SHA256 为 47daa32ef7787e4d705d55cb2209b383edc2a6a504fbb7cc995ec431bdaaa24b；原件和该历史派生文件的可点击入口见 experiments/agent_design/2026-10-07-official-product-links-v1/README.zh-CN.md。它不同于当前图精简输入包的 input/source.html。",
+            "product_match": "页面主标题为 NVIDIA AI Enterprise，与财报图中的具名产品节点相同；正文介绍该产品的软件套件、用途与使用入口。",
+            "source_url": "https://www.nvidia.com/en-us/data-center/products/ai-enterprise/",
+            "locator": "页面主标题 NVIDIA AI Enterprise 下的介绍副标题",
+            "exact_quote": "Accelerate and optimize your production AI development and deployment.",
+            "quote_sha256": "a80423e485f2164fb51a041b1314a16851c6c1aa136debcf68c25b60094351fc"
+          }
+        },
+        {
+          "id": "nvidia-ai-enterprise-docs",
+          "url": "https://docs.nvidia.com/ai-enterprise/index.html",
+          "final_url": "https://docs.nvidia.com/ai-enterprise/index.html",
+          "title": "官方文档 / Documentation",
+          "role": "documentation",
+          "publisher": "NVIDIA Corporation",
+          "official_status": "verified",
+          "availability": "readable",
+          "checked_at": "2026-10-07T08:13:05Z",
+          "published_at": null,
+          "verification": {
+            "publisher_basis": "页面位于公司 nvidia.com 的 docs 子域；文档页页脚明确标注 NVIDIA Corporation 版权，并链接 NVIDIA.com 公司主页及公司介绍，归属与产品名称相符。",
+            "product_match": "页面标题为 NVIDIA AI Enterprise，包含产品概览、发布分支、发布说明、支持和许可入口，与目标产品相符。",
+            "source_url": "https://docs.nvidia.com/ai-enterprise/index.html",
+            "locator": "Active Release Branches 标题；页脚版权及 NVIDIA.com 公司导航另用于发布者核对",
+            "exact_quote": "Active Release Branches",
+            "quote_sha256": "fdf924e682fc09de8a7de323fefffc598245862bbbb9ee12de2cabfaf4a04421"
+          }
+        }
+      ],
+      "to_watch": [
+        {
+          "id": "product-scope",
+          "question": "产品包含项或许可范围是否调整？",
+          "why": "帮助核对软件套件的产品边界。产品说明变化本身不能证明收入变化。",
+          "source_ids": [
+            "nvidia-ai-enterprise-product",
+            "nvidia-ai-enterprise-docs"
+          ],
+          "observable_signal": "官网组成项或许可文档出现新增、移除、重新归类或适用条件变更时，回读对应原文，另存更新候选。",
+          "status": "suggested"
+        },
+        {
+          "id": "release-support",
+          "question": "版本、支持范围或生命周期有哪些变化？",
+          "why": "帮助了解产品迭代与适用部署范围，并找到后续需要核对的官方说明。",
+          "source_ids": [
+            "nvidia-ai-enterprise-docs"
+          ],
+          "observable_signal": "文档中的发布分支、发布说明或支持生命周期入口出现更新时，检查版本、适用范围和生效时间。",
+          "status": "suggested"
+        }
+      ],
+      "gaps": []
+    }
+  ]
+}

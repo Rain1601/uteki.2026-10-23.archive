@@ -1,4 +1,5 @@
 """Shared company preparation/query lifecycle; CLI is only an adapter."""
+from uteki.agents.runtime.observation import observed_run, observed_step
 import asyncio
 from copy import deepcopy
 from datetime import date
@@ -119,7 +120,7 @@ class CompanyDataCoordinator:
             'documents': sorted(({k: d.get(k) for k in fields} for d in source_run['documents']), key=lambda d: d['source_id']),
             'implementation': company_materialization.implementation_fingerprint()})
 
-    def prepare(self, config, *, output, previous=None, should_stop=None):
+    def prepare(self, config, *, output, previous=None, should_stop=None, observation_context=None):
         config = deepcopy(config)
         input_config = deepcopy(config)
         if self.sec_user_agent is not None:
@@ -147,7 +148,8 @@ class CompanyDataCoordinator:
                   'workspace': str(self.workspace), 'previous_run': str(Path(previous).resolve()) if previous else None}
         try:
             self._stop(should_stop)
-            source = prepare_sources(config, self.workspace, fetch=self.fetch, should_stop=should_stop)
+            with observed_step(observation_context, 1, phase='acquire', namespace='prepare-acquire'):
+                source = prepare_sources(config, self.workspace, fetch=self.fetch, should_stop=should_stop)
             write_new(output/'acquisition.json', source)
             result['acquisition'] = {'path': 'acquisition.json', 'status': source['status'], 'requests': source['requests']}
             result['gaps'] = list(source['gaps'])
@@ -164,7 +166,8 @@ class CompanyDataCoordinator:
                 result['stage_coverage'] = manifest.get('stage_coverage', {})
                 result['gaps'] = [*source['gaps'], *[gap for gap in manifest['gaps'] if gap not in source['gaps']]]
             elif source['documents']:
-                manifest = self.materializer(source, self.workspace, output/'dataset', should_stop=should_stop)
+                with observed_step(observation_context, 1, phase='materialize', namespace='prepare-materialize'):
+                    manifest = self.materializer(source, self.workspace, output/'dataset', should_stop=should_stop)
                 result.update(dataset=_dataset_ref(output/'dataset'), materialization='created')
                 result['gaps'] = manifest['gaps']
                 result['stage_coverage'] = manifest.get('stage_coverage', {})
@@ -180,7 +183,156 @@ class CompanyDataCoordinator:
         return _seal(output, result)
 
     def refresh(self, config, *, previous, output, should_stop=None):
+        if not (Path(previous)/'source-config.json').is_file():
+            raise ValueError('refresh requires a preparation with an explicit acquisition configuration')
         return self.prepare(config, previous=previous, output=output, should_stop=should_stop)
+
+    def prepare_acquisition(self, acquisition, *, acquisition_sha256, source_ids, output, should_stop=None):
+        """Replay explicitly selected, hash-pinned acquisition bytes without HTTP."""
+        import re
+        from uteki.infrastructure.document_sources.company_acquisition import _day, _filing_selection
+        from uteki.infrastructure.document_sources.filing_integrity import validate_sec_filing
+
+        if not isinstance(acquisition_sha256, str) or not re.fullmatch(r'[0-9a-f]{64}', acquisition_sha256):
+            raise ValueError('explicit acquisition SHA256 required')
+        if (not isinstance(source_ids, (list, tuple)) or not source_ids
+                or any(not isinstance(sid, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*', sid) for sid in source_ids)
+                or len(source_ids) != len(set(source_ids))):
+            raise ValueError('explicit nonblank unique source IDs required')
+        origin = Path(acquisition)
+        if origin.is_symlink():
+            raise ValueError('acquisition manifest symlink is not allowed')
+        origin = origin.resolve()
+        raw_manifest = origin.read_bytes()
+        if digest(raw_manifest) != acquisition_sha256:
+            raise ValueError('acquisition manifest SHA256 mismatch')
+        acquired = json.loads(raw_manifest)
+        if not isinstance(acquired, dict) or acquired.get('schema_version') != 'company-source-run-v1':
+            raise ValueError('a frozen company-source-run-v1 acquisition is required')
+        parent_id = acquired.get('run_id')
+        if not isinstance(parent_id, str) or not parent_id.strip():
+            raise ValueError('acquisition run identity is required')
+        if acquired.get('status') not in {'completed', 'completed_with_gaps'}:
+            raise ValueError('acquisition must have a completed identity-resolved status')
+        company, scope = acquired.get('company'), acquired.get('scope')
+        if (not isinstance(company, dict) or not isinstance(company.get('company_id'), str)
+                or not isinstance(company.get('cik'), str) or not re.fullmatch(r'sec-[0-9]{10}', company['company_id'])
+                or not re.fullmatch(r'[0-9]{10}', company['cik'])
+                or not int(company['cik']) or company['company_id'] != 'sec-'+company['cik']):
+            raise ValueError('explicit consistent SEC company identity required')
+        if not isinstance(scope, dict):
+            raise ValueError('explicit acquisition scope required')
+        cutoff = _day(scope.get('as_of'), 'as_of')
+        if scope.get('requested_cik') is not None and scope['requested_cik'] != company['cik']:
+            raise ValueError('acquisition scope company identity mismatch')
+        for key in ('symbol', 'market'):
+            if key in scope and key in company and scope[key] != company[key]:
+                raise ValueError('acquisition scope company '+key+' mismatch')
+        policy = scope.get('source_policy')
+        if not isinstance(policy, dict) or any(not isinstance(policy.get(k), list) for k in ('official', 'third_party')):
+            raise ValueError('explicit acquisition source policy required')
+        _, mode, target_period, annual_form, period_range = _filing_selection(scope, cutoff)
+        documents, acquisition_gaps = acquired.get('documents'), acquired.get('gaps')
+        if not isinstance(documents, list) or not isinstance(acquisition_gaps, list) or any(not isinstance(g, dict) for g in acquisition_gaps):
+            raise ValueError('explicit acquisition documents and gaps required')
+        by_id = {}
+        for doc in documents:
+            sid = doc.get('source_id') if isinstance(doc, dict) else None
+            if not isinstance(sid, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*', sid) or sid in by_id:
+                raise ValueError('missing or duplicate acquisition source identity')
+            by_id[sid] = doc
+        if set(source_ids) - by_id.keys():
+            raise ValueError('selected source ID is absent from the pinned acquisition')
+        selected = [deepcopy(by_id[sid]) for sid in source_ids]
+        for doc in selected:
+            role, form = doc.get('role'), doc.get('form')
+            if not isinstance(role, str) or not isinstance(form, str) or not (
+                    (role == 'filing' and form in {'10-K', '10-K/A', '10-Q', '10-Q/A', '20-F', '20-F/A', '8-K', '8-K/A'})
+                    or (role == 'filing_attachment' and form == 'EXHIBIT')
+                    or (role in {'ir', 'blog', 'events'} and form in {'OFFICIAL_UPDATE', 'THIRD_PARTY_UPDATE'})):
+                raise ValueError('selected source has an unsupported or conflicting acquisition role and form')
+            if 'company_id' in doc and doc['company_id'] != company['company_id']:
+                raise ValueError('selected document company identity mismatch')
+            expected = doc.get('content_sha256')
+            if not isinstance(expected, str) or not re.fullmatch(r'[0-9a-f]{64}', expected):
+                raise ValueError('selected source content SHA256 required')
+            if doc.get('sha256', expected) != expected:
+                raise ValueError('selected source hash declarations conflict')
+            relative = doc.get('path')
+            if not isinstance(relative, str) or not relative.strip() or Path(relative).is_absolute():
+                raise ValueError('selected source requires an explicit relative path')
+            candidate = self.workspace/relative
+            if any(p.is_symlink() for p in (candidate, *candidate.parents) if p.is_relative_to(self.workspace)):
+                raise ValueError('selected source symlink is not allowed')
+            raw = contained(self.workspace, relative).read_bytes()
+            if digest(raw) != expected:
+                raise ValueError('selected source bytes SHA256 mismatch')
+            if (doc.get('status') not in {'downloaded', 'frozen'} or doc.get('as_of_eligible') is not True
+                    or not isinstance(doc.get('source_url'), str) or not doc['source_url'].startswith(('https://', 'http://'))
+                    or not isinstance(doc.get('form'), str) or not doc['form'].strip()
+                    or not isinstance(doc.get('mime_type'), str) or not doc['mime_type'].strip()):
+                raise ValueError('selected source must have explicit eligible frozen metadata')
+            available = _day(doc.get('filed_at') or doc.get('published_at'), 'source availability')
+            if available > cutoff:
+                raise ValueError('selected source was unavailable at the acquisition cutoff')
+            if doc.get('role') == 'filing' and mode != 'latest_10k_and_subsequent_filings':
+                period = _day(doc.get('period_end'), 'report_period_end')
+                if (doc['form'] not in {annual_form, annual_form+'/A'} or (target_period and period != target_period)
+                        or (period_range and not period_range[0] <= period <= period_range[1])):
+                    raise ValueError('selected filing conflicts with acquisition period or form scope')
+            validation = doc.get('validation')
+            if (doc.get('role') == 'filing' and scope.get('document_validation') == 'sec_inline_identity_v1') or validation:
+                if not isinstance(validation, dict) or validation.get('status') != 'identity_validated':
+                    raise ValueError('selected source lacks the acquisition identity validation')
+                verified = validate_sec_filing(raw, company['cik'], doc['form'], doc.get('period_end'))
+                if any(validation.get(k) != verified[k] for k in ('cik', 'form', 'period_end', 'content_sha256')):
+                    raise ValueError('selected source identity receipt conflicts with its metadata')
+        target = Path(output).resolve()
+        if target.is_relative_to(origin.parent):
+            raise ValueError('replay output must be outside the frozen acquisition directory')
+        for parent in target.parents:
+            manifest_path = parent/'manifest.json'
+            if manifest_path.is_file():
+                previous = _load(manifest_path)
+                version = previous.get('schema_version', '') if isinstance(previous, dict) else ''
+                if version == 'company-agent-run-v1' or str(version).startswith('research-query-v'):
+                    raise ValueError('replay output must be outside frozen runs and datasets')
+        selected_urls = {d['source_url'] for d in selected}
+        excluded_urls = {d['source_url'] for d in documents
+                         if d['source_id'] not in source_ids and isinstance(d.get('source_url'), str)} - selected_urls
+        gaps = [deepcopy(g) for g in acquisition_gaps
+                if (not (g.get('source_id') or g.get('source_snapshot_id'))
+                    or (g.get('source_id') or g.get('source_snapshot_id')) in source_ids)
+                and g.get('source_url') not in excluded_urls]
+        replay = {'schema_version': 'frozen-acquisition-replay-v1', 'origin_manifest': str(origin),
+            'origin_manifest_sha256': acquisition_sha256, 'origin_run_id': parent_id, 'source_ids': list(source_ids)}
+        source = {'schema_version': 'company-source-run-v1', 'run_id': 'replay-'+digest(replay)[:24],
+            'parent_run_ids': [parent_id], 'company': deepcopy(company),
+            'scope': {'as_of': cutoff.isoformat(), 'source_policy': deepcopy(policy),
+                      'selection': 'explicit_frozen_sources', 'source_ids': list(source_ids), 'automatic_adoption': False},
+            'documents': selected, 'gaps': gaps, 'replay': replay, 'requests': 0, 'model_calls': 0,
+            'status': 'completed_with_gaps' if gaps else 'completed'}
+        output = self._output(target)
+        write_new(output/'acquisition.input.json', replay)
+        write_new(output/'source-run.json', source)
+        result = {'schema_version': 'company-agent-result-v1', 'operation': 'prepare', 'status': 'unavailable',
+            'dataset': None, 'gaps': list(gaps), 'model_calls': 0, 'workspace': str(self.workspace),
+            'previous_run': None, 'acquisition': {'mode': 'reused_frozen', 'requests': 0, **replay}}
+        try:
+            self._stop(should_stop)
+            manifest = self.materializer(source, self.workspace, output/'dataset', should_stop=should_stop)
+            result.update(dataset=_dataset_ref(output/'dataset'), materialization='created',
+                          materialization_key=self._materialization_key(source), gaps=manifest['gaps'],
+                          stage_coverage=manifest.get('stage_coverage', {}))
+            self._stop(should_stop)
+            if manifest['source_count']:
+                result['status'] = 'prepared_with_gaps' if manifest['gaps'] else 'prepared'
+        except company_materialization.MaterializationCancelled:
+            result.update(status='cancelled', stop_reason='cancelled')
+        except Exception as error:
+            result.update(status='failed', stop_reason=type(error).__name__)
+            result['gaps'].append({'layer': 'preparation', 'reason': str(error)[:500]})
+        return _seal(output, result)
 
     def reprocess(self, previous, *, output, should_stop=None):
         """Prepare a new dataset from a verified frozen acquisition, without HTTP."""
@@ -197,9 +349,13 @@ class CompanyDataCoordinator:
         if any(target.is_relative_to(path) for path in protected):
             raise ValueError('reprocessing output must be outside frozen runs and datasets')
         source = _load(previous/'source-run.json')
+        acquisition_only = source.get('replay', {}).get('schema_version') == 'frozen-acquisition-replay-v1'
+        if not acquisition_only and not (previous/'source-config.json').is_file():
+            raise ValueError('preparation is missing its acquisition configuration')
         output = self._output(output)
-        for name in ('source-config.input.json', 'source-config.json', 'source-run.json'):
-            write_new(output/name, _load(previous/name))
+        for name in ('source-config.input.json', 'source-config.json', 'acquisition.input.json', 'source-run.json'):
+            if (previous/name).is_file():
+                write_new(output/name, _load(previous/name))
         result = {'schema_version': 'company-agent-result-v1', 'operation': 'prepare',
             'status': 'unavailable', 'dataset': None, 'gaps': list(source['gaps']), 'model_calls': 0,
             'workspace': str(self.workspace), 'previous_run': str(previous),
@@ -268,7 +424,25 @@ class CompanyDataCoordinator:
 
     async def query(self, request, *, output, planner=None, model_config=None, credential_root=None,
                     worker_planner=None, worker_model_config=None, extractor_model_config=None,
-                    method_root=None, financial_extractor=None):
+                    method_root=None, financial_extractor=None, observation_root=None):
+        checked = CompanyQueryInput.model_validate(request)
+        protected = [self.workspace, checked.dataset, checked.prepared_run]
+        if observation_root is not None and checked.prepared_run:
+            prepared = inspect_run(checked.prepared_run)['result']
+            if prepared.get('dataset'):
+                protected.append(prepared['dataset']['path'])
+        with observed_run(output=output, kind='query', role='planner',
+                origin='model' if model_config is not None else 'scripted_fixture',
+                observation_root=observation_root, scope=checked.scope or checked.company_config, title=checked.question,
+                protected=protected) as observer:
+            return await self._query(checked, output=output, planner=planner, model_config=model_config,
+                credential_root=credential_root, worker_planner=worker_planner,
+                worker_model_config=worker_model_config, extractor_model_config=extractor_model_config,
+                method_root=method_root, financial_extractor=financial_extractor, observation_context=observer)
+
+    async def _query(self, request, *, output, planner=None, model_config=None, credential_root=None,
+                    worker_planner=None, worker_model_config=None, extractor_model_config=None,
+                    method_root=None, financial_extractor=None, observation_context=None):
         request = CompanyQueryInput.model_validate(request)
         limits = AutonomousLimits.model_validate(request.limits)
         if (planner is None) == (model_config is None):
@@ -324,6 +498,8 @@ class CompanyDataCoordinator:
             _configuration(checked_config)
         output = self._output(output)
         write_new(output/'request.json', request.model_dump(mode='json'))
+        if observation_context:
+            observation_context.publish(output/'request.json', kind='request')
         if model_config is not None:
             write_new(output/'model-config.input.json', model_config)
         if worker_model_config is not None:
@@ -350,16 +526,33 @@ class CompanyDataCoordinator:
                 if request.prepared_run:
                     assert prepared_result is not None
                 else:
-                    prepared_result = await self._worker(self.prepare, request.company_config, output=prepared)
+                    with observed_step(observation_context, 1, phase='prepare', namespace='prepare') as preparation_observer:
+                        prepared_result = await self._worker(self.prepare, request.company_config, output=prepared,
+                                                             observation_context=preparation_observer)
+                        if preparation_observer:
+                            preparation_observer.recorder.publish_tree(preparation_observer, prepared)
                 if prepared_result['status'] not in {'prepared', 'prepared_with_gaps'} or not prepared_result.get('dataset') or not prepared_result['dataset']['source_count']:
                     result.update(status=prepared_result['status'], gaps=prepared_result['gaps'], stop_reason='preparation_unavailable')
                     return _seal(output, result)
                 active_dataset = Path(prepared_result['dataset']['path'])
-                config, source = _load(prepared/'source-config.json'), _load(prepared/'source-run.json')
+                source = _load(prepared/'source-run.json')
+                config_path = prepared/'source-config.json'
+                if config_path.is_file():
+                    config = _load(config_path)
+                    scope_config = config
+                elif source.get('replay', {}).get('schema_version') == 'frozen-acquisition-replay-v1':
+                    # A frozen replay has no acquisition credentials or live callbacks.
+                    scope_config = {'as_of': source['scope']['as_of']}
+                    config = None
+                else:
+                    raise ValueError('preparation is missing its acquisition configuration')
                 owner = self.port_factory(active_dataset); owners.append(owner)
-                scope = self._scope(owner, config, request.include_candidates)
+                scope = self._scope(owner, scope_config, request.include_candidates)
             result['dataset'] = _dataset_ref(active_dataset)
             write_new(output/'scope.json', scope.model_dump(mode='json'))
+            if observation_context:
+                observation_context.publish(output/'request.json', kind='request')
+                observation_context.publish(output/'scope.json', kind='scope')
             if source:
                 source_history[scope.snapshot_id] = source
                 dataset_cache[self._materialization_key(source)] = owner
@@ -418,16 +611,17 @@ class CompanyDataCoordinator:
             if worker_model_config is not None:
                 managed_worker = self._planner(worker_model_config, output/'worker-model', credential_root, role='worker')
                 worker_planner = managed_worker
-            preparation = None if source is None else {'filing_catalog': source.get('filing_catalog', []),
+            preparation = None if source is None or config is None else {'filing_catalog': source.get('filing_catalog', []),
                 'acquisition_gaps': source['gaps'], 'callbacks': {
                     'acquire': {'filing_selection': {'mode': 'annual_filing_period',
                         'annual_form': '10-K or 20-F; copy the base form from the selected filing_catalog item',
                         'report_period_end': 'ISO date from filing_catalog'}},
                     'materialize': {'source_run_id': 'ID returned by acquire'}}}
             agent = AutonomousDataAgent(owner, planner, limits=limits, worker_planner=worker_planner,
-                acquire=acquire if source else None, materialize=materialize if source else None, preparation=preparation,
+                acquire=acquire if source and config is not None else None,
+                materialize=materialize if source and config is not None else None, preparation=preparation,
                 financial_extract=financial_gateway.extract if financial_gateway else None,
-                financial_tasks=financial_gateway.catalog if financial_gateway else None)
+                financial_tasks=financial_gateway.catalog if financial_gateway else None, observation_context=observation_context)
             query_result = await agent.run({'question': request.question, 'scope': scope.model_dump(mode='json')}, output=output/'query')
             final_owner = next(p for p in owners if p.snapshot_id == query_result['active_scope']['snapshot_id'])
             result.update(status=query_result['status'], stop_reason=query_result['stop_reason'],
@@ -474,9 +668,10 @@ class CompanyDataCoordinator:
             raise ValueError('explicit model, shared ledger and budget policy are required')
         if any(not isinstance(config[key], str) or not config[key].strip() for key in ('provider', 'model', 'budget_ledger')):
             raise ValueError('provider/model/ledger must be nonempty')
-        if config.get('reasoning_effort') is not None and (not isinstance(config['reasoning_effort'], str) or config['provider'] != 'deepseek'
-                or config['reasoning_effort'] not in {'none', 'low', 'high', 'max'}):
-            raise ValueError('Explicit reasoning effort is supported only for DeepSeek: none, low, high, max')
+        from .autonomous_model import reasoning_configuration
+        _, _, native = reasoning_configuration(config['provider'], config['model'], config.get('reasoning_effort'))
+        if native and config.get('max_retries', 0) != 0:
+            raise ValueError('Native Claude currently requires explicit retries disabled')
         if config['max_requests_total'] is not None and (type(config['max_requests_total']) is not int or config['max_requests_total'] < 1):
             raise ValueError('positive shared request allowance or explicit None required')
         from decimal import Decimal, InvalidOperation

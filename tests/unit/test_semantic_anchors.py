@@ -209,3 +209,42 @@ class SemanticAnchorTests(unittest.TestCase):
         self.assertEqual(packet['source_blocks'][0]['text'], '前 12 34 后 56 。')
         self.assertEqual((anchors['a']['start'], anchors['a']['end'], anchors['a']['text']), (2, 7, '12 34'))
         self.assertEqual((anchors['b']['start'], anchors['b']['end'], anchors['b']['text']), (10, 12, '56'))
+
+    def test_versioned_line_breaks_bind_complete_rows_and_inline_offsets(self):
+        for body, expected in [
+            ('<table><tr><td>Revenue<br>net </td><td><span id="a">100</span></td></tr>'
+             '<tr><td>Profit<br hidden> </td><td><span id="b">100</span></td></tr></table>',
+             ('Revenue net 100', 'Profit 100')),
+            ('<p>净额<br>收入 <span id="a">1<b>,200</b></span> / '
+             '<span id="b">50<br>万元</span></p>', ('1,200', '50 万元')),
+        ]:
+            packet, raw = self.packet(body)
+            legacy = build_record_anchors_v3(packet, raw)
+            self.assertTrue(all(a['status'] == 'located' for a in legacy.values()))
+            tree = html.document_fromstring(raw, parser=html.HTMLParser(encoding='utf-8'))
+            block = packet['source_blocks'][0]
+            block['text'] = normalize_text(_visible_text(tree.xpath('//table|//p')[0], preserve_line_breaks=True))
+            block['text_hash'] = digest(block['text'].encode())
+            for item in packet['records']:
+                fact = tree.xpath('//*[@id="'+item['record']['record_id']+'"]')[0]
+                item['evidence']['quote'] = normalize_text(_visible_text(fact, preserve_line_breaks=True))
+            packet['parser_version'] = 'sec-source-blocks-v0.1.12'
+            anchors = packet['record_anchors'] = build_record_anchors_v3(packet, raw)
+            self.assertEqual(tuple(anchors[k]['text'] for k in ('a', 'b')), expected)
+            for key, anchor in anchors.items():
+                validate_record_anchor_coverage(packet, {'record_ids': [key], 'citations': [self.citation(anchor)]})
+            packet['parser_version'] = 'sec-source-blocks-v0.1.11'
+            self.assertTrue(all(a['status'] == 'unavailable' for a in build_record_anchors_v3(packet, raw).values()))
+            packet['parser_version'] = 'unsupported'
+            with self.assertRaisesRegex(ValueError, 'parser version'):
+                build_record_anchors_v3(packet, raw)
+
+    def test_versioned_v2_paragraph_and_table_consumers(self):
+        for body in ('<p>Revenue<br>net <span id="a">100</span>.</p>',
+                     '<table><tr><td>Revenue<br>net </td><td><span id="a">100</span></td></tr></table>'):
+            packet, raw = self.packet(body)
+            block = packet['source_blocks'][0]
+            block['text'] = block['text'].replace('Revenuenet', 'Revenue net')
+            block['text_hash'] = digest(block['text'].encode())
+            packet['parser_version'] = 'sec-source-blocks-v0.1.12'
+            self.assertEqual(build_record_anchors(packet, raw)['a']['text'], block['text'])

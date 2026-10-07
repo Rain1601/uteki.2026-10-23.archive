@@ -1,0 +1,24 @@
+flowchart LR
+  accTitle: Selected filing business structure
+  accDescr: Solid edges are explicit source assertions. Dashed edges are derived. Unknown relations are omitted; absent edges do not imply independence.
+  N000["MICROSOFT CORPORATION"]:::company
+  N002["Intelligent Cloud"]:::reportable_segment
+  N018["Server products and cloud services"]:::offering_group
+  N019["Azure"]:::business
+  N020["Azure AI Foundry"]:::business
+  N021["GitHub"]:::business
+  N022["Nuance Healthcare"]:::business
+  N023["Server products"]:::offering_group
+  N024["Enterprise and partner services"]:::offering_group
+  classDef company fill:#263c46,color:#fff,stroke:#263c46,stroke-width:1.5px
+  classDef reportable_segment fill:#e4eef2,color:#203c49,stroke:#91aeba,stroke-width:1px
+  classDef business fill:#eaf1e9,color:#2b4432,stroke:#a4b8a7,stroke-width:1px
+  classDef offering_group fill:#fff,color:#302c26,stroke:#c9c2b7,stroke-width:1px
+  N000 -->|"包含"| N002
+  N002 -->|"报告中列示"| N018
+  N002 -->|"报告中列示"| N024
+  N018 -->|"包含"| N019
+  N018 -->|"包含"| N021
+  N018 -->|"包含"| N022
+  N019 -.->|"包含"| N020
+  N002 -->|"报告中列示"| N023

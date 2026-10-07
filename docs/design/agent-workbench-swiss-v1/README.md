@@ -1,3 +1,5 @@
+> **2026-10-06：旧页面已退役。** 本目录不再提供独立页面；旧页面及其专用代码、测试已删除。当前使用 [Swiss C 投研前台](../company-workspace-swiss-c/README.md) 和 [真实数据工作台](../../../apps/review_workbench/README.md)。以下文字保留为历史记录，其中旧启动命令与页面链接不再适用。保留的原始素材、来源记录和冻结版本仅用于追溯。
+
 # Uteki 后台瑞士排版预览 / Swiss workbench preview
 
 独立视觉探索，使用与 [现版后台](../agent-workbench-v1/README.md) 相同的任务、产物和交互。工程阅读型为本页默认方案；两种风格均待用户评审，尚未成为 Uteki 的通用界面规则。

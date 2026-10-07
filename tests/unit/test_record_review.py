@@ -8,6 +8,7 @@ import unittest
 from uteki.infrastructure.research_data.company_materialization import materialize_sources
 from uteki.infrastructure.research_data.financial_records import digest
 from uteki.infrastructure.research_data.record_review import build_review_packets, validate_assessment
+from uteki.infrastructure.research_data.semantic_review import validate_dataset_binding
 from tests.unit.test_company_materialization import filing
 
 
@@ -59,6 +60,16 @@ class RecordReviewTests(unittest.TestCase):
         self.assertEqual(digest(original), fragment['original_fragment_sha256'])
         self.assertIn('contextref="c"', fragment['compact_html'])
         self.assertEqual(validate_assessment(self.packet, self.assessment())['records'][0]['verdict'], 'supported')
+
+    def test_parser_version_is_carried_and_bound_to_selected_index(self):
+        source = json.loads((self.dataset/'sources.json').read_text())[0]
+        index = json.loads((self.dataset/source['index_folder']/'index.json').read_text())
+        self.assertEqual(self.packet['parser_version'], index['parser_version'])
+        validate_dataset_binding(self.packet, self.dataset, artifact_root=self.output)
+        changed = deepcopy(self.packet)
+        changed['parser_version'] = 'sec-source-blocks-v0.1.12'
+        with self.assertRaisesRegex(ValueError, 'parser version differs'):
+            validate_dataset_binding(changed, self.dataset)
 
     def test_invented_quote_wrong_source_and_unknown_block_are_rejected(self):
         for update in ({'quote': 'invented disclosure'}, {'source_snapshot_id': 'other-company'},

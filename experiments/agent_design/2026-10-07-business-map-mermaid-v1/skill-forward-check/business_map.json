@@ -1,0 +1,360 @@
+{
+  "schema_version": "0.1",
+  "company_id": "aster",
+  "document_id": "aster-2024",
+  "summary": "合成 Aster FY2024：两个报告分部，Services 内两个商业组，以及一个跨分部共享支持组件。无数值、排名或面积权重。",
+  "businesses": [
+    {
+      "id": "aster",
+      "name": "Aster",
+      "kind": "company",
+      "description": "调用方明确选择的合成评测公司；报告两个分部。",
+      "products_services": [],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "三段材料没有说明公司整体如何收费或提供任何收入数值。",
+          "basis": "unknown",
+          "evidence_ids": [
+            "p1"
+          ]
+        }
+      ],
+      "importance_signals": [],
+      "evidence_ids": [
+        "p1"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "id": "devices",
+      "name": "设备 / Devices",
+      "kind": "reportable_segment",
+      "description": "Aster 明确报告的 Devices 分部。",
+      "products_services": [],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "材料未说明具体产品、客户、收费方式或收入数值。",
+          "basis": "unknown",
+          "evidence_ids": [
+            "p1"
+          ]
+        }
+      ],
+      "importance_signals": [],
+      "evidence_ids": [
+        "p1"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "id": "services",
+      "name": "服务 / Services",
+      "kind": "reportable_segment",
+      "description": "Aster 明确报告的 Services 分部，包含 Subscriptions 与 App Platform。",
+      "products_services": [],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "材料仅明确订阅与应用平台合并披露收入，未说明收费方式。",
+          "basis": "unknown",
+          "evidence_ids": [
+            "p1",
+            "p2"
+          ]
+        }
+      ],
+      "importance_signals": [],
+      "evidence_ids": [
+        "p1",
+        "p2"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "id": "subscriptions",
+      "name": "订阅 / Subscriptions",
+      "kind": "offering_group",
+      "description": "Services 内的商业组；不设为独立报告分部或独立收入披露。",
+      "products_services": [],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "不能仅根据名称补出套餐、收费周期或独立收入；所给材料只有合并收入披露。",
+          "basis": "unknown",
+          "evidence_ids": [
+            "p2"
+          ]
+        }
+      ],
+      "importance_signals": [],
+      "evidence_ids": [
+        "p2"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "id": "app-platform",
+      "name": "应用平台 / App Platform",
+      "kind": "offering_group",
+      "description": "Services 内的商业组；与 Subscriptions 只有合并收入披露。",
+      "products_services": [],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "材料未说明抽成、交易费、订阅费或独立收入。",
+          "basis": "unknown",
+          "evidence_ids": [
+            "p2"
+          ]
+        }
+      ],
+      "importance_signals": [],
+      "evidence_ids": [
+        "p2"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "id": "identity-infrastructure",
+      "name": "身份基础设施 / Identity Infrastructure",
+      "kind": "offering_group",
+      "description": "同时支持 Devices 与 Services 的共享支持组件；不是报告分部。",
+      "products_services": [],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "材料未披露收费方式、收入或组织归属；不推定为独立收费业务。",
+          "basis": "unknown",
+          "evidence_ids": [
+            "p3"
+          ]
+        }
+      ],
+      "importance_signals": [],
+      "evidence_ids": [
+        "p3"
+      ],
+      "review_status": "candidate"
+    }
+  ],
+  "relationships": [
+    {
+      "source_id": "devices",
+      "target_id": "aster",
+      "kind": "reported_under",
+      "description": "Devices 是 Aster 的报告分部。",
+      "evidence_ids": [
+        "p1"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "source_id": "services",
+      "target_id": "aster",
+      "kind": "reported_under",
+      "description": "Services 是 Aster 的报告分部。",
+      "evidence_ids": [
+        "p1"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "source_id": "subscriptions",
+      "target_id": "services",
+      "kind": "part_of",
+      "description": "Subscriptions 包含在 Services；只明确与 App Platform 的合并收入披露。",
+      "evidence_ids": [
+        "p2"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "source_id": "app-platform",
+      "target_id": "services",
+      "kind": "part_of",
+      "description": "App Platform 包含在 Services；只明确与 Subscriptions 的合并收入披露。",
+      "evidence_ids": [
+        "p2"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "source_id": "identity-infrastructure",
+      "target_id": "devices",
+      "kind": "supports",
+      "description": "同一个 Identity Infrastructure 支持 Devices。",
+      "evidence_ids": [
+        "p3"
+      ],
+      "review_status": "candidate"
+    },
+    {
+      "source_id": "identity-infrastructure",
+      "target_id": "services",
+      "kind": "supports",
+      "description": "同一个 Identity Infrastructure 支持 Services。",
+      "evidence_ids": [
+        "p3"
+      ],
+      "review_status": "candidate"
+    }
+  ],
+  "unknowns": [
+    {
+      "id": "u-economic-detail",
+      "question": "各业务的具体产品、客户和收费方式是什么？",
+      "materiality": "不能从分部或产品组名称推定赚钱方式。",
+      "related_business_ids": [
+        "aster",
+        "devices",
+        "services",
+        "subscriptions",
+        "app-platform",
+        "identity-infrastructure"
+      ],
+      "reason_unanswered": "调用方提供的三段材料未给这些信息；本次已读完三段，不代表真实公司年报没有披露。",
+      "evidence_ids": [
+        "p1",
+        "p2",
+        "p3"
+      ]
+    },
+    {
+      "id": "u-financial-weights",
+      "question": "收入金额、独立收入与权重如何？",
+      "materiality": "不能据布局推断财务大小，也不能拆分合并收入。",
+      "related_business_ids": [
+        "subscriptions",
+        "app-platform"
+      ],
+      "reason_unanswered": "p2 仅明确两组只有合并收入披露，输入没有金额、单位、分母或排序依据。",
+      "evidence_ids": [
+        "p2"
+      ]
+    },
+    {
+      "id": "u-shared-owner",
+      "question": "Identity Infrastructure 的组织归属是什么？",
+      "materiality": "跨分部支持不等于组织隶属。",
+      "related_business_ids": [
+        "identity-infrastructure"
+      ],
+      "reason_unanswered": "p3 只明确两个支持方向和非报告分部身份；没有给组织归属。",
+      "evidence_ids": [
+        "p3"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "p1",
+      "document_id": "aster-2024",
+      "section_path": [
+        "Caller-supplied synthetic material",
+        "p1"
+      ],
+      "paragraph_ordinal": 1,
+      "text_hash": "622ec4e08a2c21eaa2fda68bfeb094ff22376ef6fb9637ee6046b48cc6f1f5b4",
+      "source_url": "source.html",
+      "support": "Aster 的两个报告分部为 Devices 和 Services。"
+    },
+    {
+      "id": "p2",
+      "document_id": "aster-2024",
+      "section_path": [
+        "Caller-supplied synthetic material",
+        "p2"
+      ],
+      "paragraph_ordinal": 2,
+      "text_hash": "8c348836bb2c37b4ddb67f0f4c46e990c4b4dec7aaeb3387957923ce75b3160b",
+      "source_url": "source.html",
+      "support": "Services 包括订阅和应用平台；两者只有合并收入披露。"
+    },
+    {
+      "id": "p3",
+      "document_id": "aster-2024",
+      "section_path": [
+        "Caller-supplied synthetic material",
+        "p3"
+      ],
+      "paragraph_ordinal": 3,
+      "text_hash": "61a236981e45616dfb4071f163b3743e92ad7817788d300f79ab87fb604b47f5",
+      "source_url": "source.html",
+      "support": "共享 Identity Infrastructure 支持两个分部，且不是报告分部。"
+    }
+  ],
+  "metadata": {
+    "extraction_method": "codex_source_review",
+    "source_kind": "caller_supplied_synthetic_text",
+    "report_label": "Aster FY2024 · 合成评测 / Synthetic evaluation",
+    "period_end": "2024-12-31",
+    "publication_date": null,
+    "source_local_path": "/tmp/uteki-diagram-skill-check/source.html",
+    "source_url": "source.html",
+    "source_sha256": "250f6ce5e5585b7bbb59b1321d1972686f5c5f4b4c01b1f3ff40a841d28b4f98",
+    "original_input_path": "/tmp/uteki-diagram-skill-check/input.txt",
+    "original_input_sha256": "6464d6a9ab9609b319df1f026866438f5758a52e2c54866ff06232bb2b746166",
+    "input_hash_object": "p1, p2, p3 exact texts joined with one LF; no final LF",
+    "source_html_is_original": false,
+    "evidence_locators": {
+      "p1": {
+        "local_path": "/tmp/uteki-diagram-skill-check/source.html",
+        "fragment": "p1",
+        "exact_quote": "Aster reports two segments, Devices and Services.",
+        "paragraph_ordinal": 1,
+        "text_hash": "622ec4e08a2c21eaa2fda68bfeb094ff22376ef6fb9637ee6046b48cc6f1f5b4",
+        "hash_object": "Exact supplied paragraph UTF-8 bytes; no normalization or trailing newline",
+        "source_kind": "caller_supplied_synthetic_text"
+      },
+      "p2": {
+        "local_path": "/tmp/uteki-diagram-skill-check/source.html",
+        "fragment": "p2",
+        "exact_quote": "Services includes Subscriptions and App Platform; only their combined revenue is disclosed.",
+        "paragraph_ordinal": 2,
+        "text_hash": "8c348836bb2c37b4ddb67f0f4c46e990c4b4dec7aaeb3387957923ce75b3160b",
+        "hash_object": "Exact supplied paragraph UTF-8 bytes; no normalization or trailing newline",
+        "source_kind": "caller_supplied_synthetic_text"
+      },
+      "p3": {
+        "local_path": "/tmp/uteki-diagram-skill-check/source.html",
+        "fragment": "p3",
+        "exact_quote": "Identity Infrastructure supports both Devices and Services; it is not a reportable segment.",
+        "paragraph_ordinal": 3,
+        "text_hash": "61a236981e45616dfb4071f163b3743e92ad7817788d300f79ab87fb604b47f5",
+        "hash_object": "Exact supplied paragraph UTF-8 bytes; no normalization or trailing newline",
+        "source_kind": "caller_supplied_synthetic_text"
+      }
+    },
+    "node_roles": {
+      "identity-infrastructure": "shared_support_component",
+      "subscriptions": "commercial_group",
+      "app-platform": "commercial_group"
+    },
+    "node_id_to_mermaid_id": {
+      "aster": "N00",
+      "devices": "N01",
+      "services": "N02",
+      "subscriptions": "N03",
+      "app-platform": "N04",
+      "identity-infrastructure": "N05"
+    },
+    "skill_path": "skills/uteki-business-diagrams/SKILL.md",
+    "skill_version": "0.1-candidate",
+    "skill_sha256": "05a701ca0011880b825bb818d4b2316c87ba21a05bb8090eb1b0467805252e68",
+    "reference_path": "skills/uteki-business-diagrams/references/runtime-and-checks.md",
+    "reference_sha256": "d5a9b06edc0f578322d7bdaebe813649fd23c06f03817aad731e20ae4701a8e5",
+    "render_config_path": "/tmp/uteki-diagram-skill-check/mermaid-config.json",
+    "render_config_sha256": "5c7ae236a85102ccbb6da8c20212cc61863c0333b9d149c56cdf8826befc4724",
+    "read_scope": [
+      "All three caller-supplied synthetic paragraphs: p1, p2, p3"
+    ],
+    "unread_materials": [],
+    "layout": "top-to-bottom reporting hierarchy plus one shared support component; no pyramid or quantitative node sizing",
+    "review_status": "candidate",
+    "runtime_binding_claimed": false,
+    "model_api_calls": 0,
+    "network_calls": 0
+  }
+}

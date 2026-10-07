@@ -1,0 +1,45 @@
+{
+  "example_status": "discussion_only_not_an_implemented_API_or_real_dataset",
+  "description_version": "proposal-v0",
+  "artifact_type": "structured_financial_facts",
+  "artifact_id": "<ID returned by discovery>",
+  "artifact_version": "<frozen dataset version>",
+  "schema_ref": "<record schema returned by get_data_schema>",
+  "scope": {
+    "company_id": "<explicit company ID>",
+    "source_snapshot_ids": ["<explicit source snapshot ID>"],
+    "knowledge_cutoff": "<explicit cutoff date>",
+    "source_policy_id": "<explicit source policy>",
+    "include_candidates": "<explicit caller choice>"
+  },
+  "semantics": {
+    "record_grain": "One observation for one entity, metric definition, exact period, dimensions, unit and accounting basis in one source version.",
+    "period_policy": "Use source dates and period kind. Do not substitute report year for observation period.",
+    "missing_policy": "A missing row is not zero and does not prove non-disclosure in source material.",
+    "aggregation_policy": "Do not sum different units, dimensions, periods or accounting bases without an explicitly validated rule.",
+    "state_policy": "Candidate, task-reviewed and adopted are distinct. Read actual record/version review state."
+  },
+  "access_methods": [
+    {
+      "tool": "query_facts",
+      "input_contract": "<current tool input schema>",
+      "selection": "<validated selection returned by discovery>",
+      "output_contract": "<current scoped query result schema>",
+      "limits": "<limits declared by the current tool>"
+    },
+    {
+      "tool": "read_source",
+      "purpose": "Resolve returned evidence IDs, then inspect original blocks and required context within the same source selection."
+    }
+  ],
+  "evidence_requirement": {
+    "minimum": "Frozen source identity and hash plus an original text span or table cell with headers, period, unit and necessary footnotes.",
+    "computed_values": "Keep formula, operand record IDs and operand evidence; never label a computed result as a directly disclosed value.",
+    "unavailable_precision": "Return an explicit locator limitation; do not invent character, cell or page coordinates."
+  },
+  "lineage": {
+    "derived_from": ["<canonical source artifact IDs>"],
+    "run_id": "<producing run ID>",
+    "transformation_version": "<explicit version>"
+  }
+}

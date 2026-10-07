@@ -1,0 +1,4396 @@
+{
+  "source_packet": {
+    "schema_version": "direct-extraction-packet-v1",
+    "company_id": "sec-0000002488",
+    "source": {
+      "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+      "company_id": "sec-0000002488",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000000248824000012/amd-20231230.htm",
+      "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+      "document_id": "source-291485b98a75d8cfabe47571",
+      "index_id": "didx-e474cb46f65462a1",
+      "index_folder": "indexes/source-291485b98a75d8cfabe47571",
+      "raw_file": "raw/source-291485b98a75d8cfabe47571.html",
+      "raw_file_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+      "form": "10-K",
+      "period_end": "2023-12-30",
+      "declared_mime_type": "text/html",
+      "parsed_mime_type": "text/html",
+      "available_at": "2024-01-31",
+      "status": "candidate",
+      "fiscal_periods": [],
+      "capabilities": [
+        "read_context",
+        "literal_search",
+        "source_bytes",
+        "html_table_structure"
+      ],
+      "stage_coverage": {
+        "schema_version": "source-stage-coverage-v1",
+        "original": {
+          "status": "hash_verified",
+          "byte_count": 2130413,
+          "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808"
+        },
+        "reading": {
+          "status": "indexed",
+          "parser_version": "sec-source-blocks-v0.1.7",
+          "block_count": 1184,
+          "block_type_counts": {
+            "heading_candidate": 242,
+            "image": 2,
+            "list_item": 64,
+            "other": 15,
+            "page_marker": 105,
+            "paragraph": 680,
+            "table": 76
+          },
+          "index_diagnostic_count": 8
+        },
+        "tables": {
+          "status": "structure_parsed",
+          "table_node_count": 76,
+          "tables_with_cells": 76,
+          "tables_without_cells": 0,
+          "cell_count": 7429,
+          "layout_role_counts": {
+            "table_of_contents": 1,
+            "unclassified": 75
+          },
+          "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+          "financial_table_semantics": "not_evaluated"
+        },
+        "numeric": {
+          "status": "no_supported_records",
+          "record_count": 0,
+          "evidence_count": 0,
+          "gap_count": 1265,
+          "adapter": "us-gaap-inline-v1",
+          "supported_taxonomy": "US_GAAP",
+          "supported_currencies": [
+            "USD"
+          ],
+          "supported_metric_ids": [
+            "capex_cash_payments",
+            "net_income",
+            "operating_cash_flow",
+            "operating_income",
+            "revenue",
+            "revenue_including_assessed_tax"
+          ],
+          "period_support": "complete_month_boundaries_only",
+          "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+          "financial_package_completeness": "not_evaluated",
+          "semantic_review": "not_evaluated",
+          "adoption": "candidate"
+        }
+      },
+      "image_block_count": 2
+    },
+    "task": {
+      "instruction": "Extract only the explicitly required financial facts and their source qualifications from this frozen cash-flow scope. Preserve all supplied comparative periods, exact source numerals, and currency. Do not infer figures outside this scope.",
+      "company_id": "sec-0000002488",
+      "source_snapshot_ids": [
+        "source-291485b98a75d8cfabe47571"
+      ],
+      "knowledge_cutoff": "2026-10-04"
+    },
+    "knowledge_cutoff": "2026-10-04",
+    "dataset_snapshot_id": "query-596ae3d3697d9a1c2abbf86f",
+    "dataset_manifest_sha256": "dce57a5a5b94c2f8b2a3fa99c9b4a05cff5dc811d4afc5c77968bd2f686831d8",
+    "blocks": [
+      {
+        "block_id": "block-000684-941a6235",
+        "ordinal": 684,
+        "type": "heading_candidate",
+        "text": "Advanced Micro Devices, Inc.",
+        "text_hash": "941a6235d6f8e84679499f347f1ea4745c50d251cd6f64c0eff6a154b36d88c5",
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "dom_path": "/html/body/div[739]",
+        "reported_page": 58,
+        "style_signature": [
+          [
+            "font-family",
+            "'arial',sans-serif"
+          ],
+          [
+            "font-size",
+            "10pt"
+          ],
+          [
+            "font-weight",
+            "700"
+          ],
+          [
+            "line-height",
+            "120%"
+          ],
+          [
+            "margin-top",
+            "9pt"
+          ],
+          [
+            "text-align",
+            "center"
+          ]
+        ],
+        "table": null,
+        "image_asset_id": null,
+        "layout_role": null
+      },
+      {
+        "block_id": "block-000685-4f5a988d",
+        "ordinal": 685,
+        "type": "heading_candidate",
+        "text": "Consolidated Statements of Cash Flows",
+        "text_hash": "4f5a988db60976cc80906521a8b4a5254818d210fed29363c612fa9648f1b014",
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "dom_path": "/html/body/div[740]",
+        "reported_page": 58,
+        "style_signature": [
+          [
+            "font-family",
+            "'arial',sans-serif"
+          ],
+          [
+            "font-size",
+            "10pt"
+          ],
+          [
+            "font-weight",
+            "700"
+          ],
+          [
+            "line-height",
+            "120%"
+          ],
+          [
+            "margin-top",
+            "9pt"
+          ],
+          [
+            "text-align",
+            "center"
+          ]
+        ],
+        "table": null,
+        "image_asset_id": null,
+        "layout_role": null
+      },
+      {
+        "block_id": "block-000686-a6e8806b",
+        "ordinal": 686,
+        "type": "table",
+        "text": "Year EndedDecember 30,2023December 31,2022December 25,2021(In millions)Cash flows from operating activities:Net income$854 $1,320 $3,162 Adjustments to reconcile net income to net cash provided by operating activities:Depreciation and amortization3,453 4,174 407 Stock-based compensation1,384 1,081 379 Amortization of operating lease right-of-use assets98 88 56 Amortization of inventory fair value adjustment3 189 — Loss on debt redemption, repurchase and conversion— — 7 Loss on sale or disposal of property and equipment11 16 34 Deferred income taxes(1,019)(1,505)308 (Gains) losses on equity investments, net(1)62 (56)Other(67)(14)(2)Changes in operating assets and liabilities:Accounts receivable, net(1,250)(1,091)(640)Inventories(580)(1,401)(556)Receivables from related parties(7)(13)8 Prepaid expenses and other assets(472)(1,197)(920)Payables to related parties(100)379 7 Accounts payable(419)931 801 Accrued and other liabilities(221)546 526 Net cash provided by operating activities1,667 3,565 3,521 Cash flows from investing activities:Purchases of property and equipment(546)(450)(301)Purchases of short-term investments(3,722)(2,667)(2,056)Proceeds from maturity of short-term investments2,687 4,310 1,678 Proceeds from sale of short-term investments300 — — Cash received from acquisition of Xilinx— 2,366 — Acquisitions, net of cash acquired(131)(1,544)— Other(11)(16)(7)Net cash provided by (used in) investing activities(1,423)1,999 (686)Cash flows from financing activities:Proceeds from debt, net of issuance costs— 991 — Repayment of debt— (312)— Proceeds from sales of common stock through employee equity plans268 167 104 Repurchases of common stock(985)(3,702)(1,762)Common stock repurchases for tax withholding on employee equity plans(427)(406)(237)Other(2)(2)— Net cash used in financing activities(1,146)(3,264)(1,895)Net increase (decrease) in cash and cash equivalents(902)2,300 940 Cash and cash equivalents at beginning of year4,835 2,535 1,595 Cash and cash equivalents at end of year$3,933 $4,835 $2,535",
+        "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "dom_path": "/html/body/div[741]/table",
+        "reported_page": 58,
+        "style_signature": [],
+        "table": {
+          "row_count": 59,
+          "column_count": 18,
+          "cells": [
+            {
+              "text": "",
+              "row": 0,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 1,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 2,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 7,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 8,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 10,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 13,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 14,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 16,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 0,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 1,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "Year Ended",
+              "row": 1,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 15,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 2,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "December 30,2023",
+              "row": 2,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 2,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "December 31,2022",
+              "row": 2,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 2,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "December 25,2021",
+              "row": 2,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 3,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(In millions)",
+              "row": 3,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 15,
+              "is_header": false
+            },
+            {
+              "text": "Cash flows from operating activities:",
+              "row": 4,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 4,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 4,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 4,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 4,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 4,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "Net income",
+              "row": 5,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "$",
+              "row": 5,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "854",
+              "row": 5,
+              "column": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 5,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 5,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "$",
+              "row": 5,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "1,320",
+              "row": 5,
+              "column": 10,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 5,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 5,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "$",
+              "row": 5,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "3,162",
+              "row": 5,
+              "column": 16,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 5,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Adjustments to reconcile net income to net cash provided by operating activities:",
+              "row": 6,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 6,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 6,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 6,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 6,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 6,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "Depreciation and amortization",
+              "row": 7,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "3,453",
+              "row": 7,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 7,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 7,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "4,174",
+              "row": 7,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 7,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 7,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "407",
+              "row": 7,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 7,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Stock-based compensation",
+              "row": 8,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "1,384",
+              "row": 8,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 8,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 8,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "1,081",
+              "row": 8,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 8,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 8,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "379",
+              "row": 8,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 8,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Amortization of operating lease right-of-use assets",
+              "row": 10,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "98",
+              "row": 10,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 10,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 10,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "88",
+              "row": 10,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 10,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 10,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "56",
+              "row": 10,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 10,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Amortization of inventory fair value adjustment",
+              "row": 11,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "3",
+              "row": 11,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 11,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 11,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "189",
+              "row": 11,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 11,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 11,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 11,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 11,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Loss on debt redemption, repurchase and conversion",
+              "row": 12,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 12,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 12,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 12,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 12,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 12,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 12,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "7",
+              "row": 12,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 12,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Loss on sale or disposal of property and equipment",
+              "row": 13,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "11",
+              "row": 13,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 13,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 13,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "16",
+              "row": 13,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 13,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 13,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "34",
+              "row": 13,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 13,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Deferred income taxes",
+              "row": 14,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,019)",
+              "row": 14,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 14,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 14,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,505)",
+              "row": 14,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 14,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 14,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "308",
+              "row": 14,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 14,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "(Gains) losses on equity investments, net",
+              "row": 15,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1)",
+              "row": 15,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 15,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 15,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "62",
+              "row": 15,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 15,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 15,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(56)",
+              "row": 15,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 15,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Other",
+              "row": 16,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(67)",
+              "row": 16,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 16,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 16,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(14)",
+              "row": 16,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 16,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 16,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(2)",
+              "row": 16,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 16,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Changes in operating assets and liabilities:",
+              "row": 17,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 17,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 17,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 17,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 17,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 17,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "Accounts receivable, net",
+              "row": 18,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,250)",
+              "row": 18,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 18,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 18,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,091)",
+              "row": 18,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 18,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 18,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(640)",
+              "row": 18,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 18,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Inventories",
+              "row": 19,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(580)",
+              "row": 19,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 19,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 19,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,401)",
+              "row": 19,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 19,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 19,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(556)",
+              "row": 19,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 19,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Receivables from related parties",
+              "row": 20,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(7)",
+              "row": 20,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 20,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 20,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(13)",
+              "row": 20,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 20,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 20,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "8",
+              "row": 20,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 20,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Prepaid expenses and other assets",
+              "row": 21,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(472)",
+              "row": 21,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 21,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 21,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,197)",
+              "row": 21,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 21,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 21,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(920)",
+              "row": 21,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 21,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Payables to related parties",
+              "row": 22,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(100)",
+              "row": 22,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 22,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 22,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "379",
+              "row": 22,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 22,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 22,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "7",
+              "row": 22,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 22,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Accounts payable",
+              "row": 23,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(419)",
+              "row": 23,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 23,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 23,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "931",
+              "row": 23,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 23,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 23,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "801",
+              "row": 23,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 23,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Accrued and other liabilities",
+              "row": 24,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(221)",
+              "row": 24,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 24,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 24,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "546",
+              "row": 24,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 24,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 24,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "526",
+              "row": 24,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 24,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Net cash provided by operating activities",
+              "row": 25,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "1,667",
+              "row": 25,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 25,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 25,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "3,565",
+              "row": 25,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 25,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 25,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "3,521",
+              "row": 25,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 25,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Cash flows from investing activities:",
+              "row": 26,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 26,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 26,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 26,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 26,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 26,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "Purchases of property and equipment",
+              "row": 27,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(546)",
+              "row": 27,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 27,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 27,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(450)",
+              "row": 27,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 27,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 27,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(301)",
+              "row": 27,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 27,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Purchases of short-term investments",
+              "row": 28,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(3,722)",
+              "row": 28,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 28,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 28,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(2,667)",
+              "row": 28,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 28,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 28,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(2,056)",
+              "row": 28,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 28,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Proceeds from maturity of short-term investments",
+              "row": 29,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "2,687",
+              "row": 29,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 29,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 29,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "4,310",
+              "row": 29,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 29,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 29,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "1,678",
+              "row": 29,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 29,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Proceeds from sale of short-term investments",
+              "row": 30,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "300",
+              "row": 30,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 30,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 30,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 30,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 30,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 30,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 30,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 30,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Cash received from acquisition of Xilinx",
+              "row": 31,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 31,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 31,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 31,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "2,366",
+              "row": 31,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 31,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 31,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 31,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 31,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Acquisitions, net of cash acquired",
+              "row": 32,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(131)",
+              "row": 32,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 32,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 32,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,544)",
+              "row": 32,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 32,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 32,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 32,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 32,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Other",
+              "row": 33,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(11)",
+              "row": 33,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 33,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 33,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(16)",
+              "row": 33,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 33,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 33,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(7)",
+              "row": 33,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 33,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Net cash provided by (used in) investing activities",
+              "row": 34,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,423)",
+              "row": 34,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 34,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 34,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "1,999",
+              "row": 34,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 34,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 34,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(686)",
+              "row": 34,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 34,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Cash flows from financing activities:",
+              "row": 35,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 35,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 35,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 35,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 35,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 35,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "Proceeds from debt, net of issuance costs",
+              "row": 36,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 36,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 36,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 36,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "991",
+              "row": 36,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 36,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 36,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 36,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 36,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Repayment of debt",
+              "row": 37,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 37,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 37,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 37,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(312)",
+              "row": 37,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 37,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 37,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 37,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 37,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Proceeds from sales of common stock through employee equity plans",
+              "row": 38,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "268",
+              "row": 38,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 38,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 38,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "167",
+              "row": 38,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 38,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 38,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "104",
+              "row": 38,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 38,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Repurchases of common stock",
+              "row": 39,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(985)",
+              "row": 39,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 39,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 39,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(3,702)",
+              "row": 39,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 39,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 39,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,762)",
+              "row": 39,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 39,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Common stock repurchases for tax withholding on employee equity plans",
+              "row": 40,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(427)",
+              "row": 40,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 40,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 40,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(406)",
+              "row": 40,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 40,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 40,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(237)",
+              "row": 40,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 40,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Other",
+              "row": 41,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(2)",
+              "row": 41,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 41,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 41,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(2)",
+              "row": 41,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 41,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 41,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "—",
+              "row": 41,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 41,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Net cash used in financing activities",
+              "row": 42,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,146)",
+              "row": 42,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 42,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 42,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(3,264)",
+              "row": 42,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 42,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 42,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(1,895)",
+              "row": 42,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 42,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Net increase (decrease) in cash and cash equivalents",
+              "row": 43,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "(902)",
+              "row": 43,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 43,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 43,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "2,300",
+              "row": 43,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 43,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 43,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "940",
+              "row": 43,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 43,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Cash and cash equivalents at beginning of year",
+              "row": 44,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "4,835",
+              "row": 44,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 44,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 44,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "2,535",
+              "row": 44,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 44,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 44,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "1,595",
+              "row": 44,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 2,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 44,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "Cash and cash equivalents at end of year",
+              "row": 45,
+              "column": 0,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "$",
+              "row": 45,
+              "column": 3,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "3,933",
+              "row": 45,
+              "column": 4,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 45,
+              "column": 5,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 45,
+              "column": 6,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "$",
+              "row": 45,
+              "column": 9,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "4,835",
+              "row": 45,
+              "column": 10,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 45,
+              "column": 11,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 45,
+              "column": 12,
+              "rowspan": 1,
+              "colspan": 3,
+              "is_header": false
+            },
+            {
+              "text": "$",
+              "row": 45,
+              "column": 15,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "2,535",
+              "row": 45,
+              "column": 16,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            },
+            {
+              "text": "",
+              "row": 45,
+              "column": 17,
+              "rowspan": 1,
+              "colspan": 1,
+              "is_header": false
+            }
+          ]
+        },
+        "image_asset_id": null,
+        "layout_role": null
+      },
+      {
+        "block_id": "block-000687-6208ef0f",
+        "ordinal": 687,
+        "type": "page_marker",
+        "text": "58",
+        "text_hash": "6208ef0f7750c111548cf90b6ea1d0d0a66f6bff40dbef07cb45ec436263c7d6",
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "dom_path": "/html/body/div[742]/div/div",
+        "reported_page": 58,
+        "style_signature": [
+          [
+            "font-family",
+            "'arial',sans-serif"
+          ],
+          [
+            "font-size",
+            "10pt"
+          ],
+          [
+            "font-weight",
+            "400"
+          ],
+          [
+            "line-height",
+            "120%"
+          ],
+          [
+            "text-align",
+            "center"
+          ]
+        ],
+        "table": null,
+        "image_asset_id": null,
+        "layout_role": "reported_page_number"
+      },
+      {
+        "block_id": "block-000688-a9360e02",
+        "ordinal": 688,
+        "type": "paragraph",
+        "text": "Table of Contents",
+        "text_hash": "a9360e0212a4d173581c91da68494d022ee55871188be00acf863d2ed0cf7a6a",
+        "source_anchor": "i2f3a830247b542fcaaff99edb7e1a287_127",
+        "dom_path": "/html/body/div[743]/div",
+        "reported_page": 59,
+        "style_signature": [
+          [
+            "font-family",
+            "'arial',sans-serif"
+          ],
+          [
+            "font-size",
+            "9pt"
+          ],
+          [
+            "font-weight",
+            "400"
+          ],
+          [
+            "line-height",
+            "120%"
+          ]
+        ],
+        "table": null,
+        "image_asset_id": null,
+        "layout_role": null
+      }
+    ],
+    "entity_catalog": [
+      {
+        "entity_id": "sec-0000002488",
+        "company_id": "sec-0000002488",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+        "label": "Advanced Micro Devices, Inc.",
+        "aliases": [
+          "Advanced Micro Devices, Inc.",
+          "AMD",
+          "Consolidated",
+          "Company",
+          "Group"
+        ]
+      }
+    ],
+    "metric_catalog": {
+      "capex_cash_payments": {
+        "metric_id": "capex_cash_payments",
+        "label": "Cash purchases of property plant and equipment",
+        "aliases": [
+          "Purchases of property, plant and equipment",
+          "Payments for property, plant and equipment",
+          "Acquisitions of property, plant and equipment",
+          "Purchases of property and equipment"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-ppe-source-label-v2",
+        "aggregation": "no_implicit_sum"
+      },
+      "net_income": {
+        "metric_id": "net_income",
+        "label": "Net income",
+        "aliases": [
+          "Net income (loss)",
+          "Net income",
+          "Net income attributable to shareholders of the parent"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "operating_cash_flow": {
+        "metric_id": "operating_cash_flow",
+        "label": "Operating cash flow",
+        "aliases": [
+          "Net cash provided by operating activities",
+          "Net cash generated from operating activities",
+          "Net cash from operating activities"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "operating_income": {
+        "metric_id": "operating_income",
+        "label": "Operating income",
+        "aliases": [
+          "Operating income (loss)",
+          "Income from operations",
+          "Operating profit",
+          "Operating income"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "revenue": {
+        "metric_id": "revenue",
+        "label": "Revenue",
+        "aliases": [
+          "Net revenue",
+          "Net revenues",
+          "Net sales",
+          "Revenue",
+          "Revenues"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "revenue_including_assessed_tax": {
+        "metric_id": "revenue_including_assessed_tax",
+        "label": "revenue_including_assessed_tax",
+        "unit": "USD",
+        "denominator": null,
+        "definition": "revenue_including_assessed_tax",
+        "definition_version": "us-gaap-inline-v1",
+        "aggregation": "no_implicit_sum",
+        "aliases": [
+          "revenue_including_assessed_tax"
+        ]
+      },
+      "cash_and_equivalents": {
+        "metric_id": "cash_and_equivalents",
+        "label": "Cash and cash equivalents",
+        "aliases": [
+          "Cash and cash equivalents"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "short_term_debt": {
+        "metric_id": "short_term_debt",
+        "label": "Short-term debt",
+        "aliases": [
+          "Short-term borrowings",
+          "Current portion of long-term debt",
+          "Short-term debt"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "long_term_debt": {
+        "metric_id": "long_term_debt",
+        "label": "Long-term debt",
+        "aliases": [
+          "Long-term debt, net",
+          "Long-term debt",
+          "Long-term debt, excluding current portion",
+          "Long-term bank loans",
+          "Bonds payable"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "total_debt": {
+        "metric_id": "total_debt",
+        "label": "Total debt",
+        "aliases": [
+          "Total debt",
+          "Total borrowings"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "share_capital": {
+        "metric_id": "share_capital",
+        "label": "Share capital",
+        "aliases": [
+          "Common stock",
+          "Capital stock",
+          "Ordinary share capital",
+          "Share capital"
+        ],
+        "unit": "USD",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      },
+      "shares_outstanding": {
+        "metric_id": "shares_outstanding",
+        "label": "Shares outstanding",
+        "aliases": [
+          "Common shares outstanding",
+          "Ordinary shares outstanding",
+          "Shares outstanding"
+        ],
+        "unit": "shares",
+        "definition_version": "annual-core-v1",
+        "aggregation": "no_implicit_sum"
+      }
+    },
+    "period_catalog": [
+      {
+        "period_id": "fy2023",
+        "label": "Year Ended December 30, 2023",
+        "aliases": [
+          "FY2023",
+          "Fiscal 2023"
+        ],
+        "period": {
+          "kind": "year",
+          "start": "2023-01-01",
+          "end": "2023-12-30",
+          "basis": "source"
+        },
+        "company_id": "sec-0000002488",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571"
+      },
+      {
+        "period_id": "fy2022",
+        "label": "Year Ended December 31, 2022",
+        "aliases": [
+          "FY2022",
+          "Fiscal 2022"
+        ],
+        "period": {
+          "kind": "year",
+          "start": "2021-12-26",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "company_id": "sec-0000002488",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571"
+      },
+      {
+        "period_id": "fy2021",
+        "label": "Year Ended December 25, 2021",
+        "aliases": [
+          "FY2021",
+          "Fiscal 2021"
+        ],
+        "period": {
+          "kind": "year",
+          "start": "2020-12-27",
+          "end": "2021-12-25",
+          "basis": "source"
+        },
+        "company_id": "sec-0000002488",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571"
+      },
+      {
+        "period_id": "instant_2023-12-30",
+        "label": "December 30, 2023",
+        "aliases": [
+          "Balance sheet date",
+          "As of December 30, 2023"
+        ],
+        "period": {
+          "kind": "instant",
+          "start": null,
+          "end": "2023-12-30",
+          "basis": "source"
+        },
+        "company_id": "sec-0000002488",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571"
+      },
+      {
+        "period_id": "instant_2022-12-31",
+        "label": "December 31, 2022",
+        "aliases": [
+          "Balance sheet date",
+          "As of December 31, 2022"
+        ],
+        "period": {
+          "kind": "instant",
+          "start": null,
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "company_id": "sec-0000002488",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571"
+      }
+    ],
+    "coverage": {
+      "selected_blocks": [
+        "block-000684-941a6235",
+        "block-000685-4f5a988d",
+        "block-000686-a6e8806b",
+        "block-000687-6208ef0f",
+        "block-000688-a9360e02"
+      ],
+      "document_block_count": 1184,
+      "recall_completeness": "not_evaluated"
+    },
+    "record_schema_version": "research-query-v0.5",
+    "output_schema": {
+      "$defs": {
+        "DraftEvidence": {
+          "additionalProperties": false,
+          "properties": {
+            "block_id": {
+              "minLength": 1,
+              "title": "Block Id",
+              "type": "string"
+            },
+            "quote": {
+              "minLength": 1,
+              "title": "Quote",
+              "type": "string"
+            },
+            "occurrence_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Occurrence Id"
+            }
+          },
+          "required": [
+            "block_id",
+            "quote"
+          ],
+          "title": "DraftEvidence",
+          "type": "object"
+        },
+        "DraftRecord": {
+          "additionalProperties": false,
+          "properties": {
+            "draft_id": {
+              "minLength": 1,
+              "title": "Draft Id",
+              "type": "string"
+            },
+            "kind": {
+              "enum": [
+                "financial",
+                "guidance",
+                "statement"
+              ],
+              "title": "Kind",
+              "type": "string"
+            },
+            "entity": {
+              "minLength": 1,
+              "title": "Entity",
+              "type": "string"
+            },
+            "entity_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Entity Id"
+            },
+            "metric": {
+              "minLength": 1,
+              "title": "Metric",
+              "type": "string"
+            },
+            "metric_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Metric Id"
+            },
+            "period": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period"
+            },
+            "period_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Period Id"
+            },
+            "value": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Value"
+            },
+            "upper": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Upper"
+            },
+            "value_relation": {
+              "enum": [
+                "eq",
+                "range",
+                "approx",
+                "gt",
+                "gte",
+                "qualitative",
+                "unresolved"
+              ],
+              "title": "Value Relation",
+              "type": "string"
+            },
+            "unit": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Unit"
+            },
+            "denominator": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Denominator"
+            },
+            "accounting_basis": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Accounting Basis"
+            },
+            "summary": {
+              "title": "Summary",
+              "type": "string"
+            },
+            "speaker": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Speaker"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/DraftEvidence"
+              },
+              "title": "Evidence",
+              "type": "array"
+            },
+            "qualifiers": {
+              "items": {
+                "$ref": "#/$defs/DraftEvidence"
+              },
+              "title": "Qualifiers",
+              "type": "array"
+            },
+            "question_refs": {
+              "description": "Only source block IDs of analyst questions, when applicable. Never put task IDs, requirement IDs or record IDs here. Use [] for a financial statement without analyst questions.",
+              "items": {
+                "type": "string"
+              },
+              "title": "Question Refs",
+              "type": "array"
+            },
+            "unresolved_fields": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Unresolved Fields",
+              "type": "array"
+            }
+          },
+          "required": [
+            "draft_id",
+            "kind",
+            "entity",
+            "metric",
+            "value_relation",
+            "summary"
+          ],
+          "title": "DraftRecord",
+          "type": "object"
+        },
+        "DraftRelation": {
+          "additionalProperties": false,
+          "properties": {
+            "relation_id": {
+              "minLength": 1,
+              "title": "Relation Id",
+              "type": "string"
+            },
+            "relation_type": {
+              "minLength": 1,
+              "title": "Relation Type",
+              "type": "string"
+            },
+            "record_ids": {
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Record Ids",
+              "type": "array"
+            },
+            "description": {
+              "title": "Description",
+              "type": "string"
+            },
+            "evidence": {
+              "items": {
+                "$ref": "#/$defs/DraftEvidence"
+              },
+              "title": "Evidence",
+              "type": "array"
+            }
+          },
+          "required": [
+            "relation_id",
+            "relation_type",
+            "record_ids",
+            "description"
+          ],
+          "title": "DraftRelation",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "records": {
+          "items": {
+            "$ref": "#/$defs/DraftRecord"
+          },
+          "title": "Records",
+          "type": "array"
+        },
+        "relations": {
+          "items": {
+            "$ref": "#/$defs/DraftRelation"
+          },
+          "title": "Relations",
+          "type": "array"
+        },
+        "gaps": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Gaps",
+          "type": "array"
+        }
+      },
+      "title": "DirectExtraction",
+      "type": "object"
+    },
+    "source_bound_normalization": {
+      "adapter_id": "amd-fy2023-cash-flow-labels-20261008-v1",
+      "company_id": "sec-0000002488",
+      "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+      "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+      "dataset_manifest_sha256": "dce57a5a5b94c2f8b2a3fa99c9b4a05cff5dc811d4afc5c77968bd2f686831d8",
+      "block_hashes": {
+        "block-000684-941a6235": "941a6235d6f8e84679499f347f1ea4745c50d251cd6f64c0eff6a154b36d88c5",
+        "block-000685-4f5a988d": "4f5a988db60976cc80906521a8b4a5254818d210fed29363c612fa9648f1b014",
+        "block-000686-a6e8806b": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+        "block-000687-6208ef0f": "6208ef0f7750c111548cf90b6ea1d0d0a66f6bff40dbef07cb45ec436263c7d6",
+        "block-000688-a9360e02": "a9360e0212a4d173581c91da68494d022ee55871188be00acf863d2ed0cf7a6a"
+      },
+      "metric_contexts": {
+        "capex_cash_payments": [
+          {
+            "block_id": "block-000685-4f5a988d",
+            "quote": "Consolidated Statements of Cash Flows"
+          }
+        ]
+      }
+    },
+    "required_facts": [
+      {
+        "requirement_id": "operating_cash_flow-fy2021",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2021",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual"
+      },
+      {
+        "requirement_id": "operating_cash_flow-fy2022",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2022",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual"
+      },
+      {
+        "requirement_id": "operating_cash_flow-fy2023",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2023",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2021",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2021",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2022",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2022",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2023",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2023",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual"
+      }
+    ],
+    "packet_id": "packet-4b7993eda930d6ba27a07197",
+    "parent_packet_id": "packet-adc2b7aae0763b092acbf8f6",
+    "pending_requirements": [
+      {
+        "requirement_id": "operating_cash_flow-fy2021",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2021",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2020-12-27",
+          "end": "2021-12-25",
+          "basis": "source"
+        },
+        "status": "not_extracted",
+        "record_ids": [],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "operating_cash_flow-fy2022",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2022",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2021-12-26",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "status": "not_extracted",
+        "record_ids": [],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "operating_cash_flow-fy2023",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2023",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2023-01-01",
+          "end": "2023-12-30",
+          "basis": "source"
+        },
+        "status": "not_extracted",
+        "record_ids": [],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2021",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2021",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2020-12-27",
+          "end": "2021-12-25",
+          "basis": "source"
+        },
+        "status": "not_extracted",
+        "record_ids": [],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2022",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2022",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2021-12-26",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "status": "not_extracted",
+        "record_ids": [],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2023",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2023",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2023-01-01",
+          "end": "2023-12-30",
+          "basis": "source"
+        },
+        "status": "not_extracted",
+        "record_ids": [],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      }
+    ]
+  },
+  "previous_extraction": {
+    "records": [
+      {
+        "draft_id": "ocf-fy2021",
+        "kind": "financial",
+        "entity": "Advanced Micro Devices, Inc.",
+        "entity_id": "sec-0000002488",
+        "metric": "Net cash provided by operating activities",
+        "metric_id": "operating_cash_flow",
+        "period": "December 25,2021",
+        "period_id": "fy2021",
+        "value": "3,521",
+        "upper": null,
+        "value_relation": "eq",
+        "unit": "USD_millions",
+        "denominator": null,
+        "accounting_basis": "reported_consolidated",
+        "summary": "Net cash provided by operating activities for the year ended December 25, 2021 was 3,521 (USD millions).",
+        "speaker": null,
+        "evidence": [
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "Net cash provided by operating activities1,667 3,565 3,521"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "December 30,2023December 31,2022December 25,2021"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "(In millions)"
+          },
+          {
+            "block_id": "block-000685-4f5a988d",
+            "quote": "Consolidated Statements of Cash Flows"
+          }
+        ],
+        "qualifiers": [],
+        "question_refs": [
+          "operating_cash_flow-fy2021"
+        ],
+        "unresolved_fields": []
+      },
+      {
+        "draft_id": "ocf-fy2022",
+        "kind": "financial",
+        "entity": "Advanced Micro Devices, Inc.",
+        "entity_id": "sec-0000002488",
+        "metric": "Net cash provided by operating activities",
+        "metric_id": "operating_cash_flow",
+        "period": "December 31,2022",
+        "period_id": "fy2022",
+        "value": "3,565",
+        "upper": null,
+        "value_relation": "eq",
+        "unit": "USD_millions",
+        "denominator": null,
+        "accounting_basis": "reported_consolidated",
+        "summary": "Net cash provided by operating activities for the year ended December 31, 2022 was 3,565 (USD millions).",
+        "speaker": null,
+        "evidence": [
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "Net cash provided by operating activities1,667 3,565 3,521"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "December 30,2023December 31,2022December 25,2021"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "(In millions)"
+          },
+          {
+            "block_id": "block-000685-4f5a988d",
+            "quote": "Consolidated Statements of Cash Flows"
+          }
+        ],
+        "qualifiers": [],
+        "question_refs": [
+          "operating_cash_flow-fy2022"
+        ],
+        "unresolved_fields": []
+      },
+      {
+        "draft_id": "ocf-fy2023",
+        "kind": "financial",
+        "entity": "Advanced Micro Devices, Inc.",
+        "entity_id": "sec-0000002488",
+        "metric": "Net cash provided by operating activities",
+        "metric_id": "operating_cash_flow",
+        "period": "December 30,2023",
+        "period_id": "fy2023",
+        "value": "1,667",
+        "upper": null,
+        "value_relation": "eq",
+        "unit": "USD_millions",
+        "denominator": null,
+        "accounting_basis": "reported_consolidated",
+        "summary": "Net cash provided by operating activities for the year ended December 30, 2023 was 1,667 (USD millions).",
+        "speaker": null,
+        "evidence": [
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "Net cash provided by operating activities1,667 3,565 3,521"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "December 30,2023December 31,2022December 25,2021"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "(In millions)"
+          },
+          {
+            "block_id": "block-000685-4f5a988d",
+            "quote": "Consolidated Statements of Cash Flows"
+          }
+        ],
+        "qualifiers": [],
+        "question_refs": [
+          "operating_cash_flow-fy2023"
+        ],
+        "unresolved_fields": []
+      },
+      {
+        "draft_id": "capex-fy2021",
+        "kind": "financial",
+        "entity": "Advanced Micro Devices, Inc.",
+        "entity_id": "sec-0000002488",
+        "metric": "Purchases of property and equipment",
+        "metric_id": "capex_cash_payments",
+        "period": "December 25,2021",
+        "period_id": "fy2021",
+        "value": "(301)",
+        "upper": null,
+        "value_relation": "eq",
+        "unit": "USD_millions",
+        "denominator": null,
+        "accounting_basis": "reported_consolidated",
+        "summary": "Purchases of property and equipment (investing cash outflow, shown in parentheses) for the year ended December 25, 2021 was (301) (USD millions).",
+        "speaker": null,
+        "evidence": [
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "Purchases of property and equipment(546)(450)(301)"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "December 30,2023December 31,2022December 25,2021"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "(In millions)"
+          },
+          {
+            "block_id": "block-000685-4f5a988d",
+            "quote": "Consolidated Statements of Cash Flows"
+          }
+        ],
+        "qualifiers": [],
+        "question_refs": [
+          "capex_cash_payments-fy2021"
+        ],
+        "unresolved_fields": []
+      },
+      {
+        "draft_id": "capex-fy2022",
+        "kind": "financial",
+        "entity": "Advanced Micro Devices, Inc.",
+        "entity_id": "sec-0000002488",
+        "metric": "Purchases of property and equipment",
+        "metric_id": "capex_cash_payments",
+        "period": "December 31,2022",
+        "period_id": "fy2022",
+        "value": "(450)",
+        "upper": null,
+        "value_relation": "eq",
+        "unit": "USD_millions",
+        "denominator": null,
+        "accounting_basis": "reported_consolidated",
+        "summary": "Purchases of property and equipment (investing cash outflow, shown in parentheses) for the year ended December 31, 2022 was (450) (USD millions).",
+        "speaker": null,
+        "evidence": [
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "Purchases of property and equipment(546)(450)(301)"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "December 30,2023December 31,2022December 25,2021"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "(In millions)"
+          },
+          {
+            "block_id": "block-000685-4f5a988d",
+            "quote": "Consolidated Statements of Cash Flows"
+          }
+        ],
+        "qualifiers": [],
+        "question_refs": [
+          "capex_cash_payments-fy2022"
+        ],
+        "unresolved_fields": []
+      },
+      {
+        "draft_id": "capex-fy2023",
+        "kind": "financial",
+        "entity": "Advanced Micro Devices, Inc.",
+        "entity_id": "sec-0000002488",
+        "metric": "Purchases of property and equipment",
+        "metric_id": "capex_cash_payments",
+        "period": "December 30,2023",
+        "period_id": "fy2023",
+        "value": "(546)",
+        "upper": null,
+        "value_relation": "eq",
+        "unit": "USD_millions",
+        "denominator": null,
+        "accounting_basis": "reported_consolidated",
+        "summary": "Purchases of property and equipment (investing cash outflow, shown in parentheses) for the year ended December 30, 2023 was (546) (USD millions).",
+        "speaker": null,
+        "evidence": [
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "Purchases of property and equipment(546)(450)(301)"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "December 30,2023December 31,2022December 25,2021"
+          },
+          {
+            "block_id": "block-000686-a6e8806b",
+            "quote": "(In millions)"
+          },
+          {
+            "block_id": "block-000685-4f5a988d",
+            "quote": "Consolidated Statements of Cash Flows"
+          }
+        ],
+        "qualifiers": [],
+        "question_refs": [
+          "capex_cash_payments-fy2023"
+        ],
+        "unresolved_fields": []
+      }
+    ],
+    "relations": [],
+    "gaps": [
+      "Only the Consolidated Statements of Cash Flows table block was supplied; notes or captions beyond this table were not supplied, so no claim is made about other disclosures of capital expenditures (e.g., non-cash additions or other CapEx definitions) elsewhere in the filing.",
+      "The supplied statement caption lists no explicit 'consolidated' qualifier beyond the title 'Consolidated Statements of Cash Flows'; accounting framework (US GAAP) is not stated within the supplied blocks."
+    ]
+  },
+  "host_validation_feedback": [
+    {
+      "reason": "completion_citation_outside_delivered_batch"
+    }
+  ]
+}

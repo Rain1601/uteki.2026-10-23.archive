@@ -1,4 +1,5 @@
 """Explicit, hash-pinned extraction methods and one source-bound table batch."""
+from uteki.agents.runtime.observation import observed_run
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -180,7 +181,21 @@ def table_batch_catalog(packet, *, neighbor_radius):
 
 
 async def run_extraction_batch(dataset, job, output, *, task_profile, method_root, batch_index,
-                               model_config, credentials_root, method_id=None, model_call=None):
+                               model_config, credentials_root, method_id=None, model_call=None,
+                               observation_root=None, observation_context=None):
+    with observed_run(output=output, kind='extraction', role='extractor',
+            origin='scripted_fixture' if model_call else 'model', observation_root=observation_root,
+            observation_context=observation_context, child=observation_context is not None,
+            scope=job, title=job.get('task', ''), protected=(dataset,)) as observer:
+        return await _run_extraction_batch(dataset, job, output, task_profile=task_profile,
+            method_root=method_root, batch_index=batch_index, model_config=model_config,
+            credentials_root=credentials_root, method_id=method_id, model_call=model_call,
+            observation_context=observer)
+
+
+async def _run_extraction_batch(dataset, job, output, *, task_profile, method_root, batch_index,
+                               model_config, credentials_root, method_id=None, model_call=None,
+                               observation_context=None):
     """Execute exactly one explicit batch; injected model_call is an offline fixture."""
     if not isinstance(job, dict) or 'prompt' in job:
         raise ValueError('method execution requires a job without inline prompt')
@@ -223,7 +238,8 @@ async def run_extraction_batch(dataset, job, output, *, task_profile, method_roo
               'semantic_acceptance': 'not_evaluated', 'adoption': 'unchanged_candidate'}
     try:
         extracted = await run_direct_extraction(dataset, batch_job, output/'extraction-01', strategy='direct',
-            model_config=deepcopy(model_config), credentials_root=credentials_root, model_call=model_call)
+            model_config=deepcopy(model_config), credentials_root=credentials_root, model_call=model_call,
+            observation_context=observation_context)
         result.update({k: extracted[k] for k in ('status', 'plan_origin', 'raw_record_count', 'normalized_record_count',
                                                 'unresolved_count', 'dataset')})
     except BaseException as error:

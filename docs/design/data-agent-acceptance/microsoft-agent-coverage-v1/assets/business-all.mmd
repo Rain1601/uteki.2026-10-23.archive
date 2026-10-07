@@ -1,0 +1,175 @@
+flowchart LR
+  accTitle: Selected filing business structure
+  accDescr: Solid edges are explicit source assertions. Dashed edges are derived. Unknown relations are omitted; absent edges do not imply independence.
+  N000["MICROSOFT CORPORATION"]:::company
+  N001["Productivity and Business Processes"]:::reportable_segment
+  N002["Intelligent Cloud"]:::reportable_segment
+  N003["More Personal Computing"]:::reportable_segment
+  N004["Microsoft 365 Commercial products and cloud services"]:::offering_group
+  N005["Microsoft 365 Commercial cloud"]:::offering_group
+  N006["Microsoft 365 Commercial products"]:::offering_group
+  N007["Microsoft 365 Commercial"]:::business
+  N008["Microsoft 365 Copilot"]:::business
+  N009["Enterprise Mobility + Security"]:::business
+  N010["the cloud portion of Windows Commercial"]:::business
+  N011["the per-user portion of Power BI"]:::business
+  N012["Exchange"]:::business
+  N013["SharePoint"]:::business
+  N014["Microsoft Teams"]:::business
+  N015["Microsoft 365 Security and Compliance"]:::business
+  N016["Windows Commercial on-premises"]:::business
+  N017["Office licensed on-premises"]:::business
+  N018["Microsoft 365 Consumer products and cloud services"]:::offering_group
+  N019["Microsoft 365 Consumer subscriptions"]:::business
+  N020["Microsoft 365 Consumer"]:::business
+  N024["Office Consumer products"]:::business
+  N025["LinkedIn"]:::business
+  N026["Talent Solutions"]:::business
+  N027["Marketing Solutions"]:::business
+  N028["Premium Subscriptions"]:::business
+  N029["Sales Solutions"]:::business
+  N030["Dynamics products and cloud services"]:::offering_group
+  N031["Dynamics 365"]:::business
+  N032["on-premises ERP and CRM applications"]:::business
+  N033["Power Apps"]:::business
+  N034["Power Automate"]:::business
+  N035["Office"]:::business
+  N038["Server products and cloud services"]:::offering_group
+  N039["Azure and other cloud services"]:::offering_group
+  N040["cloud and AI consumption-based services"]:::business
+  N041["Azure"]:::business
+  N042["Azure AI offerings"]:::offering_group
+  N043["Azure AI Foundry"]:::business
+  N044["Azure Security offerings"]:::business
+  N045["virtual desktop offerings"]:::business
+  N047["GitHub cloud services"]:::business
+  N049["Nuance Healthcare cloud services"]:::business
+  N050["Server products"]:::offering_group
+  N051["SQL Server"]:::business
+  N052["Windows Server"]:::business
+  N053["Visual Studio"]:::business
+  N054["System Center"]:::business
+  N055["Client Access Licenses (CALs)"]:::business
+  N056["Enterprise and partner services"]:::offering_group
+  N057["Enterprise Support Services"]:::business
+  N058["Industry Solutions"]:::business
+  N059["Nuance professional services"]:::business
+  N060["Microsoft Partner Network"]:::business
+  N061["Learning Experience"]:::business
+  N062["Windows and Devices"]:::offering_group
+  N063["Windows OEM licensing"]:::business
+  N064["Devices"]:::offering_group
+  N065["Surface"]:::business
+  N066["PC accessories"]:::business
+  N067["Gaming"]:::offering_group
+  N069["Xbox hardware"]:::business
+  N070["Xbox content and services"]:::offering_group
+  N071["Xbox Game Pass"]:::business
+  N072["Xbox Cloud Gaming"]:::business
+  N074["Search and news advertising"]:::offering_group
+  N075["Bing"]:::business
+  N076["Microsoft Edge"]:::business
+  N077["Microsoft Copilot"]:::business
+  N078["Microsoft News"]:::business
+  classDef company fill:#263c46,color:#fff,stroke:#263c46,stroke-width:1.5px
+  classDef reportable_segment fill:#e4eef2,color:#203c49,stroke:#91aeba,stroke-width:1px
+  classDef business fill:#eaf1e9,color:#2b4432,stroke:#a4b8a7,stroke-width:1px
+  classDef offering_group fill:#fff,color:#302c26,stroke:#c9c2b7,stroke-width:1px
+  subgraph Unplaced["归属待核验 / Placement unresolved"]
+  N021["Microsoft 365"]:::business
+  N022["Outlook.com"]:::business
+  N023["OneDrive"]:::business
+  N036["Windows"]:::business
+  N037["Microsoft Defender for Endpoint"]:::business
+  N046["GitHub"]:::business
+  N048["Nuance Healthcare"]:::business
+  N068["Xbox"]:::business
+  N073["first-party studios"]:::offering_group
+  end
+  style Unplaced fill:#fcf8ef,stroke:#c7ad89,stroke-dasharray:4 3
+  N000 -->|"包含"| N001
+  N000 -->|"包含"| N002
+  N000 -->|"包含"| N003
+  N001 -->|"报告中列示"| N004
+  N001 -->|"报告中列示"| N018
+  N001 -->|"报告中列示"| N025
+  N001 -->|"报告中列示"| N030
+  N021 -.->|"包含"| N004
+  N021 -.->|"包含"| N018
+  N004 -->|"包含"| N005
+  N004 -->|"包含"| N006
+  N005 -->|"包含"| N007
+  N005 -->|"包含"| N009
+  N005 -->|"包含"| N010
+  N005 -->|"包含"| N011
+  N005 -->|"包含"| N012
+  N005 -->|"包含"| N013
+  N005 -->|"包含"| N014
+  N005 -->|"包含"| N015
+  N005 -->|"包含"| N008
+  N006 -->|"包含"| N016
+  N006 -->|"包含"| N017
+  N018 -->|"包含"| N017
+  N007 -->|"包含"| N008
+  N007 -->|"包含"| N009
+  N007 -->|"包含"| N035
+  N036 -.->|"包含"| N010
+  N036 -.->|"包含"| N016
+  N018 -->|"包含"| N019
+  N018 -.->|"包含"| N020
+  N022 -.->|"支撑"| N020
+  N023 -.->|"支撑"| N020
+  N020 -.->|"包含"| N024
+  N025 -->|"包含"| N026
+  N025 -->|"包含"| N027
+  N025 -->|"包含"| N028
+  N025 -->|"包含"| N029
+  N030 -->|"包含"| N031
+  N030 -->|"包含"| N032
+  N031 -->|"包含"| N033
+  N031 -->|"包含"| N034
+  N002 -->|"报告中列示"| N038
+  N002 -->|"报告中列示"| N056
+  N038 -->|"包含"| N039
+  N038 -->|"包含"| N050
+  N039 -.->|"包含"| N041
+  N039 -->|"包含"| N040
+  N039 -->|"包含"| N047
+  N039 -->|"包含"| N049
+  N039 -->|"包含"| N045
+  N046 -->|"包含"| N047
+  N048 -->|"包含"| N049
+  N041 -.->|"包含"| N042
+  N042 -.->|"包含"| N043
+  N041 -.->|"包含"| N044
+  N050 -->|"包含"| N051
+  N050 -->|"包含"| N052
+  N050 -->|"包含"| N053
+  N050 -->|"包含"| N054
+  N050 -->|"包含"| N055
+  N055 -->|"支撑"| N051
+  N055 -->|"支撑"| N052
+  N056 -->|"包含"| N057
+  N056 -->|"包含"| N058
+  N056 -->|"包含"| N059
+  N056 -->|"包含"| N060
+  N056 -->|"包含"| N061
+  N003 -->|"报告中列示"| N062
+  N003 -->|"报告中列示"| N067
+  N003 -->|"报告中列示"| N074
+  N062 -->|"包含"| N063
+  N036 -.->|"包含"| N063
+  N062 -->|"包含"| N064
+  N064 -->|"包含"| N065
+  N064 -->|"包含"| N066
+  N067 -->|"包含"| N069
+  N067 -->|"包含"| N070
+  N070 -->|"包含"| N071
+  N070 -->|"包含"| N072
+  N068 -.->|"包含"| N069
+  N068 -.->|"包含"| N070
+  N073 -.->|"支撑"| N070
+  N074 -->|"包含"| N075
+  N074 -->|"包含"| N077
+  N074 -->|"包含"| N078
+  N074 -->|"包含"| N076

@@ -5,6 +5,13 @@ from enum import StrEnum
 from typing import Any
 
 
+LEGACY_BUSINESS_MAP_VERSIONS = frozenset({
+    "0.1", "0.1-pilot", "0.1-candidate", "0.2-candidate", "0.3-candidate",
+    "m0-review-business-map-v1", "business-map-v0.1",
+})
+BUSINESS_MAP_VERSION = "business-map-v0.2"
+
+
 class BusinessKind(StrEnum):
     COMPANY = "company"
     REPORTABLE_SEGMENT = "reportable_segment"
@@ -48,6 +55,7 @@ class Evidence:
     text_hash: str
     source_url: str
     support: str
+    company_id: str | None = None
 
     def __post_init__(self) -> None:
         _nonempty(self.id, "evidence.id")
@@ -67,6 +75,19 @@ class Monetization:
 
 
 @dataclass(frozen=True, slots=True)
+class EvidenceExcerpt:
+    evidence_id: str
+    quote: str
+
+
+@dataclass(frozen=True, slots=True)
+class BusinessClaimEvidence:
+    field: str
+    item_index: int | None
+    excerpts: tuple[EvidenceExcerpt, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class Business:
     id: str
     name: str
@@ -78,6 +99,7 @@ class Business:
     importance_signals: tuple[str, ...] = ()
     evidence_ids: tuple[str, ...] = ()
     review_status: ReviewStatus = ReviewStatus.CANDIDATE
+    claim_evidence: tuple[BusinessClaimEvidence, ...] = ()
 
     def __post_init__(self) -> None:
         _nonempty(self.id, "business.id")
@@ -92,6 +114,10 @@ class Relationship:
     description: str
     evidence_ids: tuple[str, ...]
     review_status: ReviewStatus = ReviewStatus.CANDIDATE
+    # None preserves legacy "not assessed"; it must never become explicit.
+    basis: AssertionBasis | None = None
+    rationale: str | None = None
+    excerpts: tuple[EvidenceExcerpt, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,8 +141,13 @@ class BusinessMap:
     unknowns: tuple[Unknown, ...]
     evidence: tuple[Evidence, ...]
     metadata: dict[str, Any] = field(default_factory=dict)
+    relationship_absence: str | None = None
 
     def __post_init__(self) -> None:
+        if self.schema_version not in LEGACY_BUSINESS_MAP_VERSIONS | {BUSINESS_MAP_VERSION}:
+            raise ValueError("unsupported_business_map_schema_version")
+        _nonempty(self.company_id, "business_map.company_id")
+        _nonempty(self.document_id, "business_map.document_id")
         business_ids = [item.id for item in self.businesses]
         evidence_ids = [item.id for item in self.evidence]
         if len(business_ids) != len(set(business_ids)):
@@ -135,6 +166,62 @@ class BusinessMap:
         for unknown in self.unknowns:
             self._require_known(unknown.related_business_ids, known_businesses, f"unknown {unknown.id}")
             self._require_known(unknown.evidence_ids, known_evidence, f"unknown {unknown.id}")
+        if self.schema_version == "business-map-v0.2":
+            self._validate_v2()
+
+    def _validate_v2(self) -> None:
+        """Validate declared evidence bindings, not semantic entailment."""
+        if self.relationship_absence != "unknown":
+            raise ValueError("unrecorded_relationship_must_remain_unknown")
+        evidence = {e.id: e for e in self.evidence}
+        if any(e.document_id != self.document_id or e.company_id != self.company_id for e in self.evidence):
+            raise ValueError("business_map_evidence_scope_mismatch")
+
+        def excerpts(items, owner):
+            self._require_known(tuple(e.evidence_id for e in items), set(evidence), owner)
+            for item in items:
+                _nonempty(item.quote, owner + ".quote")
+                if " ".join(item.quote.split()) not in " ".join(evidence[item.evidence_id].support.split()):
+                    raise ValueError("business_map_quote_not_in_source")
+
+        for business in self.businesses:
+            expected = {("name", None), ("description", None)}
+            for field_name in ("products_services", "customers", "importance_signals"):
+                expected.update((field_name, i) for i in range(len(getattr(business, field_name))))
+            expected.update(("monetization", i) for i, m in enumerate(business.monetization)
+                            if m.basis != AssertionBasis.UNKNOWN)
+            actual = [(c.field, c.item_index) for c in business.claim_evidence]
+            if any(c.item_index is not None and type(c.item_index) is not int for c in business.claim_evidence):
+                raise ValueError("business_claim_item_index_invalid")
+            if len(actual) != len(set(actual)) or set(actual) != expected:
+                raise ValueError("business_claim_coverage_mismatch")
+            for claim in business.claim_evidence:
+                if not claim.excerpts:
+                    raise ValueError("business_claim_excerpt_required")
+                excerpts(claim.excerpts, "business_claim")
+                ids = {e.evidence_id for e in claim.excerpts}
+                if not ids.issubset(business.evidence_ids):
+                    raise ValueError("business_claim_not_in_node_evidence")
+                if claim.field == "monetization" and ids != set(business.monetization[claim.item_index].evidence_ids):
+                    raise ValueError("monetization_claim_evidence_mismatch")
+        identities = [(r.source_id, r.kind, r.target_id) for r in self.relationships]
+        if len(identities) != len(set(identities)):
+            raise ValueError("duplicate_relationship")
+        for relation in self.relationships:
+            if relation.basis not in tuple(AssertionBasis) or not relation.rationale or not relation.rationale.strip():
+                raise ValueError("relationship_basis_and_rationale_required")
+            if relation.source_id == relation.target_id:
+                raise ValueError("self_relationship_unsupported")
+            excerpts(relation.excerpts, "relationship")
+            if {e.evidence_id for e in relation.excerpts} != set(relation.evidence_ids):
+                raise ValueError("relationship_excerpt_evidence_mismatch")
+            if relation.basis != AssertionBasis.UNKNOWN and not relation.excerpts:
+                raise ValueError("asserted_relationship_excerpt_required")
+            if relation.basis == AssertionBasis.UNKNOWN:
+                if relation.review_status in (ReviewStatus.ACCEPTED, ReviewStatus.EDITED):
+                    raise ValueError("unknown_relationship_cannot_be_accepted")
+                if not any({relation.source_id, relation.target_id}.issubset(u.related_business_ids) for u in self.unknowns):
+                    raise ValueError("unknown_relationship_requires_gap")
 
     @staticmethod
     def _require_known(values: tuple[str, ...], known: set[str], owner: str) -> None:
@@ -143,7 +230,19 @@ class BusinessMap:
             raise ValueError(f"{owner} references unknown ids: {', '.join(missing)}")
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        value = asdict(self)
+        if self.schema_version != "business-map-v0.2":
+            # Historical products remain byte-shape compatible. Reading them
+            # neither invents evidence annotations nor upgrades their basis.
+            value.pop("relationship_absence")
+            for business in value["businesses"]:
+                business.pop("claim_evidence")
+            for relation in value["relationships"]:
+                for key in ("basis", "rationale", "excerpts"):
+                    relation.pop(key)
+            for evidence in value["evidence"]:
+                evidence.pop("company_id")
+        return value
 
 
 def business_map_from_dict(value: dict[str, Any]) -> BusinessMap:
@@ -156,6 +255,7 @@ def business_map_from_dict(value: dict[str, Any]) -> BusinessMap:
             text_hash=item["text_hash"],
             source_url=item["source_url"],
             support=item["support"],
+            company_id=item.get("company_id"),
         )
         for item in value.get("evidence", [])
     )
@@ -178,6 +278,10 @@ def business_map_from_dict(value: dict[str, Any]) -> BusinessMap:
             importance_signals=tuple(item.get("importance_signals", [])),
             evidence_ids=tuple(item.get("evidence_ids", [])),
             review_status=ReviewStatus(item.get("review_status", "candidate")),
+            claim_evidence=tuple(BusinessClaimEvidence(
+                field=c["field"], item_index=c["item_index"],
+                excerpts=tuple(EvidenceExcerpt(e["evidence_id"], e["quote"]) for e in c["excerpts"]))
+                for c in item.get("claim_evidence", [])),
         )
         for item in value.get("businesses", [])
     )
@@ -189,6 +293,9 @@ def business_map_from_dict(value: dict[str, Any]) -> BusinessMap:
             description=item["description"],
             evidence_ids=tuple(item.get("evidence_ids", [])),
             review_status=ReviewStatus(item.get("review_status", "candidate")),
+            basis=AssertionBasis(item["basis"]) if item.get("basis") is not None else None,
+            rationale=item.get("rationale"),
+            excerpts=tuple(EvidenceExcerpt(e["evidence_id"], e["quote"]) for e in item.get("excerpts", [])),
         )
         for item in value.get("relationships", [])
     )
@@ -213,4 +320,5 @@ def business_map_from_dict(value: dict[str, Any]) -> BusinessMap:
         unknowns=unknowns,
         evidence=evidence,
         metadata=value.get("metadata", {}),
+        relationship_absence=value.get("relationship_absence"),
     )

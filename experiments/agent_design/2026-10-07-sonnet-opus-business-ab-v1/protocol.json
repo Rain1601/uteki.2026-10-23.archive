@@ -1,0 +1,83 @@
+{
+  "schema_version": "uteki-model-ab-protocol-v1",
+  "frozen_at": "2026-10-07T06:56:34.695532+00:00",
+  "task": "Alphabet FY2025 selected-block business and revenue extraction",
+  "authorization": {
+    "basis": "User explicitly requested upgrading to Opus and comparing Sonnet with Opus in this turn",
+    "new_model_calls_max": 1,
+    "automatic_retries": 0,
+    "host_selected_estimate_limit_usd": "1.00",
+    "limit_note": "Execution bound chosen for this authorized request, not an exact amount quoted by the user. Separate from previous single-run and advisor budgets."
+  },
+  "arms": {
+    "A": {
+      "run_dir": "experiments/agent_design/2026-10-07-agent-business-revenue-v1/run-01",
+      "model": "claude-sonnet-5-5",
+      "trace_id": "run-ac090fecb2c84b8bacc9cd4d60a0bada",
+      "result_sha256": "37aa1f505c378d663993bb1d332c86c94e6629603d02f66f9fe7da55b2451962",
+      "request_sha256": "8f6ea243ea0faf94ddac34b0d1a6687776de10017ec915b5877550e2dbed6175"
+    },
+    "B": {
+      "run_dir": "experiments/agent_design/2026-10-07-sonnet-opus-business-ab-v1/opus-run-01",
+      "model": "claude-opus-5-5",
+      "request_sha256": "01bc46529a1edbcbd4f5c6a57ea3cdaab6586f7317eab68394a501c65eac819c"
+    }
+  },
+  "controlled_input": {
+    "company_id": "alphabet",
+    "document_id": "sec-0001652044-26-000018",
+    "period_end": "2025-12-31",
+    "source_packet_sha256": "a290de99e8bfd6d48a4663830bca99b43d331cc66055b7c1f7e323b6cd34b0f2",
+    "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+    "skill_sha256": "0ae0c2f9d0aa0f4a74c231b9b05a5d1c094420091e8fab89f3cb181b8bc8e413",
+    "output_schema_sha256": "0b73fe193620e45eb93dde093fd397e53ddddd10ef744b3feab5090c99701284",
+    "implementation_sha256": {
+      "product_run.py": "c29ce95bfbeefc02e8ce122204d01502da39f5162d645397c4194458f278049e",
+      "product_contract.py": "b4c8b7d251cc6c478fc6dd08eb651faf141b9ee26bdc2dc30027091f4bde0bc4"
+    }
+  },
+  "request_comparison": {
+    "differing_top_level_fields": [
+      "model"
+    ],
+    "all_other_fields_equal": true,
+    "body_parameters": {
+      "max_tokens": 16000,
+      "thinking": {
+        "type": "adaptive"
+      },
+      "output_config": {
+        "effort": "high"
+      },
+      "stream": false
+    },
+    "timeout_seconds": 300,
+    "max_retries": 0
+  },
+  "method": {
+    "repeats_per_arm": 1,
+    "baseline": "Reused completed Sonnet run; Opus runs later",
+    "blinded": false,
+    "judge": "Codex source-grounded semantic review, independent of extraction; no separate paid judge call",
+    "limitations": [
+      "One selected packet from one company, not whole-report coverage",
+      "Sequential model runs; no repeated stability or statistical superiority conclusion",
+      "Current Skill v0.4 deliberately excluded; both execute frozen v0.3"
+    ]
+  },
+  "criteria": [
+    "Raw source, schema, request and Skill identity",
+    "Contract success and usable output",
+    "Business identity, hierarchy, coverage within the selected packet",
+    "Direct evidence for node, customer, monetization and relationship claims",
+    "Revenue year, units, signs, mutually exclusive components, exact reconciliation",
+    "No invented disclosure or unsupported split; uncertainty retained",
+    "Delivered views, elapsed time, tokens and estimated cost separately"
+  ],
+  "prior_sonnet_gaps_to_recheck": [
+    "Material named businesses represented as independent queryable objects",
+    "Direct citations for customer and product assertions",
+    "Revenue title does not call all categories reportable segments",
+    "Contextual Isomorphic Labs ownership is not asserted as explicit disclosure"
+  ]
+}

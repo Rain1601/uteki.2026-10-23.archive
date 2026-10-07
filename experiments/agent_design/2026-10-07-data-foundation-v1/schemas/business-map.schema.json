@@ -1,0 +1,333 @@
+{
+  "$defs": {
+    "AssertionBasis": {
+      "enum": [
+        "explicit",
+        "derived",
+        "unknown"
+      ],
+      "title": "AssertionBasis",
+      "type": "string"
+    },
+    "Business": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/BusinessKind"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "products_services": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Products Services",
+          "type": "array"
+        },
+        "customers": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Customers",
+          "type": "array"
+        },
+        "monetization": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Monetization"
+          },
+          "title": "Monetization",
+          "type": "array"
+        },
+        "importance_signals": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Importance Signals",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "review_status": {
+          "$ref": "#/$defs/ReviewStatus",
+          "default": "candidate"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "kind",
+        "description"
+      ],
+      "title": "Business",
+      "type": "object"
+    },
+    "BusinessKind": {
+      "enum": [
+        "company",
+        "reportable_segment",
+        "business",
+        "offering_group",
+        "revenue_line"
+      ],
+      "title": "BusinessKind",
+      "type": "string"
+    },
+    "Evidence": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "document_id": {
+          "title": "Document Id",
+          "type": "string"
+        },
+        "section_path": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Section Path",
+          "type": "array"
+        },
+        "paragraph_ordinal": {
+          "title": "Paragraph Ordinal",
+          "type": "integer"
+        },
+        "text_hash": {
+          "title": "Text Hash",
+          "type": "string"
+        },
+        "source_url": {
+          "title": "Source Url",
+          "type": "string"
+        },
+        "support": {
+          "title": "Support",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "document_id",
+        "section_path",
+        "paragraph_ordinal",
+        "text_hash",
+        "source_url",
+        "support"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Monetization": {
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "basis": {
+          "$ref": "#/$defs/AssertionBasis"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "description",
+        "basis",
+        "evidence_ids"
+      ],
+      "title": "Monetization",
+      "type": "object"
+    },
+    "Relationship": {
+      "properties": {
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "title": "Target Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/RelationshipKind"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "review_status": {
+          "$ref": "#/$defs/ReviewStatus",
+          "default": "candidate"
+        }
+      },
+      "required": [
+        "source_id",
+        "target_id",
+        "kind",
+        "description",
+        "evidence_ids"
+      ],
+      "title": "Relationship",
+      "type": "object"
+    },
+    "RelationshipKind": {
+      "enum": [
+        "reported_under",
+        "part_of",
+        "revenue_component_of",
+        "supports"
+      ],
+      "title": "RelationshipKind",
+      "type": "string"
+    },
+    "ReviewStatus": {
+      "enum": [
+        "candidate",
+        "accepted",
+        "edited",
+        "rejected",
+        "ambiguous"
+      ],
+      "title": "ReviewStatus",
+      "type": "string"
+    },
+    "Unknown": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "question": {
+          "title": "Question",
+          "type": "string"
+        },
+        "materiality": {
+          "title": "Materiality",
+          "type": "string"
+        },
+        "related_business_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Business Ids",
+          "type": "array"
+        },
+        "reason_unanswered": {
+          "title": "Reason Unanswered",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "question",
+        "materiality",
+        "related_business_ids",
+        "reason_unanswered"
+      ],
+      "title": "Unknown",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "schema_version": {
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "company_id": {
+      "title": "Company Id",
+      "type": "string"
+    },
+    "document_id": {
+      "title": "Document Id",
+      "type": "string"
+    },
+    "summary": {
+      "title": "Summary",
+      "type": "string"
+    },
+    "businesses": {
+      "items": {
+        "$ref": "#/$defs/Business"
+      },
+      "title": "Businesses",
+      "type": "array"
+    },
+    "relationships": {
+      "items": {
+        "$ref": "#/$defs/Relationship"
+      },
+      "title": "Relationships",
+      "type": "array"
+    },
+    "unknowns": {
+      "items": {
+        "$ref": "#/$defs/Unknown"
+      },
+      "title": "Unknowns",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "title": "Metadata",
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "company_id",
+    "document_id",
+    "summary",
+    "businesses",
+    "relationships",
+    "unknowns",
+    "evidence"
+  ],
+  "title": "BusinessMap",
+  "type": "object"
+}

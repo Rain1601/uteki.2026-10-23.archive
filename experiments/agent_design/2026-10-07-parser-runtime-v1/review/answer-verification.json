@@ -1,0 +1,379 @@
+{
+  "schema_version": "parser-runtime-answer-verification-v1",
+  "reviewed_at": "2026-10-07T02:08:39.768579+00:00",
+  "reviewer": "Codex in the current development session",
+  "method": "Codex 对照事先独立准备的 oracle、原文包和真实运行产物逐项检查；脚本验证封存文件哈希、引文子串、来源与已读片段；内容含义和覆盖度由 Codex 逐项判断。未新增外部 judge API 调用。",
+  "external_judge_calls": 0,
+  "oracle": {
+    "path": "review/oracle.json",
+    "sha256": "6156e8d4f7f6cb6c7adb1a1ef964a2ef696c6a0dab4aed80b101c917453a86da"
+  },
+  "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+  "raw_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+  "dataset_snapshot_id": "query-85f34c9767590632252aa89e",
+  "status": "passed_for_bounded_tasks_with_process_findings",
+  "production_reliability": "not_established",
+  "model_generation_reproducibility": "not_evaluated",
+  "automatic_adoption": false,
+  "cases": [
+    {
+      "run": "runs/cashflow-source-r2",
+      "oracle_case_id": "amd-cashflow-source-evidence",
+      "run_manifest_sha256": "ac57d36519af6ba0dbf46fe09b170e16a780adbaac005a65131b734691523e69",
+      "query_manifest_sha256": "e9d563f9c4239882fd587f91d4e746565d5c35382b7d1d94d73a444e23f23fb2",
+      "run_files_verified": 199,
+      "host_status": "evidence_ready",
+      "host_stop_reason": "host_reference_checks_passed",
+      "host_semantic_status": "not_evaluated",
+      "codex_semantic_verdict": "pass_for_requested_scope",
+      "quote_checks": [
+        {
+          "candidate_evidence_id": "ev-c34ba60003c5474e4ab82658",
+          "claim_index": null,
+          "context_id": "ev-e30381af928f67cfe3cbb19d",
+          "block_id": "block-000685-4f5a988d",
+          "text_hash": "4f5a988db60976cc80906521a8b4a5254818d210fed29363c612fa9648f1b014",
+          "quote": "Consolidated Statements of Cash Flows",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 37,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        },
+        {
+          "candidate_evidence_id": "ev-67eda6850a64b5e40979085c",
+          "claim_index": null,
+          "context_id": "ev-e30381af928f67cfe3cbb19d",
+          "block_id": "block-000686-a6e8806b",
+          "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+          "quote": "Year EndedDecember 30,2023December 31,2022December 25,2021(In millions)",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 71,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        },
+        {
+          "candidate_evidence_id": "ev-f22bcfda3f375378be61c983",
+          "claim_index": null,
+          "context_id": "ev-e30381af928f67cfe3cbb19d",
+          "block_id": "block-000686-a6e8806b",
+          "text_hash": "a6e8806b2514e662c87c9ce6f116c5cf2ea12015b0397dae2f88bf49ff7a7f33",
+          "quote": "Net cash provided by operating activities1,667 3,565 3,521",
+          "exact_canonical_substring": true,
+          "start_char": 954,
+          "end_char": 1012,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        }
+      ],
+      "pending_body_reads": [],
+      "scope_checked": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "process": {
+        "model_calls": 17,
+        "decisions": 17,
+        "rejected_decisions": 6,
+        "rejections": [
+          {
+            "step": 2,
+            "action": "invalid",
+            "reason": "invalid_model_decision; visible_output=decision-0002-01-output.json; validation=[{\"type\": \"value_error\", \"location\": [], \"rule\": \"action_requires_reason\", \"suggestion\": \"For action=plan or action=gap provide a nonblank reason.\"}]"
+          },
+          {
+            "step": 4,
+            "action": "invalid",
+            "reason": "invalid_model_decision; visible_output=decision-0004-01-output.json; validation=[{\"type\": \"json_invalid\", \"location\": [], \"rule\": \"single_json_object\", \"suggestion\": \"Return exactly one valid JSON object; no prose, Markdown fences, or multiple concatenated JSON objects.\"}]"
+          },
+          {
+            "step": 5,
+            "action": "outline_source",
+            "reason": "tool action must reference existing requirements"
+          },
+          {
+            "step": 7,
+            "action": "search_source",
+            "reason": "tool action must reference existing requirements"
+          },
+          {
+            "step": 10,
+            "action": "read_context",
+            "reason": "tool action must reference existing requirements"
+          },
+          {
+            "step": 13,
+            "action": "invalid",
+            "reason": "invalid_model_decision; visible_output=decision-0013-01-output.json; validation=[{\"type\": \"less_than_equal\", \"location\": [\"artifact_read\", \"<field>\"]}]"
+          }
+        ],
+        "process_conclusion": "The agent recovered from format/parameter errors. This successful final output is not a production reliability or repeated-run stability acceptance."
+      },
+      "semantic_checks": [
+        {
+          "item": "consolidated_cash_flow_statement_title",
+          "verdict": "pass"
+        },
+        {
+          "item": "operating_cash_flow_row_label_and_values",
+          "verdict": "pass",
+          "reviewer_confirmed_values_in_header_order": [
+            "1,667",
+            "3,565",
+            "3,521"
+          ],
+          "requested_years": [
+            2023,
+            2022
+          ]
+        },
+        {
+          "item": "FY2023_FY2022_headers",
+          "verdict": "pass",
+          "column_headers": [
+            "December 30,2023",
+            "December 31,2022"
+          ],
+          "calendar_year_substitution": false
+        },
+        {
+          "item": "unit_label",
+          "verdict": "pass",
+          "source_text": "(In millions)"
+        },
+        {
+          "item": "location_and_verbatim_quotes",
+          "verdict": "pass",
+          "location_granularity": "block + exact quote"
+        }
+      ],
+      "table_text_readback": {
+        "characters": 2038,
+        "steps": [
+          12,
+          14,
+          15
+        ],
+        "range_union_complete": true,
+        "joined_pages_equal_source_text": true
+      },
+      "limitations": [
+        "This is original source evidence extraction, not standardized numerical database output or calculation.",
+        "The model read the flattened table text in three pages; it did not consume individual cell coordinates. Reviewer checks confirm row/header alignment against original cells, which is distinct from demonstrated model use of table structure.",
+        "The unit quote is In millions. No independently verified USD claim was generated; the final reason notes the dollar marker and unconfirmed cell coordinates.",
+        "The dataset has zero normalized AMD records because the existing source-period adapter rejects this fiscal-calendar shape. This successful text extraction does not resolve that gap."
+      ]
+    },
+    {
+      "run": "runs/business-source",
+      "oracle_case_id": "amd-business-segments",
+      "run_manifest_sha256": "3c5dcde3ac07f3f26cebebf7f63d748edb38abf8427da80f12edf17901775007",
+      "query_manifest_sha256": "5d7e14b216e00e69b8db21a1ca16ce22f08da44e60db8f7e913fcbdb069d80c6",
+      "run_files_verified": 147,
+      "host_status": "evidence_ready",
+      "host_stop_reason": "host_reference_checks_passed",
+      "host_semantic_status": "not_evaluated",
+      "codex_semantic_verdict": "pass_for_requested_scope",
+      "quote_checks": [
+        {
+          "candidate_evidence_id": "ev-b190b5c6de9a80fb309b6569",
+          "claim_index": 0,
+          "context_id": "ev-4f68c8e71937ae913fc7e849",
+          "block_id": "block-000072-8555b0ea",
+          "text_hash": "8555b0ea7bd3feb56e395e06b74b31a29f191ade64221ca4e0fe7fb853fa17ba",
+          "quote": "Our four reportable segments are:",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 33,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        },
+        {
+          "candidate_evidence_id": "ev-b190b5c6de9a80fb309b6569",
+          "claim_index": 1,
+          "context_id": "ev-4f68c8e71937ae913fc7e849",
+          "block_id": "block-000073-e71f5008",
+          "text_hash": "e71f5008f20c5f550419f2d664b77f955a40d90867f6538d1dd5d73ff8aedc15",
+          "quote": "•the Data Center segment, which primarily includes server CPUs, GPUs, APUs, DPUs, FPGAs, SmartNICs, AI accelerators and Adaptive SoC products for data centers;",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 159,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        },
+        {
+          "candidate_evidence_id": "ev-b190b5c6de9a80fb309b6569",
+          "claim_index": 2,
+          "context_id": "ev-4f68c8e71937ae913fc7e849",
+          "block_id": "block-000074-31027a3a",
+          "text_hash": "31027a3aca7597b6684c0c1555c680343df52fd7128fe8bef648cb07ebe9f7b4",
+          "quote": "•the Client segment, which primarily includes CPUs, APUs, and chipsets for desktop, notebook and handheld personal computers;",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 125,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        },
+        {
+          "candidate_evidence_id": "ev-b190b5c6de9a80fb309b6569",
+          "claim_index": 3,
+          "context_id": "ev-4f68c8e71937ae913fc7e849",
+          "block_id": "block-000075-f6ae3e20",
+          "text_hash": "f6ae3e20b06f624090284a7ae4a3d4f021b32e6dae6fe2b79f9983cb93db8c27",
+          "quote": "•the Gaming segment, which primarily includes discrete GPUs, semi-custom SoC products and development services; and",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 115,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        },
+        {
+          "candidate_evidence_id": "ev-b190b5c6de9a80fb309b6569",
+          "claim_index": 4,
+          "context_id": "ev-4f68c8e71937ae913fc7e849",
+          "block_id": "block-000076-25664a5d",
+          "text_hash": "25664a5de98621662b6cf9097faa4516c71746819ea363b71a430a2ce2fed88c",
+          "quote": "•the Embedded segment, which primarily includes embedded CPUs, GPUs, APUs, FPGAs, SOMs, and Adaptive SoC products.",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 114,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        },
+        {
+          "candidate_evidence_id": "ev-b190b5c6de9a80fb309b6569",
+          "claim_index": 5,
+          "context_id": "ev-a7fa6b067189aea6fea55b96",
+          "block_id": "block-000077-0cf606c9",
+          "text_hash": "0cf606c958668e8fdf79fca263c236eb6b047feccdb8039621307b0b0301ae26",
+          "quote": "In addition to these reportable segments, we have an All Other category, which is not a reportable segment.",
+          "exact_canonical_substring": true,
+          "start_char": 0,
+          "end_char": 107,
+          "delivered_before_submission": true,
+          "source_scope_matches": true
+        }
+      ],
+      "pending_body_reads": [],
+      "scope_checked": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "process": {
+        "model_calls": 12,
+        "decisions": 12,
+        "rejected_decisions": 4,
+        "rejections": [
+          {
+            "step": 2,
+            "action": "invalid",
+            "reason": "invalid_model_decision; visible_output=decision-0002-01-output.json; validation=[{\"type\": \"value_error\", \"location\": [], \"rule\": \"action_requires_reason\", \"suggestion\": \"For action=plan or action=gap provide a nonblank reason.\"}]"
+          },
+          {
+            "step": 4,
+            "action": "invalid",
+            "reason": "invalid_model_decision; visible_output=decision-0004-01-output.json; validation=[{\"type\": \"json_invalid\", \"location\": [], \"rule\": \"single_json_object\", \"suggestion\": \"Return exactly one valid JSON object; no prose, Markdown fences, or multiple concatenated JSON objects.\"}]"
+          },
+          {
+            "step": 5,
+            "action": "outline_source",
+            "reason": "tool action must reference existing requirements"
+          },
+          {
+            "step": 8,
+            "action": "read_context",
+            "reason": "tool action must reference existing requirements"
+          }
+        ],
+        "process_conclusion": "The agent recovered from format/parameter errors. This successful final output is not a production reliability or repeated-run stability acceptance."
+      },
+      "semantic_checks": [
+        {
+          "claim_index": 0,
+          "statement": "报告事实:AMD 在 FY2023 10-K 中披露其有四个可报告分部。",
+          "verdict": "pass",
+          "reviewer_reason": "The introduction states exactly four reportable segments.",
+          "temporal_basis": "reported_actual",
+          "period_context": "FY2023 10-K(财年截至 2023-12-30)"
+        },
+        {
+          "claim_index": 1,
+          "statement": "报告事实:Data Center(数据中心)分部主要包括用于数据中心的服务器 CPU、GPU、APU、DPU、FPGA、SmartNIC、AI 加速器和 Adaptive SoC 产品。",
+          "verdict": "pass",
+          "reviewer_reason": "Data Center includes all eight product categories in the source, with the data-center application context.",
+          "temporal_basis": "reported_actual",
+          "period_context": "FY2023 10-K(财年截至 2023-12-30)"
+        },
+        {
+          "claim_index": 2,
+          "statement": "报告事实:Client(客户端)分部主要包括用于台式机、笔记本和手持个人电脑的 CPU、APU 和芯片组。",
+          "verdict": "pass",
+          "reviewer_reason": "Client includes CPUs, APUs and chipsets for desktop, notebook and handheld personal computers.",
+          "temporal_basis": "reported_actual",
+          "period_context": "FY2023 10-K(财年截至 2023-12-30)"
+        },
+        {
+          "claim_index": 3,
+          "statement": "报告事实:Gaming(游戏)分部主要包括独立 GPU、半定制 SoC 产品和开发服务。",
+          "verdict": "pass",
+          "reviewer_reason": "Gaming includes discrete GPUs, semi-custom SoCs and development services.",
+          "temporal_basis": "reported_actual",
+          "period_context": "FY2023 10-K(财年截至 2023-12-30)"
+        },
+        {
+          "claim_index": 4,
+          "statement": "报告事实:Embedded(嵌入式)分部主要包括嵌入式 CPU、GPU、APU、FPGA、SOM 和 Adaptive SoC 产品。",
+          "verdict": "pass",
+          "reviewer_reason": "Embedded includes embedded CPUs, GPUs, APUs, FPGAs, SOMs and Adaptive SoCs.",
+          "temporal_basis": "reported_actual",
+          "period_context": "FY2023 10-K(财年截至 2023-12-30)"
+        },
+        {
+          "claim_index": 5,
+          "statement": "报告事实:All Other 是一个附加类别,10-K 明确说明它不是可报告分部。推断(非原文):因此 All Other 不属于上述四个可报告分部之一。本次回读的片段未描述 All Other 的具体内容。",
+          "verdict": "pass",
+          "reviewer_reason": "All Other is correctly excluded from reportable segments; its unreviewed detailed composition is explicitly outside the narrow question.",
+          "temporal_basis": "reported_actual",
+          "period_context": "FY2023 10-K(财年截至 2023-12-30)"
+        }
+      ],
+      "coverage": {
+        "required_reportable_segments": 4,
+        "correct_reportable_segments": 4,
+        "major_product_lists_complete": true,
+        "all_other_correctly_excluded": true,
+        "introduction_and_complete_list_read": true,
+        "all_other_qualification_read": true,
+        "unresolved_questions": []
+      },
+      "limitations": [
+        "This checks the narrow business-segment question against the selected FY2023 filing; it does not validate a complete business map, current company structure or investment conclusions.",
+        "The All Other claim labels a straightforward inference separately in prose, but its structured temporal_basis covers the whole claim. A future richer fact/inference schema would separate those clauses."
+      ]
+    }
+  ],
+  "overall_notes": [
+    "Both cases passed Codex review against the pre-existing oracle and original source for their explicit tasks. The runtime files retain candidate status and host semantic_completeness=not_evaluated; this separate review does not mutate or adopt those results.",
+    "The cash-flow r2 run used 17 decisions with 6 rejected decisions; the business run used 12 with 4 rejected decisions. The preceding failed cash-flow r1 is outside these answer checks and must remain visible in any reliability summary.",
+    "Preparation and model execution used their frozen implementation versions. Later replay-input validation fixes are not evidence that earlier runs executed those fixes."
+  ]
+}

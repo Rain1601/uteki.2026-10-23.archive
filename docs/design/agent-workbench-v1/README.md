@@ -1,3 +1,5 @@
+> **2026-10-06：旧页面已退役。** 本目录不再提供独立页面；旧页面及其专用代码、测试已删除。当前使用 [Swiss C 投研前台](../company-workspace-swiss-c/README.md) 和 [真实数据工作台](../../../apps/review_workbench/README.md)。以下文字保留为历史记录，其中旧启动命令与页面链接不再适用。保留的原始素材、来源记录和冻结版本仅用于追溯。
+
 # Agent 工作台 Demo v1
 
 入口：[本地 Demo](http://127.0.0.1:8769/docs/design/agent-workbench-v1/?v=20261004-agents1)。

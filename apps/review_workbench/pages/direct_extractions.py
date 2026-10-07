@@ -9,7 +9,7 @@ from apps.review_workbench.pages.dataset_view import render_block
 from apps.review_workbench.pages.extraction_facts import render_fact_matrices
 
 
-def processing_record(run):
+def processing_record(run, *, root=None):
     """Readable saved inputs and outputs, without inventing an execution trace."""
     artifacts = run['artifacts']
     packet, job = artifacts.get('packet.json', {}), artifacts.get('job.json', {})
@@ -19,8 +19,21 @@ def processing_record(run):
     if not isinstance(task, str):
         task = ''
     body = '<section id="processing-record"><h2>' + bi('这次处理做了什么', 'What this extraction did') + '</h2>'
-    body += '<p class="ev-note">' + bi('以下内容来自这次运行保存的文件。这里展示提取步骤的输入与输出；完整主 Agent 的执行过程尚未接入。',
-        'The following comes from saved run artifacts. These are the extraction step inputs and outputs; the full parent Agent trace is not connected here.') + '</p>'
+    parent_id = None
+    if root is not None:
+        from apps.review_workbench.data.agent_runs import parent_for_extraction
+        try:
+            parent_id = parent_for_extraction(root, run)
+        except (OSError, ValueError, KeyError):
+            # A missing parent cannot invalidate this separately verified extraction.
+            pass
+    if parent_id:
+        body += '<p class="ev-note">' + bi('这里展示提取步骤保存的输入与输出。完整主运行包含计划、拒绝步骤、子任务和用量。',
+            'This view shows saved extraction inputs and outputs. The parent run includes plans, rejected steps, child tasks and usage.')
+        body += ' <a href="/agent-results?' + e(urlencode({'agent': 'data', 'run': parent_id})) + '">' + bi('查看运行结果与评分', 'View result & scores') + '</a> · <a href="/agent-runs?' + e(urlencode({'agent': 'data', 'run': parent_id})) + '">Trace ID: ' + e(parent_id) + '</a></p>'
+    else:
+        body += '<p class="ev-note">' + bi('以下内容来自这次运行保存的文件。这里展示提取步骤的输入与输出；尚无已验证的主运行关联。',
+            'These are saved extraction inputs and outputs; a verified parent run association is not available.') + '</p>'
     body += '<h3>' + bi('1. 收到什么任务与材料', '1. Task and source input') + '</h3>'
     body += '<p class="ev-question">' + (e(task) if task else bi('未保存可读任务说明。', 'No readable task instruction was saved.')) + '</p>'
     if 'packet.json' in artifacts:
@@ -123,7 +136,7 @@ def render_direct_extractions(root, selection):
     body += '<p>' + bi('执行状态：', 'Execution status: ') + (bi(*states[status]) if status in states else e(status or '—')) + '</p>'
     if run['missing']:
         body += '<p>' + bi('本次未保存：', 'Not saved: ') + e(', '.join(run['missing'])) + '</p>'
-    body += processing_record(run)
+    body += processing_record(run, root=root)
     body += render_fact_matrices(run, kind=args.get('kind'), fact=args.get('fact'))
     body += saved_json(('身份、完整性与缺口', 'Identity, integrity & gaps'), {k: run[k] for k in
         ('company_id', 'source_snapshot_id', 'period_end', 'scope_status', 'source_check', 'manifest_sha256', 'missing', 'db_check')})

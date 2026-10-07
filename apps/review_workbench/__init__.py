@@ -7,7 +7,6 @@ from importlib import import_module
 import sys
 
 _LEGACY_MODULES = {'acceptance_view': 'pages.acceptance_view',
- 'attention_dashboard': 'pages.attention_dashboard',
  'cloud_analysis': 'pages.cloud_analysis',
  'cloud_spike': 'pages.cloud_spike',
  'company_brief': 'pages.company_brief',
@@ -16,7 +15,6 @@ _LEGACY_MODULES = {'acceptance_view': 'pages.acceptance_view',
  'dataset_view': 'pages.dataset_view',
  'document_index': 'pages.document_index',
  'earnings_reader': 'pages.earnings_reader',
- 'home_cards': 'pages.home_cards',
  'query_runs': 'pages.query_runs',
  'research_archive_ui': 'pages.research_archive_ui',
  'archive_navigation': 'components.archive_navigation',

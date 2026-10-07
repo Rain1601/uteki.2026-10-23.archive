@@ -1,0 +1,40 @@
+flowchart LR
+  accTitle: Selected filing business structure
+  accDescr: Solid edges are explicit source assertions. Dashed edges are derived. Unknown relations are omitted; absent edges do not imply independence.
+  N000["MICROSOFT CORPORATION"]:::company
+  N003["More Personal Computing"]:::reportable_segment
+  N062["Windows and Devices"]:::offering_group
+  N063["Windows OEM licensing"]:::business
+  N064["Devices"]:::offering_group
+  N065["Surface"]:::business
+  N066["PC accessories"]:::business
+  N067["Gaming"]:::offering_group
+  N069["Xbox hardware"]:::business
+  N070["Xbox content and services"]:::offering_group
+  N071["Xbox Game Pass"]:::business
+  N072["Xbox Cloud Gaming"]:::business
+  N074["Search and news advertising"]:::offering_group
+  N075["Bing"]:::business
+  N076["Microsoft Edge"]:::business
+  N077["Microsoft Copilot"]:::business
+  N078["Microsoft News"]:::business
+  classDef company fill:#263c46,color:#fff,stroke:#263c46,stroke-width:1.5px
+  classDef reportable_segment fill:#e4eef2,color:#203c49,stroke:#91aeba,stroke-width:1px
+  classDef business fill:#eaf1e9,color:#2b4432,stroke:#a4b8a7,stroke-width:1px
+  classDef offering_group fill:#fff,color:#302c26,stroke:#c9c2b7,stroke-width:1px
+  N000 -->|"包含"| N003
+  N003 -->|"报告中列示"| N062
+  N003 -->|"报告中列示"| N067
+  N003 -->|"报告中列示"| N074
+  N062 -->|"包含"| N063
+  N062 -->|"包含"| N064
+  N064 -->|"包含"| N065
+  N064 -->|"包含"| N066
+  N067 -->|"包含"| N069
+  N067 -->|"包含"| N070
+  N070 -->|"包含"| N071
+  N070 -->|"包含"| N072
+  N074 -->|"包含"| N075
+  N074 -->|"包含"| N077
+  N074 -->|"包含"| N078
+  N074 -->|"包含"| N076

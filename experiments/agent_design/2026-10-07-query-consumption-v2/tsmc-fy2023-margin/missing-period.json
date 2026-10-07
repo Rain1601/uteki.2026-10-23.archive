@@ -1,0 +1,142 @@
+{
+  "candidate_data": true,
+  "completion_scope": "Resolved typed plan only; document match does not establish semantic completeness of the natural-language question.",
+  "computed_facts": [],
+  "documents": [],
+  "evidence": {},
+  "execution_schema_version": "research-execution-v1",
+  "gaps": [
+    {
+      "reason": "source_missing",
+      "request": {
+        "entity_id": "sec-0001046179",
+        "metric_id": "revenue",
+        "period": {
+          "basis": "source",
+          "end": "2020-12-31",
+          "kind": "year",
+          "start": "2020-01-01"
+        },
+        "value_kind": "actual"
+      },
+      "scope": "record",
+      "selection_id": "1b9aec6bf03eacbef66d0cdd"
+    },
+    {
+      "reason": "source_missing",
+      "request": {
+        "entity_id": "sec-0001046179",
+        "metric_id": "operating_income",
+        "period": {
+          "basis": "source",
+          "end": "2020-12-31",
+          "kind": "year",
+          "start": "2020-01-01"
+        },
+        "value_kind": "actual"
+      },
+      "scope": "record",
+      "selection_id": "4393da7f9c0b5f3499dac175"
+    },
+    {
+      "formula_id": "operating_margin",
+      "reason": "operand_missing_or_ambiguous",
+      "scope": "calculation"
+    }
+  ],
+  "knowledge_cutoff": "2026-10-07",
+  "query_id": "tsmc-fy2023-margin-unprocessed-period",
+  "records": [],
+  "result_schema_version": "research-query-v0.5",
+  "scope": {
+    "company_ids": [
+      "sec-0001046179"
+    ],
+    "execution_schema_version": "research-execution-v1",
+    "include_candidates": true,
+    "knowledge_cutoff": "2026-10-07",
+    "snapshot_id": "query-direct-1a81ba2fc2361ffa029752e0",
+    "source_policy_id": "local-frozen-v1",
+    "source_snapshot_ids": [
+      "source-6719837a8d24b2b7df359f29"
+    ]
+  },
+  "scope_id": "scope-6ae8be2651a31a9edde6b4d6",
+  "selections": [
+    {
+      "reason": "not_structured_in_this_pilot; not a not-disclosed finding",
+      "record_ids": [],
+      "request": {
+        "entity_id": "sec-0001046179",
+        "metric_id": "revenue",
+        "period": {
+          "basis": "source",
+          "end": "2020-12-31",
+          "kind": "year",
+          "start": "2020-01-01"
+        },
+        "value_kind": "actual"
+      },
+      "selection_id": "1b9aec6bf03eacbef66d0cdd",
+      "status": "source_missing"
+    },
+    {
+      "reason": "not_structured_in_this_pilot; not a not-disclosed finding",
+      "record_ids": [],
+      "request": {
+        "entity_id": "sec-0001046179",
+        "metric_id": "operating_income",
+        "period": {
+          "basis": "source",
+          "end": "2020-12-31",
+          "kind": "year",
+          "start": "2020-01-01"
+        },
+        "value_kind": "actual"
+      },
+      "selection_id": "4393da7f9c0b5f3499dac175",
+      "status": "source_missing"
+    }
+  ],
+  "snapshot_id": "query-direct-1a81ba2fc2361ffa029752e0",
+  "source_policy_id": "local-frozen-v1",
+  "status": "unanswerable",
+  "trace": [
+    {
+      "parameters": [
+        "sec-0001046179",
+        "revenue",
+        "actual",
+        "year",
+        "2020-01-01",
+        "2020-12-31",
+        "2026-10-07",
+        "source-6719837a8d24b2b7df359f29",
+        "sec-0001046179",
+        "2026-10-07"
+      ],
+      "returned_rows": 0,
+      "snapshot_id": "query-direct-1a81ba2fc2361ffa029752e0",
+      "sql": "SELECT payload FROM observations WHERE entity_id = ? AND metric_id = ? AND value_kind = ? AND period_kind = ? AND period_start IS NOT DISTINCT FROM ? AND period_end = ? AND source_snapshot_id IN (SELECT source_snapshot_id FROM sources WHERE available_at <= ? AND source_snapshot_id IN (?) AND company_id IN (?)) AND available_at <= ? AND status = 'candidate' ORDER BY record_id LIMIT 257",
+      "tool": "sql"
+    },
+    {
+      "parameters": [
+        "sec-0001046179",
+        "operating_income",
+        "actual",
+        "year",
+        "2020-01-01",
+        "2020-12-31",
+        "2026-10-07",
+        "source-6719837a8d24b2b7df359f29",
+        "sec-0001046179",
+        "2026-10-07"
+      ],
+      "returned_rows": 0,
+      "snapshot_id": "query-direct-1a81ba2fc2361ffa029752e0",
+      "sql": "SELECT payload FROM observations WHERE entity_id = ? AND metric_id = ? AND value_kind = ? AND period_kind = ? AND period_start IS NOT DISTINCT FROM ? AND period_end = ? AND source_snapshot_id IN (SELECT source_snapshot_id FROM sources WHERE available_at <= ? AND source_snapshot_id IN (?) AND company_id IN (?)) AND available_at <= ? AND status = 'candidate' ORDER BY record_id LIMIT 257",
+      "tool": "sql"
+    }
+  ]
+}

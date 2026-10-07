@@ -1,0 +1,1176 @@
+{
+  "schema_version": "independent-business-semantic-review-v1",
+  "reviewed_at": "2026-10-07T14:35:13.152073+00:00",
+  "bindings": {
+    "reference_business_map_sha256": "fed4d71dfe8ad1af84be5823c713f8bcd206648b238124f87946d8a6240a6386",
+    "candidate_business_map_sha256": "6c947c8d323517645ad066529bde19621ab47e22cb3fe7177c75e722a44fdc15",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "request_sha256": "049d3fd5e281da3c7a26d766db954239451d236507c1f34cde27c8b8fb93f5ba",
+    "skill_sha256": "005b9d1802e66f83411c16114886ff3124586094b73e070dd6b59d22cb582169",
+    "criteria_sha256": "8ba7252be92bc6811aa80fed435f74d1db4e02e2c65bd87e2b41334cb47bd95f",
+    "candidate_trace_id": "run-40b2b39d02bf4915b53cedbf80ff23e7"
+  },
+  "review_status": "needs_revision_for_graph_stage",
+  "semantic_acceptance": "failed_for_graph_stage",
+  "summary": "B1 确为系统 Agent + Sonnet 的一次独立执行：35 个节点、36 条关系，结构校验通过，估算 $0.280446；原文语义验收未通过。主要缺口为云服务/AI/安全等层级遗漏、GitHub/Nuance 整体与云子集混用，以及精确引文覆盖不完整。参考对照用于定位差异，节点数相同不是验收标准。",
+  "reviewer": {
+    "role": "Codex source review after candidate freeze",
+    "blind": false,
+    "note": "Reviewer saw earlier Microsoft discussion/reference and authored the generic execution wrapper. This is a source-grounded non-blind review, not an independent blind judge. No evaluation feedback was sent to the generator."
+  },
+  "scope": {
+    "source": "Microsoft FY2025 10-K Operating Segments",
+    "blocks": 103,
+    "node_count_reviewed": 35,
+    "edge_count_reviewed": 36,
+    "unknowns_reviewed": 0,
+    "complete_report": false,
+    "detailed_attributes": "deferred_by_graph_stage_contract",
+    "visual_review": "not_performed",
+    "criteria_adaptation": "C01-C25 retained IDs; customer/monetization details deferred where graph stage explicitly excludes those attributes. Node counts and exact taxonomy are not truth labels."
+  },
+  "execution": {
+    "calls": 1,
+    "stop_reason": "end_turn",
+    "deterministic_validation": "passed",
+    "self_revision_calls": 0,
+    "estimated_usd": "0.280446",
+    "actual_billed_usd": null
+  },
+  "findings": [
+    {
+      "id": "F01",
+      "severity": "major",
+      "type": "named_object_omission",
+      "items": [
+        {
+          "name": "Microsoft 365 Commercial cloud",
+          "source_block_id": "block-000093-7018adaa",
+          "source_quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+        },
+        {
+          "name": "Microsoft 365 Commercial products",
+          "source_block_id": "block-000093-7018adaa",
+          "source_quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises."
+        },
+        {
+          "name": "Azure and other cloud services",
+          "source_block_id": "block-000120-c34f7245",
+          "source_quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "name": "Azure AI offerings",
+          "source_block_id": "block-000128-edef168d",
+          "source_quote": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        },
+        {
+          "name": "Azure Security offerings",
+          "source_block_id": "block-000134-9ca2b5c6",
+          "source_quote": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition."
+        },
+        {
+          "name": "GitHub cloud services",
+          "source_block_id": "block-000120-c34f7245",
+          "source_quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "name": "Nuance Healthcare cloud services",
+          "source_block_id": "block-000120-c34f7245",
+          "source_quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "name": "Microsoft News",
+          "source_block_id": "block-000150-9577a591",
+          "source_quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates."
+        }
+      ],
+      "note": "这些对象在原文明示且对业务层级有意义，遗漏不能用节点数不同解释。"
+    },
+    {
+      "id": "F02",
+      "severity": "major",
+      "type": "whole_subset_relationship_mismatch",
+      "edge_indices": [
+        22,
+        23
+      ],
+      "note": "整体节点却以cloud子集建立explicit边；更宽父节点仍不能修正source端范围。"
+    },
+    {
+      "id": "F03",
+      "severity": "major",
+      "type": "claim_excerpt_partial_entailment",
+      "affected_node_ids": [
+        "m365_commercial",
+        "m365_commercial_platform",
+        "m365_copilot",
+        "ems",
+        "linkedin",
+        "linkedin_premium",
+        "linkedin_sales",
+        "dynamics",
+        "dynamics365",
+        "server_cloud",
+        "github",
+        "nuance_healthcare",
+        "enterprise_partner",
+        "windows_oem",
+        "gaming",
+        "search_news_ads"
+      ],
+      "count": 16,
+      "note": "未发现这些描述全无源文支持；失败点是字段绑定的精确引文不能覆盖全部句义。完整段落存在不等于精确主张绑定合格。"
+    },
+    {
+      "id": "F04",
+      "severity": "moderate",
+      "type": "explicit_derived_strength",
+      "edge_indices": [
+        21
+      ],
+      "note": "以命名组合推断Azure单体范围应显示derived；可接受更宽有据推断但不得冒充逐字包含。"
+    },
+    {
+      "id": "F05",
+      "severity": "moderate",
+      "type": "missing_direct_group_edge",
+      "edge_indices": [
+        25
+      ],
+      "note": "Server products应保留source明确的server_cloud上层，分部捷径丢失对照结构。"
+    }
+  ],
+  "node_reviews": [
+    {
+      "node_id": "microsoft",
+      "name": "MICROSOFT CORPORATION",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000008-f2b16ab3",
+        "block-000086-935d6090"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "seg_pbp",
+      "name": "Productivity and Business Processes",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000090-94a2e06c",
+        "block-000091-d993f813"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "seg_ic",
+      "name": "Intelligent Cloud",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000117-925ee601",
+        "block-000118-5e917062"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "seg_mpc",
+      "name": "More Personal Computing",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000143-c67f142f",
+        "block-000144-6e0ae0c4"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "m365_commercial",
+      "name": "Microsoft 365 Commercial products and cloud services",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000093-7018adaa"
+      ],
+      "note": "描述含云服务和本地两组，但description摘录只有本地组。"
+    },
+    {
+      "node_id": "m365_commercial_platform",
+      "name": "Microsoft 365 Commercial",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000101-67803298"
+      ],
+      "note": "description摘录只含brings together清单，AI-powered平台性质在name摘录/整块中而未绑定description。"
+    },
+    {
+      "node_id": "m365_copilot",
+      "name": "Microsoft 365 Copilot",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000093-7018adaa"
+      ],
+      "note": "description摘录的comprising清单缺少Microsoft 365 Commercial cloud主语；整块可支持。"
+    },
+    {
+      "node_id": "ems",
+      "name": "Enterprise Mobility + Security",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000093-7018adaa",
+        "block-000114-0cdf0fbd"
+      ],
+      "note": "竞争身份/安全厂商子句未包含在description摘录；block114整块支持。"
+    },
+    {
+      "node_id": "m365_consumer",
+      "name": "Microsoft 365 Consumer products and cloud services",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000095-61bd513b"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "m365_consumer_business",
+      "name": "Microsoft 365 Consumer",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000103-a597bcd9"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "linkedin",
+      "name": "LinkedIn",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000097-13124fb7",
+        "block-000108-ec73690d"
+      ],
+      "note": "description摘录仅连接专业人士，不含免费/变现四方案；block108整块支持。"
+    },
+    {
+      "node_id": "linkedin_talent",
+      "name": "Talent Solutions",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000108-ec73690d"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "linkedin_marketing",
+      "name": "Marketing Solutions",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000108-ec73690d"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "linkedin_premium",
+      "name": "Premium Subscriptions",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000108-ec73690d"
+      ],
+      "note": "description摘录只有方案清单，缺LinkedIn与monetized solutions谓语。"
+    },
+    {
+      "node_id": "linkedin_sales",
+      "name": "Sales Solutions",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000108-ec73690d"
+      ],
+      "note": "description摘录只有Premium Subscriptions, and Sales Solutions，缺LinkedIn与变现谓语。"
+    },
+    {
+      "node_id": "dynamics",
+      "name": "Dynamics products and cloud services",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000099-da3d48eb",
+        "block-000110-99cc951e"
+      ],
+      "note": "description摘录支持云/本地ERP/CRM，但没有Dynamics365子项，需block99同一主张绑定。"
+    },
+    {
+      "node_id": "dynamics365",
+      "name": "Dynamics 365",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000099-da3d48eb",
+        "block-000110-99cc951e"
+      ],
+      "note": "description摘录含低代码平台，缺描述中ERP/CRM；block99有。"
+    },
+    {
+      "node_id": "power_platform",
+      "name": "Power Apps and Power Automate",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000110-99cc951e"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "server_cloud",
+      "name": "Server products and cloud services",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000120-c34f7245"
+      ],
+      "note": "description摘录仅including Azure and other cloud services，缺服务器及SQL/Windows Server。"
+    },
+    {
+      "node_id": "azure",
+      "name": "Azure",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000127-93a9159b"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "azure_ai_foundry",
+      "name": "Azure AI Foundry",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000128-edef168d"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "github",
+      "name": "GitHub",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000130-8d7ff1f7"
+      ],
+      "note": "description摘录仅平台定义，未含cloud and on-premises；block130首句有。"
+    },
+    {
+      "node_id": "nuance_healthcare",
+      "name": "Nuance Healthcare",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000130-8d7ff1f7"
+      ],
+      "note": "description摘录仅医疗AI定义，未含cloud and on-premises；block130首句有。"
+    },
+    {
+      "node_id": "server_products",
+      "name": "Server products",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000120-c34f7245",
+        "block-000129-264fa06b"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "enterprise_partner",
+      "name": "Enterprise and partner services",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000122-c07a987e",
+        "block-000132-f2659d3c"
+      ],
+      "note": "description摘录仅协助部署/管理，缺五类组成及培训认证。"
+    },
+    {
+      "node_id": "windows_devices",
+      "name": "Windows and Devices",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000146-c641cfcd"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "windows_oem",
+      "name": "Windows OEM licensing",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000146-c641cfcd",
+        "block-000152-fc098ac9"
+      ],
+      "note": "description摘录仅OEM Pro/non-Pro许可证，缺更个性化计算体验句。"
+    },
+    {
+      "node_id": "devices",
+      "name": "Devices (Surface and PC accessories)",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000146-c641cfcd",
+        "block-000171-f62e3835"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "gaming",
+      "name": "Gaming",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000148-2f215a60",
+        "block-000175-0fadfa22"
+      ],
+      "note": "description摘录以comprising内容清单开始，缺Gaming含硬件及content/services分组句。"
+    },
+    {
+      "node_id": "xbox_game_pass",
+      "name": "Xbox Game Pass",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000176-a1bfeea9"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "xbox_cloud_gaming",
+      "name": "Xbox Cloud Gaming",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000148-2f215a60"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "search_news_ads",
+      "name": "Search and news advertising",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "partial_support",
+      "evidence_ids": [
+        "block-000150-9577a591",
+        "block-000180-c75c41bb"
+      ],
+      "note": "description摘录仅广告用途，缺Bing/Copilot/News/Edge/affiliate组成。"
+    },
+    {
+      "node_id": "bing",
+      "name": "Bing",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000180-c75c41bb"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "edge",
+      "name": "Microsoft Edge",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000180-c75c41bb"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    },
+    {
+      "node_id": "copilot",
+      "name": "Microsoft Copilot",
+      "source_fact_status": "supported_in_declared_source_blocks",
+      "claim_excerpt_status": "supported",
+      "evidence_ids": [
+        "block-000180-c75c41bb"
+      ],
+      "note": "核对名称与短定义，可由绑定片段支持；不据此推定所有属性或下属关系已提取。"
+    }
+  ],
+  "relationship_reviews": [
+    {
+      "index_zero_based": 0,
+      "source_id": "seg_pbp",
+      "target_id": "microsoft",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000086-935d6090"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 1,
+      "source_id": "seg_ic",
+      "target_id": "microsoft",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000086-935d6090"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 2,
+      "source_id": "seg_mpc",
+      "target_id": "microsoft",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000086-935d6090"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 3,
+      "source_id": "m365_commercial",
+      "target_id": "seg_pbp",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000091-d993f813",
+        "block-000093-7018adaa"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 4,
+      "source_id": "m365_consumer",
+      "target_id": "seg_pbp",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000091-d993f813",
+        "block-000095-61bd513b"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 5,
+      "source_id": "linkedin",
+      "target_id": "seg_pbp",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000091-d993f813",
+        "block-000097-13124fb7"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 6,
+      "source_id": "dynamics",
+      "target_id": "seg_pbp",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000091-d993f813",
+        "block-000099-da3d48eb"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 7,
+      "source_id": "m365_commercial_platform",
+      "target_id": "m365_commercial",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000093-7018adaa"
+      ],
+      "note": "关系整体可成立，但摘录只含cloud子组及平台，未包含更大target组，精确引用缺上层。"
+    },
+    {
+      "index_zero_based": 8,
+      "source_id": "m365_copilot",
+      "target_id": "m365_commercial",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000093-7018adaa"
+      ],
+      "note": "摘录仅and Microsoft 365 Copilot，没有所属组谓语。"
+    },
+    {
+      "index_zero_based": 9,
+      "source_id": "ems",
+      "target_id": "m365_commercial",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000093-7018adaa"
+      ],
+      "note": "摘录仅Microsoft 365 Commercial, Enterprise Mobility + Security，没有所属组谓语。"
+    },
+    {
+      "index_zero_based": 10,
+      "source_id": "m365_copilot",
+      "target_id": "m365_commercial_platform",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000101-67803298"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。 brings together可作为组合的explicit关系；参考采用derived更保守，两者不构成必然正确/错误对立。"
+    },
+    {
+      "index_zero_based": 11,
+      "source_id": "ems",
+      "target_id": "m365_commercial_platform",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000101-67803298"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。 brings together可作为组合的explicit关系；参考采用derived更保守，两者不构成必然正确/错误对立。"
+    },
+    {
+      "index_zero_based": 12,
+      "source_id": "m365_consumer_business",
+      "target_id": "m365_consumer",
+      "kind": "part_of",
+      "basis": "derived",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000095-61bd513b",
+        "block-000103-a597bcd9"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 13,
+      "source_id": "linkedin_talent",
+      "target_id": "linkedin",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000097-13124fb7"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 14,
+      "source_id": "linkedin_marketing",
+      "target_id": "linkedin",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000097-13124fb7"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 15,
+      "source_id": "linkedin_premium",
+      "target_id": "linkedin",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000097-13124fb7"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 16,
+      "source_id": "linkedin_sales",
+      "target_id": "linkedin",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000097-13124fb7"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 17,
+      "source_id": "dynamics365",
+      "target_id": "dynamics",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000099-da3d48eb"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 18,
+      "source_id": "power_platform",
+      "target_id": "dynamics365",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000099-da3d48eb",
+        "block-000110-99cc951e"
+      ],
+      "note": "摘录有低代码清单，缺清晰Dynamics365主语绑定；整块支持关系。"
+    },
+    {
+      "index_zero_based": 19,
+      "source_id": "server_cloud",
+      "target_id": "seg_ic",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000118-5e917062",
+        "block-000120-c34f7245"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 20,
+      "source_id": "enterprise_partner",
+      "target_id": "seg_ic",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000118-5e917062",
+        "block-000122-c07a987e"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 21,
+      "source_id": "azure",
+      "target_id": "server_cloud",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "inference_marked_explicit",
+      "evidence_ids": [
+        "block-000120-c34f7245"
+      ],
+      "note": "Azure→server_cloud需经Azure and other cloud services组合和Azure定义推导，当前explicit过强。"
+    },
+    {
+      "index_zero_based": 22,
+      "source_id": "github",
+      "target_id": "server_cloud",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "scope_mismatch",
+      "evidence_ids": [
+        "block-000120-c34f7245"
+      ],
+      "note": "source_id是GitHub整体，description/rationale却仅云服务；引用不能蕴含whole节点的explicit关系。"
+    },
+    {
+      "index_zero_based": 23,
+      "source_id": "nuance_healthcare",
+      "target_id": "server_cloud",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "scope_mismatch",
+      "evidence_ids": [
+        "block-000120-c34f7245"
+      ],
+      "note": "source_id是Nuance Healthcare整体，description/rationale却仅云服务；引用不能蕴含whole节点的explicit关系。"
+    },
+    {
+      "index_zero_based": 24,
+      "source_id": "azure_ai_foundry",
+      "target_id": "azure",
+      "kind": "part_of",
+      "basis": "derived",
+      "status": "supported_derived_with_omitted_intermediate",
+      "evidence_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d"
+      ],
+      "note": "Azure→AI→Foundry上下文可支持更宽derived边；Azure AI中间对象遗漏另记覆盖问题。"
+    },
+    {
+      "index_zero_based": 25,
+      "source_id": "server_products",
+      "target_id": "seg_ic",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported_but_omitted_intermediate",
+      "evidence_ids": [
+        "block-000118-5e917062",
+        "block-000120-c34f7245"
+      ],
+      "note": "Server products属Intelligent Cloud可从层级推出；缺server_cloud这一明确直接上层，图失去云/本地并列结构。"
+    },
+    {
+      "index_zero_based": 26,
+      "source_id": "windows_devices",
+      "target_id": "seg_mpc",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000144-6e0ae0c4",
+        "block-000146-c641cfcd"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 27,
+      "source_id": "gaming",
+      "target_id": "seg_mpc",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000144-6e0ae0c4",
+        "block-000148-2f215a60"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 28,
+      "source_id": "search_news_ads",
+      "target_id": "seg_mpc",
+      "kind": "reported_under",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000144-6e0ae0c4",
+        "block-000150-9577a591"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 29,
+      "source_id": "windows_oem",
+      "target_id": "windows_devices",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000146-c641cfcd"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 30,
+      "source_id": "devices",
+      "target_id": "windows_devices",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000146-c641cfcd"
+      ],
+      "note": "摘录只有Devices组成，缺Windows and Devices父组；整块支持。"
+    },
+    {
+      "index_zero_based": 31,
+      "source_id": "xbox_game_pass",
+      "target_id": "gaming",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000148-2f215a60"
+      ],
+      "note": "摘录仅GamePass and other subscriptions，没有Gaming/内容组关系谓语。"
+    },
+    {
+      "index_zero_based": 32,
+      "source_id": "xbox_cloud_gaming",
+      "target_id": "gaming",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000148-2f215a60"
+      ],
+      "note": "摘录仅CloudGaming, advertising, other cloud services，缺Gaming主语。"
+    },
+    {
+      "index_zero_based": 33,
+      "source_id": "bing",
+      "target_id": "search_news_ads",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000150-9577a591"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 34,
+      "source_id": "copilot",
+      "target_id": "search_news_ads",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "supported",
+      "evidence_ids": [
+        "block-000150-9577a591"
+      ],
+      "note": "核对主体、目标、方向、关系依据及源文上下文，未发现实质语义矛盾。"
+    },
+    {
+      "index_zero_based": 35,
+      "source_id": "edge",
+      "target_id": "search_news_ads",
+      "kind": "part_of",
+      "basis": "explicit",
+      "status": "partial_support",
+      "evidence_ids": [
+        "block-000150-9577a591"
+      ],
+      "note": "摘录仅Microsoft News, Microsoft Edge, and third-party affiliates，缺Search/news主语。"
+    }
+  ],
+  "unknown_review": {
+    "items": [],
+    "status": "empty_not_evidence_of_completeness",
+    "note": "当前没有可逐条反驳的unknown；AzureSecurity/News等是提取遗漏而非材料未知。Defender精确产品归属、News详细功能等未决点没有展示；不要求机械复制参考三个unknown。"
+  },
+  "reference_review_boundary": {
+    "reference_is_ground_truth": false,
+    "notes": [
+      "参考相关cloud/AI/security/subset对象和News均对照原文再次确认。",
+      "Agent把Microsoft365Consumer拆成组与业务，比参考单节点更细，允许该有据选择。",
+      "Copilot/EMS平台brings together关系采用explicit可辩护；参考derived是更保守标注，不因此判Agent错误。",
+      "两版均把部分细项保留描述而未逐一成节点；本次不要求所有产品清单项成为节点。",
+      "未把此前用户视觉认可视作每条参考主张天然正确；本次参考不是全量重新验收。"
+    ]
+  },
+  "criteria_checks": [
+    {
+      "topic": "C01 · 范围、期间和三个分部",
+      "status": "pass",
+      "reference": "三个分部、FY2025、所选章节。",
+      "agent": "三个分部、FY2025、所选章节；没有整份报告覆盖声明。",
+      "evidence": "block-000086-935d6090；block-000087-44aabdcd",
+      "note": "两版均覆盖三个分部及正确报告范围。"
+    },
+    {
+      "topic": "C02 · Productivity and Business Processes 四条主线",
+      "status": "pass",
+      "reference": "Commercial、Consumer、LinkedIn、Dynamics。",
+      "agent": "四条主线均独立可定位。",
+      "evidence": "block-000091-d993f813；block-000093-7018adaa；block-000095-61bd513b；block-000097-13124fb7；block-000099-da3d48eb",
+      "note": "四条主线均有正确分部连接。"
+    },
+    {
+      "topic": "C03 · Microsoft 365 Commercial 云与本地范围",
+      "status": "partial",
+      "reference": "分别表示Commercial cloud与Commercial products。",
+      "agent": "总组描述保留云/本地；没有两个子组，部分组成仅文字可见。",
+      "evidence": "block-000093-7018adaa；block-000101-67803298",
+      "note": "未把全部Commercial误称云，但两个明示子组没有独立结构位置。"
+    },
+    {
+      "topic": "C04 · Microsoft 365 Consumer",
+      "status": "pass",
+      "reference": "Consumer组单节点。",
+      "agent": "Consumer组与平台拆成两节点，关系标derived；此建模差异可接受，不要求照抄参考。",
+      "evidence": "block-000095-61bd513b；block-000103-a597bcd9",
+      "note": "本阶段只验对象/关系；Outlook与OneDrive等详细属性后置。"
+    },
+    {
+      "topic": "C05 · LinkedIn",
+      "status": "pass",
+      "reference": "LinkedIn及四类方案。",
+      "agent": "LinkedIn及四类方案均成节点且有连接。",
+      "evidence": "block-000097-13124fb7；block-000108-ec73690d",
+      "note": "对象结构通过；变现细节不计本阶段必达项。描述精确引用另见C22。"
+    },
+    {
+      "topic": "C06 · Dynamics",
+      "status": "pass",
+      "reference": "Dynamics组、Dynamics365、低代码平台组合。",
+      "agent": "三层均在；Power Apps与Power Automate组合成一个节点，与原文和当前图粒度相容。",
+      "evidence": "block-000099-da3d48eb；block-000110-99cc951e",
+      "note": "云/本地定义与低代码平台均保留；定义引用的局部缺口另见C22。"
+    },
+    {
+      "topic": "C07 · Intelligent Cloud 两条主线",
+      "status": "pass",
+      "reference": "服务器/云组及企业伙伴服务组。",
+      "agent": "两组均连至Intelligent Cloud；另Server products直接连分部造成层级缺口见C08。",
+      "evidence": "block-000118-5e917062；block-000120-c34f7245；block-000122-c07a987e",
+      "note": "智能云两条主线存在。"
+    },
+    {
+      "topic": "C08 · Server products and cloud services 的云/服务器结构",
+      "status": "fail",
+      "reference": "Azure and other cloud services与Server products均在server_cloud下。",
+      "agent": "缺Azure and other cloud services；Server products只直连分部，未连server_cloud。",
+      "evidence": "block-000120-c34f7245",
+      "note": "应恢复原文明确组合层级；不是要求节点数与参考相等。"
+    },
+    {
+      "topic": "C09 · Azure 本体与产品能力",
+      "status": "partial",
+      "reference": "Azure→Azure and other cloud services标derived。",
+      "agent": "Azure→server_cloud标explicit，依据仅是同名更大组合Azure and other cloud services；应保持推断边界。",
+      "evidence": "block-000120-c34f7245；block-000127-93a9159b",
+      "note": "Azure定义正确且已连接；explicit强度过高。"
+    },
+    {
+      "topic": "C10 · Azure AI",
+      "status": "fail",
+      "reference": "Azure AI offerings节点及到Azure的有据derived关系。",
+      "agent": "Azure AI只在Foundry边描述中提到，没有自身节点。",
+      "evidence": "block-000127-93a9159b；block-000128-edef168d",
+      "note": "原文明确定义的Azure AI offerings没有图中对象。"
+    },
+    {
+      "topic": "C11 · Azure AI Foundry",
+      "status": "partial",
+      "reference": "Foundry→Azure AI offerings。",
+      "agent": "Foundry→Azure标derived，引用127/128及定义；可接受推断但粒度不完整。",
+      "evidence": "block-000127-93a9159b；block-000128-edef168d",
+      "note": "Foundry名称和定义正确；更宽的derived连接并非错误，但中间AI组合遗漏。"
+    },
+    {
+      "topic": "C12 · Azure Security",
+      "status": "fail",
+      "reference": "Azure Security节点与derived关联。",
+      "agent": "完全缺失；block134处分明确写Azure Security提及未建独立节点。",
+      "evidence": "block-000134-9ca2b5c6",
+      "note": "Competition含微软自己的产品定义，不能因章节标签跳过。"
+    },
+    {
+      "topic": "C13 · GitHub 整体与云子集",
+      "status": "fail",
+      "reference": "GitHub整体、云子集、两个层级关系。",
+      "agent": "GitHub整体→server_cloud标explicit，理由仅GitHub cloud services；无云子集。",
+      "evidence": "block-000120-c34f7245；block-000130-8d7ff1f7",
+      "note": "边endpoint必须表达整个节点，不能在说明里把whole边缩成subset。"
+    },
+    {
+      "topic": "C14 · Nuance Healthcare 整体与云子集",
+      "status": "fail",
+      "reference": "Nuance整体、云子集，专业服务保留企业服务范围。",
+      "agent": "Nuance整体→server_cloud标explicit，理由仅云子集；无云子集节点。",
+      "evidence": "block-000120-c34f7245；block-000122-c07a987e；block-000130-8d7ff1f7",
+      "note": "与GitHub相同的whole/subset范围错误。"
+    },
+    {
+      "topic": "C15 · Enterprise and partner services",
+      "status": "pass",
+      "reference": "组节点保留内容、用途、培训。",
+      "agent": "同样保留五类内容与用途，没有误建所有权support边。",
+      "evidence": "block-000122-c07a987e；block-000132-f2659d3c",
+      "note": "企业服务的组成与用途存在；描述引文覆盖不足另见C22。"
+    },
+    {
+      "topic": "C16 · More Personal Computing 三条主线",
+      "status": "pass",
+      "reference": "Windows/Devices、Gaming、Search/news。",
+      "agent": "三类正确连More Personal Computing。",
+      "evidence": "block-000144-6e0ae0c4；block-000146-c641cfcd；block-000148-2f215a60；block-000150-9577a591",
+      "note": "三条主线均有图中位置。"
+    },
+    {
+      "topic": "C17 · Windows and Devices",
+      "status": "pass",
+      "reference": "OEM、Devices两节点。",
+      "agent": "OEM、Devices两节点；Surface和Copilot+PC在设备定义中。",
+      "evidence": "block-000093-7018adaa；block-000146-c641cfcd；block-000152-fc098ac9；block-000171-f62e3835",
+      "note": "OEM、设备与Commercial范围没有混并。定义引用不足另见C22。"
+    },
+    {
+      "topic": "C18 · Gaming 和 Xbox",
+      "status": "pass",
+      "reference": "Gaming与两个云/订阅产品。",
+      "agent": "同样覆盖这三级对象，不要求此次拆每个硬件。",
+      "evidence": "block-000148-2f215a60；block-000176-a1bfeea9；block-000178-51f06755",
+      "note": "硬件/内容在Gaming定义，GamePass与CloudGaming在图；变现属性后置。"
+    },
+    {
+      "topic": "C19 · Search and news advertising",
+      "status": "partial",
+      "reference": "News单独节点，仅声称原文列明组件。",
+      "agent": "Bing、Edge、消费Copilot正确；Microsoft News只在组描述出现。",
+      "evidence": "block-000150-9577a591；block-000180-c75c41bb",
+      "note": "Microsoft News已在文字中却不在图中；实体覆盖不足。"
+    },
+    {
+      "topic": "C20 · 竞对证据边界",
+      "status": "pass",
+      "reference": "没有外部猜测竞争者。",
+      "agent": "没有外部猜测竞争者；EMS竞争描述有源文。",
+      "evidence": "block-000113-bc876fa1；block-000114-0cdf0fbd；block-000134-9ca2b5c6",
+      "note": "没有输出不实具名竞争者。没有竞对产物不等于已完成竞对提取。"
+    },
+    {
+      "topic": "C21 · 具名重要对象关系完整性",
+      "status": "partial",
+      "reference": "相关层级覆盖更完整。",
+      "agent": "35个节点均连通，但连通不证明对象与关系范围正确。",
+      "evidence": "block-000093-7018adaa；block-000120-c34f7245；block-000128-edef168d；block-000134-9ca2b5c6；block-000150-9577a591",
+      "note": "全部已有节点可连回公司，但缺8个材料已命名的重要对象/组。"
+    },
+    {
+      "topic": "C22 · 原文引用与主张一致",
+      "status": "fail",
+      "reference": "抽核相关参考节点有较完整的主张引用；参考不因已认可自动成为真值。",
+      "agent": "至少16个节点定义引文不完整，另8条边引文过短和2条whole/subset边错误。",
+      "evidence": "block-000093-7018adaa；block-000101-67803298；block-000108-ec73690d；block-000120-c34f7245；block-000130-8d7ff1f7；block-000132-f2659d3c；block-000148-2f215a60；block-000150-9577a591",
+      "note": "精确引用是原文子串，但多处只覆盖描述的一部分，不能当作完整证据。"
+    },
+    {
+      "topic": "C23 · 未决事项逐条分类",
+      "status": "partial",
+      "reference": "明确News功能/Windows细SKU/Defender归属等限定问题。",
+      "agent": "unknown为空；遗漏与scope问题未显示；没有可逐条核查的错误unknown主张。",
+      "evidence": "block-000113-bc876fa1；block-000134-9ca2b5c6；block-000150-9577a591",
+      "note": "空unknown避免了旧版虚假未知，但不表示材料没有缺口。"
+    },
+    {
+      "topic": "C24 · 图上可见与覆盖一致",
+      "status": "partial",
+      "reference": "42个节点、45边的已认可参考。",
+      "agent": "35个节点、36边；缺失对象无法由同一renderer呈现。实际渲染另由页面检查。",
+      "evidence": "block-000093-7018adaa；block-000120-c34f7245；block-000128-edef168d；block-000134-9ca2b5c6；block-000150-9577a591",
+      "note": "本次只核图数据可表达范围，未做浏览器视觉审阅。"
+    },
+    {
+      "topic": "C25 · 收入与精确财务分解不越界",
+      "status": "pass",
+      "reference": "详细属性后置。",
+      "agent": "products_services/customers/monetization均为空，未编造收入。",
+      "evidence": "block-000088-8339c382",
+      "note": "本阶段无财务数值，不产生金额/比例幻觉。"
+    }
+  ],
+  "program_pass_limits": "结构校验发现的是字段/出处存在、原文子串和范围一致性；无法替代对象完整性、whole/subset和语义蕴含验收。",
+  "generation_artifacts_changed": false,
+  "feedback_sent_to_model": false
+}

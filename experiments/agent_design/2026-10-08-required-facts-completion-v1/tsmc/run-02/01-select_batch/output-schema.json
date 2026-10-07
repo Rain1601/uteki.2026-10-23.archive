@@ -1,0 +1,34 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "batch_index": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Batch Index"
+    },
+    "requirement_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Requirement Ids",
+      "type": "array"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "batch_index",
+    "reason"
+  ],
+  "title": "BatchSelection",
+  "type": "object"
+}

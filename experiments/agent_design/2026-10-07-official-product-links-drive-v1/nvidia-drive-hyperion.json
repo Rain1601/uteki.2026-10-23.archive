@@ -1,0 +1,67 @@
+{
+  "schema_version": "official-product-enrichment-v1",
+  "binding": {
+    "company_id": "nvidia",
+    "document_id": "nvidia-fy2025-annual-report-10k",
+    "period_end": "2025-01-26",
+    "business_map_sha256": "bcebbd790caa9bb59be5de9a8a1ada0d31f8800d58a37bb68f2fcb6739f84ddd"
+  },
+  "provenance": {
+    "method": "codex_manual_web_review",
+    "model_api_calls": 0
+  },
+  "entities": [
+    {
+      "business_id": "drive_hyperion",
+      "official_links": [
+        {
+          "id": "nvidia-hyperion-current-product",
+          "url": "https://www.nvidia.com/en-us/solutions/autonomous-vehicles/drive-hyperion/",
+          "final_url": "https://www.nvidia.com/en-us/solutions/autonomous-vehicles/drive-hyperion/",
+          "title": "Hyperion 当前产品系列入口 / Current product overview",
+          "role": "product",
+          "publisher": "NVIDIA Corporation",
+          "official_status": "verified",
+          "availability": "readable",
+          "checked_at": "2026-10-07T08:58:39Z",
+          "published_at": null,
+          "verification": {
+            "publisher_basis": "实际页面页脚标注 Copyright © 2026 NVIDIA Corporation，Company Information 中含 About Us 与 Investors 公司入口；联系表明确 NVIDIA Corporation，当前产品位于该公司官网主机。结合产品品牌与上述公司声明核验，未只凭域名或搜索排名。",
+            "product_match": "当前页面主标题 NVIDIA Hyperion；地址仍为 /drive-hyperion/，正文介绍传感器套件、DRIVE AGX 计算与 DRIVE AV 软件，与原节点 DRIVE Hyperion 自动驾驶平台的产品系列相符。当前命名和版本展示不同于 FY2025 报告；这是同系列当前入口，不证明版本、部件、功能或历史财报文字完全相同，不回写原节点。",
+            "source_url": "https://www.nvidia.com/en-us/solutions/autonomous-vehicles/drive-hyperion/",
+            "locator": "H1 NVIDIA Hyperion 下紧邻的副标题；Specs / NVIDIA Hyperion 表和页脚 Company Information、版权另用于产品范围与发布者核验。",
+            "exact_quote": "Safe, scalable robotaxi and Level 4 reference platform.",
+            "quote_sha256": "36abfebea661a339aa9a217f1bde7f888e28c2f57bab4d83ee969012ea3468f1"
+          }
+        }
+      ],
+      "to_watch": [
+        {
+          "id": "hyperion-generation-scope",
+          "question": "Hyperion 各代产品的计算、传感器和适用范围是否变化？",
+          "why": "用同一产品系列入口复核参考平台边界；官网规格为厂商声明，不据此推导真实销量、收入或独立性能结论。",
+          "source_ids": [
+            "nvidia-hyperion-current-product"
+          ],
+          "observable_signal": "Specs 表出现新增或移除的代际列，或计算、传感器、适用范围条目变化时，回读具体代际与页面上下文并另存候选。",
+          "status": "suggested"
+        },
+        {
+          "id": "hyperion-platform-components",
+          "question": "平台说明中的软硬件组成及官方配套入口是否调整？",
+          "why": "保持平台、计算组件和软件产品的身份区分，避免把组件页面误当整个平台的文档。",
+          "source_ids": [
+            "nvidia-hyperion-current-product"
+          ],
+          "observable_signal": "Overview 或 From Road Data to Trained Models 的组成说明、DRIVE AGX / DRIVE AV 等官方链接目标发生变化时，逐项核对产品名称、关系和生效范围。",
+          "status": "suggested"
+        }
+      ],
+      "gaps": [
+        "2026-10-07T08:58:39Z 实际打开 https://developer.nvidia.com/drive/drive-hyperion，工具观察最终地址为 https://developer.nvidia.com/drive/agx，标题 DRIVE AGX Developer Kits。页面可读且与 NVIDIA 品牌一致，但对象是计算组件开发套件，未将其登记为 Hyperion 平台的独立 documentation。",
+        "本轮未找到并核验与整个 Hyperion 平台一一对应的当前独立文档或发布说明入口；一个当前产品页不代表全系列或历史版本覆盖。",
+        "记录仅包括工具观察到的请求及最终地址，未单独检查完整重定向链；quote hash 仅绑定短摘录，未冻结整页。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "profile": {
+    "configuration_version": "annual-acquisition-v2",
+    "symbol": "GOOGL",
+    "market": "NASDAQ",
+    "cik": "0001652044",
+    "as_of": "2026-10-07",
+    "document_validation": "sec_inline_identity_v1",
+    "download_policy": "reuse_verified",
+    "filing_selection": {
+      "mode": "annual_filing_period",
+      "annual_form": "10-K",
+      "report_period_end": "2025-12-31"
+    },
+    "source_policy": {
+      "official": [],
+      "third_party": []
+    },
+    "limits": {
+      "max_requests": 50,
+      "max_documents": 20,
+      "max_bytes_per_document": 20000000,
+      "timeout_seconds": 30,
+      "retries": 1,
+      "backoff_seconds": 1,
+      "max_discovery_links": 12
+    }
+  },
+  "origin": {
+    "symbol": "GOOGL",
+    "manifest": "data/company_workspace/extraction_ab_v1/corpus/googl/acquisition.json",
+    "manifest_sha256": "455fa375af70a9fb7f85361cb99227c27b435fcae4ca27f6de3ef2d38025039b",
+    "workspace": "data/company_workspace/extraction_ab_v1/corpus/googl",
+    "source_ids": [
+      "googl-2025-10k"
+    ]
+  },
+  "verified_originals": [
+    {
+      "source_id": "googl-2025-10k",
+      "identity": {
+        "validation_version": "sec-inline-identity-v1",
+        "status": "identity_validated",
+        "cik": "0001652044",
+        "form": "10-K",
+        "period_end": "2025-12-31",
+        "content_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "content_bytes": 2616499,
+        "evidence": {
+          "entitycentralindexkey": [
+            {
+              "text": "0001652044",
+              "normalized": "0001652044",
+              "context_ref": "c-1",
+              "format": null
+            }
+          ],
+          "documenttype": [
+            {
+              "text": "10-K",
+              "normalized": "10-K",
+              "context_ref": "c-1",
+              "format": null
+            }
+          ],
+          "documentperiodenddate": [
+            {
+              "text": "December 31, 2025",
+              "normalized": "2025-12-31",
+              "context_ref": "c-1",
+              "format": "ixt:date-monthname-day-year-en"
+            }
+          ]
+        },
+        "financial_semantics": "not_evaluated",
+        "completeness": "html_envelope_checked_transport_validation_still_required"
+      },
+      "original_path": "data/company_workspace/extraction_ab_v1/corpus/googl/originals/googl-2025-10k.html",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+      "form": "10-K",
+      "period_end": "2025-12-31"
+    }
+  ],
+  "scope": "Explicit selected annuals only; no new discovery or availability claim."
+}

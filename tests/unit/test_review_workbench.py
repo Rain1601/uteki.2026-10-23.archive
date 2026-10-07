@@ -31,6 +31,11 @@ from apps.review_workbench.document_index import (
 
 
 class ReviewWorkbenchTests(unittest.TestCase):
+    def test_v2_unresolved_relationships_cannot_become_legacy_hierarchy(self):
+        data = dict(self.data, schema_version='business-map-v0.2')
+        with self.assertRaisesRegex(ValueError, 'v2_display_requires_basis_aware_renderer'):
+            parent_and_children(data)
+
     def setUp(self) -> None:
         self.data = load_json(DEFAULT_DATA)
         self.bundle = load_json(EVIDENCE_BUNDLE_DATA)

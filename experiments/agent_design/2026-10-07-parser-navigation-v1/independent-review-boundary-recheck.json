@@ -1,0 +1,32 @@
+{
+  "case_id": "review-boundary-rejected-next-table-anchor",
+  "kind": "independent_synthetic_regression",
+  "input_html": "<html><body><table><tr><td>PART I</td></tr><tr><td>ITEM 1.</td><td><a href=\"#one\">BUSINESS</a></td><td>1</td></tr><tr><td>ITEM 2.</td><td><a href=\"#wrong\">RISK</a></td><td>2</td></tr><tr><td>ITEM 3.</td><td><a href=\"#three\">PROPERTIES</a></td><td>3</td></tr></table><h1>PART I</h1><table><tr><td id=\"one\">ITEM 1.</td><td>BUSINESS</td></tr></table><p>End of Business.</p><table><tr><td id=\"two\">ITEM 2.</td><td>RISK</td></tr></table><p>Risk content not Business.</p><table><tr><td id=\"three\">ITEM 3.</td><td>PROPERTIES</td></tr></table><p>Properties content.</p></body></html>",
+  "parser_version": "sec-source-blocks-v0.1.10",
+  "expected": "No Item 2 node; Item 1 must end at End of Business. before recognizable but unresolved Item 2 title.",
+  "actual_item_1_end_text": "End of Business.",
+  "actual_item_nodes": [
+    [
+      "1",
+      3,
+      4
+    ],
+    [
+      "3",
+      7,
+      8
+    ]
+  ],
+  "status": "passed",
+  "diagnostics": [
+    {
+      "code": "table_item_heading_rejected",
+      "message": "Part I Item 2: title or exact TOC anchor mismatch; table retained without an Item node."
+    },
+    {
+      "code": "outline_ranges_are_navigation",
+      "message": "Part/Item ranges are contiguous source navigation intervals; attachments, signatures and financial statements within a range are not inferred to share its semantic topic."
+    }
+  ],
+  "implementation_sha256": "a97efa48581c4d01ee7d9ebd6bd3049abeb065c59c137e9972712c807757716f"
+}

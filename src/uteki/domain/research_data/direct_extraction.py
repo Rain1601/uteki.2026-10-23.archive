@@ -29,7 +29,9 @@ class DraftRecord(Contract):
     speaker: str | None = None
     evidence: list[DraftEvidence] = Field(default_factory=list)
     qualifiers: list[DraftEvidence] = Field(default_factory=list)
-    question_refs: list[str] = Field(default_factory=list)
+    question_refs: list[str] = Field(default_factory=list, description=(
+        'Only source block IDs of analyst questions, when applicable. Never put task IDs, '
+        'requirement IDs or record IDs here. Use [] for a financial statement without analyst questions.'))
     unresolved_fields: list[str] = Field(default_factory=list)
 
 

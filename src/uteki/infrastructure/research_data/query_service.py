@@ -274,7 +274,8 @@ class QueryDataPort:
             result = reader.search(node_id, request.phrase, limit=request.limit)
             hits += result["total"]
             trace.append({"tool": "document_search", "source_snapshot_id": source["source_snapshot_id"],
-                          "phrase": request.phrase, "total_hits": result["total"], "mode": "literal_source_order"})
+                          "phrase": request.phrase, "total_hits": result["total"], "mode": "literal_source_order",
+                          **{k:v for k,v in result.items() if k.startswith('omitted_') or k == 'omission_reason'}})
             for hit in result["hits"]:
                 if remaining == 0:
                     break
@@ -295,7 +296,8 @@ class QueryDataPort:
                 payload = {"source_snapshot_id": source["source_snapshot_id"], "index_id": source["index_id"],
                            "source_url": source["source_url"], "source_sha256": source["source_sha256"],
                            "anchor_block_id": hit["block_id"], "block_ids": block_ids, "context_characters": chars,
-                           "source_period_end": source["period_end"], "available_at": source["available_at"]}
+                           "source_period_end": source["period_end"], "available_at": source["available_at"],
+                           **{k:v for k,v in context.items() if k.startswith('omitted_') or k == 'omission_reason'}}
                 if chars > 80000 or (getattr(self, "_execution_scope", None) is not None
                                     and len(json.dumps(context, ensure_ascii=False).encode()) > MAX_DOCUMENT_BYTES):
                     contexts.append({**payload, "status": "context_too_large", "blocks": [],
@@ -658,10 +660,12 @@ class ScopedQueryDataPort(QueryDataPort):
         if request.representation == "compact":
             result = compact_table_cells(result)
         lo, hi = reader._range(request.node_id)
-        returned_start = reader.positions[result["blocks"][0]["block_id"]]
-        returned_end = reader.positions[result["blocks"][-1]["block_id"]] + 1
+        # A requested layout-only slice may be explicitly omitted. Do not
+        # silently read a different block or claim that any body was returned.
+        returned_start = reader.positions[result["blocks"][0]["block_id"]] if result["blocks"] else reader.positions[start]
+        returned_end = reader.positions[result["blocks"][-1]["block_id"]] + 1 if result["blocks"] else returned_start
         crossing = [g["group_id"] for g in reader.groups
-                    if reader.positions[g["block_ids"][0]] < returned_end
+                    if result["blocks"] and reader.positions[g["block_ids"][0]] < returned_end
                     and reader.positions[g["block_ids"][-1]] + 1 > returned_start
                     and not (lo <= reader.positions[g["block_ids"][0]]
                              and reader.positions[g["block_ids"][-1]] + 1 <= hi)]
@@ -675,11 +679,14 @@ class ScopedQueryDataPort(QueryDataPort):
                                detail="Full atomic context exceeds the response limit; no blocks read or continuation advanced.")
         following = result["next_block_id"]
         cursor = ReadCursor(**self._cursor_header(source, reader, request.node_id), start_block_id=following) if following else None
-        return {**result, **self._source_header(source), "status": "read", "gaps": [],
+        layout_only = not result['blocks'] and bool(result.get('omitted_block_count'))
+        return {**result, **self._source_header(source), "status": "layout_only" if layout_only else "read", "gaps": [],
                 "requested_start_block_id": start, "block_ids": [b["block_id"] for b in result["blocks"]],
                 "next_cursor": cursor.model_dump(mode="json") if cursor else None,
                 "node_complete": following is None,
-                "coverage": "Returned full blocks only; reaching the node end does not prove all earlier blocks were read."}
+                **({'not_disclosed': False} if layout_only else {}),
+                "coverage": ("Only repeated navigation was omitted; no body blocks were read. Continuation and node_complete describe source traversal, not complete reading."
+                             if layout_only else "Returned full blocks only; reaching the node end does not prove all earlier blocks were read.")}
 
     def search_source(self, request):
         request = SourceSearchRequest.model_validate(request)

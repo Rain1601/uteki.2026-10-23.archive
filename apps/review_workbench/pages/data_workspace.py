@@ -6,6 +6,7 @@ from urllib.parse import urlencode, urlparse
 
 from apps.review_workbench.assets import asset_text
 from apps.review_workbench.components.site_navigation import bi, e
+from apps.review_workbench.components.visual_system import workbench_page
 from apps.review_workbench.data.evaluation_artifacts import load_catalog, load_dataset
 from apps.review_workbench.data.direct_extraction_views import load_dataset_run
 from apps.review_workbench.data.workspace_state import read_state, material_tasks
@@ -68,15 +69,14 @@ def parse_selection(selection):
     return args
 
 
+@workbench_page('data-detail')
 def shell(content, sidebar, config):
     payload = json.dumps(config, ensure_ascii=False).replace('<', '\\u003c')
     return ('<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">'
             '<meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<title>数据工作台 · Uteki</title><style>' + asset_text('data_workspace.css') + '</style></head>'
-            '<body><header class="dw-header"><a class="dw-brand" href="/data-workspace">Uteki</a>'
-            '<span>' + bi('数据工作台', 'Data workspace') + '</span><nav>'
-            '<a href="/evaluation">' + bi('旧版检查页', 'Previous inspector') + '</a>'
-            '<a href="/extractions">' + bi('提取运行', 'Extraction runs') + '</a>'
+            '<title>数据产物明细 · Uteki</title><style>' + asset_text('data_workspace.css') + '</style></head>'
+            '<body><header class="dw-header"><a href="/agent-results">' + bi('返回运行结果', 'Back to results') + '</a>'
+            '<span>' + bi('数据产物明细', 'Data artifact details') + '</span><nav>'
             '<button id="dw-language" type="button">中文 / EN</button></nav></header>'
             '<div class="dw-layout"><aside class="dw-companies" aria-label="Companies">' + sidebar + '</aside>'
             '<main id="dw-main">' + content + '</main></div>'
@@ -307,6 +307,12 @@ def render_data_workspace(root, selection):
             loaded_runs[rid] = load_dataset_run(root, data, rid, sid)
     if args.get('run') and args['run'] not in loaded_runs:
         loaded_runs[args['run']] = load_dataset_run(root, data, args['run'], sid)
+    if args.get('run'):
+        from apps.review_workbench.data.agent_runs import parent_for_extraction
+        parent_id = parent_for_extraction(root, loaded_runs[args['run']])
+        if parent_id:
+            trace_query = e(urlencode({'agent': 'data', 'run': parent_id}))
+            content += '<p class="dw-notice"><a href="/agent-results?' + trace_query + '">' + bi('返回这次运行的结果与评分', 'Back to this result & scores') + '</a> · <a href="/agent-runs?' + trace_query + '">Trace ID: ' + e(parent_id) + '</a></p>'
     matrix = build_dataset_table(data, sid) if args.get('base') == '1' else build_financial_table([loaded_runs[rid] for rid in selected_ids])
     # Direct links to historical candidates are inspectable without selecting or adopting them.
     if args.get('run') and (args['run'] not in selected_ids or not args.get('fact')):
@@ -349,7 +355,7 @@ def render_data_workspace(root, selection):
         archived = any(v['run_id'] == args['run'] and v['archived'] for t in tasks['tasks'] for v in t['versions'])
         if archived:
             process += empty('此提取版本已归档，历史产物仍可查看。', 'This version is archived; its historical artifacts remain readable.')
-        process += processing_record(run).replace('href="#financial-facts"', 'href="' + e(url(dataset=data['id'], source=sid, tab='financials')) + '"')
+        process += processing_record(run, root=root).replace('href="#financial-facts"', 'href="' + e(url(dataset=data['id'], source=sid, tab='financials')) + '"')
         process += '<p><a href="' + e(url(dataset=data['id'], source=sid, tab='financials', run=run['id'])) + '">' + bi('查看此版本的财务候选', 'Inspect financial candidates from this version') + '</a></p>'
         if not run.get('db_rows') and run['artifacts'].get('extraction.json', {}).get('records'):
             process += json_detail(('尚未入库的原始候选', 'Drafts not written to the database'), run['artifacts']['extraction.json']['records'])

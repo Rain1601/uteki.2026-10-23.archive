@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from uteki.domain.documents import ParsedDocument, SourceBlock
-from uteki.infrastructure.document_sources.sec_index import build_legal_outline, parse_sec_source
+from uteki.infrastructure.document_sources.sec_index import build_legal_outline, parse_sec_source, validate_parser_version
 from uteki.infrastructure.document_sources.snapshots import verify_snapshot
 
 
@@ -90,6 +90,8 @@ def _publish_manifest(output_dir: Path, content: bytes) -> None:
 
 
 def build_index_artifacts(snapshot_dir: Path, output_dir: Path, *, parser_version: str | None = None) -> dict[str, Any]:
+    if parser_version is not None:
+        validate_parser_version(parser_version)
     # Reject even an empty or incomplete previous build. Retrying needs a new
     # output identity; an existing review artifact must never be overwritten.
     if output_dir.exists() or output_dir.is_symlink():
@@ -110,7 +112,7 @@ def build_index_artifacts(snapshot_dir: Path, output_dir: Path, *, parser_versio
         raw_html,
         source_snapshot_id=source_manifest["source_snapshot_id"],
         form_type=source_manifest["form"],
-        **({"parser_version": parser_version} if parser_version else {}),
+        **({"parser_version": parser_version} if parser_version is not None else {}),
     )
     if full_snapshot:
         excluded_paths = {item["source_path"] for item in source_manifest["excluded_image_references"]}

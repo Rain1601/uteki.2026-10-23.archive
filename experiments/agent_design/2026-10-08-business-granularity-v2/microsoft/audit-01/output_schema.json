@@ -1,0 +1,227 @@
+{
+  "$defs": {
+    "AttributeRef": {
+      "additionalProperties": false,
+      "properties": {
+        "node_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "field": {
+          "enum": [
+            "products_services",
+            "customers",
+            "monetization"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "item_index": {
+          "minimum": 0,
+          "title": "Item Index",
+          "type": "integer"
+        },
+        "alignment": {
+          "description": "Required explicit alignment. same_source_span locates this mention in its inventory block. same_identity_elsewhere uses the same surface in an existing claim quote from another block in this frozen source; explain why identity and scope agree in mapping rationale. String equality is not semantic proof.",
+          "enum": [
+            "same_source_span",
+            "same_identity_elsewhere"
+          ],
+          "title": "Alignment",
+          "type": "string"
+        },
+        "excerpts": {
+          "description": "Copy exact existing claim excerpts for this populated attribute. At least one must contain this inventory mention surface, with the declared alignment. Do not replace the candidate claim evidence with new supporting text.",
+          "items": {
+            "$ref": "#/$defs/EvidenceExcerptDraft"
+          },
+          "minItems": 1,
+          "title": "Excerpts",
+          "type": "array"
+        }
+      },
+      "required": [
+        "node_id",
+        "field",
+        "item_index",
+        "alignment",
+        "excerpts"
+      ],
+      "title": "AttributeRef",
+      "type": "object"
+    },
+    "Check": {
+      "additionalProperties": false,
+      "properties": {
+        "check_key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Check Key",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "supported",
+            "partial",
+            "unsupported",
+            "overstated_basis",
+            "scope_mismatch",
+            "uncertain"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "check_key",
+        "verdict",
+        "rationale"
+      ],
+      "title": "Check",
+      "type": "object"
+    },
+    "EvidenceExcerptDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "block_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Block Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "quote"
+      ],
+      "title": "EvidenceExcerptDraft",
+      "type": "object"
+    },
+    "Mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "mention_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Mention Id",
+          "type": "string"
+        },
+        "disposition": {
+          "enum": [
+            "node",
+            "attribute",
+            "context",
+            "unresolved",
+            "missing"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "node_ids": {
+          "description": "Identity nodes only for node; related possibilities for unresolved. Empty for attribute, context and missing. Attribute hosts go in attribute_refs.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "title": "Node Ids",
+          "type": "array"
+        },
+        "attribute_refs": {
+          "items": {
+            "$ref": "#/$defs/AttributeRef"
+          },
+          "title": "Attribute Refs",
+          "type": "array"
+        },
+        "identity_requirement": {
+          "description": "Source-grounded semantic assessment: reporting company/segment and material business groups may require independent identity; merely being a named offering does not. Explain in rationale. This is a model judgment, not an engineering truth assertion.",
+          "enum": [
+            "independent_node",
+            "attribute_sufficient",
+            "context",
+            "unresolved"
+          ],
+          "title": "Identity Requirement",
+          "type": "string"
+        },
+        "rationale": {
+          "description": "Explain the source-grounded identity/attribute decision. For each same_identity_elsewhere reference, justify the same object and scope across the inventory occurrence and existing attribute evidence; do not infer identity merely from the same name.",
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mention_id",
+        "disposition",
+        "node_ids",
+        "identity_requirement",
+        "rationale"
+      ],
+      "title": "Mapping",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "business-coverage-audit-v2",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "candidate_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Candidate Sha256",
+      "type": "string"
+    },
+    "inventory_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Inventory Sha256",
+      "type": "string"
+    },
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/Mapping"
+      },
+      "title": "Mappings",
+      "type": "array"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/Check"
+      },
+      "title": "Checks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "candidate_sha256",
+    "inventory_sha256",
+    "mappings",
+    "checks"
+  ],
+  "title": "Audit",
+  "type": "object"
+}

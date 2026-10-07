@@ -126,6 +126,7 @@ def build_review_packets(dataset, scope, record_ids, output, *, batch_size=12, m
             if digest(raw) != source['source_sha256']: raise ValueError('original hash mismatch')
             tree = html.document_fromstring(raw, parser=html.HTMLParser(encoding='utf-8'))
             blocks = [json.loads(line) for line in contained(dataset, source['index_folder']+'/blocks.jsonl').read_text().splitlines()]
+            index = json.loads(contained(dataset, source['index_folder']+'/index.json').read_text())
             target = next(i for i, b in enumerate(blocks) if b['block_id'] == block_id)
             selected, gaps = _context_indexes(blocks, target)
             fragments = []
@@ -151,6 +152,7 @@ def build_review_packets(dataset, scope, record_ids, output, *, batch_size=12, m
             references = sorted(set(m.group(0) for b in contexts for m in re.finditer(
                 r'\b(?:Note\s+\d+|accompanying notes)\b', b['text'], re.I)))
             common = {'schema_version': 'record-review-input-v2', 'scope': scope.model_dump(mode='json'),
+                'parser_version': index['parser_version'],
                 'source': {k: source.get(k) for k in ('source_snapshot_id','company_id','source_url','source_sha256','form','period_end')},
                 'target_block_id': block_id, 'source_blocks': contexts, 'source_fragments': fragments,
                 'context_gaps': gaps, 'unresolved_note_references': references,

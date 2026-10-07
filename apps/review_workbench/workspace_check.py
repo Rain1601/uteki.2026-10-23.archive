@@ -61,7 +61,7 @@ def inspect_workspace(root: Path, *, data_path: Path | None = None) -> dict:
         render_company_universe_page(value)
         return f"{len(value['companies'])} companies / 家公司"
 
-    record("Home and company list / 主页与公司名单", root / COMPANIES, True, companies)
+    record("Company list / 公司名单", root / COMPANIES, True, companies)
 
     def catalog():
         from uteki.agents.material_library import load_catalog

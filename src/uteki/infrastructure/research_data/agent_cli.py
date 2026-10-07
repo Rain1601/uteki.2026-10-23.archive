@@ -10,6 +10,9 @@ def _company_arguments(action, *, allow_frozen=False):
     source.add_argument('--company', help='company name or symbol registered in the explicit catalog')
     if allow_frozen:
         source.add_argument('--from-run', type=Path, help='reprocess a frozen preparation without network')
+        source.add_argument('--from-acquisition', type=Path, help='prepare explicitly selected frozen acquisition sources without network')
+        action.add_argument('--acquisition-sha256', help='required SHA256 pin of the acquisition manifest bytes')
+        action.add_argument('--source-id', action='append', dest='source_ids', help='exact frozen source ID to replay; repeat for each selection')
     action.add_argument('--company-catalog', type=Path, help='explicit registered-company catalog with pinned source profiles')
 
 
@@ -40,6 +43,7 @@ def register_agent_commands(commands):
         action.add_argument('--sec-user-agent', help='explicit SEC contact identity, or UTEKI_SEC_USER_AGENT environment')
         action.add_argument('--settings-root', type=Path, default=Path.cwd(), help='directory containing private local .env settings')
         if name == 'query':
+            action.add_argument('--observation-root', type=Path, help='explicit separate directory for live run events')
             action.add_argument('--request', type=Path, required=True, help='CompanyQueryInput JSON')
             action.add_argument('--model-config', type=Path, required=True, help='explicit provider/model/shared budget JSON')
             action.add_argument('--credentials-root', type=Path, default=Path.cwd())
@@ -59,11 +63,13 @@ def register_agent_commands(commands):
         extract.add_argument('--'+name, type=Path, required=True)
     extract.add_argument('--strategy', choices=('direct', 'structured', 'independent_multi_pass', 'langextract'), required=True)
     extract.add_argument('--credentials-root', type=Path, default=Path.cwd())
+    extract.add_argument('--observation-root', type=Path, help='explicit separate directory for live run events')
     batch = actions.add_parser('extract-batch', help='run one table batch with a task-allowed, hash-pinned prompt and skill')
     for name in ('dataset', 'job', 'task-profile', 'method-root', 'model-config', 'credentials-root', 'output'):
         batch.add_argument('--'+name, type=Path, required=True)
     batch.add_argument('--method-id', help='explicit override within the task profile allowed methods')
     batch.add_argument('--batch-index', type=int, required=True)
+    batch.add_argument('--observation-root', type=Path, help='explicit separate directory for live run events')
 
 
 def run_agent_command(args):
@@ -81,17 +87,32 @@ def run_agent_command(args):
         config['sec_contact_origin'] = origin
         return prepare_sources(config, args.workspace)
     from uteki.agents.data_query.coordinator import CompanyDataCoordinator, inspect_run
+    if args.agent_action == 'prepare':
+        acquisition = getattr(args, 'from_acquisition', None)
+        pin = getattr(args, 'acquisition_sha256', None)
+        source_ids = getattr(args, 'source_ids', None)
+        if acquisition is not None:
+            if pin is None or not source_ids:
+                raise ValueError('--from-acquisition requires --acquisition-sha256 and at least one --source-id')
+            if getattr(args, 'company_catalog', None) is not None or getattr(args, 'sec_user_agent', None) is not None:
+                raise ValueError('frozen acquisition replay does not accept company catalog or SEC contact overrides')
+            return CompanyDataCoordinator(args.workspace).prepare_acquisition(acquisition,
+                acquisition_sha256=pin, source_ids=source_ids, output=args.output)
+        if pin is not None or source_ids is not None:
+            raise ValueError('--acquisition-sha256 and --source-id require --from-acquisition')
     if args.agent_action == 'inspect':
         return inspect_run(args.run, artifact_read=load(args.artifact_request) if args.artifact_request else None)
     if args.agent_action == 'extract':
         from .direct_extraction import run_direct_extraction
         return asyncio.run(run_direct_extraction(args.dataset, load(args.job), args.output,
-            strategy=args.strategy, model_config=load(args.model_config), credentials_root=args.credentials_root))
+            strategy=args.strategy, model_config=load(args.model_config), credentials_root=args.credentials_root,
+            observation_root=getattr(args, 'observation_root', None)))
     if args.agent_action == 'extract-batch':
         from .extraction_batches import run_extraction_batch
         return asyncio.run(run_extraction_batch(args.dataset, load(args.job), args.output,
             task_profile=args.task_profile, method_id=args.method_id, method_root=args.method_root, batch_index=args.batch_index,
-            model_config=load(args.model_config), credentials_root=args.credentials_root))
+            model_config=load(args.model_config), credentials_root=args.credentials_root,
+            observation_root=getattr(args, 'observation_root', None)))
     from uteki.infrastructure.document_sources.sec_settings import resolve_sec_contact
     source_config = _company_config(args)
     request = load(args.request) if getattr(args, 'request', None) else None
@@ -113,5 +134,6 @@ def run_agent_command(args):
         return coordinator.refresh(source_config, previous=args.previous, output=args.output)
     return asyncio.run(coordinator.query(request, output=args.output,
         model_config=load(args.model_config), credential_root=args.credentials_root,
+        observation_root=getattr(args, 'observation_root', None),
         extractor_model_config=load(args.extractor_model_config) if args.extractor_model_config else None,
         method_root=args.method_root))

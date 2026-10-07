@@ -1,0 +1,385 @@
+```json
+{
+  "company_id": "nvidia",
+  "document_id": "nvidia-fy2025-annual-report-10k",
+  "period_end": "2025-01-26",
+  "summary": "NVIDIA 在 FY2025 10-K 中称自己是全栈计算基础设施公司,按 Compute & Networking 与 Graphics 两个报告分部披露业务,并说明 Data Center、Gaming、Professional Visualization、Automotive 四个目标市场。业务图保留分部、市场与具名产品/服务组三类不同身份。收入图分为分部口径、终端市场口径和 Data Center 内部的 Compute/Networking 三张,金额均由宿主读取选定单元格。本次仅读取冻结的业务描述、收入确认、币种与两张完整收入表,不代表已读全篇。",
+  "businesses": [
+    {
+      "id": "nvidia",
+      "name": "NVIDIA Corporation(英伟达)",
+      "kind": "company",
+      "description": "全栈计算基础设施公司,把硬件、系统、软件、算法、库和服务整合为统一架构的计算平台,面向数据中心规模的 AI 与加速计算。",
+      "products_services": ["GPU、CPU、DPU 与网络产品", "CUDA 及软件库、SDK、API", "系统与云服务"],
+      "customers": ["云服务提供商与消费互联网公司", "企业与初创公司", "研究人员与开发者", "游戏玩家与专业创作者"],
+      "monetization": [
+        {
+          "description": "收入来自产品销售(含硬件和系统)、许可与开发安排、软件许可和云服务。",
+          "basis": "explicit",
+          "evidence_block_ids": ["pdf-block-001433-40824ffe"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000844-3900a891", "pdf-block-000848-c6bfc3bc", "pdf-block-001427-1b99fbe0"]
+    },
+    {
+      "id": "seg_compute_networking",
+      "name": "Compute & Networking 分部",
+      "kind": "reportable_segment",
+      "description": "报告分部,包含 Data Center 加速计算平台及 AI 解决方案和软件、网络、汽车平台及自动驾驶/电动车方案、Jetson 机器人与嵌入式平台、DGX Cloud 云计算服务。",
+      "products_services": ["Data Center 加速计算平台与 AI 软件", "网络", "汽车平台与自动驾驶/电动车方案", "Jetson", "DGX Cloud"],
+      "customers": [],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000857-8c01a130", "pdf-block-000858-fd83bcde", "pdf-block-001685-fd83bcde"]
+    },
+    {
+      "id": "seg_graphics",
+      "name": "Graphics 分部",
+      "kind": "reportable_segment",
+      "description": "报告分部,包含游戏和 PC 用 GeForce GPU、GeForce NOW 游戏流媒体及相关基础设施、游戏平台方案、Quadro/NVIDIA RTX 工作站 GPU、vGPU 软件、信息娱乐用汽车平台和 Omniverse Enterprise 软件。",
+      "products_services": ["GeForce GPU", "GeForce NOW", "Quadro/NVIDIA RTX GPU", "vGPU 软件", "汽车信息娱乐平台", "Omniverse Enterprise"],
+      "customers": [],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000857-8c01a130", "pdf-block-000859-b8b15350", "pdf-block-001686-d547e7da"]
+    },
+    {
+      "id": "mkt_data_center",
+      "name": "Data Center(数据中心市场)",
+      "kind": "business",
+      "role": "market",
+      "description": "目标市场之一。NVIDIA Data Center 平台加速 AI、数据分析、图形和科学计算等高算力负载,部署于云、超大规模、本地和边缘数据中心,由计算与网络产品及软件、服务构成,通常以系统、子系统或模块交付。",
+      "products_services": ["计算平台与服务器", "网络平台", "NVIDIA AI Enterprise", "DGX Cloud", "Blackwell 架构数据中心基础设施"],
+      "customers": ["公有云与消费互联网公司", "企业与初创公司", "公共部门机构", "OEM、ODM、系统集成商和分销商(直接客户)"],
+      "monetization": [
+        {
+          "description": "计算与网络产品通常以系统、子系统或模块交付,并配软件和服务;报告的收入确认政策包含产品销售。",
+          "basis": "explicit",
+          "evidence_block_ids": ["pdf-block-000861-b74bac5d", "pdf-block-001433-40824ffe"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000860-b924449f", "pdf-block-000861-b74bac5d", "pdf-block-000864-baf70751", "pdf-block-000870-6f7dfcf3"]
+    },
+    {
+      "id": "mkt_gaming",
+      "name": "Gaming(游戏市场)",
+      "kind": "business",
+      "role": "market",
+      "description": "目标市场之一。游戏平台以 GPU 和软件提升游戏画质与体验,NVIDIA RTX 提供光线追踪与 DLSS,并推出 Blackwell GeForce RTX 50 系列。",
+      "products_services": ["GeForce RTX/GTX GPU", "GeForce NOW 云游戏", "游戏主机 SoC 与开发服务", "NVIDIA RTX、DLSS"],
+      "customers": ["游戏玩家", "主播、广播者、艺术家和创作者"],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000860-b924449f", "pdf-block-000871-ac8a9e79", "pdf-block-000872-5a7b706e", "pdf-block-000873-d85d83ed", "pdf-block-000874-a65d5541"]
+    },
+    {
+      "id": "mkt_professional_visualization",
+      "name": "Professional Visualization(专业可视化市场)",
+      "kind": "business",
+      "role": "market",
+      "description": "目标市场之一。NVIDIA 与独立软件开发商合作,针对 NVIDIA GPU 优化,服务设计制造和数字内容创作等专业工作流。",
+      "products_services": ["RTX GPU 与软件", "NVIDIA Omniverse"],
+      "customers": ["专业艺术家、建筑师和设计师", "企业客户", "工业企业"],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000860-b924449f", "pdf-block-000855-e28b83db", "pdf-block-000875-e91d2b93", "pdf-block-000876-383f7ae6"]
+    },
+    {
+      "id": "mkt_automotive",
+      "name": "Automotive(汽车市场)",
+      "kind": "business",
+      "role": "market",
+      "description": "目标市场之一。提供从云端到车端的自动驾驶平台方案,以 DRIVE Hyperion 品牌提供端到端自动驾驶解决方案,并与数百家汽车生态伙伴合作。",
+      "products_services": ["DRIVE Hyperion 平台", "DRIVE AGX 计算硬件与 DRIVE OS", "数据中心端仿真方案"],
+      "customers": ["整车厂、卡车制造商、一级供应商、传感器制造商等汽车生态伙伴"],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000860-b924449f", "pdf-block-000879-67e00e9c", "pdf-block-000880-4bf3817c", "pdf-block-000881-d5b542b2"]
+    },
+    {
+      "id": "dc_compute",
+      "name": "Data Center 计算产品",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "包括超级计算平台和服务器,整合节能 GPU、CPU、互连和 AI/HPC 软件栈;数据中心平台由 GPU 起步,后扩展至 DPU(FY2022)和 CPU(FY2024)。",
+      "products_services": ["GPU、CPU", "超级计算平台与服务器", "加速库、API、SDK 与领域应用框架"],
+      "customers": ["云服务提供商", "企业", "OEM/ODM/系统集成商/分销商"],
+      "monetization": [
+        {
+          "description": "产品销售(含硬件和系统);产品可带支持或延保,支持与延保收入按服务期间确认。",
+          "basis": "explicit",
+          "evidence_block_ids": ["pdf-block-001433-40824ffe", "pdf-block-001434-feb3eb9d"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000858-fd83bcde", "pdf-block-000862-54188d9a", "pdf-block-000867-a0028ec8"]
+    },
+    {
+      "id": "dc_networking",
+      "name": "网络产品(InfiniBand 与 Ethernet)",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "InfiniBand 与 Ethernet 端到端平台,包括网卡、线缆、DPU、交换芯片与系统及完整软件栈,使数据中心规模的计算互连成为可能。",
+      "products_services": ["网络适配器", "线缆", "DPU", "交换芯片和系统", "软件栈"],
+      "customers": ["云服务提供商", "企业", "超算与 AI 数据中心客户"],
+      "monetization": [
+        {
+          "description": "原文的网络段落未单独说明收费方式;公司层面的产品销售政策为一般性披露。",
+          "basis": "unknown",
+          "evidence_block_ids": ["pdf-block-000863-916beda4"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000858-fd83bcde", "pdf-block-000863-916beda4"]
+    },
+    {
+      "id": "nvidia_ai_enterprise",
+      "name": "NVIDIA AI Enterprise",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "面向企业的企业级 AI 软件套件,原文称其为企业 AI 应用的“操作系统”,属于数据中心计算产品的一部分。",
+      "products_services": ["企业级 AI 软件套件"],
+      "customers": ["企业"],
+      "monetization": [
+        {
+          "description": "提供付费许可;软件许可可为永久或订阅,并常搭配支持。",
+          "basis": "explicit",
+          "evidence_block_ids": ["pdf-block-000869-03a707ef", "pdf-block-001440-6cf2f47b"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000862-54188d9a", "pdf-block-000869-03a707ef", "pdf-block-000849-ce71c5ff"]
+    },
+    {
+      "id": "dgx_cloud",
+      "name": "DGX Cloud",
+      "kind": "business",
+      "description": "完全托管的 AI 训练即服务平台,含云端基础设施与 AI 软件、可定制预训练模型以及对 NVIDIA 专家的访问。",
+      "products_services": ["云端 AI 基础设施与软件", "可定制预训练 AI 模型", "专家支持"],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "原文对 DGX Cloud 未单列收费方式;云服务收入确认政策称云服务按订阅或订阅加使用量提供,此处不将其视为对 DGX Cloud 的逐项披露。",
+          "basis": "unknown",
+          "evidence_block_ids": ["pdf-block-000869-03a707ef", "pdf-block-001441-0f5d011a"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000858-fd83bcde", "pdf-block-000862-54188d9a", "pdf-block-000869-03a707ef"]
+    },
+    {
+      "id": "jetson_embedded",
+      "name": "Jetson 机器人与嵌入式平台",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "Compute & Networking 分部下的机器人及其他嵌入式平台。所选片段未对其展开更多说明。",
+      "products_services": ["Jetson"],
+      "customers": [],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000858-fd83bcde"]
+    },
+    {
+      "id": "drive_hyperion",
+      "name": "NVIDIA DRIVE Hyperion 自动驾驶平台",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "车端全栈自动驾驶平台:高性能 DRIVE AGX 计算硬件、DRIVE OS 车载操作系统、参考传感器套件,以及用于自动驾驶、建图、泊车和智能座舱体验的开放模块化软件平台。",
+      "products_services": ["DRIVE AGX 计算硬件", "DRIVE OS", "参考传感器套件", "DRIVE 软件平台", "OTA 更新能力"],
+      "customers": ["整车厂、卡车制造商、一级供应商、传感器制造商、汽车研究机构、高精地图公司和初创公司"],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000858-fd83bcde", "pdf-block-000879-67e00e9c", "pdf-block-000880-4bf3817c", "pdf-block-000881-d5b542b2"]
+    },
+    {
+      "id": "geforce_gpus",
+      "name": "GeForce GPU",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "面向游戏和 PC 的 GPU,包括 GeForce RTX、GeForce GTX 以及 FY2025 推出的 Blackwell GeForce RTX 50 系列桌面和笔记本 GPU;另有游戏主机 SoC 与开发服务。",
+      "products_services": ["GeForce RTX/GTX GPU", "RTX 50 系列", "游戏主机 SoC 与开发服务"],
+      "customers": ["游戏玩家", "PC 用户", "创作者"],
+      "monetization": [
+        {
+          "description": "原文未逐项说明 GeForce 的收费方式;产品销售为公司层面的一般收入确认政策。",
+          "basis": "unknown",
+          "evidence_block_ids": ["pdf-block-000873-d85d83ed"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000859-b8b15350", "pdf-block-000873-d85d83ed", "pdf-block-000874-a65d5541"]
+    },
+    {
+      "id": "geforce_now",
+      "name": "GeForce NOW 云游戏",
+      "kind": "business",
+      "description": "云游戏/游戏流媒体服务,使性能不足的设备也能玩 PC 游戏;Graphics 分部还包含相关基础设施。",
+      "products_services": ["GeForce NOW 游戏流媒体服务", "相关基础设施"],
+      "customers": ["游戏玩家"],
+      "monetization": [
+        {
+          "description": "所选片段未说明 GeForce NOW 的收费方式。",
+          "basis": "unknown",
+          "evidence_block_ids": ["pdf-block-000873-d85d83ed"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000859-b8b15350", "pdf-block-000873-d85d83ed"]
+    },
+    {
+      "id": "rtx_workstation_gpus",
+      "name": "Quadro/NVIDIA RTX 工作站 GPU",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "面向企业工作站图形的 GPU;原文称生成式 AI 扩大了企业本地部署 AI 应用对工作站级 GPU 的需求。",
+      "products_services": ["Quadro/NVIDIA RTX GPU"],
+      "customers": ["专业艺术家、建筑师和设计师(通过 NVIDIA 合作伙伴产品)", "企业客户"],
+      "monetization": [
+        {
+          "description": "所选片段未说明工作站 GPU 的收费方式。",
+          "basis": "unknown",
+          "evidence_block_ids": ["pdf-block-000855-e28b83db"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000859-b8b15350", "pdf-block-000855-e28b83db", "pdf-block-000875-e91d2b93"]
+    },
+    {
+      "id": "vgpu_software",
+      "name": "vGPU 虚拟 GPU 软件",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "面向云端视觉与虚拟计算的软件,用于图形密集的虚拟桌面和工作站。",
+      "products_services": ["NVIDIA vGPU 软件"],
+      "customers": [],
+      "monetization": [
+        {
+          "description": "提供付费许可。",
+          "basis": "explicit",
+          "evidence_block_ids": ["pdf-block-000869-03a707ef"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000859-b8b15350", "pdf-block-000869-03a707ef"]
+    },
+    {
+      "id": "omniverse",
+      "name": "NVIDIA Omniverse",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "用于构建和运行虚拟世界仿真应用的开发平台和操作系统;Graphics 分部列示 Omniverse Enterprise 软件,用于工业 AI 和数字孪生。工业企业用其构建工厂数字孪生、实时 3D 产品配置器并测试验证自主机器人和车辆。",
+      "products_services": ["Omniverse Enterprise 软件", "数字孪生与仿真"],
+      "customers": ["工业企业", "个人用户(免费使用)"],
+      "monetization": [
+        {
+          "description": "企业用途为软件订阅,个人使用免费。",
+          "basis": "explicit",
+          "evidence_block_ids": ["pdf-block-000877-3df8e1b3"]
+        }
+      ],
+      "evidence_block_ids": ["pdf-block-000859-b8b15350", "pdf-block-000877-3df8e1b3", "pdf-block-000881-d5b542b2"]
+    },
+    {
+      "id": "auto_infotainment",
+      "name": "汽车信息娱乐平台",
+      "kind": "offering_group",
+      "role": "offering_group",
+      "description": "Graphics 分部中用于信息娱乐系统的汽车平台。所选片段对该项的产品细节说明有限。",
+      "products_services": ["汽车信息娱乐系统平台"],
+      "customers": [],
+      "monetization": [],
+      "evidence_block_ids": ["pdf-block-000859-b8b15350", "pdf-block-001686-d547e7da"]
+    }
+  ],
+  "relationships": [
+    {"source_id": "seg_compute_networking", "target_id": "nvidia", "kind": "reported_under", "description": "Compute & Networking 是 NVIDIA 的两个报告分部之一。", "evidence_block_ids": ["pdf-block-000857-8c01a130", "pdf-block-000858-fd83bcde"]},
+    {"source_id": "seg_graphics", "target_id": "nvidia", "kind": "reported_under", "description": "Graphics 是 NVIDIA 的两个报告分部之一。", "evidence_block_ids": ["pdf-block-000857-8c01a130", "pdf-block-000859-b8b15350"]},
+    {"source_id": "dc_compute", "target_id": "seg_compute_networking", "kind": "reported_under", "description": "Data Center 加速计算平台及 AI 解决方案和软件列入 Compute & Networking 分部。", "evidence_block_ids": ["pdf-block-000858-fd83bcde"]},
+    {"source_id": "dc_networking", "target_id": "seg_compute_networking", "kind": "reported_under", "description": "网络列入 Compute & Networking 分部。", "evidence_block_ids": ["pdf-block-000858-fd83bcde"]},
+    {"source_id": "dgx_cloud", "target_id": "seg_compute_networking", "kind": "reported_under", "description": "DGX Cloud 计算服务列入 Compute & Networking 分部。", "evidence_block_ids": ["pdf-block-000858-fd83bcde"]},
+    {"source_id": "jetson_embedded", "target_id": "seg_compute_networking", "kind": "reported_under", "description": "Jetson 机器人及其他嵌入式平台列入 Compute & Networking 分部。", "evidence_block_ids": ["pdf-block-000858-fd83bcde"]},
+    {"source_id": "drive_hyperion", "target_id": "seg_compute_networking", "kind": "reported_under", "description": "汽车平台及自动驾驶和电动车方案列入 Compute & Networking 分部;DRIVE Hyperion 为汽车市场段落所述的自动驾驶平台(归属为由两处文字结合推断)。", "evidence_block_ids": ["pdf-block-000858-fd83bcde", "pdf-block-000879-67e00e9c"]},
+    {"source_id": "geforce_gpus", "target_id": "seg_graphics", "kind": "reported_under", "description": "GeForce GPU 列入 Graphics 分部。", "evidence_block_ids": ["pdf-block-000859-b8b15350"]},
+    {"source_id": "geforce_now", "target_id": "seg_graphics", "kind": "reported_under", "description": "GeForce NOW 游戏流媒体服务及相关基础设施列入 Graphics 分部。", "evidence_block_ids": ["pdf-block-000859-b8b15350"]},
+    {"source_id": "rtx_workstation_gpus", "target_id": "seg_graphics", "kind": "reported_under", "description": "Quadro/NVIDIA RTX 企业工作站 GPU 列入 Graphics 分部。", "evidence_block_ids": ["pdf-block-000859-b8b15350"]},
+    {"source_id": "vgpu_software", "target_id": "seg_graphics", "kind": "reported_under", "description": "vGPU 软件列入 Graphics 分部。", "evidence_block_ids": ["pdf-block-000859-b8b15350"]},
+    {"source_id": "omniverse", "target_id": "seg_graphics", "kind": "reported_under", "description": "Omniverse Enterprise 软件列入 Graphics 分部。", "evidence_block_ids": ["pdf-block-000859-b8b15350"]},
+    {"source_id": "auto_infotainment", "target_id": "seg_graphics", "kind": "reported_under", "description": "用于信息娱乐系统的汽车平台列入 Graphics 分部。", "evidence_block_ids": ["pdf-block-000859-b8b15350"]},
+    {"source_id": "dc_compute", "target_id": "mkt_data_center", "kind": "part_of", "description": "Data Center 平台由计算和网络产品构成,计算产品是其中一部分。", "evidence_block_ids": ["pdf-block-000861-b74bac5d", "pdf-block-000862-54188d9a"]},
+    {"source_id": "dc_networking", "target_id": "mkt_data_center", "kind": "part_of", "description": "网络产品是 Data Center 平台的组成部分。", "evidence_block_ids": ["pdf-block-000861-b74bac5d", "pdf-block-000863-916beda4"]},
+    {"source_id": "nvidia_ai_enterprise", "target_id": "mkt_data_center", "kind": "part_of", "description": "NVIDIA AI Enterprise 列入 Data Center 计算产品所含软件。", "evidence_block_ids": ["pdf-block-000862-54188d9a", "pdf-block-000869-03a707ef"]},
+    {"source_id": "dgx_cloud", "target_id": "mkt_data_center", "kind": "part_of", "description": "DGX Cloud 列入 Data Center 计算产品。", "evidence_block_ids": ["pdf-block-000862-54188d9a"]},
+    {"source_id": "drive_hyperion", "target_id": "mkt_automotive", "kind": "part_of", "description": "DRIVE Hyperion 是 Automotive 市场下的端到端自动驾驶解决方案品牌。", "evidence_block_ids": ["pdf-block-000879-67e00e9c"]},
+    {"source_id": "geforce_gpus", "target_id": "mkt_gaming", "kind": "part_of", "description": "GeForce RTX/GTX GPU 列入游戏市场产品。", "evidence_block_ids": ["pdf-block-000873-d85d83ed"]},
+    {"source_id": "geforce_now", "target_id": "mkt_gaming", "kind": "part_of", "description": "GeForce NOW 云游戏列入游戏市场产品。", "evidence_block_ids": ["pdf-block-000873-d85d83ed"]},
+    {"source_id": "rtx_workstation_gpus", "target_id": "mkt_professional_visualization", "kind": "part_of", "description": "工作站级 RTX GPU 服务专业可视化用户;该归属由相邻段落语境推断,非逐句直接声明。", "evidence_block_ids": ["pdf-block-000855-e28b83db", "pdf-block-000875-e91d2b93"]},
+    {"source_id": "omniverse", "target_id": "mkt_professional_visualization", "kind": "part_of", "description": "Omniverse 在专业可视化市场段落中介绍;归属由段落位置推断。", "evidence_block_ids": ["pdf-block-000877-3df8e1b3"]},
+    {"source_id": "dc_compute", "target_id": "drive_hyperion", "kind": "supports", "description": "自动驾驶的深度神经网络训练使用 Data Center 计算方案。", "evidence_block_ids": ["pdf-block-000880-4bf3817c"]},
+    {"source_id": "omniverse", "target_id": "drive_hyperion", "kind": "supports", "description": "基于 Omniverse 的数据中心仿真方案用于生成合成数据以及测试验证自动驾驶平台。", "evidence_block_ids": ["pdf-block-000881-d5b542b2"]}
+  ],
+  "unknowns": [
+    {
+      "id": "unk_market_segment_mapping",
+      "question": "Data Center、Gaming、Professional Visualization、Automotive 四个市场与两个报告分部的完整对应关系是什么?",
+      "reason_unanswered": "所选片段分别列出分部产品和市场产品,未提供市场到分部的完整映射;汽车业务同时出现在两个分部(自动驾驶在 Compute & Networking,信息娱乐在 Graphics)。因此未把市场直接挂在分部下,也未从终端市场收入反推分部收入。",
+      "related_business_ids": ["mkt_data_center", "mkt_gaming", "mkt_professional_visualization", "mkt_automotive", "seg_compute_networking", "seg_graphics"]
+    },
+    {
+      "id": "unk_ai_enterprise_segment",
+      "question": "NVIDIA AI Enterprise 具体列入哪个报告分部?",
+      "reason_unanswered": "分部描述仅写“AI 解决方案和软件”和 vGPU 等,未逐项点名 NVIDIA AI Enterprise;仅确认它属于 Data Center 计算产品所含软件。",
+      "related_business_ids": ["nvidia_ai_enterprise", "seg_compute_networking"]
+    },
+    {
+      "id": "unk_product_revenue",
+      "question": "DGX Cloud、NVIDIA AI Enterprise、GeForce NOW、Omniverse 等具名产品各自贡献多少收入?",
+      "reason_unanswered": "所选两张收入表只披露报告分部、终端市场及 Data Center 下的 Compute 与 Networking,未披露这些产品的独立收入;不应从业务映射反推。",
+      "related_business_ids": ["dgx_cloud", "nvidia_ai_enterprise", "geforce_now", "omniverse"]
+    },
+    {
+      "id": "unk_coverage",
+      "question": "报告的其他部分(如竞争、客户集中度、地域、分部营业利润和 All Other 明细)有何补充?",
+      "reason_unanswered": "本次只读取冻结的业务描述、收入确认、币种、财年和两张收入表,未读全篇;“All Other”类别仅见文字说明,未选取相关金额。",
+      "related_business_ids": []
+    }
+  ],
+  "revenue_charts": [
+    {
+      "id": "rev_reportable_segments_fy2025",
+      "title": "FY2025 按报告分部划分的收入构成",
+      "denominator_label": "合并总收入(两个报告分部合计)",
+      "chart_type": "donut",
+      "total_cell_id": "cell-table-pdf133-revenue-r005-c002",
+      "unit_block_id": "pdf-table-pdf133-revenue",
+      "currency_block_id": "pdf-block-001450-f7fcd32e",
+      "period_header_cell_id": "cell-table-pdf133-revenue-r001-c001",
+      "parts": [
+        {"id": "seg_rev_compute_networking", "label": "Compute & Networking", "amount_cell_id": "cell-table-pdf133-revenue-r003-c002"},
+        {"id": "seg_rev_graphics", "label": "Graphics", "amount_cell_id": "cell-table-pdf133-revenue-r004-c002"}
+      ],
+      "adjustments": [],
+      "reported_subtotals": []
+    },
+    {
+      "id": "rev_end_markets_fy2025",
+      "title": "FY2025 按终端市场划分的收入构成",
+      "denominator_label": "合并总收入(终端市场口径)",
+      "chart_type": "donut",
+      "total_cell_id": "cell-table-pdf172-markets-r010-c002",
+      "unit_block_id": "pdf-table-pdf172-markets",
+      "currency_block_id": "pdf-block-001450-f7fcd32e",
+      "period_header_cell_id": "cell-table-pdf172-markets-r001-c001",
+      "parts": [
+        {"id": "mkt_rev_data_center", "label": "Data Center", "amount_cell_id": "cell-table-pdf172-markets-r003-c002"},
+        {"id": "mkt_rev_gaming", "label": "Gaming", "amount_cell_id": "cell-table-pdf172-markets-r006-c002"},
+        {"id": "mkt_rev_professional_visualization", "label": "Professional Visualization", "amount_cell_id": "cell-table-pdf172-markets-r007-c002"},
+        {"id": "mkt_rev_automotive", "label": "Automotive", "amount_cell_id": "cell-table-pdf172-markets-r008-c002"},
+        {"id": "mkt_rev_oem_other", "label": "OEM and Other", "amount_cell_id": "cell-table-pdf172-markets-r009-c002"}
+      ],
+      "adjustments": [],
+      "reported_subtotals": []
+    },
+    {
+      "id": "rev_data_center_split_fy2025",
+      "title": "FY2025 Data Center 终端市场内部的 Compute 与 Networking 构成",
+      "denominator_label": "Data Center 终端市场收入(非合并总收入)",
+      "chart_type": "donut",
+      "total_cell_id": "cell-table-pdf172-markets-r003-c002",
+      "unit_block_id": "pdf-table-pdf172-markets",
+      "currency_block_id": "pdf-block-001450-f7fcd32e",
+      "period_header_cell_id": "cell-table-pdf172-markets-r001-c001",
+      "parts": [
+        {"id": "dc_rev_compute", "label": "Compute", "amount_cell_id": "cell-table-pdf172-markets-r004-c002"},
+        {"id": "dc_rev_networking", "label": "Networking", "amount_cell_id": "cell-table-pdf172-markets-r005-c002"}
+      ],
+      "adjustments": [],
+      "reported_subtotals": []
+    }
+  ]
+}
+```

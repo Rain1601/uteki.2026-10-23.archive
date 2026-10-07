@@ -5,7 +5,6 @@ opaque qualified entities; company-specific segment names are never guessed.
 """
 from __future__ import annotations
 
-from dataclasses import asdict
 from collections import Counter
 from datetime import date
 import inspect
@@ -23,7 +22,11 @@ from uteki.agents.reading.document_reader import DocumentReader
 from uteki.domain.research_data.query_contract import (
     DataQuery, QueryResult, ResearchRecord, Period, SOURCE_PERIOD_VERSION, export_query_schema,
 )
-from uteki.infrastructure.document_sources.sec_index import parse_sec_source, build_legal_outline
+from uteki.infrastructure.document_sources.sec_index import parse_sec_source
+from uteki.infrastructure.document_sources.parsed_package import (
+    EXPORT as PARSED_EXPORT, PARSER as HTML_PARSER, build_parsed_package,
+)
+from uteki.domain.documents import SourceBlock
 from uteki.infrastructure.document_sources.earnings import earnings_outline
 from uteki.infrastructure.document_sources.company_acquisition import _mime
 from uteki.infrastructure.document_sources.sec import normalize_text
@@ -31,14 +34,13 @@ from .financial_records import digest, local_name, one_text, parse_number, dom_p
 from .query_dataset import DDL, contained, save
 
 ADAPTER = 'us-gaap-inline-v1'
-HTML_PARSER = 'sec-source-blocks-v0.1.7'
 
 
 def implementation_fingerprint():
     """Invalidate reuse when a parser, normalizer or exported contract changes."""
     paths = {Path(__file__), *(Path(inspect.getfile(obj)) for obj in (
         parse_sec_source, earnings_outline, _mime, normalize_text, parse_number,
-        ResearchRecord, save, DocumentReader))}
+        ResearchRecord, save, DocumentReader, build_parsed_package, SourceBlock))}
     return digest({path.name: digest(path.read_bytes()) for path in sorted(paths)})
 
 
@@ -82,19 +84,24 @@ def _period(context):
         return Period(kind=kind, start=start, end=end, basis='source')
 
 
-def _index(raw, doc, folder):
+def _index(raw, doc, folder, *, company_id):
     sid = doc['source_id']
     if doc['mime_type'] in ('text/html', 'application/xhtml+xml'):
-        parsed = parse_sec_source(sid, doc['source_url'], raw, source_snapshot_id=sid,
-                                  form_type=doc['form'], parser_version=HTML_PARSER)
-        blocks = [asdict(b) for b in parsed.blocks]
-        index = asdict(build_legal_outline(parsed))
-        assets = [asdict(a) for a in parsed.assets]
+        package = build_parsed_package(raw, {
+            'company_id': company_id, 'document_id': sid, 'source_snapshot_id': sid,
+            'source_url': doc['source_url'], 'raw_sha256': doc.get('content_sha256', doc.get('sha256')),
+            'form_type': doc['form'], 'report_period_end': doc.get('period_end'),
+            'available_at': doc.get('filed_at') or doc.get('published_at'),
+            'parser_version': HTML_PARSER, 'export_version': PARSED_EXPORT,
+        }, folder)
+        index, blocks, assets = package['index'], package['blocks'], package['assets']
         diagnostics = [{'layer': 'reading', 'reason': 'image_reference_only', 'source_snapshot_id': sid,
                         'asset_id': a['asset_id']} for a in assets]
         diagnostics.extend({'layer': 'indexing', 'reason': d['code'], 'source_snapshot_id': sid,
                             'severity': d['severity'], 'detail': d['message'], 'node_id': d.get('node_id')}
                            for d in index.get('diagnostics', ()))
+        DocumentReader(folder)  # Existing reader verifies the compatibility manifest.
+        return index, blocks, diagnostics
     elif doc['mime_type'] == 'application/pdf':
         command = shutil.which('pdftotext')
         if command is None:
@@ -292,8 +299,10 @@ def materialize_sources(source_run: dict, workspace: Path, destination: Path, *,
             if not isinstance(sid, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]*', sid) or sid in seen:
                 raise ValueError('missing or duplicate source identity')
             seen.add(sid)
-            if doc.get('company_id', company['company_id']) != company['company_id']:
+            if 'company_id' in doc and doc['company_id'] != company['company_id']:
                 raise ValueError('document company identity mismatch')
+            if doc.get('content_sha256') is not None and doc.get('sha256') is not None and doc['content_sha256'] != doc['sha256']:
+                raise ValueError('document source hash declarations conflict')
             path = doc.get('path'); expected = doc.get('content_sha256', doc.get('sha256'))
             if not isinstance(path, str) or Path(path).is_absolute() or not re.fullmatch(r'[0-9a-f]{64}', str(expected)):
                 raise ValueError('explicit relative source path and SHA256 required')
@@ -316,18 +325,27 @@ def materialize_sources(source_run: dict, workspace: Path, destination: Path, *,
             raw_path = 'raw/'+sid+('.pdf' if doc['mime_type']=='application/pdf' else '.html')
             (work/raw_path).parent.mkdir(exist_ok=True); (work/raw_path).write_bytes(raw)
             try:
-                index, blocks, index_gaps = _index(raw, doc, work/'indexes'/sid)
+                index, blocks, index_gaps = _index(raw, doc, work/'indexes'/sid, company_id=company['company_id'])
             except (ValueError, etree.ParserError, subprocess.SubprocessError, OSError) as error:
                 gaps.append({'layer': 'indexing', 'source_snapshot_id': sid, 'reason': str(error)[:300]}); continue
             rows, refs, extraction_gaps, fiscal = extract_inline_records(raw, doc, company, index, blocks, raw_path)
             _check_cancelled(should_stop)
+            parsed_package = None
+            if doc['mime_type'] in ('text/html', 'application/xhtml+xml'):
+                package_manifest = json.loads((work/'indexes'/sid/'manifest.json').read_bytes())
+                parsed_package = {'export_version': package_manifest['export_version'],
+                    'package_id': package_manifest['package_id'], 'manifest_path': 'indexes/'+sid+'/manifest.json',
+                    'manifest_sha256': digest((work/'indexes'/sid/'manifest.json').read_bytes()),
+                    'source_path': 'indexes/'+sid+'/source.json', 'document_path': 'indexes/'+sid+'/document.html',
+                    'status': 'candidate_parsed_material', 'semantic_review': 'not_reviewed'}
             sources.append({'source_snapshot_id': sid, 'company_id': company['company_id'], 'source_url': doc['source_url'],
                 'source_sha256': expected, 'document_id': sid, 'index_id': index['index_id'], 'index_folder': 'indexes/'+sid,
                 'raw_file': raw_path, 'raw_file_sha256': expected, 'form': doc['form'], 'period_end': doc.get('period_end'),
                 'declared_mime_type': declared_mime_type, 'parsed_mime_type': doc['mime_type'],
                 'available_at': available, 'status': 'candidate', 'fiscal_periods': fiscal,
+                **({'parsed_package': parsed_package} if parsed_package else {}),
                 'capabilities': ['read_context', 'literal_search', 'source_bytes'] + (
-                    ['html_table_structure'] if doc['mime_type'] in ('text/html', 'application/xhtml+xml') else []),
+                    ['html_table_structure', 'parsed_document_package'] if parsed_package else []),
                 'stage_coverage': _source_stages(raw, doc, index, blocks, rows, refs, extraction_gaps),
                 'image_block_count': sum(b['type']=='image' for b in blocks)})
             records.extend(rows); evidence.update(refs); gaps.extend(index_gaps+extraction_gaps)

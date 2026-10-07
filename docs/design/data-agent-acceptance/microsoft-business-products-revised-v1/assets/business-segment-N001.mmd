@@ -1,0 +1,18 @@
+flowchart LR
+  accTitle: Selected filing business structure
+  accDescr: Solid edges are explicit source assertions. Dashed edges are derived. Unknown relations are omitted; absent edges do not imply independence.
+  N000["Microsoft Corporation"]:::company
+  N001["Productivity and Business Processes"]:::reportable_segment
+  N004["Microsoft 365 Commercial products and cloud services"]:::business
+  N005["Microsoft 365 Consumer products and cloud services"]:::business
+  N006["LinkedIn"]:::business
+  N007["Dynamics products and cloud services"]:::business
+  classDef company fill:#263c46,color:#fff,stroke:#263c46,stroke-width:1.5px
+  classDef reportable_segment fill:#e4eef2,color:#203c49,stroke:#91aeba,stroke-width:1px
+  classDef business fill:#eaf1e9,color:#2b4432,stroke:#a4b8a7,stroke-width:1px
+  classDef offering_group fill:#fff,color:#302c26,stroke:#c9c2b7,stroke-width:1px
+  N000 -->|"报告中列示"| N001
+  N001 -->|"包含"| N004
+  N001 -->|"包含"| N005
+  N001 -->|"包含"| N006
+  N001 -->|"包含"| N007

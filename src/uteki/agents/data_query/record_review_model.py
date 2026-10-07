@@ -153,7 +153,7 @@ class SdkRecordReviewer:
         write_new(path, value)
         return {'artifact_root': str(self.output), 'path': path.name, 'sha256': digest(path.read_bytes()), 'summary': value}
 
-    async def review(self, packet):
+    async def review(self, packet, *, observation_context=None):
         async with self._lock:
             if self._closed:
                 raise ValueError('Reviewer is closed')
@@ -166,6 +166,8 @@ class SdkRecordReviewer:
             write_new(request_path, {'packet': packet, 'packet_sha256': digest(encoded),
                 'model_input': model_input, 'model_input_sha256': digest(model_input),
                 'model_config_sha256': self._config_sha256, 'prompt_sha256': self._config['prompt_sha256']})
+            if observation_context:
+                observation_context.publish(request_path, kind='model_input', owned_by_context=True)
             for attempt in range(self._config['max_retries'] + 1):
                 before = set((self.output/'calls').glob('*.json'))
                 # A budget rejection before get_response must not inherit the last response.
@@ -178,7 +180,11 @@ class SdkRecordReviewer:
                     'request': self._references([request_path])[0], 'status': 'started',
                     'started_at': datetime.now(timezone.utc).isoformat()}
                 try:
-                    result = await asyncio.wait_for(Runner.run(self._agent, model_input, max_turns=1,
+                    agent = self._agent
+                    if observation_context:
+                        observation_context.guard()
+                        agent = agent.clone(model=self._agent.model.with_observation(observation_context.for_attempt(attempt + 1)))
+                    result = await asyncio.wait_for(Runner.run(agent, model_input, max_turns=1,
                         run_config=RunConfig(tracing_disabled=True)), timeout=self._config['request_timeout'])
                     value = result.final_output
                     if hasattr(value, 'model_dump'): value = value.model_dump(mode='json')
@@ -201,6 +207,12 @@ class SdkRecordReviewer:
                     record['calls'] = self._references(set((self.output/'calls').glob('*.json')) - before)
                     write_new(self.output/f'review-{self._reviews:04d}-attempt-{attempt + 1:02d}.json', record)
                     self.snapshot_usage()
+                    if observation_context:
+                        observation_context.publish(self.output/f'review-{self._reviews:04d}-attempt-{attempt + 1:02d}.json',
+                            kind='model_attempt', owned_by_context=True)
+                        parsed = self.output/f'review-{self._reviews:04d}-parsed.json'
+                        if parsed.exists():
+                            observation_context.publish(parsed, kind='model_output', owned_by_context=True)
 
     async def aclose(self):
         async with self._lock:

@@ -1,4 +1,4 @@
-"""Product hierarchy: home, company workspace, reports and their versions."""
+"""Product hierarchy: data workspace, company reports and their versions."""
 from apps.review_workbench.assets import asset_text
 from html import escape
 from pathlib import Path
@@ -27,9 +27,9 @@ def company_tabs(company_id, active='reports'):
 
 
 def crumb(company=None, section=None):
-    result='<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">'+bi('主页','Home')+'</a>'
+    result='<nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/agent-results">'+bi('运行结果','Results')+'</a>'
     if company:
-        result+='<span>/</span><a href="/companies">'+bi('公司','Companies')+'</a><span>/</span><a href="/companies/'+e(company['id'])+'">'+e(company['name'])+'</a>'
+        result+='<span>/</span><a href="/companies/'+e(company['id'])+'">'+e(company['name'])+'</a>'
     if section: result+='<span>/</span><span>'+bi(*section)+'</span>'
     return result+'</nav>'
 

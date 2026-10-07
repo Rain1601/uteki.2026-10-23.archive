@@ -1,0 +1,20 @@
+flowchart LR
+  accTitle: Selected filing business structure
+  accDescr: Solid edges are explicit source assertions. Dashed edges are derived. Unknown relations are omitted; absent edges do not imply independence.
+  N000["Microsoft Corporation"]:::company
+  N003["More Personal Computing"]:::reportable_segment
+  N014["Windows and Devices"]:::business
+  N015["Windows OEM licensing"]:::business
+  N016["Devices (Surface and PC accessories)"]:::business
+  N017["Gaming"]:::business
+  N018["Search and news advertising"]:::business
+  classDef company fill:#263c46,color:#fff,stroke:#263c46,stroke-width:1.5px
+  classDef reportable_segment fill:#e4eef2,color:#203c49,stroke:#91aeba,stroke-width:1px
+  classDef business fill:#eaf1e9,color:#2b4432,stroke:#a4b8a7,stroke-width:1px
+  classDef offering_group fill:#fff,color:#302c26,stroke:#c9c2b7,stroke-width:1px
+  N000 -->|"报告中列示"| N003
+  N003 -->|"包含"| N014
+  N003 -->|"包含"| N017
+  N003 -->|"包含"| N018
+  N014 -->|"包含"| N015
+  N014 -->|"包含"| N016

@@ -220,6 +220,140 @@ Extractor 配置：
 
 当前完整性边界与真实验证见[技术方案](DATA_AGENT_AUTONOMY_PLAN.zh-CN.md)和[benchmark](DATA_AGENT_BENCHMARK.zh-CN.md)。查询运行尚需 T4 专用导出，才能满足 benchmark 的题目/来源绑定及累计逐请求证据接口。
 
+## 执行监控与历史导入（2026-10-06）
+
+[Agent 运行页](http://127.0.0.1:8765/agent-runs) 可查看步骤、子任务、输入输出、已保存的模型返回和逐请求用量。它只观察执行；启动仍走 CLI，页面不提供启动、取消、重试或采纳操作。
+
+`agent query`、`agent extract` 和 `agent extract-batch` 均支持可选参数 `--observation-root`。其余必需参数不变。以下 query 命令是**真实模型执行模板**：请求、公司/来源范围、模型、共享账本和请求限制需先在显式配置中准备好；若请求登记了财务任务，还需加原有 `--extractor-model-config` 和 `--method-root`。
+
+```bash
+PYTHONPATH=src:. .venv/bin/python -m uteki.infrastructure.research_data.query_cli agent query \
+  --request /absolute/path/query-request.json \
+  --model-config /absolute/path/planner-model-config.json \
+  --workspace /absolute/path/source-store \
+  --output "$HOME/.local/state/uteki/runs/query-001" \
+  --observation-root "$HOME/.local/state/uteki/observations"
+```
+
+在另一终端启动工作台读取同一观测目录，并明确允许业务输出所在的父目录：
+
+```bash
+PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app \
+  --host 127.0.0.1 --port 8765 \
+  --observation-root "$HOME/.local/state/uteki/observations" \
+  --observation-output-root "$HOME/.local/state/uteki/runs"
+```
+
+工作台的两个观测参数必须成对提供；`--observation-output-root` 可重复指定多个允许的输出父目录。运行目录必须位于其中一个父目录内，观测目录不能与业务输出或冻结数据互相包含。路径含符号链接会拒绝；每次执行仍需全新的 `--output`。单独 `acquire / prepare / refresh` 当前没有此 CLI 观测参数；query 内触发的准备、获取和物化按已记录阶段显示。
+
+每棵执行树由单个本机进程发布事件和心跳。页面可见时每 2 秒读取增量；隐藏时暂停，根运行结束且尾页读完后停止。超过 15 秒未收到未结束运行的心跳，显示“监控更新中断，执行状态未知”，不自动判失败、取消请求或释放预算。当前没有跨进程续写、多机调度和中断续跑。观测未开启的旧入口仍能执行，但不自动出现在实时列表。
+
+当前登记了两次 AMD 真实历史运行，普通工作台启动即可读取，无需观测目录或新模型调用：
+
+| 登记 ID | 查看路径与计量范围 |
+| --- | --- |
+| `amd-fy2023-main-agent-v2-parent` | 6 个父步骤；第 1、3 步拒绝，第 5 步展开一个提取任务。父运行自身 6 次调用，含子任务 7 次；输入 105,812、输出 17,512 Token，保存估算 0.17045820 USD。 |
+| `amd-fy2023-cash-flow-main-agent-v2-parent` | 7 个父步骤和一个提取任务；8 次调用，以 `no_progress_limit` 停止。已生成候选和未完成部分均保留。 |
+
+子任务在同一根运行上下文展开。`candidate_ready` 只表示候选生成；执行、交付、质量与采纳分开显示。缓存 Token 已包含于输入，reasoning Token 已包含于输出，不再相加。仅有调用开始记录时，用量保留未知；历史 SDK 记录为零但供应商未确认时，也不称为已确认零消耗。父子和累计 usage 不重复计费；保存的费用估算不是实际账单，且上述 AMD 数字不包含此前材料选择及其他实验。
+
+另一个历史运行需由调用者准备完整登记 spec，再显式导入：
+
+```bash
+./.venv/bin/python scripts/import_agent_run.py \
+  --root "$PWD" --spec /absolute/path/new-run-spec.json
+```
+
+`--root` 默认为脚本所在仓库，`--spec` 必需。spec 是一个完整条目，可参考 [`agent-runs-v1.json`](../data/evaluation_views/agent-runs-v1.json) 中不含 `summary` 的结构，填写该次运行的实际值：
+
+- `id / title / adapter`，当前历史适配器为 `company-autonomous-financial-v1`。
+- 父运行 `path / manifest_sha256`、`query`、绑定的 `dataset`、完整 `scope` 和每个来源的 hash。
+- `children` 中明确子 ID、父步骤、batch/direct 两层路径与 manifest hash；如已有旧查看页，再提供 `extraction_view_id`。
+
+该历史适配器读取 company query、autonomous query 及其可选 batch/direct 提取层；不能把任意独立提取或其他 Agent 文件套用此格式。登记读取地址必须是仓库中明确的 `experiments/` 或 `data/` 相对路径；旧机器绝对路径只作历史声明，经 hash 和 scope 映射后读取本地文件。导入校验全部登记层并新增安全摘要，不覆盖原产物、不重跑模型、不替换已有根或子 ID。
+
+工程页登记不会自动改变 `/data-workspace` 的版本选择、采纳状态或旧财务页登记。未建立且核验旧页映射的新运行，仍可在工程页查看受控产物，但没有财务页链接。大内容按需展开与续读；私密配置只显示安全投影。完整约定见[执行监控方案](DATA_AGENT_OBSERVABILITY_PLAN.zh-CN.md)。
+
+## 冻结获取记录重放与标准解析包（2026-10-07）
+
+当已获取的原件仍在指定工作区内，可从明确选择的获取记录重建新数据集。这个入口不请求网页，也不调用模型。必须提供获取 manifest 的字节 SHA256 和至少一个准确的 source ID；不默认选择首份或最新报告。
+
+```bash
+.venv/bin/uteki-data agent prepare \
+  --workspace /path/to/original-source-workspace \
+  --from-acquisition /path/to/source-run/manifest.json \
+  --acquisition-sha256 <64-character-sha256> \
+  --source-id <selected-source-id> \
+  --output /path/to/new-prepared-run
+```
+
+程序核对原件哈希、公司、日期、来源角色及已记录的 SEC 身份收据，再重建只含所选材料的 source-run。原获取记录和旧解析结果保持冻结。新输出目录必须不存在。这个入口仅接受 `company-source-run-v1` 获取记录；不能用任意文档路径代替。
+
+HTML 原件会生成 `uteki-parsed-document-v1` 包：材料身份、正文块与表格单元格、层级目录、片段锚点、资源说明、七份 JSON Schema、标准 `document.html` 和校验 manifest。`sources.json.parsed_package` 登记包及哈希。原有索引、正文读取和查询接口继续使用同一来源块。标准 HTML 保留片段和单元格链接，不执行原网页脚本、不加载外部资源；图片目前只有资源说明。PDF 继续使用原有路径，此次未新增 PDF 标准包。
+
+包的字节稳定性以原件、材料身份、解析器/导出器版本及运行环境一致为前提。模型生成的精编、数值归一化和业务结论不属于这个确定性承诺。目录错误、未知页码、未覆盖指标与财年仍作为缺口保留。
+
+新准备结果可作为 `CompanyQueryInput.prepared_run`，并显式设置 `include_candidates`。查询从已验证产物取得来源范围及截止日；获取记录重放生成的运行没有网络配置，所以该查询不提供在线 acquire/materialize 动作。`prepare --from-run` 可再次离线重建。刷新需要有明确公司获取配置的运行。
+
+## 系统 Agent 的 Claude 原生决策调用（2026-10-07）
+
+`agent query` 的 planner/worker 支持 AIHubMix `claude-sonnet-5-5`、`claude-opus-5-5` 原生 Messages 接口。Uteki 继续管理步骤、工具、证据、范围和预算；模型每次提交一个下一步决策。此接入不表示所有独立提取器或记录复核器已迁移到 Claude。
+
+模型配置显式提供 `provider=aihubmix`、模型 ID、`reasoning_effort=low|medium|high`、`max_tokens`、`request_timeout`、`max_retries=0`，以及原有共享预算字段。当前固定发送 `thinking.type=adaptive` 和 `stream=false`。不发送 temperature、top_p、top_k、seed，也未设置 `between_tools`。
+
+每次调用留存请求配置及指纹、可见输出、响应 ID、实际返回模型、停止原因和原始用量。隐藏思考正文不留存。JSON 决策通过本地契约检查后，宿主才执行动作；格式错误进入有界纠正流程，不能当作成功。HTTP/SDK 隐式重试关闭。截断或格式错误有用量时仍计费；未知用量保留未知预算占用，不能按零处理。价格估算不是供应商账单。
+
+真实验证及失败记录见 [标准包与系统 Agent 试运行](../experiments/agent_design/2026-10-07-parser-runtime-v1/README.zh-CN.md)。
+
+### 决策格式与执行校验
+
+`data-agent-decision-v1` 将动作要求集中在 `decision_protocol.py`。system prompt 的动作表、输出 JSON Schema 的条件约束和本地动作校验共同使用这份规则。运行配置保存协议版本、prompt 及 hash、schema；旧运行和旧结果保持不变。
+
+```mermaid
+flowchart LR
+    A[模型按约定生成决策] --> B[严格 JSON 与字段校验]
+    B -->|通过| C[任务范围和证据前提检查]
+    C -->|通过| D[执行或复用已有读取结果]
+    B -->|不通过| E[固定规则反馈]
+    C -->|不通过| E
+    E -->|剩余步骤与预算允许| A
+    D --> F[保存结果并核对实际送达的正文]
+```
+
+- `plan` 必须带非空 `requirements` 和 `reason`。读取、提取、查询等动作必须带非空 `requirement_ids`，且引用现有任务。重复 ID、空白 ID、多个动作载荷均不接受。
+- Claude 原生与 DeepSeek 自主决策路径检查原始可见 JSON。重复键、NaN/Infinity、溢出数值、Markdown 围栏、多个对象、非对象根节点均拒绝。不会截取文本、猜测缺失字段或静默修正动作。错误反馈只包含固定规则；原始可见输出仍单独归档。
+- 字段合法后仍检查公司、来源、快照、任务及证据范围。格式正确不等于事实正确。候选产物继续保留原文引用与缺口；语义完整性仍需独立评价。
+- 同一角色、同一次运行内，相同范围、动作参数和任务引用的成功无缺口 `outline/search/read` 请求可复用。反馈标注 `cache_hit`。重复调用不会成为新进展，也不会把“已存盘”算成“已读完”。未送达正文仍通过 `pending_body_reads` 继续分页。不同来源、参数、任务引用或快照不共用；新运行不继承缓存。
+- 格式纠正使用现有步骤、连续无进展和费用上限；没有新增隐式 API 重试。每次仍保留调用与失败记录。当前没有启用供应商原生严格输出模式（`strict_provider_schema=false`）。
+
+离线回放见 [协议回放记录](../experiments/agent_design/2026-10-07-decision-protocol-v1/replay.json)：32 份历史输出中，13 份在执行前被格式校验拒绝，19 份通过格式校验；与历史状态相符。新增重复键和非有限数值检查、缓存边界另用合成/模拟传输测试验证。本次没有新增真实模型调用，不能据此声称模型格式错误率、成本或事实质量已改善。
+
+## 本地连续 Claude 对话
+
+`scripts/claude_dialogue.py` 是独立 CLI，没有接入产品 HTTP 或 UI。会话保存在调用者明确指定的本地目录；**每次 `turn` 仍会向 AIHubMix 发送系统指令、此前完整的用户/可见助手文本和本次消息**。隐藏思考与签名不会保存或回传。目前模型明确选择 `claude-opus-5-5`，固定 adaptive/high、非流式、240 秒超时，无工具或自动重试。
+
+系统指令和价格文件须先准备在会话目录之外；新会话目录不得已存在。价格 JSON 明确提供 `model`、`input_per_million`、`output_per_million`、`cache_read_per_million`、`source_url`、`checked_date`，由调用者核验。以下仅为通用路径模板：
+
+```bash
+.venv/bin/python -B scripts/claude_dialogue.py init \
+  --session /path/to/new-session --system-file /path/to/system.txt \
+  --model claude-opus-5-5 --price-file /path/to/verified-price.json \
+  --budget-usd 1.5 --max-calls 3 --max-tokens 8192
+
+.venv/bin/python -B scripts/claude_dialogue.py turn \
+  --session /path/to/new-session --message-file /path/to/round-01.md \
+  --credentials-root /path/to/private-credentials
+
+.venv/bin/python -B scripts/claude_dialogue.py inspect \
+  --session /path/to/new-session --history
+```
+
+下一轮沿用相同 `--session`，将 `--message-file` 换成本次消息。只有以 `end_turn` 返回非空可见文本、费用已知且模型声明匹配的完成轮次进入后续历史。失败、截断、中断或未知费用保留原记录并阻止续接；不清洗回答、不隐式重试，也不通过删除失败轮次继续。
+
+初始化后，脚本只读已封存的系统指令、价格、`max_calls` 和预算配置；每轮只追加 `turns/NNNN/`，不改旧轮。达到限制后保留会话供 `inspect` 回读，不能用修改配置或另建会话重置已授权额度。请求按完整 UTF-8 字节加 16,000 的输入余量及输出上限预留费用；已知用量结算，未知费用继续占用。金额是公开价格估算，非供应商账单。
+
+会话目录权限为 700、文件为 600，并用锁拒绝并发写入。每轮保存 `user.md`、完整 `request.json` 及 SHA256、原文 `answer.md`、配置和安全回执；回执记录该轮 `runner_sha256`。`inspect` 默认显示状态与费用，`--history` 显示已完成的原文往返；命令不保存密钥或原始错误正文。
+
 ## 提取后的 LLM 记录复核
 
 `scripts/review_data_records.py` 是独立复核入口，目前尚未自动挂入 `prepare`。输入 JSON 必须显式提供冻结 `dataset` 路径、完整 `ExecutionScope` 和非空、唯一的 `record_ids`；实体及期间由这些记录固定，不能传入额外字段后静默忽略。仅支持一条记录对应一个已定位 inline fact 的输入。

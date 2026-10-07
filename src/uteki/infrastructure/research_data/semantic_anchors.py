@@ -5,7 +5,9 @@ from lxml import etree, html
 
 from uteki.domain.research_data.execution_scope import ExecutionScope
 from uteki.infrastructure.document_sources.sec import normalize_text
-from uteki.infrastructure.document_sources.sec_index import _hidden, _tag, _visible_text
+from uteki.infrastructure.document_sources.sec_index import (
+    _hidden, _tag, _visible_text, _LINE_BREAK_PARSERS, validate_parser_version,
+)
 from .financial_records import digest, dom_path_query, local_name
 
 
@@ -41,7 +43,7 @@ def _blocks(packet):
     return blocks
 
 
-def _dom_span(container, target, block_text):
+def _dom_span(container, target, block_text, *, preserve_line_breaks=False):
     """Map a DOM subtree through the same visibility and whitespace rules as blocks.
 
     Tails belong to the parent, not their preceding element. Comment contents and
@@ -60,11 +62,14 @@ def _dom_span(container, target, block_text):
         nonlocal bounds
         start = position
         if not _hidden(node) and _tag(node) not in {'script', 'style', 'noscript'}:
-            append(node.text or '')
-            for child in node:
-                if _tag(child):
-                    visit(child)
-                append(child.tail or '')
+            if preserve_line_breaks and _tag(node) == 'br':
+                append('\n')
+            else:
+                append(node.text or '')
+                for child in node:
+                    if _tag(child):
+                        visit(child)
+                    append(child.tail or '')
         if node is target:
             bounds = (start, position)
 
@@ -103,6 +108,14 @@ def build_record_anchors_v3(packet, raw: bytes):
 def build_record_anchors(packet, raw: bytes, *, policy='v2'):
     if policy not in {'v2', 'v3'}:
         raise ValueError('unsupported record anchor policy')
+    # Frozen pre-version packets retain their original whitespace semantics.
+    # New producers bind this field to the selected index, never infer it from text.
+    parser_version = packet.get('parser_version')
+    if parser_version is not None:
+        validate_parser_version(parser_version)
+    preserve_line_breaks = parser_version in _LINE_BREAK_PARSERS
+    def visible(element):
+        return _visible_text(element, preserve_line_breaks=preserve_line_breaks)
     scope = ExecutionScope.model_validate(packet['scope'])
     source = packet['source']
     sid = source['source_snapshot_id']
@@ -147,7 +160,7 @@ def build_record_anchors(packet, raw: bytes, *, policy='v2'):
         if fact is not container and container not in fact.iterancestors():
             raise ValueError('anchor fact DOM is outside its source block')
         quote = evidence.get('quote')
-        if not isinstance(quote, str) or not normalize_text(quote) or normalize_text(_visible_text(fact)) != normalize_text(quote):
+        if not isinstance(quote, str) or not normalize_text(quote) or normalize_text(visible(fact)) != normalize_text(quote):
             unavailable('fact_raw_quote_not_visible_or_mismatched')
             continue
         row = next((node for node in (fact, *fact.iterancestors()) if local_name(node) == 'tr'), None)
@@ -156,7 +169,7 @@ def build_record_anchors(packet, raw: bytes, *, policy='v2'):
             if target is not container and container not in target.iterancestors():
                 unavailable('complete_table_row_outside_source_block')
                 continue
-            span = _dom_span(container, target, block['text'])
+            span = _dom_span(container, target, block['text'], preserve_line_breaks=preserve_line_breaks)
             if span is None:
                 unavailable('visible_dom_range_not_located_in_source_block')
                 continue
@@ -172,9 +185,9 @@ def build_record_anchors(packet, raw: bytes, *, policy='v2'):
             if row is not container and container not in row.iterancestors():
                 unavailable('complete_table_row_outside_source_block')
                 continue
-            text, kind = normalize_text(_visible_text(row)), 'table_row'
+            text, kind = normalize_text(visible(row)), 'table_row'
         else:
-            text, kind = normalize_text(_visible_text(container)), 'paragraph'
+            text, kind = normalize_text(visible(container)), 'paragraph'
             if text != block['text']:
                 unavailable('visible_paragraph_differs_from_source_block')
                 continue

@@ -47,7 +47,7 @@ class ArchiveRoutesTests(unittest.TestCase):
             self.assertIn(expected, body.decode())
 
     def test_company_first_hierarchy_and_boundaries(self):
-        expected = [('/', 'Alphabet'), ('/companies/alphabet', 'report-reading'),
+        expected = [('/companies/alphabet', 'report-reading'),
             ('/companies/alphabet/materials', '可检索材料与文档目录'),
             ('/companies/alphabet/data', '财务指标'),
             ('/companies/alphabet/data/business-map', '业务图'),

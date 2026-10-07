@@ -1,0 +1,683 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "请在已选择的 AMD FY2023 10-K 冻结原文中，提取合并现金流量表中 Net cash provided by operating activities 这一行的原文证据，同时提取该表 FY2023 与 FY2022 的列标题和表内单位说明。任务是原文表格证据提取，不要求数值入库或计算。请保留源文精确引文及片段定位，明确无法从已读取正文确认的内容。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-85f34c9767590632252aa89e",
+      "company_ids": [
+        "sec-0000002488"
+      ],
+      "source_snapshot_ids": [
+        "source-291485b98a75d8cfabe47571"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-85f34c9767590632252aa89e",
+    "company_ids": [
+      "sec-0000002488"
+    ],
+    "source_snapshot_ids": [
+      "source-291485b98a75d8cfabe47571"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-04",
+    "include_candidates": true
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0000002488",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000002488",
+          "company_id": "sec-0000002488",
+          "source_snapshot_ids": [
+            "source-291485b98a75d8cfabe47571"
+          ],
+          "accounting_bases": [],
+          "reported_dimensions": []
+        }
+      ],
+      "metrics": {},
+      "fiscal_periods": []
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+          "company_id": "sec-0000002488",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000000248824000012/amd-20231230.htm",
+          "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+          "document_id": "source-291485b98a75d8cfabe47571",
+          "index_id": "didx-e474cb46f65462a1",
+          "index_folder": "indexes/source-291485b98a75d8cfabe47571",
+          "raw_file": "raw/source-291485b98a75d8cfabe47571.html",
+          "raw_file_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+          "form": "10-K",
+          "period_end": "2023-12-30",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2024-01-31",
+          "status": "candidate",
+          "fiscal_periods": [],
+          "parsed_package": {
+            "export_version": "uteki-parsed-document-v1",
+            "package_id": "parsed-a10a5f4478792231387c9ff8",
+            "manifest_path": "indexes/source-291485b98a75d8cfabe47571/manifest.json",
+            "manifest_sha256": "7a9ee2adc1bca4c6ca621e4011d474938e3eb320e79d68b69965515b2e5fa55d",
+            "source_path": "indexes/source-291485b98a75d8cfabe47571/source.json",
+            "document_path": "indexes/source-291485b98a75d8cfabe47571/document.html",
+            "status": "candidate_parsed_material",
+            "semantic_review": "not_reviewed"
+          },
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes",
+            "html_table_structure",
+            "parsed_document_package"
+          ],
+          "stage_coverage": {
+            "schema_version": "source-stage-coverage-v1",
+            "original": {
+              "status": "hash_verified",
+              "byte_count": 2130413,
+              "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808"
+            },
+            "reading": {
+              "status": "indexed",
+              "parser_version": "sec-source-blocks-v0.1.7",
+              "block_count": 1184,
+              "block_type_counts": {
+                "heading_candidate": 242,
+                "image": 2,
+                "list_item": 64,
+                "other": 15,
+                "page_marker": 105,
+                "paragraph": 680,
+                "table": 76
+              },
+              "index_diagnostic_count": 8
+            },
+            "tables": {
+              "status": "structure_parsed",
+              "table_node_count": 76,
+              "tables_with_cells": 76,
+              "tables_without_cells": 0,
+              "cell_count": 7429,
+              "layout_role_counts": {
+                "table_of_contents": 1,
+                "unclassified": 75
+              },
+              "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+              "financial_table_semantics": "not_evaluated"
+            },
+            "numeric": {
+              "status": "no_supported_records",
+              "record_count": 0,
+              "evidence_count": 0,
+              "gap_count": 1265,
+              "adapter": "us-gaap-inline-v1",
+              "supported_taxonomy": "US_GAAP",
+              "supported_currencies": [
+                "USD"
+              ],
+              "supported_metric_ids": [
+                "capex_cash_payments",
+                "net_income",
+                "operating_cash_flow",
+                "operating_income",
+                "revenue",
+                "revenue_including_assessed_tax"
+              ],
+              "period_support": "complete_month_boundaries_only",
+              "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+              "financial_package_completeness": "not_evaluated",
+              "semantic_review": "not_evaluated",
+              "adoption": "candidate"
+            }
+          },
+          "image_block_count": 2
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "scope_id": "scope-36aee6257fd579f3b924c57f",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 2785,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "complete",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "scope_id": "scope-36aee6257fd579f3b924c57f",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 241,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "scope_id": "scope-36aee6257fd579f3b924c57f",
+        "returned_count": 0,
+        "total_count": 0,
+        "bytes_returned": 2,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "scope_id": "scope-36aee6257fd579f3b924c57f",
+        "returned_count": 0,
+        "total_count": 0,
+        "bytes_returned": 2,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-291485b98a75d8cfabe47571",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-cashflow-ocf-evidence",
+      "description": "From the AMD FY2023 10-K frozen source, deliver original text for the consolidated statements of cash flows: the 'Net cash provided by operating activities' row, the FY2023 and FY2022 column headers, and the in-table unit statement, with exact quotes and block locations. State anything that cannot be confirmed from the blocks read."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-291485b98a75d8cfabe47571",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-cashflow-ocf-evidence",
+      "description": "From the AMD FY2023 10-K frozen source, deliver original text for the consolidated statements of cash flows: the 'Net cash provided by operating activities' row, the FY2023 and FY2022 column headers, and the in-table unit statement, with exact quotes and block locations. State anything that cannot be confirmed from the blocks read.",
+      "evidence_ids": [
+        "ev-e30381af928f67cfe3cbb19d",
+        "ev-c34ba60003c5474e4ab82658",
+        "ev-67eda6850a64b5e40979085c",
+        "ev-f22bcfda3f375378be61c983"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-51dce62dfeca756fefbbdb810d45eeb8",
+    "kind": "run_state",
+    "path": "artifacts/art-51dce62dfeca756fefbbdb810d45eeb8.json",
+    "sha256": "f6d7a143d31e5b3b20034bedb879859992465edfb5db749d02ed7487b81d1988",
+    "size_bytes": 2892,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-85f34c9767590632252aa89e",
+      "company_ids": [
+        "sec-0000002488"
+      ],
+      "source_snapshot_ids": [
+        "source-291485b98a75d8cfabe47571"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-04",
+      "include_candidates": true
+    },
+    "scope_id": "scope-36aee6257fd579f3b924c57f",
+    "created_step": 17,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-39117aa7fa30691432442061adc59a00",
+      "kind": "context",
+      "path": "artifacts/art-39117aa7fa30691432442061adc59a00.json",
+      "sha256": "48efec16a4dab90338dd65e1611e578d7db69f232dd0fdf7c01c8a7db9fa93c3",
+      "size_bytes": 84137,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "scope_id": "scope-36aee6257fd579f3b924c57f",
+      "created_step": 11,
+      "parent_ids": [],
+      "source_ids": [
+        "source-291485b98a75d8cfabe47571"
+      ],
+      "evidence_id": "ev-e30381af928f67cfe3cbb19d"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-b4cb31f531979b1b67d4ddd75498331d",
+      "kind": "candidate_extract",
+      "path": "artifacts/art-b4cb31f531979b1b67d4ddd75498331d.json",
+      "sha256": "493f2b77f1f9fac49bec1f18783c34c0508993fb7985e944ffcd31a1f460add7",
+      "size_bytes": 279,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "scope_id": "scope-36aee6257fd579f3b924c57f",
+      "created_step": 16,
+      "parent_ids": [
+        "art-39117aa7fa30691432442061adc59a00"
+      ],
+      "source_ids": [],
+      "evidence_id": "ev-c34ba60003c5474e4ab82658"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-09c9515ba64cd7139506549f36df4777",
+      "kind": "candidate_extract",
+      "path": "artifacts/art-09c9515ba64cd7139506549f36df4777.json",
+      "sha256": "8b6110c1e4b04f469b4b7231b1856a4b6ac9434d54850dd61bf9d73d8a24b255",
+      "size_bytes": 391,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "scope_id": "scope-36aee6257fd579f3b924c57f",
+      "created_step": 16,
+      "parent_ids": [
+        "art-39117aa7fa30691432442061adc59a00"
+      ],
+      "source_ids": [],
+      "evidence_id": "ev-67eda6850a64b5e40979085c"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-cb4118b2c5178a03053198e2f8ea8603",
+      "kind": "candidate_extract",
+      "path": "artifacts/art-cb4118b2c5178a03053198e2f8ea8603.json",
+      "sha256": "85ca5e5fb420e705083c3f99a77def966da7ff5b2484cbb6236781e4fae26353",
+      "size_bytes": 378,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "scope_id": "scope-36aee6257fd579f3b924c57f",
+      "created_step": 16,
+      "parent_ids": [
+        "art-39117aa7fa30691432442061adc59a00"
+      ],
+      "source_ids": [],
+      "evidence_id": "ev-f22bcfda3f375378be61c983"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-932380c0fb4e08a1f4fa52b57ac1ec28",
+    "sha256": "5dd7420c933aa105da4a083f9a8179866c673824648ce792f8de707b9ff20621",
+    "scope_id": "scope-36aee6257fd579f3b924c57f",
+    "snapshot_id": "query-85f34c9767590632252aa89e",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 4,
+    "total_count": 4,
+    "returned_count": 4,
+    "bytes_returned": 3099,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "evidence_ids": [
+      "ev-c34ba60003c5474e4ab82658",
+      "ev-67eda6850a64b5e40979085c",
+      "ev-f22bcfda3f375378be61c983"
+    ],
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 16,
+      "action": "extract",
+      "requirement_ids": [
+        "req-cashflow-ocf-evidence"
+      ],
+      "request_fingerprint": "d01c280282e6980a254fce9c6fe0e686386a269d7faea00af7a0e98379d3b5c8",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "runtime",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 111,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-f62bbe4230163fc534e59cee898d6f0f",
+      "kind": "tool_output",
+      "path": "artifacts/art-f62bbe4230163fc534e59cee898d6f0f.json",
+      "sha256": "9e10daa9adf99a43c569b209d638d2635f608c8f967dde2caf692d4d830ec07f",
+      "size_bytes": 132,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "scope_id": "scope-36aee6257fd579f3b924c57f",
+      "created_step": 16,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+    }
+  },
+  "loaded_skill": {
+    "name": "materialize",
+    "path": "materialize/SKILL.md",
+    "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+    "content": "---\nname: data-agent-materialize\nversion: 2\n---\nUse the host materialize callback to build a new candidate snapshot from acquired evidence. Preserve company, source policy, cutoff and candidate permissions. Unknown fields stay unknown. Normalization needs explicit units, periods and provenance; do not infer business mappings from examples. Model extracts are verbatim candidate quotes referencing returned context and block IDs, not verified numeric facts. Calculations belong to the query service. New data does not imply adoption or semantic review.\n\nCall materialize with arguments={\"source_run_id\":\"ID returned by acquire in this query\"}. The host merges the acquired originals with the current source set, reuses verified unchanged datasets, and validates all required source IDs before switching the active scope. Partial indexing, cancellation or failure preserves the old query scope and a gap. After a successful switch, use the new scoped catalog; append requirements for the new snapshot without rewriting requirements pinned to the old one.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": false,
+  "available_financial_extract": false,
+  "financial_tasks": [],
+  "financial_task_catalog": null,
+  "completion": {
+    "reference_checks_passed": true,
+    "unmet": [],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [
+      {
+        "context_evidence_id": "ev-e30381af928f67cfe3cbb19d",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+        "block_id": "block-000682-c837649c",
+        "text": "57",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-85f34c9767590632252aa89e",
+          "company_ids": [
+            "sec-0000002488"
+          ],
+          "source_snapshot_ids": [
+            "source-291485b98a75d8cfabe47571"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-04",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-39117aa7fa30691432442061adc59a00",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-e30381af928f67cfe3cbb19d",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+        "block_id": "block-000683-a9360e02",
+        "text": "Table of Contents",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-85f34c9767590632252aa89e",
+          "company_ids": [
+            "sec-0000002488"
+          ],
+          "source_snapshot_ids": [
+            "source-291485b98a75d8cfabe47571"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-04",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-39117aa7fa30691432442061adc59a00",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-e30381af928f67cfe3cbb19d",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+        "block_id": "block-000684-941a6235",
+        "text": "Advanced Micro Devices, Inc.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-85f34c9767590632252aa89e",
+          "company_ids": [
+            "sec-0000002488"
+          ],
+          "source_snapshot_ids": [
+            "source-291485b98a75d8cfabe47571"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-04",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-39117aa7fa30691432442061adc59a00",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-e30381af928f67cfe3cbb19d",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+        "block_id": "block-000685-4f5a988d",
+        "text": "Consolidated Statements of Cash Flows",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-85f34c9767590632252aa89e",
+          "company_ids": [
+            "sec-0000002488"
+          ],
+          "source_snapshot_ids": [
+            "source-291485b98a75d8cfabe47571"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-04",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-39117aa7fa30691432442061adc59a00",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-e30381af928f67cfe3cbb19d",
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+        "block_id": "block-000686-a6e8806b",
+        "text": "Year EndedDecember 30,2023December 31,2022December 25,2021(In millions)Cash flows from operating activities:Net income$854 $1,320 $3,162 Adjustments to reconcile net income to net cash provided by operating activities:Depreciation and amortization3,453 4,174 407 Stock-based compensation1,384 1,081 379 Amortization of operating lease right-of-use assets98 88 56 Amortization of inventory fair value adjustment3 189 — Loss on debt redemption, repurchase and conversion— — 7 Loss on sale or disposal of property and equipment11 16 34 Deferred income taxes(1,019)(1,505)308 (Gains) losses on equity investments, net(1)62 (56)Other(67)(14)(2)Changes in operating assets and liabilities:Accounts receivable, net(1,250)(1,091)(640)Inventories(580)(1,401)(556)Receivables from related parties(7)(13)8 Prepaid expenses and other assets(472)(1,197)(920)Payables to related parties(100)379 7 Accounts payable(419)931 801 Accrued and other liabilities(221)546 526 Net cash provided by operating activities1,667 3,565 3,521 Cash flows from investing activities:Purchases of property and equipment(546)(450)(301)Purchases of short-term investments(3,722)(2,667)(2,056)Proceeds from maturity of short-term investments2,687 4,310 1,678 Proceeds from sale of short-term investments300 — — Cash received from acquisition of Xilinx— 2,366 — Acquisitions, net of cash acquired(131)(1,544)— Other(11)(16)(7)Net cash provided by (used in) investing activities(1,423)1,999 (686)Cash flows from financing activities:Proceeds from debt, net of issuance costs— 991 — Repayment of debt— (312)— Proceeds from sales of common stock through employee equity plans268 167 104 Repurchases of common stock(985)(3,702)(1,762)Common stock repurchases for tax withholding on employee equity plans(427)(406)(237)Other(2)(2)— Net cash used in financing activities(1,146)(3,264)(1,895)Net increase (decrease) in cash and cash equivalents(902)2,300 940 Cash and cash equivalents at beginning of year4,835 2,535 1,595 Cash and cash equivalents at end of year$3,933 $4,835 $2,535",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-85f34c9767590632252aa89e",
+          "company_ids": [
+            "sec-0000002488"
+          ],
+          "source_snapshot_ids": [
+            "source-291485b98a75d8cfabe47571"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-04",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-39117aa7fa30691432442061adc59a00",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 0,
+    "byte_limit": 12000
+  },
+  "source_leads": [
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-85f34c9767590632252aa89e",
+        "company_ids": [
+          "sec-0000002488"
+        ],
+        "source_snapshot_ids": [
+          "source-291485b98a75d8cfabe47571"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-04",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+      "block_id": "block-000686-a6e8806b",
+      "index_id": "didx-e474cb46f65462a1",
+      "origin": "search",
+      "requirement_ids": [
+        "req-cashflow-ocf-evidence"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+        "block_id": "block-000686-a6e8806b"
+      },
+      "read_status": "body_delivered"
+    }
+  ],
+  "source_lead_count": 1,
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 11,
+      "action": "read_context",
+      "status": "tool_returned"
+    },
+    {
+      "step": 12,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 13,
+      "action": "invalid",
+      "status": "rejected"
+    },
+    {
+      "step": 14,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 15,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 16,
+      "action": "extract",
+      "status": null
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 2
+}

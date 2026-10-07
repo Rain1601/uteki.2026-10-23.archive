@@ -1,5 +1,7 @@
 # 本地开发与资料恢复 / Local development and data recovery
 
+2026-10-08换机请先按 [当前交接说明](MACHINE_HANDOFF.zh-CN.md) 执行。它补充最新依赖、私密状态迁移和任务断点；下文保留历史恢复边界。
+
 ## 当前交付状态
 
 2026-09-22 更新：仓库已包含公司名单、部分完整公开材料与索引、研究数据发布，以及 Data Agent 查询快照和历史样例。后续开发顺序、已知边界和换机器交接见 [开发待办](../TODO.md)。凭据、费用账本和含本机路径的运行元数据不随 Git 同步。
@@ -28,9 +30,57 @@ PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --check
 PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 --port 8765
 ```
 
-打开 `http://127.0.0.1:8765/`。启动会先检查必需输入；缺失或损坏时在绑定端口、迁移或初始化审核库之前退出。`--check` 即使检查通过也不启动服务、不写审核状态。完整来源、索引和分析扩展的缺口会单独报告。
+打开 `http://127.0.0.1:8765/agent-results`。后台主导航只有“运行结果”和“运行过程”。根地址 `/`、`/companies` 和未选择材料的 `/data-workspace` 均以 HTTP 303 转到结果页。显式数据产物、原文、公司报告审核继续作为明细工具保留。启动会先检查必需输入；缺失或损坏时在绑定端口、迁移或初始化审核库之前退出。`--check` 即使检查通过也不启动服务、不写审核状态。完整来源、索引和分析扩展的缺口会单独报告。
 
 完整本地回归的命令和覆盖边界见 [OFFLINE_TESTS.md](OFFLINE_TESTS.md)。`scripts/run_offline_checks.py --integration` 保留原测试失败与跳过结果，不会用占位资料补齐历史实验。
+
+## Agent 执行监控（2026-10-06）
+
+启动工作台后打开 [Agent 运行](http://127.0.0.1:8765/agent-runs)。默认可回看两次已登记真实历史运行：`amd-fy2023-main-agent-v2-parent`（6 个父步骤、1 个提取任务、7 次调用）和 `amd-fy2023-cash-flow-main-agent-v2-parent`（7 个父步骤、1 个提取任务、8 次调用，以 `no_progress_limit` 停止）。从步骤展开子任务、输入、候选与用量；查看不会调用模型或改变采纳状态。历史记录没有心跳，也不会补造未保存的工具耗时。
+
+要观察新的本地执行，工作台启动时同时提供观测目录和允许读取的业务输出父目录：
+
+```bash
+PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app \
+  --host 127.0.0.1 --port 8765 \
+  --observation-root "$HOME/.local/state/uteki/observations" \
+  --observation-output-root "$HOME/.local/state/uteki/runs"
+```
+
+`--observation-output-root` 可以重复指定；它是新运行目录的父目录，而非某个运行的目录。Data CLI 的 `agent query / extract / extract-batch` 使用同一个 `--observation-root`，输出例如 `--output "$HOME/.local/state/uteki/runs/query-001"`。具体请求、模型与批次参数见 [Data Agent CLI](DATA_AGENT_CLI.zh-CN.md#执行监控与历史导入2026-10-06)。这些执行命令仍按显式配置调用模型；开启工作台或读取历史本身不调用模型。
+
+观测目录、业务输出和冻结数据须分开，输出必须是新目录，路径中不能含符号链接。观测目录保存本机运行位置，应放在仓库之外，或使用已忽略的 `data/agent_observability/local/`。每棵执行树只由一个本机进程写入；当前不支持跨进程续写同一执行树、多机调度或中断续跑。未加观测参数的执行不会自动成为实时运行。
+
+页面可见时每 2 秒增量读取，隐藏时暂停。未结束运行的心跳超过 15 秒未更新，会显示连接中断、执行状态未知；已完成运行保持完成。只有开始记录或供应商用量未确认时，Token 和费用保留未知；界面分别显示本运行与含子任务的已知用量，估算费用不等于实际账单。
+
+新增历史记录使用显式导入，不从实验目录自动选择：
+
+```bash
+./.venv/bin/python scripts/import_agent_run.py \
+  --root "$PWD" --spec /absolute/path/new-run-spec.json
+```
+
+spec 的字段与适配范围见 [历史导入说明](DATA_AGENT_CLI.zh-CN.md#执行监控与历史导入2026-10-06)。导入只新增 `data/evaluation_views/agent-runs-v1.json` 的登记和展示摘要，保留原 manifest、产物和失败记录。来源、哈希、父子关系不匹配或 ID 已存在时拒绝；导入工程页也不代表已经登记到旧财务查看页。
+
+## AiHubMix 最小连接测试
+
+在项目根目录的 `.env` 中填写 `AIHUBMIX_API_KEY`，文件权限须为 `600`。也可通过环境变量配置；已有的 `AI_HUB_MIX_API_KEY` 别名仍受支持。脚本不会输出密钥，`.env` 已被 Git 忽略。
+
+安装 `analysis` 扩展后，可显式指定模型和一个全新的结果目录：
+
+```bash
+.venv/bin/python scripts/smoke_aihubmix.py \
+  --model gpt-5.4-mini \
+  --output-dir /private/tmp/uteki-aihubmix-probe-001
+```
+
+此命令会调用真实模型。验收仅包含：模型调用一个本地工具取得随机校验码，再通过结构化字段返回同一校验码。最多两轮模型响应，每轮最多 1000 个输出 Token，总超时 90 秒；不会读取公司资料或运行研究任务。结果与请求费用记录写入指定目录，已有目录不可覆盖，失败返回非零退出码。
+
+默认本地估算预算为 0.10 USD。当前登记的 `aihubmix/gpt-5.4-mini` 价格快照日期是 2026-09-13；估算不是实际账单，也不是服务商强制扣费上限。其他模型须先有明确价格记录。失败且用量未知时保留未知费用，不自动重试。离线脚本测试不能代替这次真实连接验证。
+
+Claude 5.5 使用明确的版本名：`--model claude-opus-5-5` 或 `--model claude-sonnet-5-5`，每次使用新的输出目录。2026-10-06 核对的 AiHubMix 标价为：[Opus 5.5](https://aihubmix.com/model/claude-opus-5-5) 输入 4 USD / 百万 Token、输出 20 USD / 百万 Token；[Sonnet 5.5](https://aihubmix.com/model/claude-sonnet-5-5) 输入 2 USD / 百万 Token、输出 10 USD / 百万 Token。本地估算按普通输入/输出价格计算，不计缓存读折扣、缓存写费用或账户优惠。测试仍通过当前 OpenAI 兼容适配器执行，结果只说明指定端点的兼容性，不证明模型身份或研究质量。
+
+2026-10-06 真实测试：两款 Claude 5.5 首次均调用了工具，但最终输出在 SDK 结构校验时出现 `ModelBehaviorError`。测试脚本补充明确的 JSON 格式及字段定义后，两款均通过随机工具值与结构化结果的一致性检查。该结果证明“明确格式提示 + 本地校验”链路可用，尚不能确认网关是否强制执行 `response_format=json_schema`。首次失败与复测共 8 次请求，按登记价格估算 0.014390 USD；不等于实际账单。每款只验证一个合成任务，没有评估财务研究质量或长期稳定性。
 
 ## 资料清单与恢复方式
 
@@ -38,7 +88,7 @@ PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 
 
 | 内容 | 路径 | 用途与恢复方式 |
 | --- | --- | --- |
-| 原公司名单 | `data/company_universe/v0.1-candidate/companies.json` | 首页和公司导航必需；从原环境恢复，沿用原公司集合 |
+| 原公司名单 | `data/company_universe/v0.1-candidate/companies.json` | 公司导航与报告审核必需；从原环境恢复，沿用原公司集合 |
 | 材料目录 | `data/document_library/alphabet/catalog.json`，以及可选 `earnings.json` | Alphabet 所有正式子页都会加载；目录中的相对路径须保持可解析 |
 | 已发布研究数据 | `data/research_data/alphabet_2025_10k/v0.2-candidate/` | 业务图、指标和公司页面必需；恢复 `manifest.json`、`evidence_bundle.json`、`business_map.json` 及清单声明的全部文件，例如 `query.json` |
 | 完整年报及图片 | `data/source_documents/alphabet_2025_10k/source.html.gz`、`assets/` | 原文阅读、索引重建及独立验证；解压后的 HTML 须匹配现有来源清单 SHA-256 |
@@ -50,7 +100,7 @@ PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 
 
 建议先将原工作区恢复到单独目录，用 `check_workspace.py --root ... --json` 检查和比对；再按文件清单补齐当前工作区中缺失的路径。若同一路径已有不同字节，先核对版本和来源，保留两份以待审查。凭证不属于资料恢复包，模型执行前另行配置。
 
-恢复后依次确认：主页 → Alphabet 概览 → 材料目录及原文 → 业务图及引用 → 报告及历史。真实人工采纳仍由研究者执行；离线演练的模拟采纳不会被导入。
+恢复后从运行结果进入已登记产物，明确选择公司、数据集和材料，核对原件、财务候选与证据。历史公司报告保留显式 `/companies/<company>/reports` 地址。真实人工采纳仍由研究者执行；离线演练的模拟采纳不会被导入。
 
 ## 历史恢复边界（2026-09-18 记录）
 

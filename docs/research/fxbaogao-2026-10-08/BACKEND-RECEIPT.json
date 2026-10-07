@@ -1,0 +1,76 @@
+{
+  "version": "investment-reports-backend-v1",
+  "status": "retrieval_agent_integration_passed",
+  "scope": {
+    "provider": "fxbaogao",
+    "start_date": "2026-05-01",
+    "end_date": "2026-05-31",
+    "org_names": [
+      "摩根士丹利台湾&亚洲"
+    ],
+    "report_ids": [
+      5429854
+    ]
+  },
+  "source_code_sha256": {
+    "src/uteki/infrastructure/investment_reports/fxbaogao.py": "4c8ccd285ad0fc5ea291fd6eb3543a85fcf83912c683e6ca964320936209faae",
+    "src/uteki/agents/investment_reports/agent.py": "6ed8115bc070c2cf8f16441926cca0d6b02f9b1bc27a4f702e9352ccacacb18c",
+    "src/uteki/interfaces/investment_reports/cli.py": "1557e0bbc681398cfa201b244cd48e98d456736e3b54baddab0079f0647a7371",
+    "skills/uteki-investment-reports/SKILL.md": "6799b215cee31a24755c73ae79d9bf0989ac83241c533202ecaf4530cca5528b",
+    "skills/uteki-investment-reports/references/fxbaogao.md": "146db3ff282cb7358e45996c471d9b64f38681997710450a2ae39fdcebd543eb"
+  },
+  "model": {
+    "provider": "aihubmix",
+    "requested_model": "claude-sonnet-5-5",
+    "actual_upstream_model": "unverified",
+    "calls": 3,
+    "estimated_usd": "0.036926"
+  },
+  "advisor": {
+    "conversation_turn": 15,
+    "request_id": "fxbaogao-backend-20261008-v1",
+    "estimated_usd": "0.374356"
+  },
+  "total_estimated_model_usd": "0.411282",
+  "provider_new_download_attempts": 0,
+  "provider_balance": "unknown",
+  "tools": [
+    {
+      "name": "search_reports",
+      "arguments": {
+        "keywords": "半导体分销商",
+        "page": 1
+      },
+      "status": "searched"
+    },
+    {
+      "name": "get_paragraphs",
+      "arguments": {
+        "report_id": 5429854,
+        "keyword": "AI"
+      },
+      "status": "excerpts_only"
+    },
+    {
+      "name": "download_pdf",
+      "arguments": {
+        "report_id": 5429854
+      },
+      "status": "reused"
+    }
+  ],
+  "credential_scan": {
+    "text_artifacts_scanned": 20,
+    "credential_hits": 0,
+    "signed_url_hits": 0
+  },
+  "validation": {
+    "unit_and_sdk_checks": 12,
+    "real_model_run": true,
+    "pdf_page_reading": false,
+    "full_research_quality": "not_evaluated",
+    "existing_query_agent_changed": false,
+    "web_ui_integrated": false
+  },
+  "local_run": "tmp/fxbaogao/backend-v1/agent-run-01"
+}

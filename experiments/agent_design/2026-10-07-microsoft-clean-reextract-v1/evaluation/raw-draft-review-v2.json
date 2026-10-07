@@ -1,0 +1,130 @@
+{
+  "schema_version": "microsoft-draft-semantic-review-v1",
+  "status": "failed",
+  "failure_scope": [
+    "contract_materialization",
+    "semantic_scope_consistency",
+    "required_platform_granularity"
+  ],
+  "draft_path": "experiments/agent_design/2026-10-07-microsoft-clean-reextract-v1/run-02/response.txt",
+  "counts": {
+    "nodes": 17,
+    "edges": 17,
+    "unknowns": 3
+  },
+  "binding": {
+    "response_sha256": "d9c84ddf6f9b74674e5a803b116824d4609a1a5ccac38aaba174bcc79d414611",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "request_sha256": "96a6eddfd28e6d473175769ec49134294064aeaa7e76ac0bcf5db2ca443412a7"
+  },
+  "checks": [
+    {
+      "id": "R01",
+      "label": "范围覆盖",
+      "status": "pass",
+      "classification": "grounded_inference",
+      "observation": "三个分部和主要业务组保留，但比首轮少两个节点，细业务不能仅由节点数量判断。",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000097-13124fb7",
+        "block-000099-da3d48eb",
+        "block-000120-c34f7245",
+        "block-000122-c07a987e",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R02",
+      "label": "Azure 产品身份缺失",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "Azure AI 未有独立对象名称，Foundry与Security只是Azure的产品字符串；无法交付用户要的产品层级与关系。",
+      "source_block_ids": [
+        "block-000127-93a9159b",
+        "block-000128-edef168d",
+        "block-000134-9ca2b5c6"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R03",
+      "label": "云服务组与Azure混同",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "没有 Azure and other cloud services 组；azure 节点的父边描述断言整个 Azure and other cloud services。端点与断言范围不一致。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000127-93a9159b"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R04",
+      "label": "GitHub / Nuance 整体云子集错误未解",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "两条边仍以整体为 source，说明却限定云服务；rationale不能改变JSON端点集合。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "R05",
+      "label": "无据支持候选",
+      "status": "gap",
+      "classification": "needs_evidence",
+      "observation": "新增 Azure→Microsoft365 的 unknown supports 边，有标unknown未断言事实，但无法替代实际已知业务关系；视图不得将其显示成存在的支持。",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000127-93a9159b"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U01",
+      "label": "Azure-M365支持关系",
+      "status": "gap",
+      "classification": "input_not_covered",
+      "observation": "小节未描述该支持关系，输出明确需补读，表述可保留但不应占核心图。",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000127-93a9159b"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U02",
+      "label": "GitHub/Nuance本地归属",
+      "status": "gap",
+      "classification": "not_disclosed",
+      "observation": "所选章节确实未给本地子集精确报告行；在所检查全文新增位置也未找到精确归组。不能因这个缺口不建立已知云子集。",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "supplemental_source_block_ids": []
+    },
+    {
+      "id": "U03",
+      "label": "Windows商业与OEM",
+      "status": "needs_improvement",
+      "classification": "extraction_omission",
+      "observation": "本章节已分别列商业云/本地与OEM渠道范围；跨产品许可证整合未解释，需将已知与待核细边界分开回答。",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000146-c641cfcd",
+        "block-000152-fc098ac9"
+      ],
+      "supplemental_source_block_ids": []
+    }
+  ],
+  "scope": "Raw draft, not accepted artifact. No manual changes to model response. Core semantic review only; not all-claim certification.",
+  "recommended_method_change": "Separate source-grounded entity/relationship stage from products/customers/monetization enrichment. Preserve final identity and quote coverage in both stages; no reuse of failed details as accepted without review."
+}

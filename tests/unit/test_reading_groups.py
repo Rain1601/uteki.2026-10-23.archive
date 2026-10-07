@@ -87,3 +87,54 @@ class ReadingGroupsTests(unittest.TestCase):
         self.assertEqual([block['block_id'] for block in result['blocks']], ['2', '3'])
         self.assertEqual([group['group_id'] for group in result['reading_groups']], ['inside'])
         self.assertEqual((result['previous_block_id'], result['next_block_id']), ('1', '4'))
+
+    @staticmethod
+    def table(block_id, rows):
+        cells = [{'row': r, 'column': c, 'text': text, 'rowspan': 1, 'colspan': 1}
+                 for r, row in enumerate(rows) for c, text in enumerate(row)]
+        return {'block_id': block_id, 'type': 'table', 'text': ''.join(c['text'] for c in cells),
+                'table': {'cells': cells}}
+
+    def test_table_shaped_note_preserves_unit_context_and_original_cells(self):
+        from copy import deepcopy
+        blocks = [{'block_id': 'unit', 'type': 'paragraph', 'text': 'Amounts in thousands'},
+                  self.table('values', [['Client', 'Share'], ['Company Z', '*']]),
+                  self.table('note', [['', '', ''], ['*', '', 'Less than 5%']]),
+                  self.table('next', [['Region', 'Revenue'], ['West', '120']])]
+        original = deepcopy(blocks)
+        reader = self.synthetic_reader(blocks)
+        for start in ('values', 'note'):
+            result = reader.read('section', start, count=1)
+            self.assertEqual([b['block_id'] for b in result['blocks']], ['unit', 'values', 'note'])
+            link = result['reading_groups'][0]['note_links'][0]
+            self.assertEqual(link['source_marker_cells'][0]['row'], 1)
+            self.assertEqual(link['definition_cell']['column'], 2)
+            self.assertEqual(link['semantic_applicability'], 'not_inferred')
+        self.assertEqual(blocks, original)
+        self.assertEqual(len(reader.groups), 2)
+
+    def test_explicit_note_table_requires_two_nonempty_cells_and_prose(self):
+        source = self.table('v', [['Value', '100']])
+        note = self.table('n', [['Note:', 'Changes include credits.']])
+        groups = build_reading_groups([source, note], [])
+        self.assertEqual(groups[0]['block_ids'], ['v', 'n'])
+        self.assertEqual(groups[0]['note_links'][0]['association_basis'], 'adjacent_explicit_note')
+        self.assertEqual(groups[0]['note_links'][0]['source_marker_cells'], [])
+        for rows in ([['Note:', '123']], [['Note:', 'Information', 'Another column']],
+                     [['Note: extra words', 'Information']]):
+            with self.subTest(rows=rows):
+                self.assertEqual(build_reading_groups([source, self.table('n', rows)], [])[0]['block_ids'], ['v'])
+
+    def test_exhibits_unmatched_markers_and_unrelated_tables_are_not_notes(self):
+        source = self.table('v', [['Description', 'Value'], ['Service', '*']])
+        for rows in ([['*10.28', 'Employee purchase plan']], [['(1)', 'Exhibit description']],
+                     [['**', 'Different marker']], [['*', 'Term', 'Amount']],
+                     [['*', '123']], [['Ordinary heading', 'Next business table']]):
+            with self.subTest(rows=rows):
+                self.assertEqual(build_reading_groups([source, self.table('n', rows)], [])[0]['block_ids'], ['v'])
+
+    def test_note_context_respects_legal_and_reader_boundaries(self):
+        blocks = [self.table('v', [['Amount', '*']]), self.table('n', [['*', 'Not material']])]
+        self.assertEqual(build_reading_groups(blocks, [{'kind':'item', 'start_block_id':'n'}])[0]['block_ids'], ['v'])
+        reader = self.synthetic_reader(blocks, node_end=0)
+        self.assertEqual([b['block_id'] for b in reader.read('section', 'v', count=1)['blocks']], ['v'])

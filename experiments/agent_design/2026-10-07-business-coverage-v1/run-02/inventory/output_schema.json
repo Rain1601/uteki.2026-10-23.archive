@@ -1,0 +1,171 @@
+{
+  "$defs": {
+    "EvidenceExcerptDraft": {
+      "additionalProperties": false,
+      "properties": {
+        "block_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Block Id",
+          "type": "string"
+        },
+        "quote": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "quote"
+      ],
+      "title": "EvidenceExcerptDraft",
+      "type": "object"
+    },
+    "InventoryBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "block_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Block Id",
+          "type": "string"
+        },
+        "disposition": {
+          "enum": [
+            "mentions",
+            "context",
+            "layout"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "block_id",
+        "disposition",
+        "reason"
+      ],
+      "title": "InventoryBlock",
+      "type": "object"
+    },
+    "Mention": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "block_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Block Id",
+          "type": "string"
+        },
+        "surface": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Surface",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "issuer_entity",
+            "issuer_grouping",
+            "issuer_offering",
+            "generic_capability",
+            "competitor_or_category",
+            "partner_customer",
+            "cross_reference"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "trigger": {
+          "enum": [
+            "composition",
+            "definition",
+            "self_offering",
+            "other"
+          ],
+          "title": "Trigger",
+          "type": "string"
+        },
+        "excerpts": {
+          "items": {
+            "$ref": "#/$defs/EvidenceExcerptDraft"
+          },
+          "minItems": 1,
+          "title": "Excerpts",
+          "type": "array"
+        },
+        "scope_note": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Scope Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "block_id",
+        "surface",
+        "category",
+        "trigger",
+        "excerpts",
+        "scope_note"
+      ],
+      "title": "Mention",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "business-coverage-inventory-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_packet_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Source Packet Sha256",
+      "type": "string"
+    },
+    "mentions": {
+      "items": {
+        "$ref": "#/$defs/Mention"
+      },
+      "title": "Mentions",
+      "type": "array"
+    },
+    "blocks": {
+      "items": {
+        "$ref": "#/$defs/InventoryBlock"
+      },
+      "minItems": 1,
+      "title": "Blocks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_packet_sha256",
+    "mentions",
+    "blocks"
+  ],
+  "title": "Inventory",
+  "type": "object"
+}

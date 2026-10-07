@@ -8,7 +8,7 @@ from uteki.domain.research_data.direct_extraction import DirectExtraction, Draft
 from uteki.domain.research_data.query_contract import Period, ResearchRecord, SOURCE_PERIOD_VERSION, SUPPORTED_VERSIONS, validate_period_version
 from .financial_records import digest
 
-NORMALIZATION_VERSION = 'direct-normalization-v2'
+NORMALIZATION_VERSION = 'direct-normalization-v4'
 UNITS = {'USD': ('USD', 1), 'USD_thousands': ('USD', 1000),
          'USD_millions': ('USD', 1000000), 'USD_billions': ('USD', 1000000000),
          'TWD': ('TWD', 1), 'TWD_thousands': ('TWD', 1000),
@@ -18,6 +18,83 @@ UNITS = {'USD': ('USD', 1), 'USD_thousands': ('USD', 1000),
          'shares_millions': ('shares', 1000000)}
 ACCOUNTING_BASES = {'reported', 'reported_consolidated', 'reported_dimensioned',
                     'management_guidance', 'attributed_statement'}
+
+
+def validate_required_facts(packet):
+    """Validate caller-selected coverage, without inventing a metric/period cross product."""
+    if 'required_facts' not in packet:
+        return None
+    requirements = packet['required_facts']
+    fields = {'requirement_id', 'entity_id', 'metric_id', 'period_id', 'unit',
+              'accounting_basis', 'value_kind'}
+    if not isinstance(requirements, list) or not requirements:
+        raise ValueError('required_facts must be an explicit nonempty list')
+    catalogs = {'entity_id': {x['entity_id']: x for x in packet['entity_catalog']},
+                'metric_id': packet['metric_catalog'],
+                'period_id': {x['period_id']: x for x in packet['period_catalog']}}
+    identities, scopes = set(), set()
+    for item in requirements:
+        if (not isinstance(item, dict) or set(item) != fields or
+                any(not isinstance(v, str) or not v.strip() for v in item.values())):
+            raise ValueError('required fact needs explicit identity, scope, unit and accounting basis')
+        if item['requirement_id'] in identities:
+            raise ValueError('duplicate required fact identity')
+        identities.add(item['requirement_id'])
+        if any(item[key] not in catalog for key, catalog in catalogs.items()):
+            raise ValueError('required fact outside selected catalogs')
+        if item['unit'] != catalogs['metric_id'][item['metric_id']].get('unit'):
+            raise ValueError('required fact unit differs from metric catalog')
+        bases = {'actual': {'reported', 'reported_consolidated', 'reported_dimensioned'},
+                 'management_guidance': {'management_guidance'},
+                 'attributed_statement': {'attributed_statement'}}
+        if item['accounting_basis'] not in bases.get(item['value_kind'], set()):
+            raise ValueError('unsupported required fact accounting basis or value kind')
+        scope = tuple(item[key] for key in sorted(fields - {'requirement_id'}))
+        if scope in scopes:
+            raise ValueError('duplicate required fact scope')
+        scopes.add(scope)
+    return deepcopy(requirements)
+
+
+def evaluate_required_facts(packet, records, raw_candidates, unresolved, model_gaps):
+    """Candidate coverage only. Missing extraction is never evidence of nondisclosure."""
+    requirements = validate_required_facts(packet)
+    result = {'schema_version': 'direct-fact-coverage-v1',
+              'company_id': packet['company_id'],
+              'source_snapshot_id': packet['source']['source_snapshot_id'],
+              'source_sha256': packet['source']['source_sha256'],
+              'status': 'not_requested', 'requirements': [], 'model_gaps': list(model_gaps),
+              'semantic_acceptance': 'not_evaluated', 'adoption': 'unchanged_candidate'}
+    if requirements is None:
+        return result
+    periods = {p['period_id']: Period.model_validate(p['period']).model_dump(mode='json')
+               for p in packet['period_catalog']}
+    entities = {e['entity_id']: e for e in packet['entity_catalog']}
+    for requirement in requirements:
+        matches = [r for r in records if
+            r['source_snapshot_id'] == result['source_snapshot_id'] and
+            all(r.get(k) == requirement[k] for k in
+                ('entity_id', 'metric_id', 'unit', 'accounting_basis', 'value_kind')) and
+            r['period'] == periods[requirement['period_id']] and
+            r['dimensions'] == entities[requirement['entity_id']].get('dimensions', {})]
+        draft_ids = {r['draft_id'] for r in raw_candidates if
+                     all(r.get(k) == requirement[k] for k in ('entity_id', 'metric_id', 'period_id'))}
+        issues = [deepcopy(i) for i in unresolved if i['draft_id'] in draft_ids]
+        # Decimal representations such as 1 and 1.0 denote the same amount;
+        # qualifiers/modality still remain distinct candidates requiring review.
+        signatures = {(r['value_relation'],
+                       Decimal(r['value_decimal']) if r['value_decimal'] is not None else None,
+                       Decimal(r['upper_decimal']) if r.get('upper_decimal') is not None else None,
+                       r.get('denominator'), r.get('modality'),
+                       tuple(r.get('qualifier_evidence_ids', ()))) for r in matches}
+        status = ('conflict' if len(signatures) > 1 else 'candidate_present' if matches else
+                  'unresolved' if issues else 'not_extracted')
+        result['requirements'].append({**requirement, 'period': periods[requirement['period_id']],
+            'status': status, 'record_ids': [r['record_id'] for r in matches],
+            'unresolved': issues, 'disclosure_status': 'not_evaluated'})
+    result['status'] = ('candidate_coverage_complete' if not model_gaps and
+                       all(r['status'] == 'candidate_present' for r in result['requirements']) else 'partial')
+    return result
 
 
 def _occurrences(source_id, block, quote):
@@ -48,6 +125,38 @@ def _matches(raw, spec):
     names = [spec.get('label'), spec.get('name'), *spec.get('aliases', [])]
     return isinstance(raw, str) and raw.strip().casefold() in {
         name.strip().casefold() for name in names if isinstance(name, str) and name.strip()}
+
+
+def _source_year_header(raw, spec, draft, blocks, adapter):
+    """Explicit opt-in: exact printed end-date under a table's annual caption.
+
+    This resolves a source label only. The caller's source-bound fiscal start/end
+    are never computed or changed. Other kinds/languages/layouts stay unresolved.
+    """
+    if adapter != 'table-year-header-v1' or not isinstance(raw, str) or not spec:
+        return None
+    period = Period.model_validate(spec['period'])
+    if period.kind != 'year': return None
+    months = {name.lower(): i for i, name in enumerate(('January', 'February', 'March', 'April',
+        'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'), 1)}
+    match = re.fullmatch(r'([A-Za-z]+)\s+(\d{1,2}),\s*(\d{4})', raw.strip())
+    if not match or match[1].lower() not in months: return None
+    try: printed = date(int(match[3]), months[match[1].lower()], int(match[2]))
+    except ValueError: return None
+    if printed != period.end: return None
+    for ref in draft.evidence:
+        block = blocks.get(ref.block_id, {})
+        if raw not in ref.quote: continue
+        cells = (block.get('table') or {}).get('cells', [])
+        date_cells = [c for c in cells if c.get('text') == raw]
+        for cell in date_cells:
+            captions = [c for c in cells if c['row'] < cell['row'] and
+                c['column'] <= cell['column'] < c['column'] + c['colspan'] and
+                re.fullmatch(r'(?:For the )?(?:Fiscal )?Years? Ended', c['text'], re.I)]
+            if captions:
+                caption = max(captions, key=lambda c: c['row'])
+                return DraftEvidence(block_id=ref.block_id, quote=caption['text'])
+    return None
 
 
 def _decimal(raw):
@@ -135,8 +244,11 @@ def normalize_direct_candidates(extraction, packet):
     metric_contexts = validate_source_mapping_binding(packet.get('source_bound_normalization'),
         source, list(blocks.values()), packet.get('dataset_manifest_sha256'), metrics)
     periods = _catalog(packet['period_catalog'], 'period_id', source)
+    if packet.get('period_alias_adapter') not in (None, 'table-year-header-v1'):
+        raise ValueError('unsupported period alias adapter')
     for spec in periods.values():
         validate_period_version(Period.model_validate(spec['period']), record_version)
+    validate_required_facts(packet)
     draft_ids = [r.draft_id for r in parsed.records]
     if len(set(draft_ids)) != len(draft_ids): raise ValueError('duplicate draft identity')
     relation_ids = [r.relation_id for r in parsed.relations]
@@ -186,7 +298,12 @@ def normalize_direct_candidates(extraction, packet):
         for field, identifier, raw, catalog in [('entity', draft.entity_id, draft.entity, entities),
                 ('metric', draft.metric_id, draft.metric, metrics), ('period', draft.period_id, draft.period, periods)]:
             if identifier not in catalog or not _matches(raw, catalog[identifier]):
-                issue(draft.draft_id, 'unresolved_'+field, raw=raw, selected_id=identifier)
+                header = (_source_year_header(raw, catalog.get(identifier), draft, blocks,
+                    packet.get('period_alias_adapter')) if field == 'period' else None)
+                if header is not None:
+                    qid.append(bind(header, draft.draft_id))
+                else:
+                    issue(draft.draft_id, 'unresolved_'+field, raw=raw, selected_id=identifier)
         for required in metric_contexts.get(draft.metric_id, []):
             if not any(ref.block_id == required['block_id'] and required['quote'] in ref.quote
                        for ref in [*draft.evidence, *draft.qualifiers]):
@@ -234,6 +351,7 @@ def normalize_direct_candidates(extraction, packet):
                 source_snapshot_id=sid, evidence_ids=tuple(eid), qualifier_evidence_ids=tuple(qid),
                 question_evidence_ids=tuple(questions), summary=draft.summary, speaker=draft.speaker,
                 origin={'adapter': NORMALIZATION_VERSION, 'packet_id': packet['packet_id'], 'draft_id': draft.draft_id,
+                        'period_alias_adapter': packet.get('period_alias_adapter'),
                         'raw': draft.model_dump(mode='json')}, normalization_notes=('Host source and format checks only; semantic acceptance pending.',))
         except ValueError:
             issue(draft.draft_id, 'research_record_contract_rejected'); continue
@@ -249,8 +367,10 @@ def normalize_direct_candidates(extraction, packet):
         relations.append({**relation.model_dump(mode='json'), 'status': 'candidate' if resolved else 'unresolved',
                           'normalized_record_ids': [mapped[rid] for rid in relation.record_ids if rid in mapped],
                           'evidence_ids': [ref for ref in refs if ref is not None]})
+    fact_coverage = evaluate_required_facts(packet, records, original.get('records', []), unresolved, parsed.gaps)
     return {'records': records, 'evidence': evidence, 'raw_candidates': deepcopy(original.get('records', [])),
+            'fact_coverage': fact_coverage,
             'relations': relations, 'unresolved': unresolved,
-            'validation': {'normalization_version': NORMALIZATION_VERSION, 'status': 'partial' if unresolved or parsed.gaps else 'source_validated',
+            'validation': {'normalization_version': NORMALIZATION_VERSION, 'status': 'partial' if unresolved or parsed.gaps or fact_coverage['status'] == 'partial' else 'source_validated',
                            'input_records': len(parsed.records), 'normalized_records': len(records),
                            'model_gaps': list(parsed.gaps), 'semantic_acceptance': 'not_evaluated', 'adoption': 'unchanged_candidate'}}

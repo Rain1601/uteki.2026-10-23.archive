@@ -5,6 +5,20 @@ from apps.review_workbench.visual_system import theme_html
 
 
 class VisualSystemTest(unittest.TestCase):
+    def test_company_report_reading_remains_available_without_old_home(self):
+        from apps.review_workbench.components.site_navigation import render_company_overview
+        company = dict(id='cedar', name='Cedar', ticker='CDR', attention='active')
+        report = dict(id='r1', company_id='cedar', status='candidate',
+                      created_at='2026-09-16T06:00:00+00:00', revision=1,
+                      title='A report', question='What changed?')
+        detail = render_company_overview(company, [report], {'documents': []})
+        self.assertLess(detail.index('class="featured-report"'), detail.index('class="research-support"'))
+        self.assertIn('阅读与编辑报告', detail)
+        tree = html.fromstring(detail)
+        self.assertFalse(tree.xpath('//a[@data-global-page="home"]'))
+        self.assertEqual(tree.xpath('//a[@class="site-brand"]/@href'), ['/agent-results'])
+        self.assertEqual(tree.xpath('//a[@data-global-page]/@href'), ['/agent-results', '/agent-runs'])
+
     def test_explicit_body_keeps_attributes_scripts_and_content(self):
         raw = '<html><head><style>p{color:red}</style></head><body class="zh"><script>const x="<test>";</script><p>Evidence</p></body></html>'
         themed = theme_html(raw, 'research')

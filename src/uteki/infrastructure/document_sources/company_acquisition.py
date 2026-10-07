@@ -329,6 +329,7 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
         report['scope'].update(report_period_end_from=period_range[0].isoformat(),
                                report_period_end_to=period_range[1].isoformat())
     cache, seen, previous, verified_previous, transport, frozen_paths = {}, set(), {}, {}, {}, {}
+    prior_candidates = []
     last_http_start = 0.0
 
     def remember(doc):
@@ -345,9 +346,9 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
             old = json.loads(prior.read_text())
             if old.get('scope', {}).get('symbol') == symbol:
                 previous.update({d['source_url']: d['content_sha256'] for d in old.get('documents', [])})
-                if requested_cik and (old.get('company') or {}).get('cik') == requested_cik:
-                    for doc in old.get('documents', []):
-                        remember(doc)
+                prior_cik = (old.get('company') or {}).get('cik')
+                for doc in old.get('documents', []):
+                    prior_candidates.append((prior_cik, doc))
         except (OSError, ValueError, KeyError):
             continue
     # Each completed filing has its own atomic receipt, so a process crash before
@@ -357,9 +358,9 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
             continue
         try:
             prior = json.loads(receipt.read_text())
-            if requested_cik and prior['company']['cik'] == requested_cik and prior['company']['symbol'] == symbol:
+            if prior['company']['symbol'] == symbol:
                 doc = prior['document']
-                remember(doc)
+                prior_candidates.append((prior['company']['cik'], doc))
                 previous[doc['source_url']] = doc['content_sha256']
         except (OSError, ValueError, KeyError, TypeError):
             continue
@@ -690,6 +691,12 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
             raise AcquisitionError('submission_market_mismatch')
         report['company'] = {'company_id': f'sec-{cik:010d}', 'symbol': symbol,
                              'name': data['name'], 'cik': f'{cik:010d}', 'market': market}
+        # Resolve and verify current issuer identity before trusting either
+        # manifest or crash-recovery candidates. Ticker-selected runs can reuse
+        # originals too, but a reused ticker must never inherit another issuer.
+        for prior_cik, doc in prior_candidates:
+            if prior_cik == report['company']['cik']:
+                remember(doc)
         filings = rows(data['filings']['recent'])
         catalog(filings)
         older = data['filings'].get('files')

@@ -1,0 +1,225 @@
+{
+  "schema_version": "small-model-comparison-v1",
+  "started_at": "2026-10-06T16:06:18.049307+00:00",
+  "status": "completed",
+  "origin": "independent_bounded_model_experiment",
+  "input": {
+    "packet_sha256": "7bcdfbf11422bf8eaf7bf452f63009302a29a749632027835bbc401b1f610e7e",
+    "manifest_sha256": "3f81244b3ad3fce8524dc4ed3b39943439108999265e062c2b249d368d7da923",
+    "system_sha256": "d91f8a15d1723c4763192585397f03605625021b7017e37ab8af3f32a17a7809",
+    "messages_sha256": "b03d7790b8daf91343eb147e7ca9e35f0a2d739f00508c1da0f405e952237049",
+    "packet_bytes": 10228,
+    "block_count": 5,
+    "scope": {
+      "company_id": "sec-0000002488",
+      "company_name": "Advanced Micro Devices, Inc.",
+      "source_snapshot_ids": [
+        "source-291485b98a75d8cfabe47571"
+      ],
+      "report_form": "10-K",
+      "report_period_end": "2023-12-30",
+      "comparison_years": [
+        2023,
+        2022
+      ],
+      "currency": "USD",
+      "presentation_scale": 1000000,
+      "scope_note": "Only the five explicitly selected blocks; do not treat this excerpt as the complete filing.",
+      "comparison_periods": [
+        {
+          "fiscal_year": 2023,
+          "period_start": "2023-01-01",
+          "period_end": "2023-12-30"
+        },
+        {
+          "fiscal_year": 2022,
+          "period_start": "2021-12-26",
+          "period_end": "2022-12-31"
+        }
+      ]
+    },
+    "source": {
+      "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000000248824000012/amd-20231230.htm",
+      "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+      "index_id": "didx-e474cb46f65462a1",
+      "index_sha256": "65d205ba587928e595e72a858215d46f561d0e4807fa9299ec24987b4c0ef864",
+      "blocks_sha256": "c60436e60d4aad9cd08aeeab1136d975d84963e4381f3106598686c2d44b14cd"
+    }
+  },
+  "limits": {
+    "packet_sha256": "7bcdfbf11422bf8eaf7bf452f63009302a29a749632027835bbc401b1f610e7e",
+    "manifest_sha256": "3f81244b3ad3fce8524dc4ed3b39943439108999265e062c2b249d368d7da923",
+    "system_sha256": "d91f8a15d1723c4763192585397f03605625021b7017e37ab8af3f32a17a7809",
+    "messages_sha256": "b03d7790b8daf91343eb147e7ca9e35f0a2d739f00508c1da0f405e952237049",
+    "packet_bytes": 10228,
+    "block_count": 5,
+    "scope": {
+      "company_id": "sec-0000002488",
+      "company_name": "Advanced Micro Devices, Inc.",
+      "source_snapshot_ids": [
+        "source-291485b98a75d8cfabe47571"
+      ],
+      "report_form": "10-K",
+      "report_period_end": "2023-12-30",
+      "comparison_years": [
+        2023,
+        2022
+      ],
+      "currency": "USD",
+      "presentation_scale": 1000000,
+      "scope_note": "Only the five explicitly selected blocks; do not treat this excerpt as the complete filing.",
+      "comparison_periods": [
+        {
+          "fiscal_year": 2023,
+          "period_start": "2023-01-01",
+          "period_end": "2023-12-30"
+        },
+        {
+          "fiscal_year": 2022,
+          "period_start": "2021-12-26",
+          "period_end": "2022-12-31"
+        }
+      ]
+    },
+    "source": {
+      "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000000248824000012/amd-20231230.htm",
+      "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+      "index_id": "didx-e474cb46f65462a1",
+      "index_sha256": "65d205ba587928e595e72a858215d46f561d0e4807fa9299ec24987b4c0ef864",
+      "blocks_sha256": "c60436e60d4aad9cd08aeeab1136d975d84963e4381f3106598686c2d44b14cd"
+    },
+    "budget_limit_usd": "0.14895104",
+    "arms": [
+      {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "conservative_request_reservation_usd": "0.13244616",
+        "pricing_snapshot": {
+          "provider": "deepseek",
+          "model": "deepseek-v4-pro",
+          "currency": "USD",
+          "input_per_million": "1.32",
+          "output_per_million": "3.96",
+          "cached_input_per_million": "0.044",
+          "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+          "checked_on": "2026-10-07",
+          "basis": "Pinned peak list-price estimate; no cache or off-peak discounts applied; not a provider bill."
+        }
+      }
+    ],
+    "max_output_tokens_per_arm": 24000,
+    "timeout_seconds": 180,
+    "requests_per_arm": 1,
+    "automatic_retries": 0,
+    "comparison_limit": "Same source and task, different reasoning configurations; not equal inference compute.",
+    "cost_note": "Conservative uncached list-price estimates, not provider bills or a provider-enforced cap."
+  },
+  "arms": [
+    {
+      "provider": "deepseek",
+      "requested_model": "deepseek-v4-pro",
+      "reasoning_configuration": "thinking_enabled_high",
+      "pricing_snapshot": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "currency": "USD",
+        "input_per_million": "1.32",
+        "output_per_million": "3.96",
+        "cached_input_per_million": "0.044",
+        "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+        "checked_on": "2026-10-07",
+        "basis": "Pinned peak list-price estimate; no cache or off-peak discounts applied; not a provider bill."
+      },
+      "input": {
+        "packet_sha256": "7bcdfbf11422bf8eaf7bf452f63009302a29a749632027835bbc401b1f610e7e",
+        "manifest_sha256": "3f81244b3ad3fce8524dc4ed3b39943439108999265e062c2b249d368d7da923",
+        "system_sha256": "d91f8a15d1723c4763192585397f03605625021b7017e37ab8af3f32a17a7809",
+        "messages_sha256": "b03d7790b8daf91343eb147e7ca9e35f0a2d739f00508c1da0f405e952237049",
+        "packet_bytes": 10228,
+        "block_count": 5,
+        "scope": {
+          "company_id": "sec-0000002488",
+          "company_name": "Advanced Micro Devices, Inc.",
+          "source_snapshot_ids": [
+            "source-291485b98a75d8cfabe47571"
+          ],
+          "report_form": "10-K",
+          "report_period_end": "2023-12-30",
+          "comparison_years": [
+            2023,
+            2022
+          ],
+          "currency": "USD",
+          "presentation_scale": 1000000,
+          "scope_note": "Only the five explicitly selected blocks; do not treat this excerpt as the complete filing.",
+          "comparison_periods": [
+            {
+              "fiscal_year": 2023,
+              "period_start": "2023-01-01",
+              "period_end": "2023-12-30"
+            },
+            {
+              "fiscal_year": 2022,
+              "period_start": "2021-12-26",
+              "period_end": "2022-12-31"
+            }
+          ]
+        },
+        "source": {
+          "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/2488/000000248824000012/amd-20231230.htm",
+          "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+          "index_id": "didx-e474cb46f65462a1",
+          "index_sha256": "65d205ba587928e595e72a858215d46f561d0e4807fa9299ec24987b4c0ef864",
+          "blocks_sha256": "c60436e60d4aad9cd08aeeab1136d975d84963e4381f3106598686c2d44b14cd"
+        }
+      },
+      "started_at": "2026-10-06T16:06:18.052152+00:00",
+      "status": "received",
+      "reservation_id": "7e964c13-cbfd-477c-908c-576509f6505f",
+      "reserved_usd": "0.13244616",
+      "usage_source": "provider_raw",
+      "raw_usage": {
+        "prompt_tokens": 4028,
+        "completion_tokens": 15745,
+        "total_tokens": 19773,
+        "prompt_cache_hit_tokens": 3968,
+        "prompt_cache_miss_tokens": 60,
+        "prompt_tokens_details": {
+          "cached_tokens": 3968
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 14541
+        }
+      },
+      "estimated_usd": "0.06766716",
+      "actual_billed_usd": null,
+      "usage_presence": "reported",
+      "returned_model": "deepseek-v4-pro",
+      "request_id": null,
+      "finish_reason": "stop",
+      "ended_at": "2026-10-06T16:08:36.467669+00:00",
+      "elapsed_seconds": 138.41534974984825,
+      "validation": {
+        "status": "structure_and_citations_valid",
+        "errors": [],
+        "gold_scoring": "not_performed",
+        "semantic_correctness": "not_evaluated"
+      }
+    }
+  ],
+  "actual_billed_usd": null,
+  "ended_at": "2026-10-06T16:08:36.470149+00:00",
+  "budget": {
+    "limit_usd": "0.14895104",
+    "estimated_spent_usd": "0.06766716",
+    "held_usd": "0",
+    "unknown_requests": 0,
+    "in_flight_requests": 0,
+    "requests": 1,
+    "actual_billed_usd": null,
+    "enforcement": "enforced"
+  }
+}

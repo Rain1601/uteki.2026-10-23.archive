@@ -1,0 +1,107 @@
+# Uteki Data Agent：多种数据产物、消费契约、PageIndex 与片段级证据
+
+2026-10-07。请与我们一起评审下面的业务描述与工程草案。我们希望得到能指导下一步实现的讨论，不是泛泛介绍 RAG。你是本轮唯一受邀顾问；工程师先审核现有代码和公开资料，再把结果提供给你。没有给你工具、搜索能力或仓库访问权限，请不要声称实际访问或测试。
+
+## 一、用户刚刚明确的最终目的
+
+用户认可“结构化提取 + 按问题补证”作为切入点，但进一步强调 Data Agent 的完整职责：
+
+1. 把原材料加工成不同形式的可消费数据。一份年报可能生成结构化财务事实、精简文档、段落/表格、业务图、多层索引。未来新闻、官方博客等也走相同的溯源原则。
+2. 每种数据对象都要有 schema/说明。消费模型应知道它是什么、字段含义、如何访问。文档可以检索和按片段读取，数据库可以查询，JSON 按契约读取，目录树可以分层导航。不能只是生成“一堆文件”。
+3. 自然语言问题要转换为正确的数据获取方法。比如分析“谷歌的业务是什么”，先取出业务相关描述、业务关系和必要结构化数字，再供分析使用。用户在语音中说的 circle/text to circle，当前理解为 SQL/Text-to-SQL；不是要求新建名为 circle 的产物。
+4. 提取必须正确，消费也必须正确。最终结论结合事实、可复算计算、分析过程和必要的 Web Search 补证，每项关键陈述要有依据。
+5. 引用应定位到一个具体片段或单元格，不是只给整份年报或整页 URL。用户要能快速检查“这句话依据什么”。
+6. 用户已明确确认指的是 VectifyAI/PageIndex，希望你评估这个项目是否适合该目的。仍需把分层索引方法与具体产品接入分开讨论。
+
+这是概念与技术方案讨论。本轮没有授权把任意公司/年度当默认样本、改写既有快照或运行整份报告提取。我们希望把需求写清楚、提出最小可验收方案，再逐步实施。
+
+## 二、现有项目事实：并非从零开始
+
+架构是模块化单体；Data 和 Analysis 是职责边界。Data 提供材料、事实、业务关系、计算与证据；Analysis 在这些数据上做研究判断。Data 可以摘录管理层解释；不能把推断伪装成来源披露。财报精编已有中、英文两个可读版本的业务要求，不能默认取消。
+
+以下为代码审核摘要，路径为仓库相对路径，用于区分组件，非要求你读取文件：
+
+| 已有组件 | 已经实现的内容 | 不能据此声称的能力 |
+|---|---|---|
+| domain/documents/models.py | SourceBlock 有块 ID、text/hash、DOM、页码、table/cell；DocumentIndex 有父子关系和起止块。SEC 索引主要是 document→part→item | 尚未接入 PageIndex，也没有通用语义树检索效果数据 |
+| domain/research_data/evidence_package.py | EvidencePackage、EvidenceArtifact 八种类型：原文、原表、摘录、图片引用、规范化记录、计算值、模型提取、模型摘要；derived_from 血缘与类型校验 | model_summary 只是检索产物里的 text 结构，不代表完整精编执行器已完成 |
+| SourceLocator | source_snapshot/hash、index/block、字符区间、单元格行列、PDF/报告页、DOM、bbox 与坐标系；包装器核对原文/substring/部分坐标 | 很多字段可空，不是所有来源都能到段落/单元格；图像 OCR/vision 仍有未运行状态 |
+| ResearchRecord | 主体、指标、期间、数值关系、单位/分母、会计口径、维度、available_at、source/evidence、转换信息 | 当前 QueryDataPort 查询数据集是候选；不能推广为所有发布数据都只有候选 |
+| get_schema/probe_schema/discover_catalog | 查询/记录/返回 schema，指标定义、主体、期间、能力、不支持项、同范围真实样例；有分页及大小限制 | 跨事实库/精编/业务图/索引的产品消费说明尚未完整统一 |
+| DataQueryAgent / AutonomousDataAgent | 模型输出 typed plan/action，程序校验后执行；typed plan 编译为参数化 SELECT | 不执行模型任意 SQL。自然语言到取数计划已存在，不能写成完全待建 |
+| DocumentReader + ScopedQueryDataPort | 前者提供 outline/search/read，后者提供 context 和来源绑定分页；读取原块与相邻表格/列表/问答上下文 | 目前搜索是大小写无关的字面短语匹配、按原文顺序；没有 BM25/向量或语义排序实现 |
+| interfaces/data_mcp | 只读 discover_data→get_data_schema→query_facts/read_source；有工具输入 schema 与说明；显式选冻结数据集和来源 | MCP 读接口不下载、不提取、不调用模型或任意写 SQL |
+| ResearchDataPort | 发布侧业务图、事实、指标序列、上下文和补证请求；有 published bundle 本地实现 | 与 QueryDataPort 是不同的历史契约，不能假定已全面贯通 |
+| 补证能力 | 新主 Agent 已有发现/探测 schema、读原文、加载 skill、委派、financial_extract；coordinator 有显式年报选择与 acquire/materialize callbacks | ResearchDataPort.request_missing_data 本身只登记请求；补采、补提、核验、采用的通用业务闭环仍需验收，不能说完全没有补证执行器 |
+| 审核后交接 | load_reviewed_data 核对 scope/hash/审核产物，限定 Analysis 消费入口有质量 gate | 本任务已审候选不等于全局已发布事实；程序通过也不证明语义完整 |
+
+工程后台已有结果页与过程页、Trace 跳转、模型配置和成本。每一次的新实验需保留独立请求/产物/配置。不要另建平行平台或大范围重构，也不要把新 schema 复制到另一个目录后忘记真正消费者。
+
+## 三、用户为何重视正确消费与稳定性
+
+近期在同一份 AMD FY2023 现金流小节上，Sonnet 5.5 adaptive/high 两种任务各重复 5 次。核心数值都正确且一致，但说明文字经单一匿名 Codex 评审分别只有 4/5、1/5 通过。40 条重复实例仅对应 6 个独立来源事实，不能外推生产可靠率。
+
+主要错误是把“管理层没有逐项归因”扩大为“现有表格无法计算会计贡献”。两年原表其实允许计算差额。这提示：数据可得性、公式计算、来源归因与商业解释应区分。原提示要求至少两项 gaps 可能促成错误报缺，但因果尚未验证。不要再要求固定几条缺口。
+
+另一次 DeepSeek 的 -53.2% 是正确舍入，程序评分器却用未在题目声明的严格精度误判。错误来自程序评分契约，不能归给 Codex 盲评。已有小规模标准答案和语义评审；缺的是更全面的数据集、分母与端到端产品验收，不是完全没有评估。
+
+## 四、工程师的初步方案，请你挑战
+
+### 4.1 区分业务对象、保存格式和查询方法
+
+JSON、数据库表、Markdown、树并不是互斥的业务对象。一个事实可以同时有数据库记录与 JSON 表示，业务图也可能以 JSON 保存。业务对象应有稳定身份、版本、原始来源和派生关系，避免多种表示被当成多份独立事实。
+
+候选逻辑产物：原文块/表格、结构化事实、双语精编、业务节点和关系、导航索引，以及本次查询的 EvidencePackage。各自有 schema，复用已有契约，不追求一个 payload 包含所有字段。
+
+### 4.2 每个产品说明包含三层
+
+- 结构：字段、类型、必填、关系、schema 版本和验证。
+- 语义：每条记录代表什么；主体、期间、单位、口径；可用范围、状态、缺口、何时不能合计或比较。
+- 消费：允许的工具、参数和返回 schema；分页/限额；查询例子；如何回读原文和验证出处。
+
+最小公共描述可能包含 artifact_id/type/version、schema_ref、scope/source_versions、record_grain/semantics、status、access_methods、evidence_contract、derived_from。先问这些信息能否扩充现有 catalog/get_schema，不预设必须新建注册中心。描述里的字符串不能赋予任意 SQL/文件读取权限；范围由执行工具强制校验。
+
+### 4.3 查询与分析流程
+
+问题和范围→发现数据产品→读 schema 与语义→生成并校验取数计划→选事实查询/关键词检索/目录导航→回读具体原文块和上下文→组装有血缘的证据包→Analysis 区分来源事实、公式结果、管理层观点和研究推断。
+
+Text-to-SQL 只是其中一个访问方式。现有 typed plan→参数化 SQL 先保留；何时真正需要自由 SQL，应以真实问题证明。普通文档可短语/关键词检索；大报告可目录树导航；短新闻不一定值得深树。工具返回要说明已读范围、裁剪/分页、未查范围，不能“没找到”就断言整个材料没有。
+
+例如“谷歌业务是什么、如何赚钱”：读业务描述与分部附注，按明确口径查询必要数字，取证后再写解释。这个例子未选择实际财年/材料，不应虚构 Google 数值或擅自拿最新报告充当已选范围。
+
+### 4.4 片段级溯源
+
+结论陈述→事实/计算/摘要产物→derived_from→冻结原文 block/字符区间/单元格→来源版本和 hash。表格还要带表头、期间、单位、相关脚注。页码和网址保留，但不是最终精细定位的替代。
+
+索引摘要和精编可用于导航与背景。最终来源陈述必须能回原文，不能只引用另一个模型摘要。原件或解析器更新时产生新版本，不能旧引用静默跳到新文本。新闻/官方博客也保存发布/获取时间、作者或来源归属、内容快照；第三方报道不自动成为已核实事实。Web Search 是发现入口，新来源须抓取并纳入同样范围和证据流程。
+
+## 五、请回答的内容
+
+请给约 3000–4500 中文字的具体意见，优先覆盖以下问题，可用表格和一个简洁流程图：
+
+1. 用户目的是否可用更准确的业务描述表达？工程师上述三层契约是否足够，缺了什么、哪部分过度设计？请给 5–6 种产物的最小 schema/语义/访问方式对照，区分已实现与拟议。
+2. 给一个最小公共产品说明 JSON 示例，以及一个“业务相关资料补证”的查询计划示例。必须显式说明示例数据是假设；不要发明真实财务数值。尽量对应已有 catalog、MCP 和 EvidencePackage。
+3. PageIndex 对 Uteki 的价值具体是什么？采用其方法、接本地 SDK、接 Cloud 三者怎么比较？考虑现有 SEC HTML、PDF、未来新闻/博客。明确页级与片段/单元格级、索引与证据、导航与完整性之间的差异。请依据后面的已核实材料，而不是旧版本印象或厂商总体准确率。
+4. 自然语言查询怎样路由到结构化记录、文本、树或业务图？哪些规则要程序控制、哪里模型可以选？原文与数据库冲突、缺数据、来源更新怎么办？自由 SQL 是否必要？
+5. “每条关键结论有依据”怎样变成可验收协议？定位有效、内容被证据支持、必要信息没遗漏，分别怎么检查？计算结果和研究推断如何引用？不能要求研究推断被原文逐字披露，也不能用 schema 合格保证事实正确。
+6. 给出最小迭代：一个材料、一个数值问题、一个业务问题，跑通发现契约→取数→片段引用。随后怎样公平比较现有目录/短语搜索、更好的关键词检索、PageIndex 导航？不要只用同一公司两个示例宣称泛化，不把标准答案混进检索。
+7. 成本和稳定性如何记录？分开建索引、查询、来源回读/提取、验证；相同材料多次查询时建索引成本摊销。失败调用费用如实记录，同一调用不得重复汇总，未知费用单列；不要承诺重复十次即可证明稳定。
+
+最后明确：现在最值得做的一个行为变化与验收例子；最多三个真正需要用户决定的问题。不要以咨询回答替用户取消双语要求或变更公司/报告范围。
+
+## 六、本轮已查证的 PageIndex 资料
+
+本次只读官方文档与源码，没有安装或实际建索引。固定版本为 2026-10-01 的 commit `6d23caf416858f2ca136840305d1f479a86f6ef7`，包声明 0.2.10、Alpha、MIT。开源代码已有本地 indexing、retrieval tools 和 chat，不是“开源只有索引”。来源：[仓库](https://github.com/VectifyAI/PageIndex)、[版本](https://github.com/VectifyAI/PageIndex/commit/6d23caf416858f2ca136840305d1f479a86f6ef7)。
+
+- 默认 Flash 基于 PDF 版面、标题与可信书签构建初始树；基础结构不需要 LLM，但默认树优化、摘要和文档说明仍会调用模型。Flash 无法找到结构且只能生成超过十个逐页节点时会明确拒绝，需显式切换模型构建的 standard 模式；不能假定任意长 PDF 都能处理。[Flash 实现](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/pageindex/flash/api.py)
+- 本地 SDK submit_document 接受 PDF，没有本地 OCR；SEC HTML、新闻、博客不是可以直接无损导入该入口的材料。检索过程是模型读目录/摘要、选取页、调用 get_page_content，再组织回答。[本地入口](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/pageindex/local_api.py)、[工具](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/pageindex/agent_tools.py)
+- 最新 get_tree 节点字段为 title、node_id、start_index、end_index、可选 summary/text、子 nodes。页是从 1 开始、含首尾的物理页。新索引父页范围包含子树，父摘要由子摘要形成；父节点开场内容可能拆为 intro 子节点。在线 9 月 18 日 docs 仍示范 page_index/prefix_summary，不能混用。旧树字段适配不自动得到新摘要语义。[字段处理](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/pageindex/utils.py#L1313)
+- 本地引用为页级。Cloud 块接口可给 doc_id、page、block_id、bbox、block_type、text；bbox 是页面宽高千分比，左上角原点。不是表格数值的完整会计语义，也不自动成为 Uteki 的已核验证据。Cloud 旧索引可能没有块信息。[块接口](https://docs.pageindex.ai/sdk/documents#read-a-block-cloud)
+- 文档 ID 是 UUID，树节点按遍历编号，重建后不能假定相同节点 ID 仍对应相同内容。本地存储 doc.json/tree.json/pages.json，该流程没有归档原始 PDF 或原文 hash。Uteki 需保留自己的冻结来源与映射。[存储实现](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/pageindex/local_store.py)
+- 本地可浏览已有文档，但没有 Cloud 的语义文档排序/目录服务。自有 Agent 集成的 document_context/folder_context 是提示，不是工具权限；内置本地 chat 的 doc_id 路径另有工具层 allowlist。因此 Uteki 的公司、期间、来源范围需在自有工具边界校验。[Agent 文档](https://docs.pageindex.ai/sdk/agents#choose-documents-or-a-folder)、[本地 chat](https://github.com/VectifyAI/PageIndex/blob/6d23caf416858f2ca136840305d1f479a86f6ef7/pageindex/local_chat.py#L637)
+- 当前厂商 Cloud 公开价为索引 $0.01/页，活跃页存储 $0.001/页/月、前 1000 页免费；检索服务不另按次收费，自己的查询模型另计费。本地无 PageIndex 平台费，摘要优化与查询的模型调用仍计成本。未在 Uteki 实测。[定价](https://docs.pageindex.ai/pricing)
+- 官网 98.7% FinanceBench 是 Mafin 2.5 系统成绩，不是本次版本接入 Uteki 的预测值。新 OSS benchmark 是 34 份 PDF 的 62 个正文事实查找问题，排除表格/图像/计数/计算和 Flash 不可索引文档；不能证明财报表格提取、业务图多处取证或新闻的效果。[Mafin 评测](https://github.com/VectifyAI/Mafin2.5-FinanceBench)、[OSS 评测](https://github.com/VectifyAI/PageIndex-OSS-Benchmark)
+
+基于这些机制推断的风险（不是本地实测失败率）：树摘要可能漏信息；模型未访问的分支不能证明内容不存在；PageIndex 页码需要明确映射到 Uteki 原文块，尤其 HTML/PDF 对应关系不能猜测。接入也不能破坏已有片段精度。
+
+请具体评价：先用 PageIndex 的思路增强我们自己的 block-based 目录树，还是为已有真实 PDF 独立增加适配器更值得？如何用最小实验决定，而不是凭“有树就会更好”的印象？

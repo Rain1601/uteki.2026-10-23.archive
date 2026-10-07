@@ -18,17 +18,20 @@ src/uteki/agents/
   reading/       DocumentReader, reading groups, pinned material selection
     citations.py Citation / Claim / Answer contracts shared by older consumers
     tool_session.py Bounded document tool session and citation provenance checks
-  analysis/      Historical analyst/reviewer, narrative and cloud experiments
+  analysis/      Limited reviewed-Data consumer; historical analyst/reviewer, narrative and cloud experiments
   archive/       Research archive, revision contracts, context and rerun orchestration
   runtime/       Provider adapters, credential loading, costs and budget enforcement
   business_map/  Existing BusinessMapAgent capability and contracts
   *.py           Compatibility aliases for the former flat import paths
 ```
 
-`analysis/` does **not** mean the new Analysis Agent is implemented. These are
-existing experimental analysis flows. They do not consume the new task-query
-evidence package as a unified downstream analysis contract. Moving them does not
-change their maturity, historical case scope or candidate-review requirements.
+`analysis/` does not mean the complete downstream research Agent is implemented.
+As audited on 2026-10-06, `data_consumer.py` consumes a scope-validated, reviewed
+Data handoff and has a real limited-task run from 2026-09-30. Its output remains
+a candidate awaiting content review, not a published company report. Historical
+analyst/reviewer, narrative and Cloud experiments retain their original scope.
+The complete independent research-review, revision and publication loop remains
+unfinished. See the [current Agent inventory](CODE_OVERVIEW.zh-CN.md).
 
 The current retrieval path is:
 

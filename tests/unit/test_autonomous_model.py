@@ -313,6 +313,31 @@ class AutonomousModelTests(unittest.TestCase):
                     self.assertNotIn(forbidden, artifacts)
         self.assertEqual(len(self.requests), 3)
 
+    def test_ambiguous_json_rejected_after_sdk_parse_without_retry(self):
+        cases = [
+            ('{"action":"finish","action":"load_skill","skill":"query"}', 'duplicate_key'),
+            ('{"action":"acquire","requirement_ids":["business"],"arguments":{"limit":NaN}}', 'non_finite_number'),
+            ('{"action":"acquire","requirement_ids":["business"],"arguments":{"limit":1e999}}', 'non_finite_number'),
+        ]
+        for index, (content, code) in enumerate(cases):
+            with self.subTest(code=code):
+                planner = self.planner(lambda request: self.raw_response(request, content),
+                                       name=f'ambiguous-json-{index}', max_retries=1)
+                async def run():
+                    try:
+                        with self.assertRaisesRegex(ValueError, 'invalid_model_decision') as raised:
+                            await planner.decide({'question': 'Validate explicit action before dispatch.'})
+                        return str(raised.exception)
+                    finally:
+                        await planner.aclose()
+                feedback = asyncio.run(run())
+                self.assertIn(code, feedback)
+                self.assertNotIn(content, feedback)
+                attempt, = planner.output.glob('decision-*-attempt-*.json')
+                self.assertEqual(json.loads(attempt.read_text())['status'], 'invalid_model_decision')
+                self.assertEqual(planner.snapshot_usage()['summary']['calls']['requests'], 1)
+        self.assertEqual(len(self.requests), len(cases))
+
     def test_invalid_decision_can_be_corrected_on_the_next_host_turn(self):
         responses = iter(['{"action":', '{"action":"finish"}'])
         planner = self.planner(lambda request: self.raw_response(request, next(responses)), max_retries=1)
@@ -509,7 +534,7 @@ class AutonomousModelTests(unittest.TestCase):
                 failure = ValidationError.from_exception_data('AutonomousDecision', [{
                     'type': 'value_error', 'loc': ('reason',), 'input': {'secret': secret},
                     'ctx': {'error': ValueError(message)}}])
-                with patch('uteki.agents.data_query.autonomous_model.AutonomousDecision.model_validate_json',
+                with patch('uteki.agents.data_query.autonomous_model.AutonomousDecision.model_validate',
                            side_effect=failure):
                     hints = _decision_validation_hints('{}')
                 self.assertEqual(hints, [{'type': 'value_error', 'location': ['reason']}])

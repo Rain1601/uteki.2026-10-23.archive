@@ -199,7 +199,8 @@ class DataWorkspaceTests(unittest.TestCase):
         attack = '</script><script>alert("query")</script>'
         text, doc = self.render(dataset='orchard', source='orchard-source', tab='blocks', q=attack)
         scripts = doc.xpath('//script')
-        self.assertEqual(len(scripts), 2)  # Configuration and the reviewed application script only.
+        self.assertEqual(len(scripts), 3)  # Shared navigation, configuration and reviewed application script.
+        self.assertEqual(len(doc.xpath('//*[@id="site-navigation"]')), 1)
         self.assertNotIn(UNTRUSTED, text)
         self.assertNotIn(attack, text)
         self.assertEqual(doc.xpath('//input[@name="q"]')[0].get('value'), attack)

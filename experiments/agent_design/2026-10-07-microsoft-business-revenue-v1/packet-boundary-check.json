@@ -1,0 +1,43 @@
+{
+  "schema_version": "microsoft-packet-boundaries-v1",
+  "positive_source_validation": "passed",
+  "tests": [
+    {
+      "case": "missing company scope",
+      "result": "rejected",
+      "reason": "packet_missing_company_id"
+    },
+    {
+      "case": "another company caller",
+      "result": "rejected",
+      "reason": "caller_packet_scope_mismatch: company_id"
+    },
+    {
+      "case": "another period caller",
+      "result": "rejected",
+      "reason": "caller_packet_scope_mismatch: period_end"
+    },
+    {
+      "case": "source bytes fingerprint mismatch",
+      "result": "rejected",
+      "reason": "source_manifest_scope_mismatch: content_sha256"
+    },
+    {
+      "case": "missing physical cell",
+      "result": "rejected",
+      "reason": "source_table_geometry_mismatch"
+    },
+    {
+      "case": "amount column moved",
+      "result": "rejected",
+      "reason": "source_table_geometry_mismatch"
+    },
+    {
+      "case": "altered source text",
+      "result": "rejected",
+      "reason": "packet_block_hash_mismatch"
+    }
+  ],
+  "model_calls": 0,
+  "notes": "Only validation boundary mutations in memory. No frozen packet or original HTML modified."
+}

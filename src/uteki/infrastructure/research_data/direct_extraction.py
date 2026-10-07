@@ -1,5 +1,6 @@
 """Extract from frozen source blocks and publish a separate candidate query snapshot."""
 from __future__ import annotations
+from uteki.agents.runtime.observation import observed_run, observed_step
 
 from copy import deepcopy
 from datetime import date, datetime, timezone
@@ -18,7 +19,7 @@ from uteki.agents.reading.document_reader import DocumentReader
 from uteki.domain.research_data.direct_extraction import DirectExtraction
 from uteki.domain.research_data.query_contract import (ResearchRecord, SOURCE_PERIOD_VERSION, Period,
     DataQuery, QueryResult, SUPPORTED_VERSIONS, validate_period_version, export_query_schema)
-from .direct_normalization import normalize_direct_candidates, validate_source_mapping_binding
+from .direct_normalization import normalize_direct_candidates, validate_source_mapping_binding, validate_required_facts
 from .financial_records import digest
 from .query_dataset import contained, DDL, save
 
@@ -84,6 +85,13 @@ def build_extraction_packet(dataset, job):
         'output_schema': DirectExtraction.model_json_schema()}
     if mapping_binding is not None:
         packet['source_bound_normalization'] = deepcopy(mapping_binding)
+    if config is not None and 'period_alias_adapter' in config:
+        if config['period_alias_adapter'] != 'table-year-header-v1':
+            raise ValueError('unsupported period alias adapter')
+        packet['period_alias_adapter'] = config['period_alias_adapter']
+    if 'required_facts' in job:
+        packet['required_facts'] = deepcopy(job['required_facts'])
+        validate_required_facts(packet)
     if job.get('revision_feedback') is not None:
         feedback = job['revision_feedback']
         if not isinstance(feedback, dict) or not all(feedback.get(k) for k in ('parent_run_id', 'review_sha256', 'findings')):
@@ -117,6 +125,10 @@ def _write_projection(dataset, run, packet, normalized, output):
         save(work/'evidence.json', evidence); save(work/'metrics.json', metrics)
         save(work/'raw_candidates.json', normalized['raw_candidates'])
         save(work/'relations.json', normalized['relations']); save(work/'unresolved.json', normalized['unresolved'])
+        save(work/'fact-coverage.json', normalized['fact_coverage'])
+        save(work/'model-gaps.json', normalized['validation']['model_gaps'])
+        if 'batch_gap_context' in normalized:
+            save(work/'batch-gap-context.json', normalized['batch_gap_context'])
         save(work/'extraction.json', {'run': str(run), 'packet_id': packet['packet_id'],
             'packet_sha256': digest(packet), 'normalization_sha256': digest(normalized),
             'semantic_acceptance': 'not_evaluated', 'adoption': 'candidate'})
@@ -143,7 +155,14 @@ def _write_projection(dataset, run, packet, normalized, output):
         manifest = {'schema_version': version, 'snapshot_id': 'query-direct-' + digest([packet['packet_id'], normalized])[:24],
             'source_policy_id': base['source_policy_id'], 'status': 'candidate', 'source_count': 1,
             'record_count': len(records), 'evidence_count': len(evidence), 'parent_snapshot_id': base['snapshot_id'],
-            'gaps': normalized['unresolved'], 'limits': ['Direct LLM candidates; semantic acceptance and extraction recall not evaluated.',
+            'gaps': [*normalized['unresolved'],
+                *({'reason': 'model_reported_gap', 'detail': gap, 'disclosure_status': 'not_evaluated'}
+                  for gap in normalized['validation']['model_gaps']),
+                *({'reason': 'required_fact_'+item['status'], 'requirement_id': item['requirement_id'],
+                   'disclosure_status': 'not_evaluated'}
+                  for item in normalized['fact_coverage']['requirements'] if item['status'] != 'candidate_present')],
+            'fact_coverage': {'path': 'fact-coverage.json', 'status': normalized['fact_coverage']['status']},
+            'limits': ['Direct LLM candidates; semantic acceptance and extraction recall not evaluated.',
                 'Unresolved drafts remain in raw_candidates.json; no implicit metric, entity or fiscal mappings.'],
             'files': {str(p.relative_to(work)): digest(p.read_bytes()) for p in work.rglob('*') if p.is_file()}}
         if base.get('company'):
@@ -156,9 +175,22 @@ def _write_projection(dataset, run, packet, normalized, output):
 
 
 async def run_direct_extraction(dataset, job, output, *, strategy, model_config=None,
-                                credentials_root=None, model_call=None):
+                                credentials_root=None, model_call=None, observation_root=None,
+                                observation_context=None):
+    with observed_run(output=output, kind='extraction', role='extractor',
+            origin='scripted_fixture' if model_call else 'model', observation_root=observation_root,
+            observation_context=observation_context, scope=job, title=job.get('task', ''),
+            protected=(dataset,)) as observer:
+        return await _run_direct_extraction(dataset, job, output, strategy=strategy,
+            model_config=model_config, credentials_root=credentials_root, model_call=model_call,
+            observation_context=observer)
+
+
+async def _run_direct_extraction(dataset, job, output, *, strategy, model_config=None,
+                                credentials_root=None, model_call=None, observation_context=None):
     """One immutable run; injected model_call is explicitly marked a fixture."""
-    packet = build_extraction_packet(dataset, job)
+    with observed_step(observation_context, 1, phase='build_extraction_packet', namespace='extraction-packet'):
+        packet = build_extraction_packet(dataset, job)
     prompt_spec = job.get('prompt', {'version': PROMPT_VERSION, 'text': DIRECT_PROMPT})
     if (not isinstance(prompt_spec, dict) or not isinstance(prompt_spec.get('version'), str)
             or not prompt_spec['version'].strip() or not isinstance(prompt_spec.get('text'), str)
@@ -217,13 +249,20 @@ async def run_direct_extraction(dataset, job, output, *, strategy, model_config=
                 'prompt_sha256': actor.frozen_config['prompt_sha256'],
                 'note': 'System instructions plus the exact JSON schema appended by the DeepSeek adapter.'})
             model_call = actor.review
+        invocation = 0
         async def invoke(one):
+            nonlocal invocation
+            invocation += 1
             delivered = one.get('supplied_block_ids', [b['block_id'] for b in one.get('blocks', [])])
             if not set(delivered) <= result['coverage'].keys():
                 raise ValueError('model delivery outside selected source scope')
             for bid in delivered:
                 result['coverage'][bid] = 'delivered'
-            reply = await model_call(one)
+            with observed_step(observation_context, invocation, phase='extraction_model', namespace='extract') as step_observer:
+                if step_observer:
+                    step_observer.publish(output/'packet.json', kind='packet')
+                    step_observer.publish(output/'prompt.json', kind='prompt')
+                reply = await actor.review(one, observation_context=step_observer) if actor and step_observer else await model_call(one)
             for bid in delivered:
                 result['coverage'][bid] = 'extraction_returned'
             return reply
@@ -231,9 +270,10 @@ async def run_direct_extraction(dataset, job, output, *, strategy, model_config=
             save_attempt=lambda i, reply: write_new(output/f'pass-{i:02d}.json', reply))
         write_new(output/'extraction.json', outcome['extraction'])
         write_new(output/'strategy.json', {k: v for k, v in outcome.items() if k != 'extraction'})
-        normalized = normalize_direct_candidates(outcome['extraction'], packet)
-        write_new(output/'normalized.json', normalized)
-        projection = _write_projection(dataset, output, packet, normalized, output/'dataset')
+        with observed_step(observation_context, 1, phase='normalize_and_project', namespace='extraction-normalize'):
+            normalized = normalize_direct_candidates(outcome['extraction'], packet)
+            write_new(output/'normalized.json', normalized)
+            projection = _write_projection(dataset, output, packet, normalized, output/'dataset')
         result.update(status='candidate', raw_record_count=len(outcome['extraction']['records']),
             normalized_record_count=len(normalized['records']), validation=normalized['validation'],
             unresolved_count=len(normalized['unresolved']), projection_snapshot_id=projection['snapshot_id'],

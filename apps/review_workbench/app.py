@@ -11,7 +11,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
-from apps.review_workbench.pages.company_universe import render_company_universe_page
 from apps.review_workbench.pages.company_data import render_company_data, render_document_status
 from apps.review_workbench.pages.research_archive_ui import render_archive
 from apps.review_workbench.components.visual_system import workbench_page, theme_html
@@ -108,6 +107,8 @@ def render_original_source_document(raw_html: str, excerpt: dict) -> str:
 
 
 def parent_and_children(data: dict) -> tuple[dict[str, str], dict[str, list[str]]]:
+    if data.get("schema_version") == "business-map-v0.2":
+        raise ValueError("business_map_v2_display_requires_basis_aware_renderer")
     hierarchy_kinds = {"reported_under", "part_of", "revenue_component_of"}
     parents: dict[str, str] = {}
     for relationship in data["relationships"]:
@@ -301,7 +302,9 @@ def render_page(data: dict, reviews: dict) -> str:
     return render_result_page(data, load_json(SOURCE_EXCERPT))
 
 
-def make_handler(data_path: Path, archive_path: Path | None = None):
+def make_handler(data_path: Path, archive_path: Path | None = None, *, observation_root=None, observation_output_roots=(), score_path=None):
+    observation_options = {'observation_root': observation_root, 'output_roots': tuple(observation_output_roots)}
+    score_store = Path(score_path) if score_path is not None else ROOT / 'data/review_workbench/agent-result-scores-v1.json'
     archive = Store(archive_path or ROOT / 'data/research_archive/state.json')
     imports = import_rows(ROOT)
     archive.migrate_researchers({row['id']: {key: row[key] for key in ('researcher_id', 'researcher_label', 'config_version')} for row in imports}, dry_run=False)
@@ -317,6 +320,9 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
             self.wfile.write(payload)
 
         def do_POST(self):
+            if urlparse(self.path).path.startswith('/api/agent-results/'):
+                self.agent_result_route(urlparse(self.path), write=True)
+                return
             path = urlparse(self.path).path
             if path not in {'/api/research-archive', '/api/research-annotations', '/api/data-workspace/state'}:
                 self.send_error(404); return
@@ -375,6 +381,12 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
                 self.send_header('Cache-Control', 'no-store')
                 self.end_headers()
                 self.wfile.write(body)
+            if path == '/data-workspace' and not parsed.query:
+                self.send_response(303)
+                self.send_header('Location', '/agent-results')
+                self.send_header('Content-Length', '0')
+                self.end_headers()
+                return True
             if path in {'/data-workspace', '/data-workspace/source', '/data-workspace/source-meta'}:
                 from apps.review_workbench.pages.data_workspace import render_data_workspace
                 from apps.review_workbench.pages.source_preview import load_source_preview, PREVIEW_CSP
@@ -401,8 +413,8 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
                     else:
                         from apps.review_workbench.pages.data_workspace import shell, empty
                         from apps.review_workbench.components.site_navigation import bi, e
-                        content = empty('当前选择无法读取，请返回公司目录重新选择。', 'This selection is unavailable. Return to the company list and choose again.')
-                        content += '<details><summary>' + bi('问题详情', 'Details') + '</summary><p>' + e(error) + '</p></details><a href="/data-workspace">' + bi('返回公司目录', 'Company list') + '</a>'
+                        content = empty('当前产物无法读取，请返回运行结果重新选择。', 'This artifact is unavailable. Choose again from Results.')
+                        content += '<details><summary>' + bi('问题详情', 'Details') + '</summary><p>' + e(error) + '</p></details><a href="/agent-results">' + bi('返回运行结果', 'Back to results') + '</a>'
                         payload = shell(content, '', {'selection': {}, 'revision': 0}).encode() if path == '/data-workspace' else ('<!doctype html><meta charset="utf-8">' + content).encode()
                         self.send_response(status)
                         self.send_header('Content-Type', 'text/html; charset=utf-8')
@@ -456,9 +468,12 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
                     self.end_headers()
                     self.wfile.write(body)
                 return True
-            if path == '/':
-                from apps.review_workbench.pages.attention_dashboard import render_dashboard
-                send(render_dashboard(load_json(COMPANY_UNIVERSE_DATA), archive.list()))
+            if path in {'/', '/companies'}:
+                self.send_response(303)
+                self.send_header('Location', '/agent-results')
+                self.send_header('Cache-Control', 'no-store')
+                self.send_header('Content-Length', '0')
+                self.end_headers()
                 return True
             legacy_target = None
             if path in {'/result', '/benchmark'} and not query.get('view'):
@@ -560,6 +575,12 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
 
         def do_GET(self) -> None:
             parsed = urlparse(self.path)
+            if parsed.path == '/agent-results' or parsed.path == '/api/agent-results' or parsed.path.startswith('/api/agent-results/'):
+                self.agent_result_route(parsed)
+                return
+            if parsed.path == '/agent-runs' or parsed.path == '/api/agent-runs' or parsed.path.startswith('/api/agent-runs/'):
+                self.agent_run_route(parsed)
+                return
             if self.workspace_route(parsed):
                 return
             if parsed.path == '/api/research-annotations':
@@ -786,18 +807,6 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
                 self.send_header('Location', '/companies/alphabet/documents/0001652044-26-000018/indexes/v0.1')
                 self.end_headers()
                 return
-            if parsed.path == "/companies":
-                if not COMPANY_UNIVERSE_DATA.exists():
-                    self.send_error(503, "Company universe candidate is unavailable")
-                    return
-                body = render_company_universe_page(load_json(COMPANY_UNIVERSE_DATA)).encode()
-                self.send_response(200)
-                self.send_header("Content-Type", "text/html; charset=utf-8")
-                self.send_header("Content-Length", str(len(body)))
-                self.send_header("Cache-Control", "no-store")
-                self.end_headers()
-                self.wfile.write(body)
-                return
             if parsed.path == "/annotate":
                 self.send_response(303)
                 self.send_header("Location", "/result")
@@ -820,6 +829,151 @@ def make_handler(data_path: Path, archive_path: Path | None = None):
             self.end_headers()
             self.wfile.write(body)
 
+        def agent_result_route(self, parsed, *, write=False):
+            """Read verified results and store separately bound human evaluations."""
+            host = self.headers.get('Host', '')
+            origin = self.headers.get('Origin')
+            if (urlparse('http://' + host).hostname not in {'localhost', '127.0.0.1', '::1'}
+                    or (origin is not None and origin != 'http://' + host)
+                    or self.headers.get('Sec-Fetch-Site') == 'cross-site'
+                    or (write and (self.headers.get('X-Uteki-Request') != '1'
+                        or self.headers.get('Content-Type', '').split(';')[0] != 'application/json'))):
+                self.archive_json({'error': 'Local same-origin results only'}, 403)
+                return
+            from apps.review_workbench.data import agent_run_results as results
+            from apps.review_workbench.data import run_scores
+            from urllib.parse import unquote
+            try:
+                query = parse_qs(parsed.query, keep_blank_values=True)
+                if any(len(values) != 1 or not values[0] for values in query.values()):
+                    raise ValueError('Explicit single query values required')
+                parts = [unquote(part) for part in parsed.path.strip('/').split('/')]
+                if write:
+                    if len(parts) != 4 or parts[3] != 'scores':
+                        raise KeyError('Unknown scoring route')
+                    if query:
+                        raise ValueError('Scoring does not accept query parameters')
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if not 0 < length <= 20000:
+                        raise ValueError('Invalid request size')
+                    payload = json.loads(self.rfile.read(length))
+                    detail = results.load_result(ROOT, parts[2], **observation_options)
+                    value = run_scores.save_score(score_store, detail['binding'], payload)
+                    self.archive_json(value, 201)
+                    return
+                if parsed.path == '/agent-results':
+                    from apps.review_workbench.pages.agent_results import render_agent_results
+                    body = render_agent_results(ROOT, query, **observation_options).encode()
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'text/html; charset=utf-8')
+                    self.send_header('Content-Length', str(len(body)))
+                    self.send_header('Cache-Control', 'no-store')
+                    self.send_header('X-Content-Type-Options', 'nosniff')
+                    self.send_header('Referrer-Policy', 'no-referrer')
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
+                values = {key: value[0] for key, value in query.items()}
+                if len(parts) == 2:
+                    if set(values) - {'agent'}:
+                        raise ValueError('Unknown results query')
+                    value = results.list_results(ROOT, agent=values.get('agent', 'data'), **observation_options)
+                elif len(parts) == 3 and parts[2] == 'compare':
+                    if set(values) != {'left', 'right'}:
+                        raise ValueError('Two explicit results are required')
+                    value = results.compare_results(ROOT, values['left'], values['right'], **observation_options)
+                elif len(parts) == 3 and not query:
+                    value = results.load_result(ROOT, parts[2], **observation_options)
+                elif len(parts) == 4 and parts[3] == 'scores' and not query:
+                    detail = results.load_result(ROOT, parts[2], **observation_options)
+                    value = run_scores.load_scores(score_store, detail['binding'])
+                else:
+                    raise KeyError('Unknown result route')
+                self.archive_json(value)
+            except run_scores.StaleScoreError:
+                self.archive_json({'error': 'Result revision changed; reload the result before scoring'}, 409)
+            except run_scores.CorruptScoreStoreError:
+                self.archive_json({'error': 'Saved evaluations are invalid; existing records were not replaced'}, 503)
+            except KeyError:
+                self.archive_json({'error': 'Unknown result in the selected scope'}, 404)
+            except (ValueError, TypeError):
+                self.archive_json({'error': 'Result selection or evaluation is invalid; no default was substituted'}, 400)
+            except OSError:
+                self.archive_json({'error': 'Result or evaluation storage is unavailable'}, 503)
+
+        def agent_run_route(self, parsed):
+            """Private local observation endpoints never accept paths or write state."""
+            host = self.headers.get('Host', '')
+            origin = self.headers.get('Origin')
+            if (urlparse('http://' + host).hostname not in {'localhost', '127.0.0.1', '::1'}
+                    or (origin is not None and origin != 'http://' + host)
+                    or self.headers.get('Sec-Fetch-Site') == 'cross-site'):
+                self.archive_json({'error': 'Local same-origin observation only'}, 403)
+                return
+            from apps.review_workbench.data import agent_runs
+            from urllib.parse import unquote
+            try:
+                query = parse_qs(parsed.query, keep_blank_values=True)
+                if any(len(values) != 1 or not values[0] for values in query.values()):
+                    raise ValueError('Explicit single query values required')
+                if parsed.path == '/agent-runs':
+                    from apps.review_workbench.pages.agent_runs import render_agent_runs
+                    body = render_agent_runs(ROOT, query, **observation_options).encode()
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'text/html; charset=utf-8')
+                    self.send_header('Content-Length', str(len(body)))
+                    self.send_header('Cache-Control', 'no-store')
+                    self.send_header('X-Content-Type-Options', 'nosniff')
+                    self.send_header('Referrer-Policy', 'no-referrer')
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
+                values = {key: value[0] for key, value in query.items()}
+                def allow(*keys):
+                    if set(values) - set(keys):
+                        raise ValueError('Unknown observation query')
+                def integer(key, default=None):
+                    if key not in values:
+                        return default
+                    if not values[key].isdigit() or len(values[key]) > 12:
+                        raise ValueError('Invalid observation number')
+                    return int(values[key])
+                def selected_revision():
+                    value = values.get('revision')
+                    if value is None:
+                        return None
+                    if len(value) == 64 and all(c in '0123456789abcdef' for c in value):
+                        return value
+                    return integer('revision')
+                parts = [unquote(part) for part in parsed.path.strip('/').split('/')]
+                if len(parts) == 2:
+                    allow('agent', 'cursor', 'limit')
+                    value = agent_runs.list_page(ROOT, agent=values.get('agent', 'data'), cursor=values.get('cursor'),
+                        limit=integer('limit', 50), **observation_options)
+                elif len(parts) == 3:
+                    allow('revision')
+                    value = agent_runs.load_run(ROOT, parts[2], revision=selected_revision(), **observation_options)
+                elif len(parts) == 4 and parts[3] == 'events':
+                    allow('after', 'limit')
+                    value = agent_runs.read_events(ROOT, parts[2], after=values.get('after', '0'),
+                        limit=integer('limit', 100), **observation_options)
+                elif len(parts) == 5 and parts[3] == 'steps':
+                    allow('revision')
+                    value = agent_runs.load_step(ROOT, parts[2], parts[4], revision=selected_revision(), **observation_options)
+                elif len(parts) == 5 and parts[3] == 'artifacts':
+                    allow('revision', 'cursor', 'browse')
+                    value = agent_runs.read_artifact(ROOT, parts[2], parts[4], revision=selected_revision(),
+                        cursor=values.get('cursor'), browse=values.get('browse'), **observation_options)
+                else:
+                    raise KeyError('Unknown observation route')
+                self.archive_json(value)
+            except KeyError:
+                self.archive_json({'error': 'Unknown run, step or artifact in the selected scope'}, 404)
+            except (ValueError, TypeError):
+                self.archive_json({'error': 'Observation selection or saved content is invalid; no default was substituted'}, 400)
+            except OSError:
+                self.archive_json({'error': 'Observation content is unavailable or still being written'}, 503)
+
         def log_message(self, format: str, *args) -> None:
             return
 
@@ -831,8 +985,13 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--data", type=Path, default=DEFAULT_DATA)
+    parser.add_argument('--observation-root', type=Path, help='Explicit local Agent observation store')
+    parser.add_argument('--observation-output-root', type=Path, action='append', default=[],
+                        help='Allowed business output parent; repeat for multiple local roots')
     parser.add_argument("--check", action="store_true", help="Check local inputs without starting the server or writing review state")
     args = parser.parse_args()
+    if bool(args.observation_root) != bool(args.observation_output_root):
+        parser.error('--observation-root and at least one --observation-output-root must be supplied together')
     from apps.review_workbench.workspace_check import format_report, inspect_workspace
     report = inspect_workspace(ROOT, data_path=args.data)
     if args.check or not report["ready"]:
@@ -842,9 +1001,10 @@ def main() -> None:
         return
     if any(c["status"] != "ok" for c in report["checks"]):
         print(format_report(report), file=sys.stderr)
-    server = ThreadingHTTPServer((args.host, args.port), make_handler(args.data))
-    print(f"Uteki Data Agent Result: http://{args.host}:{args.port}/result")
-    print(f"Uteki Document Navigator: http://{args.host}:{args.port}/document-index")
+    server = ThreadingHTTPServer((args.host, args.port), make_handler(args.data,
+        observation_root=args.observation_root, observation_output_roots=args.observation_output_root))
+    print(f'Uteki Agent results: http://{args.host}:{args.port}/agent-results')
+    print(f'Uteki Agent process: http://{args.host}:{args.port}/agent-runs')
     server.serve_forever()
 
 

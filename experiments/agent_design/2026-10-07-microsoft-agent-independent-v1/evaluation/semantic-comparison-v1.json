@@ -1,0 +1,214 @@
+{
+  "bindings": {
+    "reference_business_map_sha256": "fed4d71dfe8ad1af84be5823c713f8bcd206648b238124f87946d8a6240a6386",
+    "candidate_business_map_sha256": "6c947c8d323517645ad066529bde19621ab47e22cb3fe7177c75e722a44fdc15",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "request_sha256": "049d3fd5e281da3c7a26d766db954239451d236507c1f34cde27c8b8fb93f5ba",
+    "skill_sha256": "005b9d1802e66f83411c16114886ff3124586094b73e070dd6b59d22cb582169",
+    "criteria_sha256": "8ba7252be92bc6811aa80fed435f74d1db4e02e2c65bd87e2b41334cb47bd95f",
+    "candidate_trace_id": "run-40b2b39d02bf4915b53cedbf80ff23e7"
+  },
+  "summary": "B1 确为系统 Agent + Sonnet 的一次独立执行：35 个节点、36 条关系，结构校验通过，估算 $0.280446；原文语义验收未通过。主要缺口为云服务/AI/安全等层级遗漏、GitHub/Nuance 整体与云子集混用，以及精确引文覆盖不完整。参考对照用于定位差异，节点数相同不是验收标准。",
+  "checks": [
+    {
+      "topic": "C01 · 范围、期间和三个分部",
+      "status": "pass",
+      "reference": "三个分部、FY2025、所选章节。",
+      "agent": "三个分部、FY2025、所选章节；没有整份报告覆盖声明。",
+      "evidence": "block-000086-935d6090；block-000087-44aabdcd",
+      "note": "两版均覆盖三个分部及正确报告范围。"
+    },
+    {
+      "topic": "C02 · Productivity and Business Processes 四条主线",
+      "status": "pass",
+      "reference": "Commercial、Consumer、LinkedIn、Dynamics。",
+      "agent": "四条主线均独立可定位。",
+      "evidence": "block-000091-d993f813；block-000093-7018adaa；block-000095-61bd513b；block-000097-13124fb7；block-000099-da3d48eb",
+      "note": "四条主线均有正确分部连接。"
+    },
+    {
+      "topic": "C03 · Microsoft 365 Commercial 云与本地范围",
+      "status": "partial",
+      "reference": "分别表示Commercial cloud与Commercial products。",
+      "agent": "总组描述保留云/本地；没有两个子组，部分组成仅文字可见。",
+      "evidence": "block-000093-7018adaa；block-000101-67803298",
+      "note": "未把全部Commercial误称云，但两个明示子组没有独立结构位置。"
+    },
+    {
+      "topic": "C04 · Microsoft 365 Consumer",
+      "status": "pass",
+      "reference": "Consumer组单节点。",
+      "agent": "Consumer组与平台拆成两节点，关系标derived；此建模差异可接受，不要求照抄参考。",
+      "evidence": "block-000095-61bd513b；block-000103-a597bcd9",
+      "note": "本阶段只验对象/关系；Outlook与OneDrive等详细属性后置。"
+    },
+    {
+      "topic": "C05 · LinkedIn",
+      "status": "pass",
+      "reference": "LinkedIn及四类方案。",
+      "agent": "LinkedIn及四类方案均成节点且有连接。",
+      "evidence": "block-000097-13124fb7；block-000108-ec73690d",
+      "note": "对象结构通过；变现细节不计本阶段必达项。描述精确引用另见C22。"
+    },
+    {
+      "topic": "C06 · Dynamics",
+      "status": "pass",
+      "reference": "Dynamics组、Dynamics365、低代码平台组合。",
+      "agent": "三层均在；Power Apps与Power Automate组合成一个节点，与原文和当前图粒度相容。",
+      "evidence": "block-000099-da3d48eb；block-000110-99cc951e",
+      "note": "云/本地定义与低代码平台均保留；定义引用的局部缺口另见C22。"
+    },
+    {
+      "topic": "C07 · Intelligent Cloud 两条主线",
+      "status": "pass",
+      "reference": "服务器/云组及企业伙伴服务组。",
+      "agent": "两组均连至Intelligent Cloud；另Server products直接连分部造成层级缺口见C08。",
+      "evidence": "block-000118-5e917062；block-000120-c34f7245；block-000122-c07a987e",
+      "note": "智能云两条主线存在。"
+    },
+    {
+      "topic": "C08 · Server products and cloud services 的云/服务器结构",
+      "status": "fail",
+      "reference": "Azure and other cloud services与Server products均在server_cloud下。",
+      "agent": "缺Azure and other cloud services；Server products只直连分部，未连server_cloud。",
+      "evidence": "block-000120-c34f7245",
+      "note": "应恢复原文明确组合层级；不是要求节点数与参考相等。"
+    },
+    {
+      "topic": "C09 · Azure 本体与产品能力",
+      "status": "partial",
+      "reference": "Azure→Azure and other cloud services标derived。",
+      "agent": "Azure→server_cloud标explicit，依据仅是同名更大组合Azure and other cloud services；应保持推断边界。",
+      "evidence": "block-000120-c34f7245；block-000127-93a9159b",
+      "note": "Azure定义正确且已连接；explicit强度过高。"
+    },
+    {
+      "topic": "C10 · Azure AI",
+      "status": "fail",
+      "reference": "Azure AI offerings节点及到Azure的有据derived关系。",
+      "agent": "Azure AI只在Foundry边描述中提到，没有自身节点。",
+      "evidence": "block-000127-93a9159b；block-000128-edef168d",
+      "note": "原文明确定义的Azure AI offerings没有图中对象。"
+    },
+    {
+      "topic": "C11 · Azure AI Foundry",
+      "status": "partial",
+      "reference": "Foundry→Azure AI offerings。",
+      "agent": "Foundry→Azure标derived，引用127/128及定义；可接受推断但粒度不完整。",
+      "evidence": "block-000127-93a9159b；block-000128-edef168d",
+      "note": "Foundry名称和定义正确；更宽的derived连接并非错误，但中间AI组合遗漏。"
+    },
+    {
+      "topic": "C12 · Azure Security",
+      "status": "fail",
+      "reference": "Azure Security节点与derived关联。",
+      "agent": "完全缺失；block134处分明确写Azure Security提及未建独立节点。",
+      "evidence": "block-000134-9ca2b5c6",
+      "note": "Competition含微软自己的产品定义，不能因章节标签跳过。"
+    },
+    {
+      "topic": "C13 · GitHub 整体与云子集",
+      "status": "fail",
+      "reference": "GitHub整体、云子集、两个层级关系。",
+      "agent": "GitHub整体→server_cloud标explicit，理由仅GitHub cloud services；无云子集。",
+      "evidence": "block-000120-c34f7245；block-000130-8d7ff1f7",
+      "note": "边endpoint必须表达整个节点，不能在说明里把whole边缩成subset。"
+    },
+    {
+      "topic": "C14 · Nuance Healthcare 整体与云子集",
+      "status": "fail",
+      "reference": "Nuance整体、云子集，专业服务保留企业服务范围。",
+      "agent": "Nuance整体→server_cloud标explicit，理由仅云子集；无云子集节点。",
+      "evidence": "block-000120-c34f7245；block-000122-c07a987e；block-000130-8d7ff1f7",
+      "note": "与GitHub相同的whole/subset范围错误。"
+    },
+    {
+      "topic": "C15 · Enterprise and partner services",
+      "status": "pass",
+      "reference": "组节点保留内容、用途、培训。",
+      "agent": "同样保留五类内容与用途，没有误建所有权support边。",
+      "evidence": "block-000122-c07a987e；block-000132-f2659d3c",
+      "note": "企业服务的组成与用途存在；描述引文覆盖不足另见C22。"
+    },
+    {
+      "topic": "C16 · More Personal Computing 三条主线",
+      "status": "pass",
+      "reference": "Windows/Devices、Gaming、Search/news。",
+      "agent": "三类正确连More Personal Computing。",
+      "evidence": "block-000144-6e0ae0c4；block-000146-c641cfcd；block-000148-2f215a60；block-000150-9577a591",
+      "note": "三条主线均有图中位置。"
+    },
+    {
+      "topic": "C17 · Windows and Devices",
+      "status": "pass",
+      "reference": "OEM、Devices两节点。",
+      "agent": "OEM、Devices两节点；Surface和Copilot+PC在设备定义中。",
+      "evidence": "block-000093-7018adaa；block-000146-c641cfcd；block-000152-fc098ac9；block-000171-f62e3835",
+      "note": "OEM、设备与Commercial范围没有混并。定义引用不足另见C22。"
+    },
+    {
+      "topic": "C18 · Gaming 和 Xbox",
+      "status": "pass",
+      "reference": "Gaming与两个云/订阅产品。",
+      "agent": "同样覆盖这三级对象，不要求此次拆每个硬件。",
+      "evidence": "block-000148-2f215a60；block-000176-a1bfeea9；block-000178-51f06755",
+      "note": "硬件/内容在Gaming定义，GamePass与CloudGaming在图；变现属性后置。"
+    },
+    {
+      "topic": "C19 · Search and news advertising",
+      "status": "partial",
+      "reference": "News单独节点，仅声称原文列明组件。",
+      "agent": "Bing、Edge、消费Copilot正确；Microsoft News只在组描述出现。",
+      "evidence": "block-000150-9577a591；block-000180-c75c41bb",
+      "note": "Microsoft News已在文字中却不在图中；实体覆盖不足。"
+    },
+    {
+      "topic": "C20 · 竞对证据边界",
+      "status": "pass",
+      "reference": "没有外部猜测竞争者。",
+      "agent": "没有外部猜测竞争者；EMS竞争描述有源文。",
+      "evidence": "block-000113-bc876fa1；block-000114-0cdf0fbd；block-000134-9ca2b5c6",
+      "note": "没有输出不实具名竞争者。没有竞对产物不等于已完成竞对提取。"
+    },
+    {
+      "topic": "C21 · 具名重要对象关系完整性",
+      "status": "partial",
+      "reference": "相关层级覆盖更完整。",
+      "agent": "35个节点均连通，但连通不证明对象与关系范围正确。",
+      "evidence": "block-000093-7018adaa；block-000120-c34f7245；block-000128-edef168d；block-000134-9ca2b5c6；block-000150-9577a591",
+      "note": "全部已有节点可连回公司，但缺8个材料已命名的重要对象/组。"
+    },
+    {
+      "topic": "C22 · 原文引用与主张一致",
+      "status": "fail",
+      "reference": "抽核相关参考节点有较完整的主张引用；参考不因已认可自动成为真值。",
+      "agent": "至少16个节点定义引文不完整，另8条边引文过短和2条whole/subset边错误。",
+      "evidence": "block-000093-7018adaa；block-000101-67803298；block-000108-ec73690d；block-000120-c34f7245；block-000130-8d7ff1f7；block-000132-f2659d3c；block-000148-2f215a60；block-000150-9577a591",
+      "note": "精确引用是原文子串，但多处只覆盖描述的一部分，不能当作完整证据。"
+    },
+    {
+      "topic": "C23 · 未决事项逐条分类",
+      "status": "partial",
+      "reference": "明确News功能/Windows细SKU/Defender归属等限定问题。",
+      "agent": "unknown为空；遗漏与scope问题未显示；没有可逐条核查的错误unknown主张。",
+      "evidence": "block-000113-bc876fa1；block-000134-9ca2b5c6；block-000150-9577a591",
+      "note": "空unknown避免了旧版虚假未知，但不表示材料没有缺口。"
+    },
+    {
+      "topic": "C24 · 图上可见与覆盖一致",
+      "status": "partial",
+      "reference": "42个节点、45边的已认可参考。",
+      "agent": "35个节点、36边；缺失对象无法由同一renderer呈现。实际渲染另由页面检查。",
+      "evidence": "block-000093-7018adaa；block-000120-c34f7245；block-000128-edef168d；block-000134-9ca2b5c6；block-000150-9577a591",
+      "note": "本次只核图数据可表达范围，未做浏览器视觉审阅。"
+    },
+    {
+      "topic": "C25 · 收入与精确财务分解不越界",
+      "status": "pass",
+      "reference": "详细属性后置。",
+      "agent": "products_services/customers/monetization均为空，未编造收入。",
+      "evidence": "block-000088-8339c382",
+      "note": "本阶段无财务数值，不产生金额/比例幻觉。"
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": "business-coverage-run-v1",
+  "status": "failed",
+  "execution_mode": "source_inventory_exhaustive_self_audit",
+  "max_calls": 10,
+  "max_revisions": 1,
+  "max_inventory_contract_repairs": 1,
+  "retry_policy": {
+    "max_attempts_per_stage": 2,
+    "transient_only": true,
+    "unknown_cost": "retain_full_reservation",
+    "prior_failed_run": "experiments/agent_design/2026-10-07-business-coverage-v1/run-05"
+  },
+  "independent_evaluation": false,
+  "semantic_acceptance": "not_evaluated",
+  "input_run": "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01",
+  "input_trace_id": "run-40b2b39d02bf4915b53cedbf80ff23e7",
+  "candidate_path": "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01",
+  "candidate_sha256": "795d4f88fc0446a5e6986e8c08256af4dcafa854b740320c8517fdc26402a385",
+  "original_candidate_preserved": true,
+  "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+  "skill_sha256": "005b9d1802e66f83411c16114886ff3124586094b73e070dd6b59d22cb582169",
+  "attempts": [
+    {
+      "mode": "inventory",
+      "status": "completed",
+      "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-06/inventory",
+      "trace_id": "run-3089d2c377a14f9eb4ee3c59d0aff534",
+      "reused_stage_response": {
+        "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-05/inventory",
+        "response_sha256": "98774abbb370e438b81033dee0d3314ae4c353d20ade6b2799748ac1e1378423",
+        "validated_inventory_artifact": true,
+        "reason": "resume_own_model_output_without_regeneration"
+      },
+      "budget_after_stage": {
+        "limit_usd": "3",
+        "estimated_spent_usd": "0.921798",
+        "held_usd": "0.38341",
+        "unknown_requests": 1,
+        "in_flight_requests": 0,
+        "requests": 7,
+        "actual_billed_usd": null,
+        "enforcement": "enforced"
+      }
+    },
+    {
+      "mode": "audit_initial",
+      "status": "completed",
+      "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-06/audit_initial",
+      "trace_id": "run-5e56ea0f04404fb9b3441e6d318bed05",
+      "reused_stage_response": {
+        "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-05/audit_initial",
+        "response_sha256": "ce4e400804e15a73ca9e04fe20d5058f97375a58ac71fd0d221e71f11a8f979e",
+        "validated_inventory_artifact": false,
+        "reason": "resume_own_model_output_without_regeneration"
+      },
+      "self_check_status": "needs_revision",
+      "budget_after_stage": {
+        "limit_usd": "3",
+        "estimated_spent_usd": "0.921798",
+        "held_usd": "0.38341",
+        "unknown_requests": 1,
+        "in_flight_requests": 0,
+        "requests": 7,
+        "actual_billed_usd": null,
+        "enforcement": "enforced"
+      }
+    },
+    {
+      "mode": "revision",
+      "status": "failed",
+      "path": "experiments/agent_design/2026-10-07-business-coverage-v1/run-06/revision",
+      "trace_id": "run-e5650db4d3b04fff9d671a45507700cd",
+      "stop_reason": "ValueError",
+      "validation_error": "relationship_excerpt_evidence_mismatch",
+      "budget_after_stage": {
+        "limit_usd": "3",
+        "estimated_spent_usd": "1.548088",
+        "held_usd": "0.38341",
+        "unknown_requests": 1,
+        "in_flight_requests": 0,
+        "requests": 8,
+        "actual_billed_usd": null,
+        "enforcement": "enforced"
+      }
+    }
+  ],
+  "stop_reason": "revision_failed_ValueError",
+  "self_check_status": "needs_revision",
+  "final_audit_candidate_sha256": "795d4f88fc0446a5e6986e8c08256af4dcafa854b740320c8517fdc26402a385",
+  "budget": {
+    "limit_usd": "3",
+    "estimated_spent_usd": "1.548088",
+    "held_usd": "0.38341",
+    "unknown_requests": 1,
+    "in_flight_requests": 0,
+    "requests": 8,
+    "actual_billed_usd": null,
+    "enforcement": "enforced"
+  },
+  "estimated_spent_usd": "1.548088",
+  "unknown_requests": 1,
+  "in_flight_requests": 0
+}

@@ -1,0 +1,166 @@
+{
+  "kind": "retrospective_multi_batch_candidate_coverage",
+  "model_calls": 0,
+  "new_extraction": false,
+  "inputs": [
+    {
+      "folder": "experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/amd-fy2023-cash-flow-batch-v3/extraction-01",
+      "record_count": 6,
+      "plan_origin": "model",
+      "evidence_offsets_checked": true,
+      "sql_values_checked": true,
+      "files": {
+        "packet.json": "3c1d32bb89ed2d329be63c6d338c1890dc28bbde8a4889cdf1dd0158d6c46f55",
+        "normalized.json": "d6c2bb9c42b6c517df39daa43a6761585717de9709ded569a7c2b8cf4ea624f5",
+        "result.json": "5aba1f885ffe5dc44d30d99e5461f5a28b847465e0edc6fd84650858d99e84d8"
+      }
+    }
+  ],
+  "coverage": {
+    "schema_version": "direct-fact-coverage-v1",
+    "company_id": "sec-0000002488",
+    "source_snapshot_id": "source-291485b98a75d8cfabe47571",
+    "source_sha256": "47955f5d3d309e40c53ac7243dc955c8c1b594605fa938db1b5c411aaf2aa808",
+    "status": "partial",
+    "requirements": [
+      {
+        "requirement_id": "operating_cash_flow-fy2021",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2021",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2020-12-27",
+          "end": "2021-12-25",
+          "basis": "source"
+        },
+        "status": "candidate_present",
+        "record_ids": [
+          "direct-9cdb0cd584b197bc7e2a516d"
+        ],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "operating_cash_flow-fy2022",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2022",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2021-12-26",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "status": "candidate_present",
+        "record_ids": [
+          "direct-f108787af0da5a007b11d784"
+        ],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "operating_cash_flow-fy2023",
+        "entity_id": "sec-0000002488",
+        "metric_id": "operating_cash_flow",
+        "period_id": "fy2023",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2023-01-01",
+          "end": "2023-12-30",
+          "basis": "source"
+        },
+        "status": "candidate_present",
+        "record_ids": [
+          "direct-998d47f4c11c8ceefed8b66b"
+        ],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2021",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2021",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2020-12-27",
+          "end": "2021-12-25",
+          "basis": "source"
+        },
+        "status": "candidate_present",
+        "record_ids": [
+          "direct-993f48be6086c2e8f882c5f6"
+        ],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2022",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2022",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2021-12-26",
+          "end": "2022-12-31",
+          "basis": "source"
+        },
+        "status": "candidate_present",
+        "record_ids": [
+          "direct-e4ec59f4aea336c978e072f1"
+        ],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      },
+      {
+        "requirement_id": "capex_cash_payments-fy2023",
+        "entity_id": "sec-0000002488",
+        "metric_id": "capex_cash_payments",
+        "period_id": "fy2023",
+        "unit": "USD",
+        "accounting_basis": "reported_consolidated",
+        "value_kind": "actual",
+        "period": {
+          "kind": "year",
+          "start": "2023-01-01",
+          "end": "2023-12-30",
+          "basis": "source"
+        },
+        "status": "candidate_present",
+        "record_ids": [
+          "direct-5a3f01aba794760f1cdda05d"
+        ],
+        "unresolved": [],
+        "disclosure_status": "not_evaluated"
+      }
+    ],
+    "model_gaps": [
+      "Only the delivered cash flow statement batch (blocks 684-688) was reviewed; other batches, unassigned prose and undelivered blocks remain pending, so no statement about whole-filing completeness is made.",
+      "Metrics outside the targeted batch (revenue, operating income, net income, cash and cash equivalents, debt components, share capital, shares outstanding) were not extracted here; their absence from this output does not mean they are absent from the filing.",
+      "The source presents 52/53-week fiscal years ending December 30, 2023, December 31, 2022 and December 25, 2021; these source labels are retained rather than inferred calendar-year boundaries.",
+      "No statement or note was supplied to reconcile any other CapEx definition (e.g., lease additions or investor-presentation CapEx) to the cash flow line 'Purchases of property and equipment'."
+    ],
+    "semantic_acceptance": "not_evaluated",
+    "adoption": "unchanged_candidate"
+  },
+  "counts": {
+    "candidate_present": 6
+  },
+  "boundary": "All six selected fact cells have real historical candidates. Original batch gaps remain; this does not establish whole-filing completeness or a general automatic merge."
+}

@@ -1,0 +1,186 @@
+{
+  "schema_version": "business-map-independent-review-v1",
+  "status": "needs_revision",
+  "binding": {
+    "trace_id": "run-2d3065ac1ca74cfda3103082c15b8a0f",
+    "source_packet_sha256": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "skill_sha256": "9baa6616f36095abc27b5de81cd6e9070beb509c97d6add7fade888b743904d0",
+    "business_map_sha256": "539053edd17b46b18be0827b2653abe3296c46ce1ad59c4e7c6f2e7ead298170",
+    "result_sha256": "66f5d08c9a9ea39ee0f93e143a2d4c0f90eddfc88d10d357fb45958e662dc53d",
+    "request_sha256": "f46b27ee104c4889f4a6b8ac8d162f62cc5260a5b5bf51ab9400aa72cbcb40ad"
+  },
+  "criteria_sha256": "942588a74d89170e3485276ed0cf421310108c65c7433c69855ff2c46d6e4e41",
+  "prior_review_sha256": "7d8d06ef070ea69e4dbc88e01d60ee223e07c16e5873e29c92a3bb2391e8dccf",
+  "summary": "协议已恢复且Windows OEM的8段缺少引文已补；19节点及全部事实文本、关系保持不变。主结构更清晰，但整体/云子集、漏项和其他声明证据仍待修订。",
+  "review_method": "Codex独立回读protocol-repair-01原答、完整校验后的draft及源文；逐字段对比generation-01，明确模型补引文与工程冗余索引投影的不同。仅评审侧记录，未进入执行输入。回归而非盲评或holdout。",
+  "separate_statuses": {
+    "execution_ownership": "system_agent_with_explicit_evidence_index_projection",
+    "structural_contract": "passed",
+    "source_literal_quotes": "passed",
+    "selected_stage_semantic_fidelity": "needs_revision",
+    "coverage_v2_model_self_audit": "not_performed_at_review_time",
+    "final_acceptance": "not_granted"
+  },
+  "checks": [
+    {
+      "id": "PR-01",
+      "label": "协议恢复与候选发表",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000137-7902699b",
+        "block-000152-fc098ac9",
+        "block-000166-82fed103"
+      ],
+      "observation": "本次模型修复页码块ID拼写，并把Windows OEM变现claim引文从2条补到10条。模型原答仍漏节点级冗余索引，工程投影从既有引文向9个节点补23个索引引用后，完整BusinessOnlyDraftV2校验通过并发表19节点、19关系、50证据片段的候选。",
+      "note": "模型修改与工程索引投影分别记录；投影不改事实、字段文本、关系或摘录。协议通过不代表内容通过。"
+    },
+    {
+      "id": "PR-02",
+      "label": "主要业务结构及细项属性",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000086-935d6090",
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000097-13124fb7",
+        "block-000099-da3d48eb",
+        "block-000120-c34f7245",
+        "block-000122-c07a987e",
+        "block-000146-c641cfcd",
+        "block-000148-2f215a60",
+        "block-000150-9577a591"
+      ],
+      "observation": "三个报告分部、九个主要业务构成均存在；产品/服务52条、客户12条、收入相关描述9条保持不变。Teams、SQL Server、CALs、Surface/PC accessories与Xbox Game Pass等样本仍能定位。",
+      "note": "这仅通过事前MS-01主结构与MS-05部分样本，不是完整逐提及覆盖自审；19比79少不构成质量分数。"
+    },
+    {
+      "id": "PR-03",
+      "label": "Windows OEM新增引文覆盖",
+      "status": "pass",
+      "source_block_ids": [
+        "block-000154-a1c5160e",
+        "block-000156-e790ef4f",
+        "block-000158-1090a836",
+        "block-000160-8913045d",
+        "block-000162-2bcabf98",
+        "block-000164-56fa5ed0",
+        "block-000168-c54d4db7",
+        "block-000170-548ff342"
+      ],
+      "observation": "本次新增8段精确引文，涵盖设备组合、市场差异、AI PC、搭载率、客户组合、库存、供应链和盗版。它们均与冻结原块一致，修复初稿这8项收入驱动仅列文本未附claim引文的问题。",
+      "note": "本项不宣称整个monetization字段已语义通过：收入驱动与收费机制的区别仍存在；整体设备市场销量限定仍未在该claim完整引用。"
+    },
+    {
+      "id": "PR-04",
+      "label": "GitHub与Nuance整体/云子集关系",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000130-8d7ff1f7"
+      ],
+      "observation": "现候选两条part_of仍以GitHub/Nuance Healthcare整体节点连向Server products and cloud services，而rationale说仅云服务部分成立、其本地部分归属未明确。字段文本与边完全未变。derived不能缩小整体端点的范围，unknowns记录本地归属未知也不能消除此边矛盾。",
+      "note": "对应事前MS-04，尚未通过。"
+    },
+    {
+      "id": "PR-05",
+      "label": "竞争段落自有产品漏项",
+      "status": "gap",
+      "source_block_ids": [
+        "block-000113-bc876fa1",
+        "block-000134-9ca2b5c6"
+      ],
+      "observation": "Defender for Endpoint在当前19节点、产品属性及unknowns中仍无对应项，原块仍被not_used并解释为未产生独立业务事实。Azure Security则保留在Azure产品属性，说明可使用属性承接，不能将竞争标题作为整段排除依据。",
+      "note": "对应MS-07；原文有披露，属于本次提取漏项。"
+    },
+    {
+      "id": "PR-06",
+      "label": "M365与Azure字段作用范围",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000093-7018adaa",
+        "block-000095-61bd513b",
+        "block-000101-67803298",
+        "block-000103-a597bcd9",
+        "block-000127-93a9159b",
+        "block-000128-edef168d"
+      ],
+      "observation": "Commercial/Consumer用products and cloud services组名承接平台定义，范围等同仍需论证。云/本地限定保留在属性中是改善，但尚未解决组与平台整体是否同义。Azure AI硬件组合属性的摘录主语是We而非明确Azure，需确认归属；Foundry可定位且名称正确，定义主要藏在引用里。协议修订没有改变这些字段。",
+      "note": ""
+    },
+    {
+      "id": "PR-07",
+      "label": "客户、伙伴、受众及收入驱动分类",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000101-67803298",
+        "block-000108-ec73690d",
+        "block-000110-99cc951e",
+        "block-000127-93a9159b",
+        "block-000152-fc098ac9",
+        "block-000178-51f06755",
+        "block-000180-c75c41bb"
+      ],
+      "observation": "Azure/LinkedIn/Dynamics的客户与消费/订阅描述有原文；Commercial仍空客户，虽然原文列组织及部分用户范围。Gaming的开发者/伙伴生态、Search广告受众被放入customers，需区分客户/用户/伙伴。monetization混有安装量、ARPU和市场因素，不全是收费机制。新增Windows引文使依据更完整，但未改变分类语义。",
+      "note": ""
+    },
+    {
+      "id": "PR-08",
+      "label": "其余长声明的精确引用",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000108-ec73690d",
+        "block-000130-8d7ff1f7",
+        "block-000132-f2659d3c",
+        "block-000152-fc098ac9",
+        "block-000171-f62e3835",
+        "block-000180-c75c41bb"
+      ],
+      "observation": "当前description引文仍未覆盖GitHub/Nuance的云与本地、LinkedIn的免费与货币化、Enterprise服务的培训、Devices的连接人与内容等完整子句；Windows OEM描述含OEM预装但description引用未覆盖该句。Search变现描述后半增长驱动未在该claim引用中。多数内容存在于完整原块，但别处引用不能代替该声明的证据。",
+      "note": ""
+    },
+    {
+      "id": "PR-09",
+      "label": "结构化细项与仅存在于引用的细项",
+      "status": "needs_improvement",
+      "source_block_ids": [
+        "block-000120-c34f7245",
+        "block-000093-7018adaa",
+        "block-000180-c75c41bb"
+      ],
+      "observation": "Server cloud属性值仅Azure and other cloud services，GitHub/Nuance云子集及virtual desktop等细项主要在引用里；Commercial把许多成员写在同一长属性。无需把每项升级为节点，但不能因引文中出现即声称每项已形成可消费的属性对象。Microsoft Copilot数字伴侣定义也未进入结构化字段。",
+      "note": ""
+    }
+  ],
+  "artifacts": {
+    "raw_response_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/protocol-repair-01/response.txt",
+    "raw_response_sha256": "7370d479db05df691c4e2ef5c41abad924546253891960e9a9730181910bc538",
+    "draft_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/protocol-repair-01/draft.json",
+    "draft_sha256": "6516492af69ace3864fba5e6c3810cb4efe777bd79a7f824d7a1f247aa024cbd",
+    "projection_path": "experiments/agent_design/2026-10-08-business-granularity-v2/microsoft/protocol-repair-01/projection.json",
+    "projection_sha256": "64c67bac40c4dd5036ee9b42c6df50e4b5636d8e6981874c947bb5c852757614",
+    "initial_raw_sha256": "7e9fa22622d90543a9c7ac065e08cf30864fe6e407cd2d8a1d3491c87ee9ed88"
+  },
+  "actual_changes": {
+    "model_response_changes": [
+      "block_disposition[52].block_id spelling corrected",
+      "windows_oem claim_evidence monetization excerpts: 2 -> 10"
+    ],
+    "host_projection": {
+      "changed_nodes": 9,
+      "added_redundant_node_evidence_refs": 23,
+      "semantic_fields_changed": false
+    },
+    "relationship_changes": 0,
+    "node_identity_changes": 0,
+    "claim_excerpt_count": 122,
+    "field_claim_count": 111,
+    "full_audit_check_targets": 130
+  },
+  "execution_input_allowed": false,
+  "model_api_calls_by_reviewer": 0,
+  "limitations": [
+    "Model v2 coverage self-audit had not run when this review was written. Later model execution must be checked separately; this Codex review is not that stage.",
+    "Candidate remains unadopted; no full-report or unseen-company acceptance.",
+    "Browser visual review not performed."
+  ]
+}

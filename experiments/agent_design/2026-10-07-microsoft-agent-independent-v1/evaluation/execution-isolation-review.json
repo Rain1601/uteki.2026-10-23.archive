@@ -1,0 +1,70 @@
+{
+  "schema_version": "execution-isolation-review-v1",
+  "reviewed_at": "2026-10-07T14:32:34.344722+00:00",
+  "status": "passed_initial_request_and_static_revision_path_review",
+  "reviewer": "Codex subagent independent_run_audit",
+  "reviewer_independence_note": "This subagent authored independent_run.py earlier; this is a second read-only isolation audit of actual run artifacts, not an independent third-party code review.",
+  "run_status_at_review": "initial_attempt_in_progress_no_response_reviewed",
+  "actual_initial_trace_id": "run-40b2b39d02bf4915b53cedbf80ff23e7",
+  "bindings": {
+    "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run.py": "7bed06c1b67c10e34a6d6edb474f1d38ec468f471631c11d3adffc193311ca4c",
+    "src/uteki/agents/business_map/independent_run.py": "1a7f7b7a2fba26997ce04651e6457c06da30385181d74e31f5b78538b5496429",
+    "src/uteki/agents/business_map/product_run.py": "65adef50833da203a60a6cad4869b49bbecd8e8951c80fdae9153a54b9ff48da",
+    "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01/request.json": "049d3fd5e281da3c7a26d766db954239451d236507c1f34cde27c8b8fb93f5ba",
+    "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01/source_packet.json": "3ffff553e0ca5f4c982cc0e5d9befcef986158343b949980e32791095e2610e1",
+    "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01/skill.md": "005b9d1802e66f83411c16114886ff3124586094b73e070dd6b59d22cb582169",
+    "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01/output_schema.json": "8744e59960d9361aa7b269ff3f51ecc59bb5bbc60e368ae307c13b6bd9f0a783",
+    "experiments/agent_design/2026-10-07-microsoft-agent-independent-v1/run-01/attempt-01/manifest.json": "65e5a95cd30cadc59ecd09217cbae3ec41672a5455ee7017eb5a8804c80287a1"
+  },
+  "checks": {
+    "actual_initial_request_equals_48k_preflight": true,
+    "actual_request_hash_matches_manifest": true,
+    "exactly_one_user_message": true,
+    "initial_user_payload_equals_entire_frozen_packet": true,
+    "initial_user_wire_equals_standard_packet_serialization": true,
+    "initial_system_equals_generic_prompt_skill_schema": true,
+    "schema_equals_public_business_v2_contract": true,
+    "skill_equals_explicit_selected_skill": true,
+    "skill_equals_frozen_graph_stage_v3": true,
+    "source_packet_hash_matches_manifest": true,
+    "source_dom_hash_scope_validation": true,
+    "blocks_103": true,
+    "no_reference_ids_or_case_names_in_system": true,
+    "no_tool_access_in_request": true,
+    "runner_does_not_load_reference_candidate": true,
+    "public_execute_has_no_feedback_or_reference_argument": true
+  },
+  "revision_path_review": {
+    "method": "Read-only source inspection; actual revision not yet observed.",
+    "allowed_payload_keys": [
+      "frozen_source_packet",
+      "prior_response",
+      "validation_error"
+    ],
+    "prior_response_origin": "This execution previous attempt response.txt only; no prior reference run.",
+    "validation_error_origin": "parse_json_object + validate_draft rerun on that same response.",
+    "fixed_system_template": "REVISION_SYSTEM + the same selected Skill + same Schema.",
+    "guards": [
+      "original prepared request and frozen source verified again",
+      "complete end_turn required",
+      "one settled previous model request required",
+      "unknown/in-flight costs stop",
+      "remaining task budget deducted from settled estimates",
+      "at most one self_revision",
+      "no caller feedback/reference parameter",
+      "no semantic normalizer or manual patch in execution path"
+    ],
+    "no_actual_revision_claim": true
+  },
+  "interpretation": {
+    "independence": "No existing reference answer is present in the initial request; any later permitted revision uses only this run own answer and program-generated feedback.",
+    "experiment_scope": "Same-material method replay after generic rules were developed using this material; not blind unseen-data generalization.",
+    "comparison": "The approved earlier graph is a post-run reference, not an identical-settings strict A/B model comparison.",
+    "quality": "Isolation and contract checks do not establish semantic completeness. Review frozen outputs after run.",
+    "budget": "Current runner records per-task USD 3 authorization; historical costs stay recorded separately. This audit does not re-authorize spending."
+  },
+  "remaining_checks": [
+    "If a self_revision occurs, bind and inspect its actual serialized payload against its own preceding response and program error.",
+    "After completion, compare independent output with source and the frozen reference without mutating execution artifacts."
+  ]
+}

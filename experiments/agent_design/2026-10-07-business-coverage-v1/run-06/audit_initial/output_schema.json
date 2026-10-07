@@ -1,0 +1,130 @@
+{
+  "$defs": {
+    "Check": {
+      "additionalProperties": false,
+      "properties": {
+        "check_key": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Check Key",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "supported",
+            "partial",
+            "unsupported",
+            "overstated_basis",
+            "scope_mismatch",
+            "uncertain"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "check_key",
+        "verdict",
+        "rationale"
+      ],
+      "title": "Check",
+      "type": "object"
+    },
+    "Mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "mention_id": {
+          "maxLength": 200,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+          "title": "Mention Id",
+          "type": "string"
+        },
+        "disposition": {
+          "enum": [
+            "node",
+            "attribute_deferred",
+            "context_only",
+            "unresolved",
+            "missing"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "node_ids": {
+          "description": "Confirmed nodes only for disposition node. For unresolved, valid candidate IDs may identify related possibilities; they never establish coverage. All other dispositions require an empty list.",
+          "items": {
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+            "type": "string"
+          },
+          "title": "Node Ids",
+          "type": "array"
+        },
+        "rationale": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mention_id",
+        "disposition",
+        "node_ids",
+        "rationale"
+      ],
+      "title": "Mapping",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "business-coverage-audit-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "candidate_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Candidate Sha256",
+      "type": "string"
+    },
+    "inventory_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Inventory Sha256",
+      "type": "string"
+    },
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/Mapping"
+      },
+      "title": "Mappings",
+      "type": "array"
+    },
+    "checks": {
+      "items": {
+        "$ref": "#/$defs/Check"
+      },
+      "title": "Checks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "candidate_sha256",
+    "inventory_sha256",
+    "mappings",
+    "checks"
+  ],
+  "title": "Audit",
+  "type": "object"
+}
