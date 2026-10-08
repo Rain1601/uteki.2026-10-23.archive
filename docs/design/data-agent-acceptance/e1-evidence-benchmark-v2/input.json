@@ -1,0 +1,2381 @@
+{
+  "schema_version": "evidence-benchmark-page-v1",
+  "title": "E1 · 独立材料验收 / Evidence benchmark",
+  "introduction": "先看问题、实际交付、遗漏和多余内容。覆盖正确、流程成功、最小材料是三件不同的事。原文与过程折叠在各题末尾。",
+  "back_link": {
+    "label": "上一阶段 / Previous delivery",
+    "url": "../data-agent-evidence-v1/"
+  },
+  "cases": [
+    {
+      "case_id": "E1-01",
+      "status": "finished",
+      "question": "请仅依据 Microsoft FY2024 10-K 原年报，提供 FY2024 公司总收入、金额单位、财年起止及原文出处。",
+      "gold_sha256": "b60eaedab25418a4ae46d2265b5556083910397898cf2ade18f39bd8409ea462",
+      "run_sha256": "3acba964b4985da170e792acb75a37a819d9b293abfbd2976ae1070122c3f909",
+      "review": {
+        "schema_version": "evidence-review-v1",
+        "case_id": "E1-01",
+        "question": "请仅依据 Microsoft FY2024 10-K 原年报，提供 FY2024 公司总收入、金额单位、财年起止及原文出处。",
+        "reviewer": "Codex e1_gold_reading; original-first evaluation after case frozen; not blind to inherited history",
+        "requirements": [
+          {
+            "id": "A1",
+            "status": "supported",
+            "reason": "FY2024原件利润表Total revenue行的2024列为245,122，In millions表头、原始标签scale=6与USD单位一致。无分部维度的记录交付为245122000000 USD。",
+            "citations": [
+              {
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "block_id": "block-000865-dc07a7d1",
+                "start": 0,
+                "end": 75,
+                "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 "
+              },
+              {
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "block_id": "block-000865-dc07a7d1",
+                "start": 161,
+                "end": 198,
+                "quote": "Total revenue 245,122 211,915 198,270"
+              }
+            ]
+          },
+          {
+            "id": "A2",
+            "status": "supported",
+            "reason": "交付记录实际包含2023-07-01至2024-06-30；本轮复核原件context C_6dbdb3a2-9baf-41b4-922d-f59879124337完全一致。不是根据Year Ended June30擅补起日。",
+            "citations": [
+              {
+                "kind": "metadata",
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "field": "fiscal_period",
+                "value": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                }
+              }
+            ]
+          },
+          {
+            "id": "A3",
+            "status": "supported",
+            "reason": "实际交付只绑定FY2024原件source-8602...及cdcc8...原件hash，报告期2024-06-30；没有以FY2025同额比较列冒充。",
+            "citations": [
+              {
+                "kind": "metadata",
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "field": "report_period_end",
+                "value": "2024-06-30"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "scope": {
+            "status": "pass",
+            "reason": "仅Microsoft FY2024原年报，公司和观察期间均正确。"
+          },
+          "truth": {
+            "status": "pass",
+            "reason": "原始数值节点、USD定义、scale、无分部维度、期间和原文均重新核验。"
+          },
+          "provenance": {
+            "status": "pass",
+            "reason": "运行/数据集/冻结标准hash核对；数字定位原表行11列3及字符175:182。"
+          },
+          "focus": {
+            "status": "pass",
+            "reason": "集中在一张原始利润表及两标题，没有多取章节或重复表。在冻结整表粒度标准下通过；仍有767字符表内非必需数据，未达到最小充分压缩。"
+          }
+        },
+        "deliveries": [
+          {
+            "id": "D1",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000863-9d7720d5",
+            "start": 0,
+            "end": 51,
+            "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+            "segments": [
+              {
+                "start": 0,
+                "end": 51,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D2",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000864-cdef2bac",
+            "start": 0,
+            "end": 17,
+            "quote": "INCOME STATEMENTS",
+            "segments": [
+              {
+                "start": 0,
+                "end": 17,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D3",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000865-dc07a7d1",
+            "start": 0,
+            "end": 879,
+            "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 Revenue: Product $ 64,773 $ 64,699 $ 72,732 Service and other 180,349 147,216 125,538 Total revenue 245,122 211,915 198,270 Cost of revenue: Product 15,272 17,804 19,064 Service and other 58,842 48,059 43,586 Total cost of revenue 74,114 65,863 62,650 Gross margin 171,008 146,052 135,620 Research and development 29,510 27,195 24,512 Sales and marketing 24,456 22,759 21,825 General and administrative 7,609 7,575 5,900 Operating income 109,433 88,523 83,383 Other income (expense), net (1,646 ) 788 333 Income before income taxes 107,787 89,311 83,716 Provision for income taxes 19,651 16,950 10,978 Net income $ 88,136 $ 72,361 $ 72,738 Earnings per share: Basic $ 11.86 $ 9.72 $ 9.70 Diluted $ 11.80 $ 9.68 $ 9.65 Weighted average shares outstanding: Basic 7,431 7,446 7,496 Diluted 7,469 7,472 7,540",
+            "segments": [
+              {
+                "start": 0,
+                "end": 75,
+                "category": "required",
+                "requirement_ids": [
+                  "A1"
+                ]
+              },
+              {
+                "start": 75,
+                "end": 161,
+                "category": "table_structure",
+                "requirement_ids": []
+              },
+              {
+                "start": 161,
+                "end": 198,
+                "category": "required",
+                "requirement_ids": [
+                  "A1"
+                ]
+              },
+              {
+                "start": 198,
+                "end": 879,
+                "category": "table_structure",
+                "requirement_ids": []
+              }
+            ]
+          }
+        ],
+        "metadata_deliveries": [
+          {
+            "id": "M1",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "field": "fiscal_period",
+            "value": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            }
+          },
+          {
+            "id": "M2",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "field": "report_period_end",
+            "value": "2024-06-30"
+          }
+        ],
+        "cost": {
+          "known_usd": "0.700380",
+          "unknown_reserved_usd": "0"
+        },
+        "category_interpretation": {
+          "table_structure": "767 visible characters of removable incidental table data, not necessary structural syntax. Includes86 revenue-component chars and681 cost/profit/EPS/share-count chars.",
+          "necessary_context": "68 chars of location/table labels; useful navigation context, not all semantically indispensable.",
+          "irrelevant_zero_means": "No separately selected unrelated passages; does not mean zero removable content."
+        },
+        "limitations": [
+          "No assertion of unique minimum evidence set.",
+          "Visible character score excludes repeated JSON serialization and metadata bytes; packet cost reported separately.",
+          "Frozen criteria preserved; no new threshold based on observed result."
+        ]
+      },
+      "score": {
+        "schema_version": "evidence-score-v1",
+        "case_id": "E1-01",
+        "status": "pass",
+        "semantic_verification": "recorded_independent_review_not_machine_proven",
+        "location_verification": "exact_offsets_in_caller_verified_frozen_corpus",
+        "gates": {
+          "scope": "pass",
+          "truth": "pass",
+          "provenance": "pass",
+          "focus": "pass",
+          "required_coverage": "pass",
+          "all_characters_assessed": "pass"
+        },
+        "required_coverage": {
+          "numerator": 3,
+          "denominator": 3,
+          "ratio": 1.0
+        },
+        "required_status_counts": {
+          "supported": 3,
+          "partial": 0,
+          "missing": 0
+        },
+        "optional_annotated_coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "ratio": null
+        },
+        "metadata_delivery_count": 2,
+        "characters": {
+          "unique_source_characters": 947,
+          "delivered_character_occurrences": 947,
+          "repeated_location_occurrences": 0,
+          "categories": {
+            "required": {
+              "numerator": 112,
+              "denominator": 947,
+              "ratio": 0.11826821541710665
+            },
+            "optional": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "necessary_context": {
+              "numerator": 68,
+              "denominator": 947,
+              "ratio": 0.07180570221752904
+            },
+            "duplicate": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "irrelevant": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "unassessed": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "table_structure": {
+              "numerator": 767,
+              "denominator": 947,
+              "ratio": 0.8099260823653643
+            }
+          },
+          "non_table_structure_characters": 180
+        },
+        "cost": {
+          "known_estimated_usd": "0.700380",
+          "unknown_reserved_usd": "0",
+          "committed_estimated_usd": "0.700380",
+          "actual_billed_usd": null
+        },
+        "reviewer": "Codex e1_gold_reading; original-first evaluation after case frozen; not blind to inherited history"
+      },
+      "required": [
+        {
+          "id": "A1",
+          "description": "FY2024公司总收入为245,122 million USD，来自FY2024原年报的公司总额行。",
+          "kind": "text"
+        },
+        {
+          "id": "A2",
+          "description": "FY2024期间为2023-07-01至2024-06-30。",
+          "kind": "metadata"
+        },
+        {
+          "id": "A3",
+          "description": "使用FY2024原件，不能借用FY2025比较列替代。",
+          "kind": "metadata"
+        }
+      ],
+      "reference_explanation": "从 FY2024 原年报获取全年公司总收入。",
+      "provided_explanation": "交付245,122百万美元、2023-07-01至2024-06-30的原始XBRL期间、利润表及两个标题。",
+      "coverage_explanation": "必需项完整支持 3/3。本次未发现必需项缺失；精简性另行判断。",
+      "missing": [],
+      "extra": [
+        "767 字符：原表附带、本题不需要的其他行和比较列。这部分不计为必需支持。",
+        "集中在一张原始利润表及两标题，没有多取章节或重复表。在冻结整表粒度标准下通过；仍有767字符表内非必需数据，未达到最小充分压缩。"
+      ],
+      "limitations": [
+        "固定评测标准在运行前冻结，没有交给运行模型。原件优先的独立复核有历史摘要暴露，不称完全盲审。",
+        "这是特定题目和材料版本的单次或修复后验证；不能证明重复稳定性或全公司、全材料泛化。",
+        "完整表格粒度允许一些表内附带数据；固定标准通过也不等于达到用户的最小充分材料目标。",
+        "数字费用包含该运行所有失败调用，是估算，不是供应商账单。修复前的其他运行另列总账。"
+      ],
+      "evidence": [
+        {
+          "label": "A1 · 原文定位",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 ",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2024/indexes/source-8602d79f703e48c18c2f27c3/document.html#block-000865-dc07a7d1"
+        },
+        {
+          "label": "A1 · 原文定位",
+          "quote": "Total revenue 245,122 211,915 198,270",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2024/indexes/source-8602d79f703e48c18c2f27c3/document.html#block-000865-dc07a7d1"
+        }
+      ],
+      "process_links": [
+        {
+          "label": "独立核对详细说明",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-01-sonnet-r1/README.zh-CN.md"
+        },
+        {
+          "label": "原件核验",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-01-sonnet-r1/original-check.json"
+        },
+        {
+          "label": "预先冻结标准",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-01-v1.json"
+        },
+        {
+          "label": "实际系统运行状态",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-01-sonnet-r1/result.json"
+        }
+      ]
+    },
+    {
+      "case_id": "E1-02",
+      "status": "finished",
+      "question": "请仅依据 Microsoft FY2025 10-K 中的比较披露，提供 FY2024 公司总收入及单位、财年起止和原文出处；不要求分析增长。",
+      "gold_sha256": "7326a9e61e3e042e58967c925183abd0f83b7328b317960f44b7e51c4ea7a1e9",
+      "run_sha256": "a06319e3bcbd13e4c0f75fd526acbbf42ee2ad82e2aa8ef279b932d05d88d889",
+      "review": {
+        "schema_version": "evidence-review-v1",
+        "case_id": "E1-02",
+        "question": "请仅依据 Microsoft FY2025 10-K 中的比较披露，提供 FY2024 公司总收入及单位、财年起止和原文出处；不要求分析增长。",
+        "reviewer": "Codex root; independent original-source review after frozen reference",
+        "requirements": [
+          {
+            "id": "R1",
+            "status": "supported",
+            "reason": "原表FY2024公司总收入245,122百万美元；已核原始数值节点、USD单位、百万倍数、无分部维度及表头。",
+            "citations": [
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000781-9ee5633d",
+                "start": 0,
+                "end": 75,
+                "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 "
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000781-9ee5633d",
+                "start": 161,
+                "end": 198,
+                "quote": "Total revenue 281,724 245,122 211,915"
+              }
+            ]
+          },
+          {
+            "id": "R2",
+            "status": "supported",
+            "reason": "表头给出截至6月30日财年，实际交付的记录给出起止日；已回原件XBRL context核对2023-07-01至2024-06-30。不是仅凭表头猜起日。",
+            "citations": [
+              {
+                "kind": "metadata",
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "field": "fiscal_period",
+                "value": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                }
+              }
+            ]
+          },
+          {
+            "id": "R3",
+            "status": "supported",
+            "reason": "交付source_documents明确报告期2025-06-30和FY2025原件hash，未将比较列称为FY2024原年报。",
+            "citations": [
+              {
+                "kind": "metadata",
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "field": "report_period_end",
+                "value": "2025-06-30"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "scope": {
+            "status": "pass",
+            "reason": "仅指定Microsoft FY2025原件、FY2024事实期间。"
+          },
+          "truth": {
+            "status": "pass",
+            "reason": "数值、期间和USD单位已核对原件XBRL；所有正文与原DOM一致。"
+          },
+          "provenance": {
+            "status": "pass",
+            "reason": "运行、数据集、原件hash及数字所在表格单元格均核对。"
+          },
+          "focus": {
+            "status": "pass",
+            "reason": "只交付一张利润表及两个简短标题，没有附加无关章节或重复数字表。原表中本题不需要的行单列为可优化附带内容；不声称唯一最小。"
+          }
+        },
+        "deliveries": [
+          {
+            "id": "D1",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000779-9d7720d5",
+            "start": 0,
+            "end": 51,
+            "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+            "segments": [
+              {
+                "start": 0,
+                "end": 51,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D2",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000780-cdef2bac",
+            "start": 0,
+            "end": 17,
+            "quote": "INCOME STATEMENTS",
+            "segments": [
+              {
+                "start": 0,
+                "end": 17,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D3",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000781-9ee5633d",
+            "start": 0,
+            "end": 889,
+            "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 Revenue: Product $ 63,946 $ 64,773 $ 64,699 Service and other 217,778 180,349 147,216 Total revenue 281,724 245,122 211,915 Cost of revenue: Product 13,501 15,272 17,804 Service and other 74,330 58,842 48,059 Total cost of revenue 87,831 74,114 65,863 Gross margin 193,893 171,008 146,052 Research and development 32,488 29,510 27,195 Sales and marketing 25,654 24,456 22,759 General and administrative 7,223 7,609 7,575 Operating income 128,528 109,433 88,523 Other income (expense), net (4,901 ) (1,646 ) 788 Income before income taxes 123,627 107,787 89,311 Provision for income taxes 21,795 19,651 16,950 Net income $ 101,832 $ 88,136 $ 72,361 Earnings per share: Basic $ 13.70 $ 11.86 $ 9.72 Diluted $ 13.64 $ 11.80 $ 9.68 Weighted average shares outstanding: Basic 7,433 7,431 7,446 Diluted 7,465 7,469 7,472",
+            "segments": [
+              {
+                "start": 0,
+                "end": 75,
+                "category": "required",
+                "requirement_ids": [
+                  "R1"
+                ]
+              },
+              {
+                "start": 75,
+                "end": 161,
+                "category": "table_structure",
+                "requirement_ids": []
+              },
+              {
+                "start": 161,
+                "end": 198,
+                "category": "required",
+                "requirement_ids": [
+                  "R1"
+                ]
+              },
+              {
+                "start": 198,
+                "end": 889,
+                "category": "table_structure",
+                "requirement_ids": []
+              }
+            ]
+          }
+        ],
+        "metadata_deliveries": [
+          {
+            "id": "M1",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "field": "fiscal_period",
+            "value": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            }
+          },
+          {
+            "id": "M2",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "field": "report_period_end",
+            "value": "2025-06-30"
+          }
+        ],
+        "cost": {
+          "known_usd": "0.765630",
+          "unknown_reserved_usd": "0"
+        }
+      },
+      "score": {
+        "schema_version": "evidence-score-v1",
+        "case_id": "E1-02",
+        "status": "pass",
+        "semantic_verification": "recorded_independent_review_not_machine_proven",
+        "location_verification": "exact_offsets_in_caller_verified_frozen_corpus",
+        "gates": {
+          "scope": "pass",
+          "truth": "pass",
+          "provenance": "pass",
+          "focus": "pass",
+          "required_coverage": "pass",
+          "all_characters_assessed": "pass"
+        },
+        "required_coverage": {
+          "numerator": 3,
+          "denominator": 3,
+          "ratio": 1.0
+        },
+        "required_status_counts": {
+          "supported": 3,
+          "partial": 0,
+          "missing": 0
+        },
+        "optional_annotated_coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "ratio": null
+        },
+        "metadata_delivery_count": 2,
+        "characters": {
+          "unique_source_characters": 957,
+          "delivered_character_occurrences": 957,
+          "repeated_location_occurrences": 0,
+          "categories": {
+            "required": {
+              "numerator": 112,
+              "denominator": 957,
+              "ratio": 0.11703239289446186
+            },
+            "optional": {
+              "numerator": 0,
+              "denominator": 957,
+              "ratio": 0.0
+            },
+            "necessary_context": {
+              "numerator": 68,
+              "denominator": 957,
+              "ratio": 0.07105538140020899
+            },
+            "duplicate": {
+              "numerator": 0,
+              "denominator": 957,
+              "ratio": 0.0
+            },
+            "irrelevant": {
+              "numerator": 0,
+              "denominator": 957,
+              "ratio": 0.0
+            },
+            "unassessed": {
+              "numerator": 0,
+              "denominator": 957,
+              "ratio": 0.0
+            },
+            "table_structure": {
+              "numerator": 777,
+              "denominator": 957,
+              "ratio": 0.8119122257053292
+            }
+          },
+          "non_table_structure_characters": 180
+        },
+        "cost": {
+          "known_estimated_usd": "0.765630",
+          "unknown_reserved_usd": "0",
+          "committed_estimated_usd": "0.765630",
+          "actual_billed_usd": null
+        },
+        "reviewer": "Codex root; independent original-source review after frozen reference"
+      },
+      "required": [
+        {
+          "id": "R1",
+          "description": "FY2024 公司总收入为 USD 245,122 million；这是全年合并总收入，不能用某分部或产品类别替代。",
+          "kind": "text"
+        },
+        {
+          "id": "R2",
+          "description": "金额必须与 FY2024 列、Year Ended June 30 年度表头和 In millions 单位绑定；仅裸数字不算命中。",
+          "kind": "metadata"
+        },
+        {
+          "id": "R3",
+          "description": "明确原件属于 FY2025 10-K，数据为其中 FY2024 比较列；不得说已读取 FY2024 年报原件。",
+          "kind": "metadata"
+        }
+      ],
+      "reference_explanation": "从 FY2025 年报获取 FY2024 比较数，不能冒充已读取旧年报。",
+      "provided_explanation": "交付245,122百万美元及对应期间，清楚绑定FY2025原件中的FY2024比较列。",
+      "coverage_explanation": "必需项完整支持 3/3。本次未发现必需项缺失；精简性另行判断。",
+      "missing": [],
+      "extra": [
+        "777 字符：原表附带、本题不需要的其他行和比较列。这部分不计为必需支持。",
+        "只交付一张利润表及两个简短标题，没有附加无关章节或重复数字表。原表中本题不需要的行单列为可优化附带内容；不声称唯一最小。"
+      ],
+      "limitations": [
+        "固定评测标准在运行前冻结，没有交给运行模型。原件优先的独立复核有历史摘要暴露，不称完全盲审。",
+        "这是特定题目和材料版本的单次或修复后验证；不能证明重复稳定性或全公司、全材料泛化。",
+        "完整表格粒度允许一些表内附带数据；固定标准通过也不等于达到用户的最小充分材料目标。",
+        "数字费用包含该运行所有失败调用，是估算，不是供应商账单。修复前的其他运行另列总账。"
+      ],
+      "evidence": [
+        {
+          "label": "R1 · 原文定位",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 ",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000781-9ee5633d"
+        },
+        {
+          "label": "R1 · 原文定位",
+          "quote": "Total revenue 281,724 245,122 211,915",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000781-9ee5633d"
+        }
+      ],
+      "process_links": [
+        {
+          "label": "独立核对详细说明",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-02-sonnet-r1/README.zh-CN.md"
+        },
+        {
+          "label": "原件核验",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-02-sonnet-r1/original-check.json"
+        },
+        {
+          "label": "预先冻结标准",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-02-v1.json"
+        },
+        {
+          "label": "实际系统运行状态",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-02-sonnet-r1/result.json"
+        }
+      ]
+    },
+    {
+      "case_id": "E1-03",
+      "status": "finished",
+      "question": "请分别提供 Microsoft FY2024 与 FY2025 两份10-K各自披露的FY2024公司总收入，保留两份出处、单位与期间，核对是否一致；不要把重复披露相加。",
+      "gold_sha256": "c0e86ddfaea99f611ff4b013f53aa1631ce78fd601aa64de10d368ea520d1003",
+      "run_sha256": "f0579c4b865fef26011a104ea94878c9cc112555be5ea883308f57f63a47ad4c",
+      "review": {
+        "schema_version": "evidence-review-v1",
+        "case_id": "E1-03",
+        "question": "请分别提供 Microsoft FY2024 与 FY2025 两份10-K各自披露的FY2024公司总收入，保留两份出处、单位与期间，核对是否一致；不要把重复披露相加。",
+        "reviewer": "Codex e1_gold_reading; after pre-run freeze and original-source reconstruction, not blind to history",
+        "requirements": [
+          {
+            "id": "D1",
+            "status": "supported",
+            "reason": "FY2024原年报Total revenue行2024列245122百万美元；原数值标签、单位、issuer-only年度context及单元格均验证。",
+            "citations": [
+              {
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "block_id": "block-000865-dc07a7d1",
+                "start": 0,
+                "end": 75,
+                "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 "
+              },
+              {
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "block_id": "block-000865-dc07a7d1",
+                "start": 161,
+                "end": 198,
+                "quote": "Total revenue 245,122 211,915 198,270"
+              }
+            ]
+          },
+          {
+            "id": "D2",
+            "status": "supported",
+            "reason": "FY2025原年报Total revenue行2024比较列同为245122百万美元；引用2024列而不是本年281724，原始标签和期间验证。",
+            "citations": [
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000781-9ee5633d",
+                "start": 0,
+                "end": 75,
+                "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 "
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000781-9ee5633d",
+                "start": 161,
+                "end": 198,
+                "quote": "Total revenue 281,724 245,122 211,915"
+              }
+            ]
+          },
+          {
+            "id": "D3",
+            "status": "supported",
+            "reason": "实际交付保留两条不同source/hash的收入记录，单位均USD，观察期间均2023-07-01至2024-06-30，值均245122000000。未生成合并金额或计算事实，执行QueryPlan calculations为空；选择步骤明确两来源各一条、不相加。这是原数据足以支持一致性核对，并非评测者向运行填入答案。",
+            "citations": [
+              {
+                "id": "M1",
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "field": "delivered_record_binding",
+                "value": {
+                  "value_decimal": "245122000000",
+                  "unit": "USD",
+                  "period": {
+                    "kind": "year",
+                    "start": "2023-07-01",
+                    "end": "2024-06-30",
+                    "basis": "source"
+                  },
+                  "report_period_end": "2024-06-30",
+                  "available_at": "2024-07-30",
+                  "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+                  "source_sha256": "cdcc8db91bc8ac88239ffd09c19afc85a65460b0a981604ebcc4dd9ebdac8e76"
+                },
+                "kind": "metadata"
+              },
+              {
+                "id": "M2",
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "field": "delivered_record_binding",
+                "value": {
+                  "value_decimal": "245122000000",
+                  "unit": "USD",
+                  "period": {
+                    "kind": "year",
+                    "start": "2023-07-01",
+                    "end": "2024-06-30",
+                    "basis": "source"
+                  },
+                  "report_period_end": "2025-06-30",
+                  "available_at": "2025-07-30",
+                  "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+                  "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008"
+                },
+                "kind": "metadata"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "scope": {
+            "status": "pass",
+            "reason": "Microsoft同公司、两个明确版本；每边都选FY2024观察期间。"
+          },
+          "truth": {
+            "status": "pass",
+            "reason": "两个原件分别核验数值和XBRL，年度列/单位一致；未把FY2025本年值误作比较列。"
+          },
+          "provenance": {
+            "status": "pass",
+            "reason": "两份来源、原始hash、实际单元格和记录身份都保留，没有因为数值相同合并掉出处。"
+          },
+          "focus": {
+            "status": "pass",
+            "reason": "每份报告一张相关原表，无额外章节或同源重复表。两份同额材料是题目必需，不扣重复分；1544字符表内附带仍可裁剪，非最小材料。"
+          }
+        },
+        "deliveries": [
+          {
+            "id": "B1",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000863-9d7720d5",
+            "start": 0,
+            "end": 51,
+            "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+            "segments": [
+              {
+                "start": 0,
+                "end": 51,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "B2",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000864-cdef2bac",
+            "start": 0,
+            "end": 17,
+            "quote": "INCOME STATEMENTS",
+            "segments": [
+              {
+                "start": 0,
+                "end": 17,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "B3",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000865-dc07a7d1",
+            "start": 0,
+            "end": 879,
+            "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 Revenue: Product $ 64,773 $ 64,699 $ 72,732 Service and other 180,349 147,216 125,538 Total revenue 245,122 211,915 198,270 Cost of revenue: Product 15,272 17,804 19,064 Service and other 58,842 48,059 43,586 Total cost of revenue 74,114 65,863 62,650 Gross margin 171,008 146,052 135,620 Research and development 29,510 27,195 24,512 Sales and marketing 24,456 22,759 21,825 General and administrative 7,609 7,575 5,900 Operating income 109,433 88,523 83,383 Other income (expense), net (1,646 ) 788 333 Income before income taxes 107,787 89,311 83,716 Provision for income taxes 19,651 16,950 10,978 Net income $ 88,136 $ 72,361 $ 72,738 Earnings per share: Basic $ 11.86 $ 9.72 $ 9.70 Diluted $ 11.80 $ 9.68 $ 9.65 Weighted average shares outstanding: Basic 7,431 7,446 7,496 Diluted 7,469 7,472 7,540",
+            "segments": [
+              {
+                "start": 0,
+                "end": 75,
+                "category": "required",
+                "requirement_ids": [
+                  "D1"
+                ]
+              },
+              {
+                "start": 75,
+                "end": 161,
+                "category": "table_structure",
+                "requirement_ids": []
+              },
+              {
+                "start": 161,
+                "end": 198,
+                "category": "required",
+                "requirement_ids": [
+                  "D1"
+                ]
+              },
+              {
+                "start": 198,
+                "end": 879,
+                "category": "table_structure",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "B4",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000779-9d7720d5",
+            "start": 0,
+            "end": 51,
+            "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+            "segments": [
+              {
+                "start": 0,
+                "end": 51,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "B5",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000780-cdef2bac",
+            "start": 0,
+            "end": 17,
+            "quote": "INCOME STATEMENTS",
+            "segments": [
+              {
+                "start": 0,
+                "end": 17,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "B6",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000781-9ee5633d",
+            "start": 0,
+            "end": 889,
+            "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 Revenue: Product $ 63,946 $ 64,773 $ 64,699 Service and other 217,778 180,349 147,216 Total revenue 281,724 245,122 211,915 Cost of revenue: Product 13,501 15,272 17,804 Service and other 74,330 58,842 48,059 Total cost of revenue 87,831 74,114 65,863 Gross margin 193,893 171,008 146,052 Research and development 32,488 29,510 27,195 Sales and marketing 25,654 24,456 22,759 General and administrative 7,223 7,609 7,575 Operating income 128,528 109,433 88,523 Other income (expense), net (4,901 ) (1,646 ) 788 Income before income taxes 123,627 107,787 89,311 Provision for income taxes 21,795 19,651 16,950 Net income $ 101,832 $ 88,136 $ 72,361 Earnings per share: Basic $ 13.70 $ 11.86 $ 9.72 Diluted $ 13.64 $ 11.80 $ 9.68 Weighted average shares outstanding: Basic 7,433 7,431 7,446 Diluted 7,465 7,469 7,472",
+            "segments": [
+              {
+                "start": 0,
+                "end": 75,
+                "category": "required",
+                "requirement_ids": [
+                  "D2"
+                ]
+              },
+              {
+                "start": 75,
+                "end": 161,
+                "category": "table_structure",
+                "requirement_ids": []
+              },
+              {
+                "start": 161,
+                "end": 198,
+                "category": "required",
+                "requirement_ids": [
+                  "D2"
+                ]
+              },
+              {
+                "start": 198,
+                "end": 889,
+                "category": "table_structure",
+                "requirement_ids": []
+              }
+            ]
+          }
+        ],
+        "metadata_deliveries": [
+          {
+            "id": "M1",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "field": "delivered_record_binding",
+            "value": {
+              "value_decimal": "245122000000",
+              "unit": "USD",
+              "period": {
+                "kind": "year",
+                "start": "2023-07-01",
+                "end": "2024-06-30",
+                "basis": "source"
+              },
+              "report_period_end": "2024-06-30",
+              "available_at": "2024-07-30",
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "source_sha256": "cdcc8db91bc8ac88239ffd09c19afc85a65460b0a981604ebcc4dd9ebdac8e76"
+            }
+          },
+          {
+            "id": "M2",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "field": "delivered_record_binding",
+            "value": {
+              "value_decimal": "245122000000",
+              "unit": "USD",
+              "period": {
+                "kind": "year",
+                "start": "2023-07-01",
+                "end": "2024-06-30",
+                "basis": "source"
+              },
+              "report_period_end": "2025-06-30",
+              "available_at": "2025-07-30",
+              "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+              "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008"
+            }
+          }
+        ],
+        "cost": {
+          "known_usd": "1.092950",
+          "unknown_reserved_usd": "0"
+        },
+        "category_interpretation": {
+          "table_structure": "1544 chars removable table-internal data, not essential structure",
+          "necessary_context": "136 chars location/table labels, not all semantically indispensable",
+          "duplicate_zero_means": "The two different source versions are explicitly required; other-row overhead tracked separately."
+        },
+        "limitations": [
+          "D3 checks actual paired records and absence of sum; no separate machine comparison report is generated by Data Agent.",
+          "Original-source reviewer judgments, not automated semantic truth proof.",
+          "No after-the-fact relaxation or new waste threshold."
+        ]
+      },
+      "score": {
+        "schema_version": "evidence-score-v1",
+        "case_id": "E1-03",
+        "status": "pass",
+        "semantic_verification": "recorded_independent_review_not_machine_proven",
+        "location_verification": "exact_offsets_in_caller_verified_frozen_corpus",
+        "gates": {
+          "scope": "pass",
+          "truth": "pass",
+          "provenance": "pass",
+          "focus": "pass",
+          "required_coverage": "pass",
+          "all_characters_assessed": "pass"
+        },
+        "required_coverage": {
+          "numerator": 3,
+          "denominator": 3,
+          "ratio": 1.0
+        },
+        "required_status_counts": {
+          "supported": 3,
+          "partial": 0,
+          "missing": 0
+        },
+        "optional_annotated_coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "ratio": null
+        },
+        "metadata_delivery_count": 2,
+        "characters": {
+          "unique_source_characters": 1904,
+          "delivered_character_occurrences": 1904,
+          "repeated_location_occurrences": 0,
+          "categories": {
+            "required": {
+              "numerator": 224,
+              "denominator": 1904,
+              "ratio": 0.11764705882352941
+            },
+            "optional": {
+              "numerator": 0,
+              "denominator": 1904,
+              "ratio": 0.0
+            },
+            "necessary_context": {
+              "numerator": 136,
+              "denominator": 1904,
+              "ratio": 0.07142857142857142
+            },
+            "duplicate": {
+              "numerator": 0,
+              "denominator": 1904,
+              "ratio": 0.0
+            },
+            "irrelevant": {
+              "numerator": 0,
+              "denominator": 1904,
+              "ratio": 0.0
+            },
+            "unassessed": {
+              "numerator": 0,
+              "denominator": 1904,
+              "ratio": 0.0
+            },
+            "table_structure": {
+              "numerator": 1544,
+              "denominator": 1904,
+              "ratio": 0.8109243697478992
+            }
+          },
+          "non_table_structure_characters": 360
+        },
+        "cost": {
+          "known_estimated_usd": "1.092950",
+          "unknown_reserved_usd": "0",
+          "committed_estimated_usd": "1.092950",
+          "actual_billed_usd": null
+        },
+        "reviewer": "Codex e1_gold_reading; after pre-run freeze and original-source reconstruction, not blind to history"
+      },
+      "required": [
+        {
+          "id": "D1",
+          "description": "FY2024原件的FY2024总额245,122 million USD。",
+          "kind": "text"
+        },
+        {
+          "id": "D2",
+          "description": "FY2025原件的FY2024比较总额245,122 million USD。",
+          "kind": "text"
+        },
+        {
+          "id": "D3",
+          "description": "两份记录各自绑定来源、同一财年期间和单位；值一致，不相加。",
+          "kind": "metadata"
+        }
+      ],
+      "reference_explanation": "对照两份独立原件，验证同一年度收入是否相同，保留两个出处，不相加。",
+      "provided_explanation": "两个版本各自提供一条FY2024总收入记录和利润表。两者均为245,122百万美元，属于同一观察期间。",
+      "coverage_explanation": "必需项完整支持 3/3。本次未发现必需项缺失；精简性另行判断。",
+      "missing": [],
+      "extra": [
+        "1544 字符：原表附带、本题不需要的其他行和比较列。这部分不计为必需支持。",
+        "每份报告一张相关原表，无额外章节或同源重复表。两份同额材料是题目必需，不扣重复分；1544字符表内附带仍可裁剪，非最小材料。"
+      ],
+      "limitations": [
+        "固定评测标准在运行前冻结，没有交给运行模型。原件优先的独立复核有历史摘要暴露，不称完全盲审。",
+        "这是特定题目和材料版本的单次或修复后验证；不能证明重复稳定性或全公司、全材料泛化。",
+        "完整表格粒度允许一些表内附带数据；固定标准通过也不等于达到用户的最小充分材料目标。",
+        "数字费用包含该运行所有失败调用，是估算，不是供应商账单。修复前的其他运行另列总账。"
+      ],
+      "evidence": [
+        {
+          "label": "D1 · 原文定位",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 ",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2024/indexes/source-8602d79f703e48c18c2f27c3/document.html#block-000865-dc07a7d1"
+        },
+        {
+          "label": "D1 · 原文定位",
+          "quote": "Total revenue 245,122 211,915 198,270",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2024/indexes/source-8602d79f703e48c18c2f27c3/document.html#block-000865-dc07a7d1"
+        },
+        {
+          "label": "D2 · 原文定位",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 ",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000781-9ee5633d"
+        },
+        {
+          "label": "D2 · 原文定位",
+          "quote": "Total revenue 281,724 245,122 211,915",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000781-9ee5633d"
+        }
+      ],
+      "process_links": [
+        {
+          "label": "独立核对详细说明",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-03-sonnet-r1/README.zh-CN.md"
+        },
+        {
+          "label": "原件核验",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-03-sonnet-r1/original-check.json"
+        },
+        {
+          "label": "预先冻结标准",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-03-v1.json"
+        },
+        {
+          "label": "实际系统运行状态",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-03-sonnet-r1/result.json"
+        }
+      ]
+    },
+    {
+      "case_id": "E1-04",
+      "status": "finished",
+      "question": "以2024-08-01为资料可得截止日，提供Microsoft FY2024公司总收入及金额单位、财年起止、原文出处，不使用截止日之后发布的材料。",
+      "gold_sha256": "ebdb9c584e6734a20ba4658b1677f448bb636ca4b4938e5d70d60d863680a8f7",
+      "run_sha256": "b035ba7589cd7210d8cfd77b298e10e1ec56ca70341acd463a6bb18fc3a2f5a8",
+      "review": {
+        "schema_version": "evidence-review-v1",
+        "case_id": "E1-04",
+        "question": "以2024-08-01为资料可得截止日，提供Microsoft FY2024公司总收入及金额单位、财年起止、原文出处，不使用截止日之后发布的材料。",
+        "reviewer": "Codex e1_gold_reading; original-first evaluation after case frozen; not blind to inherited history",
+        "requirements": [
+          {
+            "id": "A1",
+            "status": "supported",
+            "reason": "FY2024原件利润表Total revenue行的2024列为245,122，In millions表头、原始标签scale=6与USD单位一致。无分部维度的记录交付为245122000000 USD。",
+            "citations": [
+              {
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "block_id": "block-000865-dc07a7d1",
+                "start": 0,
+                "end": 75,
+                "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 "
+              },
+              {
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "block_id": "block-000865-dc07a7d1",
+                "start": 161,
+                "end": 198,
+                "quote": "Total revenue 245,122 211,915 198,270"
+              }
+            ]
+          },
+          {
+            "id": "A2",
+            "status": "supported",
+            "reason": "交付记录实际包含2023-07-01至2024-06-30；本轮复核原件context C_6dbdb3a2-9baf-41b4-922d-f59879124337完全一致。不是根据Year Ended June30擅补起日。",
+            "citations": [
+              {
+                "kind": "metadata",
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "field": "fiscal_period",
+                "value": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                }
+              }
+            ]
+          },
+          {
+            "id": "T1",
+            "status": "supported",
+            "reason": "实际交付FY2024 available_at=2024-07-30，早于2024-08-01。全8轮查询/正文审计仅FY2024；FY2025可得日2025-07-30只能作排除元数据。",
+            "citations": [
+              {
+                "kind": "metadata",
+                "source_id": "source-8602d79f703e48c18c2f27c3",
+                "field": "available_at",
+                "value": "2024-07-30"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "scope": {
+            "status": "pass",
+            "reason": "Microsoft FY2024原年报在2024-08-01前可得，查找/查询结果/已读正文/交付无FY2025财务正文。"
+          },
+          "truth": {
+            "status": "pass",
+            "reason": "原始数值节点、USD定义、scale、无分部维度、期间和原文均重新核验。"
+          },
+          "provenance": {
+            "status": "pass",
+            "reason": "运行/数据集/冻结标准hash核对；数字定位原表行11列3及字符175:182。"
+          },
+          "focus": {
+            "status": "pass",
+            "reason": "集中在一张原始利润表及两标题，没有多取章节或重复表。在冻结整表粒度标准下通过；仍有767字符表内非必需数据，未达到最小充分压缩。"
+          }
+        },
+        "deliveries": [
+          {
+            "id": "D1",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000863-9d7720d5",
+            "start": 0,
+            "end": 51,
+            "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+            "segments": [
+              {
+                "start": 0,
+                "end": 51,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D2",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000864-cdef2bac",
+            "start": 0,
+            "end": 17,
+            "quote": "INCOME STATEMENTS",
+            "segments": [
+              {
+                "start": 0,
+                "end": 17,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D3",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "block_id": "block-000865-dc07a7d1",
+            "start": 0,
+            "end": 879,
+            "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 Revenue: Product $ 64,773 $ 64,699 $ 72,732 Service and other 180,349 147,216 125,538 Total revenue 245,122 211,915 198,270 Cost of revenue: Product 15,272 17,804 19,064 Service and other 58,842 48,059 43,586 Total cost of revenue 74,114 65,863 62,650 Gross margin 171,008 146,052 135,620 Research and development 29,510 27,195 24,512 Sales and marketing 24,456 22,759 21,825 General and administrative 7,609 7,575 5,900 Operating income 109,433 88,523 83,383 Other income (expense), net (1,646 ) 788 333 Income before income taxes 107,787 89,311 83,716 Provision for income taxes 19,651 16,950 10,978 Net income $ 88,136 $ 72,361 $ 72,738 Earnings per share: Basic $ 11.86 $ 9.72 $ 9.70 Diluted $ 11.80 $ 9.68 $ 9.65 Weighted average shares outstanding: Basic 7,431 7,446 7,496 Diluted 7,469 7,472 7,540",
+            "segments": [
+              {
+                "start": 0,
+                "end": 75,
+                "category": "required",
+                "requirement_ids": [
+                  "A1"
+                ]
+              },
+              {
+                "start": 75,
+                "end": 161,
+                "category": "table_structure",
+                "requirement_ids": []
+              },
+              {
+                "start": 161,
+                "end": 198,
+                "category": "required",
+                "requirement_ids": [
+                  "A1"
+                ]
+              },
+              {
+                "start": 198,
+                "end": 879,
+                "category": "table_structure",
+                "requirement_ids": []
+              }
+            ]
+          }
+        ],
+        "metadata_deliveries": [
+          {
+            "id": "M1",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "field": "fiscal_period",
+            "value": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            }
+          },
+          {
+            "id": "M2",
+            "source_id": "source-8602d79f703e48c18c2f27c3",
+            "field": "available_at",
+            "value": "2024-07-30"
+          }
+        ],
+        "cost": {
+          "known_usd": "0.728260",
+          "unknown_reserved_usd": "0"
+        },
+        "category_interpretation": {
+          "table_structure": "767 visible characters of removable incidental table data, not necessary structural syntax. Includes86 revenue-component chars and681 cost/profit/EPS/share-count chars.",
+          "necessary_context": "68 chars of location/table labels; useful navigation context, not all semantically indispensable.",
+          "irrelevant_zero_means": "No separately selected unrelated passages; does not mean zero removable content."
+        },
+        "limitations": [
+          "No assertion of unique minimum evidence set.",
+          "Visible character score excludes repeated JSON serialization and metadata bytes; packet cost reported separately.",
+          "Frozen criteria preserved; no new threshold based on observed result."
+        ]
+      },
+      "score": {
+        "schema_version": "evidence-score-v1",
+        "case_id": "E1-04",
+        "status": "pass",
+        "semantic_verification": "recorded_independent_review_not_machine_proven",
+        "location_verification": "exact_offsets_in_caller_verified_frozen_corpus",
+        "gates": {
+          "scope": "pass",
+          "truth": "pass",
+          "provenance": "pass",
+          "focus": "pass",
+          "required_coverage": "pass",
+          "all_characters_assessed": "pass"
+        },
+        "required_coverage": {
+          "numerator": 3,
+          "denominator": 3,
+          "ratio": 1.0
+        },
+        "required_status_counts": {
+          "supported": 3,
+          "partial": 0,
+          "missing": 0
+        },
+        "optional_annotated_coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "ratio": null
+        },
+        "metadata_delivery_count": 2,
+        "characters": {
+          "unique_source_characters": 947,
+          "delivered_character_occurrences": 947,
+          "repeated_location_occurrences": 0,
+          "categories": {
+            "required": {
+              "numerator": 112,
+              "denominator": 947,
+              "ratio": 0.11826821541710665
+            },
+            "optional": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "necessary_context": {
+              "numerator": 68,
+              "denominator": 947,
+              "ratio": 0.07180570221752904
+            },
+            "duplicate": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "irrelevant": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "unassessed": {
+              "numerator": 0,
+              "denominator": 947,
+              "ratio": 0.0
+            },
+            "table_structure": {
+              "numerator": 767,
+              "denominator": 947,
+              "ratio": 0.8099260823653643
+            }
+          },
+          "non_table_structure_characters": 180
+        },
+        "cost": {
+          "known_estimated_usd": "0.728260",
+          "unknown_reserved_usd": "0",
+          "committed_estimated_usd": "0.728260",
+          "actual_billed_usd": null
+        },
+        "reviewer": "Codex e1_gold_reading; original-first evaluation after case frozen; not blind to inherited history",
+        "evaluation_scope": "data_content_and_cutoff_only",
+        "workflow_status": "blocked_by_review_failure",
+        "workflow_accepted": false
+      },
+      "required": [
+        {
+          "id": "A1",
+          "description": "FY2024公司总收入为245,122 million USD，来自FY2024原年报的公司总额行。",
+          "kind": "text"
+        },
+        {
+          "id": "A2",
+          "description": "FY2024期间为2023-07-01至2024-06-30。",
+          "kind": "metadata"
+        },
+        {
+          "id": "T1",
+          "description": "财报发布时间2024-07-30不晚于2024-08-01；FY2025年报2025-07-30为未来材料，不能作为交付证据。",
+          "kind": "metadata"
+        }
+      ],
+      "reference_explanation": "以资料可得日为边界，既要最终结果正确，也不能在中间读取未来报告正文。",
+      "provided_explanation": "仅交付2024-07-30公开的FY2024原件。完整过程已检查；FY2025仅出现允许的身份和排除元数据。原r2审核协议失败，独立恢复审核成功，原取材未改。",
+      "coverage_explanation": "必需项完整支持 3/3。本次未发现必需项缺失；精简性另行判断。",
+      "missing": [],
+      "extra": [
+        "767 字符：原表附带、本题不需要的其他行和比较列。这部分不计为必需支持。",
+        "集中在一张原始利润表及两标题，没有多取章节或重复表。在冻结整表粒度标准下通过；仍有767字符表内非必需数据，未达到最小充分压缩。"
+      ],
+      "limitations": [
+        "固定评测标准在运行前冻结，没有交给运行模型。原件优先的独立复核有历史摘要暴露，不称完全盲审。",
+        "这是特定题目和材料版本的单次或修复后验证；不能证明重复稳定性或全公司、全材料泛化。",
+        "完整表格粒度允许一些表内附带数据；固定标准通过也不等于达到用户的最小充分材料目标。",
+        "数字费用包含该运行所有失败调用，是估算，不是供应商账单。修复前的其他运行另列总账。",
+        "本页评分费用仅为原r2的$0.728260；恢复审核另花$0.062252，合计$0.790512。更早失败r1的$0.527150也计入本轮总费用。原r2仍标为流程失败。"
+      ],
+      "evidence": [
+        {
+          "label": "A1 · 原文定位",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 ",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2024/indexes/source-8602d79f703e48c18c2f27c3/document.html#block-000865-dc07a7d1"
+        },
+        {
+          "label": "A1 · 原文定位",
+          "quote": "Total revenue 245,122 211,915 198,270",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2024/indexes/source-8602d79f703e48c18c2f27c3/document.html#block-000865-dc07a7d1"
+        }
+      ],
+      "process_links": [
+        {
+          "label": "独立核对详细说明",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-04-sonnet-r2/README.zh-CN.md"
+        },
+        {
+          "label": "原件核验",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-04-sonnet-r2/original-check.json"
+        },
+        {
+          "label": "预先冻结标准",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-04-v1.json"
+        },
+        {
+          "label": "实际系统运行状态",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-04-sonnet-r2/result.json"
+        }
+      ]
+    },
+    {
+      "case_id": "E1-05",
+      "status": "finished",
+      "question": "请依据 Microsoft FY2025 10-K，提供三个报告分部及各自核心业务的原始材料，保留所属关系与必要限定，不要求所有产品清单。",
+      "gold_sha256": "4e410ea1634fa995be31a2e08ce756cbcffb59ec949dfcaa5d693f5dad490225",
+      "run_sha256": "064233183b2f592d1c70778c3cd0ff67b9fe598852d028e033f867de2b63c88b",
+      "review": {
+        "schema_version": "evidence-review-v1",
+        "case_id": "E1-05",
+        "question": "请依据 Microsoft FY2025 10-K，提供三个报告分部及各自核心业务的原始材料，保留所属关系与必要限定，不要求所有产品清单。",
+        "reviewer": "Codex e1_gold_reading; original-first after frozen gold; inherited prior summaries, not fully blind",
+        "requirements": [
+          {
+            "id": "B1",
+            "status": "supported",
+            "reason": "原件明确 three segments，并完整列出三个分部。未将 Microsoft Cloud 或任何产品提升为第四分部。",
+            "citations": [
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000086-935d6090",
+                "start": 0,
+                "end": 167,
+                "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing."
+              }
+            ]
+          },
+          {
+            "id": "B2",
+            "status": "supported",
+            "reason": "连续PBP标题/总述和四个列表保留Commercial、Consumer、LinkedIn、Dynamics所属关系；Windows Commercial的云和本地组成均明确属于Commercial组合。",
+            "citations": [
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000090-94a2e06c",
+                "start": 0,
+                "end": 35,
+                "quote": "Productivity and Business Processes"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000091-d993f813",
+                "start": 0,
+                "end": 235,
+                "quote": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000093-7018adaa",
+                "start": 0,
+                "end": 52,
+                "quote": "Microsoft 365 Commercial products and cloud services"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000093-7018adaa",
+                "start": 165,
+                "end": 204,
+                "quote": "the cloud portion of Windows Commercial"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000093-7018adaa",
+                "start": 395,
+                "end": 425,
+                "quote": "Windows Commercial on-premises"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000095-61bd513b",
+                "start": 0,
+                "end": 50,
+                "quote": "Microsoft 365 Consumer products and cloud services"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000097-13124fb7",
+                "start": 0,
+                "end": 8,
+                "quote": "LinkedIn"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000099-da3d48eb",
+                "start": 0,
+                "end": 36,
+                "quote": "Dynamics products and cloud services"
+              }
+            ]
+          },
+          {
+            "id": "B3",
+            "status": "supported",
+            "reason": "IC标题/总述、Server products and cloud services及Enterprise and partner services两类齐全；前者同时包含Azure and other cloud services和Server products，不只交Azure。",
+            "citations": [
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000117-925ee601",
+                "start": 0,
+                "end": 17,
+                "quote": "Intelligent Cloud"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000118-5e917062",
+                "start": 0,
+                "end": 185,
+                "quote": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000120-c34f7245",
+                "start": 0,
+                "end": 34,
+                "quote": "Server products and cloud services"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000120-c34f7245",
+                "start": 46,
+                "end": 76,
+                "quote": "Azure and other cloud services"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000120-c34f7245",
+                "start": 244,
+                "end": 271,
+                "quote": "Server products, comprising"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000122-c07a987e",
+                "start": 0,
+                "end": 31,
+                "quote": "Enterprise and partner services"
+              }
+            ]
+          },
+          {
+            "id": "B4",
+            "status": "supported",
+            "reason": "MPC标题/总述与Windows and Devices、Gaming、Search and news advertising三类齐全；Windows明确限定OEM渠道，避免误把所有Windows商业组成归MPC。",
+            "citations": [
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000143-c67f142f",
+                "start": 0,
+                "end": 23,
+                "quote": "More Personal Computing"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000144-6e0ae0c4",
+                "start": 0,
+                "end": 175,
+                "quote": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000146-c641cfcd",
+                "start": 0,
+                "end": 116,
+                "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel)"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000148-2f215a60",
+                "start": 0,
+                "end": 6,
+                "quote": "Gaming"
+              },
+              {
+                "source_id": "source-360182cbf562dcf9a8ab9c4e",
+                "block_id": "block-000150-9577a591",
+                "start": 0,
+                "end": 27,
+                "quote": "Search and news advertising"
+              }
+            ]
+          }
+        ],
+        "checks": {
+          "scope": {
+            "status": "pass",
+            "reason": "只采用指定Microsoft FY2025原年报，保留当年分部所属。"
+          },
+          "truth": {
+            "status": "pass",
+            "reason": "18个交付块逐一核对原件DOM文本；另外回读相邻业务段与Note18替代列表，三个分部九个顶层业务组合齐全，非根据模型自审判断。"
+          },
+          "provenance": {
+            "status": "pass",
+            "reason": "原件hash、冻结标准、数据集、query和run manifest均核对，所有引用原文精确定位。"
+          },
+          "focus": {
+            "status": "fail",
+            "reason": "B1-B4覆盖完整，但E0087是可整块删除的490字符重组历史。题目没有FY2024比较、金额或归属变化解释，冻结conditional_context未触发；删除不会破坏三个分部九组归属。原段落保留许可只支持必需列表的细产品名，不豁免额外无关整段。另E0086后320字符管理说明可压缩。"
+          }
+        },
+        "deliveries": [
+          {
+            "id": "D86",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000086-935d6090",
+            "start": 0,
+            "end": 487,
+            "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 167,
+                "category": "required",
+                "requirement_ids": [
+                  "B1"
+                ]
+              },
+              {
+                "start": 167,
+                "end": 487,
+                "category": "irrelevant",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D87",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000087-44aabdcd",
+            "start": 0,
+            "end": 490,
+            "quote": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 490,
+                "category": "irrelevant",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D89",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000089-352d4c96",
+            "start": 0,
+            "end": 44,
+            "quote": "Our reportable segments are described below.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 44,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D90",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000090-94a2e06c",
+            "start": 0,
+            "end": 35,
+            "quote": "Productivity and Business Processes",
+            "segments": [
+              {
+                "start": 0,
+                "end": 35,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "D91",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000091-d993f813",
+            "start": 0,
+            "end": 235,
+            "quote": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:",
+            "segments": [
+              {
+                "start": 0,
+                "end": 235,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "D93",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000093-7018adaa",
+            "start": 0,
+            "end": 458,
+            "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 52,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              },
+              {
+                "start": 52,
+                "end": 165,
+                "category": "necessary_context",
+                "requirement_ids": []
+              },
+              {
+                "start": 165,
+                "end": 204,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              },
+              {
+                "start": 204,
+                "end": 395,
+                "category": "necessary_context",
+                "requirement_ids": []
+              },
+              {
+                "start": 395,
+                "end": 425,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              },
+              {
+                "start": 425,
+                "end": 458,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D95",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000095-61bd513b",
+            "start": 0,
+            "end": 157,
+            "quote": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 50,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              },
+              {
+                "start": 50,
+                "end": 157,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D97",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000097-13124fb7",
+            "start": 0,
+            "end": 102,
+            "quote": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 8,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              },
+              {
+                "start": 8,
+                "end": 102,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D99",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000099-da3d48eb",
+            "start": 0,
+            "end": 210,
+            "quote": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 36,
+                "category": "required",
+                "requirement_ids": [
+                  "B2"
+                ]
+              },
+              {
+                "start": 36,
+                "end": 210,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D117",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000117-925ee601",
+            "start": 0,
+            "end": 17,
+            "quote": "Intelligent Cloud",
+            "segments": [
+              {
+                "start": 0,
+                "end": 17,
+                "category": "required",
+                "requirement_ids": [
+                  "B3"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "D118",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000118-5e917062",
+            "start": 0,
+            "end": 185,
+            "quote": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:",
+            "segments": [
+              {
+                "start": 0,
+                "end": 185,
+                "category": "required",
+                "requirement_ids": [
+                  "B3"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "D120",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000120-c34f7245",
+            "start": 0,
+            "end": 403,
+            "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 34,
+                "category": "required",
+                "requirement_ids": [
+                  "B3"
+                ]
+              },
+              {
+                "start": 34,
+                "end": 46,
+                "category": "necessary_context",
+                "requirement_ids": []
+              },
+              {
+                "start": 46,
+                "end": 76,
+                "category": "required",
+                "requirement_ids": [
+                  "B3"
+                ]
+              },
+              {
+                "start": 76,
+                "end": 244,
+                "category": "necessary_context",
+                "requirement_ids": []
+              },
+              {
+                "start": 244,
+                "end": 271,
+                "category": "required",
+                "requirement_ids": [
+                  "B3"
+                ]
+              },
+              {
+                "start": 271,
+                "end": 403,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D122",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000122-c07a987e",
+            "start": 0,
+            "end": 173,
+            "quote": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 31,
+                "category": "required",
+                "requirement_ids": [
+                  "B3"
+                ]
+              },
+              {
+                "start": 31,
+                "end": 173,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D143",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000143-c67f142f",
+            "start": 0,
+            "end": 23,
+            "quote": "More Personal Computing",
+            "segments": [
+              {
+                "start": 0,
+                "end": 23,
+                "category": "required",
+                "requirement_ids": [
+                  "B4"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "D144",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000144-6e0ae0c4",
+            "start": 0,
+            "end": 175,
+            "quote": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:",
+            "segments": [
+              {
+                "start": 0,
+                "end": 175,
+                "category": "required",
+                "requirement_ids": [
+                  "B4"
+                ]
+              }
+            ]
+          },
+          {
+            "id": "D146",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000146-c641cfcd",
+            "start": 0,
+            "end": 168,
+            "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 116,
+                "category": "required",
+                "requirement_ids": [
+                  "B4"
+                ]
+              },
+              {
+                "start": 116,
+                "end": 168,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D148",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000148-2f215a60",
+            "start": 0,
+            "end": 241,
+            "quote": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 6,
+                "category": "required",
+                "requirement_ids": [
+                  "B4"
+                ]
+              },
+              {
+                "start": 6,
+                "end": 241,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          },
+          {
+            "id": "D150",
+            "source_id": "source-360182cbf562dcf9a8ab9c4e",
+            "block_id": "block-000150-9577a591",
+            "start": 0,
+            "end": 117,
+            "quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates.",
+            "segments": [
+              {
+                "start": 0,
+                "end": 27,
+                "category": "required",
+                "requirement_ids": [
+                  "B4"
+                ]
+              },
+              {
+                "start": 27,
+                "end": 117,
+                "category": "necessary_context",
+                "requirement_ids": []
+              }
+            ]
+          }
+        ],
+        "metadata_deliveries": [],
+        "cost": {
+          "known_usd": "1.492644",
+          "unknown_reserved_usd": "0"
+        },
+        "conditional_context_assessment": {
+          "FY24_segment_amounts_delivered": false,
+          "FY24_comparison_requested": false,
+          "membership_change_explanation_requested": false,
+          "reorganization_paragraph_required": false,
+          "reason": "交付保留FY2025的Windows Commercial/OEM划分，没有比较FY2024或声称变化，故历史变更段不自动变成必需。"
+        },
+        "category_interpretation": {
+          "necessary_context": "原列表内支持性产品说明、连接词及引导句；按冻结段落保留规则允许，但不表示所有子产品细节都不可删。",
+          "irrelevant": "可删的管理目的说明和未触发条件的重组历史；不含错误事实。",
+          "required": "直接支撑分部、顶层组合、所属及Windows必要限定的原文范围；分部总述保留功能和列表连接。"
+        },
+        "limitations": [
+          "不是证明唯一数学最小证据集。",
+          "标题和列表共同建立归属；无需每个子产品独立节点。",
+          "评价是预冻结问题的取材充分性，不等于财报整体解析质量或所有query已验收。"
+        ],
+        "minimum_sufficient_delivery": {
+          "status": "fail",
+          "whole_block_removable": [
+            {
+              "block_id": "block-000087-44aabdcd",
+              "characters": 490,
+              "coverage_after_removal": "B1-B4 all supported; membership/current-year context remains in source metadata, headings and lists"
+            }
+          ],
+          "other_compressible_characters": 320,
+          "limitation": "Not a proof of unique smallest text; identifies a definite removable whole block."
+        }
+      },
+      "score": {
+        "schema_version": "evidence-score-v1",
+        "case_id": "E1-05",
+        "status": "fail",
+        "semantic_verification": "recorded_independent_review_not_machine_proven",
+        "location_verification": "exact_offsets_in_caller_verified_frozen_corpus",
+        "gates": {
+          "scope": "pass",
+          "truth": "pass",
+          "provenance": "pass",
+          "focus": "fail",
+          "required_coverage": "pass",
+          "all_characters_assessed": "pass"
+        },
+        "required_coverage": {
+          "numerator": 4,
+          "denominator": 4,
+          "ratio": 1.0
+        },
+        "required_status_counts": {
+          "supported": 4,
+          "partial": 0,
+          "missing": 0
+        },
+        "optional_annotated_coverage": {
+          "numerator": 0,
+          "denominator": 0,
+          "ratio": null
+        },
+        "metadata_delivery_count": 0,
+        "characters": {
+          "unique_source_characters": 3720,
+          "delivered_character_occurrences": 3720,
+          "repeated_location_occurrences": 0,
+          "categories": {
+            "required": {
+              "numerator": 1323,
+              "denominator": 3720,
+              "ratio": 0.3556451612903226
+            },
+            "optional": {
+              "numerator": 0,
+              "denominator": 3720,
+              "ratio": 0.0
+            },
+            "necessary_context": {
+              "numerator": 1587,
+              "denominator": 3720,
+              "ratio": 0.4266129032258065
+            },
+            "duplicate": {
+              "numerator": 0,
+              "denominator": 3720,
+              "ratio": 0.0
+            },
+            "irrelevant": {
+              "numerator": 810,
+              "denominator": 3720,
+              "ratio": 0.21774193548387097
+            },
+            "unassessed": {
+              "numerator": 0,
+              "denominator": 3720,
+              "ratio": 0.0
+            },
+            "table_structure": {
+              "numerator": 0,
+              "denominator": 3720,
+              "ratio": 0.0
+            }
+          },
+          "non_table_structure_characters": 3720
+        },
+        "cost": {
+          "known_estimated_usd": "1.492644",
+          "unknown_reserved_usd": "0",
+          "committed_estimated_usd": "1.492644",
+          "actual_billed_usd": null
+        },
+        "reviewer": "Codex e1_gold_reading; original-first after frozen gold; inherited prior summaries, not fully blind"
+      },
+      "required": [
+        {
+          "id": "B1",
+          "description": "三个报告分部：Productivity and Business Processes、Intelligent Cloud、More Personal Computing；不能把产品或跨分部指标当成第四个分部。",
+          "kind": "text"
+        },
+        {
+          "id": "B2",
+          "description": "PBP：Microsoft 365 Commercial、Microsoft 365 Consumer、LinkedIn、Dynamics 四个核心组合，并保留其归属。",
+          "kind": "text"
+        },
+        {
+          "id": "B3",
+          "description": "Intelligent Cloud：Server products and cloud services（含 Azure and other cloud services 及服务器产品）和 Enterprise and partner services 两类；不能只给 Azure。",
+          "kind": "text"
+        },
+        {
+          "id": "B4",
+          "description": "More Personal Computing：Windows and Devices、Gaming、Search and news advertising 三类，并保留其归属。",
+          "kind": "text"
+        }
+      ],
+      "reference_explanation": "列出三个分部及核心业务组合，保留所属关系，不要求罗列每个产品。",
+      "provided_explanation": "交付三个分部及九组核心业务；Windows Commercial/OEM等归属有原文。初版仍附带本题不需要的重组历史和管理说明。",
+      "coverage_explanation": "必需项完整支持 4/4。本次未发现必需项缺失；精简性另行判断。",
+      "missing": [],
+      "extra": [
+        "810 字符：无关。这部分不计为必需支持。",
+        "B1-B4覆盖完整，但E0087是可整块删除的490字符重组历史。题目没有FY2024比较、金额或归属变化解释，冻结conditional_context未触发；删除不会破坏三个分部九组归属。原段落保留许可只支持必需列表的细产品名，不豁免额外无关整段。另E0086后320字符管理说明可压缩。"
+      ],
+      "limitations": [
+        "固定评测标准在运行前冻结，没有交给运行模型。原件优先的独立复核有历史摘要暴露，不称完全盲审。",
+        "这是特定题目和材料版本的单次或修复后验证；不能证明重复稳定性或全公司、全材料泛化。",
+        "完整表格粒度允许一些表内附带数据；固定标准通过也不等于达到用户的最小充分材料目标。",
+        "数字费用包含该运行所有失败调用，是估算，不是供应商账单。修复前的其他运行另列总账。"
+      ],
+      "evidence": [
+        {
+          "label": "B1 · 原文定位",
+          "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000086-935d6090"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "Productivity and Business Processes",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000090-94a2e06c"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000091-d993f813"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "Microsoft 365 Commercial products and cloud services",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000093-7018adaa"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "the cloud portion of Windows Commercial",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000093-7018adaa"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "Windows Commercial on-premises",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000093-7018adaa"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "Microsoft 365 Consumer products and cloud services",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000095-61bd513b"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "LinkedIn",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000097-13124fb7"
+        },
+        {
+          "label": "B2 · 原文定位",
+          "quote": "Dynamics products and cloud services",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000099-da3d48eb"
+        },
+        {
+          "label": "B3 · 原文定位",
+          "quote": "Intelligent Cloud",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000117-925ee601"
+        },
+        {
+          "label": "B3 · 原文定位",
+          "quote": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000118-5e917062"
+        },
+        {
+          "label": "B3 · 原文定位",
+          "quote": "Server products and cloud services",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000120-c34f7245"
+        },
+        {
+          "label": "B3 · 原文定位",
+          "quote": "Azure and other cloud services",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000120-c34f7245"
+        },
+        {
+          "label": "B3 · 原文定位",
+          "quote": "Server products, comprising",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000120-c34f7245"
+        },
+        {
+          "label": "B3 · 原文定位",
+          "quote": "Enterprise and partner services",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000122-c07a987e"
+        },
+        {
+          "label": "B4 · 原文定位",
+          "quote": "More Personal Computing",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000143-c67f142f"
+        },
+        {
+          "label": "B4 · 原文定位",
+          "quote": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000144-6e0ae0c4"
+        },
+        {
+          "label": "B4 · 原文定位",
+          "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel)",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000146-c641cfcd"
+        },
+        {
+          "label": "B4 · 原文定位",
+          "quote": "Gaming",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000148-2f215a60"
+        },
+        {
+          "label": "B4 · 原文定位",
+          "quote": "Search and news advertising",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025/indexes/source-360182cbf562dcf9a8ab9c4e/document.html#block-000150-9577a591"
+        }
+      ],
+      "process_links": [
+        {
+          "label": "独立核对详细说明",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-05-sonnet-r1/README.zh-CN.md"
+        },
+        {
+          "label": "原件核验",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/reviews/E1-05-sonnet-r1/original-check.json"
+        },
+        {
+          "label": "预先冻结标准",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-05-v1.json"
+        },
+        {
+          "label": "实际系统运行状态",
+          "url": "../../../../experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-05-sonnet-r1/result.json"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "packet_id": "data-review-8844352e2371e456bb8606f0",
+  "facts": [
+    {
+      "fact_id": "ev-f2309c70fce527552e45edd4",
+      "verdict": "supported",
+      "rationale": "The record value of 245122000000 USD for the period 2023-07-01 to 2024-06-30 matches the 'Total revenue' cell of 245,122 (in millions) for the year ended June 30, 2024 in the income statement. The 2023-07-01 start date is not stated explicitly in the delivered text; it follows from the June 30 fiscal year end.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "source-block-5739e8a032517bb26d71b492",
+      "verdict": "supported",
+      "rationale": "This is the Item 8 heading. It gives the section location for provenance and appears in the original text.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000863-9d7720d5",
+          "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-f8510d0eaebc5441cf36a1e4",
+      "verdict": "supported",
+      "rationale": "The 'INCOME STATEMENTS' heading identifies the statement that contains the revenue figure.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000864-cdef2bac",
+          "quote": "INCOME STATEMENTS"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-3dcd2fd2fe3a0fd11263e872",
+      "verdict": "supported",
+      "rationale": "The table gives the unit (In millions), the period heading (Year Ended June 30, 2024) and the total revenue figure of 245,122. The fiscal year start is not stated but follows from the year-end date.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024"
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ],
+      "relevance": "necessary"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "req_revenue_query",
+      "verdict": "complete",
+      "rationale": "The record gives FY2024 total revenue as 245,122,000,000 USD for 2023-07-01 to 2024-06-30. This is consistent with the original income statement, which reports 245,122 in millions for the year ended June 30, 2024.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ]
+    },
+    {
+      "requirement_id": "req_revenue_source",
+      "verdict": "complete",
+      "rationale": "The delivered original blocks give the Item 8 heading, the income statement heading, and the table with the unit, the year-ended-June-30 heading, and total revenue. Page 56 appears as reported_page metadata, not as quotable text. The fiscal year start date is not explicit in the text but follows from the June 30 year end.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024"
+        }
+      ]
+    }
+  ],
+  "source_checks": [
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "verdict": "text_sufficient",
+      "rationale": "The delivered text covers the income statement with its unit, period and total revenue. No images are needed. The reading group is fully delivered.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ]
+    }
+  ],
+  "question_coverage": "complete",
+  "coverage_reason": "The original income statement shows total revenue of $245,122 million for the year ended June 30, 2024, in millions of USD. The delivered text shows the Item 8 and income statement headings and the page via metadata. The 2023-07-01 start date follows from the June 30 fiscal year end, since the text states the end date but not the start.",
+  "missing_information": [],
+  "revision_requests": [],
+  "body_checks": [
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000863-9d7720d5",
+      "relevance": "supporting_context",
+      "rationale": "A concise section heading that gives provenance."
+    },
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000864-cdef2bac",
+      "relevance": "supporting_context",
+      "rationale": "A statement heading that identifies the income statement."
+    },
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000865-dc07a7d1",
+      "relevance": "necessary",
+      "rationale": "Contains the total revenue figure, the unit, and the period heading."
+    }
+  ],
+  "limitations": [
+    "The fiscal year start date (July 1, 2023) is not explicitly stated in the delivered blocks; it is inferred from the June 30 year end and the query record period.",
+    "The currency symbol ($) appears only on the Product revenue line, not on the Total revenue line, and the table heading says 'In millions'. The USD currency is inferred from the $ signs in the table and the record."
+  ]
+}

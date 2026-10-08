@@ -134,6 +134,19 @@ class ArtifactReadProgress:
     def would_change(self, mark):
         return deepcopy(self).apply(mark)
 
+    def collection_status(self, artifact_id, pointer, total):
+        """Describe navigation already displayed; this never credits body reading."""
+        ranges = ([(0, total)] if self._complete(artifact_id, pointer)
+                  else self.collections.get((artifact_id, pointer), []))
+        viewed = sum(max(0, min(end, total) - start) for start, end in ranges if start < total)
+        first = 0
+        for start, end in ranges:
+            if start > first:
+                break
+            first = max(first, end)
+        return {'viewed_count': viewed, 'unseen_count': total - viewed,
+                'next_unseen_offset': first if first < total else None}
+
 
 class ArtifactStore:
     def __init__(self, root, *, refs=(), observation_context=None):

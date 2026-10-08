@@ -1,0 +1,140 @@
+{
+  "packet_id": "data-review-467df9bf5eb7c890c85823e2",
+  "facts": [
+    {
+      "fact_id": "ev-1fd4c32ac162e92f7cd6b95a",
+      "verdict": "supported",
+      "rationale": "The record gives FY2024 revenue of 245,122 million USD (value 245122000000) for 2023-07-01 to 2024-06-30. The cited income statement cell shows Total revenue 245,122 under the 2024 column, in millions, for the year ended June 30. Source availability date 2024-07-30 is before the cutoff.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "source-block-5739e8a032517bb26d71b492",
+      "verdict": "supported",
+      "rationale": "The block is the Item 8 heading. It is short source-identifying context showing where the income statement sits in the 10-K.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000863-9d7720d5",
+          "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-f8510d0eaebc5441cf36a1e4",
+      "verdict": "supported",
+      "rationale": "The heading identifies the table as the income statements, so it is a short qualifier for the revenue figure.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000864-cdef2bac",
+          "quote": "INCOME STATEMENTS"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-3dcd2fd2fe3a0fd11263e872",
+      "verdict": "supported",
+      "rationale": "The table block provides the unit (in millions), the fiscal year heading (Year Ended June 30, 2024), and Total revenue of 245,122. Other rows are unrelated lines, but the table is the minimal original block available.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022"
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ],
+      "relevance": "necessary"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "rev-fy2024-query",
+      "verdict": "complete",
+      "rationale": "The query record gives entity, metric, period (2023-07-01 to 2024-06-30), value, USD unit and the filing's availability date, and the cited table cell confirms 245,122 million. The filing was available on 2024-07-30, before the cutoff.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122"
+        }
+      ]
+    },
+    {
+      "requirement_id": "rev-fy2024-source",
+      "verdict": "complete",
+      "rationale": "The delivered original blocks include the Item 8 heading, the Income Statements heading, and the table with the 'In millions' unit, the 'Year Ended June 30' header, 2024 column, and Total revenue. This provides the source location and the needed qualifiers.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024"
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000864-cdef2bac",
+          "quote": "INCOME STATEMENTS"
+        }
+      ]
+    }
+  ],
+  "source_checks": [
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "verdict": "text_sufficient",
+      "rationale": "The delivered text shows FY2024 total revenue 245,122, the unit in millions, and the Year Ended June 30 heading. The source is the 10-K for period end 2024-06-30, available 2024-07-30. No image is needed. The exact fiscal-year start date is not stated in the table, but July 1, 2023 follows from the stated June 30 year end and the one-year period of the FY2024 column.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024"
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122"
+        }
+      ]
+    }
+  ],
+  "question_coverage": "complete",
+  "coverage_reason": "The answer delivers FY2024 total revenue of 245,122 million USD from the income statement of the 10-K available 2024-07-30, with the unit, the year-ended-June-30 heading, and the source location. The 2025 source was excluded because it was unavailable at the cutoff.",
+  "missing_information": [],
+  "revision_requests": [],
+  "body_checks": [
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000863-9d7720d5",
+      "relevance": "supporting_context",
+      "rationale": "Short heading identifying the Item 8 financial statements section; useful provenance."
+    },
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000864-cdef2bac",
+      "relevance": "supporting_context",
+      "rationale": "Short heading identifying the income statement that contains the revenue figure."
+    },
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000865-dc07a7d1",
+      "relevance": "necessary",
+      "rationale": "Contains total revenue, the unit in millions, and the year-ended June 30 column headings required by the question."
+    }
+  ],
+  "limitations": [
+    "The 2025-period source (source-360182cbf562dcf9a8ab9c4e) was correctly excluded as not available at the cutoff.",
+    "The table block also contains other income statement lines unrelated to revenue; the block is indivisible at this granularity."
+  ]
+}

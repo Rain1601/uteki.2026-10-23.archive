@@ -1,0 +1,31 @@
+{
+  "schema_version": "e1-question-probe-summary-v1",
+  "runtime_reference_answers_used": false,
+  "input_material_unchanged": true,
+  "probe_only_not_end_to_end": true,
+  "runs": [
+    {
+      "run": "E1-06-question-probe-sonnet-r1",
+      "status": "needs_more_evidence",
+      "error_type": null,
+      "not_a_complete_retrieval_run": true
+    },
+    {
+      "run": "E1-06-question-probe-sonnet-r2",
+      "status": "failed",
+      "error_type": "ValueError",
+      "not_a_complete_retrieval_run": true
+    },
+    {
+      "run": "E1-06-question-probe-sonnet-repair-r1",
+      "status": "needs_more_evidence",
+      "error_type": null,
+      "not_a_complete_retrieval_run": true
+    }
+  ],
+  "findings": [
+    "v1 catches missing product definition but over-demands standalone money and a finished analysis conclusion.",
+    "v2 removes those extra demands; first response violated definition support combination and host rejected it.",
+    "One bounded rule-only repair returns the missing definition; no expected block or gold data was supplied."
+  ]
+}

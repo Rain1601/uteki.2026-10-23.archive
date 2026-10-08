@@ -1,0 +1,59 @@
+{
+  "source_sha256": "cdcc8db91bc8ac88239ffd09c19afc85a65460b0a981604ebcc4dd9ebdac8e76",
+  "dataset_manifest_sha256": "71b542497cbe8a9557a00bf5fe6156fcc74fed666c7d44071157cb6e5a21ebe0",
+  "run_manifest_sha256": "3acba964b4985da170e792acb75a37a819d9b293abfbd2976ae1070122c3f909",
+  "gold_freeze_sha256": "b60eaedab25418a4ae46d2265b5556083910397898cf2ade18f39bd8409ea462",
+  "reference_sha256": "8dcee4cfefeb9814e46b276dfbb3e01d0408ece4816f1c2f49bbc58a2aa58934",
+  "packet_sha256": "1203142d18448e86580607bcee456ac829c3249c8e7548d9e2e927440c748941",
+  "body_dom_matches": 3,
+  "xbrl_context_verified": true,
+  "xbrl_context_xml": "<xbrli:context id=\"C_6dbdb3a2-9baf-41b4-922d-f59879124337\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+  "original_numeric_attributes": {
+    "id": "F_3c083f9d-9cbe-4037-b6c1-310e199227a1",
+    "contextref": "C_6dbdb3a2-9baf-41b4-922d-f59879124337",
+    "name": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "unitref": "U_USD",
+    "scale": "6",
+    "decimals": "-6",
+    "format": "ixt:num-dot-decimal"
+  },
+  "unit_definition": "iso4217:USD",
+  "cell_verified": true,
+  "model_calls": 10,
+  "call_statuses": {
+    "succeeded": 9,
+    "failed_or_cancelled": 1
+  },
+  "protocol_validation_failures": [
+    {
+      "path": "attempt-01/data-query/model/decision-0001-attempt-01.json",
+      "status": "invalid_model_decision",
+      "validation": [
+        {
+          "type": "literal_error",
+          "location": [
+            "skill"
+          ]
+        }
+      ],
+      "error_type": "ModelBehaviorError",
+      "retry_flag": false,
+      "elapsed_seconds": 3.081906834151596
+    }
+  ],
+  "failed_known_estimated_usd": "0.04693",
+  "known_estimated_usd": "0.700380",
+  "unknown_reserved_usd": "0",
+  "usage": {
+    "input_tokens": 329725,
+    "output_tokens": 4093,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0
+  },
+  "visible_body_characters": 947,
+  "packet_file_bytes": 97978,
+  "gold_projection_note": "A1 semantics carried to body citations; A2 fiscal metadata and A3 source-vintage metadata bind actual delivered data and original. No answer fabricated or injected.",
+  "trace_note": "One recorded invalid_model_decision with literal_error at skill; next turn succeeded. Visible first response payload had skill=query. No cause inferred from this alone; not labeled network failure.",
+  "review_input_file_bytes": 97978,
+  "bytes_note": "review input packet file only; not a measurement of complete HTTP request, system prompt or all model calls"
+}

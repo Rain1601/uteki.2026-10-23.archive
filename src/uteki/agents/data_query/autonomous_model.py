@@ -37,6 +37,10 @@ def reasoning_configuration(provider, model, reasoning_effort):
         if not isinstance(reasoning_effort, str) or reasoning_effort not in {'low', 'medium', 'high'}:
             raise ValueError('Native Claude requires explicit reasoning effort: low, medium, high')
         return reasoning_effort, 'adaptive', True
+    if provider == 'aihubmix' and model == 'qwen3.8-flash':
+        if not isinstance(reasoning_effort, str) or reasoning_effort not in {'none', 'low', 'medium', 'xhigh'}:
+            raise ValueError('Qwen requires explicit reasoning effort: none, low, medium, xhigh')
+        return reasoning_effort, 'disabled' if reasoning_effort == 'none' else 'enabled', False
     if reasoning_effort is not None and (not isinstance(reasoning_effort, str)
             or provider != 'deepseek' or reasoning_effort not in {'none', 'low', 'high', 'max'}):
         raise ValueError('Explicit reasoning effort is supported only for DeepSeek or registered native Claude models')
@@ -60,12 +64,12 @@ _DECISION_RULE_HINTS = {
         'reread=evidence_ids, extract=extracts, answer=answer, acquire=arguments, materialize=arguments, '
         'financial_extract=financial_extraction, select_evidence=delivery, select_records=record_selection. '
         'The selected payload must be non-null and required lists must be nonempty.'),
-    'Value error, source_id belongs to read_node, source_evidence or source_answer; node_id belongs only to read_node': (
+    'Value error, source_id belongs to read_node, source_evidence, source_answer or query; node_id belongs only to read_node': (
         'requirement_source_fields',
-        'Within requirements, source_id is allowed for kind=read_node, kind=source_evidence or kind=source_answer; '
+        'Within requirements, source_id is allowed for kind=read_node, kind=source_evidence, kind=source_answer or kind=query; '
         'node_id is allowed only for kind=read_node. For source_evidence or source_answer provide source_id and omit node_id. '
-        'Omit them for information, query or financial_extract requirements; keep query scope in its QueryPlan '
-        'and financial extraction scope in the registered task.'),
+        'For query, source_id optionally selects one source from the active catalog; omit node_id. '
+        'Omit both fields for information or financial_extract requirements; financial extraction scope stays in the registered task.'),
     'Value error, source_evidence requires explicit source_id': (
         'source_evidence_requires_source',
         'For kind=source_evidence provide a nonblank source_id from the scoped catalog and omit node_id.'),
@@ -229,10 +233,15 @@ class SdkAutonomousPlanner:
                 reasoning_effort=effort, client_factory=client_factory,
                 schema_protocol='native_decision_envelope' if purpose == 'analysis_evidence' else 'host_decision')
             settings = ModelSettings(max_tokens=max_tokens, retry=ModelRetrySettings(max_retries=0))
+        elif provider == 'aihubmix' and model == 'qwen3.8-flash':
+            inner = model_adapter(model, provider, client_factory=create_client)
+            settings = ModelSettings(max_tokens=max_tokens, temperature=None, store=False,
+                extra_body={'reasoning_effort': effort, 'preserve_thinking': False})
         else:
             inner = model_adapter(model, provider, client_factory=create_client)
             settings = ModelSettings(max_tokens=max_tokens, temperature=None if thinking == 'enabled' else 0, store=False,
                 extra_body={'thinking': {'type': thinking}, 'reasoning_effort': effort} if provider == 'deepseek' else None)
+        self._strict_visible_json = native or bool(getattr(inner, 'strict_visible_json', False))
         self._model = MeteredModel(inner, self.output/'calls', f'autonomous_{role}_decision', provider, model, pricing, self._capped_budget)
         self._agent = Agent(name='AutonomousDataPlanner' if role == 'planner' else 'BoundedDataWorker', instructions=prompt, model=self._model,
             output_type=AgentOutputSchema(AutonomousDecision, strict_json_schema=False),
@@ -241,13 +250,14 @@ class SdkAutonomousPlanner:
             'purpose': purpose,
             'provider': provider, 'model': model, 'prompt': prompt, 'prompt_version': runtime_prompt_version(purpose),
             'prompt_sha256': digest(prompt), 'decision_protocol_version': DECISION_PROTOCOL_VERSION,
-            'strict_visible_json': provider == 'deepseek' or native,
+            'strict_visible_json': self._strict_visible_json,
             'decision_schema': AutonomousDecision.model_json_schema(), 'pricing_snapshot': deepcopy(pricing),
             'strict_provider_schema': False, 'local_output_validation': 'AutonomousDecision',
             'provider_output_contract': ('native_decision_envelope_v1' if native and purpose == 'analysis_evidence'
+                                         else 'json_object_and_local_validation' if getattr(inner, 'wire_response_format', None) == 'json_object'
                                          else 'prompt_and_local_validation'),
             'max_tokens': max_tokens, 'request_timeout': request_timeout, 'max_retries': max_retries,
-            'reasoning_effort': effort, 'thinking_mode': thinking if provider == 'deepseek' or native else None,
+            'reasoning_effort': effort, 'thinking_mode': thinking if self._strict_visible_json else None,
             'api_format': 'anthropic_messages' if native else 'chat_completions',
             'provider_sdk_retries': 0, 'max_requests_total': max_requests_total,
             'budget_ledger': str(budget.path.resolve()), 'budget_policy': 'enforced' if budget.enforce else 'record_only',
@@ -299,7 +309,7 @@ class SdkAutonomousPlanner:
             for attempt in range(self._config['max_retries'] + 1):
                 # A failed reservation can happen before the adapter is invoked.
                 # Do not attribute a previous call's response to this attempt.
-                if self._config['provider'] == 'deepseek' or self._native_model is not None:
+                if self._strict_visible_json:
                     self._model.inner.response_text = None
                     self._model.inner.response_metadata = None
                 before = set((self.output/'calls').glob('*.json'))
@@ -319,7 +329,7 @@ class SdkAutonomousPlanner:
                     # Validate the original text too: an SDK parser can silently
                     # collapse duplicate keys before final_output is available.
                     content = getattr(self._model.inner, 'response_text', None)
-                    if self._config['provider'] == 'deepseek' or self._native_model is not None:
+                    if self._strict_visible_json:
                         parse_json_object(content)
                     decision = AutonomousDecision.model_validate(result.final_output)
                     record['status'] = 'decision_returned'
@@ -331,7 +341,7 @@ class SdkAutonomousPlanner:
                     content = getattr(self._model.inner, 'response_text', None)
                     if (not isinstance(error, ClaudeTransientTransportError)
                             and isinstance(error, (ModelBehaviorError, ValidationError, StrictJSONError))
-                            and (self._config['provider'] == 'deepseek' or self._native_model is not None)
+                            and (self._strict_visible_json)
                             and metadata.get('stop_reason', metadata.get('finish_reason')) in {'stop', 'end_turn'}
                             and isinstance(content, str)):
                         # A normal stop with empty/whitespace text is an invalid
@@ -355,7 +365,7 @@ class SdkAutonomousPlanner:
                     if not retry: raise
                 finally:
                     content = getattr(self._model.inner, 'response_text', None)
-                    if (self._config['provider'] == 'deepseek' or self._native_model is not None) and isinstance(content, str):
+                    if (self._strict_visible_json) and isinstance(content, str):
                         metadata = getattr(self._model.inner, 'response_metadata', None) or {}
                         write_new(output_path, {'schema_version': 'autonomous-visible-output-v1',
                             'decision': self._decisions, 'attempt': attempt + 1, 'role': self._config['role'],

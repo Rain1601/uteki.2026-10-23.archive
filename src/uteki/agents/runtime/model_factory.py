@@ -14,5 +14,9 @@ def model_adapter(model, provider, *, client_factory=None):
             api_key=os.environ['DEEPSEEK_API_KEY'], base_url=BASE_URL, timeout=60, max_retries=0))
     if provider != 'aihubmix':
         raise ValueError('Unknown provider')
+    from .qwen_model import MODELS, QwenChatCompletionsModel
+    if model in MODELS:
+        return QwenChatCompletionsModel(model=model, openai_client=client_factory(
+            api_key=os.environ['AIHUBMIX_API_KEY'], base_url='https://aihubmix.com/v1', timeout=60, max_retries=0))
     return OpenAIChatCompletionsModel(model=model,openai_client=client_factory(
         api_key=os.environ['AIHUBMIX_API_KEY'],base_url='https://aihubmix.com/v1',timeout=60,max_retries=0))

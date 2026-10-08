@@ -1,0 +1,1508 @@
+{
+  "schema_version": "autonomous-model-usage-v1",
+  "plan_origin": "model",
+  "role": "planner",
+  "provider": "aihubmix",
+  "model": "qwen3.8-flash",
+  "reasoning_effort": "low",
+  "thinking_mode": "enabled",
+  "model_config_sha256": "99a5795e8d6c291060060f58d031e2b52583c5dc2cf62cbfdb731427e2bb6b11",
+  "prompt_sha256": "10ba4084dfd529086a55b94adf7c79bfe604c718e009dfd3a7c36e6c36b7d058",
+  "calls": {
+    "requests": 8,
+    "unknown_cost_requests": 0,
+    "known_estimated_usd": "0.0202114384",
+    "actual_billed_usd": null,
+    "records": [
+      {
+        "call_id": "03a537f8-fcee-4529-b332-e6a5b92f099c",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:35:57.741952+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 17621,
+          "output_tokens": 297,
+          "total_tokens": 17918,
+          "input_tokens_details": {
+            "cached_tokens": 0
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 284
+          }
+        },
+        "estimated_usd": "0.0020969846",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "d4937c2cee9671653b2d8b293de0479d77e21cd1980001749bdaf0072ce79d9b",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "2a85abbeb46cc8a0f205ec1ab81b28ae416cbf938e4afea377d78ecd3b9f8b02"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "b5b1d446-a212-41d3-a493-04de780c918a",
+        "reserved_usd": "0.0116500668",
+        "response_id": "chatcmpl-5d9c724a-5523-93a2-808d-cc610964272e",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 297,
+          "prompt_tokens": 17621,
+          "total_tokens": 17918,
+          "completion_tokens_details": {
+            "reasoning_tokens": 284
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          }
+        },
+        "ended_at": "2026-10-08T22:36:07.600874+00:00",
+        "elapsed_seconds": 9.85872175032273
+      },
+      {
+        "call_id": "0e88b90b-406a-458d-9f0d-d80d7fd2ee79",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:41:16.683124+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 32008,
+          "output_tokens": 2600,
+          "total_tokens": 34608,
+          "input_tokens_details": {
+            "cached_tokens": 10240
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 2390
+          }
+        },
+        "estimated_usd": "0.0035834608",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "92665e72724d362cfc8357ff6995bb72d8ce36e3e2cae298bd650949cddfddda",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "9bd22a652391f833f3c822dd44f7163147a09e9cd7b0cc28df17e35a09124f1d"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "760152ec-48bf-4dfa-8454-4310e07e07e8",
+        "reserved_usd": "0.0161466352",
+        "response_id": "chatcmpl-4a47f00d-545b-9f25-8cac-7fb794776d06",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 2600,
+          "prompt_tokens": 32008,
+          "total_tokens": 34608,
+          "completion_tokens_details": {
+            "reasoning_tokens": 2390
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 10240
+          }
+        },
+        "ended_at": "2026-10-08T22:42:12.125276+00:00",
+        "elapsed_seconds": 55.441920165903866
+      },
+      {
+        "call_id": "270e32e7-aab7-4e03-8667-8b5e2c58240c",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:37:25.343832+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 20447,
+          "output_tokens": 4352,
+          "total_tokens": 24799,
+          "input_tokens_details": {
+            "cached_tokens": 16128
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 3805
+          }
+        },
+        "estimated_usd": "0.0023674842",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "bd4261541185d54246c474468847d9f53498515c5eac2f2a1294296a35689366",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "3d81dbce7d55d62ad86cce3b7557a98918c432df5e3fcaefb45ab1fc88e72327"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "1433a74b-2295-48aa-92f3-49d9b9b90dd4",
+        "reserved_usd": "0.0131905474",
+        "response_id": "chatcmpl-9f670c80-bb57-9280-9be1-ef6404460a54",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 4352,
+          "prompt_tokens": 20447,
+          "total_tokens": 24799,
+          "completion_tokens_details": {
+            "reasoning_tokens": 3805
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 16128
+          }
+        },
+        "ended_at": "2026-10-08T22:39:05.147585+00:00",
+        "elapsed_seconds": 99.80353545816615
+      },
+      {
+        "call_id": "35fd46c5-7593-4417-8d05-9820d2b4a05d",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:39:25.982014+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 36101,
+          "output_tokens": 947,
+          "total_tokens": 37048,
+          "input_tokens_details": {
+            "cached_tokens": 16384
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 870
+          }
+        },
+        "estimated_usd": "0.0028110086",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "681416dbae98a306ef918ad04d109c1611ca064385306da482411b6116d25df8",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "fe840aa33065633435ac03010b64f8d96e09d7e6d1ececdaccf7c7ac00d38997"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "f8602655-b6a3-49df-98a8-56bda70f56dc",
+        "reserved_usd": "0.0173530316",
+        "response_id": "chatcmpl-741ce66d-cdc1-9365-a5ff-4f6e3046ba8a",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 947,
+          "prompt_tokens": 36101,
+          "total_tokens": 37048,
+          "completion_tokens_details": {
+            "reasoning_tokens": 870
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 16384
+          }
+        },
+        "ended_at": "2026-10-08T22:39:49.204778+00:00",
+        "elapsed_seconds": 23.222594374790788
+      },
+      {
+        "call_id": "96a7f7f0-5d47-4b94-953f-6fd136b35a8a",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:39:49.312135+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 35041,
+          "output_tokens": 981,
+          "total_tokens": 36022,
+          "input_tokens_details": {
+            "cached_tokens": 17408
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 889
+          }
+        },
+        "estimated_usd": "0.0026037086",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "0f2ec907d7134d112974b3712183db0607b764d3bd0c193f6fa944d092ebcb8f",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "2c9a5764902726dcd265b5290b6202bb9a814653b3d5d9b5d4f45d3f4fe209af"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "922954e2-4eb0-41c7-8680-b335484848f8",
+        "reserved_usd": "0.0170386524",
+        "response_id": "chatcmpl-7cab878d-4c51-9518-a41d-599dee32dd19",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 981,
+          "prompt_tokens": 35041,
+          "total_tokens": 36022,
+          "completion_tokens_details": {
+            "reasoning_tokens": 889
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 17408
+          }
+        },
+        "ended_at": "2026-10-08T22:40:09.922313+00:00",
+        "elapsed_seconds": 20.610000375192612
+      },
+      {
+        "call_id": "998ab5d8-9e70-496f-a34f-27a9845375c3",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:36:07.640990+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 22565,
+          "output_tokens": 3600,
+          "total_tokens": 26165,
+          "input_tokens_details": {
+            "cached_tokens": 16128
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 3138
+          }
+        },
+        "estimated_usd": "0.002320211",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "14c20fa8f09fa78438f2a1a5130b3fdc14018787c17f8ea54440502b0d77a22a",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "9ef7156a577feaaa15c956464ef8f8992dd3895f253a36a2a0f4259309a5e568"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "b5eb3f38-dc43-4929-9eb6-3cf6f84ce734",
+        "reserved_usd": "0.0145079674",
+        "response_id": "chatcmpl-cd28f2e7-65c0-9721-a310-b5a661d9f754",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 3600,
+          "prompt_tokens": 22565,
+          "total_tokens": 26165,
+          "completion_tokens_details": {
+            "reasoning_tokens": 3138
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 16128
+          }
+        },
+        "ended_at": "2026-10-08T22:37:25.320570+00:00",
+        "elapsed_seconds": 77.67931841732934
+      },
+      {
+        "call_id": "d5f4a032-6218-4850-b59a-8e0e288c18e3",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:39:05.207585+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 23209,
+          "output_tokens": 821,
+          "total_tokens": 24030,
+          "input_tokens_details": {
+            "cached_tokens": 15360
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 722
+          }
+        },
+        "estimated_usd": "0.0014123534",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "7e84912f734bae50e20d69963f743e1b409241e83499e6286c304581fd6a3121",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "c30fac0decc57e1a22156cd38cd874c10c3efccaed8e5c400f1bba2b25552438"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "4c81b97c-b3e0-4408-9e08-76548df08d77",
+        "reserved_usd": "0.0141053098",
+        "response_id": "chatcmpl-21414f0e-61ab-9d44-8fa6-a78e1744b6ee",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 821,
+          "prompt_tokens": 23209,
+          "total_tokens": 24030,
+          "completion_tokens_details": {
+            "reasoning_tokens": 722
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 15360
+          }
+        },
+        "ended_at": "2026-10-08T22:39:25.832064+00:00",
+        "elapsed_seconds": 20.6242735828273
+      },
+      {
+        "call_id": "dd69b811-c6e1-4a86-8457-7c7402a69843",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "qwen3.8-flash",
+        "actual_upstream_model": "qwen3.8-flash",
+        "reasoning_effort": "low",
+        "started_at": "2026-10-08T22:40:09.984478+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "qwen3.8-flash",
+          "currency": "USD",
+          "input_per_million": "0.1126",
+          "output_per_million": "0.38",
+          "cached_input_per_million": "0.0141",
+          "source": "https://aihubmix.com/model/qwen3.8-flash",
+          "checked_on": "2026-10-09",
+          "basis": "Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 33492,
+          "output_tokens": 2791,
+          "total_tokens": 36283,
+          "input_tokens_details": {
+            "cached_tokens": 18432
+          },
+          "output_tokens_details": {
+            "reasoning_tokens": 2644
+          }
+        },
+        "estimated_usd": "0.0030162272",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "sdk_adapter_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "meter.provider"
+            },
+            "model": {
+              "value": "qwen3.8-flash",
+              "status": "explicit",
+              "source": "meter.requested_model"
+            },
+            "api_format": {
+              "value": "chat_completions",
+              "status": "explicit",
+              "source": "sdk.adapter.type"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com/v1/",
+              "status": "explicit",
+              "source": "sdk.client.base_url"
+            },
+            "max_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "reasoning_effort": {
+              "value": "low",
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.reasoning_effort"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_object"
+              },
+              "status": "explicit",
+              "source": "adapter.wire_response_format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.adapter.get_response"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "sdk.client.timeout"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "sdk.client.max_retries"
+            },
+            "max_completion_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "adapter.total_output_from_sdk_max_tokens"
+            },
+            "preserve_thinking": {
+              "value": false,
+              "status": "explicit",
+              "source": "sdk.model_settings.extra_body.preserve_thinking"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "675737a1bb1d8a69007d73dfaf9b1ecde5518675730fc7aee24438738331063e",
+            "input_sha256": "1e8572e62b12d7bd639f94ea31347029ddc2a147353b583c23e91f4547a07a0d",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f"
+          },
+          "sha256": "b8907a24a921bb68d21e222cec90c9be36727614db2c70916f50e45e08f284af"
+        },
+        "cost_basis": "qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "8f33c612-7e80-42b3-aa92-2ad974517f0f",
+        "reserved_usd": "0.01648984",
+        "response_id": "chatcmpl-ecc757b4-ccdd-9e0a-bf78-2b8c5ff5151e",
+        "request_id": null,
+        "system_fingerprint": null,
+        "finish_reason": "stop",
+        "raw_usage": {
+          "completion_tokens": 2791,
+          "prompt_tokens": 33492,
+          "total_tokens": 36283,
+          "completion_tokens_details": {
+            "reasoning_tokens": 2644
+          },
+          "prompt_tokens_details": {
+            "cached_tokens": 18432
+          }
+        },
+        "ended_at": "2026-10-08T22:41:16.634812+00:00",
+        "elapsed_seconds": 66.65012679062784
+      }
+    ]
+  },
+  "shared_budget": {
+    "limit_usd": "40",
+    "estimated_spent_usd": "28.0852734384",
+    "held_usd": "0",
+    "unknown_requests": 0,
+    "in_flight_requests": 0,
+    "requests": 313,
+    "actual_billed_usd": null,
+    "enforcement": "enforced"
+  },
+  "artifacts": [
+    {
+      "path": "calls/03a537f8-fcee-4529-b332-e6a5b92f099c-end.json",
+      "sha256": "fc6beea2129d364d41d0e787a56905c82a0b0ac680b9e7dc44653c5a554a672a"
+    },
+    {
+      "path": "calls/03a537f8-fcee-4529-b332-e6a5b92f099c-start.json",
+      "sha256": "c1820aa842c7bd1c016c3e93fe517495840b4a3caaaca74464367ed0d0cd438a"
+    },
+    {
+      "path": "calls/0e88b90b-406a-458d-9f0d-d80d7fd2ee79-end.json",
+      "sha256": "ba459afa9f6aa6aa07da01e0b2e49ae079fbc0aea64803e1a57712c5617780e7"
+    },
+    {
+      "path": "calls/0e88b90b-406a-458d-9f0d-d80d7fd2ee79-start.json",
+      "sha256": "1fbde63a80fe9fc91875948465662e1ab67330a895d749db277880988d4028af"
+    },
+    {
+      "path": "calls/270e32e7-aab7-4e03-8667-8b5e2c58240c-end.json",
+      "sha256": "69daca18738f5ff79769a72bff4687c90ba1ac947ce498139db9a0dc1852b440"
+    },
+    {
+      "path": "calls/270e32e7-aab7-4e03-8667-8b5e2c58240c-start.json",
+      "sha256": "c4bbdbed9f3eab6e59bbd2f9046dab9513de8709b4b2466c58efd04acf8b284e"
+    },
+    {
+      "path": "calls/35fd46c5-7593-4417-8d05-9820d2b4a05d-end.json",
+      "sha256": "f966a9504b13e9accfd4c0f5f1a5cc1277872f140a96f66256c933c2e7bb9407"
+    },
+    {
+      "path": "calls/35fd46c5-7593-4417-8d05-9820d2b4a05d-start.json",
+      "sha256": "eeeaa532e49b3bfdd8cd6fd39d0049a13d3503a35b5e6504d7ace63a2e1f5584"
+    },
+    {
+      "path": "calls/96a7f7f0-5d47-4b94-953f-6fd136b35a8a-end.json",
+      "sha256": "96e90c413a061cd4a8bdc17af664f06ecbebcc9dcc6a77689696d1ec62941b01"
+    },
+    {
+      "path": "calls/96a7f7f0-5d47-4b94-953f-6fd136b35a8a-start.json",
+      "sha256": "c87f77679f813e344048331054829dfa82ef0bb8b67361333f9510138b7a0bea"
+    },
+    {
+      "path": "calls/998ab5d8-9e70-496f-a34f-27a9845375c3-end.json",
+      "sha256": "8c37c75dd6fab362dd680d87d57306b0b733367c2d75e794d55e7324ab899dd2"
+    },
+    {
+      "path": "calls/998ab5d8-9e70-496f-a34f-27a9845375c3-start.json",
+      "sha256": "19975f30644188bbd4466af331a7ba430478f20c3169e09b95835951fcd99beb"
+    },
+    {
+      "path": "calls/d5f4a032-6218-4850-b59a-8e0e288c18e3-end.json",
+      "sha256": "e8caea1e297eb395f862a88c0d4036a6b8bd99aadbdfd7f969683fc4ef04f3fd"
+    },
+    {
+      "path": "calls/d5f4a032-6218-4850-b59a-8e0e288c18e3-start.json",
+      "sha256": "807944293b8d1f4ec1c5e0824768393fc9e3181d1405be86e9fdd8a7e7aa0d46"
+    },
+    {
+      "path": "calls/dd69b811-c6e1-4a86-8457-7c7402a69843-end.json",
+      "sha256": "ba1f2f2c8a3a0c9ae8c4e1fb0e37317eb99ed1eddaca5217c933ce369a07f3b4"
+    },
+    {
+      "path": "calls/dd69b811-c6e1-4a86-8457-7c7402a69843-start.json",
+      "sha256": "e69d414303b1dd3e3d6e37ed3be7821bc24f778f97a0f59c8b96dc5c32dbf368"
+    },
+    {
+      "path": "decision-0001-01-output.json",
+      "sha256": "5acb5850ecb3c1d39a9925d43888f702f8f1927349a241bc070597c7cc33c072"
+    },
+    {
+      "path": "decision-0001-attempt-01.json",
+      "sha256": "d3a99684a56eb002e4f80bdecf1e384ef9a5d701a87c0189d9be8a6960f00a88"
+    },
+    {
+      "path": "decision-0002-01-output.json",
+      "sha256": "28cab2ce6b8c38b44036b97577351a8e6d3bdb04357c65cdd86f5ccae952074d"
+    },
+    {
+      "path": "decision-0002-attempt-01.json",
+      "sha256": "f85c7f55921d088f5e5d61956e19fd7dff92752af4e83ba08c17017f6e19bef2"
+    },
+    {
+      "path": "decision-0003-01-output.json",
+      "sha256": "8d3411e27a523a4295e5c71b21ed39cfb8abc56ea49c9a1055ae590bfce46ea2"
+    },
+    {
+      "path": "decision-0003-attempt-01.json",
+      "sha256": "932730b060173333d5c345dc6ae1421705bea30a67f4cd022a74ba49bac7445f"
+    },
+    {
+      "path": "decision-0004-01-output.json",
+      "sha256": "291e0415c7bc891b6a626333793ee9f3198b5d388a351d85a0085d78f36d28cd"
+    },
+    {
+      "path": "decision-0004-attempt-01.json",
+      "sha256": "cb5c157c4dc09251ab18086b9126412d5e5b19b557102f369f8e8e58d9134f1a"
+    },
+    {
+      "path": "decision-0005-01-output.json",
+      "sha256": "e081c65a0e041850b4aecfd24719aa4d905b953bac2fbe74d9e9722466e762c1"
+    },
+    {
+      "path": "decision-0005-attempt-01.json",
+      "sha256": "e72b1e4f901a7f79b594abbb33799839cc5776c5abe54de3573fa3e1a163dc54"
+    },
+    {
+      "path": "decision-0006-01-output.json",
+      "sha256": "2220e5cac95c11f21533fc7b65a461e93b72bf322e5c03444d8a98a00522aff0"
+    },
+    {
+      "path": "decision-0006-attempt-01.json",
+      "sha256": "cce3cd6342c66e117f24a56d2bce8f31d53d5df4c291be89ec615a0ea142c44f"
+    },
+    {
+      "path": "decision-0007-01-output.json",
+      "sha256": "a40c8e0458656560523d62a4ef5f4082d05ddaa1c50eaeaae47366633a68da8a"
+    },
+    {
+      "path": "decision-0007-attempt-01.json",
+      "sha256": "de50d77560cdf9a7a2b175a35dc1fe8a930a9dba0058e3ca28ce5f32f6a89846"
+    },
+    {
+      "path": "decision-0008-01-output.json",
+      "sha256": "c5e90c7e28537d5656692ca42ee51b9d4b386aebbe35f5648c7ef9a8474f9551"
+    },
+    {
+      "path": "decision-0008-attempt-01.json",
+      "sha256": "0284804fcb8cddf0a0cc80743a20c9996f31cb90809ac350a8c49c614ee2188d"
+    },
+    {
+      "path": "model-config.json",
+      "sha256": "99a5795e8d6c291060060f58d031e2b52583c5dc2cf62cbfdb731427e2bb6b11"
+    }
+  ],
+  "benchmark_status": "not_evaluated"
+}

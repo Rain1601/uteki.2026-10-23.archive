@@ -1,8 +1,10 @@
 """Resume and feedback must bind actual frozen execution, not asserted labels."""
 import asyncio
+from contextlib import closing
 from copy import deepcopy
 import json
 from pathlib import Path
+import sqlite3
 import unittest
 from unittest.mock import patch
 
@@ -12,6 +14,7 @@ from uteki.agents.data_query.answer_handoff import prepare_review_packet, valida
 from uteki.agents.data_query.artifacts import write_new
 from uteki.domain.research_data.company_agent import CompanyQueryInput
 from uteki.infrastructure.research_data.financial_records import digest
+from uteki.agents.runtime.run_budget import RunBudget
 from tests.unit import test_retrieval_cycle as fixtures
 from tests.unit.test_autonomous_data_agent import ScriptedPlanner
 from tests.unit.test_autonomous_source_evidence import source_plan, context_read
@@ -36,6 +39,76 @@ class RetrievalResumeProvenanceTests(unittest.TestCase):
         self.config['initial_query_ref']=cycle._reference(self.coordinator_run)
         self.request=CompanyQueryInput.model_validate(self.config['request'])
         self.query=self.coordinator_run/'query'
+
+    def increased_budget(self):
+        for role in ('planner', 'worker', 'reviewer'):
+            self.config[role].update(budget_usd='10', budget_policy='enforced', max_requests_total=100)
+        for role, name in [('planner','model-config.input.json'), ('worker','worker-model-config.input.json')]:
+            (self.coordinator_run/name).write_text(json.dumps(self.config[role]))
+        pin_dataset(self.coordinator_run)
+        self.config['initial_query_ref'] = cycle._reference(self.coordinator_run)
+        budget = RunBudget(self.config['planner']['budget_ledger'], '10')
+        token = budget.reserve('1')
+        budget.settle(token, None)
+        for old, new in [('10', '15'), ('15', '20')]:
+            budget.increase_limit(new, expected_current=old, authorization={
+                'authorized_by':'user', 'authorization_id':'increase-'+new,
+                'confirmation':'Explicitly authorized cumulative extension.', 'scope':'same test task',
+                'old_limit_usd':old, 'new_limit_usd':new})
+        for role in ('planner', 'worker', 'reviewer'):
+            self.config[role]['budget_usd'] = '20'
+        return budget
+
+    def test_resume_accepts_only_recorded_budget_increase_and_preserves_unknown_cost(self):
+        budget = self.increased_budget()
+        before = Path(budget.path).read_bytes()
+        initial = cycle.prepare_initial_query(self.config, self.request, self.output)
+        change = initial['budget_changes']['planner']
+        self.assertEqual((change['old_limit_usd'], change['new_limit_usd']), ('10', '20'))
+        self.assertEqual(len(change['authorization_records']), 2)
+        self.assertEqual(Path(budget.path).read_bytes(), before)
+        self.assertEqual(budget.summary()['held_usd'], '1')
+        self.assertEqual(budget.summary()['unknown_requests'], 1)
+        async def review(packet,output,**kwargs):
+            output.mkdir();write_new(output/'input.json',packet);write_new(output/'result.json',{'status':'reviewed'});cycle._seal(output)
+            return {'status':'reviewed','analysis_eligible':True,'review_ref':cycle._reference(output)}
+        with patch.object(cycle.CompanyDataCoordinator,'query') as paid,patch.object(cycle,'review_data_answer',side_effect=review):
+            result=asyncio.run(cycle.run_retrieval_cycle(self.config,self.output))
+        paid.assert_not_called()
+        self.assertEqual(result['attempts'][0]['resume_budget_changes']['planner'], change)
+
+    def test_budget_increase_does_not_unlock_scope_model_ledger_policy_or_decrease(self):
+        self.increased_budget()
+        changes = [lambda c:c['request']['scope'].update(knowledge_cutoff='2030-12-31'),
+            lambda c:c['planner'].update(model='deepseek-v4-pro'),
+            lambda c:c['planner'].update(budget_ledger=str(self.root/'other.sqlite')),
+            lambda c:c['planner'].update(budget_policy='record_only'),
+            lambda c:c['planner'].update(budget_usd='5'),
+            lambda c:c['planner'].update(budget_usd='15'),
+            lambda c:c['planner'].update(max_requests_total=101),
+            lambda c:c['planner'].update(allow_unknown_reservations=True)]
+        for change in changes:
+            config=deepcopy(self.config);change(config)
+            request=CompanyQueryInput.model_validate(config['request'])
+            with self.subTest(config=config),self.assertRaises(ValueError):
+                cycle.prepare_initial_query(config,request,self.output)
+
+    def test_resume_rejects_missing_forged_or_incomplete_budget_authorizations(self):
+        budget = self.increased_budget()
+        with closing(sqlite3.connect(budget.path)) as db, db:
+            # Simulate corrupt/restored data, not a supported authorization API.
+            db.execute('DROP TRIGGER limit_auth_no_update')
+            db.execute('DROP TRIGGER limit_auth_no_delete')
+            original = db.execute("SELECT record FROM limit_authorizations WHERE id='increase-15'").fetchone()[0]
+            altered=json.loads(original);altered['authorization']['confirmation']='changed'
+            db.execute("UPDATE limit_authorizations SET record=? WHERE id='increase-15'",(json.dumps(altered),))
+        with self.assertRaises(ValueError):cycle.prepare_initial_query(self.config,self.request,self.output)
+        with closing(sqlite3.connect(budget.path)) as db, db:
+            db.execute("DELETE FROM limit_authorizations WHERE id='increase-15'")
+        with self.assertRaises(ValueError):cycle.prepare_initial_query(self.config,self.request,self.output)
+        with closing(sqlite3.connect(budget.path)) as db, db:
+            db.execute('DROP TABLE limit_authorizations')
+        with self.assertRaises(ValueError):cycle.prepare_initial_query(self.config,self.request,self.output)
 
     def feedback(self):
         packet=prepare_review_packet(self.query,self.request.dataset,expected_scope=self.request.scope,

@@ -1,0 +1,92 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "record_selection": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019-dimensions-8781118eeaf71322",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_seg_rev_query",
+      "description": "Numeric records: FY2024 (year 2023-07-01 to 2024-06-30) revenue for the three reporting segments (Productivity and Business Processes, Intelligent Cloud, More Personal Computing), as disclosed in each of the FY2024 and FY2025 10-K sources, retaining source version, units and period."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_fy2024_10k_text",
+      "description": "Original segment revenue table and units/period context in the FY2024 10-K (segment information note and/or MD&A) showing FY2024 revenue for the three segments as originally reported."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_fy2025_10k_text",
+      "description": "Original segment revenue table and units/period context in the FY2025 10-K showing FY2024 comparative segment revenue as recast, plus original text explaining the segment recast/reorganization or restatement that explains differences versus the FY2024 10-K (not natural business growth)."
+    }
+  ],
+  "reason": "Plan numeric segment revenue records from both 10-K versions plus original table and explanatory recast text from each source.",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

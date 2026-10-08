@@ -82,13 +82,23 @@ def _verify_review_feedback(feedback, request, scope, dataset):
         raise ValueError('review feedback differs from frozen same-question same-scope assessment')
     # Local import avoids the module import cycle; this is a read-only bounded
     # reconstruction, not a model call or a new source-selection operation.
-    from .answer_handoff import prepare_review_packet, validate_assessment
+    from .answer_handoff import prepare_review_packet, validate_assessment, validate_saved_assessment
     fresh = prepare_review_packet(feedback['prior_query_ref']['path'], dataset, expected_scope=scope,
         max_packet_bytes=previous_input['max_packet_bytes'],
-        source_delivery=previous_input.get('source_delivery', 'full_indexed_text_v1'))
+        source_delivery=previous_input.get('source_delivery', 'full_indexed_text_v1'),
+        source_review_policy=previous_input.get('source_review_policy'),
+        question_review_policy=previous_input.get('question_review_policy'))
     if fresh != previous_input:
         raise ValueError('review feedback input does not match its frozen query and dataset')
-    _, eligible = validate_assessment(fresh, feedback['assessment'])
+    validated, eligible = (validate_saved_assessment(feedback['prior_review_ref']['path'], fresh)
+                           if 'question_review_policy' in fresh
+                           else validate_assessment(fresh, feedback['assessment']))
+    if validated != feedback['assessment']:
+        raise ValueError('feedback assessment differs from validated original review responses')
+    if 'question_review_policy' in fresh and (
+            previous.get('response_origin') != 'program-composed-independent-question-v2'
+            or previous.get('question_review_origin') not in {'model', 'scripted_fixture'}):
+        raise ValueError('feedback independent question review origin missing')
     if eligible:
         raise ValueError('needs_revision feedback disagrees with validated assessment')
 

@@ -1,0 +1,125 @@
+{
+  "schema_version": "data-answer-review-input-v1",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-83205031a5bf6c29fc360377",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "source-360182cbf562dcf9a8ab9c4e"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "question": "请依据 Microsoft FY2025 10-K，提供 Microsoft Cloud、Intelligent Cloud 与 Azure 的口径定义及 FY2025 对应披露指标，明确金额/增长率差异，不推算未披露Azure收入。",
+  "query_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-r2/attempt-02/data-query/query",
+    "manifest_sha256": "65ea23e550d72041d9fedc38e096a9e58ec4d77d68ccccf701be3188e9dcf83a"
+  },
+  "dataset_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025",
+    "manifest_sha256": "608c7d94a0aee59b6fe11f64b695fcb4c068f6807e49c8a5bd35e2e93e6ab69a"
+  },
+  "query_plan_origin": "model",
+  "query_status": "limited",
+  "query_gaps": [],
+  "source_documents": [],
+  "requirements": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_definitions",
+      "description": "Original 10-K text defining Microsoft Cloud, the Intelligent Cloud segment (principal products, services, activities) and Azure and other cloud services, with scope qualifiers (e.g. what Microsoft Cloud includes, Azure included in Intelligent Cloud).",
+      "evidence_ids": [
+        "ev-0e110e85a4805f10be98ecf3",
+        "ev-a8cf45ee41ef12713370aa75",
+        "ev-f6c9d3bbd4a22450d1c5735a",
+        "ev-e73662bfe03e58019e400a55",
+        "ev-ba8e2bd468fa7081462f49aa",
+        "ev-347a87567503de68115e15af"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "selected_blocks": [],
+      "program_check": "source_body_delivered"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_fy2025_metrics",
+      "description": "FY2025 (year ended June 30, 2025) disclosures in the 10-K: Microsoft Cloud revenue and growth, Intelligent Cloud segment revenue and growth, Azure and other cloud services growth rate, and the statement on whether Azure revenue amount is separately disclosed; with units, periods and qualifiers (MD&A text and segment tables).",
+      "evidence_ids": [
+        "ev-0e110e85a4805f10be98ecf3",
+        "ev-a8cf45ee41ef12713370aa75",
+        "ev-f6c9d3bbd4a22450d1c5735a",
+        "ev-2da34b50da7b8c5fe529917e",
+        "ev-ba8e2bd468fa7081462f49aa",
+        "ev-347a87567503de68115e15af"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "selected_blocks": [],
+      "program_check": "source_body_delivered"
+    }
+  ],
+  "facts": [],
+  "program_gaps": [
+    "delivery_selection_missing:req_definitions",
+    "delivery_selection_missing:req_fy2025_metrics",
+    "no_reviewable_source_blocks:req_definitions",
+    "no_reviewable_source_blocks:req_fy2025_metrics",
+    "no_reviewable_facts"
+  ],
+  "max_packet_bytes": 160000,
+  "source_delivery": "query_evidence_v1",
+  "purpose": "analysis_evidence",
+  "source_review_policy": "delivered-sources-v2",
+  "scope_source_availability": [
+    {
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "company_id": "sec-0000789019",
+      "source_period_end": "2025-06-30",
+      "available_at": "2025-07-30",
+      "status": "available_candidate"
+    }
+  ],
+  "source_check_ids": [],
+  "delivery_schema_version": "selected-originals-v3",
+  "packet_id": "data-review-a8225ac2214dcd02dc25e3cd"
+}

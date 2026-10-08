@@ -1,0 +1,699 @@
+{
+  "schema_version": "autonomous-result-v2",
+  "status": "partial",
+  "stop_reason": "host_reference_checks_passed",
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "请对比Microsoft FY2024与FY2025两份10-K各自披露的FY2024三个报告分部收入，分别保留来源版本、单位、期间和解释差异的原文；不要将重列差异当成自然业务增长。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8827c466518d878f83689984",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "source-8602d79f703e48c18c2f27c3",
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {
+    "req_fy2024_10k_text": [
+      {
+        "context_id": "ev-eb17f8dc44bd0f8a93369fe3",
+        "block_id": "block-001336-17c7e52c"
+      },
+      {
+        "context_id": "ev-eb17f8dc44bd0f8a93369fe3",
+        "block_id": "block-001337-f66c4eab"
+      }
+    ],
+    "req_fy2025_10k_text": [
+      {
+        "context_id": "ev-e2adbceb1f0ccd40cddc3780",
+        "block_id": "block-000817-00ca3208"
+      },
+      {
+        "context_id": "ev-a32564d4121532f13d8ad328",
+        "block_id": "block-001216-6567d29b"
+      },
+      {
+        "context_id": "ev-a32564d4121532f13d8ad328",
+        "block_id": "block-001217-90dfc72b"
+      }
+    ]
+  },
+  "delivery_schema_version": "selected-originals-v3",
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-8827c466518d878f83689984",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "source-8602d79f703e48c18c2f27c3",
+      "source-360182cbf562dcf9a8ab9c4e"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "plan_origin": "model",
+  "plans": [
+    {
+      "version": 1,
+      "requirements": [
+        {
+          "kind": "query",
+          "query": {
+            "records": [
+              {
+                "entity_id": "sec-0000789019-dimensions-8781118eeaf71322",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                },
+                "value_kind": "actual"
+              },
+              {
+                "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                },
+                "value_kind": "actual"
+              },
+              {
+                "entity_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                },
+                "value_kind": "actual"
+              }
+            ],
+            "documents": [],
+            "calculations": []
+          },
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_seg_rev_query",
+          "description": "FY2024 (year ended June 30, 2024) segment revenue for Productivity and Business Processes, Intelligent Cloud and More Personal Computing, as disclosed in both the FY2024 10-K (original) and the FY2025 10-K (recast); retain unit and source version for each record."
+        },
+        {
+          "kind": "source_evidence",
+          "query": null,
+          "source_id": "source-8602d79f703e48c18c2f27c3",
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_fy2024_10k_text",
+          "description": "FY2024 10-K original segment revenue table (units in millions, year ended June 30, 2024) with its introduction and any text about segment presentation, as originally reported."
+        },
+        {
+          "kind": "source_evidence",
+          "query": null,
+          "source_id": "source-360182cbf562dcf9a8ab9c4e",
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_fy2025_10k_text",
+          "description": "FY2025 10-K segment revenue table showing recast FY2024 figures (units, periods) plus original text explaining the August 2024 segment composition change and recast of prior period information, so differences are not read as natural growth."
+        }
+      ],
+      "reason": "Plan requirements covering numeric segment revenue in both filings and original explanatory text for the recast.",
+      "origin": "model",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "sha256": "7ffae8651db5cbe113cbb31615566ee6881b5e7aec69511f1a3c4a9011b98ae6"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019-dimensions-8781118eeaf71322",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_seg_rev_query",
+      "description": "FY2024 (year ended June 30, 2024) segment revenue for Productivity and Business Processes, Intelligent Cloud and More Personal Computing, as disclosed in both the FY2024 10-K (original) and the FY2025 10-K (recast); retain unit and source version for each record.",
+      "evidence_ids": [
+        "ev-1374c16bc4f10c4b514c57c7",
+        "ev-5deb6988e53d7e7fe3f25c92",
+        "ev-c3b22516eb188a90552241be",
+        "ev-0a0e5977ddf565a4ae91ad7c",
+        "ev-9960d764848ec047fc8d7393",
+        "ev-fa2b8f6f6455f7eafec2911c"
+      ],
+      "gap_ids": [
+        "gap-ed3adf822a27980522f5fbb9",
+        "gap-4c94e1081b533eb8b8953468",
+        "gap-1f1a77d48fe4415f259f5f21"
+      ],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:06fc29a10ee2666b61e82687",
+          "status": "blocked",
+          "reason": "record_ambiguous",
+          "detail": "sec-0000789019-dimensions-8781118eeaf71322 / revenue / 2023-07-01 — 2024-06-30：尚未取得无冲突的匹配记录。",
+          "record_ids": [
+            "obs-8b41486dcaad3fca83d5532f",
+            "obs-c8e8abdb3cf0b4bd16f7ca69"
+          ],
+          "artifact_ids": [
+            "art-3bf30759d0ad326533b8e350",
+            "art-ee45a0152e5aea3d617c0a05"
+          ],
+          "event_sequences": [
+            4
+          ]
+        },
+        {
+          "check_id": "records:5ae7824eec2ce581dff4188b",
+          "status": "blocked",
+          "reason": "record_ambiguous",
+          "detail": "sec-0000789019-dimensions-08727d67db4596da / revenue / 2023-07-01 — 2024-06-30：尚未取得无冲突的匹配记录。",
+          "record_ids": [
+            "obs-1eea19b9f890b80e7fb45c50",
+            "obs-63e2c5d39cf4eea56e8dba30"
+          ],
+          "artifact_ids": [
+            "art-89f3aa1f63250fd05151a39f",
+            "art-ffcaacd611963784ab3b3bde"
+          ],
+          "event_sequences": [
+            4
+          ]
+        },
+        {
+          "check_id": "records:3caeb894d23608b701c5d2ee",
+          "status": "blocked",
+          "reason": "record_ambiguous",
+          "detail": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7 / revenue / 2023-07-01 — 2024-06-30：尚未取得无冲突的匹配记录。",
+          "record_ids": [
+            "obs-8b28e15f22b9d1f135601d8f",
+            "obs-b5ecfdd8909a69428dd6cb0c"
+          ],
+          "artifact_ids": [
+            "art-7874aef0c2c16986c3c3da5d",
+            "art-c0f40cdea69429320740117e"
+          ],
+          "event_sequences": [
+            4
+          ]
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-004/query-receipt.json",
+          "sha256": "7a69267aa42e52ddcdc147140269a559cd915dcd5d9525be744ac8954e5cafd1"
+        }
+      ],
+      "selected_record_ids": [
+        "ev-1374c16bc4f10c4b514c57c7",
+        "ev-5deb6988e53d7e7fe3f25c92",
+        "ev-c3b22516eb188a90552241be",
+        "ev-0a0e5977ddf565a4ae91ad7c",
+        "ev-9960d764848ec047fc8d7393",
+        "ev-fa2b8f6f6455f7eafec2911c"
+      ],
+      "program_check": "blocked"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_fy2024_10k_text",
+      "description": "FY2024 10-K original segment revenue table (units in millions, year ended June 30, 2024) with its introduction and any text about segment presentation, as originally reported.",
+      "evidence_ids": [
+        "ev-eb17f8dc44bd0f8a93369fe3"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "selected_blocks": [
+        {
+          "context_id": "ev-eb17f8dc44bd0f8a93369fe3",
+          "block_id": "block-001336-17c7e52c"
+        },
+        {
+          "context_id": "ev-eb17f8dc44bd0f8a93369fe3",
+          "block_id": "block-001337-f66c4eab"
+        }
+      ],
+      "program_check": "source_body_delivered"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_fy2025_10k_text",
+      "description": "FY2025 10-K segment revenue table showing recast FY2024 figures (units, periods) plus original text explaining the August 2024 segment composition change and recast of prior period information, so differences are not read as natural growth.",
+      "evidence_ids": [
+        "ev-a32564d4121532f13d8ad328",
+        "ev-e2adbceb1f0ccd40cddc3780"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "selected_blocks": [
+        {
+          "context_id": "ev-e2adbceb1f0ccd40cddc3780",
+          "block_id": "block-000817-00ca3208"
+        },
+        {
+          "context_id": "ev-a32564d4121532f13d8ad328",
+          "block_id": "block-001216-6567d29b"
+        },
+        {
+          "context_id": "ev-a32564d4121532f13d8ad328",
+          "block_id": "block-001217-90dfc72b"
+        }
+      ],
+      "program_check": "source_body_delivered"
+    }
+  ],
+  "gaps": [
+    {
+      "gap_id": "gap-ed3adf822a27980522f5fbb9",
+      "reason": "tool_gap",
+      "detail": {
+        "scope": "record",
+        "selection_id": "06fc29a10ee2666b61e82687",
+        "reason": "ambiguous",
+        "request": {
+          "entity_id": "sec-0000789019-dimensions-8781118eeaf71322",
+          "metric_id": "revenue",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "value_kind": "actual"
+        }
+      },
+      "requirement_ids": [
+        "req_seg_rev_query"
+      ],
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    },
+    {
+      "gap_id": "gap-4c94e1081b533eb8b8953468",
+      "reason": "tool_gap",
+      "detail": {
+        "scope": "record",
+        "selection_id": "5ae7824eec2ce581dff4188b",
+        "reason": "ambiguous",
+        "request": {
+          "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+          "metric_id": "revenue",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "value_kind": "actual"
+        }
+      },
+      "requirement_ids": [
+        "req_seg_rev_query"
+      ],
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    },
+    {
+      "gap_id": "gap-1f1a77d48fe4415f259f5f21",
+      "reason": "tool_gap",
+      "detail": {
+        "scope": "record",
+        "selection_id": "3caeb894d23608b701c5d2ee",
+        "reason": "ambiguous",
+        "request": {
+          "entity_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+          "metric_id": "revenue",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "value_kind": "actual"
+        }
+      },
+      "requirement_ids": [
+        "req_seg_rev_query"
+      ],
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    }
+  ],
+  "evidence_bundle": {
+    "path": "evidence-bundle.json",
+    "bundle_id": "bundle-33761ac4890694c6216db249",
+    "item_count": 15
+  },
+  "artifact_index": {
+    "path": "artifact-index.json",
+    "count": 53
+  },
+  "semantic_completeness": "not_evaluated",
+  "trace": [
+    {
+      "step": 1,
+      "action": "load_skill",
+      "status": "skill_loaded",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 29324,
+      "receipt": "turn-001/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-001/feedback.json"
+    },
+    {
+      "step": 2,
+      "action": "discover_catalog",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 54337,
+      "receipt": "turn-002/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-002/feedback.json"
+    },
+    {
+      "step": 3,
+      "action": "plan",
+      "status": "planned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 53333,
+      "receipt": "turn-003/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-003/feedback.json"
+    },
+    {
+      "step": 4,
+      "action": "query",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 50950,
+      "receipt": "turn-004/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-004/feedback.json"
+    },
+    {
+      "step": 5,
+      "action": "select_records",
+      "status": "records_selected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 91000,
+      "receipt": "turn-005/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-005/feedback.json"
+    },
+    {
+      "step": 6,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 66109,
+      "receipt": "turn-006/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-006/feedback.json"
+    },
+    {
+      "step": 7,
+      "action": "read_artifact",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 75802,
+      "receipt": "turn-007/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-007/feedback.json"
+    },
+    {
+      "step": 8,
+      "action": "select_evidence",
+      "status": "delivery_selected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 71101,
+      "receipt": "turn-008/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-008/feedback.json"
+    },
+    {
+      "step": 9,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 68888,
+      "receipt": "turn-009/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-009/feedback.json"
+    },
+    {
+      "step": 10,
+      "action": "read_artifact",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 82200,
+      "receipt": "turn-010/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-010/feedback.json"
+    },
+    {
+      "step": 11,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 76467,
+      "receipt": "turn-011/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-011/feedback.json"
+    },
+    {
+      "step": 12,
+      "action": "select_evidence",
+      "status": "delivery_selected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 83450,
+      "receipt": "turn-012/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-012/feedback.json"
+    },
+    {
+      "step": 13,
+      "action": "finish",
+      "status": "partial",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 76037,
+      "receipt": "turn-013/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-013/feedback.json"
+    }
+  ],
+  "role": "planner",
+  "worker_runs": [],
+  "financial_extractions": [],
+  "pending_body_reads": [],
+  "decision_budget": {
+    "limit": 40,
+    "used": 13
+  },
+  "evidence_budget": {
+    "limit_bytes": 8000000,
+    "used_bytes": 123916
+  }
+}

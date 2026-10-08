@@ -16,6 +16,12 @@ from .model_configuration import capture_model_configuration
 
 
 def pricing_snapshot(provider, model):
+    if (provider, model) == ('aihubmix', 'qwen3.8-flash'):
+        return {'provider': provider, 'model': model, 'currency': 'USD',
+                'input_per_million': '0.1126', 'output_per_million': '0.38',
+                'cached_input_per_million': '0.0141',
+                'source': 'https://aihubmix.com/model/qwen3.8-flash', 'checked_on': '2026-10-09',
+                'basis': 'Public list price estimate; raw cached input counted once; unsupported cache writes remain unknown'}
     if provider == 'deepseek' and model in ('deepseek-flash', 'deepseek-v4-pro'):
         rates = {'deepseek-flash': ('0.30', '1.20', '0.006'),
                  'deepseek-v4-pro': ('1.32', '3.96', '0.044')}
@@ -49,6 +55,33 @@ def estimate(usage, pricing):
         return None
     return str((Decimal(usage['input_tokens']) * Decimal(pricing['input_per_million'])
                 + Decimal(usage['output_tokens']) * Decimal(pricing['output_per_million'])) / Decimal(1000000))
+
+
+def estimate_qwen_usage(raw, pricing):
+    """Chat totals already include reasoning and cached reads; never add twice."""
+    if not isinstance(raw, dict):
+        return None
+    incoming, outgoing = raw.get('prompt_tokens'), raw.get('completion_tokens')
+    if any(type(n) is not int or n < 0 for n in (incoming, outgoing)):
+        return None
+    details = raw.get('prompt_tokens_details') or {}
+    if not isinstance(details, dict):
+        return None
+    cached = details.get('cached_tokens', 0)
+    if type(cached) is not int or not 0 <= cached <= incoming:
+        return None
+    def unsupported_cache(value):
+        if not isinstance(value, dict):
+            return False
+        return any((('cache' in key.lower() and key != 'cached_tokens') and item not in (None, 0))
+                   or unsupported_cache(item) for key, item in value.items())
+    # No cache-writing controls are sent. An unexpected write charge is not
+    # covered by this rate snapshot, so retain the full unknown reservation.
+    if unsupported_cache(raw):
+        return None
+    return str((Decimal(incoming-cached)*Decimal(pricing['input_per_million'])
+                + Decimal(cached)*Decimal(pricing['cached_input_per_million'])
+                + Decimal(outgoing)*Decimal(pricing['output_per_million']))/Decimal(1000000))
 
 
 def estimate_anthropic_usage(usage, pricing):
@@ -224,7 +257,7 @@ class MeteredModel(Model):
                     record['estimated_usd'] = estimate_anthropic_usage(raw_usage, self.pricing)
                 if metadata.get('dispatch_status') == 'not_sent':
                     record.update(estimated_usd='0', usage_presence='absent', usage_source='host_not_sent')
-            elif self.provider == 'deepseek':
+            elif self.provider == 'deepseek' or getattr(self.inner, 'raw_chat_usage', False):
                 metadata = getattr(self.inner, 'response_metadata', None)
                 if metadata:
                     record.update(metadata)
@@ -242,6 +275,9 @@ class MeteredModel(Model):
                         'output_tokens_details': raw.get('completion_tokens_details'),
                     }
                     record['estimated_usd'] = estimate(record['usage'], self.pricing)
+                    if (self.provider, self.model) == ('aihubmix', 'qwen3.8-flash'):
+                        record['estimated_usd'] = estimate_qwen_usage(raw, self.pricing)
+                        record['cost_basis'] = 'qwen_raw_prompt_completion_cache_read_public_price_estimate_not_bill'
                 else:
                     record.update(usage=None, estimated_usd=None,
                                   usage_presence='absent' if metadata and metadata.get('raw_usage') is None else 'unknown',

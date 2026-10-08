@@ -409,7 +409,7 @@ class AutonomousModelTests(unittest.TestCase):
             ({'action': 'plan', 'reason': 'Explicit research scope', 'requirements': [
                 {'requirement_id': 'req-business', 'description': 'Read business information',
                  'kind': 'information', 'source_id': 'acme-annual', 'node_id': 'business'}]},
-             'requirement_source_fields', 'source_id is allowed for kind=read_node, kind=source_evidence or kind=source_answer'),
+             'requirement_source_fields', 'source_id is allowed for kind=read_node, kind=source_evidence, kind=source_answer or kind=query'),
             ({'action': 'plan', 'reason': 'Verify original source text', 'requirements': [
                 {'requirement_id': 'req-original', 'description': 'Verify the source text',
                  'kind': 'source_evidence'}]},

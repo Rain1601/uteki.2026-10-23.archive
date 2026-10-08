@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from pydantic import ValidationError
 
-from uteki.agents.data_query.autonomous import AutonomousDataAgent, AutonomousDecision, AUTONOMOUS_PROMPT
+from uteki.agents.data_query.autonomous import AutonomousDataAgent, AutonomousDecision, AUTONOMOUS_PROMPT, Requirement
 from uteki.agents.data_query.autonomous_model import _decision_validation_hints
 from uteki.agents.data_query.decision_protocol import ACTION_RULES
 from uteki.domain.research_data.execution_scope import ExecutionScope
@@ -48,6 +48,24 @@ class DecisionProtocolTests(unittest.TestCase):
         self.assertNotIn('other-annual', json.dumps(hint))
         self.assertEqual(AutonomousDecision.model_validate(
             {**decision, 'requirement_ids': ['business']}).requirement_ids, ('business',))
+
+    def test_first_plan_requirement_rules_preserve_strict_source_field_boundaries(self):
+        query = dict(requirement_id='fixture-numeric', description='Read an explicitly scoped numeric observation.',
+                     kind='query', query={'records': [{'entity_id': 'fixture-issuer', 'metric_id': 'revenue',
+                         'value_kind': 'actual', 'period': {'kind': 'year', 'start': '2030-01-01',
+                                                          'end': '2030-12-31', 'basis': 'source'}}]})
+        self.assertIn('kind=query: include query (a QueryPlan); omit node_id.', AUTONOMOUS_PROMPT)
+        self.assertIn('Optional source_id pins this requirement to one', AUTONOMOUS_PROMPT)
+        self.assertEqual(Requirement.model_validate(query).kind, 'query')
+        self.assertEqual(Requirement.model_validate({**query, 'source_id': 'fixture-source'}).source_id, 'fixture-source')
+        for fields in ({'source_id': ' '}, {'node_id': 'fixture-node'}):
+            with self.subTest(fields=fields), self.assertRaises(ValidationError):
+                Requirement.model_validate({**query, **fields})
+        for kind in ('source_evidence', 'source_answer'):
+            item = dict(requirement_id='r', description='Source material.', kind=kind, source_id='fixture-source')
+            self.assertEqual(Requirement.model_validate(item).source_id, 'fixture-source')
+            with self.assertRaises(ValidationError):
+                Requirement.model_validate({**item, 'node_id': 'fixture-node'})
 
     def test_artifact_reads_remain_valid_without_refs_and_respect_page_limit(self):
         value = {'action': 'read_artifact', 'artifact_read': {

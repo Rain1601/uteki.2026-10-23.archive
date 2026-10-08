@@ -83,15 +83,56 @@ def _url(value, allowed, *, resolve=False):
 
 
 class _Redirect(urllib.request.HTTPRedirectHandler):
-    def __init__(self, allowed, on_redirect=None):
+    def __init__(self, allowed, on_redirect=None, *, resolve=True):
         self.allowed = allowed
         self.on_redirect = on_redirect
+        self.resolve = resolve
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        _url(newurl, self.allowed, resolve=True)
+        _url(newurl, self.allowed, resolve=self.resolve)
         if self.on_redirect is not None:
             self.on_redirect(req.full_url, newurl)
         return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def _transport(config):
+    """Explicit local CONNECT proxy for SEC endpoints; never trust target fake IPs.
+
+    The configured proxy is the trust boundary for destination DNS. Target TLS
+    remains verified by urllib's HTTPS handler against the original hostname.
+    Non-SEC acquisition retains the normal public-DNS transport.
+    """
+    value = config.get('transport')
+    if value is None:
+        return None
+    if not isinstance(value, dict) or set(value) != {'mode', 'proxy_url', 'destination_hosts'}:
+        raise ValueError('explicit proxy transport requires mode, proxy_url and destination_hosts')
+    if value['mode'] != 'trusted_local_http_proxy':
+        raise ValueError('unsupported acquisition transport')
+    if not isinstance(value['proxy_url'], str):
+        raise ValueError('proxy_url must be an explicit URL string')
+    parsed = urllib.parse.urlsplit(value['proxy_url'])
+    try:
+        address = ipaddress.ip_address(parsed.hostname or '')
+        port = parsed.port
+    except ValueError as error:
+        raise ValueError('proxy must use an explicit loopback IP and port') from error
+    if (parsed.scheme != 'http' or not address.is_loopback or port is None
+            or not 1 <= port <= 65535 or parsed.username or parsed.password
+            or parsed.path or parsed.query or parsed.fragment):
+        raise ValueError('proxy must be credential-free HTTP at an explicit loopback IP and port')
+    hosts = value['destination_hosts']
+    if (not isinstance(hosts, list) or not hosts or any(not isinstance(h, str) for h in hosts)
+            or len(set(hosts)) != len(hosts) or not set(hosts) <= SEC_HOSTS):
+        raise ValueError('proxy destination hosts must be explicit SEC hostnames')
+    return {'mode': value['mode'], 'proxy_url': value['proxy_url'], 'destination_hosts': sorted(hosts)}
+
+
+class _ExplicitProxy(urllib.request.ProxyHandler):
+    """Honor the caller's fixed proxy even when ambient NO_PROXY matches SEC."""
+    def proxy_open(self, req, proxy, type):
+        req.set_proxy(urllib.parse.urlsplit(proxy).netloc, 'http')
+        return None
 
 
 class _Links(HTMLParser):
@@ -195,6 +236,7 @@ def _filing_selection(config, as_of):
 def _configuration(config):
     if not isinstance(config, dict):
         raise ValueError('explicit source configuration required')
+    _transport(config)
     symbol = config.get('symbol')
     if not isinstance(symbol, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.\-]{0,14}', symbol):
         raise ValueError('explicit valid symbol required')
@@ -286,6 +328,7 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     ``clock`` may supply an aware datetime for deterministic offline recovery tests.
     """
     symbol, market, as_of, ua, entries, limits, updates_window = _configuration(config)
+    proxy_transport = _transport(config)
     selection, mode, target_period, annual_form, period_range = _filing_selection(config, as_of)
     requested_cik = config.get('cik')
     target_start = period_range[0] if period_range else target_period
@@ -317,6 +360,7 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                         'sec_contact_origin': config.get('sec_contact_origin', 'caller_configuration'),
                         'document_validation': config.get('document_validation', 'legacy_transport_only'),
                         'download_policy': config.get('download_policy', 'revalidate'),
+                        'transport': proxy_transport or {'mode': 'public_dns_http'},
                         'annual_form': annual_form, 'automatic_adoption': False},
               'documents': [], 'selected_filings': [], 'gaps': [], 'discovery': [], 'requests': 0, 'model_calls': 0,
               'storage_integrity': {'status': 'referenced_objects_only', 'findings': []},
@@ -497,15 +541,23 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
             info = {}
             try:
                 if fetch is None:
-                    _url(url, allowed, resolve=True)
+                    use_proxy = proxy_transport is not None and urllib.parse.urlsplit(url).hostname in proxy_transport['destination_hosts']
+                    request_allowed = set(allowed) & set(proxy_transport['destination_hosts']) if use_proxy else allowed
+                    _url(url, request_allowed, resolve=not use_proxy)
                     throttle()
                     check_stop()
-                    opener = urllib.request.build_opener(_Redirect(allowed, redirect))
+                    handlers = [_Redirect(request_allowed, redirect, resolve=not use_proxy)]
+                    if use_proxy:
+                        handlers.insert(0, _ExplicitProxy({'https': proxy_transport['proxy_url']}))
+                    opener = urllib.request.build_opener(*handlers)
                     with opener.open(urllib.request.Request(url, headers={'User-Agent': ua, 'Accept-Encoding': 'identity'}),
                                      timeout=limits['timeout_seconds']) as response:
                         info = {'http_status': response.status, 'final_url': response.url,
                                 'content_type': response.headers.get('Content-Type'),
                                 'content_length': response.headers.get('Content-Length'), 'transport': 'http'}
+                        _url(response.url, request_allowed)
+                        if use_proxy:
+                            info.update(transport='trusted_local_http_proxy', proxy_url=proxy_transport['proxy_url'])
                         if response.status != 200:
                             raise AcquisitionError('unexpected_http_status')
                         raw = response.read(limits['max_bytes_per_document'] + 1)

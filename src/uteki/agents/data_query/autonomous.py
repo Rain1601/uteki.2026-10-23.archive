@@ -98,7 +98,7 @@ Successful extraction is candidate generation, not semantic approval or adoption
 receipts rather than repeating an extraction. The full catalog is available through its artifact.
 """
 
-AUTONOMOUS_PROMPT_VERSION = 'autonomous-data-agent-v8-financial-extraction-validated-actions'
+AUTONOMOUS_PROMPT_VERSION = 'autonomous-data-agent-v9-source-pinned-query'
 
 WORKER_PROMPT = AUTONOMOUS_PROMPT + """
 You are the bounded evidence Worker. Your packet has role=worker and fixed requirements from the
@@ -135,7 +135,7 @@ or that the final business graph is correct. Preserve that distinction in covera
 """
 
 
-ANALYSIS_EVIDENCE_PROMPT_VERSION = 'autonomous-data-agent-v14-read-catalog-pagination'
+ANALYSIS_EVIDENCE_PROMPT_VERSION = 'analysis-evidence-v17-source-pinned-query'
 ANALYSIS_EVIDENCE_DELIVERY_VERSION = 'selected-originals-v3'
 _ANALYSIS_REQUIREMENT_POLICY = (
     'This run gathers evidence for a separate Analysis Agent, which owns the narrative answer. '
@@ -157,6 +157,19 @@ source's relevant definitional enumeration; do not gather every product mention 
 Check composition coverage before trimming context. Pure revenue questions need numeric disclosures
 and their accounting context, not a forced product catalog. Keep these two question dimensions distinct.
 Deliver original evidence with source IDs, block IDs, periods, units and necessary qualifications.
+When the question asks what concepts mean, their scope or classification relationships, obtain
+original material defining EACH requested concept itself. Also retain definitions when necessary
+to interpret a requested numeric comparison. Do not add definition tasks to a pure numeric query
+when units, periods and reporting qualifiers already make the requested numbers unambiguous.
+A broader category that merely lists a requested product or service does not define that product
+or service. Keep company-wide metrics, reporting segments, grouped revenue lines and individual
+products distinct, even when their names overlap. A mention or parent membership is not a
+substitute for the requested concept's own meaning and scope. Search for its defining content;
+if unavailable, report the specific definition gap rather than claiming complete coverage.
+Negative output constraints (for example, do not estimate a missing value) restrict your actions;
+they do not add a requirement to find an explicit source statement that the value was not disclosed.
+Retrieve the requested disclosed material. If a requested value remains unsupported after relevant
+bounded checks, report that gap and the checked scope without inventing a non-disclosure statement.
 Read introductions, complete lists or adjacent qualifiers only when needed to answer the question.
 Do not default to the full report or whole selected chapter. Keep each read bounded and use exact
 artifact continuation pointers for omitted body content. If needed evidence exceeds available
@@ -184,6 +197,12 @@ The host reopens selected atomic context for independent review.
 read_body_catalog keeps locations and short previews of previously delivered blocks across tool calls.
 Its artifact_id and next_cursor let read_artifact continue the full directory beyond the inline
 window. Keep the cursor's original artifact_id; later reads may create a new directory snapshot.
+omitted_count means absent from this inline preview, NOT unread. navigation_progress includes the
+current preview and prior delivered pages of this exact artifact. If unseen_count is zero, do not
+read its tail again merely because omitted_count is positive. Otherwise next_unseen_read gives the
+next unseen directory page. This is navigation coverage, not semantic completeness or new evidence.
+source_leads prioritizes new unread locations before already read locations. source_leads_page links
+the complete scoped list; an unchanged search hit or outline is not new retrieval progress.
 Directory pages are navigation only and never establish body reading. Use a row's read_request
 to revisit its exact original text when necessary. Use it to retain progress, rather
 than repeatedly reading outlines or whole artifacts. Split a multi-part question into concrete
@@ -244,12 +263,14 @@ class Requirement(Contract):
         if self.kind == 'source_answer' and (not self.source_id or not self.source_id.strip()):
             raise ValueError('source_answer requires explicit source_id')
         if self.kind == 'query':
+            if self.source_id is not None and not self.source_id.strip():
+                raise ValueError('query source_id must be nonblank when supplied')
             if self.query is None: raise ValueError('query requirement needs an explicit QueryPlan')
             QueryRequirement(kind='query', requirement_id=self.requirement_id, query=self.query)
         elif self.query is not None:
             raise ValueError('query payload belongs to a query requirement')
-        if (self.kind not in {'read_node', 'source_evidence', 'source_answer'} and self.source_id) or (self.kind != 'read_node' and self.node_id):
-            raise ValueError('source_id belongs to read_node, source_evidence or source_answer; node_id belongs only to read_node')
+        if (self.kind not in {'read_node', 'source_evidence', 'source_answer', 'query'} and self.source_id) or (self.kind != 'read_node' and self.node_id):
+            raise ValueError('source_id belongs to read_node, source_evidence, source_answer or query; node_id belongs only to read_node')
         return self
 
     requirement_id: str = Field(min_length=1, max_length=100, pattern=r"\S")
@@ -433,7 +454,8 @@ def _worker_summary(handoff, full_ref):
     return summary
 
 
-def _read_body_catalog_page(artifacts, evidence, evidence_artifacts, delivered_blocks, *, scope, step, max_bytes):
+def _read_body_catalog_page(artifacts, evidence, evidence_artifacts, delivered_blocks, *, scope, step, max_bytes,
+                            read_progress=None):
     """Immutable navigation over this role's complete, active-scope body reads.
 
     Stable context/index order deliberately does not follow the retained-body LRU.
@@ -469,9 +491,18 @@ def _read_body_catalog_page(artifacts, evidence, evidence_artifacts, delivered_b
     ref = artifacts.put('read_body_catalog', rows, scope=scope, step=step,
         source_ids=tuple(sorted({row['source_snapshot_id'] for row in rows})))
     page = artifacts.read({'artifact_id': ref['artifact_id'], 'limit': 1000, 'max_bytes': max_bytes})
-    return {**page, 'schema_version': 'read-body-catalog-v2', 'navigation_only': True,
+    shown = deepcopy(read_progress) if read_progress is not None else ArtifactReadProgress()
+    shown.apply(shown.page_mark(page))
+    progress = shown.collection_status(ref['artifact_id'], '', page['total_count'])
+    next_read = ({'artifact_id': ref['artifact_id'], 'pointer': '',
+                  'offset': progress['next_unseen_offset'], 'limit': 1000, 'max_bytes': max_bytes}
+                 if progress['unseen_count'] else None)
+    return {**page, 'schema_version': 'read-body-catalog-v3', 'navigation_only': True,
         'artifact': ref, 'byte_limit': max_bytes,
-        'omitted_count': page['total_count'] - page['returned_count']}
+        'omitted_count': page['total_count'] - page['returned_count'],
+        'navigation_progress': {**progress, 'includes_current_preview': True,
+            'scope': 'this_immutable_catalog_only', 'body_reading_credit': False},
+        'next_unseen_read': next_read}
 
 
 class AutonomousDataAgent:
@@ -819,7 +850,10 @@ class AutonomousDataAgent:
                         state = 'body_delivered'; break
                     if delivered_text.get((eid, lead['block_id'])): state = 'partially_delivered'
                 rows.append({**lead, 'read_status': state})
-            return rows
+            # New unread locations must not be hidden behind the first page of
+            # already-read search hits. Keep every row in the scoped state artifact.
+            priority = {'located': 0, 'partially_delivered': 1, 'body_delivered': 2}
+            return sorted(reversed(rows), key=lambda row: priority[row['read_status']])
 
         def retained_body():
             # Re-present only complete blocks previously delivered to this role.
@@ -853,8 +887,11 @@ class AutonomousDataAgent:
 
         def body_catalog():
             limit = min(18000, max(512, self.limits.max_packet_bytes // 8))
+            shown = deepcopy(read_progress)
+            for mark in pending_views:
+                shown.apply(mark)
             return _read_body_catalog_page(artifacts, evidence, evidence_artifacts, delivered_blocks,
-                scope=scope, step=step, max_bytes=limit)
+                scope=scope, step=step, max_bytes=limit, read_progress=shown)
 
         def make_packet():
             state = artifacts.put('run_state', run_state(), scope=scope, step=step)
@@ -885,6 +922,10 @@ class AutonomousDataAgent:
                 **({'read_body_catalog': body_catalog()} if self.purpose == 'analysis_evidence' else {}),
                 'source_leads': lead_packet()[:self.limits.page_items],
                 'source_lead_count': len(source_leads),
+                'source_leads_page': {'ordering': 'unread_first_newest_first',
+                    'omitted_count': max(0, len(source_leads) - self.limits.page_items),
+                    'full_read': {'artifact_id': state['artifact_id'], 'pointer': '/source_leads',
+                                  'limit': self.limits.page_items}},
                 'delegations': deepcopy(worker_runs),
                 'pending_body_reads': pending_body_reads()[:self.limits.page_items],
                 'pending_body_read_count': len(pending_body_reads()),
@@ -915,7 +956,7 @@ class AutonomousDataAgent:
                     raise ValueError('source requirement source_id is outside caller source scope')
                 return {'source_scope': scope.model_dump(mode='json')}
             if req['kind'] == 'query':
-                grounded_query(QueryPlan.model_validate(req['query']))
+                grounded_query(QueryPlan.model_validate(req['query']), port.for_query_source(req.get('source_id')))
                 if self.purpose == 'analysis_evidence' and not req['query']['records']:
                     raise ValueError('analysis_evidence query requirements need original record criteria; use source_evidence for documents')
                 return {'query_scope': scope.model_dump(mode='json'),
@@ -945,23 +986,26 @@ class AutonomousDataAgent:
                 if gid not in coverage[rid]['gap_ids']: coverage[rid]['gap_ids'].append(gid)
             return gid
 
-        def grounded_query(plan):
+        def grounded_query(plan, query_port=None):
+            query_port = port if query_port is None else query_port
             if self.purpose == 'analysis_evidence' and plan.calculations:
                 raise ValueError('analysis_evidence retrieves original records; provide calculation operands for the Analysis Agent')
-            schema = port.get_schema()
+            schema = query_port.get_schema()
             entities = {e['entity_id']: e['company_id'] for e in schema['entities']}
             for item in (*plan.records, *plan.calculations):
                 if item.entity_id not in entities: raise ValueError('query entity is outside scoped catalog')
                 company = entities[item.entity_id]
                 allowed = explicit_periods(request.question, fiscal_periods=[f for f in schema.get('fiscal_periods', ())
-                    if f['company_id'] == company], require_fiscal_mapping=True)
+                    if f['company_id'] == company], require_fiscal_mapping=True,
+                    knowledge_cutoff=scope.knowledge_cutoff)
                 if not allowed: raise ValueError('numeric query requires an explicit unambiguous period for its company')
                 selected = QueryPlan(records=(item,)) if item in plan.records else QueryPlan(calculations=(item,))
                 validate_plan_periods(selected, allowed)
             for doc in plan.documents:
-                if doc.company_id not in scope.company_ids: raise ValueError('document company is outside scope')
+                if doc.company_id not in query_port.scope.company_ids: raise ValueError('document company is outside scope')
                 allowed = explicit_periods(request.question, fiscal_periods=[f for f in schema.get('fiscal_periods', ())
-                    if f['company_id'] == doc.company_id], require_fiscal_mapping=True)
+                    if f['company_id'] == doc.company_id], require_fiscal_mapping=True,
+                    knowledge_cutoff=scope.knowledge_cutoff)
                 if not allowed: raise ValueError('document query requires an explicit period for its company')
                 validate_plan_periods(QueryPlan(documents=(doc,)), allowed)
 
@@ -1359,24 +1403,31 @@ class AutonomousDataAgent:
                 else:
                     navigation_cache_hit = None
                     if action.action == 'query':
-                        grounded_query(action.plan)
+                        selectors = {coverage[rid].get('source_id') for rid in refs if coverage[rid]['kind'] == 'query'}
+                        if len(selectors) > 1:
+                            raise ValueError('one query action cannot mix requirements with different source selectors')
+                        source_id = next(iter(selectors)) if selectors else None
+                        query_port = port.for_query_source(source_id)
+                        grounded_query(action.plan, query_port)
                         for rid in refs:
                             row = coverage[rid]
                             if row['kind'] == 'query' and (row['query'] != action.plan.model_dump(mode='json')
                                     or row['query_scope'] != scope.model_dump(mode='json')):
                                 raise ValueError('query differs from requirement plan or pinned scope')
-                        value = port.query_data(DataQuery(query_id=f'autonomous-{step}', question=request.question,
+                        value = query_port.query_data(DataQuery(query_id=f'autonomous-{step}', question=request.question,
                             snapshot_id=scope.snapshot_id, source_policy_id=scope.source_policy_id,
                             knowledge_cutoff=scope.knowledge_cutoff, include_candidates=scope.include_candidates,
                             **action.plan.model_dump()))
-                        if value.get('scope') != scope.model_dump(mode='json') or value.get('scope_id') != port.scope_id:
+                        if value.get('scope') != query_port.scope.model_dump(mode='json') or value.get('scope_id') != query_port.scope_id:
                             raise ValueError('query receipt differs from active scope')
-                        package_input = {'request': {'question': request.question, 'scope': scope.model_dump(mode='json')},
+                        package_input = {'request': {'question': request.question, 'scope': query_port.scope.model_dump(mode='json')},
                             'records': value['records'], 'computed_facts': value['computed_facts'],
                             'evidence': value['evidence'], 'contexts': [], 'navigation': [], 'gaps': value.get('gaps', [])}
-                        package = build_evidence_package(port, package_input)
+                        package = build_evidence_package(query_port, package_input)
                         receipt = {'sequence': step, 'request': {'action': 'query', 'query': action.plan.model_dump(mode='json')},
                                    'result': value, 'package': package}
+                        if source_id is not None:
+                            receipt['request']['source_id'] = source_id
                         write_new(folder / 'query-receipt.json', receipt)
                         for rid in refs:
                             if coverage[rid]['kind'] == 'query':

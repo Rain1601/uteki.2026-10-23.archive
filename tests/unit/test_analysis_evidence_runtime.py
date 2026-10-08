@@ -79,6 +79,20 @@ class AnalysisEvidenceRuntimeTests(unittest.TestCase):
         self.assertEqual(planner.packets[-1]['retained_body']['items'], [])
         self.assertFalse(load_evidence_bundle(output)['delivered_body'])
 
+    def test_new_unread_lead_is_visible_ahead_of_old_read_hits(self):
+        def search(term):
+            return {'action':'search_source','requirement_ids':['business'],
+                    'search':{'source_snapshot_id':'acme-annual','node_id':'root','phrase':term}}
+        def inspect(packet):
+            self.assertEqual(packet['source_leads'][0]['block_id'],'b7')
+            self.assertEqual(packet['source_leads'][0]['read_status'],'located')
+            self.assertGreater(packet['source_leads_page']['omitted_count'],0)
+            self.assertEqual(packet['source_leads_page']['full_read']['pointer'],'/source_leads')
+            return choose('b4')(packet)
+        result, _, _ = self.run_actions([source_plan(),search('Risks'),context_read(block='b4'),
+            search('Numbers'),inspect,{'action':'finish'}],limits={'page_items':1})
+        self.assertEqual(result['status'],'evidence_ready',result['trace'])
+
     def test_reread_refreshes_retained_body_order_without_recreating_evidence(self):
         state = {}
         def second(packet):

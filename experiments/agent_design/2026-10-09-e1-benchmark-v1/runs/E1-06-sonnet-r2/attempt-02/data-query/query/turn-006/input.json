@@ -1,0 +1,2568 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "请依据 Microsoft FY2025 10-K，提供 Microsoft Cloud、Intelligent Cloud 与 Azure 的口径定义及 FY2025 对应披露指标，明确金额/增长率差异，不推算未披露Azure收入。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-83205031a5bf6c29fc360377",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-83205031a5bf6c29fc360377",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "source-360182cbf562dcf9a8ab9c4e"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {},
+  "record_selection": {},
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-r2/attempt-01/data-query/query",
+      "manifest_sha256": "b345a6492ab7ef5431474178b9381f1ffa24843812aa3453583a110b95d0e615"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-r2/attempt-01/review-01",
+      "manifest_sha256": "cb6b30ce874caab40ffc14fa26de525edc3d0bf3b7f456385bfec25367622b3c"
+    },
+    "assessment": {
+      "packet_id": "data-review-34e0b5abd2fec550e7b72006",
+      "facts": [],
+      "requirements": [
+        {
+          "requirement_id": "req_definitions",
+          "verdict": "insufficient_evidence",
+          "rationale": "No source bodies or selected blocks were delivered (source_documents is empty; selected_blocks is empty). The program gaps report delivery_selection_missing and no_reviewable_source_blocks. The definitions of Microsoft Cloud, Intelligent Cloud and Azure therefore cannot be verified.",
+          "citations": []
+        },
+        {
+          "requirement_id": "req_fy2025_metrics",
+          "verdict": "insufficient_evidence",
+          "rationale": "No original text or tables were delivered. The FY2025 Microsoft Cloud revenue and growth, Intelligent Cloud revenue and growth, Azure growth, and any statement that the Azure amount is not separately disclosed cannot be verified. Only evidence IDs were listed, with no bodies.",
+          "citations": []
+        }
+      ],
+      "source_checks": [],
+      "question_coverage": "incomplete",
+      "coverage_reason": "The answer bundle contains no delivered source bodies and no facts. The program gaps state that no reviewable source blocks or facts exist. Neither the definitions nor the FY2025 metrics can be checked against the original 10-K, so the question is not covered.",
+      "missing_information": [
+        "Original 10-K body text defining Microsoft Cloud, the Intelligent Cloud segment (products, services and activities), and Azure and other cloud services, with scope qualifiers.",
+        "FY2025 (year ended June 30, 2025) Microsoft Cloud revenue and growth rate.",
+        "FY2025 Intelligent Cloud segment revenue and growth rate.",
+        "FY2025 Azure and other cloud services growth rate, and the source statement that the Azure revenue amount is not separately disclosed.",
+        "Units and period columns for the above tables and text."
+      ],
+      "revision_requests": [],
+      "body_checks": [],
+      "limitations": [
+        "source_check_ids is empty, so no source_checks entries are emitted.",
+        "Evidence IDs listed in the requirements are not original source bodies and cannot substitute for delivered text.",
+        "Source source-360182cbf562dcf9a8ab9c4e is an available candidate, but none of its blocks were delivered for review."
+      ]
+    }
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0000789019",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-08727d67db4596da",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "msft:IntelligentCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-4e381c5389e0f256",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-4e381c5389e0f256",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "us-gaap:ServiceOtherMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "msft:MorePersonalComputingMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-6d6570373dc9e275",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-6d6570373dc9e275",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "msft:DynamicsProductsAndCloudServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-785b7959aae57be8",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-785b7959aae57be8",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "msft:MicrosoftThreeSixFiveCommercialProductsAndCloudServicesMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "Cash payments for property and equipment / 固定资产购置现金支出",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported cash payments to acquire property, plant and equipment. Not total investment, accrual additions, or free cash flow; do not reverse the cash-payment sign.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments",
+            "capex cash payments",
+            "payments to acquire property plant and equipment",
+            "固定资产购置现金支出",
+            "PaymentsToAcquirePropertyPlantAndEquipment"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "Net income / 净利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported net income or loss for the stated scope and period. Preserve the source attribution; do not substitute an adjusted or attributable-income concept.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income",
+            "net income",
+            "net loss",
+            "净利润",
+            "净亏损",
+            "NetIncomeLoss"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "Operating cash flow / 经营现金流",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Net cash provided by or used in operating activities for the stated duration. Not operating profit, free cash flow, or an ending cash balance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow",
+            "operating cash flow",
+            "cash from operations",
+            "经营现金流",
+            "经营活动现金流量净额",
+            "NetCashProvidedByUsedInOperatingActivities"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "Operating income / 营业利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported operating income or loss after operating costs and expenses. Not net income, EBITDA, or operating cash flow.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income",
+            "operating income",
+            "operating loss",
+            "income from operations",
+            "营业利润",
+            "经营利润",
+            "OperatingIncomeLoss"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "Revenue / 收入",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported revenue under the mapped revenue concept; preserve consolidated versus dimensional scope. Not cash receipts, bookings, or guidance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue",
+            "revenues",
+            "net sales",
+            "收入",
+            "营业收入",
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "Revenues",
+            "SalesRevenueNet"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-50d0579d2ecb89c52ba9429b27e559d40abe4d082945a715393425142fa00717",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2024-07-01",
+            "end": "2025-06-30",
+            "basis": "source"
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e"
+        },
+        {
+          "item_id": "fiscal-027c3bcf9b68fad3373dea9c9365b0bc948a78714ce98ff0653aca6216324506",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2024,
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-589b4a6ddfe8580ab82f109f",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 6,
+              "text": "2024"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e"
+        },
+        {
+          "item_id": "fiscal-d0495f213ffaea808259075ef91437868677f99e54a2d56e0cf2cee771a78024",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2023,
+          "period": {
+            "kind": "year",
+            "start": "2022-07-01",
+            "end": "2023-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-e37027b7b24b24747079b305",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 10,
+              "text": "2023"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+          "company_id": "sec-0000789019",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+          "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008",
+          "document_id": "source-360182cbf562dcf9a8ab9c4e",
+          "index_id": "didx-bd90da03377180c8",
+          "index_folder": "indexes/source-360182cbf562dcf9a8ab9c4e",
+          "raw_file": "raw/source-360182cbf562dcf9a8ab9c4e.html",
+          "raw_file_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008",
+          "form": "10-K",
+          "period_end": "2025-06-30",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2025-07-30",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2024-07-01",
+                "end": "2025-06-30",
+                "basis": "source"
+              }
+            },
+            {
+              "fiscal_year": 2024,
+              "period": {
+                "kind": "year",
+                "start": "2023-07-01",
+                "end": "2024-06-30",
+                "basis": "source"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-589b4a6ddfe8580ab82f109f",
+                "block_id": "block-000781-9ee5633d",
+                "header": {
+                  "row": 4,
+                  "column": 6,
+                  "text": "2024"
+                },
+                "annual_caption": {
+                  "row": 4,
+                  "column": 0,
+                  "text": "Year Ended June 30,"
+                }
+              }
+            },
+            {
+              "fiscal_year": 2023,
+              "period": {
+                "kind": "year",
+                "start": "2022-07-01",
+                "end": "2023-06-30",
+                "basis": "source"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-e37027b7b24b24747079b305",
+                "block_id": "block-000781-9ee5633d",
+                "header": {
+                  "row": 4,
+                  "column": 10,
+                  "text": "2023"
+                },
+                "annual_caption": {
+                  "row": 4,
+                  "column": 0,
+                  "text": "Year Ended June 30,"
+                }
+              }
+            }
+          ],
+          "parsed_package": {
+            "export_version": "uteki-parsed-document-v1",
+            "package_id": "parsed-3672a5efe4f45ded873feee6",
+            "manifest_path": "indexes/source-360182cbf562dcf9a8ab9c4e/manifest.json",
+            "manifest_sha256": "557c7a0db69ba827bd43efab3a3164786cda2b981b591388164deccdc249863a",
+            "source_path": "indexes/source-360182cbf562dcf9a8ab9c4e/source.json",
+            "document_path": "indexes/source-360182cbf562dcf9a8ab9c4e/document.html",
+            "status": "candidate_parsed_material",
+            "semantic_review": "not_reviewed"
+          },
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes",
+            "html_table_structure",
+            "parsed_document_package"
+          ],
+          "stage_coverage": {
+            "schema_version": "source-stage-coverage-v1",
+            "original": {
+              "status": "hash_verified",
+              "byte_count": 8158176,
+              "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008"
+            },
+            "reading": {
+              "status": "indexed",
+              "parser_version": "sec-source-blocks-v0.1.11",
+              "block_count": 1401,
+              "block_type_counts": {
+                "heading_candidate": 402,
+                "list_item": 114,
+                "other": 13,
+                "page_marker": 100,
+                "paragraph": 687,
+                "table": 85
+              },
+              "index_diagnostic_count": 25
+            },
+            "tables": {
+              "status": "structure_parsed",
+              "table_node_count": 85,
+              "tables_with_cells": 85,
+              "tables_without_cells": 0,
+              "cell_count": 19065,
+              "layout_role_counts": {
+                "table_of_contents": 1,
+                "unclassified": 84
+              },
+              "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+              "financial_table_semantics": "not_evaluated"
+            },
+            "numeric": {
+              "status": "candidate_records",
+              "record_count": 102,
+              "evidence_count": 102,
+              "gap_count": 1449,
+              "adapter": "us-gaap-inline-v1",
+              "supported_taxonomy": "US_GAAP",
+              "supported_currencies": [
+                "USD"
+              ],
+              "supported_metric_ids": [
+                "capex_cash_payments",
+                "net_income",
+                "operating_cash_flow",
+                "operating_income",
+                "revenue",
+                "revenue_including_assessed_tax"
+              ],
+              "period_support": "complete_month_boundaries_only",
+              "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+              "financial_package_completeness": "not_evaluated",
+              "semantic_review": "not_evaluated",
+              "adoption": "candidate"
+            }
+          },
+          "image_block_count": 0
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "scope_id": "scope-01db3b27fc3fd9609b177370",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 3574,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "scope_id": "scope-01db3b27fc3fd9609b177370",
+        "returned_count": 8,
+        "total_count": 20,
+        "bytes_returned": 2985,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "scope_id": "scope-01db3b27fc3fd9609b177370",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "dab3df5537b2cd2a5d9d57b16e7e9a3cd419d8f8b1f31de3a17de78270c0bd0b",
+          "offset": 8,
+          "checksum": "6855141861dc86e76961618dca4e33f0df9a264963e3f39dad04639c7dfe9809"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "scope_id": "scope-01db3b27fc3fd9609b177370",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 3389,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "scope_id": "scope-01db3b27fc3fd9609b177370",
+        "returned_count": 3,
+        "total_count": 3,
+        "bytes_returned": 1462,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_definitions",
+      "description": "Original 10-K text defining Microsoft Cloud, the Intelligent Cloud segment (principal products, services, activities) and Azure and other cloud services, with scope qualifiers (e.g. what Microsoft Cloud includes, Azure included in Intelligent Cloud)."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_fy2025_metrics",
+      "description": "FY2025 (year ended June 30, 2025) disclosures in the 10-K: Microsoft Cloud revenue and growth, Intelligent Cloud segment revenue and growth, Azure and other cloud services growth rate, and the statement on whether Azure revenue amount is separately disclosed; with units, periods and qualifiers (MD&A text and segment tables)."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_definitions",
+      "description": "Original 10-K text defining Microsoft Cloud, the Intelligent Cloud segment (principal products, services, activities) and Azure and other cloud services, with scope qualifiers (e.g. what Microsoft Cloud includes, Azure included in Intelligent Cloud).",
+      "evidence_ids": [
+        "ev-0e110e85a4805f10be98ecf3"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_fy2025_metrics",
+      "description": "FY2025 (year ended June 30, 2025) disclosures in the 10-K: Microsoft Cloud revenue and growth, Intelligent Cloud segment revenue and growth, Azure and other cloud services growth rate, and the statement on whether Azure revenue amount is separately disclosed; with units, periods and qualifiers (MD&A text and segment tables).",
+      "evidence_ids": [
+        "ev-0e110e85a4805f10be98ecf3"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-b36bf0146d0b53215d8c37f36067f43b",
+    "kind": "run_state",
+    "path": "artifacts/art-b36bf0146d0b53215d8c37f36067f43b.json",
+    "sha256": "dfef8304ecebbd58c04873afe6d3fd6ed2ba109dceae156c39d926e8f9bd1f32",
+    "size_bytes": 6979,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-83205031a5bf6c29fc360377",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    },
+    "scope_id": "scope-01db3b27fc3fd9609b177370",
+    "created_step": 6,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+      "kind": "context",
+      "path": "artifacts/art-4429cb5ee3d6ba76a3d12cfd6ef65f6c.json",
+      "sha256": "ad3ce4d12f6fa027141a362563c4c3544d1eb9dcbecb3345bc2616e1f41c8832",
+      "size_bytes": 23379,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-01db3b27fc3fd9609b177370",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "evidence_id": "ev-0e110e85a4805f10be98ecf3"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-75c1256c0775c804e7d1878248884593",
+    "sha256": "bf563ef76f33e70f291b31e1e1bd2f222abaf2e931039aed333f685dd0476040",
+    "scope_id": "scope-01db3b27fc3fd9609b177370",
+    "snapshot_id": "query-83205031a5bf6c29fc360377",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 1,
+    "total_count": 1,
+    "returned_count": 1,
+    "bytes_returned": 764,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "status": "tool_returned",
+    "evidence_ids": [
+      "ev-0e110e85a4805f10be98ecf3"
+    ],
+    "cache_hit": false,
+    "result": {
+      "index_id": "didx-bd90da03377180c8",
+      "node_id": "didx-bd90da03377180c8-document",
+      "reading_group_version": "reading-groups-v0.4",
+      "reading_groups": [
+        {
+          "group_id": "list-block-000515-bbf3475b",
+          "version": "reading-groups-v0.4",
+          "kind": "list_context",
+          "block_ids": [
+            "block-000515-bbf3475b",
+            "block-000516-4f8865ab",
+            "block-000517-e428a3ca",
+            "block-000518-4f8865ab",
+            "block-000519-c8282117",
+            "block-000520-4f8865ab",
+            "block-000521-bbf36804",
+            "block-000522-4f8865ab",
+            "block-000523-7e867f48",
+            "block-000524-4f8865ab",
+            "block-000525-b55a96f7",
+            "block-000526-4f8865ab",
+            "block-000527-e71b1de3",
+            "block-000528-4f8865ab",
+            "block-000529-669825c8",
+            "block-000530-4f8865ab",
+            "block-000531-5d365a63",
+            "block-000532-4f8865ab",
+            "block-000533-d47325c9"
+          ],
+          "item_ids": [
+            "block-000516-4f8865ab",
+            "block-000518-4f8865ab",
+            "block-000520-4f8865ab",
+            "block-000522-4f8865ab",
+            "block-000524-4f8865ab",
+            "block-000526-4f8865ab",
+            "block-000528-4f8865ab",
+            "block-000530-4f8865ab",
+            "block-000532-4f8865ab"
+          ],
+          "items": [
+            {
+              "block_id": "block-000516-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000517-e428a3ca"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000518-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000519-c8282117"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000520-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000521-bbf36804"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000522-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000523-7e867f48"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000524-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000525-b55a96f7"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000526-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000527-e71b1de3"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000528-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000529-669825c8"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000530-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000531-5d365a63"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            },
+            {
+              "block_id": "block-000532-4f8865ab",
+              "parent_id": null,
+              "content_block_ids": [
+                "block-000533-d47325c9"
+              ],
+              "association_basis": "split_bullet_same_dom_container"
+            }
+          ],
+          "rule": "consecutive bullet items including DOM-linked split marker/body + colon introduction + adjacent heading"
+        }
+      ],
+      "expansion_note": "Complete list/table/turn/Q&A context may exceed requested count; original blocks unchanged.",
+      "blocks": [
+        {
+          "block_id": "block-000515-bbf3475b",
+          "dom_path": "/html/body/div[105]/p[6]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 515,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "margin-top",
+              "9pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "Highlights from fiscal year 2025 compared with fiscal year 2024 included:",
+          "text_hash": "bbf3475b77b88437ec9e5393be351b72b4285d9ddc7f6482726bb7141d907a7d",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000516-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[1]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 516,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000517-e428a3ca",
+          "dom_path": "/html/body/div[105]/div[1]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 517,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Microsoft Cloud revenue increased 23% to $168.9 billion.",
+          "text_hash": "e428a3ca91622c380e5745a09346cdcc326d0714299f663f3d1f1d9dde673980",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000518-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[2]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 518,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000519-c8282117",
+          "dom_path": "/html/body/div[105]/div[2]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 519,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Microsoft 365 Commercial products and cloud services revenue increased 14% driven by Microsoft 365 Commercial cloud revenue growth of 15%.",
+          "text_hash": "c828211722452f8a572c31dda3c0da7b00ded51be0455cad1185a0616b8e0fc0",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000520-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[3]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 520,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000521-bbf36804",
+          "dom_path": "/html/body/div[105]/div[3]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 521,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Microsoft 365 Consumer products and cloud services revenue increased 11% driven by Microsoft 365 Consumer cloud revenue growth of 11%.",
+          "text_hash": "bbf3680445e123af32e1c42f2cd0dee349750205dddf7e9dc8f4d28288b12315",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000522-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[4]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 522,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000523-7e867f48",
+          "dom_path": "/html/body/div[105]/div[4]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 523,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "LinkedIn revenue increased 9%.",
+          "text_hash": "7e867f481c11d6e4b109a71d16389ff97b9d9afd6c3c4a2971750edd52f185b3",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000524-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[5]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 524,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000525-b55a96f7",
+          "dom_path": "/html/body/div[105]/div[5]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 525,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Dynamics products and cloud services revenue increased 15% driven by Dynamics 365 revenue growth of 19%.",
+          "text_hash": "b55a96f7ca21bbd5c5b26bfffa07eeab0fcc26975cb124139b77fb022cdf5c16",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000526-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[6]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 526,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000527-e71b1de3",
+          "dom_path": "/html/body/div[105]/div[6]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 527,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Server products and cloud services revenue increased 23% driven by Azure and other cloud services revenue growth of 34%.",
+          "text_hash": "e71b1de3359609b751b50f853e213a9912f31dbebb531e101c94f78187054325",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000528-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[7]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 528,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000529-669825c8",
+          "dom_path": "/html/body/div[105]/div[7]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 529,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Windows OEM and Devices revenue increased 3%.",
+          "text_hash": "669825c836f43a04cb941ee3e30d75e35d33aba9b82da53777d7504d87aaf251",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000530-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[8]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 530,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000531-5d365a63",
+          "dom_path": "/html/body/div[105]/div[8]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 531,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Xbox content and services revenue increased 16%.",
+          "text_hash": "5d365a63240ec70c68e593f60def8ff9b2ed19d402687caeb48d52ffd83847a5",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000532-4f8865ab",
+          "dom_path": "/html/body/div[105]/div[9]/span",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 532,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "•",
+          "text_hash": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+          "type": "list_item"
+        },
+        {
+          "block_id": "block-000533-d47325c9",
+          "dom_path": "/html/body/div[105]/div[9]/div",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 533,
+          "reported_page": 35,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "arial"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ]
+          ],
+          "table": null,
+          "text": "Search and news advertising revenue excluding traffic acquisition costs increased 20%.",
+          "text_hash": "d47325c9bce23bed9221860a78148b283accb3fcf1c53c37f82c118a538f6887",
+          "type": "paragraph"
+        }
+      ],
+      "previous_block_id": "block-000514-c48f32d8",
+      "next_block_id": "block-000534-277157f1",
+      "context_note": "Check preceding heading/introduction and following list continuation; tables retain cells and XBRL.",
+      "execution_schema_version": "research-execution-v1",
+      "scope_id": "scope-01db3b27fc3fd9609b177370",
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "snapshot_id": "query-83205031a5bf6c29fc360377",
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "candidate_data": true,
+      "source": {
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "company_id": "sec-0000789019",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+        "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008",
+        "document_id": "source-360182cbf562dcf9a8ab9c4e",
+        "index_id": "didx-bd90da03377180c8",
+        "index_folder": "indexes/source-360182cbf562dcf9a8ab9c4e",
+        "raw_file": "raw/source-360182cbf562dcf9a8ab9c4e.html",
+        "raw_file_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008",
+        "form": "10-K",
+        "period_end": "2025-06-30",
+        "declared_mime_type": "text/html",
+        "parsed_mime_type": "text/html",
+        "available_at": "2025-07-30",
+        "status": "candidate",
+        "fiscal_periods": [
+          {
+            "fiscal_year": 2025,
+            "period": {
+              "kind": "year",
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "basis": "source"
+            }
+          },
+          {
+            "fiscal_year": 2024,
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "basis_evidence": {
+              "method": "inline-table-year-v1",
+              "evidence_id": "ev-589b4a6ddfe8580ab82f109f",
+              "block_id": "block-000781-9ee5633d",
+              "header": {
+                "row": 4,
+                "column": 6,
+                "text": "2024"
+              },
+              "annual_caption": {
+                "row": 4,
+                "column": 0,
+                "text": "Year Ended June 30,"
+              }
+            }
+          },
+          {
+            "fiscal_year": 2023,
+            "period": {
+              "kind": "year",
+              "start": "2022-07-01",
+              "end": "2023-06-30",
+              "basis": "source"
+            },
+            "basis_evidence": {
+              "method": "inline-table-year-v1",
+              "evidence_id": "ev-e37027b7b24b24747079b305",
+              "block_id": "block-000781-9ee5633d",
+              "header": {
+                "row": 4,
+                "column": 10,
+                "text": "2023"
+              },
+              "annual_caption": {
+                "row": 4,
+                "column": 0,
+                "text": "Year Ended June 30,"
+              }
+            }
+          }
+        ],
+        "parsed_package": {
+          "export_version": "uteki-parsed-document-v1",
+          "package_id": "parsed-3672a5efe4f45ded873feee6",
+          "manifest_path": "indexes/source-360182cbf562dcf9a8ab9c4e/manifest.json",
+          "manifest_sha256": "557c7a0db69ba827bd43efab3a3164786cda2b981b591388164deccdc249863a",
+          "source_path": "indexes/source-360182cbf562dcf9a8ab9c4e/source.json",
+          "document_path": "indexes/source-360182cbf562dcf9a8ab9c4e/document.html",
+          "status": "candidate_parsed_material",
+          "semantic_review": "not_reviewed"
+        },
+        "capabilities": [
+          "read_context",
+          "literal_search",
+          "source_bytes",
+          "html_table_structure",
+          "parsed_document_package"
+        ],
+        "stage_coverage": {
+          "schema_version": "source-stage-coverage-v1",
+          "original": {
+            "status": "hash_verified",
+            "byte_count": 8158176,
+            "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008"
+          },
+          "reading": {
+            "status": "indexed",
+            "parser_version": "sec-source-blocks-v0.1.11",
+            "block_count": 1401,
+            "block_type_counts": {
+              "heading_candidate": 402,
+              "list_item": 114,
+              "other": 13,
+              "page_marker": 100,
+              "paragraph": 687,
+              "table": 85
+            },
+            "index_diagnostic_count": 25
+          },
+          "tables": {
+            "status": "structure_parsed",
+            "table_node_count": 85,
+            "tables_with_cells": 85,
+            "tables_without_cells": 0,
+            "cell_count": 19065,
+            "layout_role_counts": {
+              "table_of_contents": 1,
+              "unclassified": 84
+            },
+            "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+            "financial_table_semantics": "not_evaluated"
+          },
+          "numeric": {
+            "status": "candidate_records",
+            "record_count": 102,
+            "evidence_count": 102,
+            "gap_count": 1449,
+            "adapter": "us-gaap-inline-v1",
+            "supported_taxonomy": "US_GAAP",
+            "supported_currencies": [
+              "USD"
+            ],
+            "supported_metric_ids": [
+              "capex_cash_payments",
+              "net_income",
+              "operating_cash_flow",
+              "operating_income",
+              "revenue",
+              "revenue_including_assessed_tax"
+            ],
+            "period_support": "complete_month_boundaries_only",
+            "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+            "financial_package_completeness": "not_evaluated",
+            "semantic_review": "not_evaluated",
+            "adoption": "candidate"
+          }
+        },
+        "image_block_count": 0
+      },
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "company_id": "sec-0000789019",
+      "source_period_end": "2025-06-30",
+      "available_at": "2025-07-30",
+      "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+      "status": "read",
+      "gaps": [],
+      "requested_start_block_id": "block-000517-e428a3ca",
+      "block_ids": [
+        "block-000515-bbf3475b",
+        "block-000516-4f8865ab",
+        "block-000517-e428a3ca",
+        "block-000518-4f8865ab",
+        "block-000519-c8282117",
+        "block-000520-4f8865ab",
+        "block-000521-bbf36804",
+        "block-000522-4f8865ab",
+        "block-000523-7e867f48",
+        "block-000524-4f8865ab",
+        "block-000525-b55a96f7",
+        "block-000526-4f8865ab",
+        "block-000527-e71b1de3",
+        "block-000528-4f8865ab",
+        "block-000529-669825c8",
+        "block-000530-4f8865ab",
+        "block-000531-5d365a63",
+        "block-000532-4f8865ab",
+        "block-000533-d47325c9"
+      ],
+      "next_cursor": {
+        "cursor_version": "document-cursor-v1",
+        "scope_id": "scope-01db3b27fc3fd9609b177370",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "index_id": "didx-bd90da03377180c8",
+        "node_id": "didx-bd90da03377180c8-document",
+        "kind": "read",
+        "start_block_id": "block-000534-277157f1"
+      },
+      "node_complete": false,
+      "coverage": "Returned full blocks only; reaching the node end does not prove all earlier blocks were read."
+    },
+    "result_artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+      "kind": "context",
+      "path": "artifacts/art-4429cb5ee3d6ba76a3d12cfd6ef65f6c.json",
+      "sha256": "ad3ce4d12f6fa027141a362563c4c3544d1eb9dcbecb3345bc2616e1f41c8832",
+      "size_bytes": 23379,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-01db3b27fc3fd9609b177370",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "evidence_id": "ev-0e110e85a4805f10be98ecf3"
+    },
+    "preview_truncated": false,
+    "reads": [],
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 5,
+      "action": "read_context",
+      "requirement_ids": [
+        "req_definitions",
+        "req_fy2025_metrics"
+      ],
+      "request_fingerprint": "a2c50681b89c3ed85d41c2b3ddb648591cbfaefbcc0df71865337d5cdc241927",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "reading",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 18562,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-271f4d843617f7f42c2fdc6882d74091",
+      "kind": "tool_output",
+      "path": "artifacts/art-271f4d843617f7f42c2fdc6882d74091.json",
+      "sha256": "efdcead3a5829f5b041c2373931a907d30387765b392bec8e41caca3979f2d75",
+      "size_bytes": 25071,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-01db3b27fc3fd9609b177370",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267",
+    "content": "---\nname: data-agent-query\nversion: 13\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nBusiness composition and revenue composition are distinct question dimensions. For business-composition requests, plan and obtain the source's definition of each requested business/segment's principal products, services or activities, their affiliation and necessary qualifiers. Revenue or monetization categories alone are insufficient. A product/platform can define the business even without a separately reported revenue line. Preserve the relevant definitional enumeration, not every product mention across the report. Verify this coverage before trimming material. For pure revenue requests, retain the numbers and necessary period/unit/accounting context without forcing a product catalog. Describe the requested dimension in requirement descriptions; do not narrow the original question to what the first search happened to find.\n\nrecord_origins shows the latest query's record evidence IDs with immutable original citation locations and short quote previews. It stays available after reading source blocks; use its exact continuation cursor for omitted entries and each citation's read_request for complete metadata. These are navigation aids, not body reading. Inspect the original locations before selecting equivalent occurrences. A reviewer's cross-check citation does not replace a record's original source. Selecting or omitting source_evidence does not change a selected record's citation or its table context. To remove an unnecessary table, select another already-queried occurrence satisfying the same entity/metric/period/value_kind criterion with sufficient original evidence; never rewrite its source identity. Keep necessary units, headings and qualifiers.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nFor purpose=analysis_evidence, the Data Agent retrieves original material for a separate Analysis Agent. The original question can be narrative; use kind=source_evidence for its source material and kind=query for numeric retrieval. Do not create source_answer requirements or author the downstream report. Navigate using the small scoped catalog/schema and source index, then read relevant original blocks with necessary units, periods, introductions and qualifiers. Do not default to full-report or whole-chapter delivery. Preserve explicit gaps when evidence or resources are insufficient. Semantic completeness is reviewed separately after retrieval.\n\nIn analysis_evidence, query original records/operands; calculation requirements are not supported by its review handoff. Every numeric query requirement must declare records criteria. Use source_evidence for document-only retrieval. After querying, select_records with record_selection.record_ids=[evidence_id,...], requirement_ids and a reason selects the final records. These IDs are ev- record evidence IDs, not original record_id values. Retain at least one record per declared entity/metric/period/value_kind criterion, preserving explicit units and source qualifications; trim redundant disclosures when one source is sufficient. Only records returned by that requirement's same-scope query are eligible. Selection replaces previous selection, preserves the full audit trail, and is required before finish. After gathering a source_evidence requirement, use select_evidence with delivery.blocks=[{context_id,block_id}], requirement_ids and a reason. Only fully delivered same-source blocks may be selected. This replaces that requirement's final delivery selection, while retaining all exploration snapshots. Keep units, periods, full relevant lists and necessary qualifications. Do not select unrelated exploration. The reviewer checks relevance as well as support. read_body_catalog lists prior complete blocks and exact reread pointers. Continue omitted rows with read_artifact using artifact_id + next_cursor from the SAME catalog snapshot. Directory reads are navigation only; a row's read_request reopens the original. Feedback from a prior sealed review preserves the original question/scope and directs a new complete evidence package, not just an addendum.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nFor purpose=question_answer, use kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.\n\nAn answer must declare model_claimed_coverage, coverage_note and unresolved_questions. partial requires concrete unresolved questions; claimed_complete requires none but remains a model judgment. The host validates references, never semantic completeness. No answer prevents finish unless an explicit gap is recorded; a partial answer seals a partial result. research_answers persists bounded candidate answers and artifact pointers across later reading. Revising an answer preserves old versions; changing only statement or label is not new evidence. Worker answers are untrusted candidates and do not satisfy the parent's requirements.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nWhen available_financial_extract is true, inspect the host's financial_tasks catalog. Each task fixes the company, source, frozen selection, method policy and available table batches. Use source_excerpt to select the pending batch relevant to the user's request; excerpts are navigation, not body-reading receipts. The financial_task_catalog artifact retains the full initial catalog. This task reuses its explicitly registered selection; it does not establish whole-filing recall.\n\nPlan a separate kind=financial_extract requirement with financial_task_id and batch_index. Execute action=financial_extract with financial_extraction={task_id,batch_index,method_id?}, referencing exactly that requirement. Omit method_id to select the task default, or choose only an allowed_method_ids entry. The execution host loads that method's versioned Skill and Prompt before extracting; do not send paths, jobs, financial answers, period replacements or model settings. Respect max_new_batches. Successful batches show candidate status and their receipt; do not rerun them merely to repeat a completed task.\n\nA candidate_financial_extraction receipt means a separate candidate dataset was generated. It does not update the active query baseline, satisfy a numeric query, prove source body was delivered to you, or approve financial semantics. Check returned raw/normalized counts and gaps; zero normalized records and unresolved drafts remain visible limitations. Only the matching task/catalog/batch receipt can complete its financial_extract requirement. Failed or unavailable execution requires an explicit gap. A run containing only these completed requirements ends candidate_ready; all outputs still need independent review and adoption.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": true,
+  "available_financial_extract": false,
+  "financial_tasks": [],
+  "financial_task_catalog": null,
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req_definitions",
+        "reason": "delivery_selection_required"
+      },
+      {
+        "requirement_id": "req_fy2025_metrics",
+        "reason": "delivery_selection_required"
+      }
+    ],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000515-bbf3475b",
+        "text": "Highlights from fiscal year 2025 compared with fiscal year 2024 included:",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000516-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000517-e428a3ca",
+        "text": "Microsoft Cloud revenue increased 23% to $168.9 billion.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000518-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000519-c8282117",
+        "text": "Microsoft 365 Commercial products and cloud services revenue increased 14% driven by Microsoft 365 Commercial cloud revenue growth of 15%.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000520-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000521-bbf36804",
+        "text": "Microsoft 365 Consumer products and cloud services revenue increased 11% driven by Microsoft 365 Consumer cloud revenue growth of 11%.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000522-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000523-7e867f48",
+        "text": "LinkedIn revenue increased 9%.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/8/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000524-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000525-b55a96f7",
+        "text": "Dynamics products and cloud services revenue increased 15% driven by Dynamics 365 revenue growth of 19%.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/10/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000526-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/11/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000527-e71b1de3",
+        "text": "Server products and cloud services revenue increased 23% driven by Azure and other cloud services revenue growth of 34%.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/12/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000528-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/13/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000529-669825c8",
+        "text": "Windows OEM and Devices revenue increased 3%.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/14/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000530-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/15/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000531-5d365a63",
+        "text": "Xbox content and services revenue increased 16%.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/16/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-0e110e85a4805f10be98ecf3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000532-4f8865ab",
+        "text": "•",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-83205031a5bf6c29fc360377",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "source-360182cbf562dcf9a8ab9c4e"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/17/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 1,
+    "byte_limit": 12000
+  },
+  "read_body_catalog": {
+    "status": "read",
+    "artifact_id": "art-3f445161011ccdbc759e9ee0d55784cc",
+    "sha256": "941f1968ce3eab880e80e1fbf49a80bcb005432dfbba60352cad89636d73f029",
+    "scope_id": "scope-01db3b27fc3fd9609b177370",
+    "snapshot_id": "query-83205031a5bf6c29fc360377",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 19,
+    "total_count": 19,
+    "returned_count": 19,
+    "items": [
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000515-bbf3475b",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 0,
+        "text_preview": "Highlights from fiscal year 2025 compared with fiscal year 2024 included:",
+        "text_characters": 73,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000516-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 1,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000517-e428a3ca",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 2,
+        "text_preview": "Microsoft Cloud revenue increased 23% to $168.9 billion.",
+        "text_characters": 56,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000518-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 3,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000519-c8282117",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 4,
+        "text_preview": "Microsoft 365 Commercial products and cloud services revenue increased 14% driven by Microsoft 365 Commercial cloud revenue growth of 15%.",
+        "text_characters": 138,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000520-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 5,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000521-bbf36804",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 6,
+        "text_preview": "Microsoft 365 Consumer products and cloud services revenue increased 11% driven by Microsoft 365 Consumer cloud revenue growth of 11%.",
+        "text_characters": 134,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000522-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 7,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000523-7e867f48",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 8,
+        "text_preview": "LinkedIn revenue increased 9%.",
+        "text_characters": 30,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/8/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000524-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 9,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000525-b55a96f7",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 10,
+        "text_preview": "Dynamics products and cloud services revenue increased 15% driven by Dynamics 365 revenue growth of 19%.",
+        "text_characters": 104,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/10/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000526-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 11,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/11/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000527-e71b1de3",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 12,
+        "text_preview": "Server products and cloud services revenue increased 23% driven by Azure and other cloud services revenue growth of 34%.",
+        "text_characters": 120,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/12/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000528-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 13,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/13/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000529-669825c8",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 14,
+        "text_preview": "Windows OEM and Devices revenue increased 3%.",
+        "text_characters": 45,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/14/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000530-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 15,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/15/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000531-5d365a63",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 16,
+        "text_preview": "Xbox content and services revenue increased 16%.",
+        "text_characters": 48,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/16/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000532-4f8865ab",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 17,
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/17/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-0e110e85a4805f10be98ecf3",
+        "block_id": "block-000533-d47325c9",
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "context_block_index": 18,
+        "text_preview": "Search and news advertising revenue excluding traffic acquisition costs increased 20%.",
+        "text_characters": 86,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4429cb5ee3d6ba76a3d12cfd6ef65f6c",
+          "pointer": "/blocks/18/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "bytes_returned": 7562,
+    "next_cursor": null,
+    "gaps": [],
+    "schema_version": "read-body-catalog-v2",
+    "navigation_only": true,
+    "artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-3f445161011ccdbc759e9ee0d55784cc",
+      "kind": "read_body_catalog",
+      "path": "artifacts/art-3f445161011ccdbc759e9ee0d55784cc.json",
+      "sha256": "941f1968ce3eab880e80e1fbf49a80bcb005432dfbba60352cad89636d73f029",
+      "size_bytes": 8743,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-01db3b27fc3fd9609b177370",
+      "created_step": 6,
+      "parent_ids": [],
+      "source_ids": [
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "evidence_id": null
+    },
+    "byte_limit": 15000,
+    "omitted_count": 0
+  },
+  "source_leads": [
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "block_id": "block-000517-e428a3ca",
+      "index_id": "didx-bd90da03377180c8",
+      "origin": "search",
+      "requirement_ids": [
+        "req_definitions",
+        "req_fy2025_metrics"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000517-e428a3ca"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "block_id": "block-000561-0169b853",
+      "index_id": "didx-bd90da03377180c8",
+      "origin": "search",
+      "requirement_ids": [
+        "req_definitions",
+        "req_fy2025_metrics"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000561-0169b853"
+      },
+      "read_status": "located"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "block_id": "block-000575-34a8327b",
+      "index_id": "didx-bd90da03377180c8",
+      "origin": "search",
+      "requirement_ids": [
+        "req_definitions",
+        "req_fy2025_metrics"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000575-34a8327b"
+      },
+      "read_status": "located"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-83205031a5bf6c29fc360377",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "block_id": "block-000580-d829cf56",
+      "index_id": "didx-bd90da03377180c8",
+      "origin": "search",
+      "requirement_ids": [
+        "req_definitions",
+        "req_fy2025_metrics"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+        "block_id": "block-000580-d829cf56"
+      },
+      "read_status": "located"
+    }
+  ],
+  "source_lead_count": 4,
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 1,
+      "action": "load_skill",
+      "status": "skill_loaded"
+    },
+    {
+      "step": 2,
+      "action": "plan",
+      "status": "planned"
+    },
+    {
+      "step": 3,
+      "action": "outline_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 4,
+      "action": "search_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 5,
+      "action": "read_context",
+      "status": "tool_returned"
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 35
+}

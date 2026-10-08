@@ -1,0 +1,70 @@
+{
+  "request": {
+    "question": "请依据 Microsoft FY2025 10-K，提供 Microsoft Cloud、Intelligent Cloud 与 Azure 的口径定义及 FY2025 对应披露指标，明确金额/增长率差异，不推算未披露Azure收入。",
+    "purpose": "analysis_evidence",
+    "dataset": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-acquired-fy2025",
+    "scope": {
+      "snapshot_id": "query-83205031a5bf6c29fc360377",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    },
+    "limits": {
+      "max_steps": 40,
+      "max_packet_bytes": 120000,
+      "observation_bytes": 24000,
+      "page_items": 8,
+      "turn_timeout": 300
+    }
+  },
+  "planner": {
+    "provider": "aihubmix",
+    "model": "claude-sonnet-5-5",
+    "reasoning_effort": "high",
+    "max_tokens": 8192,
+    "request_timeout": 120,
+    "max_retries": 1,
+    "budget_ledger": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/costs.sqlite",
+    "budget_usd": "20",
+    "budget_policy": "enforced",
+    "max_requests_total": 500,
+    "allow_unknown_reservations": true
+  },
+  "worker": {
+    "provider": "aihubmix",
+    "model": "claude-sonnet-5-5",
+    "reasoning_effort": "high",
+    "max_tokens": 8192,
+    "request_timeout": 120,
+    "max_retries": 1,
+    "budget_ledger": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/costs.sqlite",
+    "budget_usd": "20",
+    "budget_policy": "enforced",
+    "max_requests_total": 500,
+    "allow_unknown_reservations": true
+  },
+  "reviewer": {
+    "provider": "aihubmix",
+    "model": "claude-sonnet-5-5",
+    "reasoning_effort": "high",
+    "max_tokens": 12000,
+    "request_timeout": 120,
+    "max_retries": 1,
+    "budget_ledger": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/costs.sqlite",
+    "budget_usd": "20",
+    "budget_policy": "enforced",
+    "max_requests_total": 500,
+    "allow_unknown_reservations": true
+  },
+  "credential_root": "/Users/rain/Documents/ChatGPT/uteki.beta",
+  "workspace": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runtime-workspace",
+  "max_review_packet_bytes": 160000,
+  "max_attempts": 2,
+  "reviewer_max_request_bytes": 220000
+}

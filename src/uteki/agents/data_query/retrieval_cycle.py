@@ -1,15 +1,19 @@
 """Bounded Data retrieval and content review, without an Analysis model stage."""
 import asyncio
 from copy import deepcopy
+from contextlib import closing
+from decimal import Decimal, InvalidOperation
 from importlib import import_module
+import hashlib
 import json
 from pathlib import Path
 import re
+import sqlite3
 
 from .artifacts import write_new
 from . import answer_handoff as handoff_module, coordinator as coordinator_module
 from .coordinator import CompanyDataCoordinator, _verify_manifest
-from .answer_handoff import AnswerAssessment, REVIEW_PROMPT, prepare_review_packet, review_data_answer
+from .answer_handoff import AnswerAssessment, QUESTION_REVIEW_POLICY, review_prompt, prepare_review_packet, review_data_answer
 from .autonomous_model import reasoning_configuration
 from .record_review_model import SdkRecordReviewer
 from uteki.agents.runtime.run_budget import RunBudget
@@ -19,10 +23,21 @@ from uteki.infrastructure.research_data.query_service import QueryDataPort
 from uteki.infrastructure.research_data.financial_records import digest
 
 
+def review_roles(config):
+    """Do not inject optional fields into historical configurations."""
+    present = ('question_reviewer' in config, 'question_review_policy' in config)
+    if present[0] != present[1]:
+        raise ValueError('question_reviewer and question_review_policy must be supplied together')
+    if present[0] and (config['question_review_policy'] != QUESTION_REVIEW_POLICY
+                       or not isinstance(config['question_reviewer'], dict)):
+        raise ValueError('unsupported independent question review configuration')
+    return ('planner', 'worker', 'reviewer') + (('question_reviewer',) if present[0] else ())
+
+
 def validate(config, output):
     required = {'request', 'planner', 'worker', 'reviewer', 'credential_root', 'workspace',
                 'max_review_packet_bytes', 'max_attempts'}
-    if not required <= set(config) or set(config) - required - {'reviewer_max_request_bytes', 'initial_query_ref'}:
+    if not required <= set(config) or set(config) - required - {'reviewer_max_request_bytes', 'initial_query_ref', 'question_reviewer', 'question_review_policy'}:
         raise ValueError('explicit retrieval configuration required; unknown fields rejected')
     if type(config['max_attempts']) is not int or not 1 <= config['max_attempts'] <= 3:
         raise ValueError('max_attempts must be an explicit integer between 1 and 3')
@@ -43,13 +58,13 @@ def validate(config, output):
     _verify_manifest(dataset)
     with QueryDataPort(dataset) as port:
         port.scoped(request.scope).discover_data()
-    for role in ('planner', 'worker', 'reviewer'):
+    for role in review_roles(config):
         model = config[role]
         CompanyDataCoordinator._validate_shared_model_configs(config['planner'], model)
         _, _, native = reasoning_configuration(model['provider'], model['model'], model.get('reasoning_effort'))
         if not {'max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort'} <= model.keys():
             raise ValueError(role + ' requires explicit token, timeout, retry and reasoning settings')
-        maximum = (16000 if native else 16384) if role == 'reviewer' else 8192
+        maximum = (16000 if native else 16384) if role in {'reviewer', 'question_reviewer'} else 8192
         if type(model['max_tokens']) is not int or not 256 <= model['max_tokens'] <= maximum:
             raise ValueError(role + ' has unsupported max_tokens')
         timeout = model['request_timeout']
@@ -59,7 +74,7 @@ def validate(config, output):
             raise ValueError(role + ' has unsupported max_retries')
         if model['provider'] == 'deepseek' and model['reasoning_effort'] is None:
             raise ValueError(role + ' requires explicit reasoning settings')
-        if role == 'reviewer' and model['provider'] != 'deepseek' and not native:
+        if role in {'reviewer', 'question_reviewer'} and model['provider'] != 'deepseek' and not native:
             raise ValueError('review requires a registered DeepSeek or native Claude model')
         if pricing_snapshot(model['provider'], model['model']) is None:
             raise ValueError(role + ' has no registered pricing')
@@ -68,6 +83,61 @@ def validate(config, output):
             raise ValueError('shared ledger must be outside frozen data and retrieval output')
     prepare_initial_query(config, request, output)
     return request
+
+
+def _resume_budget_increase(prior, current):
+    """Read an already-authorized increase; never create or change an allowance."""
+    error = 'initial query budget increase requires the same ledger and a complete recorded authorization chain'
+    if ({k:v for k,v in prior.items() if k != 'budget_usd'}
+            != {k:v for k,v in current.items() if k != 'budget_usd'}
+            or prior.get('budget_policy') != 'enforced'):
+        raise ValueError(error)
+    try:
+        old, new = Decimal(str(prior['budget_usd'])), Decimal(str(current['budget_usd']))
+        if not old.is_finite() or not new.is_finite() or not 0 < old < new:
+            raise ValueError(error)
+        ledger = Path(current['budget_ledger']).resolve()
+        if not ledger.is_file():
+            raise ValueError(error)
+        # mode=ro honors a live WAL and cannot initialize a missing database.
+        with closing(sqlite3.connect(ledger.as_uri() + '?mode=ro', uri=True)) as db:
+            db.execute('BEGIN')
+            limit = db.execute('SELECT usd FROM config WHERE id=1').fetchone()
+            rows = db.execute('SELECT id, record FROM limit_authorizations').fetchall()
+        if not limit or Decimal(limit[0]) != new:
+            raise ValueError(error)
+        transitions = {}
+        for identity, raw in rows:
+            record = json.loads(raw)
+            if (not isinstance(record, dict) or not isinstance(record.get('authorization'), dict)
+                    or any(not isinstance(record.get(k), str) or not record[k].strip()
+                           for k in ('old_limit_usd', 'new_limit_usd', 'applied_at', 'authorization_sha256'))):
+                raise ValueError(error)
+            auth = record['authorization']
+            body = json.dumps(auth, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
+            before, after = Decimal(record['old_limit_usd']), Decimal(record['new_limit_usd'])
+            if (not before.is_finite() or not after.is_finite() or not 0 < before < after
+                    or auth.get('authorized_by') != 'user' or auth.get('authorization_id') != identity
+                    or any(not isinstance(auth.get(k), str) or not auth[k].strip()
+                           for k in ('authorization_id', 'confirmation', 'scope'))
+                    or auth.get('old_limit_usd') != record['old_limit_usd']
+                    or auth.get('new_limit_usd') != record['new_limit_usd']
+                    or hashlib.sha256(body.encode()).hexdigest() != record['authorization_sha256']
+                    or before in transitions):
+                raise ValueError(error)
+            transitions[before] = (after, record)
+        cursor, chain = old, []
+        while cursor < new:
+            if cursor not in transitions:
+                raise ValueError(error)
+            cursor, record = transitions[cursor]
+            chain.append(record)
+        if cursor != new:
+            raise ValueError(error)
+        return {'ledger_path': str(ledger), 'old_limit_usd': str(old), 'new_limit_usd': str(new),
+                'authorization_records': chain}
+    except (sqlite3.Error, InvalidOperation, TypeError, KeyError, OverflowError) as exc:
+        raise ValueError(error) from exc
 
 
 def prepare_initial_query(config, request, output):
@@ -98,9 +168,11 @@ def prepare_initial_query(config, request, output):
     actual['dataset'] = expected['dataset']
     if actual != expected:
         raise ValueError('initial query request differs from current question, purpose, scope or limits')
+    budget_changes = {}
     for role, name in [('planner','model-config.input.json'), ('worker','worker-model-config.input.json')]:
-        if read(name) != config[role]:
-            raise ValueError('initial query model configuration differs from current ' + role)
+        previous = read(name)
+        if previous != config[role]:
+            budget_changes[role] = _resume_budget_increase(previous, config[role])
     result = read('result.json')
     scope = request.scope.model_dump(mode='json')
     if (result.get('schema_version') != 'company-agent-result-v1' or result.get('operation') != 'query'
@@ -121,22 +193,34 @@ def prepare_initial_query(config, request, output):
             or child.get('status') != result['status']):
         raise ValueError('initial inner query differs from coordinator task')
     return {'query':result, 'coordinator_ref':{'path':str(root), 'manifest_sha256':ref['manifest_sha256']},
-            'query_path':root/'query'}
+            'query_path':root/'query', 'budget_changes': budget_changes}
 
 
-def reviewer_factory(config):
-    model = config['reviewer']
+def _review_role_factory(config, role, prompt, output_schema):
+    model = config[role]
     def make(output):
         budget = RunBudget(model['budget_ledger'], model['budget_usd'],
             enforce=model['budget_policy'] == 'enforced',
             allow_unknown_reservations=model.get('allow_unknown_reservations', False))
         return SdkRecordReviewer(model['provider'], model['model'], budget=budget,
             max_requests_total=model['max_requests_total'], output=output,
-            credentials_root=config['credential_root'], prompt=REVIEW_PROMPT, output_schema=AnswerAssessment,
+            credentials_root=config['credential_root'], prompt=prompt, output_schema=output_schema,
             max_tokens=model['max_tokens'], request_timeout=model['request_timeout'],
             max_retries=model['max_retries'], reasoning_effort=model['reasoning_effort'],
             max_request_bytes=config.get('reviewer_max_request_bytes', 400000))
     return make
+
+
+
+def reviewer_factory(config, packet=None):
+    return _review_role_factory(config, 'reviewer', review_prompt(packet if packet is not None else {}), AnswerAssessment)
+
+
+def question_reviewer_factory(config):
+    from .question_coverage_review import QUESTION_REVIEW_PROMPT, QuestionCoverageAssessment
+    if 'question_reviewer' not in review_roles(config):
+        raise ValueError('independent question reviewer is not configured')
+    return _review_role_factory(config, 'question_reviewer', QUESTION_REVIEW_PROMPT, QuestionCoverageAssessment)
 
 
 def _reference(path):
@@ -166,7 +250,14 @@ async def run_retrieval_cycle(config, output):
     write_new(output/'config.json', config)
     write_new(output/'original-request.json', original)
     component_modules = ('uteki.agents.data_query.autonomous', 'uteki.agents.data_query.autonomous_model',
+        'uteki.infrastructure.research_data.query_completion',
+        'uteki.agents.data_query.question_coverage_review',
         'uteki.agents.data_query.decision_protocol', 'uteki.agents.runtime.claude_messages',
+        'uteki.domain.research_data.period_scope', 'uteki.agents.runtime.qwen_model',
+        'uteki.agents.runtime.deepseek_model', 'uteki.agents.runtime.model_factory',
+        'uteki.agents.runtime.run_budget', 'uteki.agents.runtime.strict_json',
+        'uteki.agents.runtime.call_costs', 'uteki.agents.runtime.model_configuration',
+        'uteki.infrastructure.research_data.run_artifacts',
         'uteki.infrastructure.research_data.query_service', 'uteki.infrastructure.research_data.record_locator',
         'uteki.agents.reading.reading_groups', 'uteki.infrastructure.research_data.materialization_metadata')
     components = (Path(__file__), Path(handoff_module.__file__),
@@ -174,6 +265,9 @@ async def run_retrieval_cycle(config, output):
                   Path(SdkRecordReviewer.__init__.__code__.co_filename),
                   *(Path(import_module(name).__file__) for name in component_modules))
     write_new(output/'implementation.json', {str(p.resolve()): digest(p.read_bytes()) for p in components})
+    from importlib.metadata import version
+    write_new(output/'dependencies.json', {name: version(name)
+        for name in ('openai-agents', 'openai', 'pydantic')})
     result = {'schema_version':'data-retrieval-cycle-v1', 'status':'failed',
         'question':request.question, 'scope':request.scope.model_dump(mode='json'),
         'purpose':request.purpose, 'source_delivery':'query_evidence_v1', 'attempts':[],
@@ -196,6 +290,8 @@ async def run_retrieval_cycle(config, output):
                     query = initial['query']
                     query_path = initial['query_path']
                     attempt.update(execution='reused_frozen', query_run_ref=initial['coordinator_ref'])
+                    if initial['budget_changes']:
+                        attempt['resume_budget_changes'] = initial['budget_changes']
                 else:
                     query = await coordinator.query(call, output=folder/'data-query',
                         model_config=deepcopy(config['planner']), worker_model_config=deepcopy(config['worker']),
@@ -208,7 +304,9 @@ async def run_retrieval_cycle(config, output):
                     break
                 packet = prepare_review_packet(query_path, request.dataset,
                     expected_scope=request.scope, max_packet_bytes=config['max_review_packet_bytes'],
-                    source_delivery='query_evidence_v1')
+                    source_delivery='query_evidence_v1',
+                    **({'question_review_policy': config['question_review_policy']}
+                       if 'question_review_policy' in config else {}))
                 if packet['question'] != request.question or packet['scope'] != result['scope']:
                     raise ValueError('retrieval packet changed original question or scope')
                 write_new(folder/'review-packet.json', packet)
@@ -219,7 +317,9 @@ async def run_retrieval_cycle(config, output):
                     review_path = folder/f'review-{review_ordinal:02d}'
                     try:
                         review = await review_data_answer(packet, review_path,
-                            reviewer_factory=reviewer_factory(config))
+                            reviewer_factory=reviewer_factory(config, packet),
+                            **({'question_reviewer_factory': question_reviewer_factory(config)}
+                               if 'question_reviewer' in config else {}))
                     except asyncio.CancelledError:
                         raise
                     except Exception as error:
@@ -234,7 +334,7 @@ async def run_retrieval_cycle(config, output):
                     attempt['reviews'].append({'status':review['status'], 'review_ref':review['review_ref'],
                         'analysis_eligible':review['analysis_eligible']})
                     result['final_review_ref'] = review['review_ref']
-                    if review['status'] != 'failed':
+                    if review['status'] != 'failed' or review.get('review_retryable') is False:
                         break
                 if review['status'] == 'reviewed' and review['analysis_eligible']:
                     attempt['status'] = result['status'] = 'reviewed_data_ready'

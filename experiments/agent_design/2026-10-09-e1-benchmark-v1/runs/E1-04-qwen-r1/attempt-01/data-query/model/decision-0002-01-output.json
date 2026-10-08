@@ -1,0 +1,11 @@
+{
+  "schema_version": "autonomous-visible-output-v1",
+  "decision": 2,
+  "attempt": 1,
+  "role": "planner",
+  "finish_reason": "stop",
+  "content": "{\n  \"action\": \"plan\",\n  \"requirements\": [\n    {\n      \"requirement_id\": \"req-msft-fy2024-total-revenue-query\",\n      \"kind\": \"query\",\n      \"source_id\": \"source-8602d79f703e48c18c2f27c3\",\n      \"description\": \"Retrieve Microsoft's reported consolidated total revenue for fiscal year 2024 (year ended June 30, 2024; period from 2023-07-01 to 2024-06-30) from the Microsoft FY2024 Form 10-K source available 2024-07-30, before the 2024-08-01 cutoff. Preserve the actual reported value and USD units for the company-wide revenue metric.\",\n      \"query\": {\n       \"records\": [\n       \">{ \"\n       ]}\n      },\n      {\n      \"requirement_id\": \"req-msft-fy2024-original-revenue-fiscal-source-context\",\n      \"kind\": \"source_evidence\",\n      \"source_id\": \"source-8602d79f703e48c18c2f27c3\",\n      \"description\": \"Obtain original body text or table context from the Microsoft FY2024 Form 10-K available before 2024-08-01 that identifies the company and filing, the fiscal year start and end dates or year-ended heading, the total revenue disclosure for FY2024, and the amount unit or scale (for example, USD in millions or thousands as stated in the source).\"\n    }\n  ],\n  \"reason\": \"The plan separates numeric retrieval of Microsoft's FY2024 company-wide total revenue from original-body verification of the amount unit, fiscal period boundaries, and filing source, while pinning to a scoped source available on 2024-07-30 and before the required cutoff.\"\n}",
+  "content_chars": 1448,
+  "content_sha256": "1cbea71c750eba1d9beb0941965e234363b96c6b8b526a1efde12ac605b4df88",
+  "truncated": false
+}

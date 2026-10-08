@@ -2,7 +2,12 @@
 from dataclasses import dataclass
 
 
-DECISION_PROTOCOL_VERSION = 'data-agent-decision-v3-record-selection'
+DECISION_PROTOCOL_VERSION = 'data-agent-decision-v5-source-pinned-query'
+
+# Native transports replace this host-object example with wire-envelope examples.
+# Keep a named literal so the adapter removes only our own text, not user input.
+HOST_DECISION_EXAMPLE = ('Protocol example only: {"action":"load_skill","skill":"query"}. '
+                         'A finish decision is {"action":"finish"}; the host still checks completion.')
 
 
 @dataclass(frozen=True)
@@ -72,13 +77,23 @@ def action_protocol_prompt():
             ['reason (nonblank)'] if rule.reason else [])
         rows.append(f'{action} | {rule.payload or "none"} | {", ".join(required) or "none"}')
     rows.extend([
+        'Requirement field rules apply before the first plan, not only after a rejection:',
+        'kind=query: include query (a QueryPlan); omit node_id. Optional source_id pins this requirement to one '
+        'source from the active catalog; omit source_id to query the entire active scope. '
+        'For distinct report versions, create separate requirements with their own source_id and query each separately. '
+        'Every requirement_id in one query action must have the same source selection. '
+        'Never resolve ambiguity by choosing the first/latest record or discarding a requested report.',
+        'kind=source_evidence or source_answer: include source_id from the scoped catalog; omit node_id and query.',
+        'kind=read_node: include source_id and node_id returned by the scoped outline; omit query.',
+        'kind=information: omit source_id, node_id and query; this kind does not prove body reading.',
+        'kind=financial_extract: include financial_task_id and batch_index from registered tasks; '
+        'omit source_id, node_id and query. Other kinds must omit financial_task_id and batch_index.',
         'Payload arrays must be nonempty. read_artifact may omit requirement_ids; include them when attaching evidence.',
         'read_artifact.artifact_read.limit is 1..1000 (characters for text, items for arrays). '
         'Copy pending_body_reads.read_request exactly; do not increase the limit past 1000.',
         'Before returning, check the action row, required fields, active scope and pending body reads.',
         'A rejected decision executes no action. Correct the named rule on the next bounded turn; '
         'do not repeat the same invalid decision or assume it succeeded.',
-        'Protocol example only: {"action":"load_skill","skill":"query"}. '
-        'A finish decision is {"action":"finish"}; the host still checks completion.',
+        HOST_DECISION_EXAMPLE,
     ])
     return '\n'.join(rows) + '\n'

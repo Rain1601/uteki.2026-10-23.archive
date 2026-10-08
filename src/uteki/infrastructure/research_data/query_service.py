@@ -494,6 +494,18 @@ class ScopedQueryDataPort(QueryDataPort):
         """Derived capabilities may retain or narrow, never widen, this scope."""
         return ScopedQueryDataPort(self, scope)
 
+    def for_query_source(self, source_id=None):
+        """Pin one model-declared numeric source without changing caller authority."""
+        if source_id is None:
+            return self
+        if not isinstance(source_id, str) or not source_id.strip():
+            raise ValueError("query source_id must be a nonblank scoped source ID")
+        source = self._source(source_id)
+        if source["available_at"] > str(self.scope.knowledge_cutoff):
+            raise ValueError("query source is unavailable at cutoff")
+        return self.scoped({**self.scope.model_dump(mode="json"),
+            "company_ids": [source["company_id"]], "source_snapshot_ids": [source_id]})
+
     def _header(self):
         scope = self.scope
         return {"execution_schema_version": EXECUTION_VERSION, "scope_id": self.scope_id,

@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 
 from uteki.agents.data_query.autonomous import _read_body_catalog_page
-from uteki.infrastructure.research_data.run_artifacts import ArtifactStore, load_evidence_bundle
+from uteki.infrastructure.research_data.run_artifacts import ArtifactReadProgress, ArtifactStore, load_evidence_bundle
 from tests.unit import test_analysis_evidence_runtime as runtime_fixtures
 from tests.unit.test_autonomous_source_evidence import source_plan, context_read
 from tests.unit import test_answer_handoff as handoff_fixtures
@@ -23,9 +23,31 @@ class ReadBodyCatalogPaginationTests(unittest.TestCase):
             self.refs[c] = self.store.put('context', value, scope=self.scope, step=1, evidence_id=c)
             self.delivered[c] = {b['block_id'] for b in blocks}
 
-    def page(self, *, step=2, scope=None, max_bytes=1800):
+    def page(self, *, step=2, scope=None, max_bytes=1800, read_progress=None):
         return _read_body_catalog_page(self.store, self.evidence, self.refs, self.delivered,
-            scope=scope or self.scope, step=step, max_bytes=max_bytes)
+            scope=scope or self.scope, step=step, max_bytes=max_bytes, read_progress=read_progress)
+
+    def test_read_tail_stays_seen_when_inline_preview_still_omits_it(self):
+        self.make_catalog()
+        first = self.page()
+        progress = ArtifactReadProgress()
+        page = first
+        while page['next_cursor']:
+            page = self.store.read({'artifact_id': first['artifact_id'], 'cursor': page['next_cursor'],
+                                    'limit': 1000, 'max_bytes': 1800})
+            progress.apply(progress.page_mark(page))
+        repeated = self.page(read_progress=progress)
+        self.assertGreater(repeated['omitted_count'], 0)
+        self.assertEqual(repeated['navigation_progress']['viewed_count'], 60)
+        self.assertEqual(repeated['navigation_progress']['unseen_count'], 0)
+        self.assertIsNone(repeated['next_unseen_read'])
+        self.assertFalse(progress.would_change(progress.page_mark(page)))
+        self.assertFalse(repeated['navigation_progress']['body_reading_credit'])
+        # Neither another artifact nor another scope inherits this coverage.
+        self.evidence['A']['value']['blocks'][0]['text'] += ' changed navigation'
+        changed = self.page(read_progress=progress)
+        self.assertGreater(changed['navigation_progress']['unseen_count'], 0)
+        self.assertIsNotNone(changed['next_unseen_read'])
 
     def all_rows(self, first):
         page, rows = first, list(first['items'])

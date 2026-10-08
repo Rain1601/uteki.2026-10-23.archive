@@ -1,0 +1,60 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "record_selection": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "rev-fy2024-query",
+      "description": "Microsoft (sec-0000789019) FY2024 全年总收入数值记录：entity=sec-0000789019，metric=revenue，period 为来源口径 year 2023-07-01 至 2024-06-30，value_kind=actual，仅使用 source-8602d79f703e48c18c2f27c3 中 2024-07-30 可得的 10-K 候选记录。"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "rev-fy2024-source",
+      "description": "在 source-8602d79f703e48c18c2f27c3（Microsoft 2024-06-30 10-K，available_at 2024-07-30）中定位并完整读取包含 Microsoft FY2024 全年总收入金额的原文块，保留金额单位（如 USD / 百万）与“Year Ended June 30,”财年起止标题/表头等必要限定语，以便交付原文出处。"
+    }
+  ],
+  "reason": "问题要求 FY2024 总收入数值、金额单位、财年起止与原文出处，且截止日 2024-08-01。计划拆分：(1) kind=query 数值检索，用来源口径财年 2023-07-01~2024-06-30 拉取 revenue 记录；(2) kind=source_evidence 获取含金额与单位、财年标题的原始块作为原文出处。",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

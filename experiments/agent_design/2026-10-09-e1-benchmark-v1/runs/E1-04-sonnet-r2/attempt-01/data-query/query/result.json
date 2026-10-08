@@ -1,0 +1,436 @@
+{
+  "schema_version": "autonomous-result-v2",
+  "status": "evidence_ready",
+  "stop_reason": "host_reference_checks_passed",
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "以2024-08-01为资料可得截止日，提供Microsoft FY2024公司总收入及金额单位、财年起止、原文出处，不使用截止日之后发布的材料。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-8827c466518d878f83689984",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "source-8602d79f703e48c18c2f27c3",
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2024-08-01",
+      "include_candidates": true
+    }
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {
+    "req_source_text": [
+      {
+        "context_id": "ev-1350eed436095c00f6f3baa4",
+        "block_id": "block-000863-9d7720d5"
+      },
+      {
+        "context_id": "ev-1350eed436095c00f6f3baa4",
+        "block_id": "block-000864-cdef2bac"
+      },
+      {
+        "context_id": "ev-1350eed436095c00f6f3baa4",
+        "block_id": "block-000865-dc07a7d1"
+      }
+    ]
+  },
+  "delivery_schema_version": "selected-originals-v3",
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-8827c466518d878f83689984",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "source-8602d79f703e48c18c2f27c3",
+      "source-360182cbf562dcf9a8ab9c4e"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2024-08-01",
+    "include_candidates": true
+  },
+  "plan_origin": "model",
+  "plans": [
+    {
+      "version": 1,
+      "requirements": [
+        {
+          "kind": "query",
+          "query": {
+            "records": [
+              {
+                "entity_id": "sec-0000789019",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                },
+                "value_kind": "actual"
+              }
+            ],
+            "documents": [],
+            "calculations": []
+          },
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_revenue_query",
+          "description": "Microsoft FY2024 consolidated total revenue (fiscal year 2023-07-01 to 2024-06-30), with USD unit, as reported actual value."
+        },
+        {
+          "kind": "source_evidence",
+          "query": null,
+          "source_id": "source-8602d79f703e48c18c2f27c3",
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_source_text",
+          "description": "Original 10-K text/table blocks showing Microsoft total revenue for the year ended June 30, 2024, the amount unit (in millions), and the fiscal year start and end dates (July 1, 2023 to June 30, 2024)."
+        }
+      ],
+      "reason": "Plan numeric revenue query plus original source evidence for unit, fiscal year dates and citation, within the 2024-08-01 cutoff (10-K available 2024-07-30).",
+      "origin": "model",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "sha256": "2c75bc87c344aae0c3a1c47412de96098463cf16bf6d17360e19b861b1e7debd"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_query",
+      "description": "Microsoft FY2024 consolidated total revenue (fiscal year 2023-07-01 to 2024-06-30), with USD unit, as reported actual value.",
+      "evidence_ids": [
+        "ev-b6e3572e670c2045fdc0c288",
+        "ev-51c2b61132381108439b3d00",
+        "ev-1fd4c32ac162e92f7cd6b95a",
+        "ev-6ef328d6fd39411c13ddbd05",
+        "ev-1350eed436095c00f6f3baa4"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:779c2d684aff5571fc19e516",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0000789019 / revenue / 2023-07-01 — 2024-06-30：取得匹配记录。",
+          "record_ids": [
+            "obs-95070e45ef9df5f4a685c60d",
+            "obs-c622d085cee5900d9704f00a",
+            "obs-f05ae2ac60f8975e1894121c",
+            "obs-f44ba7f537b87bc8d559fe77"
+          ],
+          "artifact_ids": [
+            "art-bf32150fe9019e2234f18bfb",
+            "art-58542151d5c81a3bbc1b29fd",
+            "art-bba8944a7745b9cb1277c496",
+            "art-ff06cba6db05548c0a8fd3d5"
+          ],
+          "event_sequences": [
+            3
+          ]
+        },
+        {
+          "check_id": "citations:obs-95070e45ef9df5f4a685c60d",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-95070e45ef9df5f4a685c60d"
+          ],
+          "artifact_ids": [
+            "art-517f1946a4b0492fe0faffdb"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-c622d085cee5900d9704f00a",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-c622d085cee5900d9704f00a"
+          ],
+          "artifact_ids": [
+            "art-1dec06065ff130d1d9209e7a"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-f05ae2ac60f8975e1894121c",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-f05ae2ac60f8975e1894121c"
+          ],
+          "artifact_ids": [
+            "art-cc76c08c9ab797328ca00d05"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-f44ba7f537b87bc8d559fe77",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-f44ba7f537b87bc8d559fe77"
+          ],
+          "artifact_ids": [
+            "art-61be4bbff9ecb3b64ac3c04d"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-003/query-receipt.json",
+          "sha256": "9f3688457942b27275bec8b208b67ef3e6c48ab59c232c057b0b2345604feb3e"
+        }
+      ],
+      "selected_record_ids": [
+        "ev-1fd4c32ac162e92f7cd6b95a"
+      ],
+      "program_check": "satisfied"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_source_text",
+      "description": "Original 10-K text/table blocks showing Microsoft total revenue for the year ended June 30, 2024, the amount unit (in millions), and the fiscal year start and end dates (July 1, 2023 to June 30, 2024).",
+      "evidence_ids": [
+        "ev-1350eed436095c00f6f3baa4"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      },
+      "selected_blocks": [
+        {
+          "context_id": "ev-1350eed436095c00f6f3baa4",
+          "block_id": "block-000863-9d7720d5"
+        },
+        {
+          "context_id": "ev-1350eed436095c00f6f3baa4",
+          "block_id": "block-000864-cdef2bac"
+        },
+        {
+          "context_id": "ev-1350eed436095c00f6f3baa4",
+          "block_id": "block-000865-dc07a7d1"
+        }
+      ],
+      "program_check": "source_body_delivered"
+    }
+  ],
+  "gaps": [],
+  "evidence_bundle": {
+    "path": "evidence-bundle.json",
+    "bundle_id": "bundle-6b4b38a355b9ba068757f730",
+    "item_count": 9
+  },
+  "artifact_index": {
+    "path": "artifact-index.json",
+    "count": 32
+  },
+  "semantic_completeness": "not_evaluated",
+  "trace": [
+    {
+      "step": 1,
+      "action": "load_skill",
+      "status": "skill_loaded",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 17470,
+      "receipt": "turn-001/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-001/feedback.json"
+    },
+    {
+      "step": 2,
+      "action": "plan",
+      "status": "planned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 42483,
+      "receipt": "turn-002/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-002/feedback.json"
+    },
+    {
+      "step": 3,
+      "action": "query",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 35380,
+      "receipt": "turn-003/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-003/feedback.json"
+    },
+    {
+      "step": 4,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 62746,
+      "receipt": "turn-004/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-004/feedback.json"
+    },
+    {
+      "step": 5,
+      "action": "read_artifact",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 60157,
+      "receipt": "turn-005/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-005/feedback.json"
+    },
+    {
+      "step": 6,
+      "action": "select_records",
+      "status": "records_selected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 55797,
+      "receipt": "turn-006/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-006/feedback.json"
+    },
+    {
+      "step": 7,
+      "action": "select_evidence",
+      "status": "delivery_selected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 52970,
+      "receipt": "turn-007/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-007/feedback.json"
+    },
+    {
+      "step": 8,
+      "action": "finish",
+      "status": "evidence_ready",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 53391,
+      "receipt": "turn-008/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "52bc9c411f684a3309d6b9416484b39bb34bb1ca90edf0d19d2ccd0451415267"
+      },
+      "feedback": "turn-008/feedback.json"
+    }
+  ],
+  "role": "planner",
+  "worker_runs": [],
+  "financial_extractions": [],
+  "pending_body_reads": [],
+  "decision_budget": {
+    "limit": 40,
+    "used": 8
+  },
+  "evidence_budget": {
+    "limit_bytes": 8000000,
+    "used_bytes": 67402
+  }
+}

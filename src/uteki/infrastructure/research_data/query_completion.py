@@ -23,6 +23,15 @@ class QueryCompletionEvaluator:
         if receipt['request']['query'] != req.query.model_dump(mode='json'):
             raise ValueError('Query receipt differs from declared requirement')
         value, package = receipt['result'], receipt['package']
+        source_id = getattr(req, 'source_id', None)
+        if receipt['request'].get('source_id') != source_id:
+            raise ValueError('Query receipt differs from declared source selector')
+        if source_id is not None:
+            if (value.get('scope', {}).get('source_snapshot_ids') != [source_id]
+                    or package.get('scope') != value.get('scope')
+                    or any(r.get('source_snapshot_id') != source_id for r in value['records'])
+                    or any(ev.get('source_snapshot_id') != source_id for ev in value.get('evidence', {}).values())):
+                raise ValueError('Query receipt or evidence exceeds declared source selector')
         artifacts = {a['artifact_id']: a for a in package['artifacts']}
         records = {r['record_id']: r for r in value['records']}
         calculations = list({digest(c.model_dump(mode='json')): c for c in req.query.calculations}.values())

@@ -1,0 +1,230 @@
+{
+  "schema_version": "autonomous-model-usage-v1",
+  "plan_origin": "model",
+  "role": "planner",
+  "provider": "aihubmix",
+  "model": "claude-sonnet-5-5",
+  "reasoning_effort": "high",
+  "thinking_mode": "adaptive",
+  "model_config_sha256": "6e19fefaa222db2ac3027dc6312fde3c063a2ff36649b36ed783ac31ac3c1a94",
+  "prompt_sha256": "ebe0a47b84e2327792a881d755bd366ac63fc0dbb04e8ec1b7463e6e1056fc90",
+  "calls": {
+    "requests": 1,
+    "unknown_cost_requests": 0,
+    "known_estimated_usd": "0.049722",
+    "actual_billed_usd": null,
+    "records": [
+      {
+        "call_id": "aa13d008-85f3-4a47-9183-cfe52f2dd8e6",
+        "stage": "autonomous_planner_decision",
+        "provider": "aihubmix",
+        "requested_model": "claude-sonnet-5-5",
+        "actual_upstream_model": "claude-sonnet-5-5",
+        "reasoning_effort": "high",
+        "started_at": "2026-10-08T21:26:56.698352+00:00",
+        "pricing_snapshot": {
+          "provider": "aihubmix",
+          "model": "claude-sonnet-5-5",
+          "currency": "USD",
+          "input_per_million": "2",
+          "output_per_million": "10",
+          "cached_input_per_million": "0.2",
+          "source": "https://aihubmix.com/model/claude-sonnet-5-5",
+          "checked_on": "2026-10-06",
+          "basis": "Uncached public list price estimate; excludes cache discounts, cache-writing charges, fees and account discounts"
+        },
+        "actual_billed_usd": null,
+        "status": "succeeded",
+        "usage": {
+          "input_tokens": 24661,
+          "output_tokens": 40,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0
+        },
+        "estimated_usd": "0.049722",
+        "usage_presence": "reported",
+        "usage_source": "provider_raw",
+        "configuration_snapshot": {
+          "schema_version": "model-call-config-v1",
+          "capture_kind": "before_dispatch",
+          "capture_layer": "http_request_before_dispatch",
+          "effective_configuration": "unverified",
+          "fields": {
+            "provider": {
+              "value": "aihubmix",
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "model": {
+              "value": "claude-sonnet-5-5",
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "api_format": {
+              "value": "anthropic_messages",
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "base_url": {
+              "value": "https://aihubmix.com",
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "max_tokens": {
+              "value": 8192,
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "thinking": {
+              "value": {
+                "type": "adaptive"
+              },
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "reasoning_effort": {
+              "value": "high",
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "temperature": {
+              "value": null,
+              "status": "not_sent",
+              "source": "request.omitted"
+            },
+            "top_p": {
+              "value": null,
+              "status": "not_sent",
+              "source": "request.omitted"
+            },
+            "top_k": {
+              "value": null,
+              "status": "not_sent",
+              "source": "request.omitted"
+            },
+            "seed": {
+              "value": null,
+              "status": "not_sent",
+              "source": "request.omitted"
+            },
+            "response_format": {
+              "value": {
+                "type": "json_schema"
+              },
+              "status": "explicit",
+              "source": "http_request.output_config.format"
+            },
+            "tool_choice": {
+              "value": null,
+              "status": "not_sent",
+              "source": "request.omitted"
+            },
+            "parallel_tool_calls": {
+              "value": null,
+              "status": "not_sent",
+              "source": "request.omitted"
+            },
+            "stream": {
+              "value": false,
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "timeout_seconds": {
+              "value": 120,
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "max_retries": {
+              "value": 0,
+              "status": "explicit",
+              "source": "http_request"
+            },
+            "max_completion_tokens": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            },
+            "preserve_thinking": {
+              "value": null,
+              "status": "not_recorded",
+              "source": "not_recorded"
+            }
+          },
+          "fingerprints": {
+            "system_sha256": "ae57658483496db4e0193e92105dc6e9bdbeeb06068677b4e21c78186857dad3",
+            "input_sha256": "51f4ebfd7d63f48c2e14f37ca0019fe6153473a0b849d5dfd5b49b00a5d4b77a",
+            "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+            "output_schema_sha256": "105a490bd707535262d9befd015463dfff3a3110a464afdef36b67c582040e6b"
+          },
+          "sha256": "d6d185d12a8b340a31668cbf6722cb3a3dc446d7a6257c8829862b4512de668d"
+        },
+        "cost_basis": "anthropic_raw_input_output_cache_read_public_price_estimate_not_bill",
+        "budget_reservation_id": "79959e3c-efc6-413d-9734-93afd19bf7b5",
+        "reserved_usd": "0.242394",
+        "request_sha256": "f5c2c9ac3917acb3f0af8891d058a42f5c0de74c83b16fa41b647c491c948f3c",
+        "request_bytes": 64237,
+        "response_id": "msg_bdrk_6pgyz4z3ckc5gtj3vpzjit6x7pddadufyay3oqt2abwipmevt2tq",
+        "request_id": null,
+        "stop_reason": "end_turn",
+        "raw_usage": {
+          "input_tokens": 24661,
+          "output_tokens": 40,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          }
+        },
+        "dispatch_status": "sent",
+        "http_status": 200,
+        "visible_text_secret_redacted": false,
+        "transport_phase": "body_complete",
+        "headers_received": true,
+        "headers_received_elapsed_seconds": 2.581669499631971,
+        "schema_protocol": "native_decision_envelope",
+        "wire_schema_sha256": "105a490bd707535262d9befd015463dfff3a3110a464afdef36b67c582040e6b",
+        "host_output_schema_sha256": "aabe0a42e6473c910c9a50facc59088963cb5b20ab9de04a58341d8078b4ef9f",
+        "transport_decode": "decoded",
+        "host_decision_sha256": "bb9789e72c78628aee227c5a20c6c1c719833d9fecf32128c93f77ca927e7deb",
+        "host_schema_validation": "passed",
+        "provider_enforced_schema": "decision_envelope_only",
+        "ended_at": "2026-10-08T21:26:59.282277+00:00",
+        "elapsed_seconds": 2.5836951662786305
+      }
+    ]
+  },
+  "shared_budget": {
+    "limit_usd": "10",
+    "estimated_spent_usd": "6.861422",
+    "held_usd": "0",
+    "unknown_requests": 0,
+    "in_flight_requests": 0,
+    "requests": 91,
+    "actual_billed_usd": null,
+    "enforcement": "enforced"
+  },
+  "artifacts": [
+    {
+      "path": "calls/aa13d008-85f3-4a47-9183-cfe52f2dd8e6-end.json",
+      "sha256": "f4eae1eb5ed16ffc3ddf30dfe1c4384168d2f5d187050d22c0104052b29e19f7"
+    },
+    {
+      "path": "calls/aa13d008-85f3-4a47-9183-cfe52f2dd8e6-start.json",
+      "sha256": "4daf779f36ef05c1d6e49a8dbf66fe3a81a5eb763955e6bb3b611c4fd9489ef3"
+    },
+    {
+      "path": "decision-0001-01-output.json",
+      "sha256": "379c39b4b400a1af4f03fce49116d389e75818e4f07f4713a6a3ce5d732f1295"
+    },
+    {
+      "path": "decision-0001-attempt-01.json",
+      "sha256": "da132f7388bdd60d2d350be2242ea5db73596d2058985ea7ef352370cd6b3856"
+    },
+    {
+      "path": "model-config.json",
+      "sha256": "6e19fefaa222db2ac3027dc6312fde3c063a2ff36649b36ed783ac31ac3c1a94"
+    }
+  ],
+  "benchmark_status": "not_evaluated"
+}

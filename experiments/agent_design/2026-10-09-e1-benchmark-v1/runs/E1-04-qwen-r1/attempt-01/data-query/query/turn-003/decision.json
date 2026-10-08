@@ -1,0 +1,70 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "record_selection": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-fy24-total-revenue-numeric",
+      "description": "检索 Microsoft（sec-0000789019）FY2024 合并总收入原始数值记录：财年为 2023-07-01 至 2024-06-30，metric=revenue，value_kind=actual，并仅使用 2024-08-01 前可得的已索引来源记录。"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-fy24-total-revenue-original-text",
+      "description": "获取 Microsoft FY2024 公司总收入及金额单位的原始正文/表格上下文证据，例如合并利润表或财务数据表中显示总收入金额和单位标题（如 In millions）的完整可读块；不要求整章阅读。"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-fy24-fiscal-year-source-text",
+      "description": "获取 Microsoft FY2024 财年起止、财年结束日以及该 10-K 资料原始出处身份的原文证据，例如封面 Form 10-K、For the fiscal year ended June 30, 2024、正文中关于 fiscal year 的限定语或表头年度上下文。"
+    }
+  ],
+  "reason": "问题需要 Microsoft FY2024 合并总收入、金额单位、财年起止和原文出处，且只能使用 2024-08-01 前可得资料。已发现范围内 FY2024 10-K 来源可用，因此分别规划可追溯的数值记录需求与原文证据需求；数值需求固定到该来源的合并收入记录，原文需求保留总收入/单位及财年与出处上下文。",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

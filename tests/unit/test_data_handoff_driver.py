@@ -64,7 +64,7 @@ class DataHandoffDriverTests(unittest.TestCase):
 
     def test_native_claude_invalid_modes_fail_before_data_calls(self):
         for role in ('reviewer', 'analyst'):
-            for changes in ({'max_tokens': 16384}, {'max_retries': 1},
+            for changes in ({'max_tokens': 16384}, {'max_retries': 4},
                             {'reasoning_effort': None}, {'reasoning_effort': 'max'}):
                 with self.subTest(role=role, changes=changes):
                     config = deepcopy(self.config)
@@ -72,6 +72,14 @@ class DataHandoffDriverTests(unittest.TestCase):
                                         reasoning_effort='high')
                     config[role].update(changes)
                     self.reject_before_run(config)
+
+    def test_native_claude_bounded_retry_is_valid_without_calls(self):
+        config = deepcopy(self.config)
+        config['reviewer'].update(provider='aihubmix', model='claude-sonnet-5-5',
+                                  reasoning_effort='high', max_retries=1)
+        driver.validate(config, self.output)
+        self.assertFalse(self.output.exists())
+        self.assertFalse((self.root/'costs.sqlite').exists())
 
     def test_role_factory_preserves_claude_budget_envelope_and_configuration(self):
         config = deepcopy(self.config)
@@ -92,6 +100,26 @@ class DataHandoffDriverTests(unittest.TestCase):
         config = deepcopy(self.config)
         config['source_delivery'] = 'silent_full_report_fallback'
         self.reject_before_run(config)
+
+    def test_review_prompt_dispatch_uses_packet_version_including_legacy(self):
+        # Only the caller's prompt selection is mocked here, not an acceptance run.
+        for number, policy in enumerate((None, 'delivered-sources-v1', 'delivered-sources-v2')):
+            packet = {'query_ref': {'path': 'fixture', 'manifest_sha256': 'a'*64},
+                      'query_status': 'evidence_ready'}
+            if policy is not None:
+                packet['source_review_policy'] = policy
+            async def review(packet, output, **kwargs):
+                return {'status': 'needs_revision', 'analysis_eligible': False,
+                        'review_ref': {'path': str(output), 'manifest_sha256': 'b'*64}}
+            with self.subTest(policy=policy), \
+                    patch.object(driver, 'prepare_resume', return_value=packet), \
+                    patch.object(driver, 'role_factory') as factory, \
+                    patch.object(driver, 'review_data_answer', side_effect=review):
+                result = asyncio.run(driver.run(self.config, self.root/f'prompt-{number}'))
+                self.assertEqual(result['status'], 'blocked_by_content_review')
+                self.assertEqual(factory.call_args.args[2], driver.review_prompt(packet))
+                self.assertEqual('source_check_ids' in factory.call_args.args[2],
+                                 policy == 'delivered-sources-v2')
 
     def test_missing_role_setting_fails_before_query_and_output(self):
         for role in ('planner', 'worker', 'reviewer', 'analyst'):

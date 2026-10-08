@@ -380,6 +380,8 @@ def load_run(root, run_id):
         review_folder = _path(root, review["path"])
         review_manifest = _manifest(review_folder, review["manifest_sha256"])
         packet = _read(review_folder, review_manifest, "input.json")
+        if 'question_review_policy' in packet:
+            raise ValueError('Independent question review requires the canonical data_review_delivery renderer; this legacy importer does not support it')
         review_result = _read(review_folder, review_manifest, "result.json")
         _bound_reference(packet["query_ref"], query)
         _bound_reference(packet["dataset_ref"], dataset_entry)

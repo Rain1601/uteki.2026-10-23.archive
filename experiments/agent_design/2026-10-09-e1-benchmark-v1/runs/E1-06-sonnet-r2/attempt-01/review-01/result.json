@@ -1,0 +1,288 @@
+{
+  "schema_version": "data-answer-review-result-v1",
+  "status": "needs_revision",
+  "packet_id": "data-review-34e0b5abd2fec550e7b72006",
+  "input_sha256": "f35c52471d19298be1422de3069075bf0bcf00cfcb175d10c071e371e5dec4e9",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-83205031a5bf6c29fc360377",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "source-360182cbf562dcf9a8ab9c4e"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "assessment": {
+    "packet_id": "data-review-34e0b5abd2fec550e7b72006",
+    "facts": [],
+    "requirements": [
+      {
+        "requirement_id": "req_definitions",
+        "verdict": "insufficient_evidence",
+        "rationale": "No source bodies or selected blocks were delivered (source_documents is empty; selected_blocks is empty). The program gaps report delivery_selection_missing and no_reviewable_source_blocks. The definitions of Microsoft Cloud, Intelligent Cloud and Azure therefore cannot be verified.",
+        "citations": []
+      },
+      {
+        "requirement_id": "req_fy2025_metrics",
+        "verdict": "insufficient_evidence",
+        "rationale": "No original text or tables were delivered. The FY2025 Microsoft Cloud revenue and growth, Intelligent Cloud revenue and growth, Azure growth, and any statement that the Azure amount is not separately disclosed cannot be verified. Only evidence IDs were listed, with no bodies.",
+        "citations": []
+      }
+    ],
+    "source_checks": [],
+    "question_coverage": "incomplete",
+    "coverage_reason": "The answer bundle contains no delivered source bodies and no facts. The program gaps state that no reviewable source blocks or facts exist. Neither the definitions nor the FY2025 metrics can be checked against the original 10-K, so the question is not covered.",
+    "missing_information": [
+      "Original 10-K body text defining Microsoft Cloud, the Intelligent Cloud segment (products, services and activities), and Azure and other cloud services, with scope qualifiers.",
+      "FY2025 (year ended June 30, 2025) Microsoft Cloud revenue and growth rate.",
+      "FY2025 Intelligent Cloud segment revenue and growth rate.",
+      "FY2025 Azure and other cloud services growth rate, and the source statement that the Azure revenue amount is not separately disclosed.",
+      "Units and period columns for the above tables and text."
+    ],
+    "revision_requests": [],
+    "body_checks": [],
+    "limitations": [
+      "source_check_ids is empty, so no source_checks entries are emitted.",
+      "Evidence IDs listed in the requirements are not original source bodies and cannot substitute for delivered text.",
+      "Source source-360182cbf562dcf9a8ab9c4e is an available candidate, but none of its blocks were delivered for review."
+    ]
+  },
+  "analysis_eligible": false,
+  "adoption": "unchanged_candidate",
+  "plan_origin": "model",
+  "failures": [],
+  "usage": {
+    "artifact_root": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-r2/attempt-01/review-01/model",
+    "path": "usage-0002.json",
+    "sha256": "df8683a4c8554a5402fb3cbec1af75f82090d42afa0c85267a3269c19e65c4d8",
+    "summary": {
+      "schema_version": "record-review-model-usage-v1",
+      "plan_origin": "model",
+      "provider": "aihubmix",
+      "model": "claude-sonnet-5-5",
+      "reasoning_effort": "high",
+      "thinking_mode": "adaptive",
+      "max_request_bytes": 220000,
+      "model_config_sha256": "94bd1a30dba429909334f1be2db48d755f63f83acf2841b316b09c853d6b0223",
+      "prompt_sha256": "5fde4d3a6b58f817a3b1dc45bfc792b150aac7ddf6360319027e6d648e3bbc60",
+      "calls": {
+        "requests": 1,
+        "unknown_cost_requests": 0,
+        "known_estimated_usd": "0.018624",
+        "actual_billed_usd": null,
+        "records": [
+          {
+            "call_id": "d7972eba-50b1-46af-9818-0d1f361bcc04",
+            "stage": "record_review",
+            "provider": "aihubmix",
+            "requested_model": "claude-sonnet-5-5",
+            "actual_upstream_model": "claude-sonnet-5-5",
+            "reasoning_effort": "high",
+            "started_at": "2026-10-08T21:26:50.276662+00:00",
+            "pricing_snapshot": {
+              "provider": "aihubmix",
+              "model": "claude-sonnet-5-5",
+              "currency": "USD",
+              "input_per_million": "2",
+              "output_per_million": "10",
+              "cached_input_per_million": "0.2",
+              "source": "https://aihubmix.com/model/claude-sonnet-5-5",
+              "checked_on": "2026-10-06",
+              "basis": "Uncached public list price estimate; excludes cache discounts, cache-writing charges, fees and account discounts"
+            },
+            "actual_billed_usd": null,
+            "status": "succeeded",
+            "usage": {
+              "input_tokens": 5677,
+              "output_tokens": 727,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0
+            },
+            "estimated_usd": "0.018624",
+            "usage_presence": "reported",
+            "usage_source": "provider_raw",
+            "configuration_snapshot": {
+              "schema_version": "model-call-config-v1",
+              "capture_kind": "before_dispatch",
+              "capture_layer": "http_request_before_dispatch",
+              "effective_configuration": "unverified",
+              "fields": {
+                "provider": {
+                  "value": "aihubmix",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "model": {
+                  "value": "claude-sonnet-5-5",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "api_format": {
+                  "value": "anthropic_messages",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "base_url": {
+                  "value": "https://aihubmix.com",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "max_tokens": {
+                  "value": 12000,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "thinking": {
+                  "value": {
+                    "type": "adaptive"
+                  },
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "reasoning_effort": {
+                  "value": "high",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "temperature": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "top_p": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "top_k": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "seed": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "response_format": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "tool_choice": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "parallel_tool_calls": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "stream": {
+                  "value": false,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "timeout_seconds": {
+                  "value": 120,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "max_retries": {
+                  "value": 0,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "max_completion_tokens": {
+                  "value": null,
+                  "status": "not_recorded",
+                  "source": "not_recorded"
+                },
+                "preserve_thinking": {
+                  "value": null,
+                  "status": "not_recorded",
+                  "source": "not_recorded"
+                }
+              },
+              "fingerprints": {
+                "system_sha256": "60ce669ebdb3d94311f1d83367a80c55538cf6788f50cc6ae8f6f7b0e3cd6032",
+                "input_sha256": "3df1de68d1c844931616de3ac9e6b64b320c46adf0a0787b14cccb3b2c9872aa",
+                "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                "output_schema_sha256": "d9c32c0be8b474089c605b786ca6719d37f2f997c772552325e6eb6460e5ea74"
+              },
+              "sha256": "daa88226269551a917bcedcbb7a35d78173f2eea5aeaae3248c791cf5b178508"
+            },
+            "cost_basis": "anthropic_raw_input_output_cache_read_public_price_estimate_not_bill",
+            "budget_reservation_id": "838e0c99-1069-4120-8dde-294ed0dd1eb8",
+            "reserved_usd": "0.183262",
+            "request_sha256": "8c04cae834cd42b228ef96a94372f17b0456c00ddeb3059df2801ee5b5d2472d",
+            "request_bytes": 15631,
+            "response_id": "msg_bdrk_qp2oazc2oeqvg6fgsuxncjg5h46host7e4xmke75bjvdj5lixd4a",
+            "request_id": null,
+            "stop_reason": "end_turn",
+            "raw_usage": {
+              "input_tokens": 5677,
+              "output_tokens": 727,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 0
+              }
+            },
+            "dispatch_status": "sent",
+            "http_status": 200,
+            "visible_text_secret_redacted": false,
+            "transport_phase": "body_complete",
+            "headers_received": true,
+            "headers_received_elapsed_seconds": 6.198689624667168,
+            "ended_at": "2026-10-08T21:26:56.485281+00:00",
+            "elapsed_seconds": 6.208403250202537
+          }
+        ]
+      },
+      "shared_budget": {
+        "limit_usd": "10",
+        "estimated_spent_usd": "6.811700",
+        "held_usd": "0",
+        "unknown_requests": 0,
+        "in_flight_requests": 0,
+        "requests": 90,
+        "actual_billed_usd": null,
+        "enforcement": "enforced"
+      },
+      "artifacts": [
+        {
+          "path": "calls/d7972eba-50b1-46af-9818-0d1f361bcc04-end.json",
+          "sha256": "eaa68cad2ff05667bd03a6e3f3856600300a1ea121e78bc817f2da318cc951d9"
+        },
+        {
+          "path": "calls/d7972eba-50b1-46af-9818-0d1f361bcc04-start.json",
+          "sha256": "5124f7d76e37caa604c0456acceb81193a679467bbf1fb4846ab004cd7db5fd0"
+        },
+        {
+          "path": "model-config.json",
+          "sha256": "94bd1a30dba429909334f1be2db48d755f63f83acf2841b316b09c853d6b0223"
+        },
+        {
+          "path": "review-0001-attempt-01.json",
+          "sha256": "ef093d79bb9f56947acfdb401a3a819a2c3cceddced835272effd71b75dcfd0c"
+        },
+        {
+          "path": "review-0001-input.json",
+          "sha256": "3bcad1fb9096bde4d89ff74ddcdc347b1e3b9a361c8862212b14ce6b4b713f55"
+        },
+        {
+          "path": "review-0001-parsed.json",
+          "sha256": "1bf4482a524e40337a59c10a76fe237e13c28c068d6ce34aafacaabb2c707a86"
+        }
+      ],
+      "business_validation": "not_evaluated"
+    }
+  }
+}

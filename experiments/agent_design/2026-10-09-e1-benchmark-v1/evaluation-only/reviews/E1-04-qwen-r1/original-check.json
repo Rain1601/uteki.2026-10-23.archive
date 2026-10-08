@@ -1,0 +1,117 @@
+{
+  "source_sha256": "cdcc8db91bc8ac88239ffd09c19afc85a65460b0a981604ebcc4dd9ebdac8e76",
+  "dataset_manifest_sha256": "71400408119779092f47f195f47dee9056e369b005ee8ea913f928b5acb62a55",
+  "run_manifest_sha256": "63c1827841f6dd6c4363757b91d5692d042ef8b3f493335687921572b76df23f",
+  "gold_freeze_sha256": "ebdb9c584e6734a20ba4658b1677f448bb636ca4b4938e5d70d60d863680a8f7",
+  "reference_sha256": "8dcee4cfefeb9814e46b276dfbb3e01d0408ece4816f1c2f49bbc58a2aa58934",
+  "packet_sha256": "bc8020ccafcb7d6510855a021b13f5e50a4ced016e509f30ce348af35f134893",
+  "body_dom_matches": 5,
+  "xbrl_context_verified": true,
+  "xbrl_context_xml": "<xbrli:context id=\"C_6dbdb3a2-9baf-41b4-922d-f59879124337\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+  "original_numeric_attributes": {
+    "id": "F_3c083f9d-9cbe-4037-b6c1-310e199227a1",
+    "contextref": "C_6dbdb3a2-9baf-41b4-922d-f59879124337",
+    "name": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+    "unitref": "U_USD",
+    "scale": "6",
+    "decimals": "-6",
+    "format": "ixt:num-dot-decimal"
+  },
+  "unit_definition": "iso4217:USD",
+  "cell_verified": true,
+  "model_calls": 30,
+  "call_statuses": {
+    "succeeded": 28,
+    "failed_or_cancelled": 2
+  },
+  "protocol_validation_failures": [
+    {
+      "path": "attempt-01/data-query/model/decision-0002-attempt-01.json",
+      "status": "invalid_model_decision",
+      "validation": [
+        {
+          "type": "model_type",
+          "location": [
+            "requirements",
+            0,
+            "<field>",
+            "<field>",
+            0
+          ]
+        }
+      ],
+      "error_type": "ModelBehaviorError",
+      "retry_flag": false,
+      "elapsed_seconds": 77.68983079120517
+    },
+    {
+      "path": "attempt-01/data-query/model/decision-0013-attempt-01.json",
+      "status": "timed_out",
+      "validation": null,
+      "error_type": "TimeoutError",
+      "retry_flag": false,
+      "elapsed_seconds": 120.0115146250464
+    },
+    {
+      "path": "attempt-02/data-query/model/decision-0010-attempt-01.json",
+      "status": "failed_or_cancelled",
+      "validation": null,
+      "error_type": "APIConnectionError",
+      "retry_flag": false,
+      "elapsed_seconds": 11.512863707728684
+    }
+  ],
+  "failed_known_estimated_usd": "0",
+  "known_estimated_usd": "0.2480091834",
+  "unknown_reserved_usd": "0.0358508674",
+  "usage": {
+    "input_tokens": 930699,
+    "output_tokens": 71373,
+    "total_tokens": 943434,
+    "cache_read_input_tokens": 0,
+    "cache_creation_input_tokens": 0
+  },
+  "visible_body_characters": 1123,
+  "packet_file_bytes": 107207,
+  "review_input_file_bytes": 107207,
+  "bytes_note": "review input packet file only; not a measurement of complete HTTP request, system prompt or all model calls",
+  "gold_projection_note": "A1 semantics carried to body citations; A2 fiscal metadata and T1 source available_at metadata bind actual delivered data and original. No answer fabricated or injected.",
+  "trace_note": "Fresh configuration run; all query artifacts and actual serialized reviewer inputs are checked below. API transport and application outcomes remain distinct.",
+  "available_at_verified_against_acquisition_receipt": true,
+  "workflow_status": "attempts_exhausted",
+  "analysis_eligible": false,
+  "analysis_called": false,
+  "query_manifest_sha256": "0351ffe823bf887ac9faac1f182dc5ea53eb3ff5fcec16b46d3b275dec16b036",
+  "review_protocol_failures": [],
+  "unknown_receipts": [
+    {
+      "call_id": "351673e0-476a-414c-ab66-d18704043d64",
+      "status": "failed_or_cancelled",
+      "reserved_usd": "0.0176731534",
+      "transport_phase": null,
+      "dispatch_status": null
+    },
+    {
+      "call_id": "24580930-e9fb-4f78-b829-f6dbdb28a62b",
+      "status": "failed_or_cancelled",
+      "reserved_usd": "0.018177714",
+      "transport_phase": null,
+      "dispatch_status": null
+    }
+  ],
+  "attempt_costs": {
+    "attempt-02": {
+      "calls": 14,
+      "known_usd": "0.1123840368",
+      "unknown_reserved_usd": "0.018177714"
+    },
+    "attempt-01": {
+      "calls": 16,
+      "known_usd": "0.1356251466",
+      "unknown_reserved_usd": "0.0176731534"
+    }
+  },
+  "final_revision_requests": [
+    "Add original 10-K text that states the fiscal year runs from July 1, 2023 to June 30, 2024, or state that the start date relies on the structured record and is not explicit in the delivered text."
+  ]
+}

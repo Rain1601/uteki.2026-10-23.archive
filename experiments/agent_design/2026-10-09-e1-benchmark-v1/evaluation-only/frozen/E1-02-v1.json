@@ -1,0 +1,158 @@
+{
+  "schema_version": "e1-case-gold-freeze-v1",
+  "case_id": "E1-02",
+  "frozen_at": "2026-10-08T20:53:43.752779+00:00",
+  "reference_path": "evaluation-only/fy2025-independent/reference-revalidated.json",
+  "reference_sha256": "7ad58a2395ea6563723fceeeafb2da3f1c4dcc70c4e2be9068ee6a6249193d6c",
+  "dataset_path": "datasets/msft-acquired-fy2025",
+  "dataset_manifest_sha256": "608c7d94a0aee59b6fe11f64b695fcb4c068f6807e49c8a5bd35e2e93e6ab69a",
+  "case": {
+    "case_id": "E1-02",
+    "query_zh": "请仅依据 Microsoft FY2025 10-K 中的比较披露，提供 FY2024 公司总收入及单位、财年起止和原文出处；不要求分析增长。",
+    "scope": {
+      "company_id": "sec-0000789019",
+      "report_year": 2025,
+      "observation_period_start": "2023-07-01",
+      "observation_period_end": "2024-06-30",
+      "source_policy": "specified_report_comparative_disclosure"
+    },
+    "requirements": [
+      {
+        "id": "R1",
+        "meaning_zh": "FY2024 公司总收入为 USD 245,122 million；这是全年合并总收入，不能用某分部或产品类别替代。",
+        "required": true,
+        "acceptable_evidence_sets": [
+          [
+            "E0781"
+          ],
+          [
+            "E1217"
+          ],
+          [
+            "E1218",
+            "E1219"
+          ],
+          [
+            "E1225",
+            "E1226"
+          ]
+        ],
+        "fact": {
+          "decimal": "245122000000",
+          "currency": "USD",
+          "period_start": "2023-07-01",
+          "period_end": "2024-06-30",
+          "entity": "Microsoft Corporation and subsidiaries",
+          "value_kind": "actual"
+        },
+        "why_omission_hurts_zh": "去掉金额、总额标签或单位，不能确定答的是哪个值。"
+      },
+      {
+        "id": "R2",
+        "meaning_zh": "金额必须与 FY2024 列、Year Ended June 30 年度表头和 In millions 单位绑定；仅裸数字不算命中。",
+        "required": true,
+        "acceptable_evidence_sets": [
+          [
+            "E0781"
+          ],
+          [
+            "E1217"
+          ],
+          [
+            "E1218",
+            "E1219"
+          ],
+          [
+            "E1225",
+            "E1226"
+          ]
+        ],
+        "allow_header_metadata_equivalence": true,
+        "metadata_requirement": "Record-linked validated fiscal period start=2023-07-01,end=2024-06-30; exact original XBRL context C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862 is provided in inline_xbrl_total_revenue_check. Year Ended June 30 table text alone does not literally state start date.",
+        "why_omission_hurts_zh": "去掉年度表头/期间元数据，FY2024可能被误读为自然年或季度。"
+      },
+      {
+        "id": "R3",
+        "meaning_zh": "明确原件属于 FY2025 10-K，数据为其中 FY2024 比较列；不得说已读取 FY2024 年报原件。",
+        "required": true,
+        "acceptable_evidence_sets": [],
+        "metadata_requirement": "frozen source manifest with report_period_end=2025-06-30 and original hash",
+        "why_omission_hurts_zh": "没有报告身份，无法证明回答遵守FY2025比较披露范围。"
+      }
+    ],
+    "alternative_paths_requiring_context": [
+      {
+        "evidence": [
+          "E0572"
+        ],
+        "condition_zh": "表头只有 2024 而没有 June 30；额外提供已验证的公司财年期间元数据或原文期间表头，可作为等价简明出处。"
+      },
+      {
+        "evidence": [
+          "E0587"
+        ],
+        "condition_zh": "同样需要补全 June 30 财年期间，且必须使用 Total Revenue 行。"
+      }
+    ],
+    "conditional_context": [
+      {
+        "trigger": "解释跨年原始披露与重列是否影响总收入",
+        "required_evidence_sets": [
+          [
+            "E0817",
+            "E0818"
+          ]
+        ],
+        "reason_zh": "先交代重列对象为分部，再保留其未影响合并利润表的限定；不能仅说有重列便认为总收入变化。"
+      },
+      {
+        "trigger": "对合并范围或 GAAP 有明确问题",
+        "required_evidence_sets": [
+          [
+            "E0813",
+            "E0815"
+          ]
+        ],
+        "reason_zh": "合并报表包含公司及子公司并抵消内部交易。不是一个总收入数字查询必取的整份政策。"
+      }
+    ],
+    "optional_evidence": [
+      {
+        "sets": [
+          [
+            "E0781"
+          ]
+        ],
+        "note_zh": "同一表中的 FY2025/FY2023 比较列可以作为表格上下文。"
+      }
+    ],
+    "excess_zh": [
+      "获取六处重复的同一总收入；没有增加解释能力。",
+      "整份会计政策、现金流表、各产品介绍与竞争章节。",
+      "为回答单个数字追加完整分部利润分析。"
+    ],
+    "misleading_zh": [
+      "把 245,122 当美元而非百万美元。",
+      "把 FY2024 错当 2024-01-01 至 2024-12-31。",
+      "用后续 FY2025 比较披露回答截至 2024 年的已知信息问题。",
+      "把分部重列说成合并总收入重列。"
+    ],
+    "footnote_review_zh": "利润表 Total revenue 行没有单独脚注标记。Refer to accompanying notes 不意味着必须附上所有附注。地理表 (a) 指向 United States 行，并不改变 Total 行；若选择地理表作总额出处，不强制读取其 OEM 地理分配脚注。",
+    "equivalence_rule_zh": "证据集合是已核验候选包，不强制每个标题块都出现。由来源元数据或可靠章节路径保留同等归属/期间上下文可以替代标题；新出处原文复核后可扩充。"
+  },
+  "root_review": {
+    "reviewer": "Codex root",
+    "reviewed_originals": [
+      "Income statement original table, header and FY2024 value",
+      "Exact issuer-only original XBRL context with 2023-07-01 start and 2024-06-30 end",
+      "Geographic and product revenue tables and adjacent revenue-identifying sentences",
+      "Old and re-acquired report bytes differ only in final SEC dynamic script src; separate source hashes retained"
+    ],
+    "corrections_before_freeze": [
+      "Geographic/product Total tables require revenue identity from preceding text or verified metadata",
+      "Year Ended June 30 alone does not prove start date; require original-bound XBRL/period metadata"
+    ],
+    "independence": "original-first reconstruction; inherited prior summaries, not blind; no new candidate seen before freezing"
+  },
+  "runtime_gold_access": "forbidden; actual request below independently specifies only question and caller scope"
+}

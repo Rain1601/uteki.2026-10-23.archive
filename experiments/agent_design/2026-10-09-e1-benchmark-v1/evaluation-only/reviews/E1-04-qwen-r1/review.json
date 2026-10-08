@@ -1,0 +1,234 @@
+{
+  "schema_version": "evidence-review-v1",
+  "case_id": "E1-04",
+  "question": "以2024-08-01为资料可得截止日，提供Microsoft FY2024公司总收入及金额单位、财年起止、原文出处，不使用截止日之后发布的材料。",
+  "reviewer": "Codex e1_gold_reading; original-first evaluation after case frozen; not blind to inherited history",
+  "requirements": [
+    {
+      "id": "A1",
+      "status": "supported",
+      "reason": "FY2024原件利润表Total revenue行的2024列为245,122，In millions表头、原始标签scale=6与USD单位一致。无分部维度的记录交付为245122000000 USD。",
+      "citations": [
+        {
+          "source_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "start": 0,
+          "end": 75,
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 "
+        },
+        {
+          "source_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "start": 161,
+          "end": 198,
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ]
+    },
+    {
+      "id": "A2",
+      "status": "supported",
+      "reason": "交付记录实际包含2023-07-01至2024-06-30；本轮复核原件context C_6dbdb3a2-9baf-41b4-922d-f59879124337完全一致。不是根据Year Ended June30擅补起日。",
+      "citations": [
+        {
+          "kind": "metadata",
+          "source_id": "source-8602d79f703e48c18c2f27c3",
+          "field": "fiscal_period",
+          "value": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          }
+        }
+      ]
+    },
+    {
+      "id": "T1",
+      "status": "supported",
+      "reason": "实际交付FY2024 available_at=2024-07-30，早于2024-08-01。全程查询/正文审计仅FY2024；FY2025可得日2025-07-30只能作排除元数据。",
+      "citations": [
+        {
+          "kind": "metadata",
+          "source_id": "source-8602d79f703e48c18c2f27c3",
+          "field": "available_at",
+          "value": "2024-07-30"
+        }
+      ]
+    }
+  ],
+  "checks": {
+    "scope": {
+      "status": "pass",
+      "reason": "Microsoft FY2024原年报在2024-08-01前可得，查找/查询结果/已读正文/交付无FY2025财务正文。"
+    },
+    "truth": {
+      "status": "pass",
+      "reason": "原始数值节点、USD定义、scale、无分部维度、期间和原文均重新核验。"
+    },
+    "provenance": {
+      "status": "pass",
+      "reason": "运行/数据集/冻结标准hash核对；数字定位原表行11列3及字符175:182。"
+    },
+    "focus": {
+      "status": "pass",
+      "reason": "最终单张利润表、两财务标题与两处短封面类型/财年上下文。未取无关业务章节；按冻结整块标准通过。但封面期间重复、未勾选过渡期模板128字符、表内767字符可压缩，最小材料未达标。"
+    }
+  },
+  "deliveries": [
+    {
+      "id": "D1",
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000004-26678be6",
+      "start": 0,
+      "end": 9,
+      "quote": "FORM 10-K",
+      "segments": [
+        {
+          "start": 0,
+          "end": 9,
+          "category": "necessary_context",
+          "requirement_ids": []
+        }
+      ]
+    },
+    {
+      "id": "D2",
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000006-3e1a5af2",
+      "start": 0,
+      "end": 167,
+      "quote": "For the Fiscal Year Ended June 30, 2024 OR ☐ TRANSITION REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934 For the Transition Period From to",
+      "segments": [
+        {
+          "start": 0,
+          "end": 39,
+          "category": "necessary_context",
+          "requirement_ids": []
+        },
+        {
+          "start": 39,
+          "end": 167,
+          "category": "irrelevant",
+          "requirement_ids": []
+        }
+      ]
+    },
+    {
+      "id": "D3",
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000863-9d7720d5",
+      "start": 0,
+      "end": 51,
+      "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+      "segments": [
+        {
+          "start": 0,
+          "end": 51,
+          "category": "necessary_context",
+          "requirement_ids": []
+        }
+      ]
+    },
+    {
+      "id": "D4",
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000864-cdef2bac",
+      "start": 0,
+      "end": 17,
+      "quote": "INCOME STATEMENTS",
+      "segments": [
+        {
+          "start": 0,
+          "end": 17,
+          "category": "necessary_context",
+          "requirement_ids": []
+        }
+      ]
+    },
+    {
+      "id": "D5",
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000865-dc07a7d1",
+      "start": 0,
+      "end": 879,
+      "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 Revenue: Product $ 64,773 $ 64,699 $ 72,732 Service and other 180,349 147,216 125,538 Total revenue 245,122 211,915 198,270 Cost of revenue: Product 15,272 17,804 19,064 Service and other 58,842 48,059 43,586 Total cost of revenue 74,114 65,863 62,650 Gross margin 171,008 146,052 135,620 Research and development 29,510 27,195 24,512 Sales and marketing 24,456 22,759 21,825 General and administrative 7,609 7,575 5,900 Operating income 109,433 88,523 83,383 Other income (expense), net (1,646 ) 788 333 Income before income taxes 107,787 89,311 83,716 Provision for income taxes 19,651 16,950 10,978 Net income $ 88,136 $ 72,361 $ 72,738 Earnings per share: Basic $ 11.86 $ 9.72 $ 9.70 Diluted $ 11.80 $ 9.68 $ 9.65 Weighted average shares outstanding: Basic 7,431 7,446 7,496 Diluted 7,469 7,472 7,540",
+      "segments": [
+        {
+          "start": 0,
+          "end": 75,
+          "category": "required",
+          "requirement_ids": [
+            "A1"
+          ]
+        },
+        {
+          "start": 75,
+          "end": 161,
+          "category": "table_structure",
+          "requirement_ids": []
+        },
+        {
+          "start": 161,
+          "end": 198,
+          "category": "required",
+          "requirement_ids": [
+            "A1"
+          ]
+        },
+        {
+          "start": 198,
+          "end": 879,
+          "category": "table_structure",
+          "requirement_ids": []
+        }
+      ]
+    }
+  ],
+  "metadata_deliveries": [
+    {
+      "id": "M1",
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "field": "fiscal_period",
+      "value": {
+        "kind": "year",
+        "start": "2023-07-01",
+        "end": "2024-06-30",
+        "basis": "source"
+      }
+    },
+    {
+      "id": "M2",
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "field": "available_at",
+      "value": "2024-07-30"
+    }
+  ],
+  "cost": {
+    "known_usd": "0.2480091834",
+    "unknown_reserved_usd": "0.0358508674"
+  },
+  "category_interpretation": {
+    "table_structure": "767 visible characters of removable incidental table data, not necessary structural syntax. Includes86 revenue-component chars and681 cost/profit/EPS/share-count chars.",
+    "necessary_context": "Title/context includes financial statement labels plus FORM10K and fiscal-end cover wording if selected; useful identity context, not all indispensable.",
+    "irrelevant": "Unselected transition-period template wording within a selected cover block, if present. Does not establish a transition fiscal period."
+  },
+  "limitations": [
+    "No assertion of unique minimum evidence set.",
+    "Visible character score excludes repeated JSON serialization and metadata bytes; packet cost reported separately.",
+    "Frozen criteria preserved; no new threshold based on observed result."
+  ],
+  "workflow_status": "attempts_exhausted",
+  "run_binding": {
+    "run_manifest_sha256": "63c1827841f6dd6c4363757b91d5692d042ef8b3f493335687921572b76df23f",
+    "packet_sha256": "bc8020ccafcb7d6510855a021b13f5e50a4ced016e509f30ce348af35f134893",
+    "query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-04-qwen-r1/attempt-02/data-query/query",
+      "manifest_sha256": "0351ffe823bf887ac9faac1f182dc5ea53eb3ff5fcec16b46d3b275dec16b036"
+    }
+  },
+  "minimum_sufficient_delivery": {
+    "status": "not_demonstrated",
+    "reason": "整表及标题/封面模板仍可压缩，冻结粒度通过不等于严格最少。"
+  }
+}

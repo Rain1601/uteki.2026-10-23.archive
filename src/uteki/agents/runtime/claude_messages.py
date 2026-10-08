@@ -146,6 +146,17 @@ def decision_envelope_schema():
         'required': ['action', 'requirement_ids', 'reason', 'payload_json'], 'additionalProperties': False}
 
 
+def decision_envelope_examples():
+    """Wire shapes only; placeholders are not task scope or observed evidence."""
+    return [
+        {'action': 'load_skill', 'requirement_ids': [], 'reason': None,
+         'payload_json': _canonical('query').decode('utf-8')},
+        {'action': 'reread', 'requirement_ids': ['requirement-id-from-current-packet'], 'reason': None,
+         'payload_json': _canonical(['evidence-id-from-current-packet']).decode('utf-8')},
+        {'action': 'finish', 'requirement_ids': [], 'reason': None, 'payload_json': None},
+    ]
+
+
 def decode_decision_envelope(text):
     """Decode without repairing the wire JSON or relaxing the host contract."""
     from uteki.agents.data_query.decision_protocol import ACTION_RULES
@@ -249,9 +260,10 @@ class ClaudeMessagesModel(Model):
         schema = output_schema.json_schema() if output_schema and not output_schema.is_plain_text() else None
         system = system_instructions or ''
         if self.schema_protocol == 'native_decision_envelope':
-            from uteki.agents.data_query.decision_protocol import ACTION_RULES
+            from uteki.agents.data_query.decision_protocol import ACTION_RULES, HOST_DECISION_EXAMPLE
             if schema is None or set(schema.get('properties', {}).get('action', {}).get('enum', ())) != set(ACTION_RULES):
                 raise ValueError('Native decision envelope requires the host AutonomousDecision schema')
+            system = system.replace(HOST_DECISION_EXAMPLE, '')
             system += ('\nThis endpoint offers no tools. Return the native JSON decision envelope, not XML or tool-call markup. '
                 'All four envelope fields are required. action is the host action name; requirement_ids is an array '
                 '(use [] when no references are needed); reason is the short task explanation or null. '
@@ -260,6 +272,13 @@ class ClaudeMessagesModel(Model):
                 'payload_json must be null. The host decodes that string into the selected action field and validates '
                 'the complete decision against the original schema below. Do not include unrelated fields. '
                 'The outer native schema guarantees only the envelope; all inner constraints still apply. '
+                'For a scalar payload, encode the scalar itself: load_skill uses the JSON string value '
+                '"query", never an object containing a skill key. Arrays similarly contain the array itself, '
+                'not an object containing an evidence_ids or requirements key. '
+                'The following examples illustrate wire shapes only, not which action to choose. '
+                'Replace placeholder IDs with existing IDs from the current packet.\n'
+                + '\n'.join('Wire example: ' + _canonical(item).decode('utf-8') for item in decision_envelope_examples())
+                + '\n'
                 'Action-to-payload-field mapping:\n' + _canonical({a:r.payload for a,r in ACTION_RULES.items()}).decode('utf-8')
                 + '\nOriginal host decision JSON Schema (applies AFTER envelope decoding):\n' + _canonical(schema).decode('utf-8'))
         elif schema is not None and self.schema_protocol == 'host_decision':

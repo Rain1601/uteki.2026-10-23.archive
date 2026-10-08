@@ -1,0 +1,92 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "record_selection": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_defs",
+      "description": "Original 10-K text defining Microsoft Cloud, Intelligent Cloud segment (products/services/activities) and Azure (including how Azure is described, e.g. Azure and other cloud services), with qualifiers on scope/composition and how each is measured."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_disclosed_metrics",
+      "description": "Original 10-K MD&A/segment text and tables for FY2025 disclosed metrics: Microsoft Cloud revenue and growth, Intelligent Cloud segment revenue/operating income and growth, Azure and other cloud services growth rate (and any statement that Azure revenue amount is not separately disclosed), with units, periods and qualifiers (e.g., constant currency)."
+    },
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+            "metric_id": "operating_income",
+            "period": {
+              "kind": "year",
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_ic_records",
+      "description": "Numeric records: Intelligent Cloud segment revenue and operating income for FY2025 (and FY2024 comparative) from the structured records."
+    }
+  ],
+  "reason": "Plan requirements: definitions, disclosed FY2025 metrics text, and Intelligent Cloud numeric records; Azure revenue not separately disclosed so no derivation.",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

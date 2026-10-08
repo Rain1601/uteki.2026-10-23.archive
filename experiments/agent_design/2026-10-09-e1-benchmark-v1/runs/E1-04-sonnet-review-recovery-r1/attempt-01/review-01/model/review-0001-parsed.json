@@ -1,0 +1,136 @@
+{
+  "packet_id": "data-review-adf2d64a5d9f3e7442e187b5",
+  "facts": [
+    {
+      "fact_id": "ev-1fd4c32ac162e92f7cd6b95a",
+      "verdict": "supported",
+      "rationale": "Record gives revenue 245,122,000,000 USD for 2023-07-01 to 2024-06-30, consistent with the income statement table (Total revenue 245,122, in millions, year ended June 30, 2024). It is a candidate XBRL record, but the cited table cell matches.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "source-block-5739e8a032517bb26d71b492",
+      "verdict": "supported",
+      "rationale": "The heading is accurately quoted and identifies the source as Item 8 financial statements; it gives provenance for the table.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000863-9d7720d5",
+          "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-f8510d0eaebc5441cf36a1e4",
+      "verdict": "supported",
+      "rationale": "The heading is accurately quoted and identifies the table as the income statements.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000864-cdef2bac",
+          "quote": "INCOME STATEMENTS"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-3dcd2fd2fe3a0fd11263e872",
+      "verdict": "supported",
+      "rationale": "The table body contains the unit statement, 'Year Ended June 30, 2024' column and Total revenue 245,122. The extra rows are unrelated, but the whole table is the minimal original-block granularity.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 Revenue:"
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ],
+      "relevance": "necessary"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "req_revenue_query",
+      "verdict": "complete",
+      "rationale": "Revenue of USD 245,122 million for FY ended 2024-06-30, consolidated reported basis, is supported; available_at 2024-07-30 is before the cutoff. The period start 2023-07-01 is not explicitly stated in the table; it is a derived fiscal-year start from the record and the 'Year Ended June 30' column.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ]
+    },
+    {
+      "requirement_id": "req_source_text",
+      "verdict": "complete",
+      "rationale": "The delivered original blocks provide the source heading, income statement title, unit ('In millions'), the 'Year Ended June 30, 2024' period and total revenue. Fiscal-year start date is not literally stated in these blocks but follows from a 'year ended June 30, 2024' annual column; the structured record supplies 2023-07-01.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "(In millions, except per share amounts) Year Ended June 30, 2024"
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000864-cdef2bac",
+          "quote": "INCOME STATEMENTS"
+        }
+      ]
+    }
+  ],
+  "source_checks": [
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "verdict": "text_sufficient",
+      "rationale": "The delivered table text contains unit, period-end column and total revenue; no image content is needed. The 10-K was available on 2024-07-30, before the cutoff.",
+      "citations": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "quote": "Total revenue 245,122 211,915 198,270"
+        }
+      ]
+    }
+  ],
+  "question_coverage": "complete",
+  "coverage_reason": "The answer gives FY2024 total revenue of $245,122 million (USD 245.122 billion), fiscal year July 1, 2023 to June 30, 2024, with the original 10-K income statement as source, using a pre-cutoff document only.",
+  "missing_information": [],
+  "revision_requests": [],
+  "body_checks": [
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000863-9d7720d5",
+      "relevance": "supporting_context",
+      "rationale": "Short section heading identifying the source item."
+    },
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000864-cdef2bac",
+      "relevance": "supporting_context",
+      "rationale": "Statement title identifying the table as the income statements."
+    },
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000865-dc07a7d1",
+      "relevance": "necessary",
+      "rationale": "Contains total revenue, unit and fiscal year column."
+    }
+  ],
+  "limitations": [
+    "The delivered blocks do not literally state the fiscal-year start date of July 1, 2023; it is inferred from 'Year Ended June 30, 2024' and the structured record period.",
+    "The 2025 filing source was correctly excluded as not available at cutoff.",
+    "The income statement table includes unrelated rows (costs, EPS), but it is a single original table block and is acceptable."
+  ]
+}

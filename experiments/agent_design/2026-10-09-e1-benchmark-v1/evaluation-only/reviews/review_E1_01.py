@@ -1,0 +1,70 @@
+"""E1-01 original-source audit. Evaluation only; never consumed by Agent runtime."""
+from pathlib import Path
+from hashlib import sha256
+from decimal import Decimal
+from collections import Counter
+import json
+from lxml import html
+from uteki.agents.data_query.coordinator import _verify_manifest
+from uteki.evaluation.evidence_benchmark import evaluate
+E=Path(__file__).resolve().parents[2];run=E/'runs/E1-01-sonnet-r1';freeze_path=E/'evaluation-only/frozen/E1-01-v1.json'
+def read(p):return json.loads(p.read_text())
+def h(p):return sha256(p.read_bytes()).hexdigest()
+def save(p,d):
+ with p.open('x') as f:json.dump(d,f,ensure_ascii=False,indent=2);f.write('\n')
+_verify_manifest(run);freeze=read(freeze_path);reference=E/freeze['reference_path'];assert h(reference)==freeze['reference_sha256'];ref=read(reference)
+packetpath=run/'attempt-01/review-01/input.json';packet=read(packetpath);assert packet==read(run/'attempt-01/review-packet.json');assert packet['question']==freeze['case']['query_zh']
+_verify_manifest(Path(packet['query_ref']['path']),packet['query_ref']['manifest_sha256']);dataset=Path(packet['dataset_ref']['path']);_verify_manifest(dataset,packet['dataset_ref']['manifest_sha256']);assert h(dataset/'manifest.json')==freeze['dataset_manifest_sha256']
+sources=read(dataset/'sources.json');assert len(sources)==1;source=sources[0];sid=source['source_snapshot_id'];assert sid=='source-8602d79f703e48c18c2f27c3';raw=dataset/source['raw_file'];assert h(raw)==source['source_sha256']==next(s for s in ref['sources'] if s['source_snapshot_id']==sid)['raw_sha256']
+assert packet['scope']['source_snapshot_ids']==[sid] and packet['scope']['company_ids']==['sec-0000789019']
+tree=html.fromstring(raw.read_bytes());et=tree.getroottree();nodes={et.getpath(n):n for n in tree.iter() if isinstance(n.tag,str)}
+blocks={b['block_id']:b for b in map(json.loads,(dataset/source['index_folder']/'blocks.jsonl').read_text().splitlines())}
+docs=packet['source_documents'];assert len(docs)==1 and docs[0]['source_snapshot_id']==sid
+for body in docs[0]['blocks']:
+ assert body['text']==blocks[body['block_id']]['text']==' '.join(nodes[body['dom_path']].text_content().split())
+records=[x for x in packet['facts'] if x['kind']=='record'];assert len(records)==1;record=records[0]['value']
+assert record['entity_id']=='sec-0000789019' and record['metric_id']=='revenue' and record['dimensions']=={} and record['origin']['raw_dimensions']=={}
+assert record['value_decimal']=='245122000000' and record['unit']=='USD' and record['available_at']=='2024-07-30'
+quote=records[0]['citations'][0];assert quote['source_snapshot_id']==sid and quote['quote']=='245,122'
+b=blocks[quote['block_id']];assert b['text'][quote['char_start']:quote['char_end']]==quote['quote']
+table_node=nodes[b['dom_path']];cell=table_node.xpath('.//tr')[quote['cell']['row']].xpath('./td|./th')[quote['cell']['column']];assert ' '.join(cell.text_content().split())=='245,122'
+numeric=next(n for n in cell.iter() if n.get('contextref'));assert numeric.get('contextref')==record['origin']['context_ref'] and numeric.get('name')==record['origin']['concept'] and numeric.get('scale')=='6'
+unit=next(n for n in tree.iter() if n.get('id')==numeric.get('unitref'));assert ' '.join(unit.itertext()).strip()=='iso4217:USD'
+ctx=next(n for n in tree.iter() if n.get('id')==numeric.get('contextref'));values={n.tag.split(':')[-1]:' '.join(n.itertext()).strip() for n in ctx.iter() if isinstance(n.tag,str)}
+assert values['identifier']=='0000789019' and values['startdate']==record['period']['start']=='2023-07-01' and values['enddate']==record['period']['end']=='2024-06-30' and 'segment' not in values
+assert record['period']['basis']=='source' and docs[0]['source_period_end']==source['period_end']=='2024-06-30'
+metadata={'fiscal_period':record['period'],'report_period_end':docs[0]['source_period_end']}
+corpus={sid:{'company_id':source['company_id'],'sha256':source['source_sha256'],'blocks':{k:v['text'] for k,v in blocks.items()},'metadata':metadata}}
+gold={'schema_version':'evidence-gold-v1','case_id':'E1-01','question':packet['question'],'company_ids':[source['company_id']],'sources':[{'source_id':sid,'company_id':source['company_id'],'sha256':source['source_sha256']}],'required':[{'id':r['id'],'description':r['meaning_zh'],'kind':'metadata' if r['id'] in ['A2','A3'] else 'text'} for r in freeze['case']['requirements']],'optional':[]}
+deliveries=[]
+for i,b in enumerate(docs[0]['blocks']):
+ t=b['text']
+ if b['type']=='table':
+  table=b;start=t.index('Revenue:');total=t.index('Total revenue');end=t.index(' Cost of revenue:')
+  parts=[(0,start,'required',['A1']),(start,total,'table_structure',[]),(total,end,'required',['A1']),(end,len(t),'table_structure',[])]
+ else:parts=[(0,len(t),'necessary_context',[])]
+ deliveries.append({'id':f'D{i+1}','source_id':sid,'block_id':b['block_id'],'start':0,'end':len(t),'quote':t,'segments':[{'start':a,'end':z,'category':c,'requirement_ids':ids} for a,z,c,ids in parts]})
+def cite(a,z):return {'source_id':sid,'block_id':table['block_id'],'start':a,'end':z,'quote':table['text'][a:z]}
+calls=[read(p) for p in run.rglob('*-end.json')];known=sum((Decimal(c['estimated_usd']) for c in calls if c.get('estimated_usd') is not None),Decimal(0));unknown=sum((Decimal(c['reserved_usd']) for c in calls if c.get('estimated_usd') is None),Decimal(0));failedcost=sum((Decimal(c['estimated_usd']) for c in calls if c.get('estimated_usd') is not None and c['status']!='succeeded'),Decimal(0))
+usage=Counter()
+for c in calls:
+ for k,v in (c.get('usage') or {}).items():
+  if type(v)is int:usage[k]+=v
+protocol=[]
+for p in sorted((run/'attempt-01/data-query/model').glob('decision-*-attempt-*.json')):
+ d=read(p)
+ if d['status']!='decision_returned':protocol.append({'path':str(p.relative_to(run)),'status':d['status'],'validation':d.get('validation'),'error_type':d.get('error_type'),'retry_flag':d.get('retry'),'elapsed_seconds':d.get('elapsed_seconds')})
+review={'schema_version':'evidence-review-v1','case_id':'E1-01','question':packet['question'],'reviewer':'Codex e1_gold_reading; original-first evaluation after case frozen; not blind to inherited history','requirements':[
+{'id':'A1','status':'supported','reason':'FY2024原件利润表Total revenue行的2024列为245,122，In millions表头、原始标签scale=6与USD单位一致。无分部维度的记录交付为245122000000 USD。','citations':[cite(0,start),cite(total,end)]},
+{'id':'A2','status':'supported','reason':'交付记录实际包含2023-07-01至2024-06-30；本轮复核原件context C_6dbdb3a2-9baf-41b4-922d-f59879124337完全一致。不是根据Year Ended June30擅补起日。','citations':[{'kind':'metadata','source_id':sid,'field':'fiscal_period','value':metadata['fiscal_period']}]},
+{'id':'A3','status':'supported','reason':'实际交付只绑定FY2024原件source-8602...及cdcc8...原件hash，报告期2024-06-30；没有以FY2025同额比较列冒充。','citations':[{'kind':'metadata','source_id':sid,'field':'report_period_end','value':metadata['report_period_end']}]}],
+'checks':{k:{'status':'pass','reason':v} for k,v in {'scope':'仅Microsoft FY2024原年报，公司和观察期间均正确。','truth':'原始数值节点、USD定义、scale、无分部维度、期间和原文均重新核验。','provenance':'运行/数据集/冻结标准hash核对；数字定位原表行11列3及字符175:182。','focus':'集中在一张原始利润表及两标题，没有多取章节或重复表。在冻结整表粒度标准下通过；仍有767字符表内非必需数据，未达到最小充分压缩。'}.items()},
+'deliveries':deliveries,'metadata_deliveries':[{'id':'M1','source_id':sid,'field':'fiscal_period','value':metadata['fiscal_period']},{'id':'M2','source_id':sid,'field':'report_period_end','value':metadata['report_period_end']}],
+'cost':{'known_usd':str(known),'unknown_reserved_usd':str(unknown)},
+'category_interpretation':{'table_structure':'767 visible characters of removable incidental table data, not necessary structural syntax. Includes86 revenue-component chars and681 cost/profit/EPS/share-count chars.','necessary_context':'68 chars of location/table labels; useful navigation context, not all semantically indispensable.','irrelevant_zero_means':'No separately selected unrelated passages; does not mean zero removable content.'},
+'limitations':['No assertion of unique minimum evidence set.','Visible character score excludes repeated JSON serialization and metadata bytes; packet cost reported separately.','Frozen criteria preserved; no new threshold based on observed result.']}
+score=evaluate(gold,review,corpus)
+checks={'source_sha256':h(raw),'dataset_manifest_sha256':h(dataset/'manifest.json'),'run_manifest_sha256':h(run/'manifest.json'),'gold_freeze_sha256':h(freeze_path),'reference_sha256':h(reference),'packet_sha256':h(packetpath),'body_dom_matches':len(deliveries),'xbrl_context_verified':True,'xbrl_context_xml':html.tostring(ctx,encoding='unicode'),'original_numeric_attributes':dict(numeric.attrib),'unit_definition':'iso4217:USD','cell_verified':True,'model_calls':len(calls),'call_statuses':dict(Counter(c['status'] for c in calls)),'protocol_validation_failures':protocol,'failed_known_estimated_usd':str(failedcost),'known_estimated_usd':str(known),'unknown_reserved_usd':str(unknown),'usage':dict(usage),'visible_body_characters':sum(len(x['text']) for x in docs[0]['blocks']),'packet_file_bytes':packetpath.stat().st_size,'review_input_file_bytes':packetpath.stat().st_size,'bytes_note':'review input packet file only; not a measurement of complete HTTP request, system prompt or all model calls','gold_projection_note':'A1 semantics carried to body citations; A2 fiscal metadata and A3 source-vintage metadata bind actual delivered data and original. No answer fabricated or injected.','trace_note':'One recorded invalid_model_decision with literal_error at skill; next turn succeeded. Visible first response payload had skill=query. No cause inferred from this alone; not labeled network failure.'}
+output=E/'evaluation-only/reviews/E1-01-sonnet-r1';output.mkdir()
+for name,d in [('gold-projection.json',gold),('review.json',review),('score.json',score),('original-check.json',checks)]:save(output/name,d)
+print(json.dumps({'score':score,'audit':checks},ensure_ascii=False,indent=2))

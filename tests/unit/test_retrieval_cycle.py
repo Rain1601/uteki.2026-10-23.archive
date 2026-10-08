@@ -36,7 +36,7 @@ class RetrievalCycleTests(unittest.TestCase):
         self.output = self.root/'output'
         self.calls, self.reviews = [], []
 
-    def run_fixture(self, statuses, *, query_status='evidence_ready', cancel=False):
+    def run_fixture(self, statuses, *, query_status='evidence_ready', cancel=False, retryable=None):
         async def query(request, *, output, **kwargs):
             self.calls.append((deepcopy(request), deepcopy(kwargs)))
             output.mkdir()
@@ -62,6 +62,7 @@ class RetrievalCycleTests(unittest.TestCase):
             status = statuses[len(self.reviews)-1]
             result = {'status':status, 'analysis_eligible':status=='reviewed',
                       'assessment':{'missing_information':['missing independent detail']} if status=='needs_revision' else {}}
+            if retryable is not None: result['review_retryable'] = retryable
             write_new(output/'result.json', result)
             cycle._seal(output)
             return {**result, 'review_ref':cycle._reference(output)}
@@ -69,6 +70,12 @@ class RetrievalCycleTests(unittest.TestCase):
              patch.object(cycle, 'prepare_review_packet', side_effect=packet), \
              patch.object(cycle, 'review_data_answer', side_effect=review):
             return asyncio.run(cycle.run_retrieval_cycle(self.config, self.output))
+
+    def test_exhausted_independent_protocol_repair_does_not_retry_entire_review(self):
+        result = self.run_fixture(['failed'], retryable=False)
+        self.assertEqual(result['status'], 'blocked_by_review_failure')
+        self.assertEqual(len(self.reviews), 1)
+        self.assertEqual(len(self.calls), 1)
 
     def test_first_pass_stops_and_records_pinned_artifacts_without_analysis(self):
         before = deepcopy(self.config)
@@ -89,6 +96,8 @@ class RetrievalCycleTests(unittest.TestCase):
             for ordinal in (1,2):
                 cycle.reviewer_factory(self.config)(self.root/f'review-{ordinal}')
                 arguments = reviewer.call_args.kwargs
+                self.assertEqual(arguments['prompt'], cycle.review_prompt({}))
+                self.assertNotIn('source_check_ids', arguments['prompt'])
                 self.assertEqual(arguments['budget'].path, budget.path)
                 self.assertFalse(arguments['budget'].enforce)
                 self.assertEqual(arguments['budget'].summary(), before)

@@ -1,0 +1,384 @@
+{
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-total-revenue-query",
+      "description": "Retrieve Microsoft's actual consolidated FY2024 total revenue as numeric records for the source-basis fiscal year beginning 2023-07-01 and ending 2024-06-30, using only the pre-cutoff 10-K source. Preserve reported USD units and source citations."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-income-statement-source",
+      "description": "Obtain original Microsoft FY2024 Form 10-K income-statement table context showing Total revenue for the year ended June 30, 2024, together with the necessary reporting-unit caption (In millions, except per share amounts) and annual-column heading."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-fiscal-period-source",
+      "description": "Obtain original Microsoft FY2024 Form 10-K text or table context establishing the fiscal-year period boundaries, preferably explicit disclosure of the fiscal year beginning July 1, 2023 and ending June 30, 2024; otherwise retain the shortest annual-report and income-statement headings that directly support FY2024 period boundaries."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-total-revenue-query",
+      "description": "Retrieve Microsoft's actual consolidated FY2024 total revenue as numeric records for the source-basis fiscal year beginning 2023-07-01 and ending 2024-06-30, using only the pre-cutoff 10-K source. Preserve reported USD units and source citations.",
+      "evidence_ids": [
+        "ev-b6e3572e670c2045fdc0c288",
+        "ev-51c2b61132381108439b3d00",
+        "ev-1fd4c32ac162e92f7cd6b95a",
+        "ev-6ef328d6fd39411c13ddbd05"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:779c2d684aff5571fc19e516",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0000789019 / revenue / 2023-07-01 — 2024-06-30：取得匹配记录。",
+          "record_ids": [
+            "obs-95070e45ef9df5f4a685c60d",
+            "obs-c622d085cee5900d9704f00a",
+            "obs-f05ae2ac60f8975e1894121c",
+            "obs-f44ba7f537b87bc8d559fe77"
+          ],
+          "artifact_ids": [
+            "art-bf32150fe9019e2234f18bfb",
+            "art-58542151d5c81a3bbc1b29fd",
+            "art-bba8944a7745b9cb1277c496",
+            "art-ff06cba6db05548c0a8fd3d5"
+          ],
+          "event_sequences": [
+            3
+          ]
+        },
+        {
+          "check_id": "citations:obs-95070e45ef9df5f4a685c60d",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-95070e45ef9df5f4a685c60d"
+          ],
+          "artifact_ids": [
+            "art-517f1946a4b0492fe0faffdb"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-c622d085cee5900d9704f00a",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-c622d085cee5900d9704f00a"
+          ],
+          "artifact_ids": [
+            "art-1dec06065ff130d1d9209e7a"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-f05ae2ac60f8975e1894121c",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-f05ae2ac60f8975e1894121c"
+          ],
+          "artifact_ids": [
+            "art-cc76c08c9ab797328ca00d05"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-f44ba7f537b87bc8d559fe77",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-f44ba7f537b87bc8d559fe77"
+          ],
+          "artifact_ids": [
+            "art-61be4bbff9ecb3b64ac3c04d"
+          ],
+          "event_sequences": [
+            3
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-003/query-receipt.json",
+          "sha256": "f5d13bfe2de0faaf18cbc69bd802c7e347327de27bc3f6c953ae40dcd45e3e7d"
+        }
+      ]
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-income-statement-source",
+      "description": "Obtain original Microsoft FY2024 Form 10-K income-statement table context showing Total revenue for the year ended June 30, 2024, together with the necessary reporting-unit caption (In millions, except per share amounts) and annual-column heading.",
+      "evidence_ids": [
+        "ev-1350eed436095c00f6f3baa4"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      }
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-fiscal-period-source",
+      "description": "Obtain original Microsoft FY2024 Form 10-K text or table context establishing the fiscal-year period boundaries, preferably explicit disclosure of the fiscal year beginning July 1, 2023 and ending June 30, 2024; otherwise retain the shortest annual-report and income-statement headings that directly support FY2024 period boundaries.",
+      "evidence_ids": [
+        "ev-1350eed436095c00f6f3baa4"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "delegations": [],
+  "pending_body_reads": [
+    {
+      "context_evidence_id": "ev-1350eed436095c00f6f3baa4",
+      "block_id": "block-000865-dc07a7d1",
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "requirement_ids": [
+        "req-msft-fy2024-fiscal-period-source",
+        "req-msft-fy2024-income-statement-source"
+      ],
+      "read_request": {
+        "artifact_id": "art-be3dda739656e60351b34706e18940a4",
+        "pointer": "/blocks/2/text",
+        "limit": 1000,
+        "offset": 0
+      }
+    }
+  ],
+  "source_leads": [
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-001337-f66c4eab",
+      "index_id": "didx-11f91d75aec67ad3",
+      "origin": "citation",
+      "requirement_ids": [
+        "req-msft-fy2024-total-revenue-query"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+        "block_id": "block-001337-f66c4eab"
+      },
+      "read_status": "located"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-000865-dc07a7d1",
+      "index_id": "didx-11f91d75aec67ad3",
+      "origin": "citation",
+      "requirement_ids": [
+        "req-msft-fy2024-total-revenue-query"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+        "block_id": "block-000865-dc07a7d1"
+      },
+      "read_status": "located"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-001339-09d30e15",
+      "index_id": "didx-11f91d75aec67ad3",
+      "origin": "citation",
+      "requirement_ids": [
+        "req-msft-fy2024-total-revenue-query"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+        "block_id": "block-001339-09d30e15"
+      },
+      "read_status": "located"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-8827c466518d878f83689984",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "source-8602d79f703e48c18c2f27c3",
+          "source-360182cbf562dcf9a8ab9c4e"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2024-08-01",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "block_id": "block-001346-23a6b3b7",
+      "index_id": "didx-11f91d75aec67ad3",
+      "origin": "citation",
+      "requirement_ids": [
+        "req-msft-fy2024-total-revenue-query"
+      ],
+      "read_request": {
+        "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+        "block_id": "block-001346-23a6b3b7"
+      },
+      "read_status": "located"
+    }
+  ]
+}

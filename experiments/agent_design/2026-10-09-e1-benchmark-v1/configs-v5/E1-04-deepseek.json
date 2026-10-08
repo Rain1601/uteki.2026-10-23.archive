@@ -1,0 +1,71 @@
+{
+  "request": {
+    "question": "以2024-08-01为资料可得截止日，提供Microsoft FY2024公司总收入及金额单位、财年起止、原文出处，不使用截止日之后发布的材料。",
+    "purpose": "analysis_evidence",
+    "dataset": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-two-annuals",
+    "scope": {
+      "snapshot_id": "query-8827c466518d878f83689984",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "source-8602d79f703e48c18c2f27c3",
+        "source-360182cbf562dcf9a8ab9c4e"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2024-08-01",
+      "include_candidates": true
+    },
+    "limits": {
+      "max_steps": 40,
+      "max_packet_bytes": 120000,
+      "observation_bytes": 24000,
+      "page_items": 8,
+      "turn_timeout": 300
+    }
+  },
+  "planner": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "reasoning_effort": "low",
+    "max_tokens": 8192,
+    "request_timeout": 120,
+    "max_retries": 1,
+    "budget_ledger": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/costs.sqlite",
+    "budget_usd": "40",
+    "budget_policy": "enforced",
+    "max_requests_total": 500,
+    "allow_unknown_reservations": true
+  },
+  "worker": {
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "reasoning_effort": "low",
+    "max_tokens": 8192,
+    "request_timeout": 120,
+    "max_retries": 1,
+    "budget_ledger": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/costs.sqlite",
+    "budget_usd": "40",
+    "budget_policy": "enforced",
+    "max_requests_total": 500,
+    "allow_unknown_reservations": true
+  },
+  "reviewer": {
+    "provider": "aihubmix",
+    "model": "claude-sonnet-5-5",
+    "reasoning_effort": "high",
+    "max_tokens": 12000,
+    "request_timeout": 120,
+    "max_retries": 1,
+    "budget_ledger": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/costs.sqlite",
+    "budget_usd": "40",
+    "budget_policy": "enforced",
+    "max_requests_total": 500,
+    "allow_unknown_reservations": true
+  },
+  "credential_root": "/Users/rain/Documents/ChatGPT/uteki.beta",
+  "workspace": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runtime-workspace",
+  "max_review_packet_bytes": 160000,
+  "max_attempts": 2,
+  "reviewer_max_request_bytes": 220000
+}

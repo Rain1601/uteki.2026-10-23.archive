@@ -1,0 +1,70 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "record_selection": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-total-revenue-query",
+      "description": "Retrieve Microsoft's actual consolidated FY2024 total revenue as numeric records for the source-basis fiscal year beginning 2023-07-01 and ending 2024-06-30, using only the pre-cutoff 10-K source. Preserve reported USD units and source citations."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-income-statement-source",
+      "description": "Obtain original Microsoft FY2024 Form 10-K income-statement table context showing Total revenue for the year ended June 30, 2024, together with the necessary reporting-unit caption (In millions, except per share amounts) and annual-column heading."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-msft-fy2024-fiscal-period-source",
+      "description": "Obtain original Microsoft FY2024 Form 10-K text or table context establishing the fiscal-year period boundaries, preferably explicit disclosure of the fiscal year beginning July 1, 2023 and ending June 30, 2024; otherwise retain the shortest annual-report and income-statement headings that directly support FY2024 period boundaries."
+    }
+  ],
+  "reason": "Plan evidence for Microsoft FY2024 consolidated total revenue, its reported unit, fiscal period boundaries, and original Form 10-K source provenance, restricted to material available on or before 2024-08-01. The prior review requested a corrected package with nonessential cover-page blocks trimmed, so separate numeric-query and targeted source-evidence requirements are used.",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

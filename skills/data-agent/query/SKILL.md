@@ -1,6 +1,6 @@
 ---
 name: data-agent-query
-version: 13
+version: 14
 ---
 Load this skill when planning or querying. Its content and hash stay frozen for the run.
 
@@ -10,7 +10,9 @@ record_origins shows the latest query's record evidence IDs with immutable origi
 
 Plan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.
 
-Use kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.
+Use kind=query with an explicit QueryPlan for numeric requirements. Entity, periods and formula must match the requirement and pinned scope. The host verifies records, citations and registered calculations; Business text cannot satisfy a margin requirement. QueryPlan has no currency filter; results retain units and calculations reject incompatible units/accounting bases. Fiscal mappings must belong to the requested entity's company.
+
+Query requirements may pin source_id to one scoped report. Compare report versions through separate requirements and queries. Omission keeps full scope. Mixed source selectors in one query are rejected; conflicts are never merged.
 
 For purpose=analysis_evidence, the Data Agent retrieves original material for a separate Analysis Agent. The original question can be narrative; use kind=source_evidence for its source material and kind=query for numeric retrieval. Do not create source_answer requirements or author the downstream report. Navigate using the small scoped catalog/schema and source index, then read relevant original blocks with necessary units, periods, introductions and qualifiers. Do not default to full-report or whole-chapter delivery. Preserve explicit gaps when evidence or resources are insufficient. Semantic completeness is reviewed separately after retrieval.
 

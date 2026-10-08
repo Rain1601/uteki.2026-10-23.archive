@@ -1,0 +1,3051 @@
+{
+  "schema_version": "uteki-evaluation-reference-candidate-v1",
+  "status": "candidate_needs_root_review_and_freeze",
+  "usage": "evaluation_only_never_runtime_input",
+  "created_date": "2026-10-09",
+  "reviewer": "Codex subagent e1_gold_reading",
+  "independence": {
+    "agent_deliveries_opened": false,
+    "prior_evaluation_files_opened": false,
+    "inherited_context_contains_prior_result_summary": true,
+    "claim": "original-first reconstruction; not fully blind independent gold"
+  },
+  "source": {
+    "asset_policy": "references_only; bytes_not_included; OCR_and_vision_not_run",
+    "available_at": "2025-07-30",
+    "character_offsets": "zero-based Unicode code points in canonical block text; end exclusive",
+    "company_id": "sec-0000789019",
+    "document_id": "msft-2025-10k",
+    "export_version": "uteki-parsed-document-v1",
+    "form_type": "10-K",
+    "index_id": "didx-692376daa635828b",
+    "parser_version": "sec-source-blocks-v0.1.11",
+    "raw_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+    "report_period_end": "2025-06-30",
+    "semantic_review": "not_reviewed",
+    "source_identity_sha256": "7ac537fbf21ceb2725c927647fed5f0a9d392a0d3bd31b37944f81348a621c71",
+    "source_snapshot_id": "msft-2025-10k",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+    "status": "candidate_parsed_material",
+    "text_representation": "normalized-visible-html-text-v1"
+  },
+  "original_sha256_verified": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+  "read_coverage": {
+    "ranges_in_prepared_ordinal_navigation": [
+      [
+        83,
+        156
+      ],
+      [
+        548,
+        566
+      ],
+      [
+        570,
+        589
+      ],
+      [
+        609,
+        616
+      ],
+      [
+        774,
+        784
+      ],
+      [
+        811,
+        826
+      ],
+      [
+        1180,
+        1230
+      ]
+    ],
+    "original_nodes_read": 199,
+    "method": "Resolve navigation DOM paths in original SEC HTML; all quotes are original DOM normalized-visible text. Colon-named ix elements resolved with name(), not by trusting extracted quote.",
+    "not_claimed": [
+      "every paragraph manually read",
+      "perfect exhaustive minimal evidence",
+      "other FY originals reviewed"
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "E1-02",
+      "query_zh": "请仅依据 Microsoft FY2025 10-K 中的比较披露，提供 FY2024 公司总收入及单位、财年起止和原文出处；不要求分析增长。",
+      "scope": {
+        "company_id": "sec-0000789019",
+        "report_year": 2025,
+        "observation_period_start": "2023-07-01",
+        "observation_period_end": "2024-06-30",
+        "source_policy": "specified_report_comparative_disclosure"
+      },
+      "requirements": [
+        {
+          "id": "R1",
+          "meaning_zh": "FY2024 公司总收入为 USD 245,122 million；这是全年合并总收入，不能用某分部或产品类别替代。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0781"
+            ],
+            [
+              "E1217"
+            ],
+            [
+              "E1218",
+              "E1219"
+            ],
+            [
+              "E1225",
+              "E1226"
+            ]
+          ],
+          "fact": {
+            "decimal": "245122000000",
+            "currency": "USD",
+            "period_start": "2023-07-01",
+            "period_end": "2024-06-30",
+            "entity": "Microsoft Corporation and subsidiaries",
+            "value_kind": "actual"
+          },
+          "why_omission_hurts_zh": "去掉金额、总额标签或单位，不能确定答的是哪个值。"
+        },
+        {
+          "id": "R2",
+          "meaning_zh": "金额必须与 FY2024 列、Year Ended June 30 年度表头和 In millions 单位绑定；仅裸数字不算命中。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0781"
+            ],
+            [
+              "E1217"
+            ],
+            [
+              "E1218",
+              "E1219"
+            ],
+            [
+              "E1225",
+              "E1226"
+            ]
+          ],
+          "allow_header_metadata_equivalence": true,
+          "metadata_requirement": "Record-linked validated fiscal period start=2023-07-01,end=2024-06-30; exact original XBRL context C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862 is provided in inline_xbrl_total_revenue_check. Year Ended June 30 table text alone does not literally state start date.",
+          "why_omission_hurts_zh": "去掉年度表头/期间元数据，FY2024可能被误读为自然年或季度。"
+        },
+        {
+          "id": "R3",
+          "meaning_zh": "明确原件属于 FY2025 10-K，数据为其中 FY2024 比较列；不得说已读取 FY2024 年报原件。",
+          "required": true,
+          "acceptable_evidence_sets": [],
+          "metadata_requirement": "frozen source manifest with report_period_end=2025-06-30 and original hash",
+          "why_omission_hurts_zh": "没有报告身份，无法证明回答遵守FY2025比较披露范围。"
+        }
+      ],
+      "alternative_paths_requiring_context": [
+        {
+          "evidence": [
+            "E0572"
+          ],
+          "condition_zh": "表头只有 2024 而没有 June 30；额外提供已验证的公司财年期间元数据或原文期间表头，可作为等价简明出处。"
+        },
+        {
+          "evidence": [
+            "E0587"
+          ],
+          "condition_zh": "同样需要补全 June 30 财年期间，且必须使用 Total Revenue 行。"
+        }
+      ],
+      "conditional_context": [
+        {
+          "trigger": "解释跨年原始披露与重列是否影响总收入",
+          "required_evidence_sets": [
+            [
+              "E0817",
+              "E0818"
+            ]
+          ],
+          "reason_zh": "先交代重列对象为分部，再保留其未影响合并利润表的限定；不能仅说有重列便认为总收入变化。"
+        },
+        {
+          "trigger": "对合并范围或 GAAP 有明确问题",
+          "required_evidence_sets": [
+            [
+              "E0813",
+              "E0815"
+            ]
+          ],
+          "reason_zh": "合并报表包含公司及子公司并抵消内部交易。不是一个总收入数字查询必取的整份政策。"
+        }
+      ],
+      "optional_evidence": [
+        {
+          "sets": [
+            [
+              "E0781"
+            ]
+          ],
+          "note_zh": "同一表中的 FY2025/FY2023 比较列可以作为表格上下文。"
+        }
+      ],
+      "excess_zh": [
+        "获取六处重复的同一总收入；没有增加解释能力。",
+        "整份会计政策、现金流表、各产品介绍与竞争章节。",
+        "为回答单个数字追加完整分部利润分析。"
+      ],
+      "misleading_zh": [
+        "把 245,122 当美元而非百万美元。",
+        "把 FY2024 错当 2024-01-01 至 2024-12-31。",
+        "用后续 FY2025 比较披露回答截至 2024 年的已知信息问题。",
+        "把分部重列说成合并总收入重列。"
+      ],
+      "footnote_review_zh": "利润表 Total revenue 行没有单独脚注标记。Refer to accompanying notes 不意味着必须附上所有附注。地理表 (a) 指向 United States 行，并不改变 Total 行；若选择地理表作总额出处，不强制读取其 OEM 地理分配脚注。",
+      "equivalence_rule_zh": "证据集合是已核验候选包，不强制每个标题块都出现。由来源元数据或可靠章节路径保留同等归属/期间上下文可以替代标题；新出处原文复核后可扩充。"
+    },
+    {
+      "case_id": "E1-05",
+      "query_zh": "请依据 Microsoft FY2025 10-K，提供三个报告分部及各自核心业务的原始材料，保留所属关系与必要限定，不要求所有产品清单。",
+      "scope": {
+        "company_id": "sec-0000789019",
+        "report_year": 2025,
+        "source_policy": "specified_report_business_scope"
+      },
+      "requirements": [
+        {
+          "id": "B1",
+          "meaning_zh": "三个报告分部：Productivity and Business Processes、Intelligent Cloud、More Personal Computing；不能把产品或跨分部指标当成第四个分部。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0086"
+            ],
+            [
+              "E0550"
+            ],
+            [
+              "E1181"
+            ]
+          ],
+          "why_omission_hurts_zh": "缺分部身份，产品、组合指标可能被误升为分部。"
+        },
+        {
+          "id": "B2",
+          "meaning_zh": "PBP：Microsoft 365 Commercial、Microsoft 365 Consumer、LinkedIn、Dynamics 四个核心组合，并保留其归属。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0090",
+              "E0091",
+              "E0093",
+              "E0095",
+              "E0097",
+              "E0099"
+            ],
+            [
+              "E1184",
+              "E1185",
+              "E1187",
+              "E1189",
+              "E1191",
+              "E1193"
+            ]
+          ],
+          "facets": [
+            "Microsoft 365 Commercial products and cloud services",
+            "Microsoft 365 Consumer products and cloud services",
+            "LinkedIn",
+            "Dynamics products and cloud services"
+          ],
+          "why_omission_hurts_zh": "四个顶层组合缺一个，就会遗漏该分部的一项核心业务；不要求每个子产品各建节点。"
+        },
+        {
+          "id": "B3",
+          "meaning_zh": "Intelligent Cloud：Server products and cloud services（含 Azure and other cloud services 及服务器产品）和 Enterprise and partner services 两类；不能只给 Azure。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0117",
+              "E0118",
+              "E0120",
+              "E0122"
+            ],
+            [
+              "E1197",
+              "E1198",
+              "E1200",
+              "E1202"
+            ]
+          ],
+          "facets": [
+            "Server products and cloud services",
+            "Azure and other cloud services",
+            "Server products",
+            "Enterprise and partner services"
+          ],
+          "why_omission_hurts_zh": "只保留Azure会漏本地服务器产品及企业伙伴服务两部分。"
+        },
+        {
+          "id": "B4",
+          "meaning_zh": "More Personal Computing：Windows and Devices、Gaming、Search and news advertising 三类，并保留其归属。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0143",
+              "E0144",
+              "E0146",
+              "E0148",
+              "E0150"
+            ],
+            [
+              "E1203",
+              "E1204",
+              "E1206",
+              "E1208",
+              "E1210"
+            ]
+          ],
+          "facets": [
+            "Windows and Devices",
+            "Gaming",
+            "Search and news advertising"
+          ],
+          "why_omission_hurts_zh": "只给Windows或Gaming会漏另外核心组合，无法覆盖分部全貌。"
+        }
+      ],
+      "conditional_context": [
+        {
+          "trigger": "与 FY2024 的分部对比，或解释 Windows 商业成分归属变化",
+          "required_evidence_sets": [
+            [
+              "E0087"
+            ],
+            [
+              "E0551"
+            ],
+            [
+              "E0817"
+            ]
+          ],
+          "reason_zh": "FY2025 分部口径重排，Microsoft 365 的商业组成集中到 PBP。"
+        },
+        {
+          "trigger": "交付表中含 FY2024 分部金额",
+          "required_evidence_sets": [
+            [
+              "E0551"
+            ],
+            [
+              "E0817"
+            ]
+          ],
+          "reason_zh": "必须提示前期分部数字已按 FY2025 内部管理口径重列。"
+        }
+      ],
+      "optional_evidence": [
+        {
+          "sets": [
+            [
+              "E0127"
+            ]
+          ],
+          "note_zh": "用一个段落帮助解释 Azure 的业务作用。"
+        },
+        {
+          "sets": [
+            [
+              "E0101"
+            ],
+            [
+              "E0103"
+            ],
+            [
+              "E0108"
+            ],
+            [
+              "E0110"
+            ],
+            [
+              "E0132"
+            ]
+          ],
+          "note_zh": "用户不熟悉业务名称时可少量补充功能，不能机械全部追加。"
+        }
+      ],
+      "excess_zh": [
+        "Item 1 和 Note 18 同一份完整分部列表各交付一次。",
+        "所有竞对、所有增长驱动、费用分配或每个产品功能。",
+        "仅因出现 AI 而额外加入整段 AI 战略、OpenAI 合作和 Azure AI Foundry。"
+      ],
+      "misleading_zh": [
+        "把 Microsoft Cloud 当成报告分部。",
+        "只给收入类别表而不交代业务功能和分部归属。",
+        "把 Windows 所有产品都归 MPC，忽略 Windows Commercial 的区分。",
+        "把 GitHub、Azure AI Foundry 等全部提升为独立报告分部。"
+      ],
+      "granularity_policy_zh": "必需覆盖的是三个分部及其九个顶层业务组合。原文列表包含更细的产品名，完整保留原始段落可以接受；不按每个子产品强制新增独立节点，不以遗漏每个子产品名判整题失败。九组中 M365 Commercial、Consumer 各算一组；Intelligent Cloud 的两组、MPC 三组。",
+      "equivalence_rule_zh": "证据集合是已核验候选包，不强制每个标题块都出现。由来源元数据或可靠章节路径保留同等归属/期间上下文可以替代标题；新出处原文复核后可扩充。"
+    },
+    {
+      "case_id": "E1-06",
+      "query_zh": "请依据 Microsoft FY2025 10-K，提供 Microsoft Cloud、Intelligent Cloud 与 Azure 的口径定义及 FY2025 对应披露指标，明确金额/增长率差异，不推算未披露Azure收入。",
+      "scope": {
+        "company_id": "sec-0000789019",
+        "report_year": 2025,
+        "observation_period_ends": [
+          "2025-06-30"
+        ],
+        "source_policy": "specified_report_metrics_and_segments"
+      },
+      "requirements": [
+        {
+          "id": "C1",
+          "meaning_zh": "Microsoft Cloud 是包含 M365 Commercial cloud、Azure and other cloud services、LinkedIn 商业部分、Dynamics 365 的跨业务指标；FY2025 168.9 billion USD；不强制附 FY2024 金额。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E1227"
+            ]
+          ],
+          "fact": {
+            "fy2025_usd_billion": "168.9"
+          },
+          "why_omission_hurts_zh": "没有组成与金额，跨分部Microsoft Cloud可能被误当Intelligent Cloud。"
+        },
+        {
+          "id": "C2",
+          "meaning_zh": "Intelligent Cloud 是报告分部，范围包括 Server products and cloud services 以及 Enterprise and partner services；不能等同 Microsoft Cloud。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0117",
+              "E0118",
+              "E0120",
+              "E0122"
+            ],
+            [
+              "E1197",
+              "E1198",
+              "E1200",
+              "E1202"
+            ]
+          ],
+          "why_omission_hurts_zh": "没有服务器及伙伴服务边界，无法区分分部和云指标。"
+        },
+        {
+          "id": "C3",
+          "meaning_zh": "Intelligent Cloud 分部 FY2025 106,265 million USD，按 June 30 财年；不强制附 FY2024 金额。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E1217"
+            ],
+            [
+              "E0587"
+            ]
+          ],
+          "fact": {
+            "fy2025_usd_million": "106265"
+          },
+          "alternative_context_note": "E0587 需要另外保留 June 30 年度元数据。",
+          "why_omission_hurts_zh": "缺分部金额，无法对应题目要求的FY2025指标。"
+        },
+        {
+          "id": "C4",
+          "meaning_zh": "Azure and other cloud services 包含 cloud/AI consumption、GitHub cloud、Nuance Healthcare cloud、virtual desktop 和其他云服务；范围不是 Azure 单体，也不包括整个服务器产品组。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0120"
+            ],
+            [
+              "E1200"
+            ],
+            [
+              "E0564"
+            ]
+          ],
+          "why_omission_hurts_zh": "没有组合定义，34%容易被错误称为Azure单体增长。"
+        },
+        {
+          "id": "C5",
+          "meaning_zh": "该文件明确披露 Azure and other cloud services FY2025 收入增长 34%；不能把增长率当美元金额。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0613"
+            ]
+          ],
+          "fact": {
+            "metric": "Azure and other cloud services revenue growth",
+            "fy2025_percent": "34",
+            "comparison": "corresponding previous fiscal year"
+          },
+          "why_omission_hurts_zh": "缺指标/单位，无法区分披露增长与未披露绝对金额。"
+        },
+        {
+          "id": "C7",
+          "meaning_zh": "Azure 是供开发者、IT 专业人员及企业构建、部署、管理应用的云服务平台；其收入主要受 IaaS/PaaS 消费影响。Azure 产品定义与 Azure and other cloud services 财务组合定义分开。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E0127"
+            ]
+          ],
+          "why_omission_hurts_zh": "Azure本身和Azure and other cloud services不是同一个命名对象，只有组合定义不能完整回答产品平台定义。"
+        },
+        {
+          "id": "C6",
+          "meaning_zh": "区分指标重叠与可加总：这三个口径有包含/重叠，不是可相加得到公司收入的三个并列分部。",
+          "required": true,
+          "acceptable_evidence_sets": [
+            [
+              "E1227",
+              "E0120",
+              "E0122"
+            ],
+            [
+              "E1227",
+              "E1200",
+              "E1202"
+            ]
+          ],
+          "derived_judgment": true,
+          "why_omission_hurts_zh": "没有包含关系，使用者可能把重叠指标当可加总分部；这是从原文组成推导的检查，不要求原文恰好写不可相加。"
+        }
+      ],
+      "conditional_context": [
+        {
+          "trigger": "展示 FY2024 与 FY2025 分部可比性",
+          "required_evidence_sets": [
+            [
+              "E0551"
+            ],
+            [
+              "E0817"
+            ]
+          ],
+          "reason_zh": "FY2024 分部数字在 FY2025 报告中为重列口径。"
+        },
+        {
+          "trigger": "解释 98,435 / 79,828 million 是否等于 Azure 收入",
+          "required_evidence_sets": [
+            [
+              "E1226",
+              "E0120"
+            ],
+            [
+              "E1226",
+              "E1200"
+            ]
+          ],
+          "reason_zh": "这是 Server products and cloud services 大类，含服务器产品，不是 Azure 的单独金额。"
+        },
+        {
+          "trigger": "把 34% 标为实际同比而非固定汇率增长",
+          "required_evidence_sets": [
+            [
+              "E0557",
+              "E0613"
+            ]
+          ],
+          "reason_zh": "Metrics 说明增长对应上一财年期间；这里没有 constant currency 标签。"
+        }
+      ],
+      "optional_evidence": [
+        {
+          "sets": [
+            [
+              "E0561"
+            ]
+          ],
+          "note_zh": "Microsoft Cloud 定义表，是 E1227 的定义部分等价出处，但表本身没有收入金额。"
+        },
+        {
+          "sets": [
+            [
+              "E0128"
+            ]
+          ],
+          "note_zh": "只有需进一步解释 Azure AI/Foundry 时有用，本题不强制。"
+        }
+      ],
+      "excess_zh": [
+        "Azure 全部产品功能及竞争说明。",
+        "完整 PBP/MPC 产品名录。",
+        "所有收入、利润、毛利和费用表；只为口径区分没有必要。",
+        "将同一段 Microsoft Cloud 定义在 MD&A 与 Note 18 重复附上。"
+      ],
+      "misleading_zh": [
+        "Microsoft Cloud=Intelligent Cloud=Azure。",
+        "98,435 million 是 Azure FY2025 收入。",
+        "把 34% 应用于 Intelligent Cloud 或整个 Microsoft Cloud。",
+        "将 168.9、106.265 和未披露的 Azure 金额相加。"
+      ],
+      "negative_finding_zh": "本轮在选定 10-K 内的 Azure 全文匹配、业务说明、指标定义、MD&A、Note 18 数字表中，未找到 Azure 或 Azure and other cloud services 单独绝对金额；这是此原件内的有范围负面查找结论，不等于公司在财报新闻稿或其他官方渠道从未披露。不得给“负面事实”编造单一证明块。",
+      "equivalence_rule_zh": "证据集合是已核验候选包，不强制每个标题块都出现。由来源元数据或可靠章节路径保留同等归属/期间上下文可以替代标题；新出处原文复核后可扩充。"
+    }
+  ],
+  "evidence_catalog": {
+    "E0083": {
+      "ordinal": 83,
+      "candidate_block_id": "block-000083-495768bd",
+      "dom_path": "/html/body/div[14]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "PART I",
+      "original_text_sha256": "495768bd3d6957619d4fbe2457811a0483df9e815938bdd9fb195935ece1b264",
+      "index_text_matches_original_normalized": true
+    },
+    "E0084": {
+      "ordinal": 84,
+      "candidate_block_id": "block-000084-c5ddfeff",
+      "dom_path": "/html/body/div[14]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Item 1",
+      "original_text_sha256": "c5ddfeffb275254140796b8c080f372d65ebb1b0590e238b191f595d5fcd32ca",
+      "index_text_matches_original_normalized": true
+    },
+    "E0085": {
+      "ordinal": 85,
+      "candidate_block_id": "block-000085-2f5cfd00",
+      "dom_path": "/html/body/div[15]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "OPERATING SEGMENTS",
+      "original_text_sha256": "2f5cfd0027421a885a0d87a5d04f9b0d8858ff200263ef01ed7c0c3078164847",
+      "index_text_matches_original_normalized": true
+    },
+    "E0086": {
+      "ordinal": 86,
+      "candidate_block_id": "block-000086-935d6090",
+      "dom_path": "/html/body/div[15]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses.",
+      "original_text_sha256": "935d60904eb39710e00cb0d07e9c8f15556ba7d4792be8f0e005e28fdcc9c92f",
+      "index_text_matches_original_normalized": true
+    },
+    "E0087": {
+      "ordinal": 87,
+      "candidate_block_id": "block-000087-44aabdcd",
+      "dom_path": "/html/body/div[15]/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes.",
+      "original_text_sha256": "44aabdcda6f4b04c42224b6ae75148f50a2c1113a26a3b4004de54b5f65179b4",
+      "index_text_matches_original_normalized": true
+    },
+    "E0088": {
+      "ordinal": 88,
+      "candidate_block_id": "block-000088-8339c382",
+      "dom_path": "/html/body/div[15]/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Additional information on our operating segments and geographic and product information is contained in Note 18 – Segment Information and Geographic Data of the Notes to Financial Statements (Part II, Item 8 of this Form 10-K).",
+      "original_text_sha256": "8339c38282c50757ec1b7dc3bb8ae7c3b8a3fbf9c77033fb9762aa774543c23e",
+      "index_text_matches_original_normalized": true
+    },
+    "E0089": {
+      "ordinal": 89,
+      "candidate_block_id": "block-000089-352d4c96",
+      "dom_path": "/html/body/div[15]/p[5]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Our reportable segments are described below.",
+      "original_text_sha256": "352d4c9695094536bfaee575b0ea75367d93f89b434e0a8256c31abc3d9ce269",
+      "index_text_matches_original_normalized": true
+    },
+    "E0090": {
+      "ordinal": 90,
+      "candidate_block_id": "block-000090-94a2e06c",
+      "dom_path": "/html/body/div[15]/p[6]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Productivity and Business Processes",
+      "original_text_sha256": "94a2e06cbe413c1e0742016cfc2688049e77680cbbe06c7bdca7fa26fbcded88",
+      "index_text_matches_original_normalized": true
+    },
+    "E0091": {
+      "ordinal": 91,
+      "candidate_block_id": "block-000091-d993f813",
+      "dom_path": "/html/body/div[15]/p[7]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:",
+      "original_text_sha256": "d993f813170ccba6b56ef55f21d23a571600f3e3997733ba6230381a8cdeb7b2",
+      "index_text_matches_original_normalized": true
+    },
+    "E0092": {
+      "ordinal": 92,
+      "candidate_block_id": "block-000092-4f8865ab",
+      "dom_path": "/html/body/div[15]/div[1]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0093": {
+      "ordinal": 93,
+      "candidate_block_id": "block-000093-7018adaa",
+      "dom_path": "/html/body/div[15]/div[1]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises.",
+      "original_text_sha256": "7018adaab1771400d012d62f1d71beaaf43645407f6d794872fd87001e9c4bde",
+      "index_text_matches_original_normalized": true
+    },
+    "E0094": {
+      "ordinal": 94,
+      "candidate_block_id": "block-000094-4f8865ab",
+      "dom_path": "/html/body/div[15]/div[2]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0095": {
+      "ordinal": 95,
+      "candidate_block_id": "block-000095-61bd513b",
+      "dom_path": "/html/body/div[15]/div[2]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services.",
+      "original_text_sha256": "61bd513b7ff69104bce0b7c1e0bdb29e8d8f9ada2b9b0d1368f2554de078f784",
+      "index_text_matches_original_normalized": true
+    },
+    "E0096": {
+      "ordinal": 96,
+      "candidate_block_id": "block-000096-4f8865ab",
+      "dom_path": "/html/body/div[15]/div[3]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0097": {
+      "ordinal": 97,
+      "candidate_block_id": "block-000097-13124fb7",
+      "dom_path": "/html/body/div[15]/div[3]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions.",
+      "original_text_sha256": "13124fb73864f984aa690440624343f61d9931b2c234a3120641d0110adf30c3",
+      "index_text_matches_original_normalized": true
+    },
+    "E0098": {
+      "ordinal": 98,
+      "candidate_block_id": "block-000098-4f8865ab",
+      "dom_path": "/html/body/div[15]/div[4]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0099": {
+      "ordinal": 99,
+      "candidate_block_id": "block-000099-da3d48eb",
+      "dom_path": "/html/body/div[15]/div[4]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications.",
+      "original_text_sha256": "da3d48ebd71ff1df7005f49ca5852c5cee82aade24fd23ab92c60502783a2355",
+      "index_text_matches_original_normalized": true
+    },
+    "E0100": {
+      "ordinal": 100,
+      "candidate_block_id": "block-000100-36240328",
+      "dom_path": "/html/body/div[15]/p[8]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Microsoft 365 Commercial Products and Cloud Services",
+      "original_text_sha256": "36240328251d3e3edca2a5974ea6b3fc18b4246f88dd197ae89a9a390b9f78c9",
+      "index_text_matches_original_normalized": true
+    },
+    "E0101": {
+      "ordinal": 101,
+      "candidate_block_id": "block-000101-67803298",
+      "dom_path": "/html/body/div[15]/p[9]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Microsoft 365 Commercial is an AI-powered business and productivity solutions platform that brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security to help organizations empower their employees. Growth depends on our ability to reach new users in new markets such as frontline workers, small and medium businesses, and growth markets, as well as add AI-enabled tools, features, and agentic scenarios to our core product and service offerings across communication, collaboration, analytics, security, compliance, and other AI business productivity categories. Microsoft 365 Commercial revenue is mainly affected by a combination of continued installed base growth and average revenue per user expansion, as well as the continued shift from Office licensed on-premises to Microsoft 365.",
+      "original_text_sha256": "6780329863d5a23515b01856bcfff1f74f2385faa41f706c61c225db9bb34eb0",
+      "index_text_matches_original_normalized": true
+    },
+    "E0102": {
+      "ordinal": 102,
+      "candidate_block_id": "block-000102-83762012",
+      "dom_path": "/html/body/div[15]/p[10]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Microsoft 365 Consumer Products and Cloud Services",
+      "original_text_sha256": "83762012f8b897dcd83bb7b213cedc91a00afae988230bf9a0ac4a8220e0fd1d",
+      "index_text_matches_original_normalized": true
+    },
+    "E0103": {
+      "ordinal": 103,
+      "candidate_block_id": "block-000103-a597bcd9",
+      "dom_path": "/html/body/div[15]/p[11]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "Microsoft 365 Consumer is designed to increase personal productivity and creativity through a range of products and services. Growth depends on our ability to reach new users, add value to our core product set with new features including AI tools, and continue to expand our product and service offerings into new markets. Microsoft 365 Consumer cloud revenue and Office Consumer products revenue is mainly affected by the percentage of customers that buy Office with their new devices and the continued shift from Office licensed on-premises to Microsoft 365 Consumer subscriptions. Microsoft 365 Consumer cloud revenue is also affected by the demand for communication and storage through Outlook.com and OneDrive, which is largely driven by subscriptions and advertising.",
+      "original_text_sha256": "a597bcd909f9d5f121109e41762ff47af22edb5f1504c614244496d41bd98765",
+      "index_text_matches_original_normalized": true
+    },
+    "E0104": {
+      "ordinal": 104,
+      "candidate_block_id": "block-000104-ef2d127d",
+      "dom_path": "/html/body/div[16]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 5,
+      "original_text": "5",
+      "original_text_sha256": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+      "index_text_matches_original_normalized": true
+    },
+    "E0105": {
+      "ordinal": 105,
+      "candidate_block_id": "block-000105-495768bd",
+      "dom_path": "/html/body/div[17]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "PART I",
+      "original_text_sha256": "495768bd3d6957619d4fbe2457811a0483df9e815938bdd9fb195935ece1b264",
+      "index_text_matches_original_normalized": true
+    },
+    "E0106": {
+      "ordinal": 106,
+      "candidate_block_id": "block-000106-c5ddfeff",
+      "dom_path": "/html/body/div[17]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Item 1",
+      "original_text_sha256": "c5ddfeffb275254140796b8c080f372d65ebb1b0590e238b191f595d5fcd32ca",
+      "index_text_matches_original_normalized": true
+    },
+    "E0107": {
+      "ordinal": 107,
+      "candidate_block_id": "block-000107-dd84425b",
+      "dom_path": "/html/body/div[18]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "LinkedIn",
+      "original_text_sha256": "dd84425b72da12c6c828339ce814342daceac705b50d42e377e1acebf8f2320b",
+      "index_text_matches_original_normalized": true
+    },
+    "E0108": {
+      "ordinal": 108,
+      "candidate_block_id": "block-000108-ec73690d",
+      "dom_path": "/html/body/div[18]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "LinkedIn connects the world’s professionals to make them more productive and successful and transforms the way companies hire, market, sell, and learn. In addition to LinkedIn’s free services, LinkedIn offers monetized solutions designed to offer AI-enabled insights and productivity: Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions. Growth will depend on our ability to increase LinkedIn member engagement on the platform and our ability to continue offering insight and AI-enabled services that provide value for our members and customers. LinkedIn revenue is mainly affected by demand from enterprises and professionals for subscriptions to Talent Solutions, Sales Solutions, and Premium Subscriptions offerings, as well as member engagement and the quality of the sponsored content delivered to those members to drive Marketing Solutions.",
+      "original_text_sha256": "ec73690d30b9fa1f2d340c9cf6bb3192802da70dd4131f56d0c394aa5eb52aa1",
+      "index_text_matches_original_normalized": true
+    },
+    "E0109": {
+      "ordinal": 109,
+      "candidate_block_id": "block-000109-5aca154a",
+      "dom_path": "/html/body/div[18]/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Dynamics Products and Cloud Services",
+      "original_text_sha256": "5aca154a5c347a231ed558d6f19db8c8c3f0f9633df7c53236dd19e34aaccad7",
+      "index_text_matches_original_normalized": true
+    },
+    "E0110": {
+      "ordinal": 110,
+      "candidate_block_id": "block-000110-99cc951e",
+      "dom_path": "/html/body/div[18]/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Dynamics provides cloud-based and on-premises business solutions for financial management, enterprise resource planning (“ERP”), customer relationship management (“CRM”), and supply chain management, as well as agentic AI and other low code application development platforms, for small and medium businesses, large organizations, and divisions of global enterprises. Dynamics revenue is driven by the number of users licensed and applications consumed, expansion of average revenue per user, and the continued shift to Dynamics 365, a unified set of cloud-based intelligent business applications, including our low code development platforms, such as Power Apps and Power Automate.",
+      "original_text_sha256": "99cc951ee9e65cd5ea620ee8e7a1b298704b2b8562ceb6b1c77bc9d34dce1785",
+      "index_text_matches_original_normalized": true
+    },
+    "E0111": {
+      "ordinal": 111,
+      "candidate_block_id": "block-000111-44930333",
+      "dom_path": "/html/body/div[18]/p[5]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Competition",
+      "original_text_sha256": "449303332f88997ae6389add7de42f361aa69068157b81b78327e111fc7f63b0",
+      "index_text_matches_original_normalized": true
+    },
+    "E0112": {
+      "ordinal": 112,
+      "candidate_block_id": "block-000112-7c427d3a",
+      "dom_path": "/html/body/div[18]/p[6]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Competitors to Office include software and global application vendors, web-based and mobile application companies, AI-first application companies, as well as local application developers. We compete by providing secure, integrated industry-specific, and easy-to-use productivity and collaboration tools and services that create comprehensive solutions and work well with technologies our customers already have both on-premises or in the cloud.",
+      "original_text_sha256": "7c427d3a2300ee8affc8b7f6596f3dc6aeb3b0834b875526a3cd11c2011b0f47",
+      "index_text_matches_original_normalized": true
+    },
+    "E0113": {
+      "ordinal": 113,
+      "candidate_block_id": "block-000113-bc876fa1",
+      "dom_path": "/html/body/div[18]/p[7]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Windows faces competition from various software products and from alternative platforms and devices. Microsoft Defender for Endpoint competes with endpoint security solution providers.",
+      "original_text_sha256": "bc876fa1bdf9d1e2574a55ca6681b8188df845a8f87429eb53dabf9602aaeb17",
+      "index_text_matches_original_normalized": true
+    },
+    "E0114": {
+      "ordinal": 114,
+      "candidate_block_id": "block-000114-0cdf0fbd",
+      "dom_path": "/html/body/div[18]/p[8]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Our Enterprise Mobility + Security offerings compete with products from a range of competitors including identity vendors, security solution vendors, and numerous other security point solution vendors.",
+      "original_text_sha256": "0cdf0fbdbad223360d5182e757085d57a0b94daf68a9422519718b92b4b772c4",
+      "index_text_matches_original_normalized": true
+    },
+    "E0115": {
+      "ordinal": 115,
+      "candidate_block_id": "block-000115-aeccb0a6",
+      "dom_path": "/html/body/div[18]/p[9]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "LinkedIn faces competition from online professional networks; recruiting, talent management, and human resource services companies; job boards; companies that provide learning and development products and services; online and offline outlets that generate revenue from advertisers and marketers; and online and offline outlets for companies with lead generation and customer intelligence and insights.",
+      "original_text_sha256": "aeccb0a6d850778a9f4a597c8c38c71167078b3fca6358401f70f69a7f3a9e63",
+      "index_text_matches_original_normalized": true
+    },
+    "E0116": {
+      "ordinal": 116,
+      "candidate_block_id": "block-000116-338416e5",
+      "dom_path": "/html/body/div[18]/p[10]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Dynamics competes with cloud-based and on-premises business solution providers.",
+      "original_text_sha256": "338416e5bbc2e40c9e7ff2dba2994e20f0288bde8ed901676cbde8755dffd8f6",
+      "index_text_matches_original_normalized": true
+    },
+    "E0117": {
+      "ordinal": 117,
+      "candidate_block_id": "block-000117-925ee601",
+      "dom_path": "/html/body/div[18]/p[11]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Intelligent Cloud",
+      "original_text_sha256": "925ee6010a3a345fe7254c4a0afd9d3d6ee895065adf6733491fdfc7ea81b29e",
+      "index_text_matches_original_normalized": true
+    },
+    "E0118": {
+      "ordinal": 118,
+      "candidate_block_id": "block-000118-5e917062",
+      "dom_path": "/html/body/div[18]/p[12]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:",
+      "original_text_sha256": "5e917062d98a0c16faaba740b5332ca48d66d29ec417085265ec93005789e273",
+      "index_text_matches_original_normalized": true
+    },
+    "E0119": {
+      "ordinal": 119,
+      "candidate_block_id": "block-000119-4f8865ab",
+      "dom_path": "/html/body/div[18]/div[1]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0120": {
+      "ordinal": 120,
+      "candidate_block_id": "block-000120-c34f7245",
+      "dom_path": "/html/body/div[18]/div[1]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings.",
+      "original_text_sha256": "c34f7245fa9e88e6ae478ced0a0998fbba3c5cdfbf20ee4c78ae1a0d47c747bb",
+      "index_text_matches_original_normalized": true
+    },
+    "E0121": {
+      "ordinal": 121,
+      "candidate_block_id": "block-000121-4f8865ab",
+      "dom_path": "/html/body/div[18]/div[2]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0122": {
+      "ordinal": 122,
+      "candidate_block_id": "block-000122-c07a987e",
+      "dom_path": "/html/body/div[18]/div[2]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience.",
+      "original_text_sha256": "c07a987eb7f09b3a5158f3aa698c357965655a36d0d8f79f9559316e17d1a1cc",
+      "index_text_matches_original_normalized": true
+    },
+    "E0123": {
+      "ordinal": 123,
+      "candidate_block_id": "block-000123-e7f6c011",
+      "dom_path": "/html/body/div[19]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 6,
+      "original_text": "6",
+      "original_text_sha256": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+      "index_text_matches_original_normalized": true
+    },
+    "E0124": {
+      "ordinal": 124,
+      "candidate_block_id": "block-000124-495768bd",
+      "dom_path": "/html/body/div[20]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "PART I",
+      "original_text_sha256": "495768bd3d6957619d4fbe2457811a0483df9e815938bdd9fb195935ece1b264",
+      "index_text_matches_original_normalized": true
+    },
+    "E0125": {
+      "ordinal": 125,
+      "candidate_block_id": "block-000125-c5ddfeff",
+      "dom_path": "/html/body/div[20]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Item 1",
+      "original_text_sha256": "c5ddfeffb275254140796b8c080f372d65ebb1b0590e238b191f595d5fcd32ca",
+      "index_text_matches_original_normalized": true
+    },
+    "E0126": {
+      "ordinal": 126,
+      "candidate_block_id": "block-000126-60d9b18e",
+      "dom_path": "/html/body/div[21]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Server Products and Cloud Services",
+      "original_text_sha256": "60d9b18e7bf65cd843e329daceee7f92b39cab3dc17d37ece480254c2707e3a2",
+      "index_text_matches_original_normalized": true
+    },
+    "E0127": {
+      "ordinal": 127,
+      "candidate_block_id": "block-000127-93a9159b",
+      "dom_path": "/html/body/div[21]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use Azure through our global network of datacenters for computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning. Azure enables customers to devote more resources to development and use of applications that benefit their organizations, rather than managing on-premises hardware and software. Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services.",
+      "original_text_sha256": "93a9159b81c6d7c3a672279e63cea873f307a130c4ecd124e226024ab092e374",
+      "index_text_matches_original_normalized": true
+    },
+    "E0128": {
+      "ordinal": 128,
+      "candidate_block_id": "block-000128-edef168d",
+      "dom_path": "/html/body/div[21]/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents.",
+      "original_text_sha256": "edef168d00440bbe2b7ce09f7119b21cf4f00fa8754203706fd4e17038a83970",
+      "index_text_matches_original_normalized": true
+    },
+    "E0129": {
+      "ordinal": 129,
+      "candidate_block_id": "block-000129-264fa06b",
+      "dom_path": "/html/body/div[21]/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Our server products are designed to make IT professionals, developers, and their systems more productive and efficient. Server software is integrated server infrastructure and middleware designed to support software applications built on the Windows Server operating system. This includes the server platform, database, business intelligence, storage, management and operations, virtualization, service-oriented architecture platform, security, and identity software. We also license standalone and software development lifecycle tools for software architects, developers, testers, and project managers. Server products revenue is mainly affected by purchases through volume licensing programs, licenses sold to OEMs, and retail packaged products. CALs provide access rights to certain server products, including SQL Server and Windows Server, and revenue is reported along with the associated server product.",
+      "original_text_sha256": "264fa06b62f591e7ae1ae6fbc329d721f61da563df05e416ba1a13873de86d12",
+      "index_text_matches_original_normalized": true
+    },
+    "E0130": {
+      "ordinal": 130,
+      "candidate_block_id": "block-000130-8d7ff1f7",
+      "dom_path": "/html/body/div[21]/p[5]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry.",
+      "original_text_sha256": "8d7ff1f71b25f9da9e0bee5f5ae71b58ab1d7f70e6284af848eb159f1d414905",
+      "index_text_matches_original_normalized": true
+    },
+    "E0131": {
+      "ordinal": 131,
+      "candidate_block_id": "block-000131-155cf0a6",
+      "dom_path": "/html/body/div[21]/p[6]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Enterprise and Partner Services",
+      "original_text_sha256": "155cf0a62a7525bb79bf13d0f8cb9060af3c53dcf3678fd1b41abfd0d863d591",
+      "index_text_matches_original_normalized": true
+    },
+    "E0132": {
+      "ordinal": 132,
+      "candidate_block_id": "block-000132-f2659d3c",
+      "dom_path": "/html/body/div[21]/p[7]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience, assist customers in developing, deploying, and managing Microsoft server solutions, Microsoft desktop solutions, and Nuance conversational AI and ambient intelligent solutions, along with providing training and certification to developers and IT professionals on various Microsoft products.",
+      "original_text_sha256": "f2659d3c392325adba0f610648c5c338bbd78254a25b7a707f3cd939ff061446",
+      "index_text_matches_original_normalized": true
+    },
+    "E0133": {
+      "ordinal": 133,
+      "candidate_block_id": "block-000133-44930333",
+      "dom_path": "/html/body/div[21]/p[8]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Competition",
+      "original_text_sha256": "449303332f88997ae6389add7de42f361aa69068157b81b78327e111fc7f63b0",
+      "index_text_matches_original_normalized": true
+    },
+    "E0134": {
+      "ordinal": 134,
+      "candidate_block_id": "block-000134-9ca2b5c6",
+      "dom_path": "/html/body/div[21]/p[9]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition.",
+      "original_text_sha256": "9ca2b5c67504bec4ae9df2371d9bc9a723c67dcc21aa81867a7aea95e70c2b68",
+      "index_text_matches_original_normalized": true
+    },
+    "E0135": {
+      "ordinal": 135,
+      "candidate_block_id": "block-000135-0320c8fa",
+      "dom_path": "/html/body/div[21]/p[10]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "Our server products face competition from a wide variety of server operating systems and applications offered by companies with a range of market approaches. Vertically integrated computer manufacturers offer their own versions of the Unix operating system preinstalled on server hardware and nearly all computer manufacturers offer server hardware for the Linux operating system.",
+      "original_text_sha256": "0320c8fae337b682a7ccf3349ea53d739af8a64ad423b77cca740129f4dc95a8",
+      "index_text_matches_original_normalized": true
+    },
+    "E0136": {
+      "ordinal": 136,
+      "candidate_block_id": "block-000136-cb770dd8",
+      "dom_path": "/html/body/div[21]/p[11]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "We compete to provide enterprise-wide computing and point solutions with numerous commercial software vendors that offer solutions and middleware technology platforms, software applications for connectivity, security, hosting, database, and e-business servers.",
+      "original_text_sha256": "cb770dd8b84aa74b73ac812a9ca355ac61dc2ff197a86e1aace8af17495d6d0d",
+      "index_text_matches_original_normalized": true
+    },
+    "E0137": {
+      "ordinal": 137,
+      "candidate_block_id": "block-000137-7902699b",
+      "dom_path": "/html/body/div[22]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 7,
+      "original_text": "7",
+      "original_text_sha256": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+      "index_text_matches_original_normalized": true
+    },
+    "E0138": {
+      "ordinal": 138,
+      "candidate_block_id": "block-000138-495768bd",
+      "dom_path": "/html/body/div[23]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "PART I",
+      "original_text_sha256": "495768bd3d6957619d4fbe2457811a0483df9e815938bdd9fb195935ece1b264",
+      "index_text_matches_original_normalized": true
+    },
+    "E0139": {
+      "ordinal": 139,
+      "candidate_block_id": "block-000139-c5ddfeff",
+      "dom_path": "/html/body/div[23]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Item 1",
+      "original_text_sha256": "c5ddfeffb275254140796b8c080f372d65ebb1b0590e238b191f595d5fcd32ca",
+      "index_text_matches_original_normalized": true
+    },
+    "E0140": {
+      "ordinal": 140,
+      "candidate_block_id": "block-000140-4045a828",
+      "dom_path": "/html/body/div[24]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Our database, business intelligence, and data warehousing solutions offerings compete with products from providers in the data and analytics industry. Our system management solutions compete with server management and server virtualization platform providers. Our products for software developers compete against offerings from major technology providers, as well as open source alternatives.",
+      "original_text_sha256": "4045a828d5ce8fa43bb65f84b9d1c23885ed166d65bcebf9aedc6364544d1f0f",
+      "index_text_matches_original_normalized": true
+    },
+    "E0141": {
+      "ordinal": 141,
+      "candidate_block_id": "block-000141-879cac60",
+      "dom_path": "/html/body/div[24]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "We believe our server products provide customers with advantages in performance, total costs of ownership, and productivity by delivering superior applications, development tools, compatibility with a broad base of hardware and software applications, security, and manageability.",
+      "original_text_sha256": "879cac60e56dc3f0946a2eea198cb6f06466e7b2a737a2b938b33737861925d9",
+      "index_text_matches_original_normalized": true
+    },
+    "E0142": {
+      "ordinal": 142,
+      "candidate_block_id": "block-000142-3e738e53",
+      "dom_path": "/html/body/div[24]/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Our Enterprise and partner services business competes with a wide range of companies that provide strategy and business planning, application development, and infrastructure services, including multinational consulting firms and small niche businesses focused on specific technologies.",
+      "original_text_sha256": "3e738e537a6ba671c210d9708a833ffc4cd8a67a9ab774c2cb5b38f71020b859",
+      "index_text_matches_original_normalized": true
+    },
+    "E0143": {
+      "ordinal": 143,
+      "candidate_block_id": "block-000143-c67f142f",
+      "dom_path": "/html/body/div[24]/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "More Personal Computing",
+      "original_text_sha256": "c67f142f1ff0a8e0e21f763ca81edaa4b8c71ef43e8a41cf5ffe4103b273779f",
+      "index_text_matches_original_normalized": true
+    },
+    "E0144": {
+      "ordinal": 144,
+      "candidate_block_id": "block-000144-6e0ae0c4",
+      "dom_path": "/html/body/div[24]/p[5]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:",
+      "original_text_sha256": "6e0ae0c4087ac566b8e2f526bc149145e95f4512862546ec023ff089ee335a6a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0145": {
+      "ordinal": 145,
+      "candidate_block_id": "block-000145-4f8865ab",
+      "dom_path": "/html/body/div[24]/div[1]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0146": {
+      "ordinal": 146,
+      "candidate_block_id": "block-000146-c641cfcd",
+      "dom_path": "/html/body/div[24]/div[1]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories.",
+      "original_text_sha256": "c641cfcd89511a2dcaa3efc45af8ce2a8e4a95c7a34cdcb4df86c26459ed9de8",
+      "index_text_matches_original_normalized": true
+    },
+    "E0147": {
+      "ordinal": 147,
+      "candidate_block_id": "block-000147-4f8865ab",
+      "dom_path": "/html/body/div[24]/div[2]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0148": {
+      "ordinal": 148,
+      "candidate_block_id": "block-000148-2f215a60",
+      "dom_path": "/html/body/div[24]/div[2]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services.",
+      "original_text_sha256": "2f215a60d89b2281b04683e06c9d8b1cdc04d615d4f5cb1e3e8e8503f1fc29b0",
+      "index_text_matches_original_normalized": true
+    },
+    "E0149": {
+      "ordinal": 149,
+      "candidate_block_id": "block-000149-4f8865ab",
+      "dom_path": "/html/body/div[24]/div[3]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0150": {
+      "ordinal": 150,
+      "candidate_block_id": "block-000150-9577a591",
+      "dom_path": "/html/body/div[24]/div[3]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates.",
+      "original_text_sha256": "9577a59155b65ffacdf1a70f76e28abf25f1cd843349f28772698c166a47ec30",
+      "index_text_matches_original_normalized": true
+    },
+    "E0151": {
+      "ordinal": 151,
+      "candidate_block_id": "block-000151-1473b22a",
+      "dom_path": "/html/body/div[24]/p[6]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Windows and Devices",
+      "original_text_sha256": "1473b22a61abc862c9f172829638dbcd9ae9c7e74543a98855bb76a25200dd7c",
+      "index_text_matches_original_normalized": true
+    },
+    "E0152": {
+      "ordinal": 152,
+      "candidate_block_id": "block-000152-fc098ac9",
+      "dom_path": "/html/body/div[24]/p[7]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "The Windows operating system is designed to deliver a more personal computing experience for users by enabling consistency of experience, applications, and information across their devices. Windows OEM revenue is impacted significantly by the number of Windows operating system licenses purchased by OEMs, which they pre-install on the devices they sell. In addition to computing device market volume, Windows OEM revenue is impacted by:",
+      "original_text_sha256": "fc098ac9d9be7f8291823a4f7e1f0a3626efa9109bb46c4c803ec79f5a963652",
+      "index_text_matches_original_normalized": true
+    },
+    "E0153": {
+      "ordinal": 153,
+      "candidate_block_id": "block-000153-4f8865ab",
+      "dom_path": "/html/body/div[24]/div[4]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0154": {
+      "ordinal": 154,
+      "candidate_block_id": "block-000154-a1c5160e",
+      "dom_path": "/html/body/div[24]/div[4]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "The mix of computing devices based on form factor and screen size.",
+      "original_text_sha256": "a1c5160e100be85eeff8e536f3d82a42a920159ab1ec8ab66dbe2e6113df19bb",
+      "index_text_matches_original_normalized": true
+    },
+    "E0155": {
+      "ordinal": 155,
+      "candidate_block_id": "block-000155-4f8865ab",
+      "dom_path": "/html/body/div[24]/div[5]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0156": {
+      "ordinal": 156,
+      "candidate_block_id": "block-000156-e790ef4f",
+      "dom_path": "/html/body/div[24]/div[5]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 8,
+      "original_text": "Differences in device market demand between developed markets and growth markets.",
+      "original_text_sha256": "e790ef4f4635c15df5897f8727a00638fd786dfc9e8b797059188e7460ab0b68",
+      "index_text_matches_original_normalized": true
+    },
+    "E0548": {
+      "ordinal": 548,
+      "candidate_block_id": "block-000548-daf04b28",
+      "dom_path": "/html/body/div[108]/p[9]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 36,
+      "original_text": "Our revenue fluctuates quarterly and is generally higher in the fourth quarter of our fiscal year. Fourth quarter revenue is driven by a higher volume of multi-year contracts executed during the period.",
+      "original_text_sha256": "daf04b28e90a17fb29a4947a584cf2f29ed88be5b788b3b9b702b4846ed610c5",
+      "index_text_matches_original_normalized": true
+    },
+    "E0549": {
+      "ordinal": 549,
+      "candidate_block_id": "block-000549-a1f6d862",
+      "dom_path": "/html/body/div[108]/p[10]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 36,
+      "original_text": "Reportable Segments",
+      "original_text_sha256": "a1f6d862aeb50ffa0fc383bcdbe4c65bfa53c9bc8423b5563e0cb81f1667dbd3",
+      "index_text_matches_original_normalized": true
+    },
+    "E0550": {
+      "ordinal": 550,
+      "candidate_block_id": "block-000550-51fab0a0",
+      "dom_path": "/html/body/div[108]/p[11]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 36,
+      "original_text": "We report our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. The segment amounts included in MD&A are presented on a basis consistent with our internal management reporting.",
+      "original_text_sha256": "51fab0a0a4734e09d8995e8717859b0078da8a92e9aebcc446aa99d9fea1fd20",
+      "index_text_matches_original_normalized": true
+    },
+    "E0551": {
+      "ordinal": 551,
+      "candidate_block_id": "block-000551-65c0c622",
+      "dom_path": "/html/body/div[108]/p[12]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 36,
+      "original_text": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes. Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025.",
+      "original_text_sha256": "65c0c62276b194dd9ba33d52767604258acf9987a58aa6a04f90f698d29bf56a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0552": {
+      "ordinal": 552,
+      "candidate_block_id": "block-000552-59c451b2",
+      "dom_path": "/html/body/div[108]/p[13]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 36,
+      "original_text": "Additional information on our reportable segments is contained in Note 18 – Segment Information and Geographic Data of the Notes to Financial Statements (Part II, Item 8 of this Form 10-K).",
+      "original_text_sha256": "59c451b2a996b42b70e5a96cfbef90c009680d00b3fcac0a4045e473fb1430d6",
+      "index_text_matches_original_normalized": true
+    },
+    "E0553": {
+      "ordinal": 553,
+      "candidate_block_id": "block-000553-76a50887",
+      "dom_path": "/html/body/div[109]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 36,
+      "original_text": "36",
+      "original_text_sha256": "76a50887d8f1c2e9301755428990ad81479ee21c25b43215cf524541e0503269",
+      "index_text_matches_original_normalized": true
+    },
+    "E0554": {
+      "ordinal": 554,
+      "candidate_block_id": "block-000554-87b6a3b1",
+      "dom_path": "/html/body/div[110]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0555": {
+      "ordinal": 555,
+      "candidate_block_id": "block-000555-6fb2db0f",
+      "dom_path": "/html/body/div[110]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Item 7",
+      "original_text_sha256": "6fb2db0fe4c4a42049a9f54f18891d22a2b8523542ece709ba6c8284040592e7",
+      "index_text_matches_original_normalized": true
+    },
+    "E0556": {
+      "ordinal": 556,
+      "candidate_block_id": "block-000556-a58da793",
+      "dom_path": "/html/body/div[111]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Metrics",
+      "original_text_sha256": "a58da793c7250f1b3b8f8710efd7c7ee7e1a2dac4208f355dad42458a421e4ec",
+      "index_text_matches_original_normalized": true
+    },
+    "E0557": {
+      "ordinal": 557,
+      "candidate_block_id": "block-000557-f3be6766",
+      "dom_path": "/html/body/div[111]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "We use metrics in assessing the performance of our business and to make informed decisions regarding the allocation of resources. We disclose metrics to enable investors to evaluate progress against our ambitions, provide transparency into performance trends, and reflect the continued evolution of our products and services. Our commercial and other business metrics are fundamentally connected based on how customers use our products and services. The metrics are disclosed in the MD&A or the Notes to Financial Statements (Part II, Item 8 of this Form 10-K). Financial metrics are calculated based on financial results prepared in accordance with accounting principles generally accepted in the United States of America (“GAAP”), and growth comparisons relate to the corresponding period of last fiscal year.",
+      "original_text_sha256": "f3be676601a16546023d7e8ccc724ac0a15143cbb4fd4ddb89c78645c5463f26",
+      "index_text_matches_original_normalized": true
+    },
+    "E0558": {
+      "ordinal": 558,
+      "candidate_block_id": "block-000558-4e0fcd86",
+      "dom_path": "/html/body/div[111]/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "In the first quarter of fiscal year 2025, we made updates to our metrics in connection with the segment changes described above. These changes align our metrics with how we manage and monitor certain businesses. The key change was bringing the commercial components of Microsoft 365 together and creating a new Microsoft 365 Commercial cloud revenue growth metric. Other changes include combining Windows OEM and Devices into a single revenue growth metric that brings revenue from PC market-driven businesses together, as well as elevating our cloud revenue growth metrics to align to our strategic focus on cloud growth.",
+      "original_text_sha256": "4e0fcd863377309ed4f7b4454bfe036fe73812a72745e185420d50e1cc8a5b98",
+      "index_text_matches_original_normalized": true
+    },
+    "E0559": {
+      "ordinal": 559,
+      "candidate_block_id": "block-000559-ea7d0b76",
+      "dom_path": "/html/body/div[111]/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Commercial",
+      "original_text_sha256": "ea7d0b7634355f44b9d8380584d66eac54061f00a6d89342a5175c07eaeb4e19",
+      "index_text_matches_original_normalized": true
+    },
+    "E0560": {
+      "ordinal": 560,
+      "candidate_block_id": "block-000560-fa389669",
+      "dom_path": "/html/body/div[111]/p[5]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Our commercial business primarily consists of Server products and cloud services, Microsoft 365 Commercial products and cloud services, the commercial portion of LinkedIn, Dynamics products and cloud services, and Enterprise and partner services. Our commercial metrics allow management and investors to assess the overall health of our commercial business and include leading indicators of future performance.",
+      "original_text_sha256": "fa3896690ce45d7242601e137ba40b4238e06130915e724b452dc937b5ec709a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0561": {
+      "ordinal": 561,
+      "candidate_block_id": "block-000561-0169b853",
+      "dom_path": "/html/body/div[111]/table[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Commercial remaining performance obligation Commercial portion of revenue allocated to remaining performance obligations, which includes unearned revenue and amounts that will be invoiced and recognized as revenue in future periods Microsoft Cloud revenue and revenue growth Revenue from Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365 Microsoft Cloud gross margin percentage Gross margin percentage for our Microsoft Cloud business",
+      "original_text_sha256": "0169b85342155af384dbd30e03d0d654f85d91de2bd2ab6bd602a80ae317343a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0562": {
+      "ordinal": 562,
+      "candidate_block_id": "block-000562-05d52d4a",
+      "dom_path": "/html/body/div[111]/p[8]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Productivity and Business Processes and Intelligent Cloud",
+      "original_text_sha256": "05d52d4a2af75b4bfa4ba5546891c76b4895e340351821eb785cb20cc2ee340f",
+      "index_text_matches_original_normalized": true
+    },
+    "E0563": {
+      "ordinal": 563,
+      "candidate_block_id": "block-000563-764717a6",
+      "dom_path": "/html/body/div[111]/p[9]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Metrics related to our Productivity and Business Processes and Intelligent Cloud segments assess the health of our core businesses within these segments. The metrics primarily reflect growth across our cloud services.",
+      "original_text_sha256": "764717a6bc1ec9df631cba43ba9d1b2ca3c23e4868e22311d71a4b39eb6769d2",
+      "index_text_matches_original_normalized": true
+    },
+    "E0564": {
+      "ordinal": 564,
+      "candidate_block_id": "block-000564-5a5acdbe",
+      "dom_path": "/html/body/div[111]/table[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "Microsoft 365 Commercial cloud revenue growth Revenue from Microsoft 365 Commercial subscriptions, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot Microsoft 365 Commercial seat growth The number of Microsoft 365 Commercial seats at end of period where seats are paid users covered by a Microsoft 365 Commercial subscription Microsoft 365 Consumer cloud revenue growth Revenue from Microsoft 365 Consumer subscriptions and other consumer services Microsoft 365 Consumer subscribers The number of Microsoft 365 Consumer subscribers at end of period LinkedIn revenue growth Revenue from LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions Dynamics 365 revenue growth Revenue from Dynamics 365, including a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate Azure and other cloud services revenue growth Revenue from Azure and other cloud services, including cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services",
+      "original_text_sha256": "5a5acdbe1e59d87394246bd34879d3d86e1b775ccb64d242cff6d452f9db2a68",
+      "index_text_matches_original_normalized": true
+    },
+    "E0565": {
+      "ordinal": 565,
+      "candidate_block_id": "block-000565-7a61b537",
+      "dom_path": "/html/body/div[112]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 37,
+      "original_text": "37",
+      "original_text_sha256": "7a61b53701befdae0eeeffaecc73f14e20b537bb0f8b91ad7c2936dc63562b25",
+      "index_text_matches_original_normalized": true
+    },
+    "E0566": {
+      "ordinal": 566,
+      "candidate_block_id": "block-000566-87b6a3b1",
+      "dom_path": "/html/body/div[113]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0570": {
+      "ordinal": 570,
+      "candidate_block_id": "block-000570-c6c67598",
+      "dom_path": "/html/body/div[114]/table[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Windows OEM and Devices revenue growth Revenue from sales of Windows Pro and non-Pro licenses sold through the OEM channel and sales of first-party Devices, including Surface and PC accessories Xbox content and services revenue growth Revenue from Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services Search and news advertising revenue (ex TAC) growth Revenue from search and news advertising excluding traffic acquisition costs (“TAC”) paid to Bing Ads network publishers and news partners",
+      "original_text_sha256": "c6c67598e9b097f8afd79a2b2e7e74483294a3e732ea992b9b8406dfe7892bc6",
+      "index_text_matches_original_normalized": true
+    },
+    "E0571": {
+      "ordinal": 571,
+      "candidate_block_id": "block-000571-6f424a7f",
+      "dom_path": "/html/body/div[114]/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "SUMMARY RESULTS OF OPERATIONS",
+      "original_text_sha256": "6f424a7fefe768ca5bab1f53215965546224f04701661f7da470d7103e906ce5",
+      "index_text_matches_original_normalized": true
+    },
+    "E0572": {
+      "ordinal": 572,
+      "candidate_block_id": "block-000572-6c81003e",
+      "dom_path": "/html/body/div[114]/table[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "(In millions, except percentages and per share amounts) 2025 2024 PercentageChange Revenue $ 281,724 $ 245,122 15% Gross margin 193,893 171,008 13% Operating income 128,528 109,433 17% Net income 101,832 88,136 16% Diluted earnings per share 13.64 11.80 16%",
+      "original_text_sha256": "6c81003e335942e5267ae796f187ea2458bef8a9f006e16094faa5a212e2abff",
+      "index_text_matches_original_normalized": true
+    },
+    "E0573": {
+      "ordinal": 573,
+      "candidate_block_id": "block-000573-c433c86c",
+      "dom_path": "/html/body/div[114]/p[7]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Fiscal Year 2025 Compared with Fiscal Year 2024",
+      "original_text_sha256": "c433c86c28ea26506c88b2ff396ff4a44dad69622f30270b159fb33464114c0a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0574": {
+      "ordinal": 574,
+      "candidate_block_id": "block-000574-be03b245",
+      "dom_path": "/html/body/div[114]/p[8]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Revenue increased $36.6 billion or 15% with growth across each of our segments. Intelligent Cloud revenue increased driven by Azure. Productivity and Business Processes revenue increased driven by Microsoft 365 Commercial cloud. More Personal Computing revenue increased driven by Gaming and Search and news advertising.",
+      "original_text_sha256": "be03b245809a2071c284f1313f99560345d158d5e5d3c020fac61e17d62d17b5",
+      "index_text_matches_original_normalized": true
+    },
+    "E0575": {
+      "ordinal": 575,
+      "candidate_block_id": "block-000575-34a8327b",
+      "dom_path": "/html/body/div[114]/p[9]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Cost of revenue increased $13.7 billion or 19% driven by growth in Microsoft Cloud.",
+      "original_text_sha256": "34a8327ba9f6ca0f458d83c7e29a0caf4bc2703ee557a90c91965de74538f052",
+      "index_text_matches_original_normalized": true
+    },
+    "E0576": {
+      "ordinal": 576,
+      "candidate_block_id": "block-000576-3e6226d0",
+      "dom_path": "/html/body/div[114]/p[10]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Gross margin increased $22.9 billion or 13% with growth across each of our segments.",
+      "original_text_sha256": "3e6226d0b63b2358993c6e1bb5e4932f1127b7b0ef4d1f0768b3fb71c85a3485",
+      "index_text_matches_original_normalized": true
+    },
+    "E0577": {
+      "ordinal": 577,
+      "candidate_block_id": "block-000577-4f8865ab",
+      "dom_path": "/html/body/div[114]/div[1]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0578": {
+      "ordinal": 578,
+      "candidate_block_id": "block-000578-199fb5f9",
+      "dom_path": "/html/body/div[114]/div[1]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Gross margin percentage decreased slightly driven by Intelligent Cloud, offset in part by More Personal Computing.",
+      "original_text_sha256": "199fb5f972feeffa0f0a26874e7ee56a47b7b04234a4db8dd517e70a6870a79e",
+      "index_text_matches_original_normalized": true
+    },
+    "E0579": {
+      "ordinal": 579,
+      "candidate_block_id": "block-000579-4f8865ab",
+      "dom_path": "/html/body/div[114]/div[2]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0580": {
+      "ordinal": 580,
+      "candidate_block_id": "block-000580-d829cf56",
+      "dom_path": "/html/body/div[114]/div[2]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Microsoft Cloud gross margin percentage decreased to 69% driven by the impact of scaling our AI infrastructure, offset in part by efficiency gains in Azure.",
+      "original_text_sha256": "d829cf568dc4dbaca6ffbe40fb41b250cccf4cd2085f1696e852d45fbfd7620e",
+      "index_text_matches_original_normalized": true
+    },
+    "E0581": {
+      "ordinal": 581,
+      "candidate_block_id": "block-000581-1cf3f5ac",
+      "dom_path": "/html/body/div[114]/p[11]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Operating expenses increased $3.8 billion or 6% driven by investments in cloud and AI engineering and Gaming, including the impact of the Activision Blizzard acquisition.",
+      "original_text_sha256": "1cf3f5ac6c2837a69e29fdaa51d3e16056b1d56e993ceb86af521e4c1276d4aa",
+      "index_text_matches_original_normalized": true
+    },
+    "E0582": {
+      "ordinal": 582,
+      "candidate_block_id": "block-000582-65489f75",
+      "dom_path": "/html/body/div[114]/p[12]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "Operating income increased $19.1 billion or 17% with growth across each of our segments.",
+      "original_text_sha256": "65489f753c56b86b5a8c73ca68e2f29a686cf9fed879c820713cb30954462b21",
+      "index_text_matches_original_normalized": true
+    },
+    "E0583": {
+      "ordinal": 583,
+      "candidate_block_id": "block-000583-aea92132",
+      "dom_path": "/html/body/div[115]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 38,
+      "original_text": "38",
+      "original_text_sha256": "aea92132c4cbeb263e6ac2bf6c183b5d81737f179f21efdc5863739672f0f470",
+      "index_text_matches_original_normalized": true
+    },
+    "E0584": {
+      "ordinal": 584,
+      "candidate_block_id": "block-000584-87b6a3b1",
+      "dom_path": "/html/body/div[116]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 39,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0585": {
+      "ordinal": 585,
+      "candidate_block_id": "block-000585-6fb2db0f",
+      "dom_path": "/html/body/div[116]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 39,
+      "original_text": "Item 7",
+      "original_text_sha256": "6fb2db0fe4c4a42049a9f54f18891d22a2b8523542ece709ba6c8284040592e7",
+      "index_text_matches_original_normalized": true
+    },
+    "E0586": {
+      "ordinal": 586,
+      "candidate_block_id": "block-000586-41e503f4",
+      "dom_path": "/html/body/div[117]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 39,
+      "original_text": "SEGMENT RESULTS OF OPERATIONS",
+      "original_text_sha256": "41e503f424d4a7af2564658a24598c017ae007ae95d3587c6e73686ab9f9280f",
+      "index_text_matches_original_normalized": true
+    },
+    "E0587": {
+      "ordinal": 587,
+      "candidate_block_id": "block-000587-59d50164",
+      "dom_path": "/html/body/div[117]/table",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 39,
+      "original_text": "(In millions, except percentages) 2025 2024 PercentageChange Productivity and Business Processes Revenue $ 120,810 $ 106,820 13% Cost of revenue 22,422 19,611 14% Operating expenses 28,615 27,548 4% Operating Income $ 69,773 $ 59,661 17% Intelligent Cloud Revenue $ 106,265 $ 87,464 21% Cost of revenue 40,171 29,611 36% Operating expenses 21,505 20,040 7% Operating Income $ 44,589 $ 37,813 18% More Personal Computing Revenue $ 54,649 $ 50,838 7% Cost of revenue 25,238 24,892 1% Operating expenses 15,245 13,987 9% Operating Income $ 14,166 $ 11,959 18% Total Revenue $ 281,724 $ 245,122 15% Cost of revenue 87,831 74,114 19% Operating expenses 65,365 61,575 6% Operating Income $ 128,528 $ 109,433 17%",
+      "original_text_sha256": "59d501645f4054e0344e5fd0abce5189fdc7f12c0f48f774e8d7c99ff863b6cb",
+      "index_text_matches_original_normalized": true
+    },
+    "E0588": {
+      "ordinal": 588,
+      "candidate_block_id": "block-000588-a1f6d862",
+      "dom_path": "/html/body/div[117]/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 39,
+      "original_text": "Reportable Segments",
+      "original_text_sha256": "a1f6d862aeb50ffa0fc383bcdbe4c65bfa53c9bc8423b5563e0cb81f1667dbd3",
+      "index_text_matches_original_normalized": true
+    },
+    "E0589": {
+      "ordinal": 589,
+      "candidate_block_id": "block-000589-c433c86c",
+      "dom_path": "/html/body/div[117]/p[5]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 39,
+      "original_text": "Fiscal Year 2025 Compared with Fiscal Year 2024",
+      "original_text_sha256": "c433c86c28ea26506c88b2ff396ff4a44dad69622f30270b159fb33464114c0a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0609": {
+      "ordinal": 609,
+      "candidate_block_id": "block-000609-6fb2db0f",
+      "dom_path": "/html/body/div[119]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "Item 7",
+      "original_text_sha256": "6fb2db0fe4c4a42049a9f54f18891d22a2b8523542ece709ba6c8284040592e7",
+      "index_text_matches_original_normalized": true
+    },
+    "E0610": {
+      "ordinal": 610,
+      "candidate_block_id": "block-000610-925ee601",
+      "dom_path": "/html/body/div[120]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "Intelligent Cloud",
+      "original_text_sha256": "925ee6010a3a345fe7254c4a0afd9d3d6ee895065adf6733491fdfc7ea81b29e",
+      "index_text_matches_original_normalized": true
+    },
+    "E0611": {
+      "ordinal": 611,
+      "candidate_block_id": "block-000611-8968a2bf",
+      "dom_path": "/html/body/div[120]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "Revenue increased $18.8 billion or 21%.",
+      "original_text_sha256": "8968a2bf21c652af75b662c0344029d160d4dce8cc662e8ddbda1dddea5e1551",
+      "index_text_matches_original_normalized": true
+    },
+    "E0612": {
+      "ordinal": 612,
+      "candidate_block_id": "block-000612-4f8865ab",
+      "dom_path": "/html/body/div[120]/div[1]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0613": {
+      "ordinal": 613,
+      "candidate_block_id": "block-000613-2b412f2d",
+      "dom_path": "/html/body/div[120]/div[1]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "Server products and cloud services revenue increased $18.6 billion or 23% driven by Azure and other cloud services. Azure and other cloud services revenue grew 34% driven by demand for our portfolio of services. Server products revenue decreased 3% driven by a decrease in transactional purchasing with continued customer shift to cloud offerings.",
+      "original_text_sha256": "2b412f2dcf2414593e033d7da216e09c6ef3e6404c6f384e297ea2ec54798f8e",
+      "index_text_matches_original_normalized": true,
+      "suggested_quote_spans": [
+        {
+          "char_start": 116,
+          "char_end": 211,
+          "quote": "Azure and other cloud services revenue grew 34% driven by demand for our portfolio of services."
+        }
+      ]
+    },
+    "E0614": {
+      "ordinal": 614,
+      "candidate_block_id": "block-000614-4f8865ab",
+      "dom_path": "/html/body/div[120]/div[2]/span",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E0615": {
+      "ordinal": 615,
+      "candidate_block_id": "block-000615-f2839461",
+      "dom_path": "/html/body/div[120]/div[2]/div",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "Enterprise and partner services revenue increased $166 million or 2% driven by growth in Enterprise Support Services, offset in part by a decline in Industry Solutions.",
+      "original_text_sha256": "f2839461eece0a5ad93a91bfc576844448ff1db9b4e927cd3b8405a513d4b81e",
+      "index_text_matches_original_normalized": true
+    },
+    "E0616": {
+      "ordinal": 616,
+      "candidate_block_id": "block-000616-b682a4da",
+      "dom_path": "/html/body/div[120]/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 40,
+      "original_text": "Operating income increased $6.8 billion or 18%.",
+      "original_text_sha256": "b682a4dadcf8d0a5e0ac77201c6f3595ceaf485116c4654579dc57415e2f4841",
+      "index_text_matches_original_normalized": true
+    },
+    "E0774": {
+      "ordinal": 774,
+      "candidate_block_id": "block-000774-f570bdb0",
+      "dom_path": "/html/body/div[147]/p[13]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 49,
+      "original_text": "The following table sets forth the potential loss in future earnings or fair values, including associated derivatives, resulting from hypothetical changes in relevant market rates or prices:",
+      "original_text_sha256": "f570bdb0242dad3b664802fc27d55b3bf438c2a0d673e5bba7e9773550fb52ae",
+      "index_text_matches_original_normalized": true
+    },
+    "E0775": {
+      "ordinal": 775,
+      "candidate_block_id": "block-000775-c74f179e",
+      "dom_path": "/html/body/div[147]/table",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 49,
+      "original_text": "(In millions) Risk Categories Hypothetical Change June 30,2025 Impact Foreign currency – Revenue 10% decrease in foreign exchange rates $ (11,596 ) Earnings Foreign currency – Investments 10% decrease in foreign exchange rates (17 ) Fair Value Interest rate 100 basis point increase in U.S. treasury interest rates (1,415 ) Fair Value Credit 100 basis point increase in credit spreads (436 ) Fair Value Equity 10% decrease in equity market prices (1,213 ) Earnings",
+      "original_text_sha256": "c74f179ec4c00ad5077340b119f3d50bc6d6a68fc713684e86342e506030b0bc",
+      "index_text_matches_original_normalized": true
+    },
+    "E0776": {
+      "ordinal": 776,
+      "candidate_block_id": "block-000776-0e17daca",
+      "dom_path": "/html/body/div[148]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 49,
+      "original_text": "49",
+      "original_text_sha256": "0e17daca5f3e175f448bacace3bc0da47d0655a74c8dd0dc497a3afbdad95f1f",
+      "index_text_matches_original_normalized": true
+    },
+    "E0777": {
+      "ordinal": 777,
+      "candidate_block_id": "block-000777-87b6a3b1",
+      "dom_path": "/html/body/div[149]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 50,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0778": {
+      "ordinal": 778,
+      "candidate_block_id": "block-000778-cfc3637b",
+      "dom_path": "/html/body/div[149]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 50,
+      "original_text": "Item 8",
+      "original_text_sha256": "cfc3637bd6712da85137c80600e5290f49cd064e68ace3151e1ed788f06aa67d",
+      "index_text_matches_original_normalized": true
+    },
+    "E0779": {
+      "ordinal": 779,
+      "candidate_block_id": "block-000779-9d7720d5",
+      "dom_path": "/html/body/div[150]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 50,
+      "original_text": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA",
+      "original_text_sha256": "9d7720d5379ec2b3ce27d07bad3ba39185679ea02025f2fed30d3775b9d195a3",
+      "index_text_matches_original_normalized": true
+    },
+    "E0780": {
+      "ordinal": 780,
+      "candidate_block_id": "block-000780-cdef2bac",
+      "dom_path": "/html/body/div[150]/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 50,
+      "original_text": "INCOME STATEMENTS",
+      "original_text_sha256": "cdef2bacb10e903b53218ee5415fbcfad0a0e259028aa425a73b569c5799bc36",
+      "index_text_matches_original_normalized": true
+    },
+    "E0781": {
+      "ordinal": 781,
+      "candidate_block_id": "block-000781-9ee5633d",
+      "dom_path": "/html/body/div[150]/table",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 50,
+      "original_text": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 Revenue: Product $ 63,946 $ 64,773 $ 64,699 Service and other 217,778 180,349 147,216 Total revenue 281,724 245,122 211,915 Cost of revenue: Product 13,501 15,272 17,804 Service and other 74,330 58,842 48,059 Total cost of revenue 87,831 74,114 65,863 Gross margin 193,893 171,008 146,052 Research and development 32,488 29,510 27,195 Sales and marketing 25,654 24,456 22,759 General and administrative 7,223 7,609 7,575 Operating income 128,528 109,433 88,523 Other income (expense), net (4,901 ) (1,646 ) 788 Income before income taxes 123,627 107,787 89,311 Provision for income taxes 21,795 19,651 16,950 Net income $ 101,832 $ 88,136 $ 72,361 Earnings per share: Basic $ 13.70 $ 11.86 $ 9.72 Diluted $ 13.64 $ 11.80 $ 9.68 Weighted average shares outstanding: Basic 7,433 7,431 7,446 Diluted 7,465 7,469 7,472",
+      "original_text_sha256": "9ee5633df804a67fca8110856500b749499f0408c6de3bab307db9fe9e650961",
+      "index_text_matches_original_normalized": true,
+      "suggested_quote_spans": [
+        {
+          "char_start": 0,
+          "char_end": 39,
+          "quote": "(In millions, except per share amounts)"
+        },
+        {
+          "char_start": 40,
+          "char_end": 74,
+          "quote": "Year Ended June 30, 2025 2024 2023"
+        },
+        {
+          "char_start": 161,
+          "char_end": 198,
+          "quote": "Total revenue 281,724 245,122 211,915"
+        }
+      ]
+    },
+    "E0782": {
+      "ordinal": 782,
+      "candidate_block_id": "block-000782-66ed816b",
+      "dom_path": "/html/body/div[150]/p[5]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 50,
+      "original_text": "Refer to accompanying notes.",
+      "original_text_sha256": "66ed816b11adb00cd21183111adf1630c3b92aedf1ff45ed2293c758e673ecb4",
+      "index_text_matches_original_normalized": true
+    },
+    "E0783": {
+      "ordinal": 783,
+      "candidate_block_id": "block-000783-1a656259",
+      "dom_path": "/html/body/div[151]/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 50,
+      "original_text": "50",
+      "original_text_sha256": "1a6562590ef19d1045d06c4055742d38288e9e6dcd71ccde5cee80f1d5a774eb",
+      "index_text_matches_original_normalized": true
+    },
+    "E0784": {
+      "ordinal": 784,
+      "candidate_block_id": "block-000784-87b6a3b1",
+      "dom_path": "/html/body/div[152]/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 51,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0811": {
+      "ordinal": 811,
+      "candidate_block_id": "block-000811-12435452",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "NOTE 1 — ACCOUNTING POLICIES",
+      "original_text_sha256": "12435452cb60d18e8c9e7aa508543787b2b9a6246386d8a676ade5e697cd7207",
+      "index_text_matches_original_normalized": true
+    },
+    "E0812": {
+      "ordinal": 812,
+      "candidate_block_id": "block-000812-25c6b5cc",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[1]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Accounting Principles",
+      "original_text_sha256": "25c6b5cce853b472e7a0426d54d18a661d5e45fbb2a093d6bc907baa8c997c53",
+      "index_text_matches_original_normalized": true
+    },
+    "E0813": {
+      "ordinal": 813,
+      "candidate_block_id": "block-000813-86814fe3",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[1]/ix:nonnumeric/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Our consolidated financial statements and accompanying notes are prepared in accordance with accounting principles generally accepted in the United States of America (“GAAP”).",
+      "original_text_sha256": "86814fe3bba9973fca40ff5bcb68c4e4a2dfb9b58b4f931fb4211ae75f2089e3",
+      "index_text_matches_original_normalized": true
+    },
+    "E0814": {
+      "ordinal": 814,
+      "candidate_block_id": "block-000814-f173f73a",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[2]/ix:nonnumeric/p",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Principles of Consolidation",
+      "original_text_sha256": "f173f73a16aa3275fa1a5a1dd156a3305423f0634fc8da7df2817c989b95b9f9",
+      "index_text_matches_original_normalized": true
+    },
+    "E0815": {
+      "ordinal": 815,
+      "candidate_block_id": "block-000815-a9d394c1",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "The consolidated financial statements include the accounts of Microsoft Corporation and its subsidiaries. Intercompany transactions and balances have been eliminated.",
+      "original_text_sha256": "a9d394c1ec3d4f0f9c16e1e298109702bed81fe20f33caf866a440975ea60a3d",
+      "index_text_matches_original_normalized": true
+    },
+    "E0816": {
+      "ordinal": 816,
+      "candidate_block_id": "block-000816-8d9f4520",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Recast of Certain Prior Period Information",
+      "original_text_sha256": "8d9f4520480dc9b2e1c51062615526503535c456a45959b1243c67e5e272cd84",
+      "index_text_matches_original_normalized": true
+    },
+    "E0817": {
+      "ordinal": 817,
+      "candidate_block_id": "block-000817-00ca3208",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes. Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025. These changes primarily impacted Note 8 – Goodwill, Note 12 – Unearned Revenue, and Note 18 – Segment Information and Geographic Data.",
+      "original_text_sha256": "00ca320873c6aa6182d621143965a62b7fafee7673bd3ef6926ae2056d0aa17f",
+      "index_text_matches_original_normalized": true,
+      "suggested_quote_spans": [
+        {
+          "char_start": 491,
+          "char_end": 632,
+          "quote": "Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025."
+        }
+      ]
+    },
+    "E0818": {
+      "ordinal": 818,
+      "candidate_block_id": "block-000818-3a2e0b27",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "The recast of prior period information had no impact on our consolidated balance sheets, consolidated income statements, or consolidated cash flows statements.",
+      "original_text_sha256": "3a2e0b27db1433d902b9434c4ab5618da4e5088c418a401b9f15074e9dbe6278",
+      "index_text_matches_original_normalized": true,
+      "suggested_quote_spans": [
+        {
+          "char_start": 0,
+          "char_end": 159,
+          "quote": "The recast of prior period information had no impact on our consolidated balance sheets, consolidated income statements, or consolidated cash flows statements."
+        }
+      ]
+    },
+    "E0819": {
+      "ordinal": 819,
+      "candidate_block_id": "block-000819-5371510e",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[4]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Estimates and Assumptions",
+      "original_text_sha256": "5371510e794812d15354ecfa5cc36bd7d8391842c79cdc0813e14e3a2d0f417a",
+      "index_text_matches_original_normalized": true
+    },
+    "E0820": {
+      "ordinal": 820,
+      "candidate_block_id": "block-000820-1b271dba",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[4]/ix:nonnumeric/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Preparing financial statements requires management to make estimates and assumptions that affect the reported amounts of assets, liabilities, revenue, and expenses. Examples of estimates and assumptions include: for revenue recognition, determining the nature and timing of satisfaction of performance obligations, and determining the standalone selling price (\"SSP\") of performance obligations, variable consideration, and other obligations such as product returns and refunds; loss contingencies; the fair value of and/or potential impairment of goodwill and intangible assets for our reporting units; product life cycles; useful lives of our tangible and intangible assets; allowances for doubtful accounts; stock-based compensation forfeiture rates; when technological feasibility is achieved for our products; the potential outcome of uncertain tax positions that have been recognized in our consolidated financial statements or tax returns; and determining the timing and amount of impairments for investments. Actual results and outcomes may differ from management’s estimates and assumptions due to risks and uncertainties.",
+      "original_text_sha256": "1b271dba73166bd0d5d2dde40d4cfcdf7be0901986faeeeb86bbf74a0168861c",
+      "index_text_matches_original_normalized": true
+    },
+    "E0821": {
+      "ordinal": 821,
+      "candidate_block_id": "block-000821-19655b4c",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[5]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Foreign Currencies",
+      "original_text_sha256": "19655b4c308d054f1cf309ba226927c5d807f5f1cfe56cddd777079481855494",
+      "index_text_matches_original_normalized": true
+    },
+    "E0822": {
+      "ordinal": 822,
+      "candidate_block_id": "block-000822-dba8d0bb",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[5]/ix:nonnumeric/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Assets and liabilities recorded in foreign currencies are translated at the exchange rate on the balance sheet date. Revenue and expenses are translated at average rates of exchange prevailing during the year. Translation adjustments resulting from this process are recorded to other comprehensive income.",
+      "original_text_sha256": "dba8d0bbfc61683cc756a328e071ec540f0b162b4d9bc8b0eacb466f531a453b",
+      "index_text_matches_original_normalized": true
+    },
+    "E0823": {
+      "ordinal": 823,
+      "candidate_block_id": "block-000823-c4b7330b",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[6]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Revenue",
+      "original_text_sha256": "c4b7330bd91e0c971041618056cb7201fd3f384e5db390bc89230d70712d7a47",
+      "index_text_matches_original_normalized": true
+    },
+    "E0824": {
+      "ordinal": 824,
+      "candidate_block_id": "block-000824-f7662877",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[6]/ix:nonnumeric/p[2]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Product Revenue and Service and Other Revenue",
+      "original_text_sha256": "f7662877b2969173002706787f9bc69c8111d78d15421ae9c3d85f68a6ccdc6e",
+      "index_text_matches_original_normalized": true
+    },
+    "E0825": {
+      "ordinal": 825,
+      "candidate_block_id": "block-000825-2a71cd2a",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[6]/ix:nonnumeric/p[3]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Product revenue includes sales from operating systems, cross-device productivity and collaboration applications, server applications, business solution applications, desktop and server management tools, software development tools, video games, and hardware such as PCs, tablets, gaming and entertainment consoles, other intelligent devices, and related accessories.",
+      "original_text_sha256": "2a71cd2a9726ea210da92569d74bdd2b908cc2c969c160ba0b9cbdeef8637e08",
+      "index_text_matches_original_normalized": true
+    },
+    "E0826": {
+      "ordinal": 826,
+      "candidate_block_id": "block-000826-6de83a50",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[6]/ix:nonnumeric/p[4]",
+      "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+      "reported_page": 55,
+      "original_text": "Service and other revenue includes sales from cloud-based solutions that provide customers with software, services, platforms, and content such as Office 365, Azure, Dynamics 365, and gaming; solution support; and consulting services. Service and other revenue also includes sales from online advertising and LinkedIn.",
+      "original_text_sha256": "6de83a5004f9e59a6a362d5967cee4a3d2960b9bded47efd3bda6f3c6a671d30",
+      "index_text_matches_original_normalized": true
+    },
+    "E1180": {
+      "ordinal": 1180,
+      "candidate_block_id": "block-001180-cef2be87",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "NOTE 18 — SEGMENT INFORMATION AND GEOGRAPHIC DATA",
+      "original_text_sha256": "cef2be873281be3299cb5d4fe7e365958cd505a3592fab3065d71bf57bceacb9",
+      "index_text_matches_original_normalized": true
+    },
+    "E1181": {
+      "ordinal": 1181,
+      "candidate_block_id": "block-001181-efcd150c",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[2]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "In its operation of the business, management, including our chief operating decision maker (“CODM”), who is also our Chief Executive Officer, reviews certain financial information, including segmented internal profit and loss statements. The primary profitability measure used by the CODM to review segment operating results is operating income. The CODM uses operating income to allocate resources during our annual planning process and throughout the year, as well as to assess the performance of our segments, primarily by monitoring actual results compared to prior periods and expected results. During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.",
+      "original_text_sha256": "efcd150c810bc715a97d3e59da4d44ef059f51e0a0d38a40339c8115ccfe851c",
+      "index_text_matches_original_normalized": true
+    },
+    "E1182": {
+      "ordinal": 1182,
+      "candidate_block_id": "block-001182-b3eedf85",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[3]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information.",
+      "original_text_sha256": "b3eedf85b83657382fbf26fd50e029ba4d5aad257e880c636fb772135ab5cd43",
+      "index_text_matches_original_normalized": true
+    },
+    "E1183": {
+      "ordinal": 1183,
+      "candidate_block_id": "block-001183-352d4c96",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[4]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "Our reportable segments are described below.",
+      "original_text_sha256": "352d4c9695094536bfaee575b0ea75367d93f89b434e0a8256c31abc3d9ce269",
+      "index_text_matches_original_normalized": true
+    },
+    "E1184": {
+      "ordinal": 1184,
+      "candidate_block_id": "block-001184-94a2e06c",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[5]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "Productivity and Business Processes",
+      "original_text_sha256": "94a2e06cbe413c1e0742016cfc2688049e77680cbbe06c7bdca7fa26fbcded88",
+      "index_text_matches_original_normalized": true
+    },
+    "E1185": {
+      "ordinal": 1185,
+      "candidate_block_id": "block-001185-d993f813",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[6]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:",
+      "original_text_sha256": "d993f813170ccba6b56ef55f21d23a571600f3e3997733ba6230381a8cdeb7b2",
+      "index_text_matches_original_normalized": true
+    },
+    "E1186": {
+      "ordinal": 1186,
+      "candidate_block_id": "block-001186-4f8865ab",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[1]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1187": {
+      "ordinal": 1187,
+      "candidate_block_id": "block-001187-7018adaa",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[1]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises.",
+      "original_text_sha256": "7018adaab1771400d012d62f1d71beaaf43645407f6d794872fd87001e9c4bde",
+      "index_text_matches_original_normalized": true
+    },
+    "E1188": {
+      "ordinal": 1188,
+      "candidate_block_id": "block-001188-4f8865ab",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[2]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1189": {
+      "ordinal": 1189,
+      "candidate_block_id": "block-001189-61bd513b",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[2]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services.",
+      "original_text_sha256": "61bd513b7ff69104bce0b7c1e0bdb29e8d8f9ada2b9b0d1368f2554de078f784",
+      "index_text_matches_original_normalized": true
+    },
+    "E1190": {
+      "ordinal": 1190,
+      "candidate_block_id": "block-001190-4f8865ab",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[3]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1191": {
+      "ordinal": 1191,
+      "candidate_block_id": "block-001191-13124fb7",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[3]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions.",
+      "original_text_sha256": "13124fb73864f984aa690440624343f61d9931b2c234a3120641d0110adf30c3",
+      "index_text_matches_original_normalized": true
+    },
+    "E1192": {
+      "ordinal": 1192,
+      "candidate_block_id": "block-001192-4f8865ab",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[4]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1193": {
+      "ordinal": 1193,
+      "candidate_block_id": "block-001193-da3d48eb",
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[4]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications.",
+      "original_text_sha256": "da3d48ebd71ff1df7005f49ca5852c5cee82aade24fd23ab92c60502783a2355",
+      "index_text_matches_original_normalized": true
+    },
+    "E1194": {
+      "ordinal": 1194,
+      "candidate_block_id": "block-001194-a46e3763",
+      "dom_path": "/html/body/div[247]/p",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 82,
+      "original_text": "82",
+      "original_text_sha256": "a46e37632fa6ca51a13fe39a567b3c23b28c2f47d8af6be9bd63e030e214ba38",
+      "index_text_matches_original_normalized": true
+    },
+    "E1195": {
+      "ordinal": 1195,
+      "candidate_block_id": "block-001195-87b6a3b1",
+      "dom_path": "/html/body/div[248]/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E1196": {
+      "ordinal": 1196,
+      "candidate_block_id": "block-001196-cfc3637b",
+      "dom_path": "/html/body/div[248]/p[2]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Item 8",
+      "original_text_sha256": "cfc3637bd6712da85137c80600e5290f49cd064e68ace3151e1ed788f06aa67d",
+      "index_text_matches_original_normalized": true
+    },
+    "E1197": {
+      "ordinal": 1197,
+      "candidate_block_id": "block-001197-925ee601",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Intelligent Cloud",
+      "original_text_sha256": "925ee6010a3a345fe7254c4a0afd9d3d6ee895065adf6733491fdfc7ea81b29e",
+      "index_text_matches_original_normalized": true
+    },
+    "E1198": {
+      "ordinal": 1198,
+      "candidate_block_id": "block-001198-5e917062",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/p[2]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:",
+      "original_text_sha256": "5e917062d98a0c16faaba740b5332ca48d66d29ec417085265ec93005789e273",
+      "index_text_matches_original_normalized": true
+    },
+    "E1199": {
+      "ordinal": 1199,
+      "candidate_block_id": "block-001199-4f8865ab",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[1]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1200": {
+      "ordinal": 1200,
+      "candidate_block_id": "block-001200-c34f7245",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[1]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings.",
+      "original_text_sha256": "c34f7245fa9e88e6ae478ced0a0998fbba3c5cdfbf20ee4c78ae1a0d47c747bb",
+      "index_text_matches_original_normalized": true
+    },
+    "E1201": {
+      "ordinal": 1201,
+      "candidate_block_id": "block-001201-4f8865ab",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[2]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1202": {
+      "ordinal": 1202,
+      "candidate_block_id": "block-001202-c07a987e",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[2]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience.",
+      "original_text_sha256": "c07a987eb7f09b3a5158f3aa698c357965655a36d0d8f79f9559316e17d1a1cc",
+      "index_text_matches_original_normalized": true
+    },
+    "E1203": {
+      "ordinal": 1203,
+      "candidate_block_id": "block-001203-c67f142f",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/p[3]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "More Personal Computing",
+      "original_text_sha256": "c67f142f1ff0a8e0e21f763ca81edaa4b8c71ef43e8a41cf5ffe4103b273779f",
+      "index_text_matches_original_normalized": true
+    },
+    "E1204": {
+      "ordinal": 1204,
+      "candidate_block_id": "block-001204-6e0ae0c4",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/p[4]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:",
+      "original_text_sha256": "6e0ae0c4087ac566b8e2f526bc149145e95f4512862546ec023ff089ee335a6a",
+      "index_text_matches_original_normalized": true
+    },
+    "E1205": {
+      "ordinal": 1205,
+      "candidate_block_id": "block-001205-4f8865ab",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[3]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1206": {
+      "ordinal": 1206,
+      "candidate_block_id": "block-001206-c641cfcd",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[3]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories.",
+      "original_text_sha256": "c641cfcd89511a2dcaa3efc45af8ce2a8e4a95c7a34cdcb4df86c26459ed9de8",
+      "index_text_matches_original_normalized": true
+    },
+    "E1207": {
+      "ordinal": 1207,
+      "candidate_block_id": "block-001207-4f8865ab",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[4]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1208": {
+      "ordinal": 1208,
+      "candidate_block_id": "block-001208-2f215a60",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[4]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services.",
+      "original_text_sha256": "2f215a60d89b2281b04683e06c9d8b1cdc04d615d4f5cb1e3e8e8503f1fc29b0",
+      "index_text_matches_original_normalized": true
+    },
+    "E1209": {
+      "ordinal": 1209,
+      "candidate_block_id": "block-001209-4f8865ab",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[5]/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "•",
+      "original_text_sha256": "4f8865abeddbfab37520d0c56eed1bf17f37e3778e1a55e6dc54895d2ae17849",
+      "index_text_matches_original_normalized": true
+    },
+    "E1210": {
+      "ordinal": 1210,
+      "candidate_block_id": "block-001210-9577a591",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[5]/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates.",
+      "original_text_sha256": "9577a59155b65ffacdf1a70f76e28abf25f1cd843349f28772698c166a47ec30",
+      "index_text_matches_original_normalized": true
+    },
+    "E1211": {
+      "ordinal": 1211,
+      "candidate_block_id": "block-001211-94df82c9",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[6]/ix:nonnumeric/p",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "Revenue and costs are generally directly attributed to our segments. However, due to the integrated structure of our business, certain revenue recognized and costs incurred by one segment may benefit other segments. Revenue from certain contracts is allocated among the segments based on the relative value of the underlying products and services, which can include allocation based on actual prices charged, prices when sold separately, or estimated costs plus a profit margin. Cost of revenue is allocated in certain cases based on a relative revenue methodology. Operating expenses that are allocated primarily include those relating to marketing of products and services from which multiple segments benefit and are generally allocated based on relative gross margin.",
+      "original_text_sha256": "94df82c9dadd15b39a835597847f63f5050b0b0da9a93e9c04e6980ebd184b34",
+      "index_text_matches_original_normalized": true
+    },
+    "E1212": {
+      "ordinal": 1212,
+      "candidate_block_id": "block-001212-72e12aed",
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[7]/ix:continuation/p",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "In addition, certain costs are incurred at a corporate level and allocated to our segments. These allocated costs generally include legal, including settlements and fines, information technology, human resources, finance, excise taxes, field selling, shared facilities services, customer service and support, and severance incurred as part of a corporate program. Each allocation is measured differently based on the specific facts and circumstances of the costs being allocated and is generally based on relative gross margin or relative headcount.",
+      "original_text_sha256": "72e12aed108d1d77911c98947c8c0b2e450c50d6c8357790061251d0a3e40b12",
+      "index_text_matches_original_normalized": true
+    },
+    "E1213": {
+      "ordinal": 1213,
+      "candidate_block_id": "block-001213-bbb965ab",
+      "dom_path": "/html/body/div[250]/p",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 83,
+      "original_text": "83",
+      "original_text_sha256": "bbb965ab0c80d6538cf2184babad2a564a010376712012bd07b0af92dcd3097d",
+      "index_text_matches_original_normalized": true
+    },
+    "E1214": {
+      "ordinal": 1214,
+      "candidate_block_id": "block-001214-87b6a3b1",
+      "dom_path": "/html/body/div[251]/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E1215": {
+      "ordinal": 1215,
+      "candidate_block_id": "block-001215-cfc3637b",
+      "dom_path": "/html/body/div[251]/p[2]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "Item 8",
+      "original_text_sha256": "cfc3637bd6712da85137c80600e5290f49cd064e68ace3151e1ed788f06aa67d",
+      "index_text_matches_original_normalized": true
+    },
+    "E1216": {
+      "ordinal": 1216,
+      "candidate_block_id": "block-001216-6567d29b",
+      "dom_path": "/html/body/div[252]/div/ix:continuation/div[1]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "Segment revenue, cost of revenue, operating expenses, and operating income were as follows during the periods presented:",
+      "original_text_sha256": "6567d29b4db3b9bca3df98bb433b022041ca320bec44dcf380696a17583dfbb5",
+      "index_text_matches_original_normalized": true
+    },
+    "E1217": {
+      "ordinal": 1217,
+      "candidate_block_id": "block-001217-90dfc72b",
+      "dom_path": "/html/body/div[252]/div/ix:continuation/div[1]/ix:nonnumeric/table",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "(In millions) Year Ended June 30, 2025 2024 2023 Productivity and Business Processes Revenue $ 120,810 $ 106,820 $ 94,151 Cost of revenue 22,422 19,611 17,202 Operating expenses 28,615 27,548 26,875 Operating Income $ 69,773 $ 59,661 $ 50,074 Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944 Cost of revenue 40,171 29,611 24,109 Operating expenses 21,505 20,040 20,424 Operating Income $ 44,589 $ 37,813 $ 28,411 More Personal Computing Revenue $ 54,649 $ 50,838 $ 44,820 Cost of revenue 25,238 24,892 24,552 Operating expenses 15,245 13,987 10,230 Operating Income $ 14,166 $ 11,959 $ 10,038 Total Revenue $ 281,724 $ 245,122 $ 211,915 Cost of revenue 87,831 74,114 65,863 Operating expenses 65,365 61,575 57,529 Operating Income $ 128,528 $ 109,433 $ 88,523",
+      "original_text_sha256": "90dfc72b7d69537584af292e26e4d0a51b0c32548b675560c4bd0c970317bf09",
+      "index_text_matches_original_normalized": true,
+      "suggested_quote_spans": [
+        {
+          "char_start": 0,
+          "char_end": 48,
+          "quote": "(In millions) Year Ended June 30, 2025 2024 2023"
+        },
+        {
+          "char_start": 243,
+          "char_end": 296,
+          "quote": "Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944"
+        },
+        {
+          "char_start": 598,
+          "char_end": 641,
+          "quote": "Total Revenue $ 281,724 $ 245,122 $ 211,915"
+        }
+      ]
+    },
+    "E1218": {
+      "ordinal": 1218,
+      "candidate_block_id": "block-001218-43fbab2a",
+      "dom_path": "/html/body/div[252]/div/ix:continuation/p[2]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "No sales to an individual customer or country other than the United States accounted for more than 10% of revenue for fiscal years 2025, 2024, or 2023. Revenue, classified by the major geographic areas in which our customers were located, was as follows:",
+      "original_text_sha256": "43fbab2a76b6e1da6ac03bde0c6928bd8848c618e3aef1e3315a3e202a694435",
+      "index_text_matches_original_normalized": true
+    },
+    "E1219": {
+      "ordinal": 1219,
+      "candidate_block_id": "block-001219-8fbdd09e",
+      "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/table",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "(In millions) Year Ended June 30, 2025 2024 2023 United States (a) $ 144,546 $ 124,704 $ 106,744 Other countries 137,178 120,418 105,171 Total $ 281,724 $ 245,122 $ 211,915",
+      "original_text_sha256": "8fbdd09eae6408b7114307db2ecb5900bd69d63b0799f31a5c16fdaef1943598",
+      "index_text_matches_original_normalized": true,
+      "suggested_quote_spans": [
+        {
+          "char_start": 0,
+          "char_end": 48,
+          "quote": "(In millions) Year Ended June 30, 2025 2024 2023"
+        },
+        {
+          "char_start": 137,
+          "char_end": 172,
+          "quote": "Total $ 281,724 $ 245,122 $ 211,915"
+        }
+      ]
+    },
+    "E1220": {
+      "ordinal": 1220,
+      "candidate_block_id": "block-001220-f89bf797",
+      "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/div/span",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "(a)",
+      "original_text_sha256": "f89bf797c3b1dda4ee48380783e5e979067686a6a9540c5a40e8d75ae5f3d199",
+      "index_text_matches_original_normalized": true
+    },
+    "E1221": {
+      "ordinal": 1221,
+      "candidate_block_id": "block-001221-73695690",
+      "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/div/div",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "Includes billings to OEMs and certain multinational organizations because of the nature of these businesses and the impracticability of determining the geographic source of the revenue.",
+      "original_text_sha256": "7369569095374556277221a3615237e1b41902a995b4743084ad5d0205134dab",
+      "index_text_matches_original_normalized": true
+    },
+    "E1222": {
+      "ordinal": 1222,
+      "candidate_block_id": "block-001222-44c8031c",
+      "dom_path": "/html/body/div[253]/p",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 84,
+      "original_text": "84",
+      "original_text_sha256": "44c8031cb036a7350d8b9b8603af662a4b9cdbd2f96e8d5de5af435c9c35da69",
+      "index_text_matches_original_normalized": true
+    },
+    "E1223": {
+      "ordinal": 1223,
+      "candidate_block_id": "block-001223-87b6a3b1",
+      "dom_path": "/html/body/div[254]/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "PART II",
+      "original_text_sha256": "87b6a3b1d87b62692a8d3c58da990ad0e08cd90f00d5c5f3169ed3bb04bf166a",
+      "index_text_matches_original_normalized": true
+    },
+    "E1224": {
+      "ordinal": 1224,
+      "candidate_block_id": "block-001224-cfc3637b",
+      "dom_path": "/html/body/div[254]/p[2]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "Item 8",
+      "original_text_sha256": "cfc3637bd6712da85137c80600e5290f49cd064e68ace3151e1ed788f06aa67d",
+      "index_text_matches_original_normalized": true
+    },
+    "E1225": {
+      "ordinal": 1225,
+      "candidate_block_id": "block-001225-3895f129",
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "Revenue, classified by significant product and service offerings, was as follows:",
+      "original_text_sha256": "3895f129f8bbca52974180f958a942a07d7c980123e62cde605fb1a12a67cddd",
+      "index_text_matches_original_normalized": true
+    },
+    "E1226": {
+      "ordinal": 1226,
+      "candidate_block_id": "block-001226-283de46e",
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/table",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "(In millions) Year Ended June 30, 2025 2024 2023 Server products and cloud services $ 98,435 $ 79,828 $ 65,007 Microsoft 365 Commercial products and cloud services 87,767 76,969 66,949 Gaming 23,455 21,503 15,466 LinkedIn 17,812 16,372 14,989 Windows and Devices 17,314 17,026 17,147 Search and news advertising 13,878 12,306 12,125 Dynamics products and cloud services 7,827 6,831 5,796 Enterprise and partner services 7,760 7,594 7,900 Microsoft 365 Consumer products and cloud services 7,404 6,648 6,417 Other 72 45 119 Total $ 281,724 $ 245,122 $ 211,915",
+      "original_text_sha256": "283de46ecdb49aaf06e035894a9b7cd920233aa2ff4c28f80764d1c768c259fb",
+      "index_text_matches_original_normalized": true,
+      "suggested_quote_spans": [
+        {
+          "char_start": 0,
+          "char_end": 48,
+          "quote": "(In millions) Year Ended June 30, 2025 2024 2023"
+        },
+        {
+          "char_start": 49,
+          "char_end": 110,
+          "quote": "Server products and cloud services $ 98,435 $ 79,828 $ 65,007"
+        },
+        {
+          "char_start": 523,
+          "char_end": 558,
+          "quote": "Total $ 281,724 $ 245,122 $ 211,915"
+        }
+      ]
+    },
+    "E1227": {
+      "ordinal": 1227,
+      "candidate_block_id": "block-001227-3bdf0315",
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.",
+      "original_text_sha256": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e",
+      "index_text_matches_original_normalized": true
+    },
+    "E1228": {
+      "ordinal": 1228,
+      "candidate_block_id": "block-001228-76ee317f",
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[2]/ix:continuation/p",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "Assets are not allocated to segments for internal reporting presentations. A portion of amortization and depreciation is included with various other costs in an overhead allocation to each segment. It is impracticable for us to separately identify the amount of amortization and depreciation by segment that is included in the measure of segment profit or loss.",
+      "original_text_sha256": "76ee317f3d6851e11f3a8a7904b60d135ca51048f3591e089e1b3f9eddd188a3",
+      "index_text_matches_original_normalized": true
+    },
+    "E1229": {
+      "ordinal": 1229,
+      "candidate_block_id": "block-001229-e2dcee9b",
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[3]/ix:nonnumeric/p[1]",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "Long-lived assets, excluding financial instruments and tax assets, classified by the location of the controlling statutory company and with countries over 10% of the total shown separately, were as follows:",
+      "original_text_sha256": "e2dcee9b22f0c5f6063079404e4a7bdd92f7a7cb7834985ed30aaaddaf509b6c",
+      "index_text_matches_original_normalized": true
+    },
+    "E1230": {
+      "ordinal": 1230,
+      "candidate_block_id": "block-001230-54600a26",
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[3]/ix:nonnumeric/table",
+      "source_anchor": "F_7f967ae4-814d-466a-a8e1-584a8795d9c6_2",
+      "reported_page": 85,
+      "original_text": "(In millions) June 30, 2025 2024 2023 United States $ 230,069 $ 186,106 $ 114,380 Other countries 141,833 115,263 72,859 Total $ 371,902 $ 301,369 $ 187,239",
+      "original_text_sha256": "54600a26878eb2e8a29d576b706bcc3d989d13114cc15cbb4bc8e8a193f8e5e1",
+      "index_text_matches_original_normalized": true
+    }
+  },
+  "search_log": [
+    {
+      "term": "Azure",
+      "hits": [
+        {
+          "ordinal": 120,
+          "dom_path": "/html/body/div[18]/div[1]/div",
+          "text": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "ordinal": 127,
+          "dom_path": "/html/body/div[21]/p[2]",
+          "text": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use Azure through our global network of datacenters for computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning. Azure enables customers to devote more resources to development and use of applications that benefit their organizations, rather than managing on-premises hardware and software. Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services."
+        },
+        {
+          "ordinal": 128,
+          "dom_path": "/html/body/div[21]/p[3]",
+          "text": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents."
+        },
+        {
+          "ordinal": 134,
+          "dom_path": "/html/body/div[21]/p[9]",
+          "text": "Azure faces diverse competition from cloud service providers and open source offerings. Azure’s competitive advantage includes enabling a hybrid cloud, allowing deployment of existing datacenters with our public cloud into a single, cohesive infrastructure, and the ability to run at a scale that meets the needs of businesses of all sizes and complexities. Our AI offerings compete with AI products from hyperscalers, as well as products from other emerging competitors and other open source offerings, many of which are also current or potential partners. Our Azure Security offerings include our cloud security solution and security information and event management solution, which compete with providers in the cybersecurity and cloud security space. We believe our cloud’s global scale, coupled with our broad portfolio of identity and security solutions, allows us to effectively solve complex cybersecurity challenges for our customers and differentiates us from the competition."
+        },
+        {
+          "ordinal": 527,
+          "dom_path": "/html/body/div[105]/div[6]/div",
+          "text": "Server products and cloud services revenue increased 23% driven by Azure and other cloud services revenue growth of 34%."
+        },
+        {
+          "ordinal": 536,
+          "dom_path": "/html/body/div[105]/p[9]",
+          "text": "Microsoft and OpenAI maintain a long-term strategic partnership originally established in 2019. Microsoft is a major investor in OpenAI, and the companies have reciprocal revenue-sharing arrangements. We hold rights to OpenAI’s intellectual property, including models and infrastructure, for integration into our products. The OpenAI API is exclusive to Azure, runs on Azure, and is available through the Azure OpenAI Service. We also have a right of first refusal on OpenAI's new capacity needs."
+        },
+        {
+          "ordinal": 561,
+          "dom_path": "/html/body/div[111]/table[1]",
+          "text": "Commercial remaining performance obligation Commercial portion of revenue allocated to remaining performance obligations, which includes unearned revenue and amounts that will be invoiced and recognized as revenue in future periods Microsoft Cloud revenue and revenue growth Revenue from Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365 Microsoft Cloud gross margin percentage Gross margin percentage for our Microsoft Cloud business"
+        },
+        {
+          "ordinal": 564,
+          "dom_path": "/html/body/div[111]/table[2]",
+          "text": "Microsoft 365 Commercial cloud revenue growth Revenue from Microsoft 365 Commercial subscriptions, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot Microsoft 365 Commercial seat growth The number of Microsoft 365 Commercial seats at end of period where seats are paid users covered by a Microsoft 365 Commercial subscription Microsoft 365 Consumer cloud revenue growth Revenue from Microsoft 365 Consumer subscriptions and other consumer services Microsoft 365 Consumer subscribers The number of Microsoft 365 Consumer subscribers at end of period LinkedIn revenue growth Revenue from LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions Dynamics 365 revenue growth Revenue from Dynamics 365, including a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate Azure and other cloud services revenue growth Revenue from Azure and other cloud services, including cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services"
+        },
+        {
+          "ordinal": 574,
+          "dom_path": "/html/body/div[114]/p[8]",
+          "text": "Revenue increased $36.6 billion or 15% with growth across each of our segments. Intelligent Cloud revenue increased driven by Azure. Productivity and Business Processes revenue increased driven by Microsoft 365 Commercial cloud. More Personal Computing revenue increased driven by Gaming and Search and news advertising."
+        },
+        {
+          "ordinal": 580,
+          "dom_path": "/html/body/div[114]/div[2]/div",
+          "text": "Microsoft Cloud gross margin percentage decreased to 69% driven by the impact of scaling our AI infrastructure, offset in part by efficiency gains in Azure."
+        },
+        {
+          "ordinal": 613,
+          "dom_path": "/html/body/div[120]/div[1]/div",
+          "text": "Server products and cloud services revenue increased $18.6 billion or 23% driven by Azure and other cloud services. Azure and other cloud services revenue grew 34% driven by demand for our portfolio of services. Server products revenue decreased 3% driven by a decrease in transactional purchasing with continued customer shift to cloud offerings."
+        },
+        {
+          "ordinal": 618,
+          "dom_path": "/html/body/div[120]/div[3]/div",
+          "text": "Cost of revenue increased $10.6 billion or 36% driven by growth in Azure."
+        },
+        {
+          "ordinal": 620,
+          "dom_path": "/html/body/div[120]/div[4]/div",
+          "text": "Gross margin increased $8.2 billion or 14% driven by growth in Azure. Gross margin percentage decreased driven by the impact of scaling our AI infrastructure, offset in part by efficiency gains in Azure."
+        },
+        {
+          "ordinal": 826,
+          "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[6]/ix:nonnumeric/p[4]",
+          "text": "Service and other revenue includes sales from cloud-based solutions that provide customers with software, services, platforms, and content such as Office 365, Azure, Dynamics 365, and gaming; solution support; and consulting services. Service and other revenue also includes sales from online advertising and LinkedIn."
+        },
+        {
+          "ordinal": 1200,
+          "dom_path": "/html/body/div[249]/div/ix:continuation/div[1]/div",
+          "text": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings."
+        },
+        {
+          "ordinal": 1227,
+          "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+          "text": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above."
+        }
+      ]
+    },
+    {
+      "term": "recast",
+      "hits": [
+        {
+          "ordinal": 551,
+          "dom_path": "/html/body/div[108]/p[12]",
+          "text": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes. Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025."
+        },
+        {
+          "ordinal": 739,
+          "dom_path": "/html/body/div[138]/p[10]",
+          "text": "Application of the goodwill impairment test requires judgment, including the identification of reporting units, assignment of assets and liabilities to reporting units, assignment of goodwill to reporting units, and determination of the fair value of each reporting unit. The fair value of each reporting unit is estimated primarily through the use of a discounted cash flow methodology. This analysis requires significant judgments, including estimation of future cash flows, which is dependent on internal forecasts, estimation of the long-term rate of growth for our business, estimation of the useful life over which cash flows will occur, and determination of our weighted average cost of capital."
+        },
+        {
+          "ordinal": 766,
+          "dom_path": "/html/body/div[147]/p[5]",
+          "text": "Certain forecasted transactions, assets, and liabilities are exposed to foreign currency risk. We monitor our foreign currency exposures daily to maximize the economic effectiveness of our foreign currency positions, including hedges. Principal currency exposures include the Euro, Japanese yen, British pound, Canadian dollar, and Australian dollar."
+        },
+        {
+          "ordinal": 816,
+          "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[1]",
+          "text": "Recast of Certain Prior Period Information"
+        },
+        {
+          "ordinal": 817,
+          "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[2]",
+          "text": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes. Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025. These changes primarily impacted Note 8 – Goodwill, Note 12 – Unearned Revenue, and Note 18 – Segment Information and Geographic Data."
+        },
+        {
+          "ordinal": 818,
+          "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[3]",
+          "text": "The recast of prior period information had no impact on our consolidated balance sheets, consolidated income statements, or consolidated cash flows statements."
+        },
+        {
+          "ordinal": 976,
+          "dom_path": "/html/body/div[201]/div/ix:nonnumeric/p[4]",
+          "text": "Certain forecasted transactions, assets, and liabilities are exposed to foreign currency risk. We monitor our foreign currency exposures daily to maximize the economic effectiveness of our foreign currency hedge positions."
+        },
+        {
+          "ordinal": 1031,
+          "dom_path": "/html/body/div[213]/div[1]/ix:nonnumeric/p[2]",
+          "text": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information."
+        },
+        {
+          "ordinal": 1101,
+          "dom_path": "/html/body/div[228]/div[2]/ix:nonnumeric/p[3]",
+          "text": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information."
+        },
+        {
+          "ordinal": 1182,
+          "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[3]",
+          "text": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information."
+        }
+      ]
+    },
+    {
+      "term": "245,122",
+      "hits": [
+        {
+          "ordinal": 572,
+          "dom_path": "/html/body/div[114]/table[2]",
+          "text": "(In millions, except percentages and per share amounts) 2025 2024 PercentageChange Revenue $ 281,724 $ 245,122 15% Gross margin 193,893 171,008 13% Operating income 128,528 109,433 17% Net income 101,832 88,136 16% Diluted earnings per share 13.64 11.80 16%"
+        },
+        {
+          "ordinal": 587,
+          "dom_path": "/html/body/div[117]/table",
+          "text": "(In millions, except percentages) 2025 2024 PercentageChange Productivity and Business Processes Revenue $ 120,810 $ 106,820 13% Cost of revenue 22,422 19,611 14% Operating expenses 28,615 27,548 4% Operating Income $ 69,773 $ 59,661 17% Intelligent Cloud Revenue $ 106,265 $ 87,464 21% Cost of revenue 40,171 29,611 36% Operating expenses 21,505 20,040 7% Operating Income $ 44,589 $ 37,813 18% More Personal Computing Revenue $ 54,649 $ 50,838 7% Cost of revenue 25,238 24,892 1% Operating expenses 15,245 13,987 9% Operating Income $ 14,166 $ 11,959 18% Total Revenue $ 281,724 $ 245,122 15% Cost of revenue 87,831 74,114 19% Operating expenses 65,365 61,575 6% Operating Income $ 128,528 $ 109,433 17%"
+        },
+        {
+          "ordinal": 781,
+          "dom_path": "/html/body/div[150]/table",
+          "text": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 Revenue: Product $ 63,946 $ 64,773 $ 64,699 Service and other 217,778 180,349 147,216 Total revenue 281,724 245,122 211,915 Cost of revenue: Product 13,501 15,272 17,804 Service and other 74,330 58,842 48,059 Total cost of revenue 87,831 74,114 65,863 Gross margin 193,893 171,008 146,052 Research and development 32,488 29,510 27,195 Sales and marketing 25,654 24,456 22,759 General and administrative 7,223 7,609 7,575 Operating income 128,528 109,433 88,523 Other income (expense), net (4,901 ) (1,646 ) 788 Income before income taxes 123,627 107,787 89,311 Provision for income taxes 21,795 19,651 16,950 Net income $ 101,832 $ 88,136 $ 72,361 Earnings per share: Basic $ 13.70 $ 11.86 $ 9.72 Diluted $ 13.64 $ 11.80 $ 9.68 Weighted average shares outstanding: Basic 7,433 7,431 7,446 Diluted 7,465 7,469 7,472"
+        },
+        {
+          "ordinal": 1217,
+          "dom_path": "/html/body/div[252]/div/ix:continuation/div[1]/ix:nonnumeric/table",
+          "text": "(In millions) Year Ended June 30, 2025 2024 2023 Productivity and Business Processes Revenue $ 120,810 $ 106,820 $ 94,151 Cost of revenue 22,422 19,611 17,202 Operating expenses 28,615 27,548 26,875 Operating Income $ 69,773 $ 59,661 $ 50,074 Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944 Cost of revenue 40,171 29,611 24,109 Operating expenses 21,505 20,040 20,424 Operating Income $ 44,589 $ 37,813 $ 28,411 More Personal Computing Revenue $ 54,649 $ 50,838 $ 44,820 Cost of revenue 25,238 24,892 24,552 Operating expenses 15,245 13,987 10,230 Operating Income $ 14,166 $ 11,959 $ 10,038 Total Revenue $ 281,724 $ 245,122 $ 211,915 Cost of revenue 87,831 74,114 65,863 Operating expenses 65,365 61,575 57,529 Operating Income $ 128,528 $ 109,433 $ 88,523"
+        },
+        {
+          "ordinal": 1219,
+          "dom_path": "/html/body/div[252]/div/ix:continuation/div[2]/ix:continuation/table",
+          "text": "(In millions) Year Ended June 30, 2025 2024 2023 United States (a) $ 144,546 $ 124,704 $ 106,744 Other countries 137,178 120,418 105,171 Total $ 281,724 $ 245,122 $ 211,915"
+        },
+        {
+          "ordinal": 1226,
+          "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/table",
+          "text": "(In millions) Year Ended June 30, 2025 2024 2023 Server products and cloud services $ 98,435 $ 79,828 $ 65,007 Microsoft 365 Commercial products and cloud services 87,767 76,969 66,949 Gaming 23,455 21,503 15,466 LinkedIn 17,812 16,372 14,989 Windows and Devices 17,314 17,026 17,147 Search and news advertising 13,878 12,306 12,125 Dynamics products and cloud services 7,827 6,831 5,796 Enterprise and partner services 7,760 7,594 7,900 Microsoft 365 Consumer products and cloud services 7,404 6,648 6,417 Other 72 45 119 Total $ 281,724 $ 245,122 $ 211,915"
+        }
+      ]
+    },
+    {
+      "term": "Microsoft Cloud",
+      "hits": [
+        {
+          "ordinal": 53,
+          "dom_path": "/html/body/div[12]/p[1]",
+          "text": "The Microsoft Cloud provides integration across the technology stack while offering openness, improving time to value, reducing costs, and increasing agility. Our cloud business benefits from three economies of scale: datacenters that deploy computational resources at significantly lower cost per unit than smaller ones; datacenters that coordinate and aggregate diverse customer, geographic, and application demand patterns, improving the utilization of computing, storage, and network resources; and multi-tenancy locations that lower application maintenance labor costs."
+        },
+        {
+          "ordinal": 64,
+          "dom_path": "/html/body/div[12]/p[6]",
+          "text": "We are focused on helping customers use the breadth and depth of the Microsoft Cloud to get the most value out of their digital spend while leading the AI platform wave across our solution areas. We continue to develop complete, intelligent solutions for our customers that empower people to be productive and collaborate, while safeguarding businesses and simplifying IT management. Our goal is to lead the industry in several distinct areas of technology over the long term, which we expect will translate to sustained growth. We are investing significant resources in:"
+        },
+        {
+          "ordinal": 214,
+          "dom_path": "/html/body/div[33]/p[10]",
+          "text": "Organizations also license our products and services indirectly, primarily through licensing solution partners (“LSP”), distributors, value-added resellers (“VAR”), and retailers. Although each type of reselling partner may reach organizations of all sizes, LSPs are primarily engaged with large organizations, distributors resell primarily to VARs, and VARs typically reach small and medium organizations. ESAs are also typically authorized as LSPs and operate as resellers for our other volume licensing programs. Microsoft Cloud Solution Provider is our main partner program for reselling cloud services."
+        },
+        {
+          "ordinal": 243,
+          "dom_path": "/html/body/div[39]/p[6]",
+          "text": "The Microsoft Cloud Solution Provider Program offers customers an easy way to license the cloud services they need in combination with the value-added services offered by their systems integrator, managed services provider, or cloud reseller partner. Partners in this program can easily package their own products and services to directly provision, manage, and support their customer subscriptions."
+        },
+        {
+          "ordinal": 517,
+          "dom_path": "/html/body/div[105]/div[1]/div",
+          "text": "Microsoft Cloud revenue increased 23% to $168.9 billion."
+        },
+        {
+          "ordinal": 561,
+          "dom_path": "/html/body/div[111]/table[1]",
+          "text": "Commercial remaining performance obligation Commercial portion of revenue allocated to remaining performance obligations, which includes unearned revenue and amounts that will be invoiced and recognized as revenue in future periods Microsoft Cloud revenue and revenue growth Revenue from Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365 Microsoft Cloud gross margin percentage Gross margin percentage for our Microsoft Cloud business"
+        },
+        {
+          "ordinal": 575,
+          "dom_path": "/html/body/div[114]/p[9]",
+          "text": "Cost of revenue increased $13.7 billion or 19% driven by growth in Microsoft Cloud."
+        },
+        {
+          "ordinal": 580,
+          "dom_path": "/html/body/div[114]/div[2]/div",
+          "text": "Microsoft Cloud gross margin percentage decreased to 69% driven by the impact of scaling our AI infrastructure, offset in part by efficiency gains in Azure."
+        },
+        {
+          "ordinal": 1227,
+          "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+          "text": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above."
+        }
+      ]
+    },
+    {
+      "term": "Intelligent Cloud",
+      "hits": [
+        {
+          "ordinal": 60,
+          "dom_path": "/html/body/div[12]/div[2]/div",
+          "text": "Build the intelligent cloud and intelligent edge platform to provide a foundation for our customers’ digital workloads including hybrid consistency, developer productivity, data and AI capabilities, and trusted security and compliance."
+        },
+        {
+          "ordinal": 86,
+          "dom_path": "/html/body/div[15]/p[2]",
+          "text": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses."
+        },
+        {
+          "ordinal": 117,
+          "dom_path": "/html/body/div[18]/p[11]",
+          "text": "Intelligent Cloud"
+        },
+        {
+          "ordinal": 118,
+          "dom_path": "/html/body/div[18]/p[12]",
+          "text": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:"
+        },
+        {
+          "ordinal": 550,
+          "dom_path": "/html/body/div[108]/p[11]",
+          "text": "We report our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. The segment amounts included in MD&A are presented on a basis consistent with our internal management reporting."
+        },
+        {
+          "ordinal": 562,
+          "dom_path": "/html/body/div[111]/p[8]",
+          "text": "Productivity and Business Processes and Intelligent Cloud"
+        },
+        {
+          "ordinal": 563,
+          "dom_path": "/html/body/div[111]/p[9]",
+          "text": "Metrics related to our Productivity and Business Processes and Intelligent Cloud segments assess the health of our core businesses within these segments. The metrics primarily reflect growth across our cloud services."
+        },
+        {
+          "ordinal": 574,
+          "dom_path": "/html/body/div[114]/p[8]",
+          "text": "Revenue increased $36.6 billion or 15% with growth across each of our segments. Intelligent Cloud revenue increased driven by Azure. Productivity and Business Processes revenue increased driven by Microsoft 365 Commercial cloud. More Personal Computing revenue increased driven by Gaming and Search and news advertising."
+        },
+        {
+          "ordinal": 578,
+          "dom_path": "/html/body/div[114]/div[1]/div",
+          "text": "Gross margin percentage decreased slightly driven by Intelligent Cloud, offset in part by More Personal Computing."
+        },
+        {
+          "ordinal": 587,
+          "dom_path": "/html/body/div[117]/table",
+          "text": "(In millions, except percentages) 2025 2024 PercentageChange Productivity and Business Processes Revenue $ 120,810 $ 106,820 13% Cost of revenue 22,422 19,611 14% Operating expenses 28,615 27,548 4% Operating Income $ 69,773 $ 59,661 17% Intelligent Cloud Revenue $ 106,265 $ 87,464 21% Cost of revenue 40,171 29,611 36% Operating expenses 21,505 20,040 7% Operating Income $ 44,589 $ 37,813 18% More Personal Computing Revenue $ 54,649 $ 50,838 7% Cost of revenue 25,238 24,892 1% Operating expenses 15,245 13,987 9% Operating Income $ 14,166 $ 11,959 18% Total Revenue $ 281,724 $ 245,122 15% Cost of revenue 87,831 74,114 19% Operating expenses 65,365 61,575 6% Operating Income $ 128,528 $ 109,433 17%"
+        },
+        {
+          "ordinal": 610,
+          "dom_path": "/html/body/div[120]/p[1]",
+          "text": "Intelligent Cloud"
+        },
+        {
+          "ordinal": 1030,
+          "dom_path": "/html/body/div[213]/div[1]/ix:nonnumeric/div/ix:nonnumeric/table",
+          "text": "(In millions) June 30,2023 Acquisitions Other June 30,2024 Acquisitions Other June 30,2025 Productivity and Business Processes $ 31,359 $ 0 $ 2 $ 31,361 $ 0 $ 96 $ 31,457 Intelligent Cloud 25,676 0 (28 ) 25,648 0 41 25,689 More Personal Computing 10,851 51,235 125 62,211 0 152 62,363 Total $ 67,886 $ 51,235 $ 99 $ 119,220 $ 0 $ 289 $ 119,509"
+        },
+        {
+          "ordinal": 1100,
+          "dom_path": "/html/body/div[228]/div[2]/ix:nonnumeric/div/ix:nonnumeric/table",
+          "text": "(In millions) June 30, 2025 2024 Productivity and Business Processes $ 50,567 $ 43,599 Intelligent Cloud 14,022 13,683 More Personal Computing 2,676 2,902 Total $ 67,265 $ 60,184"
+        },
+        {
+          "ordinal": 1181,
+          "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[2]",
+          "text": "In its operation of the business, management, including our chief operating decision maker (“CODM”), who is also our Chief Executive Officer, reviews certain financial information, including segmented internal profit and loss statements. The primary profitability measure used by the CODM to review segment operating results is operating income. The CODM uses operating income to allocate resources during our annual planning process and throughout the year, as well as to assess the performance of our segments, primarily by monitoring actual results compared to prior periods and expected results. During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing."
+        },
+        {
+          "ordinal": 1197,
+          "dom_path": "/html/body/div[249]/div/ix:continuation/p[1]",
+          "text": "Intelligent Cloud"
+        },
+        {
+          "ordinal": 1198,
+          "dom_path": "/html/body/div[249]/div/ix:continuation/p[2]",
+          "text": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:"
+        },
+        {
+          "ordinal": 1217,
+          "dom_path": "/html/body/div[252]/div/ix:continuation/div[1]/ix:nonnumeric/table",
+          "text": "(In millions) Year Ended June 30, 2025 2024 2023 Productivity and Business Processes Revenue $ 120,810 $ 106,820 $ 94,151 Cost of revenue 22,422 19,611 17,202 Operating expenses 28,615 27,548 26,875 Operating Income $ 69,773 $ 59,661 $ 50,074 Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944 Cost of revenue 40,171 29,611 24,109 Operating expenses 21,505 20,040 20,424 Operating Income $ 44,589 $ 37,813 $ 28,411 More Personal Computing Revenue $ 54,649 $ 50,838 $ 44,820 Cost of revenue 25,238 24,892 24,552 Operating expenses 15,245 13,987 10,230 Operating Income $ 14,166 $ 11,959 $ 10,038 Total Revenue $ 281,724 $ 245,122 $ 211,915 Cost of revenue 87,831 74,114 65,863 Operating expenses 65,365 61,575 57,529 Operating Income $ 128,528 $ 109,433 $ 88,523"
+        }
+      ]
+    },
+    {
+      "term": "75 billion",
+      "hits": [
+        {
+          "ordinal": 1107,
+          "dom_path": "/html/body/div[231]/div[1]/ix:continuation/p[2]",
+          "text": "Revenue allocated to remaining performance obligations, which includes unearned revenue and amounts that will be invoiced and recognized as revenue in future periods, was $375 billion as of June 30, 2025, of which $368 billion is related to the commercial portion of revenue. We expect to recognize approximately 40% of our total company remaining performance obligation revenue over the next 12 months and the remainder thereafter."
+        }
+      ]
+    }
+  ],
+  "inline_xbrl_total_revenue_check": [
+    {
+      "text": "281,724",
+      "attributes": {
+        "id": "F_54f7ed46-65f2-456a-a77a-3c4b7593c6fb",
+        "contextref": "C_7102029d-8d6c-44c5-b166-04cf41443b1e",
+        "name": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "unitref": "U_USD",
+        "scale": "6",
+        "decimals": "-6",
+        "format": "ixt:num-dot-decimal"
+      },
+      "context_xml": "<xbrli:context id=\"C_7102029d-8d6c-44c5-b166-04cf41443b1e\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2024-07-01</xbrli:startdate><xbrli:enddate>2025-06-30</xbrli:enddate></xbrli:period></xbrli:context>"
+    },
+    {
+      "text": "245,122",
+      "attributes": {
+        "id": "F_f3644c27-3201-4eae-830b-29806654338e",
+        "contextref": "C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862",
+        "name": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "unitref": "U_USD",
+        "scale": "6",
+        "decimals": "-6",
+        "format": "ixt:num-dot-decimal"
+      },
+      "context_xml": "<xbrli:context id=\"C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>"
+    },
+    {
+      "text": "211,915",
+      "attributes": {
+        "id": "F_143fd9c9-0b25-4821-9921-cd1df8906c84",
+        "contextref": "C_deaa7eaf-e13f-4828-9e73-3d077f8605da",
+        "name": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "unitref": "U_USD",
+        "scale": "6",
+        "decimals": "-6",
+        "format": "ixt:num-dot-decimal"
+      },
+      "context_xml": "<xbrli:context id=\"C_deaa7eaf-e13f-4828-9e73-3d077f8605da\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2022-07-01</xbrli:startdate><xbrli:enddate>2023-06-30</xbrli:enddate></xbrli:period></xbrli:context>"
+    }
+  ],
+  "grading_policy": {
+    "unit": "semantic requirement; alternative source occurrences accepted",
+    "hard_fail": [
+      "wrong company/source/vintage",
+      "wrong number/unit/period",
+      "missing required semantics",
+      "fabricated or non-verifiable citation",
+      "materially misleading metric substitution"
+    ],
+    "no_unique_block_lock": true,
+    "unlisted_valid_evidence": "manual original verification then add as equivalent with revision audit",
+    "duplicate_policy": "same fact at several origins earns coverage once; unrelated excess and repeat text recorded separately",
+    "excess_policy": "Separate semantic irrelevant content from unavoidable whole-block/table overhead; no arbitrary length cutoff in this candidate.",
+    "optional_credit": "optional evidence does not repair missing required evidence",
+    "conditional_requirements": "activate only when answer/query makes the triggering assertion; do not inflate minimal sets by blindly collecting all optional context",
+    "next_review": "Second reviewer should inspect original and resolve granularity/conditional context before freeze; no runtime run scored by this candidate yet."
+  }
+}

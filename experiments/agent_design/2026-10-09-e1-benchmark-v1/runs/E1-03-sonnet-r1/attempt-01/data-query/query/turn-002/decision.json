@@ -1,0 +1,70 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "record_selection": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "q_rev_fy2024",
+      "description": "Query Microsoft consolidated total revenue for FY2024 (year ended 2024-06-30, USD) as disclosed in the records of both the FY2024 and FY2025 10-Ks; keep each source's citation, unit and period separate and do not sum duplicate disclosures."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-8602d79f703e48c18c2f27c3",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "e_fy2024_10k",
+      "description": "Original income statement or table block in the FY2024 10-K (period end 2024-06-30) showing total revenue for the year ended June 30, 2024, with unit and period headings."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "source-360182cbf562dcf9a8ab9c4e",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "e_fy2025_10k",
+      "description": "Original income statement or table block in the FY2025 10-K (period end 2025-06-30) showing the FY2024 comparative total revenue for the year ended June 30, 2024, with unit and period headings."
+    }
+  ],
+  "reason": "Plan numeric query for FY2024 consolidated revenue plus original-table source evidence from each 10-K to compare the two disclosures.",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

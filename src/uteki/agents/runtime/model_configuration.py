@@ -15,11 +15,14 @@ CONFIGURATION_FIELDS = (
     'provider', 'model', 'api_format', 'base_url', 'max_tokens', 'thinking',
     'reasoning_effort', 'temperature', 'top_p', 'top_k', 'seed', 'response_format',
     'tool_choice', 'parallel_tool_calls', 'stream', 'timeout_seconds', 'max_retries',
+    'max_completion_tokens', 'preserve_thinking',
 )
-_LEGACY_CONFIGURATION_FIELDS = tuple(key for key in CONFIGURATION_FIELDS if key != 'top_k')
+_PRE_QWEN_CONFIGURATION_FIELDS = tuple(key for key in CONFIGURATION_FIELDS if key not in ('max_completion_tokens', 'preserve_thinking'))
+_LEGACY_CONFIGURATION_FIELDS = tuple(key for key in _PRE_QWEN_CONFIGURATION_FIELDS if key != 'top_k')
 FINGERPRINT_FIELDS = ('system_sha256', 'input_sha256', 'tools_sha256', 'output_schema_sha256')
 _REQUEST_FIELDS = ('max_tokens', 'thinking', 'reasoning_effort', 'temperature', 'top_p', 'top_k',
-                   'seed', 'response_format', 'tool_choice', 'parallel_tool_calls', 'stream')
+                   'seed', 'response_format', 'tool_choice', 'parallel_tool_calls', 'stream',
+                   'max_completion_tokens', 'preserve_thinking')
 _LAYERS = {'historical_records', 'sdk_adapter_before_dispatch', 'http_request_before_dispatch'}
 _ENDPOINTS = {'https://api.deepseek.com', 'https://api.deepseek.com/v1',
               'https://aihubmix.com', 'https://aihubmix.com/v1',
@@ -56,13 +59,13 @@ def _safe_value(key, value):
         return value if isinstance(value, str) and value.rstrip('/') in _ENDPOINTS else None
     if key == 'api_format':
         return value if value in ('chat_completions', 'responses', 'anthropic_messages') else None
-    if key in {'max_tokens', 'max_retries', 'top_k'}:
+    if key in {'max_tokens', 'max_completion_tokens', 'max_retries', 'top_k'}:
         return value if type(value) is int and 0 <= value <= 2**63 - 1 else None
     if key == 'seed':
         return value if type(value) is int and -(2**63) <= value <= 2**63 - 1 else None
     if key in {'temperature', 'top_p'}:
         return value if _number(value) else None
-    if key in {'stream', 'parallel_tool_calls'}:
+    if key in {'stream', 'parallel_tool_calls', 'preserve_thinking'}:
         return value if type(value) is bool else None
     if key == 'reasoning_effort':
         return value if value in ('none', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max', 'ultra') else None
@@ -161,7 +164,7 @@ def validate_configuration_snapshot(snapshot):
             raise ValueError
         fields = snapshot['fields']
         if not isinstance(fields, dict) or set(fields) not in (
-                set(CONFIGURATION_FIELDS), set(_LEGACY_CONFIGURATION_FIELDS)):
+                set(CONFIGURATION_FIELDS), set(_PRE_QWEN_CONFIGURATION_FIELDS), set(_LEGACY_CONFIGURATION_FIELDS)):
             raise ValueError
         expected = build_configuration_snapshot(
             {key: field['value'] for key, field in fields.items()},
@@ -169,10 +172,11 @@ def validate_configuration_snapshot(snapshot):
             sources={key: field['source'] for key, field in fields.items()},
             statuses={key: field['status'] for key, field in fields.items()},
             fingerprints=snapshot['fingerprints'])
-        if 'top_k' not in fields:
+        if set(fields) != set(CONFIGURATION_FIELDS):
             # v1 originally had 16 fields. Keep historical bytes/identity: a
             # reader must not add a new unknown field and invalidate old hashes.
-            del expected['fields']['top_k']
+            for key in set(CONFIGURATION_FIELDS)-set(fields):
+                del expected['fields'][key]
             expected['sha256'] = _hash({key: value for key, value in expected.items() if key != 'sha256'})
         if snapshot != expected:
             raise ValueError
@@ -212,6 +216,10 @@ def capture_model_configuration(provider, model, inner, args, kwargs):
                 if key in extra:
                     values[key] = extra[key]
                     sources[key] = 'sdk.model_settings.' + extra_name + '.' + key
+    if _get(inner, 'output_limit_parameter') == 'max_completion_tokens':
+        values['max_completion_tokens'] = _get(settings, 'max_tokens')
+        sources['max_completion_tokens'] = 'adapter.total_output_from_sdk_max_tokens'
+        values['max_tokens'] = None
     from agents.models.openai_chatcompletions import OpenAIChatCompletionsModel
     from agents.models.openai_responses import OpenAIResponsesModel, OpenAIResponsesWSModel
     if isinstance(inner, OpenAIChatCompletionsModel):
@@ -262,8 +270,9 @@ def capture_model_configuration(provider, model, inner, args, kwargs):
                     fingerprints['output_schema_sha256'] = _hash(schema.json_schema())
                     # Requested SDK format, before any provider adapter changes.
                     if 'response_format' not in values:
-                        values['response_format'] = {'type': 'json_schema'}
-                        sources['response_format'] = 'sdk.output_schema'
+                        adapter_format = _get(inner, 'wire_response_format')
+                        values['response_format'] = {'type': adapter_format if adapter_format == 'json_object' else 'json_schema'}
+                        sources['response_format'] = 'adapter.wire_response_format' if adapter_format == 'json_object' else 'sdk.output_schema'
             except (TypeError, ValueError, OverflowError, RecursionError):
                 pass
     return build_configuration_snapshot(values, capture_kind='before_dispatch',

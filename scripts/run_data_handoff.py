@@ -7,7 +7,7 @@ from pathlib import Path
 from uteki.agents.data_query.artifacts import write_new
 from uteki.agents.data_query.coordinator import CompanyDataCoordinator, _verify_manifest
 from uteki.agents.data_query.answer_handoff import (
-    AnswerAssessment, REVIEW_PROMPT, prepare_review_packet, review_data_answer,
+    AnswerAssessment, review_prompt, prepare_review_packet, review_data_answer,
 )
 from uteki.agents.data_query.record_review_model import SdkRecordReviewer
 from uteki.agents.data_query.autonomous_model import reasoning_configuration
@@ -140,7 +140,7 @@ async def run(config, output, *, query_run=None, query_manifest_sha256=None):
                 expected_scope=request.scope, max_packet_bytes=config['max_review_packet_bytes'],
                 source_delivery=config.get('source_delivery', 'query_evidence_v1'))
         review = await review_data_answer(packet, output/'data-review',
-            reviewer_factory=role_factory(config, 'reviewer', REVIEW_PROMPT, AnswerAssessment))
+            reviewer_factory=role_factory(config, 'reviewer', review_prompt(packet), AnswerAssessment))
         summary['stages']['review'] = {'path': 'data-review', 'status': review['status'],
             'review_ref': review['review_ref'], 'analysis_eligible': review['analysis_eligible']}
         print(json.dumps({'stage': 'review', 'status': review['status']}, ensure_ascii=False), flush=True)

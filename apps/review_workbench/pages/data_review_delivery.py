@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 from urllib.parse import urlencode, urlparse
 
-from uteki.agents.data_query.answer_handoff import prepare_review_packet, validate_assessment
+from uteki.agents.data_query.answer_handoff import prepare_review_packet, validate_saved_assessment
 from uteki.agents.data_query.coordinator import _verify_manifest
 from uteki.agents.data_query.artifacts import write_new
 from uteki.infrastructure.research_data.evidence_coordinates import character_span
@@ -95,13 +95,19 @@ def render_data_review(review_dir, output, *, expected_manifest_sha256,
         raise ValueError('Review result is not bound to this exact input and scope')
     fresh = prepare_review_packet(packet['query_ref']['path'], packet['dataset_ref']['path'],
         expected_scope=packet['scope'], max_packet_bytes=packet['max_packet_bytes'],
-        source_delivery=packet.get('source_delivery', 'full_indexed_text_v1'))
+        source_delivery=packet.get('source_delivery', 'full_indexed_text_v1'),
+        source_review_policy=packet.get('source_review_policy'),
+        question_review_policy=packet.get('question_review_policy'))
     if fresh != packet:
         raise ValueError('Review input no longer matches frozen upstream evidence')
     if result.get('assessment') is not None:
         if 'response.json' not in manifest['files']:
             raise ValueError('Assessed review must retain its original response')
-        assessment, eligible = validate_assessment(packet, _json(root/'response.json'))
+        assessment, eligible = validate_saved_assessment(root, packet)
+        if packet.get('question_review_policy') and (
+                result.get('response_origin') != 'program-composed-independent-question-v2'
+                or result.get('question_review_origin') not in {'model', 'scripted_fixture'}):
+            raise ValueError('Independent review origin must be explicit')
         if result['assessment'] != assessment:
             raise ValueError('Saved assessment differs from the validated response')
         if result['status'] == 'reviewed' and (not eligible or not result['analysis_eligible'] or result['failures']):
@@ -191,6 +197,13 @@ def render_data_review(review_dir, output, *, expected_manifest_sha256,
                 + str(len(block.get('text', ''))) + ' characters') + '</summary><section><div class="quote">'
                 + escape(block.get('text', '')) + '</div><details><summary>原始结构 / Original structure</summary><pre>'
                 + escape(json.dumps(block, ensure_ascii=False, indent=2)) + '</pre></details></section></details>']
+    independent_files = [name for name in ('source-response.json', 'question-input.json',
+        'question-response-01.json', 'question-repair-input.json', 'question-response-02.json',
+        'question-response.json', 'response.json') if name in manifest['files']] if packet.get('question_review_policy') else []
+    if independent_files:
+        html_parts += ['<h2>独立问题审核 / Independent question review</h2><section><p>'
+            '材料审核与原问题审核必须同时通过。最终判断由程序组合，原始回答分别保留。</p><p>'
+            + ' · '.join(_link(name, name) for name in independent_files) + '</p></section>']
     if assessment and assessment.get('revision_requests'):
         html_parts += ['<h2>待修订 / Requested revisions</h2><section><ul>'
             + ''.join('<li>' + escape(item) + '</li>' for item in assessment['revision_requests'])
@@ -207,6 +220,7 @@ def render_data_review(review_dir, output, *, expected_manifest_sha256,
     # Read/validate all copied artifacts before creating any delivery output.
     copies = {'input.json': (root/'input.json').read_bytes(), 'result.json': (root/'result.json').read_bytes(),
         'review-manifest.json': (root/'manifest.json').read_bytes(), 'dataset-manifest.json': (dataset/'manifest.json').read_bytes()}
+    for name in independent_files: copies[name] = (root/name).read_bytes()
     for sid in documents:
         metadata = source_metadata[sid]
         path = contained(dataset, metadata['index_folder'] + '/index.json')

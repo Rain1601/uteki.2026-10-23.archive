@@ -1,0 +1,305 @@
+{
+  "question": "以2024-08-01为资料可得截止日，提供Microsoft FY2024公司总收入及金额单位、财年起止、原文出处，不使用截止日之后发布的材料。",
+  "purpose": "analysis_evidence",
+  "dataset": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/datasets/msft-two-annuals",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-8827c466518d878f83689984",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "source-8602d79f703e48c18c2f27c3",
+      "source-360182cbf562dcf9a8ab9c4e"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2024-08-01",
+    "include_candidates": true
+  },
+  "prepared_run": null,
+  "company_config": null,
+  "include_candidates": null,
+  "limits": {
+    "max_steps": 40,
+    "max_packet_bytes": 120000,
+    "observation_bytes": 24000,
+    "page_items": 8,
+    "turn_timeout": 300
+  },
+  "financial_tasks": [],
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-04-qwen-r1/attempt-01/data-query/query",
+      "manifest_sha256": "3516bf6a160f9b0fb85dbcbaf644c8c1603a7b940a83821a07e3b06d067fa6a2"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-04-qwen-r1/attempt-01/review-01",
+      "manifest_sha256": "8c395b28f47cffaa78f744c143f21e50b32ddde1309c8f6fd6fad45871a97320"
+    },
+    "assessment": {
+      "packet_id": "data-review-20da31bf2f00cfa73064bafa",
+      "facts": [
+        {
+          "fact_id": "ev-1fd4c32ac162e92f7cd6b95a",
+          "verdict": "supported",
+          "rationale": "The record gives FY2024 revenue of 245,122,000,000 USD for 2023-07-01 to 2024-06-30. The income statement shows Total revenue 245,122 for the year ended June 30, 2024, in millions, so the record is consistent with it.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000865-dc07a7d1",
+              "quote": "Total revenue 245,122 211,915 198,270"
+            },
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000865-dc07a7d1",
+              "quote": "(In millions, except per share amounts)"
+            }
+          ],
+          "relevance": "necessary"
+        },
+        {
+          "fact_id": "source-block-f8510d0eaebc5441cf36a1e4",
+          "verdict": "supported",
+          "rationale": "The heading identifies the table as the income statements, which gives the statement type for the revenue figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000864-cdef2bac",
+              "quote": "INCOME STATEMENTS"
+            }
+          ],
+          "relevance": "supporting_context"
+        },
+        {
+          "fact_id": "source-block-3dcd2fd2fe3a0fd11263e872",
+          "verdict": "supported",
+          "rationale": "The table gives the unit (in millions), the FY2024 column (year ended June 30, 2024) and the total revenue of 245,122. Other rows are unneeded but sit in an indivisible table block.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000865-dc07a7d1",
+              "quote": "(In millions, except per share amounts) Year Ended June 30, 2024 2023 2022 Revenue:"
+            },
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000865-dc07a7d1",
+              "quote": "Total revenue 245,122 211,915 198,270"
+            }
+          ],
+          "relevance": "necessary"
+        },
+        {
+          "fact_id": "source-block-5f9dc7dd3daacb4490a9f544",
+          "verdict": "supported",
+          "rationale": "The text is delivered as a cover-page heading, but it adds no information on revenue, fiscal period or document type.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000001-7c099db6",
+              "quote": "UNITED STATES"
+            }
+          ],
+          "relevance": "irrelevant"
+        },
+        {
+          "fact_id": "source-block-4b073234c78fc2a16d3d31ea",
+          "verdict": "supported",
+          "rationale": "The text is a cover-page filer heading and is not needed for the requested values. The SEC filing identity is already given by the Form 10-K block and the source URL.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000002-08d6cb02",
+              "quote": "SECURITIES AND EXCHANGE COMMISSION"
+            }
+          ],
+          "relevance": "irrelevant"
+        },
+        {
+          "fact_id": "source-block-20dd7fe70bb84302003fee34",
+          "verdict": "supported",
+          "rationale": "The text is a cover-page address and is irrelevant to revenue, unit and fiscal period.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000003-4463578c",
+              "quote": "Washington, D.C. 20549"
+            }
+          ],
+          "relevance": "irrelevant"
+        },
+        {
+          "fact_id": "source-block-cd8b41dac03675aadf98f12f",
+          "verdict": "supported",
+          "rationale": "This short heading identifies the document as a Form 10-K, which is useful provenance.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000004-26678be6",
+              "quote": "FORM 10-K"
+            }
+          ],
+          "relevance": "supporting_context"
+        },
+        {
+          "fact_id": "source-block-bbe29028f0ba927804f35f1b",
+          "verdict": "supported",
+          "rationale": "The block states that this is an annual report under Section 13 or 15(d). It adds modest filing-type context, but the Form 10-K heading and fiscal-year block already cover this. It is redundant.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000005-4ccc0084",
+              "quote": "ANNUAL REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "source-block-e44c3f26e4e44652d544dd7c",
+          "verdict": "supported",
+          "rationale": "The block states the fiscal year ended June 30, 2024. Together with the income-statement column header, this supports the FY2024 end date. The 2023-07-01 start date is not stated in the delivered text and is only derivable from the year-ended-June-30 convention and the structured record.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000006-3e1a5af2",
+              "quote": "For the Fiscal Year Ended June 30, 2024"
+            }
+          ],
+          "relevance": "necessary"
+        }
+      ],
+      "requirements": [
+        {
+          "requirement_id": "req-fy24-total-revenue-numeric",
+          "verdict": "complete",
+          "rationale": "The structured record gives FY2024 revenue of 245,122,000,000 USD for 2023-07-01 to 2024-06-30. The source has a verified citation, and the original income statement agrees.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000865-dc07a7d1",
+              "quote": "Total revenue 245,122 211,915 198,270"
+            }
+          ]
+        },
+        {
+          "requirement_id": "req-fy24-total-revenue-original-text",
+          "verdict": "complete",
+          "rationale": "The income-statement table gives total revenue of 245,122 with the unit '(In millions...)' and the year-ended-June-30, 2024 column. The heading identifies the statement type.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000864-cdef2bac",
+              "quote": "INCOME STATEMENTS"
+            },
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000865-dc07a7d1",
+              "quote": "(In millions, except per share amounts) Year Ended June 30, 2024"
+            }
+          ]
+        },
+        {
+          "requirement_id": "req-fy24-fiscal-year-source-text",
+          "verdict": "complete",
+          "rationale": "The filing identifies itself as a Form 10-K for the fiscal year ended June 30, 2024. The start date 2023-07-01 is not stated in the delivered text, but the question can be answered through the structured record and the one-year period convention. Several cover heading blocks are unnecessary.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000004-26678be6",
+              "quote": "FORM 10-K"
+            },
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000006-3e1a5af2",
+              "quote": "For the Fiscal Year Ended June 30, 2024"
+            }
+          ]
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "verdict": "text_sufficient",
+          "rationale": "The delivered text covers the Form 10-K identity, the fiscal year end of June 30, 2024, the income-statement unit (millions) and total revenue of 245,122. The permitted 2024 source is used, and the 2025 source was excluded for being after the cutoff.",
+          "citations": [
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000006-3e1a5af2",
+              "quote": "For the Fiscal Year Ended June 30, 2024"
+            },
+            {
+              "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+              "block_id": "block-000865-dc07a7d1",
+              "quote": "Total revenue 245,122 211,915 198,270"
+            }
+          ]
+        }
+      ],
+      "question_coverage": "complete",
+      "coverage_reason": "The answer has the FY2024 total revenue of 245,122 million USD, the unit, the fiscal year ending June 30, 2024 (start 2023-07-01 is in the structured record), and the original 10-K source, all within the cutoff. A few cover-page blocks are unnecessary, which is a trimming issue and not a coverage gap.",
+      "missing_information": [],
+      "revision_requests": [
+        "Remove the non-essential cover-page blocks: block-000001-7c099db6, block-000002-08d6cb02, block-000003-4463578c and block-000005-4ccc0084. Keep the Form 10-K heading and the fiscal-year block."
+      ],
+      "body_checks": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000001-7c099db6",
+          "relevance": "irrelevant",
+          "rationale": "The cover heading 'UNITED STATES' adds nothing to revenue, unit or fiscal period."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000002-08d6cb02",
+          "relevance": "irrelevant",
+          "rationale": "The SEC heading is not needed for the requested values, and the filing identity is already given by the Form 10-K heading."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000003-4463578c",
+          "relevance": "irrelevant",
+          "rationale": "This is a cover-page address."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000004-26678be6",
+          "relevance": "supporting_context",
+          "rationale": "A short heading identifying the document as Form 10-K gives provenance."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000005-4ccc0084",
+          "relevance": "redundant",
+          "rationale": "The annual-report checkbox is redundant once Form 10-K and the fiscal year ended are delivered."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000006-3e1a5af2",
+          "relevance": "necessary",
+          "rationale": "This block states the fiscal year ended June 30, 2024."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000863-9d7720d5",
+          "relevance": "supporting_context",
+          "rationale": "Item 8 heading gives the location of the financial statements."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000864-cdef2bac",
+          "relevance": "supporting_context",
+          "rationale": "Income statements heading identifies the statement type."
+        },
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000865-dc07a7d1",
+          "relevance": "necessary",
+          "rationale": "This block contains the unit, the year column and the total revenue figure."
+        }
+      ],
+      "limitations": [
+        "The delivered text states the fiscal year end, but the 2023-07-01 start date appears only in the structured record, not in original text.",
+        "The 2025 source (source-360182cbf562dcf9a8ab9c4e) is after the cutoff and correctly not used."
+      ]
+    }
+  }
+}

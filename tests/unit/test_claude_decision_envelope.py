@@ -8,7 +8,8 @@ from unittest.mock import patch
 import httpx2 as httpx
 from agents import AgentOutputSchema, ModelSettings
 from agents.exceptions import ModelBehaviorError
-from uteki.agents.data_query.autonomous import AutonomousDecision
+from uteki.agents.data_query.autonomous import AutonomousDecision, AUTONOMOUS_PROMPT
+from uteki.agents.data_query.decision_protocol import HOST_DECISION_EXAMPLE
 from uteki.agents.runtime.claude_messages import ClaudeMessagesModel, decision_envelope_schema, decode_decision_envelope, _canonical, _sha
 from uteki.agents.runtime.model_configuration import validate_configuration_snapshot
 from uteki.agents.runtime.strict_json import StrictJSONError
@@ -73,6 +74,28 @@ class ClaudeDecisionEnvelopeTests(unittest.TestCase):
         self.assertEqual(set(schema['required']),set(schema['properties']))
         self.assertFalse(schema['additionalProperties'])
         self.assertEqual(sum('anyOf' in p for p in schema['properties'].values()),2)
+
+    def test_wire_examples_replace_host_example_and_validate_without_repairs(self):
+        kwargs = self.kwargs(); kwargs['system_instructions'] = AUTONOMOUS_PROMPT
+        # Capture the actual prepared request, not a separately copied example.
+        original = self.kwargs
+        self.kwargs = lambda: kwargs
+        try:
+            self.run_wire(json.dumps(envelope('load_skill', 'query')))
+        finally:
+            self.kwargs = original
+        system = json.loads(self.requests[0].content)['system']
+        self.assertNotIn(HOST_DECISION_EXAMPLE, system)
+        examples = [json.loads(line.removeprefix('Wire example: ')) for line in system.splitlines()
+                    if line.startswith('Wire example: ')]
+        self.assertEqual(len(examples), 3)
+        for example in examples:
+            AutonomousDecision.model_validate_json(decode_decision_envelope(json.dumps(example)))
+        self.assertEqual(json.loads(examples[0]['payload_json']), 'query')
+        # Historical failure shape remains rejected; do not silently unwrap it.
+        with self.assertRaises(ModelBehaviorError):
+            self.run_wire(json.dumps(envelope('load_skill', {'skill': 'query'})))
+        self.assertEqual(self.model.response_metadata['host_schema_validation'], 'rejected')
 
     def test_array_and_string_payloads_decode_to_original_action_field(self):
         examples=[('plan',[{'kind':'source_evidence','requirement_id':'r','source_id':'s','description':'Source evidence'}],'requirements'),
