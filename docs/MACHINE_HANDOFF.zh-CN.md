@@ -46,7 +46,7 @@ PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 
 
 ## 私密状态单独迁移
 
-GitHub仓库是公开的。代码、公开材料、候选、页面与Todo随Git同步。预算SQLite、私密Claude对话、本机观测和含运营身份的获取配置另存本地迁移包：
+用户已将GitHub仓库改为私有，并明确授权同步完整提交；推送前已通过GitHub接口确认`isPrivate=true`。代码、公开材料、候选、页面、实验产物、回测材料与Todo随Git同步。API密钥仍不进入Git。预算SQLite、私密Claude对话、本机观测和含运营身份的获取配置沿用单独迁移包：
 
 `output/machine-handoff-20261008/private-state-v2.tar.gz`
 

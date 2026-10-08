@@ -34,7 +34,7 @@ retain their original dates and do not describe every subsequent increment.
   [CLI](docs/DATA_AGENT_CLI.zh-CN.md), and [MCP](docs/DATA_AGENT_MCP.zh-CN.md).
 - Research policy: [core investment questions](docs/INVESTMENT_CORE_QUESTIONS.zh-CN.md).
 
-This public handoff includes reviewed source code, designs, public filing
+This repository handoff includes reviewed source code, designs, public filing
 archives, experiment records, ordinary configuration, and report/brand samples.
 Credentials, private operator contact settings, usage ledgers, machine caches,
 and internal reference copies remain local. Frozen files that contain sensitive
