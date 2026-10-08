@@ -114,6 +114,8 @@ class BusinessRevenueRunTests(unittest.IsolatedAsyncioTestCase):
     def respond(self, request):
         self.requests.append(request)
         if self.transport_error:
+            if self.transport_error == 'read':
+                raise httpx.ReadError('mock response read error', request=request)
             raise httpx.ConnectError("mock transport error", request=request)
         return httpx.Response(200, json={"id": "msg_fixture", "model": "claude-sonnet-5-5",
             "stop_reason": self.stop_reason, "usage": {"input_tokens": 120, "output_tokens": 80},
@@ -368,7 +370,9 @@ class BusinessRevenueRunTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.requests), 1)
 
     async def test_transport_failure_preserves_unknown_cost_without_retry(self):
-        self.transport_error = True
+        # Connection failure is proven not sent by the adapter. A response read
+        # failure can follow dispatch and must retain its uncertain charge.
+        self.transport_error = 'read'
         with self.assertRaises(RuntimeError):
             await self.execute()
         result = json.loads((self.root/"run/result.json").read_text())
@@ -376,6 +380,15 @@ class BusinessRevenueRunTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["budget"]["unknown_requests"], 1)
         self.assertEqual(result["costs"]["unknown_cost_requests"], 1)
         self.assertTrue(self.clients[0].is_closed)
+
+    async def test_connection_failure_records_not_sent_without_retry(self):
+        self.transport_error = True
+        with self.assertRaises(RuntimeError):
+            await self.execute()
+        result = json.loads((self.root/'run/result.json').read_text())
+        self.assertEqual(len(self.requests), 1)
+        self.assertEqual(result['budget']['unknown_requests'], 0)
+        self.assertEqual(result['budget']['estimated_spent_usd'], '0')
 
     async def test_output_and_observation_paths_fail_without_call(self):
         prepared = self.prepare()

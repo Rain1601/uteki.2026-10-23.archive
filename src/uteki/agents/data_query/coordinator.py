@@ -605,8 +605,15 @@ class CompanyDataCoordinator:
                     model_config=extractor_model_config, credentials_root=credential_root,
                     model_call=financial_extractor)
             initial_scope = scope
+            if request.purpose == 'business_materials':
+                scoped = owner.scoped(scope)
+                supported = [scoped._source(sid) for sid in scope.source_snapshot_ids
+                    if scoped._source(sid).get('form') in {'10-K', '10-K/A'}
+                    and Path(scoped._source(sid).get('raw_file', '')).suffix.lower() in {'.html', '.htm'}]
+                if not supported:
+                    raise ValueError('business material selection requires an allowed SEC HTML 10-K or 10-K/A source')
             if model_config is not None:
-                managed_planner = self._planner(model_config, output/'model', credential_root)
+                managed_planner = self._planner(model_config, output/'model', credential_root, purpose=request.purpose)
                 planner = managed_planner
             if worker_model_config is not None:
                 managed_worker = self._planner(worker_model_config, output/'worker-model', credential_root, role='worker')
@@ -618,6 +625,7 @@ class CompanyDataCoordinator:
                         'report_period_end': 'ISO date from filing_catalog'}},
                     'materialize': {'source_run_id': 'ID returned by acquire'}}}
             agent = AutonomousDataAgent(owner, planner, limits=limits, worker_planner=worker_planner,
+                purpose=request.purpose,
                 acquire=acquire if source and config is not None else None,
                 materialize=materialize if source and config is not None else None, preparation=preparation,
                 financial_extract=financial_gateway.extract if financial_gateway else None,
@@ -698,7 +706,7 @@ class CompanyDataCoordinator:
             raise ValueError('planner and worker must share the same budget ledger, USD limit, policy and request allowance')
 
     @staticmethod
-    def _planner(config, output, credential_root, *, role='planner'):
+    def _planner(config, output, credential_root, *, role='planner', purpose='question_answer'):
         from uteki.agents.runtime.run_budget import RunBudget
         from .autonomous_model import SdkAutonomousPlanner
         CompanyDataCoordinator._validate_model_config(config)
@@ -706,4 +714,4 @@ class CompanyDataCoordinator:
         return SdkAutonomousPlanner(config['provider'], config['model'], budget=budget,
             max_requests_total=config['max_requests_total'], output=output, credentials_root=credential_root,
             max_tokens=config.get('max_tokens', 4096), request_timeout=config.get('request_timeout', 60),
-            max_retries=config.get('max_retries', 0), role=role, reasoning_effort=config.get('reasoning_effort'))
+            max_retries=config.get('max_retries', 0), role=role, reasoning_effort=config.get('reasoning_effort'), purpose=purpose)

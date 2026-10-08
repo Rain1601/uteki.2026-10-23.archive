@@ -38,6 +38,8 @@ CORE_TESTS = (
     "tests.unit.test_observation_relocation",
     "tests.unit.test_workspace_routes.WorkspaceRoutesTests.test_root_redirects_to_unselected_data_workspace",
     "tests.unit.test_business_map_agent",
+    "tests.unit.test_business_runtime_materials",
+    "tests.unit.test_business_system_task",
     "tests.unit.test_business_coverage_contract",
     "tests.unit.test_business_coverage_contract_v2",
     "tests.unit.test_business_coverage_diagnostics",

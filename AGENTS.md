@@ -231,6 +231,17 @@ Agent 的 system prompt 或输出契约。
 
 ## No implicit business scope or sample-specific fallbacks
 
+- Runtime responsibility (user confirmed 2026-10-09): the system Agent must
+  translate the user's task into source discovery, query, section selection,
+  reading, follow-up retrieval and extraction. Codex implements and tests those
+  capabilities; it must not prepare semantic chapter/block selections or fill
+  factual gaps on behalf of a production run. Caller inputs may fix company,
+  reporting scope, source policy, task, Skill, model and resource limits.
+- A model extracting from a Codex-curated packet is an extraction experiment,
+  not an end-to-end autonomous Agent evaluation. Preserve that distinction in
+  run metadata, TODO status and delivery language. Keep selected-text delivery,
+  selection sufficiency and business-content acceptance as separate checks.
+
 - Shared contracts, parsers, prompts, query services, and production entry points
   must not hardcode a company/entity, reporting period, source/snapshot, local
   experiment path, or expected financial result as a default or fallback.

@@ -2,7 +2,7 @@
 
 ## 接手入口
 
-先读 [八项待办](DATA_AGENT_EXTRACTION_TODO.zh-CN.md)、[最新阶段记录](../experiments/agent_design/2026-10-08-business-granularity-v2/README.zh-CN.md) 和 [本轮内容复核](../experiments/agent_design/2026-10-08-business-granularity-v2/evaluation/critic-revised-02-content-review.md)。完整历史在 [TODO.md](../TODO.md)。
+先读 [八项待办](DATA_AGENT_EXTRACTION_TODO.zh-CN.md) 与 [系统自主取材入口](DATA_AGENT_RUNTIME_MATERIALS.zh-CN.md)。旧候选见[阶段记录](../experiments/agent_design/2026-10-08-business-granularity-v2/README.zh-CN.md)和[内容复核](../experiments/agent_design/2026-10-08-business-granularity-v2/evaluation/critic-revised-02-content-review.md)。完整历史在 [TODO.md](../TODO.md)。
 
 范围是01–09，跳过06；10–16暂不做。**09业务图独立执行成立，内容仍未通过。** 不把协议通过当成内容正确。
 
@@ -10,7 +10,7 @@
 
 新机器开启Codex任务时可以直接交代：
 
-> 先读AGENTS.md、docs/MACHINE_HANDOFF.zh-CN.md和docs/DATA_AGENT_EXTRACTION_TODO.zh-CN.md，从09业务图内容验收断点继续。沿用系统Agent独立调用Sonnet、Opus复核、Codex开发与独立审阅的分工。保留冻结证据、失败记录和同一预算，不把参考答案放回执行输入。先核对迁移完整性；当前超额调用须先取得授权。
+> 先读AGENTS.md、docs/MACHINE_HANDOFF.zh-CN.md、docs/DATA_AGENT_EXTRACTION_TODO.zh-CN.md和docs/DATA_AGENT_RUNTIME_MATERIALS.zh-CN.md，从09系统自主取材→提取入口的真实模型验收继续。旧103块材料是Codex预选的，不能再当自主输入。Codex只开发与测试；系统自己选章节、读原文和补读。保留冻结证据、失败记录和同一预算，不把参考答案放回执行输入。先核对迁移完整性；当前超额调用须先取得授权。
 
 ## 安装与启动
 
@@ -112,7 +112,7 @@ PYTHONPATH=src .venv/bin/python -m apps.claude_dialogue \
 
 | 顺序 | 工作 | 真实状态 |
 |---|---|---|
-| 当前 | 09：系统Agent独立业务图 | 内容复核仍有引文范围、已知信息承接与覆盖缺口 |
+| 当前 | 09：系统自主取材并提取 | 新入口离线已连通；真实模型选材充分性与业务内容仍待验收，旧103块输入不是自主选材 |
 | 后续 | 03/04：整文解析质量 | 部分结构与相邻脚注通过；复杂表头、单位、跨节引用未完成 |
 | 后续 | 07：结构化财务事实 | 小样本通过；三张主表及必要附注未全部覆盖 |
 | 后续 | 08：财报精编 | Microsoft业务小节已执行，整文未完成 |

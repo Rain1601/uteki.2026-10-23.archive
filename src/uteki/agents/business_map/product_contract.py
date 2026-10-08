@@ -204,6 +204,9 @@ def validate_business_scope(packet, blocks):
     not proof that a caller selected the right subsection.
     """
     scope = packet.get("extraction_scope")
+    if isinstance(scope, dict) and scope.get("kind") == "runtime-indexed-sections-v1":
+        from .runtime_materials import validate_runtime_scope
+        return validate_runtime_scope(packet, blocks)
     if not isinstance(scope, dict) or scope.get("kind") != "complete_report_subsection":
         raise ValueError("explicit_business_subsection_required")
     _text(scope.get("title"), "business_scope_title")

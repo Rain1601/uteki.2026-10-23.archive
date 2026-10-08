@@ -1,5 +1,9 @@
 # 公司 Data Agent CLI
 
+## 系统自主取材并提取业务（2026-10-09）
+
+新增 `agent business`：从公司/报告范围和问题进入已有自主查询器，系统选择目录节点、读原文并冻结材料，再调用业务提取器。无调用者章节/block/摘录参数。共享模型预算和规则快照，保留选材与内容质量未评估状态。当前支持单份 SEC inline HTML 10-K / 10-K/A；[请求格式、产物与验收边界](DATA_AGENT_RUNTIME_MATERIALS.zh-CN.md)。旧 `--packet` 提取脚本仍用于实验重放，不能当作全程自主入口。
+
 ## 只获取官方原件（2026-10-04）
 
 新增 `agent acquire --config <公司来源配置> --workspace <原件库>`，直接调用已有获取组件，不调用模型、不要求模型凭据、不启动解析。支持显式 CIK 与 10-K / 20-F 年报区间；真实配置见 `config/company_sources/amd-annual-v1.json` 和 `tsmc-annual-v1.json`。联系身份按 `--sec-user-agent`、环境 `UTEKI_SEC_USER_AGENT`、非空公司配置、私有 `.env` 顺序读取；`--settings-root` 默认为工作目录，可显式指定。逐份状态保存在返回的 `manifest_path`，有缺口退出 2。本机既有 SEC 联系身份已持久保存，后续无需重复输入。

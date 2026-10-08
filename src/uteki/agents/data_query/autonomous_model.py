@@ -23,7 +23,7 @@ from uteki.agents.runtime.strict_json import StrictJSONError, parse_json_object
 from uteki.infrastructure.research_data.financial_records import digest
 from .artifacts import write_new
 from .decision_protocol import DECISION_PROTOCOL_VERSION
-from .autonomous import AUTONOMOUS_PROMPT, AUTONOMOUS_PROMPT_VERSION, WORKER_PROMPT, AutonomousDecision
+from .autonomous import AUTONOMOUS_PROMPT, AUTONOMOUS_PROMPT_VERSION, WORKER_PROMPT, AutonomousDecision, runtime_prompt
 
 
 VISIBLE_OUTPUT_CHAR_LIMIT = 128000
@@ -168,6 +168,9 @@ class _RequestLimitedBudget:
     def settle(self, token, actual):
         return self.budget.settle(token, actual)
 
+    def summary(self):
+        return self.budget.summary()
+
 
 class SdkAutonomousPlanner:
     """Only the default provider path is model-origin; injected HTTP is a fixture.
@@ -177,10 +180,10 @@ class SdkAutonomousPlanner:
     """
     def __init__(self, provider, model, *, budget, max_requests_total, output, credentials_root,
                  max_tokens=3000, request_timeout=90, max_retries=0, pricing=None, client_factory=None,
-                 role='planner', reasoning_effort=None):
+                 role='planner', reasoning_effort=None, purpose='question_answer'):
         if role not in {'planner', 'worker'}:
             raise ValueError('Role must be planner or worker')
-        prompt = AUTONOMOUS_PROMPT if role == 'planner' else WORKER_PROMPT
+        prompt = runtime_prompt(role, purpose)
         effort, thinking, native = reasoning_configuration(provider, model, reasoning_effort)
         if native and max_retries != 0:
             raise ValueError('Native Claude currently requires explicit retries disabled')
@@ -235,6 +238,7 @@ class SdkAutonomousPlanner:
             output_type=AgentOutputSchema(AutonomousDecision, strict_json_schema=False),
             model_settings=settings)
         self._config = {'schema_version': 'autonomous-model-config-v1', 'plan_origin': self.plan_origin, 'role': role,
+            'purpose': purpose,
             'provider': provider, 'model': model, 'prompt': prompt, 'prompt_version': AUTONOMOUS_PROMPT_VERSION,
             'prompt_sha256': digest(prompt), 'decision_protocol_version': DECISION_PROTOCOL_VERSION,
             'strict_visible_json': provider == 'deepseek' or native,

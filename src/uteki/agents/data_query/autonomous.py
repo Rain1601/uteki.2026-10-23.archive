@@ -108,6 +108,39 @@ Only your fixed requirements need completion; the original parent question suppl
 assignments. Do not perform the Planner's other requirements or repeat the parent's delegation request.
 """
 
+BUSINESS_MATERIALS_PROMPT = """
+This run prepares original material for a later business extraction, rather than a narrative answer.
+This extraction gateway currently supports multiple indexed nodes from ONE SEC inline HTML 10-K
+or 10-K/A source. It cannot merge reports, interpret images, process PDF or 20-F, or extract financial
+table cells. Choose a supported source only when it meets the original request. If the request needs
+unsupported or multiple sources, report a gap; never silently pick the first source or shrink scope.
+The original request defines the business scope. Discover available sources and their real outlines,
+then select the relevant complete nodes yourself. Caller-supplied chapter lists or excerpts are not
+the selection policy. An initial kind=information requirement can support catalog/outline navigation;
+keep it when appending kind=read_node requirements for actual node IDs returned by the outline.
+Associate the ensuing body reads with both that navigation requirement and the read_node requirement;
+outline metadata alone does not complete an information requirement's evidence check.
+Plan kind=read_node for every selected node and explain why it is needed.
+Read the full selected nodes, including all source and artifact pages. Search hits are leads only.
+Check introductions, lists and cross-references for additional required sections; revise the plan
+and read them when needed. Do not reduce the requested business scope to make reading cheaper.
+Do not replace this task with source_answer/claimed_complete or a few matching paragraphs.
+If sources, supported representations or budget are insufficient, report the specific gap.
+Finish after all planned reading is complete. The host will freeze the original blocks for the
+extractor; do not rewrite, summarize or select individual blocks as its input. Reading completion
+proves only that selected indexed text was delivered, not that all relevant sections were selected
+or that the final business graph is correct. Preserve that distinction in coverage statements.
+"""
+
+
+def runtime_prompt(role, purpose='question_answer'):
+    if purpose not in {'question_answer', 'business_materials'}:
+        raise ValueError('unsupported autonomous purpose')
+    base = WORKER_PROMPT if role == 'worker' else AUTONOMOUS_PROMPT
+    if role == 'planner' and purpose == 'business_materials':
+        return base + BUSINESS_MATERIALS_PROMPT
+    return base
+
 
 class Requirement(Contract):
     kind: Literal['information', 'source_evidence', 'source_answer', 'read_node', 'query', 'financial_extract'] = 'information'
@@ -298,7 +331,10 @@ def _worker_summary(handoff, full_ref):
 
 class AutonomousDataAgent:
     def __init__(self, port, planner, *, acquire=None, materialize=None, limits=None, skills=None, preparation=None,
-                 worker_planner=None, financial_extract=None, financial_tasks=None, observation_context=None):
+                 worker_planner=None, financial_extract=None, financial_tasks=None, observation_context=None,
+                 purpose='question_answer'):
+        runtime_prompt('planner', purpose)
+        self.purpose = purpose
         self.port, self.planner = port, planner
         self.observation_context = observation_context
         self.worker_planner = worker_planner
@@ -391,7 +427,7 @@ class AutonomousDataAgent:
         write_new(output / 'request.json', request.model_dump(mode='json'))
         skills = self._skills()
         write_new(output / 'skills.json', skills)
-        prompt = WORKER_PROMPT if role == 'worker' else AUTONOMOUS_PROMPT
+        prompt = runtime_prompt(role, self.purpose)
         write_new(output / 'config.json', {'limits': self.limits.model_dump(), 'plan_origin': self.planner.plan_origin,
             'role': role, 'prompt_version': AUTONOMOUS_PROMPT_VERSION, 'decision_protocol_version': DECISION_PROTOCOL_VERSION,
             'prompt_sha256': digest(prompt), 'prompt': prompt})
@@ -523,6 +559,9 @@ class AutonomousDataAgent:
             unmet = []
             if not requirements:
                 unmet.append({'requirement_id': None, 'reason': 'plan_not_established'})
+            if role == 'planner' and self.purpose == 'business_materials' and not any(
+                    r['kind'] == 'read_node' for r in requirements.values()):
+                unmet.append({'requirement_id': None, 'reason': 'business_materials_require_node_reading'})
             pending = pending_body_reads()
             for rid, row in coverage.items():
                 if row['gap_ids']: continue
@@ -658,6 +697,7 @@ class AutonomousDataAgent:
                                          'max_bytes': max(512, self.limits.max_packet_bytes // 8)})
             projected = state_view['value']
             packet = {'request': request.model_dump(mode='json'), 'active_scope': scope.model_dump(mode='json'),
+                'purpose': self.purpose,
                 'role': role, 'delegation_instruction': instruction,
                 'catalog': catalog_packet(), **{k: projected.get(k, []) for k in ('requirements', 'coverage', 'gaps')},
                 'state_artifact': state, 'state_reads': state_view['reads'],
@@ -1278,6 +1318,7 @@ class AutonomousDataAgent:
         write_new(output / 'evidence-bundle.json', bundle)
         write_new(output / 'artifact-index.json', [r.model_dump(mode='json') for r in artifacts.refs.values()])
         result = {'schema_version': 'autonomous-result-v2', 'status': status, 'stop_reason': stop_reason, 'request': request.model_dump(mode='json'),
+            'purpose': self.purpose,
             'active_scope': scope.model_dump(mode='json'), 'plan_origin': self.planner.plan_origin,
             'plans': revisions, 'coverage': list(coverage.values()), 'gaps': list(gaps.values()),
             'evidence_bundle': {'path': 'evidence-bundle.json', 'bundle_id': bundle['bundle_id'], 'item_count': len(bundle['items'])},

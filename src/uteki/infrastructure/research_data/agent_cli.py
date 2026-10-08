@@ -31,6 +31,11 @@ def _company_config(args):
 def register_agent_commands(commands):
     agent = commands.add_parser('agent', help='prepare/extract/query/refresh/inspect company research data')
     actions = agent.add_subparsers(dest='agent_action', required=True)
+    business = actions.add_parser('business', help='system-selected original material to a business candidate; no section/excerpt arguments')
+    for name in ('request', 'root', 'workspace', 'output', 'model-config', 'extractor-model-config',
+                 'credentials-root', 'observation-root'):
+        business.add_argument('--'+name, type=Path, required=True)
+    business.add_argument('--sec-user-agent', help='SEC application/contact identity when acquiring sources')
     acquire = actions.add_parser('acquire', help='discover and download official filings without parsing or model calls')
     _company_arguments(acquire)
     acquire.add_argument('--workspace', type=Path, required=True, help='original files and immutable acquisition runs')
@@ -74,6 +79,21 @@ def register_agent_commands(commands):
 
 def run_agent_command(args):
     def load(path): return json.loads(path.read_text())
+    if args.agent_action == 'business':
+        from uteki.agents.business_map.workflow import run_business_task
+        from uteki.infrastructure.document_sources.sec_settings import resolve_sec_contact
+        request = load(args.request)
+        source_config = request.get('query', {}).get('company_config')
+        contact = None
+        if source_config is not None:
+            if not isinstance(source_config, dict):
+                raise ValueError('explicit company configuration object required')
+            contact, _ = resolve_sec_contact(explicit=args.sec_user_agent,
+                configured=source_config.get('sec_user_agent'), settings_root=args.credentials_root)
+        return asyncio.run(run_business_task(request, root=args.root, workspace=args.workspace,
+            output=args.output, planner_model_config=load(args.model_config),
+            extractor_model_config=load(args.extractor_model_config), credentials_root=args.credentials_root,
+            observation_root=args.observation_root, sec_user_agent=contact))
     if args.agent_action == 'acquire':
         from uteki.infrastructure.document_sources.company_acquisition import prepare_sources
         from uteki.infrastructure.document_sources.sec_settings import resolve_sec_contact

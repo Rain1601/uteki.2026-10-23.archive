@@ -1,4 +1,5 @@
 """Caller-selected preparation or frozen-dataset input for the company agent."""
+from typing import Literal
 from pydantic import Field, model_validator
 
 from .execution_scope import ExecutionScope
@@ -16,6 +17,7 @@ class RegisteredFinancialTask(Contract):
 
 class CompanyQueryInput(Contract):
     question: str = Field(min_length=1, max_length=20000, pattern=r'\S')
+    purpose: Literal['question_answer', 'business_materials'] = 'question_answer'
     dataset: str | None = Field(default=None, min_length=1, pattern=r'\S')
     scope: ExecutionScope | None = None
     prepared_run: str | None = Field(default=None, min_length=1, pattern=r'\S')

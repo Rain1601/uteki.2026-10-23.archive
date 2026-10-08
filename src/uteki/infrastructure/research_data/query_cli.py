@@ -101,7 +101,7 @@ def main(argv=None):
             print(output, end="")
         if args.tool == 'agent' and args.agent_action == 'acquire':
             return 0 if result.get('status') == 'completed' else 2
-        return 2 if args.tool == 'agent' and result.get('status') in {'failed', 'unavailable', 'cancelled'} else 0
+        return 2 if args.tool == 'agent' and result.get('status') in {'failed', 'unavailable', 'cancelled', 'material_gap'} else 0
     except (ValueError, KeyError, OSError, RuntimeError, duckdb.Error) as error:
         print(json.dumps({"status": "failed", "error_type": type(error).__name__, "message": str(error)}, ensure_ascii=False), file=sys.stderr)
         return 2
