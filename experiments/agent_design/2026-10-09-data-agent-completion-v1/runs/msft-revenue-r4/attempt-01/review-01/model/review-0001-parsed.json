@@ -1,0 +1,92 @@
+{
+  "packet_id": "data-review-063746d1a9526161264b6887",
+  "facts": [
+    {
+      "fact_id": "ev-0f0d534526e008dece6e074f",
+      "verdict": "supported",
+      "rationale": "The income statement table shows Total revenue of 281,724 under the 2025 column (year ended June 30, 2025), with a header of \"In millions\". This is consistent with the record's value of 281,724,000,000 USD. The reported consolidated basis is consistent with the consolidated income statement. The record's unit, period and value match.",
+      "citations": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000781-9ee5633d",
+          "quote": "Total revenue 281,724 245,122 211,915"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "ev-36fab0af3579301a8032bcd5",
+      "verdict": "supported",
+      "rationale": "The income statement table shows Total revenue of 245,122 under the 2024 column (year ended June 30, 2024), in millions. This is consistent with the record's value of 245,122,000,000 USD, FY2024 period and consolidated basis.",
+      "citations": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000781-9ee5633d",
+          "quote": "Total revenue 281,724 245,122 211,915"
+        }
+      ],
+      "relevance": "necessary"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "req-revenue",
+      "verdict": "complete",
+      "rationale": "Both FY2025 (281,724 million) and FY2024 (245,122 million) total revenue are given with units (in millions, USD), periods (years ended June 30), and the consolidated income statement basis, with verifiable original citations from the 10-K Item 8 income statements. The candidate status is noted but the values match the source.",
+      "citations": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000781-9ee5633d",
+          "quote": "Total revenue 281,724 245,122 211,915"
+        },
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000779-9d7720d5",
+          "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA"
+        }
+      ]
+    }
+  ],
+  "source_checks": [
+    {
+      "source_snapshot_id": "msft-2025-10k",
+      "verdict": "text_sufficient",
+      "rationale": "The delivered income statement table, with its heading and unit line, contains both required total revenue values with period columns. No images are needed.",
+      "citations": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000781-9ee5633d",
+          "quote": "(In millions, except per share amounts)"
+        }
+      ]
+    }
+  ],
+  "question_coverage": "complete",
+  "coverage_reason": "The delivered original blocks give total revenue for FY2025 and FY2024 with units, year-ended-June-30 periods, consolidated income statement basis, and citeable source location. Both facts match the source.",
+  "missing_information": [],
+  "revision_requests": [],
+  "body_checks": [
+    {
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000779-9d7720d5",
+      "relevance": "supporting_context",
+      "rationale": "Item 8 heading identifies the financial statements section for provenance."
+    },
+    {
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000780-cdef2bac",
+      "relevance": "supporting_context",
+      "rationale": "Income Statements heading identifies the statement type and basis."
+    },
+    {
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000781-9ee5633d",
+      "relevance": "necessary",
+      "rationale": "Contains the unit line, period columns and the Total revenue values for 2025 and 2024."
+    }
+  ],
+  "limitations": [
+    "The records are candidate status and were not independently adopted; the FY2023 column is present in the table but not requested.",
+    "The accounting basis is inferred from the consolidated income statement heading; no explicit GAAP statement was delivered in these blocks."
+  ]
+}

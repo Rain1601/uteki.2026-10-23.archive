@@ -1,0 +1,149 @@
+{
+  "packet_id": "data-review-e9960af26932bcc38159f951",
+  "facts": [
+    {
+      "fact_id": "ev-67189f4cd4dcee452cb83ab2",
+      "verdict": "supported",
+      "rationale": "The income statement table shows Revenues of $402,836 (millions) in the 2025 column, matching the record value of 402,836,000,000 USD, FY2025, consolidated.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Revenues$307,394 $350,018 $402,836"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "ev-3a5c83fac5b23e1d158f3492",
+      "verdict": "supported",
+      "rationale": "The income statement table shows Revenues of $350,018 (millions) in the 2024 column, matching the record value of 350,018,000,000 USD, FY2024, consolidated.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Revenues$307,394 $350,018 $402,836"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "source-block-6d38eb62e6e73089d8452206",
+      "verdict": "supported",
+      "rationale": "The heading identifies the table as the consolidated statements of income, which provides the accounting basis.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000751-1e6373dd",
+          "quote": "CONSOLIDATED STATEMENTS OF INCOME"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-3106f0481f5c969a0956e926",
+      "verdict": "supported",
+      "rationale": "The unit line states that amounts are in millions, except per share amounts, which is needed to read the revenue figures.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000752-dfe26017",
+          "quote": "(in millions, except per share amounts)"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "source-block-ff738279896d3dc0249381f7",
+      "verdict": "supported",
+      "rationale": "The table body contains the period header (Year Ended December 31) and the revenue figures for 2024 and 2025. It also contains 2023 data and other lines that are unneeded but belong to the same table block.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Year Ended December 31, 202320242025Revenues$307,394 $350,018 $402,836"
+        }
+      ],
+      "relevance": "necessary"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "rev_query",
+      "verdict": "complete",
+      "rationale": "The records give FY2025 and FY2024 revenue in USD, with periods resolved, basis reported_consolidated, and source citations that match the table cells.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Revenues$307,394 $350,018 $402,836"
+        }
+      ]
+    },
+    {
+      "requirement_id": "rev_source",
+      "verdict": "complete",
+      "rationale": "The original statement heading, unit line and table are delivered. Together they cover the years ended December 31, the units in millions, and the consolidated income statement basis.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000752-dfe26017",
+          "quote": "(in millions, except per share amounts)"
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000751-1e6373dd",
+          "quote": "CONSOLIDATED STATEMENTS OF INCOME"
+        }
+      ]
+    }
+  ],
+  "source_checks": [
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "verdict": "text_sufficient",
+      "rationale": "The delivered text blocks of the consolidated statements of income suffice for FY2025 and FY2024 total revenue, with unit, period and basis. No images are needed.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Revenues$307,394 $350,018 $402,836"
+        }
+      ]
+    }
+  ],
+  "question_coverage": "complete",
+  "coverage_reason": "Both years' consolidated revenue (350,018 and 402,836 million USD) are supported by the income statement, with units, year-ended-December-31 periods and consolidated statement basis.",
+  "missing_information": [],
+  "revision_requests": [],
+  "body_checks": [
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000750-9faf493a",
+      "relevance": "supporting_context",
+      "rationale": "Short company-name heading that identifies the statement's issuer."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000751-1e6373dd",
+      "relevance": "supporting_context",
+      "rationale": "Statement title gives the accounting basis (consolidated income statement)."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000752-dfe26017",
+      "relevance": "necessary",
+      "rationale": "Gives the unit (millions)."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000753-53762a3b",
+      "relevance": "necessary",
+      "rationale": "Contains the period headers and the revenue values for 2024 and 2025."
+    }
+  ],
+  "limitations": [
+    "The table block also contains 2023 and non-revenue lines, which cannot be split at the available block granularity.",
+    "The company name heading block is delivered as optional provenance context only."
+  ]
+}

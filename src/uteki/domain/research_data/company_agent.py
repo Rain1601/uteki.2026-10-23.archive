@@ -17,7 +17,7 @@ class RegisteredFinancialTask(Contract):
 
 class CompanyQueryInput(Contract):
     question: str = Field(min_length=1, max_length=20000, pattern=r'\S')
-    purpose: Literal['question_answer', 'business_materials'] = 'question_answer'
+    purpose: Literal['question_answer', 'business_materials', 'analysis_evidence'] = 'question_answer'
     dataset: str | None = Field(default=None, min_length=1, pattern=r'\S')
     scope: ExecutionScope | None = None
     prepared_run: str | None = Field(default=None, min_length=1, pattern=r'\S')
@@ -25,6 +25,7 @@ class CompanyQueryInput(Contract):
     include_candidates: bool | None = None
     limits: dict = Field(default_factory=dict)
     financial_tasks: tuple[RegisteredFinancialTask, ...] = Field(default=(), max_length=16)
+    review_feedback: dict | None = None
 
     @model_validator(mode='after')
     def explicit_input(self):

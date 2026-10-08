@@ -60,6 +60,10 @@ class FinancialTaskGateway:
         if ('max_retries' in model_config
                 and (type(model_config['max_retries']) is not int or model_config['max_retries'] != 0)):
             raise ValueError('financial extraction supports only max_retries=0; automatic retries are unsupported')
+        if type(model_config.get('allow_unknown_reservations', False)) is not bool:
+            raise ValueError('allow_unknown_reservations must be a boolean')
+        if model_config.get('allow_unknown_reservations', False):
+            raise ValueError('financial extraction does not support allow_unknown_reservations=True')
         self.model_config = deepcopy(model_config)
         enforced = model_config['budget_policy'] == 'enforced'
         if 'enforce_cost' in model_config and model_config['enforce_cost'] is not enforced:

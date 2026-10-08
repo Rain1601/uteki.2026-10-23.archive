@@ -1,0 +1,50 @@
+{
+  "check": "offline deterministic delivery rebuild; not new model execution",
+  "fixture": "experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r1/attempt-03/review-01/input.json",
+  "fixture_sha256": "7bcb75c8d7ac2eca5b0a0bb4abd2332eba20ecdd47ba2f6e76dedfc57a523ce4",
+  "v2_block_ids": [
+    "block-000749-2f8c99ac",
+    "block-000750-9faf493a",
+    "block-000751-1e6373dd",
+    "block-000752-dfe26017",
+    "block-000753-53762a3b",
+    "block-000923-2fa308c0",
+    "block-000924-9c4544a8",
+    "block-000925-24dd13aa"
+  ],
+  "v3_block_ids": [
+    "block-000750-9faf493a",
+    "block-000751-1e6373dd",
+    "block-000752-dfe26017",
+    "block-000753-53762a3b",
+    "block-000923-2fa308c0",
+    "block-000924-9c4544a8",
+    "block-000925-24dd13aa"
+  ],
+  "removed_block_ids": [
+    "block-000749-2f8c99ac"
+  ],
+  "remaining_bodies_identical": true,
+  "historical_input_unchanged": true,
+  "exclusions": [
+    {
+      "block_id": "block-000749-2f8c99ac",
+      "layout_role": "running_header",
+      "reason": "frozen_running_header"
+    }
+  ],
+  "limitation": "This only removes frozen layout context. Existing selected record provenance and selection minimality still require model review.",
+  "focused_validation": {
+    "modules": [
+      "test_selected_originals_v3",
+      "test_selected_originals_v2",
+      "test_analysis_record_selection",
+      "test_exact_record_handoff",
+      "test_bounded_answer_handoff",
+      "test_answer_handoff"
+    ],
+    "tests": 49,
+    "result": "passed",
+    "diff_check": "passed"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "decision": 3,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "role": "planner",
+  "packet_sha256": "05014488b92407ed873286e9bdba1c62d3da85118bc154e361a628b41ce2873b",
+  "started_at": "2026-10-08T18:35:14.539394+00:00",
+  "status": "invalid_model_decision",
+  "error_type": "ModelBehaviorError",
+  "validation": [
+    {
+      "type": "value_error",
+      "location": [
+        "requirements",
+        0
+      ],
+      "rule": "requirement_source_fields",
+      "suggestion": "Within requirements, source_id is allowed for kind=read_node, kind=source_evidence or kind=source_answer; node_id is allowed only for kind=read_node. For source_evidence or source_answer provide source_id and omit node_id. Omit them for information, query or financial_extract requirements; keep query scope in its QueryPlan and financial extraction scope in the registered task."
+    }
+  ],
+  "visible_output": {
+    "path": "decision-0003-01-output.json",
+    "sha256": "273e68c4165592d1e68a7d80ce91b710f77fa7211d752203831b343fe7f9d228"
+  },
+  "elapsed_seconds": 6.07032904215157,
+  "calls": [
+    {
+      "path": "calls/ea569196-459f-42af-b236-9dad9a490db9-end.json",
+      "sha256": "d55990e39e7440f16ad5f4eead6bd771dfaac8c12a6d39395c3dc667eb025f69"
+    },
+    {
+      "path": "calls/ea569196-459f-42af-b236-9dad9a490db9-start.json",
+      "sha256": "c3f8eec6df0d30106b44c75f5bd200bfef825e7481b2d5bf30259508a54c7b6c"
+    }
+  ]
+}

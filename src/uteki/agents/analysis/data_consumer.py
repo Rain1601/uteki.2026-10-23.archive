@@ -2,6 +2,7 @@
 import asyncio
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import Field
 
@@ -19,6 +20,11 @@ Explain what remains unknowable and what additional evidence is required. Do not
 source identities, investment returns, prices, or holdings. This is an internal limited research
 task, not a complete company report, valuation, publication, or buy/sell recommendation.
 You cannot read raw files or substitute another company/period. Ask for missing data explicitly.
+The handoff contains original source fragments, not only Data Agent summaries. Read the relevant
+original text and qualifiers before forming interpretations. Selected evidence is not the whole
+report; reference validation and content review do not prove that every relevant fact was found.
+Answer in the language of the question. Your statements will be rendered into a short report
+without a second model rewriting them. Do not claim that Codex selected or approved your evidence.
 """
 
 
@@ -34,6 +40,39 @@ class DataAnalysisAnswer(Contract):
     interpretations: tuple[Interpretation, ...] = Field(min_length=1)
     missing_data_requests: tuple[str, ...]
     limitations: tuple[str, ...] = Field(min_length=1)
+
+
+def render_analysis_report(handoff, result):
+    """Display the model's validated answer verbatim; never invent analysis or citations."""
+    answer = result['answer']
+    lines = ['# 分析结果 / Analysis', '', handoff['question'], '',
+        '状态：候选结论，内容尚待独立验收。 / Candidate; independent content review pending.', '',
+        f"Handoff: `{handoff['handoff_id']}`", '', '## 结论 / Findings', '']
+    citations = {}
+    for number, interpretation in enumerate(answer['interpretations'], 1):
+        kind = '原文归纳 / Source summary' if interpretation['basis'] == 'source_summary' else '研究假设 / Hypothesis'
+        lines.extend([f'### {number}. {kind}', '', interpretation['statement'], ''])
+        refs = []
+        for citation in interpretation['source_citations']:
+            key = (citation['source_snapshot_id'], citation['block_id'], citation['quote'])
+            if key not in citations:
+                citations[key] = (len(citations) + 1, citation)
+            refs.append(str(citations[key][0]))
+        lines.extend(['依据 / Evidence: ' + ', '.join(dict.fromkeys(refs)), ''])
+        for limitation in interpretation['limitations']:
+            lines.extend(['限制 / Limitation: ' + limitation, ''])
+    lines.extend(['## 待补材料与限制 / Gaps and limitations', ''])
+    for item in (*answer['missing_data_requests'], *answer['limitations']):
+        lines.extend(['- ' + item, ''])
+    lines.extend(['## 原文依据 / Original evidence', ''])
+    for number, citation in citations.values():
+        lines.extend([f"### [{number}] {citation['source_snapshot_id']} · {citation['block_id']}", ''])
+        url = citation.get('source_url')
+        if isinstance(url, str) and urlsplit(url).scheme in {'https', 'http'}:
+            lines.extend(['原件 / Original: <' + url.replace('<', '%3C').replace('>', '%3E') + '>', ''])
+        lines.extend(['> ' + line for line in citation['quote'].splitlines()])
+        lines.extend(['', f"Index: `{citation.get('index_id')}` · Source SHA256: `{citation.get('source_sha256')}`", ''])
+    return '\n'.join(lines)
 
 
 async def analyze_reviewed_data(review_run, output, *, expected_scope, expected_review_manifest_sha256,
@@ -94,6 +133,10 @@ async def analyze_reviewed_data(review_run, output, *, expected_scope, expected_
             result['status'] = 'failed'
         if cancelled:
             result['status'] = 'cancelled'
+        if result['status'] == 'candidate_pending_content_review':
+            with (output/'report.md').open('x', encoding='utf-8') as stream:
+                stream.write(render_analysis_report(handoff, result))
+            result['report_path'] = 'report.md'
         write_new(output/'result.json', result)
         write_new(output/'manifest.json', {'files': {str(p.relative_to(output)): digest(p.read_bytes())
             for p in sorted(output.rglob('*')) if p.is_file()}})

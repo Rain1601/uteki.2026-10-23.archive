@@ -147,13 +147,17 @@
     divider.addEventListener('pointermove', move);
     divider.addEventListener('pointerup', stop, {once: true}); divider.addEventListener('pointercancel', stop, {once: true});
   });
-  async function locate(block, quote) {
+  const locatorFields = {charStart: 'char_start', charEnd: 'char_end', cellRow: 'cell_row', cellColumn: 'cell_column', textHash: 'text_hash', sourceSha256: 'source_sha256'};
+  const buttonLocator = button => Object.fromEntries(Object.keys(locatorFields).filter(key => button.dataset[key] !== undefined).map(key => [key, button.dataset[key]]));
+  async function locate(block, quote, locator = {}) {
     const sequence = ++locatorRequest;
     if (locatorAbort) locatorAbort.abort();
     locatorAbort = new AbortController();
     pendingFrame = null;
     sourceStatus('checking', '正在核对原文位置…', 'Checking source location…');
     const params = new URLSearchParams({dataset: selection.dataset, source: selection.source, block});
+    for (const [key, param] of Object.entries(locatorFields)) if (locator[key] !== undefined && locator[key] !== null) params.set(param, locator[key]);
+    if (quote && (params.has('char_start') || params.has('cell_row'))) params.set('quote', quote);
     const cited = q('#dw-source-quote');
     cited.hidden = !quote;
     cited.querySelector('blockquote').textContent = quote || '';
@@ -163,11 +167,17 @@
       if (sequence !== locatorRequest) return;
       if (!response.ok) throw new Error(result.error || response.statusText);
       if (result.dataset_id !== selection.dataset || result.source_snapshot_id !== selection.source || result.block_id !== block) throw new Error('Source scope mismatch');
+      for (const field of ['char_start', 'char_end', 'cell_row', 'cell_column']) {
+        if (params.has(field) && result[field] !== Number(params.get(field))) throw new Error('Evidence coordinate mismatch');
+      }
+      const requestedPrecision = params.has('char_start') ? 'character' : params.has('cell_row') ? 'cell' : 'block';
+      if (requestedPrecision !== 'block' && result.locator_status === 'located' && result.locator_precision !== requestedPrecision) throw new Error('Evidence precision mismatch');
+      if (params.has('source_sha256') && result.source_sha256 !== params.get('source_sha256')) throw new Error('Source hash mismatch');
       const src = '/data-workspace/source?' + params + (result.fragment ? '#' + result.fragment : '');
       pendingFrame = {sequence, src, result};
       sourceStatus('loading', '位置已核对，正在载入原件…', 'Location checked; loading the original…');
       q('#dw-source-frame').src = src;
-      store.set(context + ':evidence', {block, quote});
+      store.set(context + ':evidence', {block, quote, locator});
     } catch (error) {
       if (error.name === 'AbortError' || sequence !== locatorRequest) return;
       pendingFrame = null;
@@ -187,7 +197,7 @@
     pendingFrame = null;
     sourceStatus('error', '原件未能载入，请重新定位或稍后重试。', 'The original could not load. Locate it again or retry later.');
   });
-  all('[data-locate]').forEach(button => button.addEventListener('click', () => locate(button.dataset.locate, button.dataset.quote)));
+  all('[data-locate]').forEach(button => button.addEventListener('click', () => locate(button.dataset.locate, button.dataset.quote, buttonLocator(button))));
   function clearEvidence() {
     locatorRequest++;
     if (locatorAbort) locatorAbort.abort();
@@ -228,7 +238,7 @@
     q('#dw-source-context').textContent = [button.dataset.factLabel, button.dataset.factPeriod].filter(Boolean).join(' · ');
     q('#dw-source-context').hidden = !q('#dw-source-context').textContent;
     const evidence = detail.querySelector('[data-locate]');
-    if (evidence) locate(evidence.dataset.locate, evidence.dataset.quote);
+    if (evidence) locate(evidence.dataset.locate, evidence.dataset.quote, buttonLocator(evidence));
     else clearEvidence();
     if (updateURL) {
       const current = new URL(location.href);
@@ -299,7 +309,7 @@
   if (!selectFactFromURL(new URL(location.href))) {
     const previous = store.get(context + ':evidence');
     if (selection.block) locate(selection.block);
-    else if (previous && previous.block) locate(previous.block, previous.quote);
+    else if (previous && previous.block) locate(previous.block, previous.quote, previous.locator || {});
   }
   requestAnimationFrame(restorePositions);
 })();

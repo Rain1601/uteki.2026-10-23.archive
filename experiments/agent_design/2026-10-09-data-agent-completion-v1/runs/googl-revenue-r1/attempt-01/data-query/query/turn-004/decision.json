@@ -1,0 +1,69 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "record_selection": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_query",
+      "description": "Query Alphabet consolidated total revenues for FY2025 and FY2024 with units, periods and reported consolidated accounting basis."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_source",
+      "description": "Original 10-K text/table blocks showing consolidated total revenues for the years ended December 31, 2025 and 2024, with units, period headings and presentation basis."
+    }
+  ],
+  "reason": "Plan a numeric query for consolidated revenue FY2025 and FY2024 plus original 10-K source evidence for verification; the previous plan was rejected for source fields on a query requirement.",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

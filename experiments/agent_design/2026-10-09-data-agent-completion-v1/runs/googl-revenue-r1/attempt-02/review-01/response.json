@@ -1,0 +1,177 @@
+{
+  "packet_id": "data-review-035b9491ceaa0aa178b3c6c1",
+  "facts": [
+    {
+      "fact_id": "ev-67189f4cd4dcee452cb83ab2",
+      "verdict": "supported",
+      "rationale": "FY2025 revenue 402,836 (millions USD) appears in the income statement table, year ended Dec 31, 2025. The record's 402836000000 USD matches the table in millions; it is a consolidated reported figure.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Revenues$307,394 $350,018 $402,836"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "ev-d312eb342721e806a647fa8d",
+      "verdict": "supported",
+      "rationale": "FY2024 revenue 350,018 (millions) is supported; the record's 350018000000 USD matches. The cited block is the geography table's Total revenues, which is consistent with the income statement figure.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000924-9c4544a8",
+          "quote": "Total revenues$307,394 100 %$350,018 100 %$402,836"
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Revenues$307,394 $350,018 $402,836"
+        }
+      ],
+      "relevance": "necessary"
+    },
+    {
+      "fact_id": "source-block-03e04953908b8e68695d3a3e",
+      "verdict": "supported",
+      "rationale": "The block text 'Alphabet Inc.' is the company heading above the statement; it identifies the reporting entity.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000750-9faf493a",
+          "quote": "Alphabet Inc."
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-6d38eb62e6e73089d8452206",
+      "verdict": "supported",
+      "rationale": "The statement title establishes the consolidated accounting basis.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000751-1e6373dd",
+          "quote": "CONSOLIDATED STATEMENTS OF INCOME"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-3106f0481f5c969a0956e926",
+      "verdict": "supported",
+      "rationale": "The unit line gives millions, required to interpret the figures.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000752-dfe26017",
+          "quote": "(in millions, except per share amounts)"
+        }
+      ],
+      "relevance": "supporting_context"
+    },
+    {
+      "fact_id": "source-block-ff738279896d3dc0249381f7",
+      "verdict": "supported",
+      "rationale": "The income statement table gives year-ended Dec 31 column headers and the Revenues line for 2023, 2024 and 2025. It is the primary source for both values. The table also includes other lines, but it is an indivisible original block.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Year Ended December 31, 202320242025Revenues$307,394 $350,018 $402,836"
+        }
+      ],
+      "relevance": "necessary"
+    }
+  ],
+  "requirements": [
+    {
+      "requirement_id": "req_revenue_query",
+      "verdict": "complete",
+      "rationale": "Both FY2025 and FY2024 annual consolidated revenue records are delivered with USD units, periods, reported consolidated basis and source citations that verify in the text.",
+      "citations": []
+    },
+    {
+      "requirement_id": "req_revenue_source",
+      "verdict": "complete",
+      "rationale": "The original statement title, unit line and income statement table with year headers and Revenues line are delivered.",
+      "citations": []
+    }
+  ],
+  "source_checks": [
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "verdict": "text_sufficient",
+      "rationale": "The delivered text contains the income statement with the unit line and the Revenues row, plus a cross-check revenue table. No images are needed for this question.",
+      "citations": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "quote": "Revenues$307,394 $350,018 $402,836"
+        }
+      ]
+    }
+  ],
+  "question_coverage": "complete",
+  "coverage_reason": "FY2025 revenue of $402,836M and FY2024 revenue of $350,018M are verified in the consolidated statements of income, with the unit (millions), period (years ended Dec 31) and consolidated basis plus citations.",
+  "missing_information": [],
+  "revision_requests": [
+    "Remove the unneeded geography blocks block-000923-2fa308c0 and block-000925-24dd13aa, and the layout-only running header block-000749-2f8c99ac, from the final bundle. Also consider dropping block-000924-9c4544a8, unless the FY2024 record citation is kept to it; the income statement already supports FY2024."
+  ],
+  "body_checks": [
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000749-2f8c99ac",
+      "relevance": "irrelevant",
+      "rationale": "Layout-only running header ('Table of Contents / Alphabet Inc.') adds nothing to the revenue values."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000750-9faf493a",
+      "relevance": "supporting_context",
+      "rationale": "Company name heading identifies the reporting entity for the statement."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000751-1e6373dd",
+      "relevance": "supporting_context",
+      "rationale": "Statement title shows the consolidated basis."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000752-dfe26017",
+      "relevance": "supporting_context",
+      "rationale": "Unit line (in millions)."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000753-53762a3b",
+      "relevance": "necessary",
+      "rationale": "Primary income statement table with the Revenues line and year headers."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000923-2fa308c0",
+      "relevance": "irrelevant",
+      "rationale": "Introduction to the revenue-by-geography table, which is not needed for total revenue."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000924-9c4544a8",
+      "relevance": "redundant",
+      "rationale": "Geography table's Total revenues duplicates the income statement figures. It is cited by the FY2024 record, but the income statement already supports that value."
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "block_id": "block-000925-24dd13aa",
+      "relevance": "irrelevant",
+      "rationale": "Footnote defining regions is irrelevant to total revenue."
+    }
+  ],
+  "limitations": [
+    "The records' status is candidate (not independently adopted).",
+    "The geography table blocks (the intro, table and footnote) are a cross-check and are not needed for the answer; the FY2024 record cites the geography table rather than the income statement.",
+    "The page-header table block is layout-only."
+  ]
+}

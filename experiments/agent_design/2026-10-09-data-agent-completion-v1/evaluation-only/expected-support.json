@@ -1,0 +1,4043 @@
+{
+  "schema_version": "evaluation-only-expected-support-v1",
+  "purpose": "Codex offline outcome review only; not runtime input, not model requirements, not a unique block-selection answer",
+  "model_calls": 0,
+  "network_calls": 0,
+  "gold_created_after_runtime_implementation": true,
+  "leakage_policy": "No production/skill imports, no API prompt use, no case-specific tool hints; evaluate only after run artifacts exist. This debugging matrix is not held-out or unseen-company evaluation.",
+  "sources": {
+    "msft": {
+      "company_id": "sec-0000789019",
+      "source_snapshot_id": "msft-2025-10k",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+      "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+      "period_end": "2025-06-30",
+      "dataset_path": "experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/msft",
+      "raw_path": "experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/msft/raw/msft-2025-10k.html",
+      "blocks_path": "experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/msft/indexes/msft-2025-10k/blocks.jsonl",
+      "blocks_sha256": "0f89b470fa423ca6369be61f27a5fd574dc193103a6d5293e8c4feae2881788c",
+      "parser_version": "sec-source-blocks-v0.1.11",
+      "source_hash_verified": true,
+      "inline_xbrl_usd_units": [
+        {
+          "id": "U_UnitedStatesOfAmericaDollarsShare",
+          "measure_text": "iso4217:USDxbrli:shares",
+          "dom_path": "/html/body/div[1]/ix:header/ix:resources/xbrli:unit[4]"
+        },
+        {
+          "id": "U_USD",
+          "measure_text": "iso4217:USD",
+          "dom_path": "/html/body/div[1]/ix:header/ix:resources/xbrli:unit[5]"
+        }
+      ],
+      "frozen_dataset_unchanged": true
+    },
+    "googl": {
+      "company_id": "sec-0001652044",
+      "source_snapshot_id": "googl-2025-10k",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+      "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+      "period_end": "2025-12-31",
+      "dataset_path": "experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/googl",
+      "raw_path": "experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/googl/raw/googl-2025-10k.html",
+      "blocks_path": "experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/googl/indexes/googl-2025-10k/blocks.jsonl",
+      "blocks_sha256": "39a59a592c29ece761562e13f165329414027bb65dd66e8d12e7b8c8fb4ae0b1",
+      "parser_version": "sec-source-blocks-v0.1.11",
+      "source_hash_verified": true,
+      "inline_xbrl_usd_units": [
+        {
+          "id": "usd",
+          "measure_text": "iso4217:USD",
+          "dom_path": "/html/body/div[1]/ix:header/ix:resources/xbrli:unit[1]"
+        },
+        {
+          "id": "usdPerShare",
+          "measure_text": "iso4217:USDxbrli:shares",
+          "dom_path": "/html/body/div[1]/ix:header/ix:resources/xbrli:unit[3]"
+        }
+      ],
+      "frozen_dataset_unchanged": true
+    }
+  },
+  "cases": [
+    {
+      "case_id": "msft-business",
+      "symbol": "msft",
+      "question": "Microsoft 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。",
+      "question_sha256": "5a1bf93733b01aab1a22da5596121b162f2fa42038d8b5ab6df2209b0087e1bc",
+      "requirements": [
+        {
+          "id": "segment-identity",
+          "necessary_semantics": "Three reportable segments: Productivity and Business Processes, Intelligent Cloud, More Personal Computing; FY2025 composition rather than outdated organization.",
+          "one_verified_support_set": [
+            "msft:86",
+            "msft:87"
+          ],
+          "alternative_support_sets": [
+            [
+              "msft:1181",
+              "msft:1182"
+            ]
+          ],
+          "evaluation_notes": "Accept other same-source evidence that directly supports the same semantics. These block IDs are examples, not required runtime selections."
+        },
+        {
+          "id": "pbp-members",
+          "necessary_semantics": "PBP complete primary list: Microsoft 365 Commercial products/cloud, Microsoft 365 Consumer products/cloud, LinkedIn, Dynamics products/cloud; preserve cloud versus on-premises distinctions and disclosed sub-lists.",
+          "one_verified_support_set": [
+            "msft:91",
+            "msft:93",
+            "msft:95",
+            "msft:97",
+            "msft:99"
+          ],
+          "alternative_support_sets": [
+            [
+              "msft:1185",
+              "msft:1187",
+              "msft:1189",
+              "msft:1191",
+              "msft:1193"
+            ]
+          ],
+          "evaluation_notes": "Accept other same-source evidence that directly supports the same semantics. These block IDs are examples, not required runtime selections."
+        },
+        {
+          "id": "ic-members",
+          "necessary_semantics": "Intelligent Cloud complete two-part primary list: Server products/cloud (Azure and other cloud services plus server products) AND Enterprise and partner services. Retain GitHub cloud, Nuance Healthcare cloud, virtual desktop, named server products and service sub-list.",
+          "one_verified_support_set": [
+            "msft:118",
+            "msft:120",
+            "msft:122"
+          ],
+          "alternative_support_sets": [
+            [
+              "msft:1198",
+              "msft:1200",
+              "msft:1202"
+            ]
+          ],
+          "evaluation_notes": "Accept other same-source evidence that directly supports the same semantics. These block IDs are examples, not required runtime selections."
+        },
+        {
+          "id": "mpc-members",
+          "necessary_semantics": "More Personal Computing complete primary list: Windows and Devices; Gaming; Search and news advertising, with disclosed component lists.",
+          "one_verified_support_set": [
+            "msft:144",
+            "msft:146",
+            "msft:148",
+            "msft:150"
+          ],
+          "alternative_support_sets": [
+            [
+              "msft:1204",
+              "msft:1206",
+              "msft:1208",
+              "msft:1210"
+            ]
+          ],
+          "evaluation_notes": "Accept other same-source evidence that directly supports the same semantics. These block IDs are examples, not required runtime selections."
+        }
+      ],
+      "pass_policy": "Judge direct semantic support and necessary qualifiers; allow equivalent original locations and any valid independent runtime retrieval path. Conditional safeguards only apply if the final answer makes the corresponding claim. Never feed this evaluation-only file to a model or retrieval planner."
+    },
+    {
+      "case_id": "googl-business",
+      "symbol": "googl",
+      "question": "Alphabet 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。",
+      "question_sha256": "40223ca383a79d4547d763b7bad4a7293d249a295192d214cd80c7622db736d1",
+      "requirements": [
+        {
+          "id": "segment-identity",
+          "necessary_semantics": "Google is reported as Google Services and Google Cloud; other non-Google businesses collectively Other Bets. Other Bets combines multiple individually immaterial operating segments; Alphabet-level AI/shared activities are not a fourth reportable business segment.",
+          "one_verified_support_set": [
+            "googl:64",
+            "googl:1232",
+            "googl:1237",
+            "googl:1239",
+            "googl:1240"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Do not treat Google parent company, Alphabet-level activities, or every product as peer reportable segments."
+        },
+        {
+          "id": "services-members",
+          "necessary_semantics": "Google Services main products/services: ads, Android, Chrome, devices, Google Maps, Google Play, Search, YouTube; revenues advertising, consumer subscriptions (YouTube TV/Music/Premium/NFL Sunday Ticket/Google One), apps/in-app and devices.",
+          "one_verified_support_set": [
+            "googl:1233"
+          ],
+          "alternative_support_sets": [
+            [
+              "googl:85",
+              "googl:93",
+              "googl:97",
+              "googl:98",
+              "googl:99",
+              "googl:100"
+            ]
+          ],
+          "evaluation_notes": "Accept other same-source evidence that directly supports the same semantics. These block IDs are examples, not required runtime selections."
+        },
+        {
+          "id": "cloud-members",
+          "necessary_semantics": "Google Cloud enterprise infrastructure/platform, applications and other services; GCP, Workspace and other enterprise services; consumption and subscription basis.",
+          "one_verified_support_set": [
+            "googl:1234"
+          ],
+          "alternative_support_sets": [
+            [
+              "googl:102",
+              "googl:105",
+              "googl:106",
+              "googl:107",
+              "googl:108",
+              "googl:109",
+              "googl:110",
+              "googl:111"
+            ]
+          ],
+          "evaluation_notes": "Note 15 is sufficient for segment-level main businesses. If using Item 1 customer-use list, preserve its complete list including Agents children; optional product depth is not mandatory."
+        },
+        {
+          "id": "other-bets",
+          "necessary_semantics": "Other Bets autonomous transportation and internet services; different stages of development, with X/Waymo examples if names are provided.",
+          "one_verified_support_set": [
+            "googl:1237"
+          ],
+          "alternative_support_sets": [
+            [
+              "googl:113",
+              "googl:114"
+            ]
+          ],
+          "evaluation_notes": "Waymo/X are optional examples, not proof of a complete subsidiaries list. Other Bets is not a single named product."
+        }
+      ],
+      "pass_policy": "Judge direct semantic support and necessary qualifiers; allow equivalent original locations and any valid independent runtime retrieval path. Conditional safeguards only apply if the final answer makes the corresponding claim. Never feed this evaluation-only file to a model or retrieval planner."
+    },
+    {
+      "case_id": "msft-revenue",
+      "symbol": "msft",
+      "question": "请从 Microsoft FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+      "question_sha256": "51e7317c9db1f2fa68dea4983e1dc14a4d5e240f8a0210362f3478b8b6a1f3d4",
+      "requirements": [
+        {
+          "id": "total-both-years",
+          "necessary_semantics": "Company consolidated TOTAL revenue: FY2025 281,724 and FY2024 245,122, in USD millions, year ended June 30. Not Product 63,946/64,773, not one segment.",
+          "one_verified_support_set": [
+            "msft:781:1,4,6,7,8,11"
+          ],
+          "alternative_support_sets": [
+            [
+              "msft:1217:1,4,36,38"
+            ],
+            [
+              "msft:1226"
+            ]
+          ],
+          "evaluation_notes": "FY2025 ends 2025-06-30, FY2024 ends 2024-06-30. Row/column headers + units are essential; unused FY2023 need not be delivered. Financial inline unit must resolve to USD, not infer from company name."
+        },
+        {
+          "id": "accounting-scope",
+          "necessary_semantics": "Consolidated Microsoft Corporation and subsidiaries, GAAP; intercompany transactions/balances eliminated.",
+          "one_verified_support_set": [
+            "msft:813",
+            "msft:815"
+          ],
+          "alternative_support_sets": [
+            [
+              "msft:1237"
+            ]
+          ],
+          "evaluation_notes": "Accept other same-source evidence that directly supports the same semantics. These block IDs are examples, not required runtime selections."
+        },
+        {
+          "id": "recast-qualification",
+          "necessary_semantics": "If discussing FY2025 segment recast, distinguish it from company total: recast had no impact on consolidated income statements.",
+          "one_verified_support_set": [
+            "msft:817",
+            "msft:818"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Conditional safeguard, not mandatory extra reading if report simply supplies company total without mentioning recast."
+        }
+      ],
+      "pass_policy": "Judge direct semantic support and necessary qualifiers; allow equivalent original locations and any valid independent runtime retrieval path. Conditional safeguards only apply if the final answer makes the corresponding claim. Never feed this evaluation-only file to a model or retrieval planner."
+    },
+    {
+      "case_id": "googl-revenue",
+      "symbol": "googl",
+      "question": "请从 Alphabet FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+      "question_sha256": "00fc3f09dbb995c2966747d08cc0fafc13475ee9c4f38c99b43d25579fbe9320",
+      "requirements": [
+        {
+          "id": "total-both-years",
+          "necessary_semantics": "Company consolidated revenues: FY2025 402,836 and FY2024 350,018, in USD millions, years ended December 31. Not Google Services, Search or Google Cloud alone.",
+          "one_verified_support_set": [
+            "googl:751",
+            "googl:752",
+            "googl:753:1,2,3"
+          ],
+          "alternative_support_sets": [
+            [
+              "googl:921",
+              "googl:920"
+            ],
+            [
+              "googl:1246",
+              "googl:1245"
+            ]
+          ],
+          "evaluation_notes": "FY2025 ends 2025-12-31, FY2024 ends 2024-12-31. Alternative segment/product table needs its unit context and total row including hedging gains/losses; do not sum product categories and omit hedging."
+        },
+        {
+          "id": "accounting-scope",
+          "necessary_semantics": "Consolidated Alphabet and entities under variable-interest/voting models, intercompany balances eliminated, GAAP; reported revenue excludes sales and similar taxes.",
+          "one_verified_support_set": [
+            "googl:785",
+            "googl:787",
+            "googl:789"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Recognition-policy quote retains source accounting basis; no need to deliver the full accounting-policy section."
+        }
+      ],
+      "pass_policy": "Judge direct semantic support and necessary qualifiers; allow equivalent original locations and any valid independent runtime retrieval path. Conditional safeguards only apply if the final answer makes the corresponding claim. Never feed this evaluation-only file to a model or retrieval planner."
+    },
+    {
+      "case_id": "msft-cloud",
+      "symbol": "msft",
+      "question": "Microsoft FY2025 10-K 中 Microsoft Cloud、Intelligent Cloud 和 Azure and other cloud services 的披露口径有什么不同？请取得回答所需原始定义和收入披露材料，供分析 Agent 使用。",
+      "question_sha256": "b455f9ef7684e9167c68d14095958dcb4ab9458fae5450a7ea615ae47be49da2",
+      "requirements": [
+        {
+          "id": "microsoft-cloud",
+          "necessary_semantics": "Microsoft Cloud is a revenue metric spanning Microsoft 365 Commercial cloud, Azure and other cloud services, COMMERCIAL portion of LinkedIn and Dynamics 365. FY2025 $168.9bn, FY2024 $137.7bn; included within multiple product/service categories, not an additional segment.",
+          "one_verified_support_set": [
+            "msft:1227"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Definition alternative: metrics table561 row3 plus a separately verified revenue amount/period. Full LinkedIn revenue or all Dynamics products must not replace the stated cloud/commercial subset."
+        },
+        {
+          "id": "intelligent-cloud",
+          "necessary_semantics": "Intelligent Cloud is reportable segment: public/private/hybrid server/cloud plus enterprise/partner services. FY2025 $106,265m and FY2024 $87,464m segment revenue.",
+          "one_verified_support_set": [
+            "msft:118",
+            "msft:120",
+            "msft:122",
+            "msft:1217:1,4,16,18"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Definition may alternatively use Note18 blocks1198/1200/1202 and MD&A table587 with corresponding unit headers."
+        },
+        {
+          "id": "azure-metric",
+          "necessary_semantics": "Azure and other cloud services is part of Server products/cloud; consists of cloud/AI consumption, GitHub cloud, Nuance Healthcare cloud, virtual desktop and other cloud services. FY2025 revenue growth 34% is disclosed; do not label all Intelligent Cloud or Server products/cloud revenue as Azure.",
+          "one_verified_support_set": [
+            "msft:564:13",
+            "msft:613",
+            "msft:120"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Do not claim absolute Azure revenue is disclosed in these selected tables. Search any potential other source before global not_disclosed; these passages provide growth and scope, not an absolute amount."
+        },
+        {
+          "id": "relationship-qualifiers",
+          "necessary_semantics": "Three labels are different overlapping scopes, not a clean additive peer partition: Microsoft Cloud spans selected cloud/commercial offerings from multiple product categories; Intelligent Cloud also contains server and enterprise services; Azure-and-other is a component.",
+          "one_verified_support_set": [
+            "msft:1227",
+            "msft:120",
+            "msft:122"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Analysis may synthesize the distinction from these source definitions; Data need only deliver facts. Optional Azure product paragraph127/128 or GitHub paragraph130 may clarify product membership without inventing revenue."
+        }
+      ],
+      "pass_policy": "Judge direct semantic support and necessary qualifiers; allow equivalent original locations and any valid independent runtime retrieval path. Conditional safeguards only apply if the final answer makes the corresponding claim. Never feed this evaluation-only file to a model or retrieval planner."
+    },
+    {
+      "case_id": "googl-buyback",
+      "symbol": "googl",
+      "question": "Alphabet FY2025 10-K 对2025年股票回购金额和回购授权剩余额度有何披露？请提供相关表格和必要脚注，明确表中金额包含或不包含哪些成本。",
+      "question_sha256": "a84751fcf7fa3a309193215b513d6e9f4c02816b0ed84e12600a29cdd5a93504",
+      "requirements": [
+        {
+          "id": "annual-amount",
+          "necessary_semantics": "FY2025 Class A $6,501m + Class C $38,897m = total $45,398m; 240m shares. Period is full year ended December31 2025 and table is in millions.",
+          "one_verified_support_set": [
+            "googl:1154",
+            "googl:1155:1,2,3,4,5,6"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Class breakdown is useful table context; key required amount is full-year total. $45.4bn rounded narrative509/635 is corroboration, not replacement when query requests the table."
+        },
+        {
+          "id": "annual-footnote",
+          "necessary_semantics": "Footnote(1) to annual total: shares repurchased include unsettled repurchases. Keep marker and definition associated with annual table.",
+          "one_verified_support_set": [
+            "googl:1156",
+            "googl:1157"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Do not equate the annual repurchase table with settled cash-flow outflow."
+        },
+        {
+          "id": "remaining-authorization",
+          "necessary_semantics": "At December31 2025, $69.5bn remained available for Class A/C repurchases. Apr2025 additional $70bn authorization is distinct from remaining balance; Apr2024 authorization also $70bn.",
+          "one_verified_support_set": [
+            "googl:1153"
+          ],
+          "alternative_support_sets": [
+            [
+              "googl:365",
+              "googl:366:1,4",
+              "googl:367"
+            ]
+          ],
+          "evaluation_notes": "Q4 table reports more precise $69,503m at December period end, compatible with rounded $69.5bn; do not call $70bn the year-end remaining amount."
+        },
+        {
+          "id": "cost-footnote-scope",
+          "necessary_semantics": "Q4 issuer-purchase table Average Price Paid per Share includes costs associated with repurchases, per note(2). This footnote attaches to average price columns, not explicitly to the annual dollar total.",
+          "one_verified_support_set": [
+            "googl:365",
+            "googl:366:1,2,3,4",
+            "googl:368"
+          ],
+          "alternative_support_sets": [],
+          "evaluation_notes": "Annual note11 table1155 only has unsettled-share footnote. No explicit annual total excise/commission inclusion or exclusion found in reviewed passages. Must state that limit; general 1% excise-risk disclosure298 cannot prove annual table treatment. Do not invent excluded costs."
+        },
+        {
+          "id": "authorization-limits",
+          "necessary_semantics": "Programs do not expire, execution depends on general business/market conditions and investment opportunities.",
+          "one_verified_support_set": [
+            "googl:1158"
+          ],
+          "alternative_support_sets": [
+            [
+              "googl:367"
+            ]
+          ],
+          "evaluation_notes": "Needed if report describes remaining authorization as committed future spending; otherwise ancillary context."
+        }
+      ],
+      "pass_policy": "Judge direct semantic support and necessary qualifiers; allow equivalent original locations and any valid independent runtime retrieval path. Conditional safeguards only apply if the final answer makes the corresponding claim. Never feed this evaluation-only file to a model or retrieval planner."
+    }
+  ],
+  "evidence_catalog": {
+    "msft:86": {
+      "source": "msft",
+      "block_id": "block-000086-935d6090",
+      "block_ordinal": 86,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[15]/p[2]",
+      "block_text_sha256": "935d60904eb39710e00cb0d07e9c8f15556ba7d4792be8f0e005e28fdcc9c92f",
+      "quote": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses.",
+      "start": 0,
+      "end": 487,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:87": {
+      "source": "msft",
+      "block_id": "block-000087-44aabdcd",
+      "block_ordinal": 87,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[15]/p[3]",
+      "block_text_sha256": "44aabdcda6f4b04c42224b6ae75148f50a2c1113a26a3b4004de54b5f65179b4",
+      "quote": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes.",
+      "start": 0,
+      "end": 490,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1181": {
+      "source": "msft",
+      "block_id": "block-001181-efcd150c",
+      "block_ordinal": 1181,
+      "reported_page": 82,
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[2]",
+      "block_text_sha256": "efcd150c810bc715a97d3e59da4d44ef059f51e0a0d38a40339c8115ccfe851c",
+      "quote": "In its operation of the business, management, including our chief operating decision maker (“CODM”), who is also our Chief Executive Officer, reviews certain financial information, including segmented internal profit and loss statements. The primary profitability measure used by the CODM to review segment operating results is operating income. The CODM uses operating income to allocate resources during our annual planning process and throughout the year, as well as to assess the performance of our segments, primarily by monitoring actual results compared to prior periods and expected results. During the periods presented, we reported our financial performance based on the following segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.",
+      "start": 0,
+      "end": 785,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1182": {
+      "source": "msft",
+      "block_id": "block-001182-b3eedf85",
+      "block_ordinal": 1182,
+      "reported_page": 82,
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[3]",
+      "block_text_sha256": "b3eedf85b83657382fbf26fd50e029ba4d5aad257e880c636fb772135ab5cd43",
+      "quote": "We have recast certain prior period amounts to conform to the way we internally manage and monitor our business. Refer to Note 1 – Accounting Policies for further information.",
+      "start": 0,
+      "end": 175,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:91": {
+      "source": "msft",
+      "block_id": "block-000091-d993f813",
+      "block_ordinal": 91,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[15]/p[7]",
+      "block_text_sha256": "d993f813170ccba6b56ef55f21d23a571600f3e3997733ba6230381a8cdeb7b2",
+      "quote": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:",
+      "start": 0,
+      "end": 235,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:93": {
+      "source": "msft",
+      "block_id": "block-000093-7018adaa",
+      "block_ordinal": 93,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[15]/div[1]/div",
+      "block_text_sha256": "7018adaab1771400d012d62f1d71beaaf43645407f6d794872fd87001e9c4bde",
+      "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises.",
+      "start": 0,
+      "end": 458,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:95": {
+      "source": "msft",
+      "block_id": "block-000095-61bd513b",
+      "block_ordinal": 95,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[15]/div[2]/div",
+      "block_text_sha256": "61bd513b7ff69104bce0b7c1e0bdb29e8d8f9ada2b9b0d1368f2554de078f784",
+      "quote": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services.",
+      "start": 0,
+      "end": 157,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:97": {
+      "source": "msft",
+      "block_id": "block-000097-13124fb7",
+      "block_ordinal": 97,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[15]/div[3]/div",
+      "block_text_sha256": "13124fb73864f984aa690440624343f61d9931b2c234a3120641d0110adf30c3",
+      "quote": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions.",
+      "start": 0,
+      "end": 102,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:99": {
+      "source": "msft",
+      "block_id": "block-000099-da3d48eb",
+      "block_ordinal": 99,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[15]/div[4]/div",
+      "block_text_sha256": "da3d48ebd71ff1df7005f49ca5852c5cee82aade24fd23ab92c60502783a2355",
+      "quote": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications.",
+      "start": 0,
+      "end": 210,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1185": {
+      "source": "msft",
+      "block_id": "block-001185-d993f813",
+      "block_ordinal": 1185,
+      "reported_page": 82,
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/p[6]",
+      "block_text_sha256": "d993f813170ccba6b56ef55f21d23a571600f3e3997733ba6230381a8cdeb7b2",
+      "quote": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spanning a variety of devices and platforms. This segment primarily comprises:",
+      "start": 0,
+      "end": 235,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1187": {
+      "source": "msft",
+      "block_id": "block-001187-7018adaa",
+      "block_ordinal": 1187,
+      "reported_page": 82,
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[1]/div",
+      "block_text_sha256": "7018adaab1771400d012d62f1d71beaaf43645407f6d794872fd87001e9c4bde",
+      "quote": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot; and Microsoft 365 Commercial products, comprising Windows Commercial on-premises and Office licensed on-premises.",
+      "start": 0,
+      "end": 458,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1189": {
+      "source": "msft",
+      "block_id": "block-001189-61bd513b",
+      "block_ordinal": 1189,
+      "reported_page": 82,
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[2]/div",
+      "block_text_sha256": "61bd513b7ff69104bce0b7c1e0bdb29e8d8f9ada2b9b0d1368f2554de078f784",
+      "quote": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services.",
+      "start": 0,
+      "end": 157,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1191": {
+      "source": "msft",
+      "block_id": "block-001191-13124fb7",
+      "block_ordinal": 1191,
+      "reported_page": 82,
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[3]/div",
+      "block_text_sha256": "13124fb73864f984aa690440624343f61d9931b2c234a3120641d0110adf30c3",
+      "quote": "LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions.",
+      "start": 0,
+      "end": 102,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1193": {
+      "source": "msft",
+      "block_id": "block-001193-da3d48eb",
+      "block_ordinal": 1193,
+      "reported_page": 82,
+      "dom_path": "/html/body/div[246]/div[2]/ix:nonnumeric/div[4]/div",
+      "block_text_sha256": "da3d48ebd71ff1df7005f49ca5852c5cee82aade24fd23ab92c60502783a2355",
+      "quote": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications.",
+      "start": 0,
+      "end": 210,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:118": {
+      "source": "msft",
+      "block_id": "block-000118-5e917062",
+      "block_ordinal": 118,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[18]/p[12]",
+      "block_text_sha256": "5e917062d98a0c16faaba740b5332ca48d66d29ec417085265ec93005789e273",
+      "quote": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:",
+      "start": 0,
+      "end": 185,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:120": {
+      "source": "msft",
+      "block_id": "block-000120-c34f7245",
+      "block_ordinal": 120,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[18]/div[1]/div",
+      "block_text_sha256": "c34f7245fa9e88e6ae478ced0a0998fbba3c5cdfbf20ee4c78ae1a0d47c747bb",
+      "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings.",
+      "start": 0,
+      "end": 403,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:122": {
+      "source": "msft",
+      "block_id": "block-000122-c07a987e",
+      "block_ordinal": 122,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[18]/div[2]/div",
+      "block_text_sha256": "c07a987eb7f09b3a5158f3aa698c357965655a36d0d8f79f9559316e17d1a1cc",
+      "quote": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience.",
+      "start": 0,
+      "end": 173,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1198": {
+      "source": "msft",
+      "block_id": "block-001198-5e917062",
+      "block_ordinal": 1198,
+      "reported_page": 83,
+      "dom_path": "/html/body/div[249]/div/ix:continuation/p[2]",
+      "block_text_sha256": "5e917062d98a0c16faaba740b5332ca48d66d29ec417085265ec93005789e273",
+      "quote": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This segment primarily comprises:",
+      "start": 0,
+      "end": 185,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1200": {
+      "source": "msft",
+      "block_id": "block-001200-c34f7245",
+      "block_ordinal": 1200,
+      "reported_page": 83,
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[1]/div",
+      "block_text_sha256": "c34f7245fa9e88e6ae478ced0a0998fbba3c5cdfbf20ee4c78ae1a0d47c747bb",
+      "quote": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services; and Server products, comprising SQL Server, Windows Server, Visual Studio, System Center, related Client Access Licenses (“CALs”), and other on-premises offerings.",
+      "start": 0,
+      "end": 403,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1202": {
+      "source": "msft",
+      "block_id": "block-001202-c07a987e",
+      "block_ordinal": 1202,
+      "reported_page": 83,
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[2]/div",
+      "block_text_sha256": "c07a987eb7f09b3a5158f3aa698c357965655a36d0d8f79f9559316e17d1a1cc",
+      "quote": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learning Experience.",
+      "start": 0,
+      "end": 173,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:144": {
+      "source": "msft",
+      "block_id": "block-000144-6e0ae0c4",
+      "block_ordinal": 144,
+      "reported_page": 8,
+      "dom_path": "/html/body/div[24]/p[5]",
+      "block_text_sha256": "6e0ae0c4087ac566b8e2f526bc149145e95f4512862546ec023ff089ee335a6a",
+      "quote": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:",
+      "start": 0,
+      "end": 175,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:146": {
+      "source": "msft",
+      "block_id": "block-000146-c641cfcd",
+      "block_ordinal": 146,
+      "reported_page": 8,
+      "dom_path": "/html/body/div[24]/div[1]/div",
+      "block_text_sha256": "c641cfcd89511a2dcaa3efc45af8ce2a8e4a95c7a34cdcb4df86c26459ed9de8",
+      "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories.",
+      "start": 0,
+      "end": 168,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:148": {
+      "source": "msft",
+      "block_id": "block-000148-2f215a60",
+      "block_ordinal": 148,
+      "reported_page": 8,
+      "dom_path": "/html/body/div[24]/div[2]/div",
+      "block_text_sha256": "2f215a60d89b2281b04683e06c9d8b1cdc04d615d4f5cb1e3e8e8503f1fc29b0",
+      "quote": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services.",
+      "start": 0,
+      "end": 241,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:150": {
+      "source": "msft",
+      "block_id": "block-000150-9577a591",
+      "block_ordinal": 150,
+      "reported_page": 8,
+      "dom_path": "/html/body/div[24]/div[3]/div",
+      "block_text_sha256": "9577a59155b65ffacdf1a70f76e28abf25f1cd843349f28772698c166a47ec30",
+      "quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates.",
+      "start": 0,
+      "end": 117,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1204": {
+      "source": "msft",
+      "block_id": "block-001204-6e0ae0c4",
+      "block_ordinal": 1204,
+      "reported_page": 83,
+      "dom_path": "/html/body/div[249]/div/ix:continuation/p[4]",
+      "block_text_sha256": "6e0ae0c4087ac566b8e2f526bc149145e95f4512862546ec023ff089ee335a6a",
+      "quote": "Our More Personal Computing segment consists of products and services that put customers at the center of the experience with our technology. This segment primarily comprises:",
+      "start": 0,
+      "end": 175,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1206": {
+      "source": "msft",
+      "block_id": "block-001206-c641cfcd",
+      "block_ordinal": 1206,
+      "reported_page": 83,
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[3]/div",
+      "block_text_sha256": "c641cfcd89511a2dcaa3efc45af8ce2a8e4a95c7a34cdcb4df86c26459ed9de8",
+      "quote": "Windows and Devices, including Windows OEM licensing (Windows Pro and non-Pro licenses sold through the OEM channel) and Devices, comprising Surface and PC accessories.",
+      "start": 0,
+      "end": 168,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1208": {
+      "source": "msft",
+      "block_id": "block-001208-2f215a60",
+      "block_ordinal": 1208,
+      "reported_page": 83,
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[4]/div",
+      "block_text_sha256": "2f215a60d89b2281b04683e06c9d8b1cdc04d615d4f5cb1e3e8e8503f1fc29b0",
+      "quote": "Gaming, including Xbox hardware and Xbox content and services, comprising first- and third-party content (including games and in-game content), Xbox Game Pass and other subscriptions, Xbox Cloud Gaming, advertising, and other cloud services.",
+      "start": 0,
+      "end": 241,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1210": {
+      "source": "msft",
+      "block_id": "block-001210-9577a591",
+      "block_ordinal": 1210,
+      "reported_page": 83,
+      "dom_path": "/html/body/div[249]/div/ix:continuation/div[5]/div",
+      "block_text_sha256": "9577a59155b65ffacdf1a70f76e28abf25f1cd843349f28772698c166a47ec30",
+      "quote": "Search and news advertising, comprising Bing and Copilot, Microsoft News, Microsoft Edge, and third-party affiliates.",
+      "start": 0,
+      "end": 117,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:64": {
+      "source": "googl",
+      "block_id": "block-000064-ab2556c8",
+      "block_ordinal": 64,
+      "reported_page": 3,
+      "dom_path": "/html/body/div[71]",
+      "block_text_sha256": "ab2556c8c13f84c98da87bfca59a6ac497b3b7fe3850f9bc849621e872e9dddc",
+      "quote": "Alphabet is a collection of businesses — the largest of which is Google. We report Google in two segments, Google Services and Google Cloud, and all non-Google businesses collectively as Other Bets. Supporting these businesses, we have centralized certain AI-related research and development focused on advanced research in AI and developing the frontier models that serve our businesses, which is reported in Alphabet-level activities. Alphabet's structure is about helping each of our businesses prosper through strong leaders and independence.",
+      "start": 0,
+      "end": 546,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1232": {
+      "source": "googl",
+      "block_id": "block-001232-46924ceb",
+      "block_ordinal": 1232,
+      "reported_page": 86,
+      "dom_path": "/html/body/ix:nonnumeric[6]/ix:continuation/div[1]",
+      "block_text_sha256": "46924ceb35d34f5e586923276997571501dd118f1c8c80a295821938d27b57f4",
+      "quote": "We report our segment results as Google Services, Google Cloud, and Other Bets:",
+      "start": 0,
+      "end": 79,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1237": {
+      "source": "googl",
+      "block_id": "block-001237-a179d53a",
+      "block_ordinal": 1237,
+      "reported_page": 87,
+      "dom_path": "/html/body/ix:continuation[48]/ix:continuation/div[1]",
+      "block_text_sha256": "a179d53a16bdeb85fc8220dba95e17fcacc26715daf152c1489fec6995445c37",
+      "quote": "•Other Bets is a combination of multiple operating segments that are not individually material. Revenues from Other Bets are generated primarily from the sale of autonomous transportation services and internet services.",
+      "start": 0,
+      "end": 219,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1239": {
+      "source": "googl",
+      "block_id": "block-001239-ab593ea8",
+      "block_ordinal": 1239,
+      "reported_page": 87,
+      "dom_path": "/html/body/ix:continuation[48]/ix:continuation/div[3]",
+      "block_text_sha256": "ab593ea87d65137aa14b1d7e172dcc19e2f4d4894573a2758745aebe35523439",
+      "quote": "Certain costs are not allocated to our segments because they represent Alphabet-level activities. These costs primarily include:",
+      "start": 0,
+      "end": 128,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1240": {
+      "source": "googl",
+      "block_id": "block-001240-360457db",
+      "block_ordinal": 1240,
+      "reported_page": 87,
+      "dom_path": "/html/body/ix:continuation[48]/ix:continuation/div[4]",
+      "block_text_sha256": "360457db6420a0bd611672830cba25124057c6bfba65157eafe2c8c956daa981",
+      "quote": "•certain AI-focused shared research and development activities, including employee compensation expenses and technical infrastructure usage costs associated with the development of our general AI models;",
+      "start": 0,
+      "end": 203,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1233": {
+      "source": "googl",
+      "block_id": "block-001233-0b2226dd",
+      "block_ordinal": 1233,
+      "reported_page": 86,
+      "dom_path": "/html/body/ix:nonnumeric[6]/ix:continuation/div[2]",
+      "block_text_sha256": "0b2226dd5a7874ed45e01e909b84888e4c2ac295944d86fd8b6189716a5396df",
+      "quote": "•Google Services includes products and services such as ads, Android, Chrome, devices, Google Maps, Google Play, Search, and YouTube. Google Services generates revenues primarily from advertising; fees received for consumer subscription-based products such as YouTube TV, YouTube Music and Premium, and NFL Sunday Ticket, as well as Google One; the sale of apps and in-app purchases; and devices.",
+      "start": 0,
+      "end": 396,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:85": {
+      "source": "googl",
+      "block_id": "block-000085-7bd7f443",
+      "block_ordinal": 85,
+      "reported_page": 4,
+      "dom_path": "/html/body/div[92]",
+      "block_text_sha256": "7bd7f443cbee4325873c6cb0afa19d968c25e274613d5131e7735d3192ffc627",
+      "quote": "We have always been committed to building helpful products that can improve the lives of millions of people worldwide. Our product innovations are what make our services widely used, and our brand one of the most recognized in the world. Google Services' core products and platforms include ads, Android, Chrome, devices, Gmail, Google Drive, Google Gemini, Google Maps, Google Photos, Google Play, Search, and YouTube, with broad and growing adoption by users around the world.",
+      "start": 0,
+      "end": 478,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:93": {
+      "source": "googl",
+      "block_id": "block-000093-0c7f9036",
+      "block_ordinal": 93,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[100]",
+      "block_text_sha256": "0c7f90368d1c0afccc25c1019c26787fda62248d39a91b6c43d6761b322bd7a1",
+      "quote": "Google Services generates revenues primarily by delivering both performance and brand advertising that appears on Google Search & other properties, YouTube, and Google Network partners' properties (\"Google Network properties\"). We continue to invest in both performance and brand advertising and seek to improve the measurability of advertising so advertisers understand the effectiveness of their campaigns.",
+      "start": 0,
+      "end": 408,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:97": {
+      "source": "googl",
+      "block_id": "block-000097-b1521a49",
+      "block_ordinal": 97,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[104]",
+      "block_text_sha256": "b1521a490872d564cbed15ae19081309d0df87b94f8a93d66b3c6b61cddadbe9",
+      "quote": "In addition, Google Services generates revenues from products and services beyond advertising, including:",
+      "start": 0,
+      "end": 105,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:98": {
+      "source": "googl",
+      "block_id": "block-000098-9da7e695",
+      "block_ordinal": 98,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[105]",
+      "block_text_sha256": "9da7e695e75792ccb77496ce6528f9a735ca57113629e471e47e4af14227ba13",
+      "quote": "•consumer subscriptions, which primarily include revenues from YouTube services, such as YouTube TV, YouTube Music and Premium, and NFL Sunday Ticket, as well as Google One, which offers access to our most capable Gemini models;",
+      "start": 0,
+      "end": 228,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:99": {
+      "source": "googl",
+      "block_id": "block-000099-0a4cdc1c",
+      "block_ordinal": 99,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[106]",
+      "block_text_sha256": "0a4cdc1c763c73b2db10d77e076c3457f5e4fce9abaebfba2a938f21c6a0b541",
+      "quote": "•platforms, which primarily include revenues from Google Play sales of apps and in-app purchases; and",
+      "start": 0,
+      "end": 101,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:100": {
+      "source": "googl",
+      "block_id": "block-000100-50fe9352",
+      "block_ordinal": 100,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[107]",
+      "block_text_sha256": "50fe93522a4adc497ba0486614d6f1665b3782b44894f1aecdb9adbf2f771fd5",
+      "quote": "•devices, which primarily include sales of the Pixel family of devices.",
+      "start": 0,
+      "end": 71,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1234": {
+      "source": "googl",
+      "block_id": "block-001234-995bd5bd",
+      "block_ordinal": 1234,
+      "reported_page": 86,
+      "dom_path": "/html/body/ix:nonnumeric[6]/ix:continuation/div[3]",
+      "block_text_sha256": "995bd5bd22090a91774c8470ffa27f07c87a34ad97c0b92068824c2d0ac24d53",
+      "quote": "•Google Cloud includes infrastructure and platform services, applications, and other services for enterprise customers. Google Cloud generates revenues primarily from consumption-based fees and subscriptions received for Google Cloud Platform services, Google Workspace communication and collaboration tools, and other enterprise services.",
+      "start": 0,
+      "end": 339,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:102": {
+      "source": "googl",
+      "block_id": "block-000102-d95e78b6",
+      "block_ordinal": 102,
+      "reported_page": 5,
+      "dom_path": "/html/body/div[109]",
+      "block_text_sha256": "d95e78b68ab2a6077311c7644022bc0d91f9413013300a9996f678058a500123",
+      "quote": "Through our Google Cloud Platform and Google Workspace offerings, Google Cloud generates revenues primarily from consumption-based fees and subscriptions for infrastructure, platform, applications, and other cloud services. Customers use Google Cloud in multiple ways such as:",
+      "start": 0,
+      "end": 276,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:105": {
+      "source": "googl",
+      "block_id": "block-000105-d537716d",
+      "block_ordinal": 105,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[112]",
+      "block_text_sha256": "d537716dd765de196c08e5854e0692c20b8d935f12b34cf73244b09f3c8fa5f4",
+      "quote": "•AI-optimized Infrastructure: runs on our Cloud, at the edge, or in customers' data centers. It can be used to migrate and modernize information technology (IT) systems and to train and serve various types of AI models. Our AI infrastructure delivers cost-performance for AI workloads. We offer a range of AI accelerators, including our custom TPUs and specialized GPUs, as well as AI-optimized storage offerings, and efficient AI software.",
+      "start": 0,
+      "end": 440,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:106": {
+      "source": "googl",
+      "block_id": "block-000106-5f81eec2",
+      "block_ordinal": 106,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[113]",
+      "block_text_sha256": "5f81eec2151b7b665873c241aa73b87c91d0557cc905ec1df3cd2ba8a3a22edd",
+      "quote": "•Developer Platform: delivers a fully managed AI development platform, through Vertex AI, for accessing, tuning, augmenting, and deploying custom models and agents, helping customers build applications with more than 200 foundation models, including our Gemini family, third-party, and open models.",
+      "start": 0,
+      "end": 298,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:107": {
+      "source": "googl",
+      "block_id": "block-000107-b7d3b9a6",
+      "block_ordinal": 107,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[114]",
+      "block_text_sha256": "b7d3b9a6471cfa7c3c2381935d1e6fd53ba0b92110187f0b4d1ce3ed8a9aec6b",
+      "quote": "•Cybersecurity: provides AI-powered threat intelligence and cybersecurity solutions to help customers detect, analyze, protect against, and respond to a broad range of cybersecurity threats.",
+      "start": 0,
+      "end": 190,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:108": {
+      "source": "googl",
+      "block_id": "block-000108-2b3eb887",
+      "block_ordinal": 108,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[115]",
+      "block_text_sha256": "2b3eb887fcb2fec84c6dce7958fe9ad1333ee09f9bdf74f3f53606a40856b672",
+      "quote": "•Data and Analytics: enables customers to migrate, clean, prepare, and feed data into their models. Our data platform also unifies data lakes, data warehouses, data governance, and advanced machine learning into a single platform that helps users analyze data using AI models across any cloud.",
+      "start": 0,
+      "end": 293,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:109": {
+      "source": "googl",
+      "block_id": "block-000109-05590fd8",
+      "block_ordinal": 109,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[116]",
+      "block_text_sha256": "05590fd8c036a6928455d770d61ab60a015c303e6c6f289982b7a4b660aeda2f",
+      "quote": "•Agents:",
+      "start": 0,
+      "end": 8,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:110": {
+      "source": "googl",
+      "block_id": "block-000110-5fa24a66",
+      "block_ordinal": 110,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[117]",
+      "block_text_sha256": "5fa24a66b2be6db64a8ede031cf15240d8b67079e586ce3c341a547152a61b10",
+      "quote": "◦Gemini Enterprise: empowers teams to discover, create, share, and run AI agents all in one secure platform, bringing the best of Google AI to employees through an intuitive chat interface, helping to automate workflows and drive smarter business outcomes.",
+      "start": 0,
+      "end": 256,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:111": {
+      "source": "googl",
+      "block_id": "block-000111-6e57c03e",
+      "block_ordinal": 111,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[119]",
+      "block_text_sha256": "6e57c03e24a9ae931b1e21445b954971201fa89477f52ccde8095c13a4c4c936",
+      "quote": "◦Gemini for Google Workspace: brings our AI-powered agents into Gmail, Docs, Sheets, and more to help users write, organize, visualize, accelerate workflows, and have more productive meetings.",
+      "start": 0,
+      "end": 192,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:113": {
+      "source": "googl",
+      "block_id": "block-000113-f5db1f8d",
+      "block_ordinal": 113,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[121]",
+      "block_text_sha256": "f5db1f8d8832518280034a127f8d816aca91b6fcb9489bb48b76e659f01fb553",
+      "quote": "Across Alphabet, we are also using technology to try to solve big problems that affect a wide variety of industries, including transportation and health technology. Alphabet’s investment in the portfolio of Other Bets includes businesses that are at various stages of development, ranging from those in the research and development phase, such as X, our moonshot factory focused on developing breakthrough technologies, to those that are scaling commercialization, such as Waymo, which is expanding to more cities domestically, entering international markets, and further scaling operations.",
+      "start": 0,
+      "end": 591,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:114": {
+      "source": "googl",
+      "block_id": "block-000114-2c911087",
+      "block_ordinal": 114,
+      "reported_page": 6,
+      "dom_path": "/html/body/div[122]",
+      "block_text_sha256": "2c9110877e34bb74330f0104014b57691d8b6560487a29c559c5dfe59ed35a2f",
+      "quote": "Other Bets operate as independent companies and some of them have their own boards with independent members and outside investors. While these early-stage businesses naturally come with considerable uncertainty, some of them are already generating revenue and making important strides in their industries. Revenues from Other Bets are generated primarily from the sale of autonomous transportation and internet services.",
+      "start": 0,
+      "end": 420,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:781:1,4,6,7,8,11": {
+      "source": "msft",
+      "block_id": "block-000781-9ee5633d",
+      "block_ordinal": 781,
+      "reported_page": 50,
+      "dom_path": "/html/body/div[150]/table",
+      "block_text_sha256": "9ee5633df804a67fca8110856500b749499f0408c6de3bab307db9fe9e650961",
+      "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 Revenue: Product $ 63,946 $ 64,773 $ 64,699 Service and other 217,778 180,349 147,216 Total revenue 281,724 245,122 211,915 Cost of revenue: Product 13,501 15,272 17,804 Service and other 74,330 58,842 48,059 Total cost of revenue 87,831 74,114 65,863 Gross margin 193,893 171,008 146,052 Research and development 32,488 29,510 27,195 Sales and marketing 25,654 24,456 22,759 General and administrative 7,223 7,609 7,575 Operating income 128,528 109,433 88,523 Other income (expense), net (4,901 ) (1,646 ) 788 Income before income taxes 123,627 107,787 89,311 Provision for income taxes 21,795 19,651 16,950 Net income $ 101,832 $ 88,136 $ 72,361 Earnings per share: Basic $ 13.70 $ 11.86 $ 9.72 Diluted $ 13.64 $ 11.80 $ 9.68 Weighted average shares outstanding: Basic 7,433 7,431 7,446 Diluted 7,465 7,469 7,472",
+      "start": 0,
+      "end": 889,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "(In millions, except per share amounts)"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Year Ended June 30,"
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "2025"
+        },
+        {
+          "row": 4,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "2024"
+        },
+        {
+          "row": 4,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "2023"
+        },
+        {
+          "row": 6,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Revenue:"
+        },
+        {
+          "row": 7,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Product"
+        },
+        {
+          "row": 7,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 7,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "63,946"
+        },
+        {
+          "row": 7,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 7,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "64,773"
+        },
+        {
+          "row": 7,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 7,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "64,699"
+        },
+        {
+          "row": 8,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Service and other"
+        },
+        {
+          "row": 8,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "217,778"
+        },
+        {
+          "row": 8,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "180,349"
+        },
+        {
+          "row": 8,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "147,216"
+        },
+        {
+          "row": 11,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Total revenue"
+        },
+        {
+          "row": 11,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "281,724"
+        },
+        {
+          "row": 11,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "245,122"
+        },
+        {
+          "row": 11,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "211,915"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "msft:1217:1,4,36,38": {
+      "source": "msft",
+      "block_id": "block-001217-90dfc72b",
+      "block_ordinal": 1217,
+      "reported_page": 84,
+      "dom_path": "/html/body/div[252]/div/ix:continuation/div[1]/ix:nonnumeric/table",
+      "block_text_sha256": "90dfc72b7d69537584af292e26e4d0a51b0c32548b675560c4bd0c970317bf09",
+      "quote": "(In millions) Year Ended June 30, 2025 2024 2023 Productivity and Business Processes Revenue $ 120,810 $ 106,820 $ 94,151 Cost of revenue 22,422 19,611 17,202 Operating expenses 28,615 27,548 26,875 Operating Income $ 69,773 $ 59,661 $ 50,074 Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944 Cost of revenue 40,171 29,611 24,109 Operating expenses 21,505 20,040 20,424 Operating Income $ 44,589 $ 37,813 $ 28,411 More Personal Computing Revenue $ 54,649 $ 50,838 $ 44,820 Cost of revenue 25,238 24,892 24,552 Operating expenses 15,245 13,987 10,230 Operating Income $ 14,166 $ 11,959 $ 10,038 Total Revenue $ 281,724 $ 245,122 $ 211,915 Cost of revenue 87,831 74,114 65,863 Operating expenses 65,365 61,575 57,529 Operating Income $ 128,528 $ 109,433 $ 88,523",
+      "start": 0,
+      "end": 764,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "(In millions)"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Year Ended June 30,"
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "2025"
+        },
+        {
+          "row": 4,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "2024"
+        },
+        {
+          "row": 4,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "2023"
+        },
+        {
+          "row": 36,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Total"
+        },
+        {
+          "row": 38,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Revenue"
+        },
+        {
+          "row": 38,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 38,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "281,724"
+        },
+        {
+          "row": 38,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 38,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "245,122"
+        },
+        {
+          "row": 38,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 38,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "211,915"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "msft:1226": {
+      "source": "msft",
+      "block_id": "block-001226-283de46e",
+      "block_ordinal": 1226,
+      "reported_page": 85,
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/table",
+      "block_text_sha256": "283de46ecdb49aaf06e035894a9b7cd920233aa2ff4c28f80764d1c768c259fb",
+      "quote": "(In millions) Year Ended June 30, 2025 2024 2023 Server products and cloud services $ 98,435 $ 79,828 $ 65,007 Microsoft 365 Commercial products and cloud services 87,767 76,969 66,949 Gaming 23,455 21,503 15,466 LinkedIn 17,812 16,372 14,989 Windows and Devices 17,314 17,026 17,147 Search and news advertising 13,878 12,306 12,125 Dynamics products and cloud services 7,827 6,831 5,796 Enterprise and partner services 7,760 7,594 7,900 Microsoft 365 Consumer products and cloud services 7,404 6,648 6,417 Other 72 45 119 Total $ 281,724 $ 245,122 $ 211,915",
+      "start": 0,
+      "end": 558,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "(In millions)"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Year Ended June 30,"
+        },
+        {
+          "row": 4,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "2025"
+        },
+        {
+          "row": 4,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "2024"
+        },
+        {
+          "row": 4,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "2023"
+        },
+        {
+          "row": 6,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Server products and cloud services"
+        },
+        {
+          "row": 6,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 6,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "98,435"
+        },
+        {
+          "row": 6,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 6,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "79,828"
+        },
+        {
+          "row": 6,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 6,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "65,007"
+        },
+        {
+          "row": 7,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Microsoft 365 Commercial products and cloud services"
+        },
+        {
+          "row": 7,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "87,767"
+        },
+        {
+          "row": 7,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "76,969"
+        },
+        {
+          "row": 7,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "66,949"
+        },
+        {
+          "row": 8,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Gaming"
+        },
+        {
+          "row": 8,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "23,455"
+        },
+        {
+          "row": 8,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "21,503"
+        },
+        {
+          "row": 8,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "15,466"
+        },
+        {
+          "row": 9,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "LinkedIn"
+        },
+        {
+          "row": 9,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "17,812"
+        },
+        {
+          "row": 9,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "16,372"
+        },
+        {
+          "row": 9,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "14,989"
+        },
+        {
+          "row": 10,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Windows and Devices"
+        },
+        {
+          "row": 10,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "17,314"
+        },
+        {
+          "row": 10,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "17,026"
+        },
+        {
+          "row": 10,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "17,147"
+        },
+        {
+          "row": 11,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Search and news advertising"
+        },
+        {
+          "row": 11,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "13,878"
+        },
+        {
+          "row": 11,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "12,306"
+        },
+        {
+          "row": 11,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "12,125"
+        },
+        {
+          "row": 12,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Dynamics products and cloud services"
+        },
+        {
+          "row": 12,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "7,827"
+        },
+        {
+          "row": 12,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "6,831"
+        },
+        {
+          "row": 12,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "5,796"
+        },
+        {
+          "row": 13,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Enterprise and partner services"
+        },
+        {
+          "row": 13,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "7,760"
+        },
+        {
+          "row": 13,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "7,594"
+        },
+        {
+          "row": 13,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "7,900"
+        },
+        {
+          "row": 14,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Microsoft 365 Consumer products and cloud services"
+        },
+        {
+          "row": 14,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "7,404"
+        },
+        {
+          "row": 14,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "6,648"
+        },
+        {
+          "row": 14,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "6,417"
+        },
+        {
+          "row": 15,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Other"
+        },
+        {
+          "row": 15,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "72"
+        },
+        {
+          "row": 15,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "45"
+        },
+        {
+          "row": 15,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "119"
+        },
+        {
+          "row": 18,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Total"
+        },
+        {
+          "row": 18,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 18,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "281,724"
+        },
+        {
+          "row": 18,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 18,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "245,122"
+        },
+        {
+          "row": 18,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 18,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "211,915"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "msft:813": {
+      "source": "msft",
+      "block_id": "block-000813-86814fe3",
+      "block_ordinal": 813,
+      "reported_page": 55,
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[1]/ix:nonnumeric/p[2]",
+      "block_text_sha256": "86814fe3bba9973fca40ff5bcb68c4e4a2dfb9b58b4f931fb4211ae75f2089e3",
+      "quote": "Our consolidated financial statements and accompanying notes are prepared in accordance with accounting principles generally accepted in the United States of America (“GAAP”).",
+      "start": 0,
+      "end": 175,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:815": {
+      "source": "msft",
+      "block_id": "block-000815-a9d394c1",
+      "block_ordinal": 815,
+      "reported_page": 55,
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/p[2]",
+      "block_text_sha256": "a9d394c1ec3d4f0f9c16e1e298109702bed81fe20f33caf866a440975ea60a3d",
+      "quote": "The consolidated financial statements include the accounts of Microsoft Corporation and its subsidiaries. Intercompany transactions and balances have been eliminated.",
+      "start": 0,
+      "end": 166,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1237": {
+      "source": "msft",
+      "block_id": "block-001237-a5e5d3df",
+      "block_ordinal": 1237,
+      "reported_page": 86,
+      "dom_path": "/html/body/div[258]/div/ix:nonnumeric/p[2]",
+      "block_text_sha256": "a5e5d3df2cca6ad892dcc7722a9f92ef92e8447dac0299722c6fa48be1426226",
+      "quote": "We have audited the accompanying consolidated balance sheets of Microsoft Corporation and subsidiaries (the \"Company\") as of June 30, 2025 and 2024, the related consolidated statements of income, comprehensive income, cash flows, and stockholders' equity, for each of the three years in the period ended June 30, 2025, and the related notes (collectively referred to as the \"financial statements\"). In our opinion, the financial statements present fairly, in all material respects, the financial position of the Company as of June 30, 2025 and 2024, and the results of its operations and its cash flows for each of the three years in the period ended June 30, 2025, in conformity with accounting principles generally accepted in the United States of America.",
+      "start": 0,
+      "end": 758,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:817": {
+      "source": "msft",
+      "block_id": "block-000817-00ca3208",
+      "block_ordinal": 817,
+      "reported_page": 55,
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[2]",
+      "block_text_sha256": "00ca320873c6aa6182d621143965a62b7fafee7673bd3ef6926ae2056d0aa17f",
+      "quote": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notably bringing the commercial components of Microsoft 365 together in the Productivity and Business Processes segment. Beginning in fiscal year 2025, the information that our chief operating decision maker is regularly provided and reviews for purposes of allocating resources and assessing performance reflects these segment changes. Prior period segment information has been recast to conform to the way we internally manage and monitor our business during fiscal year 2025. These changes primarily impacted Note 8 – Goodwill, Note 12 – Unearned Revenue, and Note 18 – Segment Information and Geographic Data.",
+      "start": 0,
+      "end": 767,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:818": {
+      "source": "msft",
+      "block_id": "block-000818-3a2e0b27",
+      "block_ordinal": 818,
+      "reported_page": 55,
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[3]/ix:nonnumeric/p[3]",
+      "block_text_sha256": "3a2e0b27db1433d902b9434c4ab5618da4e5088c418a401b9f15074e9dbe6278",
+      "quote": "The recast of prior period information had no impact on our consolidated balance sheets, consolidated income statements, or consolidated cash flows statements.",
+      "start": 0,
+      "end": 159,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:751": {
+      "source": "googl",
+      "block_id": "block-000751-1e6373dd",
+      "block_ordinal": 751,
+      "reported_page": 49,
+      "dom_path": "/html/body/div[815]",
+      "block_text_sha256": "1e6373dd1ad7c9f4215cfb74cb43acc71959fb2c31a9831a366ff2b7abe46cb6",
+      "quote": "CONSOLIDATED STATEMENTS OF INCOME",
+      "start": 0,
+      "end": 33,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:752": {
+      "source": "googl",
+      "block_id": "block-000752-dfe26017",
+      "block_ordinal": 752,
+      "reported_page": 49,
+      "dom_path": "/html/body/div[816]/span",
+      "block_text_sha256": "dfe260176ffdee13fb6c38175bafdfa3076ba48faa2172b59ff687824e691645",
+      "quote": "(in millions, except per share amounts)",
+      "start": 0,
+      "end": 39,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:753:1,2,3": {
+      "source": "googl",
+      "block_id": "block-000753-53762a3b",
+      "block_ordinal": 753,
+      "reported_page": 49,
+      "dom_path": "/html/body/div[816]/table",
+      "block_text_sha256": "53762a3b18f01eade98317079f2483f5de42f545fdf83823b977d197c3da0ac7",
+      "quote": "Year Ended December 31, 202320242025Revenues$307,394 $350,018 $402,836 Costs and expenses:Cost of revenues133,332 146,306 162,535 Research and development45,427 49,326 61,087 Sales and marketing27,917 27,808 28,693 General and administrative16,425 14,188 21,482 Total costs and expenses223,101 237,628 273,797 Income from operations84,293 112,390 129,039 Other income (expense), net1,424 7,425 29,787 Income before income taxes85,717 119,815 158,826 Provision for income taxes11,922 19,697 26,656 Net income$73,795 $100,118 $132,170 Basic net income per share (Note 12)$5.84 $8.13 $10.91 Diluted net income per share (Note 12)$5.80 $8.04 $10.81",
+      "start": 0,
+      "end": 644,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 15,
+          "text": "Year Ended December 31,"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2023"
+        },
+        {
+          "row": 2,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2024"
+        },
+        {
+          "row": 2,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2025"
+        },
+        {
+          "row": 3,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Revenues"
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "307,394"
+        },
+        {
+          "row": 3,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "350,018"
+        },
+        {
+          "row": 3,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "402,836"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "googl:921": {
+      "source": "googl",
+      "block_id": "block-000921-942753de",
+      "block_ordinal": 921,
+      "reported_page": 60,
+      "dom_path": "/html/body/ix:continuation[10]/ix:nonnumeric[1]/div[2]/table",
+      "block_text_sha256": "942753deb135cce0c039fdf419a8b9a1765dc5c8c68c32f729f53c631aaad364",
+      "quote": "Year Ended December 31,202320242025Google Search & other$175,033 $198,084 $224,532 YouTube ads31,510 36,147 40,367 Google Network31,312 30,359 29,792 Google advertising237,855 264,590 294,691 Google subscriptions, platforms, and devices34,688 40,340 48,030 Google Services total272,543 304,930 342,721 Google Cloud33,088 43,229 58,705 Other Bets1,527 1,648 1,537 Hedging gains (losses)236 211 (127)Total revenues$307,394 $350,018 $402,836",
+      "start": 0,
+      "end": 438,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 15,
+          "text": "Year Ended December 31,"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2023"
+        },
+        {
+          "row": 2,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2024"
+        },
+        {
+          "row": 2,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2025"
+        },
+        {
+          "row": 3,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Search & other"
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "175,033"
+        },
+        {
+          "row": 3,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "198,084"
+        },
+        {
+          "row": 3,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "224,532"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "YouTube ads"
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "31,510"
+        },
+        {
+          "row": 4,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "36,147"
+        },
+        {
+          "row": 4,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "40,367"
+        },
+        {
+          "row": 5,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Network"
+        },
+        {
+          "row": 5,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "31,312"
+        },
+        {
+          "row": 5,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "30,359"
+        },
+        {
+          "row": 5,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "29,792"
+        },
+        {
+          "row": 6,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google advertising"
+        },
+        {
+          "row": 6,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "237,855"
+        },
+        {
+          "row": 6,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "264,590"
+        },
+        {
+          "row": 6,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "294,691"
+        },
+        {
+          "row": 7,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google subscriptions, platforms, and devices"
+        },
+        {
+          "row": 7,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "34,688"
+        },
+        {
+          "row": 7,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "40,340"
+        },
+        {
+          "row": 7,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "48,030"
+        },
+        {
+          "row": 8,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Services total"
+        },
+        {
+          "row": 8,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "272,543"
+        },
+        {
+          "row": 8,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "304,930"
+        },
+        {
+          "row": 8,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "342,721"
+        },
+        {
+          "row": 9,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Cloud"
+        },
+        {
+          "row": 9,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "33,088"
+        },
+        {
+          "row": 9,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "43,229"
+        },
+        {
+          "row": 9,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "58,705"
+        },
+        {
+          "row": 10,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Other Bets"
+        },
+        {
+          "row": 10,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "1,527"
+        },
+        {
+          "row": 10,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "1,648"
+        },
+        {
+          "row": 10,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "1,537"
+        },
+        {
+          "row": 11,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Hedging gains (losses)"
+        },
+        {
+          "row": 11,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "236"
+        },
+        {
+          "row": 11,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "211"
+        },
+        {
+          "row": 11,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(127)"
+        },
+        {
+          "row": 12,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total revenues"
+        },
+        {
+          "row": 12,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 12,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "307,394"
+        },
+        {
+          "row": 12,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 12,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "350,018"
+        },
+        {
+          "row": 12,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 12,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "402,836"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "googl:920": {
+      "source": "googl",
+      "block_id": "block-000920-8fc58b8e",
+      "block_ordinal": 920,
+      "reported_page": 60,
+      "dom_path": "/html/body/ix:continuation[10]/ix:nonnumeric[1]/div[1]",
+      "block_text_sha256": "8fc58b8ed766ac5cd960377871d101bb76813b7d77224c0239ad047229aeeca8",
+      "quote": "The following table presents revenues disaggregated by type (in millions):",
+      "start": 0,
+      "end": 74,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1246": {
+      "source": "googl",
+      "block_id": "block-001246-d9c3ca1b",
+      "block_ordinal": 1246,
+      "reported_page": 87,
+      "dom_path": "/html/body/ix:continuation[48]/ix:nonnumeric/div[2]/table",
+      "block_text_sha256": "d9c3ca1b1b0085ac758e46b8f06ef903f820edb58d26aabd2632797b15ad404c",
+      "quote": "Year Ended December 31,202320242025Revenues:Google Services$272,543 $304,930 $342,721 Google Cloud33,088 43,229 58,705 Other Bets1,527 1,648 1,537 Hedging gains (losses)236 211 (127)Total revenues$307,394 $350,018 $402,836 Operating income (loss):Google Services$95,858 $121,263 $139,404 Google Cloud1,716 6,112 13,910 Other Bets(4,095)(4,444)(7,515)Alphabet-level activities(9,186)(10,541)(16,760)Total income from operations$84,293 $112,390 $129,039 Supplemental information about segment expenses:Google Services:Employee compensation expenses$46,224 $44,560 $45,124 Other costs and expenses130,461 139,107 158,193 Total Google Services costs and expenses$176,685 $183,667 $203,317 Google Cloud:Employee compensation expenses$19,054 $20,519 $22,078 Other costs and expenses12,318 16,598 22,717 Total Google Cloud costs and expenses$31,372 $37,117 $44,795",
+      "start": 0,
+      "end": 857,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 15,
+          "text": "Year Ended December 31,"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2023"
+        },
+        {
+          "row": 2,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2024"
+        },
+        {
+          "row": 2,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "2025"
+        },
+        {
+          "row": 3,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Revenues:"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Services"
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "272,543"
+        },
+        {
+          "row": 4,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "304,930"
+        },
+        {
+          "row": 4,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "342,721"
+        },
+        {
+          "row": 5,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Cloud"
+        },
+        {
+          "row": 5,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "33,088"
+        },
+        {
+          "row": 5,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "43,229"
+        },
+        {
+          "row": 5,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "58,705"
+        },
+        {
+          "row": 6,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Other Bets"
+        },
+        {
+          "row": 6,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "1,527"
+        },
+        {
+          "row": 6,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "1,648"
+        },
+        {
+          "row": 6,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "1,537"
+        },
+        {
+          "row": 7,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Hedging gains (losses)"
+        },
+        {
+          "row": 7,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "236"
+        },
+        {
+          "row": 7,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "211"
+        },
+        {
+          "row": 7,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(127)"
+        },
+        {
+          "row": 8,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total revenues"
+        },
+        {
+          "row": 8,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 8,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "307,394"
+        },
+        {
+          "row": 8,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 8,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "350,018"
+        },
+        {
+          "row": 8,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 8,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "402,836"
+        },
+        {
+          "row": 9,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Operating income (loss):"
+        },
+        {
+          "row": 10,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Services"
+        },
+        {
+          "row": 10,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 10,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "95,858"
+        },
+        {
+          "row": 10,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 10,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "121,263"
+        },
+        {
+          "row": 10,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 10,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "139,404"
+        },
+        {
+          "row": 11,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Cloud"
+        },
+        {
+          "row": 11,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "1,716"
+        },
+        {
+          "row": 11,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "6,112"
+        },
+        {
+          "row": 11,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "13,910"
+        },
+        {
+          "row": 12,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Other Bets"
+        },
+        {
+          "row": 12,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(4,095)"
+        },
+        {
+          "row": 12,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(4,444)"
+        },
+        {
+          "row": 12,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(7,515)"
+        },
+        {
+          "row": 13,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Alphabet-level activities"
+        },
+        {
+          "row": 13,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(9,186)"
+        },
+        {
+          "row": 13,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(10,541)"
+        },
+        {
+          "row": 13,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "(16,760)"
+        },
+        {
+          "row": 14,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total income from operations"
+        },
+        {
+          "row": 14,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 14,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "84,293"
+        },
+        {
+          "row": 14,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 14,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "112,390"
+        },
+        {
+          "row": 14,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 14,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "129,039"
+        },
+        {
+          "row": 15,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Supplemental information about segment expenses:"
+        },
+        {
+          "row": 16,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Services:"
+        },
+        {
+          "row": 17,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Employee compensation expenses"
+        },
+        {
+          "row": 17,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 17,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "46,224"
+        },
+        {
+          "row": 17,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 17,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "44,560"
+        },
+        {
+          "row": 17,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 17,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "45,124"
+        },
+        {
+          "row": 18,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Other costs and expenses"
+        },
+        {
+          "row": 18,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "130,461"
+        },
+        {
+          "row": 18,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "139,107"
+        },
+        {
+          "row": 18,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "158,193"
+        },
+        {
+          "row": 19,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Google Services costs and expenses"
+        },
+        {
+          "row": 19,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 19,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "176,685"
+        },
+        {
+          "row": 19,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 19,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "183,667"
+        },
+        {
+          "row": 19,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 19,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "203,317"
+        },
+        {
+          "row": 20,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Google Cloud:"
+        },
+        {
+          "row": 21,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Employee compensation expenses"
+        },
+        {
+          "row": 21,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 21,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "19,054"
+        },
+        {
+          "row": 21,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 21,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "20,519"
+        },
+        {
+          "row": 21,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 21,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "22,078"
+        },
+        {
+          "row": 22,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Other costs and expenses"
+        },
+        {
+          "row": 22,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "12,318"
+        },
+        {
+          "row": 22,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "16,598"
+        },
+        {
+          "row": 22,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "22,717"
+        },
+        {
+          "row": 23,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Google Cloud costs and expenses"
+        },
+        {
+          "row": 23,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 23,
+          "column": 4,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "31,372"
+        },
+        {
+          "row": 23,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 23,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "37,117"
+        },
+        {
+          "row": 23,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 23,
+          "column": 16,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "44,795"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "googl:1245": {
+      "source": "googl",
+      "block_id": "block-001245-814bacb4",
+      "block_ordinal": 1245,
+      "reported_page": 87,
+      "dom_path": "/html/body/ix:continuation[48]/ix:nonnumeric/div[1]",
+      "block_text_sha256": "814bacb44e8a12aaa6d679c93f7f7188f7bd4ff0b85d0b19314c9c619498614c",
+      "quote": "The following table presents revenue, profitability, and expense information about our segments (in millions):",
+      "start": 0,
+      "end": 110,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:785": {
+      "source": "googl",
+      "block_id": "block-000785-afc83922",
+      "block_ordinal": 785,
+      "reported_page": 53,
+      "dom_path": "/html/body/ix:continuation[2]/ix:nonnumeric[2]/div[2]",
+      "block_text_sha256": "afc839229bfd13ce71b1296aad8367a1445b15741cab646e9798e2d13700f06d",
+      "quote": "The consolidated financial statements of Alphabet include the accounts of Alphabet and entities consolidated under the variable interest and voting models. Intercompany balances and transactions have been eliminated.",
+      "start": 0,
+      "end": 216,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:787": {
+      "source": "googl",
+      "block_id": "block-000787-d09bf90b",
+      "block_ordinal": 787,
+      "reported_page": 53,
+      "dom_path": "/html/body/ix:continuation[2]/ix:nonnumeric[3]/div[2]",
+      "block_text_sha256": "d09bf90b5231e367f0b0ce658016e5068e433abf22a5e6e7bc9f4dc0ad05464b",
+      "quote": "Preparation of consolidated financial statements in conformity with GAAP requires us to make estimates and assumptions that affect the amounts reported and disclosed in the financial statements and the accompanying notes. Actual results could differ materially from these estimates due to uncertainties. On an ongoing basis, we evaluate our estimates, including those related to the allowance for credit losses; contingent liabilities; fair values of financial instruments and goodwill; income taxes; inventory; and useful lives of property and equipment, among others. We base our estimates on assumptions, both historical and forward looking, that are believed to be reasonable, and the results of which form the basis for making judgments about the carrying values of assets and liabilities.",
+      "start": 0,
+      "end": 794,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:789": {
+      "source": "googl",
+      "block_id": "block-000789-b15401bc",
+      "block_ordinal": 789,
+      "reported_page": 53,
+      "dom_path": "/html/body/ix:continuation[2]/ix:nonnumeric[4]/div[2]",
+      "block_text_sha256": "b15401bc554db0044469a706129ab412bad35b1d3b1007ec4d7c20e3a14cc726",
+      "quote": "Revenues are recognized when control of the promised goods or services is transferred to our customers, and the collectibility of an amount that we expect in exchange for those goods or services is probable. Sales and other similar taxes are excluded from revenues.",
+      "start": 0,
+      "end": 265,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1227": {
+      "source": "msft",
+      "block_id": "block-001227-3bdf0315",
+      "block_ordinal": 1227,
+      "reported_page": 85,
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+      "block_text_sha256": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e",
+      "quote": "Our Microsoft Cloud revenue, which includes Microsoft 365 Commercial cloud, Azure and other cloud services, the commercial portion of LinkedIn, and Dynamics 365, was $168.9 billion, $137.7 billion, and $111.6 billion in fiscal years 2025, 2024, and 2023, respectively. These amounts are included in Microsoft 365 Commercial products and cloud services, Server products and cloud services, LinkedIn, and Dynamics products and cloud services in the table above.",
+      "start": 0,
+      "end": 459,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "msft:1217:1,4,16,18": {
+      "source": "msft",
+      "block_id": "block-001217-90dfc72b",
+      "block_ordinal": 1217,
+      "reported_page": 84,
+      "dom_path": "/html/body/div[252]/div/ix:continuation/div[1]/ix:nonnumeric/table",
+      "block_text_sha256": "90dfc72b7d69537584af292e26e4d0a51b0c32548b675560c4bd0c970317bf09",
+      "quote": "(In millions) Year Ended June 30, 2025 2024 2023 Productivity and Business Processes Revenue $ 120,810 $ 106,820 $ 94,151 Cost of revenue 22,422 19,611 17,202 Operating expenses 28,615 27,548 26,875 Operating Income $ 69,773 $ 59,661 $ 50,074 Intelligent Cloud Revenue $ 106,265 $ 87,464 $ 72,944 Cost of revenue 40,171 29,611 24,109 Operating expenses 21,505 20,040 20,424 Operating Income $ 44,589 $ 37,813 $ 28,411 More Personal Computing Revenue $ 54,649 $ 50,838 $ 44,820 Cost of revenue 25,238 24,892 24,552 Operating expenses 15,245 13,987 10,230 Operating Income $ 14,166 $ 11,959 $ 10,038 Total Revenue $ 281,724 $ 245,122 $ 211,915 Cost of revenue 87,831 74,114 65,863 Operating expenses 65,365 61,575 57,529 Operating Income $ 128,528 $ 109,433 $ 88,523",
+      "start": 0,
+      "end": 764,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "(In millions)"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Year Ended June 30,"
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "2025"
+        },
+        {
+          "row": 4,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "2024"
+        },
+        {
+          "row": 4,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "2023"
+        },
+        {
+          "row": 16,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Intelligent Cloud"
+        },
+        {
+          "row": 18,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Revenue"
+        },
+        {
+          "row": 18,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 18,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "106,265"
+        },
+        {
+          "row": 18,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 18,
+          "column": 7,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "87,464"
+        },
+        {
+          "row": 18,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 18,
+          "column": 11,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "72,944"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "msft:564:13": {
+      "source": "msft",
+      "block_id": "block-000564-5a5acdbe",
+      "block_ordinal": 564,
+      "reported_page": 37,
+      "dom_path": "/html/body/div[111]/table[2]",
+      "block_text_sha256": "5a5acdbe1e59d87394246bd34879d3d86e1b775ccb64d242cff6d452f9db2a68",
+      "quote": "Microsoft 365 Commercial cloud revenue growth Revenue from Microsoft 365 Commercial subscriptions, comprising Microsoft 365 Commercial, Enterprise Mobility + Security, the cloud portion of Windows Commercial, the per-user portion of Power BI, Exchange, SharePoint, Microsoft Teams, Microsoft 365 Security and Compliance, and Microsoft 365 Copilot Microsoft 365 Commercial seat growth The number of Microsoft 365 Commercial seats at end of period where seats are paid users covered by a Microsoft 365 Commercial subscription Microsoft 365 Consumer cloud revenue growth Revenue from Microsoft 365 Consumer subscriptions and other consumer services Microsoft 365 Consumer subscribers The number of Microsoft 365 Consumer subscribers at end of period LinkedIn revenue growth Revenue from LinkedIn, including Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions Dynamics 365 revenue growth Revenue from Dynamics 365, including a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate Azure and other cloud services revenue growth Revenue from Azure and other cloud services, including cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services",
+      "start": 0,
+      "end": 1296,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 13,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Azure and other cloud services revenue growth"
+        },
+        {
+          "row": 13,
+          "column": 2,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "Revenue from Azure and other cloud services, including cloud and AI consumption-based services, GitHub cloud services, Nuance Healthcare cloud services, virtual desktop offerings, and other cloud services"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "msft:613": {
+      "source": "msft",
+      "block_id": "block-000613-2b412f2d",
+      "block_ordinal": 613,
+      "reported_page": 40,
+      "dom_path": "/html/body/div[120]/div[1]/div",
+      "block_text_sha256": "2b412f2dcf2414593e033d7da216e09c6ef3e6404c6f384e297ea2ec54798f8e",
+      "quote": "Server products and cloud services revenue increased $18.6 billion or 23% driven by Azure and other cloud services. Azure and other cloud services revenue grew 34% driven by demand for our portfolio of services. Server products revenue decreased 3% driven by a decrease in transactional purchasing with continued customer shift to cloud offerings.",
+      "start": 0,
+      "end": 347,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1154": {
+      "source": "googl",
+      "block_id": "block-001154-75d62601",
+      "block_ordinal": 1154,
+      "reported_page": 78,
+      "dom_path": "/html/body/ix:continuation[37]/ix:nonnumeric/div[1]",
+      "block_text_sha256": "75d6260185137a2ac79dc195522c5f3eb5589a13928ef03f7f1b9f8c1c345805",
+      "quote": "The following table presents Class A and Class C shares repurchased and subsequently retired (in millions):",
+      "start": 0,
+      "end": 107,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1155:1,2,3,4,5,6": {
+      "source": "googl",
+      "block_id": "block-001155-e007c40e",
+      "block_ordinal": 1155,
+      "reported_page": 78,
+      "dom_path": "/html/body/ix:continuation[37]/ix:nonnumeric/div[2]/table",
+      "block_text_sha256": "e007c40ec44fe0eb8f06c781382f3d57ac82890c90c64e43cf9cf3e15c5e236d",
+      "quote": "Year Ended December 31,202320242025SharesAmountSharesAmountSharesAmountClass A share repurchases78$9,316 73$11,855 37$6,501 Class C share repurchases45052,868 30650,192 20338,897 Total share repurchases(1)528$62,184 379$62,047 240$45,398",
+      "start": 0,
+      "end": 237,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 33,
+          "text": "Year Ended December 31,"
+        },
+        {
+          "row": 2,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 9,
+          "text": "2023"
+        },
+        {
+          "row": 2,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 9,
+          "text": "2024"
+        },
+        {
+          "row": 2,
+          "column": 27,
+          "rowspan": 1,
+          "colspan": 9,
+          "text": "2025"
+        },
+        {
+          "row": 3,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Shares"
+        },
+        {
+          "row": 3,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Amount"
+        },
+        {
+          "row": 3,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Shares"
+        },
+        {
+          "row": 3,
+          "column": 21,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Amount"
+        },
+        {
+          "row": 3,
+          "column": 27,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Shares"
+        },
+        {
+          "row": 3,
+          "column": 33,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Amount"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Class A share repurchases"
+        },
+        {
+          "row": 4,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "78"
+        },
+        {
+          "row": 4,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "9,316"
+        },
+        {
+          "row": 4,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "73"
+        },
+        {
+          "row": 4,
+          "column": 21,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 22,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "11,855"
+        },
+        {
+          "row": 4,
+          "column": 27,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "37"
+        },
+        {
+          "row": 4,
+          "column": 33,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 34,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "6,501"
+        },
+        {
+          "row": 5,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Class C share repurchases"
+        },
+        {
+          "row": 5,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "450"
+        },
+        {
+          "row": 5,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "52,868"
+        },
+        {
+          "row": 5,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "306"
+        },
+        {
+          "row": 5,
+          "column": 21,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "50,192"
+        },
+        {
+          "row": 5,
+          "column": 27,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "203"
+        },
+        {
+          "row": 5,
+          "column": 33,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "38,897"
+        },
+        {
+          "row": 6,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total share repurchases(1)"
+        },
+        {
+          "row": 6,
+          "column": 3,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "528"
+        },
+        {
+          "row": 6,
+          "column": 9,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 6,
+          "column": 10,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "62,184"
+        },
+        {
+          "row": 6,
+          "column": 15,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "379"
+        },
+        {
+          "row": 6,
+          "column": 21,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 6,
+          "column": 22,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "62,047"
+        },
+        {
+          "row": 6,
+          "column": 27,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "240"
+        },
+        {
+          "row": 6,
+          "column": 33,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 6,
+          "column": 34,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "45,398"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "googl:1156": {
+      "source": "googl",
+      "block_id": "block-001156-fd0ad902",
+      "block_ordinal": 1156,
+      "reported_page": 78,
+      "dom_path": "/html/body/ix:continuation[37]/ix:nonnumeric/div[2]/span[1]",
+      "block_text_sha256": "fd0ad9026eee596b7072a762941f60bef57e760a230edd450b3a634825685c2a",
+      "quote": "(1)",
+      "start": 0,
+      "end": 3,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1157": {
+      "source": "googl",
+      "block_id": "block-001157-ac5ea763",
+      "block_ordinal": 1157,
+      "reported_page": 78,
+      "dom_path": "/html/body/ix:continuation[37]/ix:nonnumeric/div[2]/span[2]",
+      "block_text_sha256": "ac5ea763cb04f1060522522641336c593611987afaff98252a59683db76b0b01",
+      "quote": "Shares repurchased include any unsettled repurchases.",
+      "start": 0,
+      "end": 53,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1153": {
+      "source": "googl",
+      "block_id": "block-001153-90ff936a",
+      "block_ordinal": 1153,
+      "reported_page": 78,
+      "dom_path": "/html/body/ix:continuation[37]/div[4]",
+      "block_text_sha256": "90ff936a779440b62d196d88938fd3a56612cdb82b9501f9a11532c31cc70e2f",
+      "quote": "In the years ended December 31, 2023, 2024, and 2025, we continued to repurchase both Class A and Class C shares in a manner deemed in the best interest of the company and its stockholders, taking into account the economic cost and prevailing market conditions, including the relative trading prices and volumes of the Class A and Class C shares. In April 2024, the company's Board of Directors authorized a $70.0 billion share repurchase program for its Class A and Class C shares. In April 2025, the company's Board of Directors authorized an additional $70.0 billion share repurchase program for its Class A and Class C shares. As of December 31, 2025, $69.5 billion remained available for Class A and Class C share repurchases.",
+      "start": 0,
+      "end": 731,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:365": {
+      "source": "googl",
+      "block_id": "block-000365-845ab851",
+      "block_ordinal": 365,
+      "reported_page": 25,
+      "dom_path": "/html/body/div[383]",
+      "block_text_sha256": "845ab851839fb8a0f931606b85551e576dcc55e53d477d243b18ecbdc49c3a0d",
+      "quote": "The following table presents information with respect to Alphabet's repurchases of Class A and Class C stock during the quarter ended December 31, 2025:",
+      "start": 0,
+      "end": 152,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:366:1,4": {
+      "source": "googl",
+      "block_id": "block-000366-0d6dca34",
+      "block_ordinal": 366,
+      "reported_page": 25,
+      "dom_path": "/html/body/div[384]/table",
+      "block_text_sha256": "0d6dca34eb5494fab489df545359f6baf2a801cb434d1f8437277437316834ba",
+      "quote": "PeriodTotal Number of Class A Shares Purchased (in thousands)(1)Total Number of Class C Shares Purchased (in thousands)(1)Average Price Paid per Class A Share(2)Average Price Paid per Class C Share(2)Total Number of Shares Purchased as Part of Publicly Announced Programs(in thousands)(1)Approximate Dollar Value of Shares that May Yet Be Purchased Under the Program (in millions)October 1 - 31841 13,305 $253.20 $255.03 14,146 $71,231 November 1 - 30209 5,885 $286.00 $281.46 6,094 $69,503 December 1 - 310 0 $0.00 $0.00 0 $69,503 Total1,050 19,190 20,240",
+      "start": 0,
+      "end": 556,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Period"
+        },
+        {
+          "row": 1,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Number of Class A Shares Purchased (in thousands)(1)"
+        },
+        {
+          "row": 1,
+          "column": 12,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Number of Class C Shares Purchased (in thousands)(1)"
+        },
+        {
+          "row": 1,
+          "column": 18,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Average Price Paid per Class A Share(2)"
+        },
+        {
+          "row": 1,
+          "column": 24,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Average Price Paid per Class C Share(2)"
+        },
+        {
+          "row": 1,
+          "column": 30,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Number of Shares Purchased as Part of Publicly Announced Programs(in thousands)(1)"
+        },
+        {
+          "row": 1,
+          "column": 36,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Approximate Dollar Value of Shares that May Yet Be Purchased Under the Program (in millions)"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "December 1 - 31"
+        },
+        {
+          "row": 4,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "0"
+        },
+        {
+          "row": 4,
+          "column": 12,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "0"
+        },
+        {
+          "row": 4,
+          "column": 18,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 19,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "0.00"
+        },
+        {
+          "row": 4,
+          "column": 24,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 25,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "0.00"
+        },
+        {
+          "row": 4,
+          "column": 30,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "0"
+        },
+        {
+          "row": 4,
+          "column": 36,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 37,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "69,503"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "googl:367": {
+      "source": "googl",
+      "block_id": "block-000367-4e75343a",
+      "block_ordinal": 367,
+      "reported_page": 25,
+      "dom_path": "/html/body/div[385]",
+      "block_text_sha256": "4e75343ad2eb8d0fbc115fb829e1ed66efe6813aa6ef3d484740408bc0d86b99",
+      "quote": "(1) In April 2024, the company's Board of Directors authorized a $70.0 billion share repurchase program for its Class A and Class C shares. In April 2025, the company's Board of Directors authorized an additional $70.0 billion share repurchase program for its Class A and Class C shares. Repurchases are being executed from time to time, subject to general business and market conditions and other investment opportunities, through open market purchases or privately negotiated transactions, including through Rule 10b5-1 plans. The repurchase programs do not have an expiration date. For additional information related to share repurchases, see Note 11 of the Notes to Consolidated Financial Statements included in Item 8 of this Annual Report on Form 10-K.",
+      "start": 0,
+      "end": 758,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:366:1,2,3,4": {
+      "source": "googl",
+      "block_id": "block-000366-0d6dca34",
+      "block_ordinal": 366,
+      "reported_page": 25,
+      "dom_path": "/html/body/div[384]/table",
+      "block_text_sha256": "0d6dca34eb5494fab489df545359f6baf2a801cb434d1f8437277437316834ba",
+      "quote": "PeriodTotal Number of Class A Shares Purchased (in thousands)(1)Total Number of Class C Shares Purchased (in thousands)(1)Average Price Paid per Class A Share(2)Average Price Paid per Class C Share(2)Total Number of Shares Purchased as Part of Publicly Announced Programs(in thousands)(1)Approximate Dollar Value of Shares that May Yet Be Purchased Under the Program (in millions)October 1 - 31841 13,305 $253.20 $255.03 14,146 $71,231 November 1 - 30209 5,885 $286.00 $281.46 6,094 $69,503 December 1 - 310 0 $0.00 $0.00 0 $69,503 Total1,050 19,190 20,240",
+      "start": 0,
+      "end": 556,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true,
+      "cells": [
+        {
+          "row": 1,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Period"
+        },
+        {
+          "row": 1,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Number of Class A Shares Purchased (in thousands)(1)"
+        },
+        {
+          "row": 1,
+          "column": 12,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Number of Class C Shares Purchased (in thousands)(1)"
+        },
+        {
+          "row": 1,
+          "column": 18,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Average Price Paid per Class A Share(2)"
+        },
+        {
+          "row": 1,
+          "column": 24,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Average Price Paid per Class C Share(2)"
+        },
+        {
+          "row": 1,
+          "column": 30,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Total Number of Shares Purchased as Part of Publicly Announced Programs(in thousands)(1)"
+        },
+        {
+          "row": 1,
+          "column": 36,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "Approximate Dollar Value of Shares that May Yet Be Purchased Under the Program (in millions)"
+        },
+        {
+          "row": 2,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "October 1 - 31"
+        },
+        {
+          "row": 2,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "841"
+        },
+        {
+          "row": 2,
+          "column": 12,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "13,305"
+        },
+        {
+          "row": 2,
+          "column": 18,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 2,
+          "column": 19,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "253.20"
+        },
+        {
+          "row": 2,
+          "column": 24,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 2,
+          "column": 25,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "255.03"
+        },
+        {
+          "row": 2,
+          "column": 30,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "14,146"
+        },
+        {
+          "row": 2,
+          "column": 36,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 2,
+          "column": 37,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "71,231"
+        },
+        {
+          "row": 3,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "November 1 - 30"
+        },
+        {
+          "row": 3,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "209"
+        },
+        {
+          "row": 3,
+          "column": 12,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "5,885"
+        },
+        {
+          "row": 3,
+          "column": 18,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 19,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "286.00"
+        },
+        {
+          "row": 3,
+          "column": 24,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 25,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "281.46"
+        },
+        {
+          "row": 3,
+          "column": 30,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "6,094"
+        },
+        {
+          "row": 3,
+          "column": 36,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 3,
+          "column": 37,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "69,503"
+        },
+        {
+          "row": 4,
+          "column": 0,
+          "rowspan": 1,
+          "colspan": 3,
+          "text": "December 1 - 31"
+        },
+        {
+          "row": 4,
+          "column": 6,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "0"
+        },
+        {
+          "row": 4,
+          "column": 12,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "0"
+        },
+        {
+          "row": 4,
+          "column": 18,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 19,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "0.00"
+        },
+        {
+          "row": 4,
+          "column": 24,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 25,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "0.00"
+        },
+        {
+          "row": 4,
+          "column": 30,
+          "rowspan": 1,
+          "colspan": 2,
+          "text": "0"
+        },
+        {
+          "row": 4,
+          "column": 36,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "$"
+        },
+        {
+          "row": 4,
+          "column": 37,
+          "rowspan": 1,
+          "colspan": 1,
+          "text": "69,503"
+        }
+      ],
+      "cell_coordinates_basis": "zero-based HTML table grid, including blank rows/columns; nonempty relevant cells shown",
+      "original_dom_cells_verified": true
+    },
+    "googl:368": {
+      "source": "googl",
+      "block_id": "block-000368-dfce9472",
+      "block_ordinal": 368,
+      "reported_page": 25,
+      "dom_path": "/html/body/div[386]",
+      "block_text_sha256": "dfce9472066333a714a867c62ed8d79f025bd78f2295a95b76ae34a2d8b766e8",
+      "quote": "(2) Average price paid per share includes costs associated with the repurchases.",
+      "start": 0,
+      "end": 80,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    },
+    "googl:1158": {
+      "source": "googl",
+      "block_id": "block-001158-21708fe2",
+      "block_ordinal": 1158,
+      "reported_page": 78,
+      "dom_path": "/html/body/ix:continuation[37]/div[5]",
+      "block_text_sha256": "21708fe22e6d97ecfabca8e25097f2f9855c953a628ed474c0df31c5405eb341",
+      "quote": "Repurchases are executed from time to time, subject to general business and market conditions and other investment opportunities, through open market purchases or privately negotiated transactions, including through Rule 10b5-1 plans. The repurchase programs do not have an expiration date.",
+      "start": 0,
+      "end": 290,
+      "offset_basis": "zero-based Unicode characters in frozen normalized block.text, end exclusive",
+      "original_dom_text_verified": true
+    }
+  },
+  "limits": [
+    "Minimum segment-level list coverage, not an exhaustive product taxonomy.",
+    "Verified DOM text/cells establish source existence; semantic sufficiency remains a separate offline judgment.",
+    "No unique retrieval path or required exact block set.",
+    "Annual buyback cost inclusion/exclusion not explicitly disclosed in reviewed annual-table passages; Q4 average-price note has narrower scope."
+  ]
+}

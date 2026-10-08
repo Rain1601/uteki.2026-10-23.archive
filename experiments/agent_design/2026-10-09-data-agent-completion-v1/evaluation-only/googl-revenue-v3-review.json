@@ -1,0 +1,211 @@
+{
+  "schema_version": "evaluation-only-revenue-v3-review-v1",
+  "purpose": "Independent offline content review only; never runtime/model input",
+  "model_calls": 0,
+  "network_calls": 0,
+  "company": "googl",
+  "cycle_name": "googl-revenue-r2",
+  "cycle_status": "reviewed_data_ready",
+  "cycle_sha256": "fa01ce3175509b9da7be850167d8402275989ae334563a9cea3cb2034b2fca18",
+  "dataset_manifest_sha256": "da31bb36ba9837f996536911ec38f6a91b44109d9e5ff76868d098afb8f74b66",
+  "raw_source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+  "final_query_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r2/attempt-01/data-query/query",
+    "manifest_sha256": "5fd34f75fc6413f8c0e44a0d0580dbd3fcd2b59b3513fff0c5805b0086d81a2f"
+  },
+  "final_review_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r2/attempt-01/review-01",
+    "manifest_sha256": "f9a5b0d3d3e695b6910a94c10f954aa3f3c07257c08a9ca81d3b0837b566dce7"
+  },
+  "checks": {
+    "raw_hash": true,
+    "all_dataset_files": true,
+    "dataset_binding": true,
+    "final_review_binding": true,
+    "final_query_binding": true,
+    "packet_identical": true
+  },
+  "verdict": "pass_for_reported_company_total_with_claim_boundary",
+  "packet_path": "runs/googl-revenue-r2/attempt-01/review-packet.json",
+  "packet_sha256": "e2a821601e92026dd1989d765d953bfa338d356dbca00276d836f141d68ec22d",
+  "packet_id": "data-review-cd68ad0c713a5832afb91062",
+  "delivery_schema_version": "selected-originals-v3",
+  "query_status": "evidence_ready",
+  "review_analysis_eligible": true,
+  "question": "请从 Alphabet FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+  "body_checks": [
+    {
+      "block_id": "block-000750-9faf493a",
+      "dom_path": "/html/body/div[814]",
+      "type": "heading_candidate",
+      "layout_role": null,
+      "text": "Alphabet Inc.",
+      "text_original_match": true,
+      "cells_original_match": null,
+      "relevance": "supporting_context"
+    },
+    {
+      "block_id": "block-000751-1e6373dd",
+      "dom_path": "/html/body/div[815]",
+      "type": "heading_candidate",
+      "layout_role": null,
+      "text": "CONSOLIDATED STATEMENTS OF INCOME",
+      "text_original_match": true,
+      "cells_original_match": null,
+      "relevance": "supporting_context"
+    },
+    {
+      "block_id": "block-000752-dfe26017",
+      "dom_path": "/html/body/div[816]/span",
+      "type": "heading_candidate",
+      "layout_role": null,
+      "text": "(in millions, except per share amounts)",
+      "text_original_match": true,
+      "cells_original_match": null,
+      "relevance": "supporting_context"
+    },
+    {
+      "block_id": "block-000753-53762a3b",
+      "dom_path": "/html/body/div[816]/table",
+      "type": "table",
+      "layout_role": null,
+      "text": "Year Ended December 31, 202320242025Revenues$307,394 $350,018 $402,836 Costs and expenses:Cost of revenues133,332 146,306 162,535 Research and development45,427 49,326 61,087 Sales and marketing27,917 27,808 28,693 General and administrative16,425 14,188 21,482 Total costs and expenses223,101 237,628 273,797 Income from operations84,293 112,390 129,039 Other income (expense), net1,424 7,425 29,787 Income before income taxes85,717 119,815 158,826 Provision for income taxes11,922 19,697 26,656 Net income$73,795 $100,118 $132,170 Basic net income per share (Note 12)$5.84 $8.13 $10.91 Diluted net income per share (Note 12)$5.80 $8.04 $10.81",
+      "text_original_match": true,
+      "cells_original_match": true,
+      "relevance": "necessary"
+    }
+  ],
+  "record_checks": [
+    {
+      "record_id": "obs-4afa0ed7f2b1e54cff658afb",
+      "year": 2025,
+      "value_usd": "402836000000",
+      "raw_literal": "402,836",
+      "scale": "6",
+      "period": {
+        "kind": "year",
+        "start": "2025-01-01",
+        "end": "2025-12-31"
+      },
+      "checks": {
+        "amount": true,
+        "unit": true,
+        "period": true,
+        "issuer": true,
+        "no_dimensions": true,
+        "standard_concept": true,
+        "quote_span": true,
+        "cell": true
+      },
+      "citation": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000753-53762a3b",
+        "quote": "402,836",
+        "index_id": "didx-77aca7159c9571b7",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "char_start": 63,
+        "char_end": 70,
+        "text_hash": "53762a3b18f01eade98317079f2483f5de42f545fdf83823b977d197c3da0ac7",
+        "cell": {
+          "row": 3,
+          "column": 16
+        }
+      },
+      "fact_dom_path": "/html/body/div[816]/table/tr[4]/td[11]/span/ix:nonfraction",
+      "context_ref": "c-1"
+    },
+    {
+      "record_id": "obs-b5db8f0949bc70a4e8bc553f",
+      "year": 2024,
+      "value_usd": "350018000000",
+      "raw_literal": "350,018",
+      "scale": "6",
+      "period": {
+        "kind": "year",
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      },
+      "checks": {
+        "amount": true,
+        "unit": true,
+        "period": true,
+        "issuer": true,
+        "no_dimensions": true,
+        "standard_concept": true,
+        "quote_span": true,
+        "cell": true
+      },
+      "citation": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000753-53762a3b",
+        "quote": "350,018",
+        "index_id": "didx-77aca7159c9571b7",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "char_start": 54,
+        "char_end": 61,
+        "text_hash": "53762a3b18f01eade98317079f2483f5de42f545fdf83823b977d197c3da0ac7",
+        "cell": {
+          "row": 3,
+          "column": 10
+        }
+      },
+      "fact_dom_path": "/html/body/div[816]/table/tr[4]/td[7]/span/ix:nonfraction",
+      "context_ref": "c-28"
+    }
+  ],
+  "program_gaps": [],
+  "query_gaps": [],
+  "source_body_count": 4,
+  "record_fact_count": 2,
+  "source_block_fact_count": 4,
+  "runtime_boundary": {
+    "plan_origin": "model",
+    "caller_scope_and_task_only": true,
+    "selection_decisions": [
+      {
+        "turn": "turn-003",
+        "action": "plan",
+        "sha256": "58b445807bbf04fd541868ad22c7f4c0d257922029bd724849395d581b40e545"
+      },
+      {
+        "turn": "turn-006",
+        "action": "select_records",
+        "sha256": "8bc1898b0666129d1c8722347f326957c1c85539f57e6c1ba15d1bf01022f6f5"
+      },
+      {
+        "turn": "turn-007",
+        "action": "select_evidence",
+        "sha256": "5b27692cf198c38095c1f6eb02c15b91e1ba80b5684b9670c3850d4873c57042"
+      }
+    ]
+  },
+  "numeric_facts": "pass",
+  "period_unit_and_total_scope": "pass",
+  "original_identity_and_coordinates": "pass",
+  "minimality": "pass_with_atomic_income_statement_context",
+  "minimum_semantic_coverage": "sufficient_for_reported_company_total",
+  "blocking_issues": [],
+  "accounting_basis_assessment": {
+    "supported": "Explicit CONSOLIDATED STATEMENTS OF INCOME heading, company title, Revenues row and undimensioned issuer XBRL support actual reported consolidated company revenues.",
+    "not_asserted": [
+      "Full GAAP policy",
+      "Consolidation perimeter",
+      "Intercompany elimination policy",
+      "Revenue exclusions for sales and similar taxes"
+    ],
+    "conditional_requirement": "Retrieve original policy evidence if the final report makes these further claims; they are not mandatory additions to the original two-year total-revenue request."
+  },
+  "change_from_r1": {
+    "record_selection": "FY2024 now selects original income-statement occurrence obs-b5db8f0949bc70a4e8bc553f, instead of geography-table occurrence.",
+    "selection_origin": "Model turn006 used record_origins with all10 queried occurrences visible; reason explicitly selects the already-read income statement for both years.",
+    "body_delivery": "4 blocks instead of8. Running header and extra geography table/introduction/region note absent.",
+    "not_a_claim": "Does not establish that every future numeric question will select optimally."
+  },
+  "limitations": [
+    "Targeted independent acceptance of this question and frozen source only, not full financial-report quality acceptance.",
+    "Entire income statement contains extra line items; acceptable original-table context under the current atomic contract.",
+    "No API calls, no frozen data/results modifications, and no Codex runtime passage selection."
+  ]
+}

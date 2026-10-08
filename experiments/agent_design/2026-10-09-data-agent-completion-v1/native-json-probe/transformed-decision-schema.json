@@ -1,0 +1,1239 @@
+{
+  "$defs": {
+    "ArtifactCursor": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor_version": {
+          "const": "run-artifact-cursor-v1",
+          "default": "run-artifact-cursor-v1",
+          "title": "Cursor Version",
+          "type": "string"
+        },
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "sha256": {
+          "title": "Sha256",
+          "type": "string"
+        },
+        "scope_id": {
+          "title": "Scope Id",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "pointer": {
+          "title": "Pointer",
+          "type": "string"
+        },
+        "offset": {
+          "title": "Offset",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "sha256",
+        "scope_id",
+        "snapshot_id",
+        "pointer",
+        "offset"
+      ],
+      "title": "ArtifactCursor",
+      "type": "object"
+    },
+    "ArtifactReadRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "pointer": {
+          "default": "",
+          "title": "Pointer",
+          "type": "string"
+        },
+        "offset": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Offset"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactCursor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "limit": {
+          "default": 12,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "max_bytes": {
+          "default": 12000,
+          "title": "Max Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id"
+      ],
+      "title": "ArtifactReadRequest",
+      "type": "object"
+    },
+    "CalculationRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "formula_id": {
+          "enum": [
+            "operating_margin",
+            "revenue_yoy",
+            "operating_income_yoy",
+            "operating_margin_delta_pp"
+          ],
+          "title": "Formula Id",
+          "type": "string"
+        },
+        "entity_id": {
+          "pattern": "\\S",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "periods": {
+          "items": {
+            "$ref": "#/$defs/Period"
+          },
+          "minItems": 1,
+          "title": "Periods",
+          "type": "array"
+        }
+      },
+      "required": [
+        "formula_id",
+        "entity_id",
+        "periods"
+      ],
+      "title": "CalculationRequest",
+      "type": "object"
+    },
+    "CatalogCursor": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "const": "query-catalog-cursor-v1",
+          "default": "query-catalog-cursor-v1",
+          "title": "Version",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "scope_id": {
+          "title": "Scope Id",
+          "type": "string"
+        },
+        "filter_hash": {
+          "title": "Filter Hash",
+          "type": "string"
+        },
+        "content_hash": {
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "offset": {
+          "title": "Offset",
+          "type": "integer"
+        },
+        "checksum": {
+          "title": "Checksum",
+          "type": "string"
+        }
+      },
+      "required": [
+        "snapshot_id",
+        "scope_id",
+        "filter_hash",
+        "content_hash",
+        "offset",
+        "checksum"
+      ],
+      "title": "CatalogCursor",
+      "type": "object"
+    },
+    "CatalogRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "sources",
+            "entities",
+            "metrics",
+            "fiscal_periods",
+            "coverage"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Ids",
+          "type": "array"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CatalogCursor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "limit": {
+          "default": 20,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "max_bytes": {
+          "default": 12000,
+          "title": "Max Bytes",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "CatalogRequest",
+      "type": "object"
+    },
+    "ContextRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "source_snapshot_id": {
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "block_id": {
+          "title": "Block Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_snapshot_id",
+        "block_id"
+      ],
+      "title": "ContextRequest",
+      "type": "object"
+    },
+    "DocumentRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "company_id": {
+          "description": "Explicit company identifier from source discovery; no default company.",
+          "pattern": "\\S",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "form": {
+          "enum": [
+            "10-K",
+            "10-Q",
+            "EARNINGS_CALL"
+          ],
+          "title": "Form",
+          "type": "string"
+        },
+        "period_end": {
+          "format": "date",
+          "title": "Period End",
+          "type": "string"
+        },
+        "phrase": {
+          "title": "Phrase",
+          "type": "string"
+        },
+        "limit": {
+          "default": 2,
+          "title": "Limit",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "company_id",
+        "form",
+        "period_end",
+        "phrase"
+      ],
+      "title": "DocumentRequest",
+      "type": "object"
+    },
+    "EvidenceBlockSelection": {
+      "additionalProperties": false,
+      "properties": {
+        "context_id": {
+          "title": "Context Id",
+          "type": "string"
+        },
+        "block_id": {
+          "title": "Block Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "context_id",
+        "block_id"
+      ],
+      "title": "EvidenceBlockSelection",
+      "type": "object"
+    },
+    "EvidenceDelivery": {
+      "additionalProperties": false,
+      "properties": {
+        "blocks": {
+          "items": {
+            "$ref": "#/$defs/EvidenceBlockSelection"
+          },
+          "minItems": 1,
+          "title": "Blocks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "blocks"
+      ],
+      "title": "EvidenceDelivery",
+      "type": "object"
+    },
+    "Extraction": {
+      "additionalProperties": false,
+      "properties": {
+        "context_id": {
+          "title": "Context Id",
+          "type": "string"
+        },
+        "block_id": {
+          "title": "Block Id",
+          "type": "string"
+        },
+        "quote": {
+          "pattern": "\\S",
+          "title": "Quote",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        }
+      },
+      "required": [
+        "context_id",
+        "block_id",
+        "quote",
+        "label"
+      ],
+      "title": "Extraction",
+      "type": "object"
+    },
+    "FinancialExtractionAction": {
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "pattern": "\\S",
+          "title": "Task Id",
+          "type": "string"
+        },
+        "batch_index": {
+          "title": "Batch Index",
+          "type": "integer"
+        },
+        "method_id": {
+          "anyOf": [
+            {
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Method Id"
+        }
+      },
+      "required": [
+        "task_id",
+        "batch_index"
+      ],
+      "title": "FinancialExtractionAction",
+      "type": "object"
+    },
+    "Period": {
+      "additionalProperties": false,
+      "description": "Calendar periods, or exact source dates checked against the selected protocol.\n\nSource basis preserves the supplied dates and period kind; it does not infer\na fiscal calendar, week count or a reporting period from duration alone.",
+      "properties": {
+        "kind": {
+          "enum": [
+            "quarter",
+            "ytd",
+            "year",
+            "instant"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start"
+        },
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        },
+        "basis": {
+          "default": "calendar",
+          "enum": [
+            "calendar",
+            "source"
+          ],
+          "title": "Basis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "start",
+        "end"
+      ],
+      "title": "Period",
+      "type": "object"
+    },
+    "QueryPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "records": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RecordRequest"
+          },
+          "title": "Records",
+          "type": "array"
+        },
+        "documents": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DocumentRequest"
+          },
+          "title": "Documents",
+          "type": "array"
+        },
+        "calculations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CalculationRequest"
+          },
+          "title": "Calculations",
+          "type": "array"
+        }
+      },
+      "title": "QueryPlan",
+      "type": "object"
+    },
+    "ReadCursor": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor_version": {
+          "const": "document-cursor-v1",
+          "default": "document-cursor-v1",
+          "title": "Cursor Version",
+          "type": "string"
+        },
+        "scope_id": {
+          "title": "Scope Id",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "source_snapshot_id": {
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "index_id": {
+          "title": "Index Id",
+          "type": "string"
+        },
+        "node_id": {
+          "title": "Node Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "read",
+          "default": "read",
+          "title": "Kind",
+          "type": "string"
+        },
+        "start_block_id": {
+          "title": "Start Block Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope_id",
+        "snapshot_id",
+        "source_snapshot_id",
+        "index_id",
+        "node_id",
+        "start_block_id"
+      ],
+      "title": "ReadCursor",
+      "type": "object"
+    },
+    "RecordRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "entity_id": {
+          "pattern": "\\S",
+          "title": "Entity Id",
+          "type": "string"
+        },
+        "metric_id": {
+          "pattern": "\\S",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "period": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Period"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "value_kind": {
+          "default": "actual",
+          "enum": [
+            "actual",
+            "management_guidance",
+            "attributed_statement"
+          ],
+          "title": "Value Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_id",
+        "metric_id",
+        "period"
+      ],
+      "title": "RecordRequest",
+      "type": "object"
+    },
+    "Requirement": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "default": "information",
+          "enum": [
+            "information",
+            "source_evidence",
+            "source_answer",
+            "read_node",
+            "query",
+            "financial_extract"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "query": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QueryPlan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Id"
+        },
+        "node_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Node Id"
+        },
+        "financial_task_id": {
+          "anyOf": [
+            {
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Financial Task Id"
+        },
+        "batch_index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Batch Index"
+        },
+        "requirement_id": {
+          "pattern": "\\S",
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "description": {
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "description"
+      ],
+      "title": "Requirement",
+      "type": "object"
+    },
+    "SchemaProbeRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "metric_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Metric Ids",
+          "type": "array"
+        },
+        "entity_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Entity Ids",
+          "type": "array"
+        },
+        "source_snapshot_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Snapshot Ids",
+          "type": "array"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CatalogCursor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "limit": {
+          "default": 20,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "max_bytes": {
+          "default": 12000,
+          "title": "Max Bytes",
+          "type": "integer"
+        }
+      },
+      "title": "SchemaProbeRequest",
+      "type": "object"
+    },
+    "SearchCursor": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor_version": {
+          "const": "document-cursor-v1",
+          "default": "document-cursor-v1",
+          "title": "Cursor Version",
+          "type": "string"
+        },
+        "scope_id": {
+          "title": "Scope Id",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "source_snapshot_id": {
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "index_id": {
+          "title": "Index Id",
+          "type": "string"
+        },
+        "node_id": {
+          "title": "Node Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "search",
+          "default": "search",
+          "title": "Kind",
+          "type": "string"
+        },
+        "phrase": {
+          "pattern": "\\S",
+          "title": "Phrase",
+          "type": "string"
+        },
+        "offset": {
+          "title": "Offset",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "scope_id",
+        "snapshot_id",
+        "source_snapshot_id",
+        "index_id",
+        "node_id",
+        "phrase",
+        "offset"
+      ],
+      "title": "SearchCursor",
+      "type": "object"
+    },
+    "SourceAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/SourceClaim"
+          },
+          "minItems": 1,
+          "title": "Claims",
+          "type": "array"
+        },
+        "model_claimed_coverage": {
+          "enum": [
+            "claimed_complete",
+            "partial"
+          ],
+          "title": "Model Claimed Coverage",
+          "type": "string"
+        },
+        "coverage_note": {
+          "pattern": "\\S",
+          "title": "Coverage Note",
+          "type": "string"
+        },
+        "unresolved_questions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Unresolved Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claims",
+        "model_claimed_coverage",
+        "coverage_note"
+      ],
+      "title": "SourceAnswer",
+      "type": "object"
+    },
+    "SourceClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "pattern": "\\S",
+          "title": "Statement",
+          "type": "string"
+        },
+        "temporal_basis": {
+          "enum": [
+            "reported_actual",
+            "forward_looking",
+            "not_period_specific",
+            "unclear"
+          ],
+          "title": "Temporal Basis",
+          "type": "string"
+        },
+        "period_context": {
+          "pattern": "\\S",
+          "title": "Period Context",
+          "type": "string"
+        },
+        "citations": {
+          "items": {
+            "$ref": "#/$defs/Extraction"
+          },
+          "minItems": 1,
+          "title": "Citations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "statement",
+        "temporal_basis",
+        "period_context",
+        "citations"
+      ],
+      "title": "SourceClaim",
+      "type": "object"
+    },
+    "SourceOutlineRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "source_snapshot_id": {
+          "pattern": "\\S",
+          "title": "Source Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_snapshot_id"
+      ],
+      "title": "SourceOutlineRequest",
+      "type": "object"
+    },
+    "SourceReadRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "source_snapshot_id": {
+          "pattern": "\\S",
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "node_id": {
+          "pattern": "\\S",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "start_block_id": {
+          "anyOf": [
+            {
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Block Id"
+        },
+        "count": {
+          "default": 8,
+          "title": "Count",
+          "type": "integer"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReadCursor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "representation": {
+          "default": "full",
+          "description": "compact preserves all table cells as tuples with cell_fields; no text or cells are omitted.",
+          "enum": [
+            "full",
+            "compact"
+          ],
+          "title": "Representation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_snapshot_id",
+        "node_id"
+      ],
+      "title": "SourceReadRequest",
+      "type": "object"
+    },
+    "SourceSearchRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "source_snapshot_id": {
+          "pattern": "\\S",
+          "title": "Source Snapshot Id",
+          "type": "string"
+        },
+        "node_id": {
+          "pattern": "\\S",
+          "title": "Node Id",
+          "type": "string"
+        },
+        "phrase": {
+          "pattern": "\\S",
+          "title": "Phrase",
+          "type": "string"
+        },
+        "offset": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Null starts at zero, or resumes from the supplied cursor.",
+          "title": "Offset"
+        },
+        "limit": {
+          "default": 8,
+          "title": "Limit",
+          "type": "integer"
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SearchCursor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "source_snapshot_id",
+        "node_id",
+        "phrase"
+      ],
+      "title": "SourceSearchRequest",
+      "type": "object"
+    },
+    "WorkerDelegation": {
+      "additionalProperties": false,
+      "properties": {
+        "instruction": {
+          "pattern": "\\S",
+          "title": "Instruction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "instruction"
+      ],
+      "title": "WorkerDelegation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "plan",
+        "query",
+        "outline_source",
+        "read_source",
+        "search_source",
+        "read_context",
+        "reread",
+        "extract",
+        "answer",
+        "acquire",
+        "materialize",
+        "load_skill",
+        "gap",
+        "finish",
+        "discover_catalog",
+        "probe_schema",
+        "read_artifact",
+        "list_artifacts",
+        "delegate",
+        "financial_extract",
+        "select_evidence"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "delivery": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EvidenceDelivery"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "delegation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WorkerDelegation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "financial_extraction": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FinancialExtractionAction"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "catalog": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CatalogRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "schema_probe": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SchemaProbeRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "artifact_read": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ArtifactReadRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "skill": {
+      "anyOf": [
+        {
+          "enum": [
+            "acquire",
+            "materialize",
+            "query"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Skill"
+    },
+    "requirement_ids": {
+      "default": [],
+      "description": "Existing requirement IDs. Required for scoped execution actions; see action rules.",
+      "items": {
+        "pattern": "\\S",
+        "type": "string"
+      },
+      "title": "Requirement Ids",
+      "type": "array"
+    },
+    "requirements": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Requirement"
+      },
+      "title": "Requirements",
+      "type": "array"
+    },
+    "reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reason"
+    },
+    "plan": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QueryPlan"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "outline": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SourceOutlineRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "read": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SourceReadRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "search": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SourceSearchRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "context": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ContextRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "evidence_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "extracts": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Extraction"
+      },
+      "title": "Extracts",
+      "type": "array"
+    },
+    "answer": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SourceAnswer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "arguments": {
+      "anyOf": [
+        {
+          "additionalProperties": false,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Arguments"
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "title": "AutonomousDecision",
+  "type": "object"
+}

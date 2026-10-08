@@ -19,11 +19,12 @@ from uteki.agents.runtime.call_costs import MeteredModel, pricing_snapshot, summ
 from uteki.agents.runtime.local_credentials import load_provider_key
 from uteki.agents.runtime.model_factory import model_adapter
 from uteki.agents.runtime.run_budget import RunBudget, BudgetExceeded
+from uteki.agents.runtime.claude_messages import ClaudeTransientTransportError
 from uteki.agents.runtime.strict_json import StrictJSONError, parse_json_object
 from uteki.infrastructure.research_data.financial_records import digest
 from .artifacts import write_new
 from .decision_protocol import DECISION_PROTOCOL_VERSION
-from .autonomous import AUTONOMOUS_PROMPT, AUTONOMOUS_PROMPT_VERSION, WORKER_PROMPT, AutonomousDecision, runtime_prompt
+from .autonomous import AUTONOMOUS_PROMPT, AUTONOMOUS_PROMPT_VERSION, WORKER_PROMPT, AutonomousDecision, runtime_prompt, runtime_prompt_version
 
 
 VISIBLE_OUTPUT_CHAR_LIMIT = 128000
@@ -57,7 +58,7 @@ _DECISION_RULE_HINTS = {
         'read_artifact=artifact_read, load_skill=skill, plan=requirements, query=plan, '
         'outline_source=outline, read_source=read, search_source=search, read_context=context, '
         'reread=evidence_ids, extract=extracts, answer=answer, acquire=arguments, materialize=arguments, '
-        'financial_extract=financial_extraction. '
+        'financial_extract=financial_extraction, select_evidence=delivery, select_records=record_selection. '
         'The selected payload must be non-null and required lists must be nonempty.'),
     'Value error, source_id belongs to read_node, source_evidence or source_answer; node_id belongs only to read_node': (
         'requirement_source_fields',
@@ -185,8 +186,6 @@ class SdkAutonomousPlanner:
             raise ValueError('Role must be planner or worker')
         prompt = runtime_prompt(role, purpose)
         effort, thinking, native = reasoning_configuration(provider, model, reasoning_effort)
-        if native and max_retries != 0:
-            raise ValueError('Native Claude currently requires explicit retries disabled')
         if not isinstance(budget, RunBudget):
             raise ValueError('An explicit shared RunBudget is required')
         if max_requests_total is not None and (type(max_requests_total) is not int or max_requests_total < 1):
@@ -227,7 +226,8 @@ class SdkAutonomousPlanner:
         if native:
             from uteki.agents.runtime.claude_messages import ClaudeMessagesModel
             inner = self._native_model = ClaudeMessagesModel(model, timeout_seconds=request_timeout,
-                reasoning_effort=effort, client_factory=client_factory)
+                reasoning_effort=effort, client_factory=client_factory,
+                schema_protocol='native_decision_envelope' if purpose == 'analysis_evidence' else 'host_decision')
             settings = ModelSettings(max_tokens=max_tokens, retry=ModelRetrySettings(max_retries=0))
         else:
             inner = model_adapter(model, provider, client_factory=create_client)
@@ -239,16 +239,19 @@ class SdkAutonomousPlanner:
             model_settings=settings)
         self._config = {'schema_version': 'autonomous-model-config-v1', 'plan_origin': self.plan_origin, 'role': role,
             'purpose': purpose,
-            'provider': provider, 'model': model, 'prompt': prompt, 'prompt_version': AUTONOMOUS_PROMPT_VERSION,
+            'provider': provider, 'model': model, 'prompt': prompt, 'prompt_version': runtime_prompt_version(purpose),
             'prompt_sha256': digest(prompt), 'decision_protocol_version': DECISION_PROTOCOL_VERSION,
             'strict_visible_json': provider == 'deepseek' or native,
             'decision_schema': AutonomousDecision.model_json_schema(), 'pricing_snapshot': deepcopy(pricing),
             'strict_provider_schema': False, 'local_output_validation': 'AutonomousDecision',
+            'provider_output_contract': ('native_decision_envelope_v1' if native and purpose == 'analysis_evidence'
+                                         else 'prompt_and_local_validation'),
             'max_tokens': max_tokens, 'request_timeout': request_timeout, 'max_retries': max_retries,
             'reasoning_effort': effort, 'thinking_mode': thinking if provider == 'deepseek' or native else None,
             'api_format': 'anthropic_messages' if native else 'chat_completions',
             'provider_sdk_retries': 0, 'max_requests_total': max_requests_total,
             'budget_ledger': str(budget.path.resolve()), 'budget_policy': 'enforced' if budget.enforce else 'record_only',
+            'allow_unknown_reservations': budget.allow_unknown_reservations,
             'credential_origin': credential_origin, 'budget_at_start': budget.summary()}
         write_new(self.output/'model-config.json', self._config)
         self._config_sha256 = digest((self.output/'model-config.json').read_bytes())
@@ -326,18 +329,29 @@ class SdkAutonomousPlanner:
                                   error_type=type(error).__name__)
                     metadata = getattr(self._model.inner, 'response_metadata', None) or {}
                     content = getattr(self._model.inner, 'response_text', None)
-                    if (isinstance(error, (ModelBehaviorError, ValidationError, StrictJSONError))
+                    if (not isinstance(error, ClaudeTransientTransportError)
+                            and isinstance(error, (ModelBehaviorError, ValidationError, StrictJSONError))
                             and (self._config['provider'] == 'deepseek' or self._native_model is not None)
                             and metadata.get('stop_reason', metadata.get('finish_reason')) in {'stop', 'end_turn'}
                             and isinstance(content, str)):
                         # A normal stop with empty/whitespace text is an invalid
                         # decision, too. Let the host spend its next bounded turn
                         # requesting JSON; never execute an action or retry here.
-                        hints = _decision_validation_hints(content)
+                        if self._config['provider_output_contract'] == 'native_decision_envelope_v1':
+                            from uteki.agents.runtime.claude_messages import decode_decision_envelope
+                            try:
+                                hints = _decision_validation_hints(decode_decision_envelope(content))
+                            except StrictJSONError as wire_error:
+                                hints = [{'type': 'envelope_invalid', 'code': wire_error.code,
+                                    'suggestion': 'Return the four native envelope fields; payload_json must encode only the selected action payload value as valid JSON, with no XML or duplicate keys.'}]
+                        else:
+                            hints = _decision_validation_hints(content)
                         record.update(status='invalid_model_decision', validation=hints)
                         raise ValueError('invalid_model_decision; visible_output=' + output_path.name
                                          + '; validation=' + json.dumps(hints, ensure_ascii=True)) from None
-                    retry = isinstance(error, (TimeoutError, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)) and attempt < self._config['max_retries']
+                    retry = isinstance(error, (TimeoutError, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError, ClaudeTransientTransportError)) and attempt < self._config['max_retries']
+                    if retry and self._native_model is not None:
+                        record.update(retry_scheduled=True, retry_delay_seconds=min(2, 0.25 * 2**attempt))
                     if not retry: raise
                 finally:
                     content = getattr(self._model.inner, 'response_text', None)
@@ -358,6 +372,8 @@ class SdkAutonomousPlanner:
                             kind='model_attempt', owned_by_context=True)
                         if output_path.exists():
                             observation_context.publish(output_path, kind='model_visible_output', owned_by_context=True)
+                if retry and self._native_model is not None:
+                    await asyncio.sleep(min(2, 0.25 * 2**attempt))
 
     async def aclose(self):
         async with self._lock:

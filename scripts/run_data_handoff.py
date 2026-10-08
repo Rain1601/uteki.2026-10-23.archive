@@ -10,6 +10,7 @@ from uteki.agents.data_query.answer_handoff import (
     AnswerAssessment, REVIEW_PROMPT, prepare_review_packet, review_data_answer,
 )
 from uteki.agents.data_query.record_review_model import SdkRecordReviewer
+from uteki.agents.data_query.autonomous_model import reasoning_configuration
 from uteki.agents.analysis.data_consumer import DataAnalysisAnswer, ANALYSIS_PROMPT, analyze_reviewed_data
 from uteki.agents.runtime.run_budget import RunBudget, reserve_request
 from uteki.agents.runtime.call_costs import MeteredModel, pricing_snapshot
@@ -21,8 +22,10 @@ from uteki.infrastructure.research_data.financial_records import digest
 def validate(config, output):
     required = {'request', 'planner', 'worker', 'reviewer', 'analyst', 'credential_root',
                 'workspace', 'max_review_packet_bytes'}
-    if not required <= set(config) or set(config) - required - {'request_envelope_limits'}:
+    if not required <= set(config) or set(config) - required - {'request_envelope_limits', 'source_delivery'}:
         raise ValueError('explicit handoff configuration fields required; unknown fields rejected')
+    if config.get('source_delivery', 'query_evidence_v1') not in {'query_evidence_v1', 'full_indexed_text_v1'}:
+        raise ValueError('explicit supported source delivery required')
     if 'request_envelope_limits' in config:
         limits = config['request_envelope_limits']
         if (not isinstance(limits, dict) or set(limits) != {'reviewer', 'analyst'}
@@ -46,10 +49,11 @@ def validate(config, output):
     for role in ('planner', 'worker', 'reviewer', 'analyst'):
         model = config[role]
         CompanyDataCoordinator._validate_shared_model_configs(config['planner'], model)
+        _, _, native = reasoning_configuration(model['provider'], model['model'], model.get('reasoning_effort'))
         runtime_fields = {'max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort'}
         if not runtime_fields <= set(model):
             raise ValueError(f'{role} requires explicit token, timeout, retry and reasoning settings')
-        max_output_tokens = 8192 if role in {'planner', 'worker'} else 16384
+        max_output_tokens = 8192 if role in {'planner', 'worker'} else (16000 if native else 16384)
         if type(model['max_tokens']) is not int or not 256 <= model['max_tokens'] <= max_output_tokens:
             raise ValueError(f'{role} has unsupported max_tokens')
         timeout = model['request_timeout']
@@ -59,8 +63,8 @@ def validate(config, output):
             raise ValueError(f'{role} has unsupported max_retries')
         if model['provider'] == 'deepseek' and model['reasoning_effort'] is None:
             raise ValueError(f'{role} requires an explicit DeepSeek reasoning setting')
-        if role in {'reviewer', 'analyst'} and model['provider'] != 'deepseek':
-            raise ValueError('review and Analysis adapter currently supports registered DeepSeek only')
+        if role in {'reviewer', 'analyst'} and model['provider'] != 'deepseek' and not native:
+            raise ValueError('review and Analysis require registered DeepSeek or native Claude models')
         if pricing_snapshot(model['provider'], model['model']) is None:
             raise ValueError(f'{role} model has no registered pricing or adapter')
         ledger = Path(model['budget_ledger']).resolve()
@@ -73,7 +77,8 @@ def role_factory(config, name, prompt, schema):
     model = config[name]
     def make(output):
         budget = RunBudget(model['budget_ledger'], model['budget_usd'],
-                          enforce=model['budget_policy'] == 'enforced')
+                          enforce=model['budget_policy'] == 'enforced',
+                          allow_unknown_reservations=model.get('allow_unknown_reservations', False))
         return SdkRecordReviewer(model['provider'], model['model'], budget=budget,
             max_requests_total=model['max_requests_total'], output=output,
             credentials_root=config['credential_root'], prompt=prompt, output_schema=schema,
@@ -93,7 +98,8 @@ def prepare_resume(config, request, output, query_run, query_manifest_sha256):
         raise ValueError('resume output cannot modify the frozen query')
     _verify_manifest(query_run, query_manifest_sha256)
     packet = prepare_review_packet(query_run, request.dataset, expected_scope=request.scope,
-                                   max_packet_bytes=config['max_review_packet_bytes'])
+                                   max_packet_bytes=config['max_review_packet_bytes'],
+                                   source_delivery=config.get('source_delivery', 'query_evidence_v1'))
     if packet['question'] != request.question:
         raise ValueError('resumed query question differs from explicit request')
     return packet
@@ -131,7 +137,8 @@ async def run(config, output, *, query_run=None, query_manifest_sha256=None):
             return summary
         if packet is None:
             packet = prepare_review_packet(output/'data-query/query', request.dataset,
-                expected_scope=request.scope, max_packet_bytes=config['max_review_packet_bytes'])
+                expected_scope=request.scope, max_packet_bytes=config['max_review_packet_bytes'],
+                source_delivery=config.get('source_delivery', 'query_evidence_v1'))
         review = await review_data_answer(packet, output/'data-review',
             reviewer_factory=role_factory(config, 'reviewer', REVIEW_PROMPT, AnswerAssessment))
         summary['stages']['review'] = {'path': 'data-review', 'status': review['status'],

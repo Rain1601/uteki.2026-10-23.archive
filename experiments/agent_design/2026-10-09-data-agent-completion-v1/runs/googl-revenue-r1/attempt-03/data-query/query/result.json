@@ -1,0 +1,585 @@
+{
+  "schema_version": "autonomous-result-v2",
+  "status": "evidence_ready",
+  "stop_reason": "host_reference_checks_passed",
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "请从 Alphabet FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {
+    "req_revenue_source": [
+      {
+        "context_id": "ev-3428ac04834f3023da3d35a7",
+        "block_id": "block-000750-9faf493a"
+      },
+      {
+        "context_id": "ev-3428ac04834f3023da3d35a7",
+        "block_id": "block-000751-1e6373dd"
+      },
+      {
+        "context_id": "ev-3428ac04834f3023da3d35a7",
+        "block_id": "block-000752-dfe26017"
+      },
+      {
+        "context_id": "ev-3428ac04834f3023da3d35a7",
+        "block_id": "block-000753-53762a3b"
+      }
+    ]
+  },
+  "delivery_schema_version": "selected-originals-v2",
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "plan_origin": "model",
+  "plans": [
+    {
+      "version": 1,
+      "requirements": [
+        {
+          "kind": "query",
+          "query": {
+            "records": [
+              {
+                "entity_id": "sec-0001652044",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2025-01-01",
+                  "end": "2025-12-31"
+                },
+                "value_kind": "actual"
+              },
+              {
+                "entity_id": "sec-0001652044",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2024-01-01",
+                  "end": "2024-12-31"
+                },
+                "value_kind": "actual"
+              }
+            ],
+            "documents": [],
+            "calculations": []
+          },
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_revenue_query",
+          "description": "Query Alphabet consolidated total revenue for FY2025 and FY2024 (annual, USD, reported consolidated basis)."
+        },
+        {
+          "kind": "source_evidence",
+          "query": null,
+          "source_id": "googl-2025-10k",
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_revenue_source",
+          "description": "Original consolidated statements of income blocks in the Alphabet FY2025 10-K: statement title, unit line (in millions) and table with year headers and Revenues line for 2024 and 2025."
+        }
+      ],
+      "reason": "Plan a numeric query requirement and a source evidence requirement for the income statement, per the skill and prior review feedback.",
+      "origin": "model",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "sha256": "feb0fdae0abb3859234e6edeb7068715867ef795e589f0140b0b27b6dd8de07d"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_query",
+      "description": "Query Alphabet consolidated total revenue for FY2025 and FY2024 (annual, USD, reported consolidated basis).",
+      "evidence_ids": [
+        "ev-67189f4cd4dcee452cb83ab2",
+        "ev-d11cee9070b8f7ceb270e96e",
+        "ev-55fa8b2bad681eb8cc99f0d0",
+        "ev-ca50fa3e814ebd61c808f9ae",
+        "ev-4d5d9589c0357c8577e1d6ec",
+        "ev-d312eb342721e806a647fa8d",
+        "ev-94ab4c622bab692259480d54",
+        "ev-98965445253c9c026163fb10",
+        "ev-2dbdd399863d05fc1d78422b",
+        "ev-3a5c83fac5b23e1d158f3492"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "records:ac2dab32082bb120d1a77281",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / revenue / 2025-01-01 — 2025-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-4afa0ed7f2b1e54cff658afb",
+            "obs-84ae9954dfcf642c6f47213b",
+            "obs-a73fbe15d50d5e6e8239abcd",
+            "obs-ad7a06e0ebccdbb06e4f93e6",
+            "obs-cfe3743029f5da10d21403ae"
+          ],
+          "artifact_ids": [
+            "art-db33dfbb53d3674aac41627f",
+            "art-3e51d5b7ef20c3e3f756d49f",
+            "art-547de258134dbde8ac850a18",
+            "art-34d331e3e8e37797772d4fb4",
+            "art-35cd85406fc8e706aa498f96"
+          ],
+          "event_sequences": [
+            4
+          ]
+        },
+        {
+          "check_id": "citations:obs-4afa0ed7f2b1e54cff658afb",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-4afa0ed7f2b1e54cff658afb"
+          ],
+          "artifact_ids": [
+            "art-14ea5d7536fbbda357ec9cca"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-84ae9954dfcf642c6f47213b",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-84ae9954dfcf642c6f47213b"
+          ],
+          "artifact_ids": [
+            "art-ee69414bba6dfc4532bd3370"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-a73fbe15d50d5e6e8239abcd",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-a73fbe15d50d5e6e8239abcd"
+          ],
+          "artifact_ids": [
+            "art-bc3cb650c9c3d39dc6a86fd6"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-ad7a06e0ebccdbb06e4f93e6",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-ad7a06e0ebccdbb06e4f93e6"
+          ],
+          "artifact_ids": [
+            "art-820ab3aaa691addfd62f7f57"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-cfe3743029f5da10d21403ae",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-cfe3743029f5da10d21403ae"
+          ],
+          "artifact_ids": [
+            "art-3cbc77cec8c62bdf748edcab"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "records:6ca3bcb2f193b7b86c1ba718",
+          "status": "satisfied",
+          "reason": "records_returned",
+          "detail": "sec-0001652044 / revenue / 2024-01-01 — 2024-12-31：取得匹配记录。",
+          "record_ids": [
+            "obs-147f43d45f01f0017614da48",
+            "obs-50273d029ebc21c954183436",
+            "obs-5ac65848692e1a9fc71573c1",
+            "obs-ad75c0c7957cffc9e820efda",
+            "obs-b5db8f0949bc70a4e8bc553f"
+          ],
+          "artifact_ids": [
+            "art-04a78f297a1aefeb8a398b09",
+            "art-02e4ba8929cb828b7f889133",
+            "art-5083241841e7fef23658a1e9",
+            "art-6d23e40aeea7143781639b2e",
+            "art-ff2c21f4f99e1239e599bf1d"
+          ],
+          "event_sequences": [
+            4
+          ]
+        },
+        {
+          "check_id": "citations:obs-147f43d45f01f0017614da48",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-147f43d45f01f0017614da48"
+          ],
+          "artifact_ids": [
+            "art-2a85415ad3afe5e49a2b5406"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-50273d029ebc21c954183436",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-50273d029ebc21c954183436"
+          ],
+          "artifact_ids": [
+            "art-a402bbe426067fccc28b5535"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-5ac65848692e1a9fc71573c1",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-5ac65848692e1a9fc71573c1"
+          ],
+          "artifact_ids": [
+            "art-a5af5258a7319232ebb86f54"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-ad75c0c7957cffc9e820efda",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-ad75c0c7957cffc9e820efda"
+          ],
+          "artifact_ids": [
+            "art-b2cff2aae86bbb3d8cfd2a0f"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        },
+        {
+          "check_id": "citations:obs-b5db8f0949bc70a4e8bc553f",
+          "status": "satisfied",
+          "reason": "source_citations_verified",
+          "detail": "记录及其条件、问答引用均已核验到原文。",
+          "record_ids": [
+            "obs-b5db8f0949bc70a4e8bc553f"
+          ],
+          "artifact_ids": [
+            "art-d1994ff086460fc725308761"
+          ],
+          "event_sequences": [
+            4
+          ],
+          "remaining_count": 0
+        }
+      ],
+      "query_receipt_files": [
+        {
+          "path": "turn-004/query-receipt.json",
+          "sha256": "fdc659bf1836f3f4ba2a1e4813602a1353681d4ded6bcca739df759f9351ab17"
+        }
+      ],
+      "selected_record_ids": [
+        "ev-67189f4cd4dcee452cb83ab2",
+        "ev-d312eb342721e806a647fa8d"
+      ],
+      "program_check": "satisfied"
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_source",
+      "description": "Original consolidated statements of income blocks in the Alphabet FY2025 10-K: statement title, unit line (in millions) and table with year headers and Revenues line for 2024 and 2025.",
+      "evidence_ids": [
+        "ev-3428ac04834f3023da3d35a7"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "selected_blocks": [
+        {
+          "context_id": "ev-3428ac04834f3023da3d35a7",
+          "block_id": "block-000750-9faf493a"
+        },
+        {
+          "context_id": "ev-3428ac04834f3023da3d35a7",
+          "block_id": "block-000751-1e6373dd"
+        },
+        {
+          "context_id": "ev-3428ac04834f3023da3d35a7",
+          "block_id": "block-000752-dfe26017"
+        },
+        {
+          "context_id": "ev-3428ac04834f3023da3d35a7",
+          "block_id": "block-000753-53762a3b"
+        }
+      ],
+      "program_check": "source_body_delivered"
+    }
+  ],
+  "gaps": [],
+  "evidence_bundle": {
+    "path": "evidence-bundle.json",
+    "bundle_id": "bundle-f8f30692e7ad4947b2a63b37",
+    "item_count": 21
+  },
+  "artifact_index": {
+    "path": "artifact-index.json",
+    "count": 38
+  },
+  "semantic_completeness": "not_evaluated",
+  "trace": [
+    {
+      "step": 1,
+      "action": "invalid",
+      "status": "rejected",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 22620,
+      "receipt": "turn-001/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-001/feedback.json"
+    },
+    {
+      "step": 2,
+      "action": "load_skill",
+      "status": "skill_loaded",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 23979,
+      "receipt": "turn-002/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-002/feedback.json"
+    },
+    {
+      "step": 3,
+      "action": "plan",
+      "status": "planned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 44101,
+      "receipt": "turn-003/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-003/feedback.json"
+    },
+    {
+      "step": 4,
+      "action": "query",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 38906,
+      "receipt": "turn-004/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-004/feedback.json"
+    },
+    {
+      "step": 5,
+      "action": "select_records",
+      "status": "records_selected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 66991,
+      "receipt": "turn-005/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-005/feedback.json"
+    },
+    {
+      "step": 6,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 51389,
+      "receipt": "turn-006/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-006/feedback.json"
+    },
+    {
+      "step": 7,
+      "action": "select_evidence",
+      "status": "delivery_selected",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 78507,
+      "receipt": "turn-007/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-007/feedback.json"
+    },
+    {
+      "step": 8,
+      "action": "finish",
+      "status": "evidence_ready",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 56899,
+      "receipt": "turn-008/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "feedback": "turn-008/feedback.json"
+    }
+  ],
+  "role": "planner",
+  "worker_runs": [],
+  "financial_extractions": [],
+  "pending_body_reads": [],
+  "decision_budget": {
+    "limit": 40,
+    "used": 8
+  },
+  "evidence_budget": {
+    "limit_bytes": 8000000,
+    "used_bytes": 56743
+  }
+}

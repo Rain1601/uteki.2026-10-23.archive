@@ -10,6 +10,7 @@ from uteki.domain.research_data.scoped_agent_query import ScopedAgentQuery
 from .adapters.evidence_provenance import classify_record_origin
 from .financial_records import digest
 from .query_dataset import contained
+from .evidence_coordinates import character_span
 
 
 class _Packager:
@@ -59,9 +60,14 @@ class _Packager:
                   "index_id": source.get("index_id"), "block_id": block.get("block_id"),
                   "reported_page": block.get("reported_page"), "pdf_page": block.get("pdf_page"),
                   "dom_path": block.get("dom_path"), "text_hash": block.get("text_hash")}
-        if evidence.get("start") is not None or evidence.get("end") is not None:
-            fields.update(char_start=evidence.get("start"), char_end=evidence.get("end"))
+        span = character_span(evidence, text=block.get("text"))
+        if span is not None:
+            if not block.get("block_id") or not isinstance(block.get("text"), str):
+                raise ValueError("Character evidence requires a verified original block")
+            fields.update(char_start=span[0], char_end=span[1])
         if evidence.get("cell"):
+            if any(type(evidence["cell"].get(key)) is not int or evidence["cell"][key] < 0 for key in ("row", "column")):
+                raise ValueError("Evidence cell requires explicit nonnegative integer row and column")
             fields["cell"] = {key: evidence["cell"][key] for key in ("row", "column")}
         if block.get("bbox") is not None:
             fields.update(bbox=block["bbox"], region_coordinate_system="indexed_bbox_units_unverified")
@@ -217,8 +223,7 @@ class _Packager:
                         ("source_sha256", source.get("source_sha256")), ("index_id", source.get("index_id"))):
                     if ev.get(key) is not None and ev[key] != expected:
                         raise ValueError("evidence locator disagrees with the frozen source")
-                if ev.get("start") is not None and block["text"][ev["start"]:ev.get("end")] != ev["quote"]:
-                    raise ValueError("evidence quote character offsets disagree")
+                character_span(ev, text=block["text"])
                 if ev.get("cell") or ev.get("verified_header_cells"):
                     cells = (block.get("table") or {}).get("cells", [])
                     for cell in ([ev["cell"]] if ev.get("cell") else []) + ev.get("verified_header_cells", []):

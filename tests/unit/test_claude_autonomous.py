@@ -110,9 +110,49 @@ class ClaudeAutonomousTests(unittest.TestCase):
         self.assertEqual(json.loads(output.read_text())['content'], 'invalid decision text')
         self.assertEqual(len(self.requests), 1)
 
+    def test_native_envelope_persists_host_validation_and_safe_unicode_feedback(self):
+        cases = (
+            ('valid', 'load_skill', '"query"', 'decoded', 'passed'),
+            ('host-invalid', 'read_context', '{"source_snapshot_id":"s","block_id":"b"}', 'decoded', 'rejected'),
+            ('unicode', 'load_skill', '"private-marker-\\ud800"', 'rejected', 'local'),
+        )
+        for name, action, payload, decoded, validated in cases:
+            with self.subTest(name=name):
+                budget = RunBudget(self.root/(name+'.sqlite'), '1')
+                output = self.root/name
+                text = json.dumps({'action':action,'requirement_ids':[], 'reason':None, 'payload_json':payload})
+                planner = SdkAutonomousPlanner('aihubmix','claude-sonnet-5-5', budget=budget,
+                    max_requests_total=1, output=output, credentials_root=self.root,
+                    reasoning_effort='high', purpose='analysis_evidence',
+                    client_factory=self.transport(lambda request: self.response(request, text)))
+                async def run():
+                    try:
+                        if name == 'valid':
+                            decision = await planner.decide({'question':'Explicit synthetic request'})
+                            self.assertEqual(decision.skill,'query')
+                        else:
+                            with self.assertRaisesRegex(ValueError,'invalid_model_decision') as raised:
+                                await planner.decide({'question':'Explicit synthetic request'})
+                            self.assertNotIn('private-marker',str(raised.exception))
+                    finally:
+                        await planner.aclose()
+                asyncio.run(run())
+                log = json.loads(next((output/'calls').glob('*-end.json')).read_text())
+                self.assertEqual(log['transport_decode'],decoded)
+                self.assertEqual(log['host_schema_validation'],validated)
+                self.assertEqual(log['provider_enforced_schema'],'decision_envelope_only')
+                self.assertEqual(budget.summary()['estimated_spent_usd'],'0.0007')
+                self.assertEqual(budget.summary()['unknown_requests'],0)
+                if name == 'unicode':
+                    self.assertEqual(log['transport_decode_error'],'invalid_decision_unicode')
+                    attempt = json.loads(next(output.glob('decision-*-attempt-*.json')).read_text())
+                    self.assertEqual(attempt['status'],'invalid_model_decision')
+                    self.assertEqual(attempt['validation'][0]['code'],'invalid_decision_unicode')
+                    self.assertNotIn('private-marker',json.dumps(attempt['validation']))
+
     def test_unsupported_native_profile_fails_before_credentials_or_artifacts(self):
         for index, update in enumerate(({'reasoning_effort': None}, {'reasoning_effort': 'max'},
-                                        {'max_retries': 1}, {'model': 'claude-unknown', 'reasoning_effort': 'high'})):
+                                        {'max_retries': 4}, {'model': 'claude-unknown', 'reasoning_effort': 'high'})):
             config = {**self.config, **update}
             with self.subTest(update=update), self.assertRaises(ValueError):
                 CompanyDataCoordinator._planner(config, self.root/f'invalid-{index}', self.root)

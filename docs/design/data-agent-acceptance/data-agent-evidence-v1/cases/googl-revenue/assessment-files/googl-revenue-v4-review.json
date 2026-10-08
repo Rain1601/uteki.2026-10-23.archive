@@ -1,0 +1,172 @@
+{
+  "schema_version": "evaluation-only-data-case-review-v1",
+  "case_id": "googl-revenue",
+  "cycle_name": "googl-revenue-r3",
+  "verdict": "pass_for_reported_company_total_with_claim_boundary",
+  "cycle_status": "reviewed_data_ready",
+  "final_query_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r3/attempt-01/data-query/query",
+    "manifest_sha256": "a3cef98dd554be24dd269a65edead9fd532adccd642e6bcf2d74225ac3892259"
+  },
+  "final_review_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r3/attempt-01/review-01",
+    "manifest_sha256": "0ba9a19cb3a201aff34c530aaf8070f86d96525e072fa11cdb6d1df90a456134"
+  },
+  "run_manifest_sha256": "c54d4a32bcdfac08025369b3dc369d5b424b440ef2eb960e4848c1dc7d66d54d",
+  "packet_path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r3/attempt-01/review-01/input.json",
+  "packet_sha256": "7a267b3f78d91bec0f65eec562082cbd08e692e5d29ba996e502fcdd55a13794",
+  "dataset_manifest_sha256": "da31bb36ba9837f996536911ec38f6a91b44109d9e5ff76868d098afb8f74b66",
+  "raw_source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+  "delivery_schema_version": "selected-originals-v3",
+  "question": "请从 Alphabet FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+  "source_body_count": 4,
+  "record_fact_count": 2,
+  "body_checks": [
+    {
+      "block_id": "block-000750-9faf493a",
+      "type": "heading_candidate",
+      "dom_path": "/html/body/div[814]",
+      "text_sha256": "9faf493af028a880099ce96519e4abc4edbc010f9f602173143db9af09e3e22b",
+      "frozen_body_exact_match": true,
+      "original_dom_nonwhitespace_characters_match": true
+    },
+    {
+      "block_id": "block-000751-1e6373dd",
+      "type": "heading_candidate",
+      "dom_path": "/html/body/div[815]",
+      "text_sha256": "1e6373dd1ad7c9f4215cfb74cb43acc71959fb2c31a9831a366ff2b7abe46cb6",
+      "frozen_body_exact_match": true,
+      "original_dom_nonwhitespace_characters_match": true
+    },
+    {
+      "block_id": "block-000752-dfe26017",
+      "type": "heading_candidate",
+      "dom_path": "/html/body/div[816]/span",
+      "text_sha256": "dfe260176ffdee13fb6c38175bafdfa3076ba48faa2172b59ff687824e691645",
+      "frozen_body_exact_match": true,
+      "original_dom_nonwhitespace_characters_match": true
+    },
+    {
+      "block_id": "block-000753-53762a3b",
+      "type": "table",
+      "dom_path": "/html/body/div[816]/table",
+      "text_sha256": "53762a3b18f01eade98317079f2483f5de42f545fdf83823b977d197c3da0ac7",
+      "frozen_body_exact_match": true,
+      "original_dom_nonwhitespace_characters_match": true
+    }
+  ],
+  "record_checks": [
+    {
+      "fact_id": "ev-67189f4cd4dcee452cb83ab2",
+      "record_id": "obs-4afa0ed7f2b1e54cff658afb",
+      "year": "2025",
+      "value_usd": "402836000000",
+      "period": {
+        "kind": "year",
+        "start": "2025-01-01",
+        "end": "2025-12-31"
+      },
+      "accounting_basis": "reported_consolidated",
+      "origin": {
+        "artifact": "raw/googl-2025-10k.html",
+        "record_index": 9401,
+        "adapter": "us-gaap-inline-v1",
+        "concept": "us-gaap:Revenues",
+        "context_ref": "c-1",
+        "raw_dimensions": {},
+        "entity_identifier": "0001652044"
+      },
+      "citation": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000753-53762a3b",
+        "quote": "402,836",
+        "index_id": "didx-77aca7159c9571b7",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "char_start": 63,
+        "char_end": 70,
+        "text_hash": "53762a3b18f01eade98317079f2483f5de42f545fdf83823b977d197c3da0ac7",
+        "cell": {
+          "row": 3,
+          "column": 16
+        }
+      },
+      "fact_dom_path": "/html/body/div[816]/table/tr[4]/td[11]/span/ix:nonfraction",
+      "original_cell_exact": true,
+      "original_fact_scale_and_usd_verified": true,
+      "issuer_period_no_dimensions_verified": true,
+      "locator_rebuilt_exactly": true
+    },
+    {
+      "fact_id": "ev-3a5c83fac5b23e1d158f3492",
+      "record_id": "obs-b5db8f0949bc70a4e8bc553f",
+      "year": "2024",
+      "value_usd": "350018000000",
+      "period": {
+        "kind": "year",
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      },
+      "accounting_basis": "reported_consolidated",
+      "origin": {
+        "artifact": "raw/googl-2025-10k.html",
+        "record_index": 9394,
+        "adapter": "us-gaap-inline-v1",
+        "concept": "us-gaap:Revenues",
+        "context_ref": "c-28",
+        "raw_dimensions": {},
+        "entity_identifier": "0001652044"
+      },
+      "citation": {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000753-53762a3b",
+        "quote": "350,018",
+        "index_id": "didx-77aca7159c9571b7",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "char_start": 54,
+        "char_end": 61,
+        "text_hash": "53762a3b18f01eade98317079f2483f5de42f545fdf83823b977d197c3da0ac7",
+        "cell": {
+          "row": 3,
+          "column": 10
+        }
+      },
+      "fact_dom_path": "/html/body/div[816]/table/tr[4]/td[7]/span/ix:nonfraction",
+      "original_cell_exact": true,
+      "original_fact_scale_and_usd_verified": true,
+      "issuer_period_no_dimensions_verified": true,
+      "locator_rebuilt_exactly": true
+    }
+  ],
+  "packet_rebuild_identical": true,
+  "review_analysis_eligible": true,
+  "minimum_semantic_coverage": "Both fiscal-year company-wide actual revenue totals, USD units and year headings, tied to issuer-only original income-statement XBRL records.",
+  "accounting_basis_assessment": {
+    "supported": "Reported company-wide actual total revenue in the issuer income statement; undimensioned source fact, not a business segment or adjusted figure.",
+    "not_claimed": [
+      "Full US GAAP preparation-policy review",
+      "Subsidiary consolidation perimeter",
+      "Intercompany elimination policy",
+      "Sales-tax recognition policy beyond this numeric source fact"
+    ],
+    "boundary": "Further policy claims require additional original evidence. The original two-year revenue task does not require full accounting-policy passages."
+  },
+  "minimality": {
+    "verdict": "pass",
+    "one_selected_record_per_requested_year": true,
+    "record_origin_table_count": 1,
+    "product_or_business_list_added": false,
+    "explanation": "Final bodies consist of one original income statement and concise issuer/statement/unit headings; other rows remain only because the original table is atomic."
+  },
+  "runtime_boundary": "Fresh v4-config runtime independently queried and selected its evidence; Codex inspected only after sealing. Historical v3 pass was not reused as evidence.",
+  "analysis_called": false,
+  "model_calls_by_this_evaluation": 0,
+  "network_calls_by_this_evaluation": 0,
+  "blocking_issues": [],
+  "limitations": [
+    "No Analysis report was generated.",
+    "No visual browser check in this review.",
+    "Quoted numeric char/cell coordinates were verified against raw source; whole income table contains non-revenue rows by the current block-level delivery contract."
+  ]
+}

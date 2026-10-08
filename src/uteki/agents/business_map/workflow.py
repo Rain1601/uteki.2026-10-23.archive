@@ -104,7 +104,8 @@ async def run_business_task(request, *, root, workspace, output, planner_model_c
     # Validate the existing ledger policy before any model request. No stage may
     # silently reset its allowance or replace an unknown charge with zero.
     ledger_budget = RunBudget(ledger, planner_model_config['budget_usd'],
-                             enforce=planner_model_config['budget_policy'] == 'enforced')
+                             enforce=planner_model_config['budget_policy'] == 'enforced',
+                             allow_unknown_reservations=planner_model_config.get('allow_unknown_reservations', False))
     shared_budget = _RequestLimitedBudget(ledger_budget, planner_model_config['max_requests_total'])
     output.mkdir(parents=True, exist_ok=False)
     # Freeze before planning; editing the repository Skill during a long read

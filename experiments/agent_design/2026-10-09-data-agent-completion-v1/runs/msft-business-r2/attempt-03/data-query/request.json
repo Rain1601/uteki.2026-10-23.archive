@@ -1,0 +1,71 @@
+{
+  "question": "Microsoft 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。",
+  "purpose": "analysis_evidence",
+  "dataset": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/msft",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "msft-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "prepared_run": null,
+  "company_config": null,
+  "include_candidates": null,
+  "limits": {
+    "max_steps": 40,
+    "max_packet_bytes": 120000,
+    "observation_bytes": 24000,
+    "page_items": 8,
+    "turn_timeout": 240
+  },
+  "financial_tasks": [],
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-business-r2/attempt-02/data-query/query",
+      "manifest_sha256": "b70925378ead7a3397283c268754ac631c6cf1d955faa0d9158cc5aad3586361"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-business-r2/attempt-02/review-01",
+      "manifest_sha256": "7642e6ef9c93b1fec92c5d8f58cddb14def81d0e998d30f70dc9709c4fb809c0"
+    },
+    "assessment": {
+      "packet_id": "data-review-e27b32ed05cff84b3b5af555",
+      "facts": [],
+      "requirements": [
+        {
+          "requirement_id": "req-segments",
+          "verdict": "insufficient_evidence",
+          "rationale": "No source bodies, selected blocks, or facts were delivered for req-segments. The program checks report delivery_selection_missing, no_reviewable_source_blocks and no_reviewable_facts. The evidence_ids are referenced, but no text is available to verify the reportable segments, the main businesses in each, the complete lists, or their qualifiers.",
+          "citations": []
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "verdict": "requires_more_source_content",
+          "rationale": "source_documents is empty and no blocks were delivered for msft-2025-10k. No citation can be made, and the text cannot be judged sufficient for the question.",
+          "citations": []
+        }
+      ],
+      "question_coverage": "incomplete",
+      "coverage_reason": "The answer cannot be verified or considered complete: no original paragraphs, facts, or segment lists were delivered. The question requires the reportable segments, their main businesses, and the original passages with complete enumerations and qualifiers.",
+      "missing_information": [
+        "Deliver the original text blocks from Microsoft FY2025 10-K Item 1 Business and the segment note that name the reportable segments (Productivity and Business Processes, Intelligent Cloud, More Personal Computing).",
+        "Deliver the complete list of products and services in each segment, together with the introductory text and qualifiers.",
+        "Provide reviewable facts tied to the source blocks, with block_ids and quotes.",
+        "Resolve the program gaps: delivery_selection_missing, no_reviewable_source_blocks and no_reviewable_facts."
+      ],
+      "limitations": [
+        "The review is limited to the delivered packet, which has no source body text.",
+        "No segment names or product lists are asserted here, since there is no delivered evidence to cite."
+      ]
+    }
+  }
+}

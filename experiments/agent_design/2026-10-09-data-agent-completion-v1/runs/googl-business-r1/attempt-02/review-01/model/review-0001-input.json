@@ -1,0 +1,120 @@
+{
+  "packet": {
+    "schema_version": "data-answer-review-input-v1",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    },
+    "question": "Alphabet 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。",
+    "query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-business-r1/attempt-02/data-query/query",
+      "manifest_sha256": "a8d5814751fab0bb43cb5e28d628faa34e7db0e95942e5f88fd0e5957a1534bb"
+    },
+    "dataset_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/googl",
+      "manifest_sha256": "da31bb36ba9837f996536911ec38f6a91b44109d9e5ff76868d098afb8f74b66"
+    },
+    "query_plan_origin": "model",
+    "query_status": "limited",
+    "query_gaps": [
+      {
+        "gap_id": "gap-c3303a8e9358a70bec1f77a4",
+        "reason": "tool_gap",
+        "detail": {
+          "scope": "document_search",
+          "reason": "no_literal_match",
+          "source_snapshot_id": "googl-2025-10k",
+          "node_id": "didx-77aca7159c9571b7-document"
+        },
+        "requirement_ids": [
+          "req-segments"
+        ],
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        }
+      }
+    ],
+    "source_documents": [],
+    "requirements": [
+      {
+        "kind": "source_evidence",
+        "query": null,
+        "source_id": "googl-2025-10k",
+        "node_id": null,
+        "financial_task_id": null,
+        "batch_index": null,
+        "requirement_id": "req-segments",
+        "description": "Alphabet FY2025 10-K: reportable segments (Google Services, Google Cloud, Other Bets) and the main businesses within each, including the complete Business-section descriptions and lists (Google Services products and revenue categories, Google Cloud offerings and the full use-case list, Other Bets businesses), the Alphabet-level activities qualifier, and the segment-reporting note on reportable segments.",
+        "evidence_ids": [
+          "ev-b1fb8541ec3fa06262aec72b",
+          "ev-8c4a9a8885bd7ba3d99a08b6",
+          "ev-11dcd2eea25f3e77f8db7b94",
+          "ev-f19c2bd3e35f37aaa82b8f8f",
+          "ev-1715d4805dd23e1f26a2d1a5",
+          "ev-b3f797cf25760148172f4845",
+          "ev-72f63acae705f7c4e6125520",
+          "ev-fe5b9920ca6497aab784f61f",
+          "ev-afdd9f5ec38eb8e8d69eff48",
+          "ev-af33ed2e46d9bb2c175de803",
+          "ev-18ed9df8f1727c78660ff22c",
+          "ev-299ece00248cced08bfa719f"
+        ],
+        "gap_ids": [
+          "gap-c3303a8e9358a70bec1f77a4"
+        ],
+        "semantic_review": "pending",
+        "source_scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "selected_blocks": [],
+        "program_check": "source_body_delivered"
+      }
+    ],
+    "facts": [],
+    "program_gaps": [
+      "delivery_selection_missing:req-segments",
+      "requirement_incomplete:req-segments",
+      "no_reviewable_source_blocks:req-segments",
+      "no_reviewable_facts"
+    ],
+    "max_packet_bytes": 160000,
+    "source_delivery": "query_evidence_v1",
+    "purpose": "analysis_evidence",
+    "delivery_schema_version": "selected-originals-v2",
+    "packet_id": "data-review-76867b666023dc0bf46e1311"
+  },
+  "packet_sha256": "77286bafef9bf2e17a1dac42ef08c8485304c387917b3a58075a3295d93b27d8",
+  "model_input": "{\"schema_version\": \"data-answer-review-input-v1\", \"scope\": {\"execution_schema_version\": \"research-execution-v1\", \"snapshot_id\": \"query-025a1b23302b3227b44ac8c3\", \"company_ids\": [\"sec-0001652044\"], \"source_snapshot_ids\": [\"googl-2025-10k\"], \"source_policy_id\": \"local-frozen-v1\", \"knowledge_cutoff\": \"2026-10-09\", \"include_candidates\": true}, \"question\": \"Alphabet 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。\", \"query_ref\": {\"path\": \"/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-business-r1/attempt-02/data-query/query\", \"manifest_sha256\": \"a8d5814751fab0bb43cb5e28d628faa34e7db0e95942e5f88fd0e5957a1534bb\"}, \"dataset_ref\": {\"path\": \"/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/googl\", \"manifest_sha256\": \"da31bb36ba9837f996536911ec38f6a91b44109d9e5ff76868d098afb8f74b66\"}, \"query_plan_origin\": \"model\", \"query_status\": \"limited\", \"query_gaps\": [{\"gap_id\": \"gap-c3303a8e9358a70bec1f77a4\", \"reason\": \"tool_gap\", \"detail\": {\"scope\": \"document_search\", \"reason\": \"no_literal_match\", \"source_snapshot_id\": \"googl-2025-10k\", \"node_id\": \"didx-77aca7159c9571b7-document\"}, \"requirement_ids\": [\"req-segments\"], \"scope\": {\"execution_schema_version\": \"research-execution-v1\", \"snapshot_id\": \"query-025a1b23302b3227b44ac8c3\", \"company_ids\": [\"sec-0001652044\"], \"source_snapshot_ids\": [\"googl-2025-10k\"], \"source_policy_id\": \"local-frozen-v1\", \"knowledge_cutoff\": \"2026-10-09\", \"include_candidates\": true}}], \"source_documents\": [], \"requirements\": [{\"kind\": \"source_evidence\", \"query\": null, \"source_id\": \"googl-2025-10k\", \"node_id\": null, \"financial_task_id\": null, \"batch_index\": null, \"requirement_id\": \"req-segments\", \"description\": \"Alphabet FY2025 10-K: reportable segments (Google Services, Google Cloud, Other Bets) and the main businesses within each, including the complete Business-section descriptions and lists (Google Services products and revenue categories, Google Cloud offerings and the full use-case list, Other Bets businesses), the Alphabet-level activities qualifier, and the segment-reporting note on reportable segments.\", \"evidence_ids\": [\"ev-b1fb8541ec3fa06262aec72b\", \"ev-8c4a9a8885bd7ba3d99a08b6\", \"ev-11dcd2eea25f3e77f8db7b94\", \"ev-f19c2bd3e35f37aaa82b8f8f\", \"ev-1715d4805dd23e1f26a2d1a5\", \"ev-b3f797cf25760148172f4845\", \"ev-72f63acae705f7c4e6125520\", \"ev-fe5b9920ca6497aab784f61f\", \"ev-afdd9f5ec38eb8e8d69eff48\", \"ev-af33ed2e46d9bb2c175de803\", \"ev-18ed9df8f1727c78660ff22c\", \"ev-299ece00248cced08bfa719f\"], \"gap_ids\": [\"gap-c3303a8e9358a70bec1f77a4\"], \"semantic_review\": \"pending\", \"source_scope\": {\"execution_schema_version\": \"research-execution-v1\", \"snapshot_id\": \"query-025a1b23302b3227b44ac8c3\", \"company_ids\": [\"sec-0001652044\"], \"source_snapshot_ids\": [\"googl-2025-10k\"], \"source_policy_id\": \"local-frozen-v1\", \"knowledge_cutoff\": \"2026-10-09\", \"include_candidates\": true}, \"selected_blocks\": [], \"program_check\": \"source_body_delivered\"}], \"facts\": [], \"program_gaps\": [\"delivery_selection_missing:req-segments\", \"requirement_incomplete:req-segments\", \"no_reviewable_source_blocks:req-segments\", \"no_reviewable_facts\"], \"max_packet_bytes\": 160000, \"source_delivery\": \"query_evidence_v1\", \"purpose\": \"analysis_evidence\", \"delivery_schema_version\": \"selected-originals-v2\", \"packet_id\": \"data-review-76867b666023dc0bf46e1311\"}",
+  "model_input_sha256": "77286bafef9bf2e17a1dac42ef08c8485304c387917b3a58075a3295d93b27d8",
+  "model_config_sha256": "5e002e9fe4704ddc319fd5cd78d2683a6b67e17c41ac4d09e9a39af96131ef31",
+  "prompt_sha256": "bc55b1d3dadf22e133429b5e77d0c68ef1b97a2c8ec94a45bd3f5815674a527f"
+}

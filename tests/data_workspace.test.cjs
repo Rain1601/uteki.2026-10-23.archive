@@ -389,3 +389,40 @@ test('version update sends exact scope and revision; conflict does not reload or
   assert.equal(h.location.replaced, undefined); assert.equal(h.task.disabled, false); assert.equal(h.archive.disabled, false);
   assert.equal(h.get('dw-message').hidden, false);
 });
+
+test('precise source request forwards explicit coordinates and persists them without searching the quote', async () => {
+  const h = harness({fetcher: async url => {
+    const p = new URL(url, 'http://local.test').searchParams;
+    return {ok: true, json: async () => ({dataset_id: 'cedar', source_snapshot_id: 'cedar-report',
+      block_id: 'block-a', char_start: Number(p.get('char_start')), char_end: Number(p.get('char_end')),
+      cell_row: 2, cell_column: 3, source_sha256: 'a'.repeat(64), locator_status: 'located',
+      locator_precision: 'character', fragment: 'workspace-evidence', notice: {zh: '精确引用', en: 'Exact range'}})};
+  }});
+  const button = h.first.detail.querySelector('[data-locate]');
+  for (const [key, value] of Object.entries({'char-start': '15', 'char-end': '27', 'cell-row': '2', 'cell-column': '3',
+    'text-hash': 'b'.repeat(64), 'source-sha256': 'a'.repeat(64)})) button.setAttribute('data-' + key, value);
+  h.first.button.dispatch('click'); await h.flush(); h.frame.dispatch('load');
+  const params = new URL(h.calls[0].url, 'http://local.test').searchParams;
+  assert.equal(params.get('char_start'), '15'); assert.equal(params.get('char_end'), '27');
+  assert.equal(params.get('cell_row'), '2'); assert.equal(params.get('cell_column'), '3');
+  assert.equal(params.get('quote'), 'Quoted first');
+  assert.equal(params.get('source_sha256'), 'a'.repeat(64));
+  assert.equal(h.get('dw-source-status').dataset.state, 'located');
+  const saved = JSON.parse(h.storage.get('uteki-data-workspace:cedar:cedar-report:evidence'));
+  assert.equal(saved.locator.charStart, '15');
+  assert.equal(saved.locator.cellColumn, '3');
+  assert.match(h.frame.src, /char_start=15/);
+});
+
+test('precise source request refuses silent block downgrade or different coordinates', async () => {
+  for (const change of [{locator_precision: 'block'}, {char_start: 0}]) {
+    const h = harness({fetcher: async () => ({ok: true, json: async () => ({dataset_id: 'cedar',
+      source_snapshot_id: 'cedar-report', block_id: 'block-a', char_start: 15, char_end: 27,
+      locator_status: 'located', locator_precision: 'character', fragment: 'workspace-evidence', ...change})})});
+    const button = h.first.detail.querySelector('[data-locate]');
+    button.setAttribute('data-char-start', '15'); button.setAttribute('data-char-end', '27');
+    h.first.button.dispatch('click'); await h.flush();
+    assert.equal(h.get('dw-source-status').dataset.state, 'error');
+    assert.doesNotMatch(h.frame.src, /#/);
+  }
+});

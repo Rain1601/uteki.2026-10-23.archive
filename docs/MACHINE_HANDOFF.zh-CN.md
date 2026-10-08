@@ -1,4 +1,43 @@
-# 换机接续开发 · 2026-10-08
+# 换机接续开发 · 当前入口 2026-10-09
+
+## 当前：Data-only 证据闭环已验收
+
+当前先验证系统 Data Agent 独立取材、选择原文/记录和复核补取；不运行 Analysis 报告生成。说明见 [运行边界](DATA_QUERY_ANALYSIS_BOUNDARY.zh-CN.md) 与 [证据验收](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)。原六题与目录分页针对性复跑均独立验收通过。[打开统一结果](http://127.0.0.1:8769/docs/design/data-agent-acceptance/data-agent-evidence-v1/) · [范围、费用和验证明细](../experiments/agent_design/2026-10-09-data-agent-completion-v1/DELIVERY.zh-CN.md)。
+
+本轮目录、六题列表、产物查看和上传边界集中在 [completion-v1 README](../experiments/agent_design/2026-10-09-data-agent-completion-v1/README.md)。旧运行内部的绝对引用不会自动迁移；已渲染的相对路径成品可以阅读，重新生成历史页仍可能需要原路径。不要修改冻结 JSON 来消除这个限制。
+
+安装依赖后，在仓库根目录执行。新脚本从自身位置确定本机仓库路径，读取显式 `cases.json`、版本化 `configs-v3` 模板和仓库内 `datasets/msft`、`datasets/googl`。它核对冻结 manifest、公司、来源、snapshot 与原问题；只重定位数据集、凭证根目录、workspace 和 ledger 路径，不复制旧 `initial_query_ref`、选段或预期答案。
+
+```sh
+PYTHONPATH=src .venv/bin/python experiments/agent_design/2026-10-09-data-agent-completion-v1/make_replay_configs.py \
+  --cases experiments/agent_design/2026-10-09-data-agent-completion-v1/cases.json \
+  --output-dir "$PWD/workspace/data-replay-configs-local-01" \
+  --ledger "$PWD/experiments/agent_design/2026-10-09-data-agent-completion-v1/costs.sqlite" \
+  --check-only
+```
+
+该检查不调用模型、不读取 key、不写文件。通过后去掉 `--check-only`，生成六份新配置及输入 hash 清单；输出目录必须尚不存在。planner/worker 使用 Sonnet 5.5、8192 输出 token；reviewer 保留 12000。随后先检查一个问题，再启动它：
+
+```sh
+PYTHONPATH=src .venv/bin/python scripts/run_data_retrieval.py \
+  --config workspace/data-replay-configs-local-01/msft-revenue.json \
+  --output workspace/data-replay-runs-local-01/msft-revenue \
+  --check-only
+
+PYTHONPATH=src .venv/bin/python scripts/run_data_retrieval.py \
+  --config workspace/data-replay-configs-local-01/msft-revenue.json \
+  --output workspace/data-replay-runs-local-01/msft-revenue
+```
+
+最后一条会真实调用模型。其他五题分别使用同目录对应配置，每题用新输出路径；不自动并发启动六题。输出保留原始请求、实现与数据 hash、每个 attempt、模型配置、复核结果和最终状态。旧配置内的绝对路径仅为历史记录，不能直接当新机器入口，也不要原地替换冻结文件。
+
+`AIHUBMIX_API_KEY` 在新机器本地 `.env` 配置并保持权限 `600`，不要加入 Git。先按下方迁移说明恢复需要延续的私密费用账本；`--ledger` 指定所有角色共用的真实本机路径，生成器不会创建、清空或搬迁账本。最新授权使用 `record_only`、无美元硬上限，但失败费用和未知预留继续记录，attempt、请求超时与重试仍有界。不要把旧账本漏迁移解释为历史费用为零。
+
+当前模型队列已停止。本轮私密包为 `output/machine-handoff-20261009/private-state-v1.tar.gz`，校验记录为同目录 `verification.json`。它们不在Git中，需要通过用户控制的私密渠道带到新机器；恢复步骤可复用下文，但必须替换为这份新包。当前 `experiments/**/costs.sqlite*` 已忽略，可被 `transfer_local_state.py` 纳入包；2026-10-08 的旧包不包含本轮新增账本状态。仓库外的 Claude 会话必须使用真实的 `--dialogue-root` 显式选择；`.env` 不在包内。
+
+## 历史交接快照 · 2026-10-08
+
+以下安装步骤仍可参考；旧业务图状态、旧私密包指纹和预算是 2026-10-08 的历史记录，不是当前 Data-only 任务的进度或费用限制。保留历史原文供追溯。
 
 ## 接手入口
 
@@ -108,7 +147,7 @@ PYTHONPATH=src .venv/bin/python -m apps.claude_dialogue \
 
 只查看不付费。窗口账本和业务提取账本分别保留；不新建空账本冒充原会话。
 
-## 当前位置与下一步
+## 历史位置与下一步（2026-10-08）
 
 | 顺序 | 工作 | 真实状态 |
 |---|---|---|
@@ -120,7 +159,7 @@ PYTHONPATH=src .venv/bin/python -m apps.claude_dialogue \
 
 最新Microsoft候选为 `critic-revision-02`：19对象、16关系、68产品属性。系统Sonnet提取/修订，Opus独立复核；Codex评审与执行输入隔离。Google93块原文冻结，但新同规则运行尚未执行；Meta尚无系统候选。不能宣称多公司或陌生公司验收通过。
 
-原任务账本：`experiments/agent_design/2026-10-07-business-coverage-v1/run-06/budget.sqlite`。
+历史业务图任务账本（以下额度与余额仅记录当时状态）：`experiments/agent_design/2026-10-07-business-coverage-v1/run-06/budget.sqlite`。
 
 - 当前授权上限 **$8**；估算已用$7.305062，未知占用$0.383410，可用$0.311528。
 - 下一次Opus04预留$1.027704，预检不通过，**没有发送请求**。

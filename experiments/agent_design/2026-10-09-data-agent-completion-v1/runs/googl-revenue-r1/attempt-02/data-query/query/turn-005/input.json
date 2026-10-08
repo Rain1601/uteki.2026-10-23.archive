@@ -1,0 +1,1123 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "请从 Alphabet FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {},
+  "record_selection": {},
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r1/attempt-01/data-query/query",
+      "manifest_sha256": "bd9ec6e150945daf9e45b7a0564c46ee9bfd78a3b2b3630d639ac024744bc33c"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r1/attempt-01/review-01",
+      "manifest_sha256": "054df1acbfe486ee52711647638ca197f7372f504c786ec582dad71ecab35697"
+    },
+    "assessment": {
+      "packet_id": "data-review-99c3883f519967a306a68f16",
+      "facts": [
+        {
+          "fact_id": "ev-67189f4cd4dcee452cb83ab2",
+          "verdict": "supported",
+          "rationale": "FY2025 revenue of 402,836 (in millions USD) appears in the income statement, year ended Dec 31, 2025. The record's value of 402836000000 USD, the period and the consolidated basis are consistent with the source. The statement heading says 'in millions'.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000753-53762a3b",
+              "quote": "Revenues$307,394 $350,018 $402,836"
+            }
+          ],
+          "relevance": "necessary"
+        },
+        {
+          "fact_id": "ev-d312eb342721e806a647fa8d",
+          "verdict": "supported",
+          "rationale": "FY2024 revenue of 350,018 (in millions USD) appears in the income statement and in the geography table as Total revenues. The record value of 350018000000 USD matches. The cited block is the geographic table, which is redundant with the income statement but still verifies the figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000924-9c4544a8",
+              "quote": "Total revenues$307,394 100 %$350,018 100 %$402,836 100 %"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "source-block-6d38eb62e6e73089d8452206",
+          "verdict": "supported",
+          "rationale": "The heading identifies the statement as the consolidated statements of income, which gives the accounting basis.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000751-1e6373dd",
+              "quote": "CONSOLIDATED STATEMENTS OF INCOME"
+            }
+          ],
+          "relevance": "supporting_context"
+        },
+        {
+          "fact_id": "source-block-3106f0481f5c969a0956e926",
+          "verdict": "supported",
+          "rationale": "The heading gives the unit (in millions), which is necessary to interpret the figures.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000752-dfe26017",
+              "quote": "(in millions, except per share amounts)"
+            }
+          ],
+          "relevance": "supporting_context"
+        },
+        {
+          "fact_id": "source-block-ff738279896d3dc0249381f7",
+          "verdict": "supported",
+          "rationale": "The table gives Revenues for 2023, 2024 and 2025 under the 'Year Ended December 31,' header. It includes the FY2025 and FY2024 figures with period columns. It also contains other line items that the question does not require, but at table granularity this is acceptable.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000753-53762a3b",
+              "quote": "Year Ended December 31, 202320242025Revenues$307,394 $350,018 $402,836"
+            }
+          ],
+          "relevance": "necessary"
+        }
+      ],
+      "requirements": [
+        {
+          "requirement_id": "req_revenue_query",
+          "verdict": "complete",
+          "rationale": "Both FY2025 (402,836 million USD) and FY2024 (350,018 million USD) total revenues are present, with annual periods, USD units and reported consolidated basis, and are verified against the source.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000753-53762a3b",
+              "quote": "Revenues$307,394 $350,018 $402,836"
+            }
+          ]
+        },
+        {
+          "requirement_id": "req_revenue_source",
+          "verdict": "complete",
+          "rationale": "The consolidated statements of income heading, the unit line and the table with year headers are delivered, so the figures can be checked against the original text.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000752-dfe26017",
+              "quote": "(in millions, except per share amounts)"
+            },
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000751-1e6373dd",
+              "quote": "CONSOLIDATED STATEMENTS OF INCOME"
+            }
+          ]
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "verdict": "text_sufficient",
+          "rationale": "The delivered text and tables contain the income statement with units, periods and revenue values for both years. No images are needed.",
+          "citations": [
+            {
+              "source_snapshot_id": "googl-2025-10k",
+              "block_id": "block-000753-53762a3b",
+              "quote": "Revenues$307,394 $350,018 $402,836"
+            }
+          ]
+        }
+      ],
+      "question_coverage": "complete",
+      "coverage_reason": "Income statement revenue for FY2025 (402,836) and FY2024 (350,018), in millions USD for the years ended December 31, on a consolidated basis, is fully supported by the delivered blocks.",
+      "missing_information": [],
+      "revision_requests": [
+        "Remove the unneeded blocks: the running header table block-000749-2f8c99ac, and the redundant geography blocks block-000923-2fa308c0, block-000924-9c4544a8 and block-000925-24dd13aa. If the FY2024 fact stays cited to the geography table, the income statement should be cited instead."
+      ],
+      "body_checks": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000749-2f8c99ac",
+          "relevance": "irrelevant",
+          "rationale": "This is the running page header (Table of Contents / Alphabet Inc.) and carries no revenue data."
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000750-9faf493a",
+          "relevance": "supporting_context",
+          "rationale": "This short heading names the company and gives provenance for the statement."
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000751-1e6373dd",
+          "relevance": "supporting_context",
+          "rationale": "The statement title identifies the consolidated basis."
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000752-dfe26017",
+          "relevance": "supporting_context",
+          "rationale": "It supplies the unit (millions)."
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000753-53762a3b",
+          "relevance": "necessary",
+          "rationale": "The table contains the Revenues line for both years with the period headers."
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000923-2fa308c0",
+          "relevance": "redundant",
+          "rationale": "This introduction to the geography table is not needed once the income statement is used."
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000924-9c4544a8",
+          "relevance": "redundant",
+          "rationale": "The Total revenues row duplicates the income statement figures and is only needed because the FY2024 fact cites it."
+        },
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "block_id": "block-000925-24dd13aa",
+          "relevance": "irrelevant",
+          "rationale": "The footnote on regional definitions has no bearing on total revenue."
+        }
+      ],
+      "limitations": [
+        "The delivered bundle includes unrelated blocks (a running header, the 'Alphabet Inc.' heading and the revenue-by-geography blocks). These are optional trimming preferences; the geography table duplicates the FY2024 figure."
+      ]
+    }
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0001652044",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "goog:YouTubeAdvertisingRevenueMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "us-gaap:AllOtherSegmentsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ConsolidationItemsAxis": "us-gaap:OperatingSegmentsMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "goog:AmericasExcludingUnitedStatesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "Cash payments for property and equipment / 固定资产购置现金支出",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported cash payments to acquire property, plant and equipment. Not total investment, accrual additions, or free cash flow; do not reverse the cash-payment sign.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments",
+            "capex cash payments",
+            "payments to acquire property plant and equipment",
+            "固定资产购置现金支出",
+            "PaymentsToAcquirePropertyPlantAndEquipment"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "Net income / 净利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported net income or loss for the stated scope and period. Preserve the source attribution; do not substitute an adjusted or attributable-income concept.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income",
+            "net income",
+            "net loss",
+            "净利润",
+            "净亏损",
+            "NetIncomeLoss"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "Operating cash flow / 经营现金流",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Net cash provided by or used in operating activities for the stated duration. Not operating profit, free cash flow, or an ending cash balance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow",
+            "operating cash flow",
+            "cash from operations",
+            "经营现金流",
+            "经营活动现金流量净额",
+            "NetCashProvidedByUsedInOperatingActivities"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "Operating income / 营业利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported operating income or loss after operating costs and expenses. Not net income, EBITDA, or operating cash flow.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income",
+            "operating income",
+            "operating loss",
+            "income from operations",
+            "营业利润",
+            "经营利润",
+            "OperatingIncomeLoss"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "Revenue / 收入",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported revenue under the mapped revenue concept; preserve consolidated versus dimensional scope. Not cash receipts, bookings, or guidance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue",
+            "revenues",
+            "net sales",
+            "收入",
+            "营业收入",
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "Revenues",
+            "SalesRevenueNet"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-7d95f8d35723138498f123ab6c2e2b8e675d13bb9a7a1dae0fda631376a0f962",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        },
+        {
+          "item_id": "fiscal-a0159795ad844be9110c771f07f29319585ff103ad0cd9a42d1f56ecba7a8bd5",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2023,
+          "period": {
+            "kind": "year",
+            "start": "2023-01-01",
+            "end": "2023-12-31"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-4290691e78da1e2a42fb5351",
+            "block_id": "block-000753-53762a3b",
+            "header": {
+              "row": 2,
+              "column": 3,
+              "text": "2023"
+            },
+            "annual_caption": {
+              "row": 1,
+              "column": 3,
+              "text": "Year Ended December 31,"
+            }
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        },
+        {
+          "item_id": "fiscal-bef82c1ed9da6f1409ee8c3553e8726f31f767ee84b2f201ec210714bf7eb1ba",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2024,
+          "period": {
+            "kind": "year",
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-e114a7300acd536d7bd2f07c",
+            "block_id": "block-000753-53762a3b",
+            "header": {
+              "row": 2,
+              "column": 9,
+              "text": "2024"
+            },
+            "annual_caption": {
+              "row": 1,
+              "column": 3,
+              "text": "Year Ended December 31,"
+            }
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "company_id": "sec-0001652044",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "document_id": "googl-2025-10k",
+          "index_id": "didx-77aca7159c9571b7",
+          "index_folder": "indexes/googl-2025-10k",
+          "raw_file": "raw/googl-2025-10k.html",
+          "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "form": "10-K",
+          "period_end": "2025-12-31",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2026-02-05",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              }
+            },
+            {
+              "fiscal_year": 2023,
+              "period": {
+                "kind": "year",
+                "start": "2023-01-01",
+                "end": "2023-12-31"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-4290691e78da1e2a42fb5351",
+                "block_id": "block-000753-53762a3b",
+                "header": {
+                  "row": 2,
+                  "column": 3,
+                  "text": "2023"
+                },
+                "annual_caption": {
+                  "row": 1,
+                  "column": 3,
+                  "text": "Year Ended December 31,"
+                }
+              }
+            },
+            {
+              "fiscal_year": 2024,
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-e114a7300acd536d7bd2f07c",
+                "block_id": "block-000753-53762a3b",
+                "header": {
+                  "row": 2,
+                  "column": 9,
+                  "text": "2024"
+                },
+                "annual_caption": {
+                  "row": 1,
+                  "column": 3,
+                  "text": "Year Ended December 31,"
+                }
+              }
+            }
+          ],
+          "parsed_package": {
+            "export_version": "uteki-parsed-document-v1",
+            "package_id": "parsed-e5c568989414ee95a62d38a3",
+            "manifest_path": "indexes/googl-2025-10k/manifest.json",
+            "manifest_sha256": "468b4a4e7afd55dbc04ffc5bebccf3c264f838c6f478ae0a2e88f1223ced7a89",
+            "source_path": "indexes/googl-2025-10k/source.json",
+            "document_path": "indexes/googl-2025-10k/document.html",
+            "status": "candidate_parsed_material",
+            "semantic_review": "not_reviewed"
+          },
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes",
+            "html_table_structure",
+            "parsed_document_package"
+          ],
+          "stage_coverage": {
+            "schema_version": "source-stage-coverage-v1",
+            "original": {
+              "status": "hash_verified",
+              "byte_count": 2616499,
+              "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161"
+            },
+            "reading": {
+              "status": "indexed",
+              "parser_version": "sec-source-blocks-v0.1.11",
+              "block_count": 1338,
+              "block_type_counts": {
+                "heading_candidate": 273,
+                "image": 2,
+                "list_item": 148,
+                "other": 11,
+                "page_marker": 97,
+                "paragraph": 622,
+                "table": 185
+              },
+              "index_diagnostic_count": 1
+            },
+            "tables": {
+              "status": "structure_parsed",
+              "table_node_count": 185,
+              "tables_with_cells": 185,
+              "tables_without_cells": 0,
+              "cell_count": 10015,
+              "layout_role_counts": {
+                "running_header": 97,
+                "table_of_contents": 1,
+                "unclassified": 87
+              },
+              "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+              "financial_table_semantics": "not_evaluated"
+            },
+            "numeric": {
+              "status": "candidate_records",
+              "record_count": 111,
+              "evidence_count": 111,
+              "gap_count": 1521,
+              "adapter": "us-gaap-inline-v1",
+              "supported_taxonomy": "US_GAAP",
+              "supported_currencies": [
+                "USD"
+              ],
+              "supported_metric_ids": [
+                "capex_cash_payments",
+                "net_income",
+                "operating_cash_flow",
+                "operating_income",
+                "revenue",
+                "revenue_including_assessed_tax"
+              ],
+              "period_support": "complete_month_boundaries_only",
+              "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+              "financial_package_completeness": "not_evaluated",
+              "semantic_review": "not_evaluated",
+              "adoption": "candidate"
+            }
+          },
+          "image_block_count": 2
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 3426,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 8,
+        "total_count": 21,
+        "bytes_returned": 2957,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "scope_id": "scope-6e33cd9d940b822849d88367",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "f52047ae48ebf93aabbb651de919eab578f9baa6d8ad257e4d37bda50302f502",
+          "offset": 8,
+          "checksum": "9bda42d7d87b929583d316b17be1a99cbbb3b3142b1c4e0e092c2df4071a81e7"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 3304,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 3,
+        "total_count": 3,
+        "bytes_returned": 1367,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_query",
+      "description": "Query Alphabet consolidated total revenue for FY2025 and FY2024 (annual periods ending Dec 31), reported actual, USD, keeping units and accounting basis."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_source",
+      "description": "Deliver the original text of the Alphabet FY2025 10-K consolidated statements of income: statement title, unit line (in millions) and the table with the year headers and the Revenues line for 2025 and 2024."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0001652044",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_query",
+      "description": "Query Alphabet consolidated total revenue for FY2025 and FY2024 (annual periods ending Dec 31), reported actual, USD, keeping units and accounting basis.",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "query_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "query_checks": [
+        {
+          "check_id": "query_execution",
+          "status": "missing_evidence",
+          "reason": "query_not_returned",
+          "detail": "尚无本要求的成功查询与已校验证据包。"
+        }
+      ],
+      "query_receipt_files": []
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_revenue_source",
+      "description": "Deliver the original text of the Alphabet FY2025 10-K consolidated statements of income: statement title, unit line (in millions) and the table with the year headers and the Revenues line for 2025 and 2024.",
+      "evidence_ids": [],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-e36e3a4107562279eb07a51aefc83d15",
+    "kind": "run_state",
+    "path": "artifacts/art-e36e3a4107562279eb07a51aefc83d15.json",
+    "sha256": "f27cfa941721061dd9a7a05a3e8d260068b35cc5bf139228393d08b9ef58275e",
+    "size_bytes": 4393,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    },
+    "scope_id": "scope-6e33cd9d940b822849d88367",
+    "created_step": 5,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-c1dd391f885f7caf2988c0bfc2f92e2a",
+    "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "scope_id": "scope-6e33cd9d940b822849d88367",
+    "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 0,
+    "total_count": 0,
+    "returned_count": 0,
+    "bytes_returned": 2,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "status": "planned",
+    "plan": {
+      "version": 1,
+      "requirements": [
+        {
+          "kind": "query",
+          "query": {
+            "records": [
+              {
+                "entity_id": "sec-0001652044",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2025-01-01",
+                  "end": "2025-12-31"
+                },
+                "value_kind": "actual"
+              },
+              {
+                "entity_id": "sec-0001652044",
+                "metric_id": "revenue",
+                "period": {
+                  "kind": "year",
+                  "start": "2024-01-01",
+                  "end": "2024-12-31"
+                },
+                "value_kind": "actual"
+              }
+            ],
+            "documents": [],
+            "calculations": []
+          },
+          "source_id": null,
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_revenue_query",
+          "description": "Query Alphabet consolidated total revenue for FY2025 and FY2024 (annual periods ending Dec 31), reported actual, USD, keeping units and accounting basis."
+        },
+        {
+          "kind": "source_evidence",
+          "query": null,
+          "source_id": "googl-2025-10k",
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_revenue_source",
+          "description": "Deliver the original text of the Alphabet FY2025 10-K consolidated statements of income: statement title, unit line (in millions) and the table with the year headers and the Revenues line for 2025 and 2024."
+        }
+      ],
+      "reason": "Plan numeric query and source evidence requirements for FY2025 and FY2024 total revenue; query requirement omits source_id per validation feedback.",
+      "origin": "model",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+      },
+      "sha256": "5cfc21bc61d23a6243e8917b87585a1d3c22c462005274941b568e76d3bda1b3"
+    },
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 4,
+      "action": "plan",
+      "requirement_ids": [],
+      "request_fingerprint": "a4cda1611c1aeefdea2c93f0706d1b348507e0d8276d06e88d2ec8dd63ab9b65",
+      "status": "planned",
+      "error_code": null,
+      "layer": "runtime",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 1664,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-b6411620974f406f1b2b581126223663",
+      "kind": "tool_output",
+      "path": "artifacts/art-b6411620974f406f1b2b581126223663.json",
+      "sha256": "e00e3dc0099deb315851f5bd92001677f7b3c4120bce4782148d02142cd3d502",
+      "size_bytes": 2229,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-6e33cd9d940b822849d88367",
+      "created_step": 4,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33",
+    "content": "---\nname: data-agent-query\nversion: 10\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nFor purpose=analysis_evidence, the Data Agent retrieves original material for a separate Analysis Agent. The original question can be narrative; use kind=source_evidence for its source material and kind=query for numeric retrieval. Do not create source_answer requirements or author the downstream report. Navigate using the small scoped catalog/schema and source index, then read relevant original blocks with necessary units, periods, introductions and qualifiers. Do not default to full-report or whole-chapter delivery. Preserve explicit gaps when evidence or resources are insufficient. Semantic completeness is reviewed separately after retrieval.\n\nIn analysis_evidence, query original records/operands; calculation requirements are not supported by its review handoff. Every numeric query requirement must declare records criteria. Use source_evidence for document-only retrieval. After querying, select_records with record_selection.record_ids=[evidence_id,...], requirement_ids and a reason selects the final records. These IDs are ev- record evidence IDs, not original record_id values. Retain at least one record per declared entity/metric/period/value_kind criterion, preserving explicit units and source qualifications; trim redundant disclosures when one source is sufficient. Only records returned by that requirement's same-scope query are eligible. Selection replaces previous selection, preserves the full audit trail, and is required before finish. After gathering a source_evidence requirement, use select_evidence with delivery.blocks=[{context_id,block_id}], requirement_ids and a reason. Only fully delivered same-source blocks may be selected. This replaces that requirement's final delivery selection, while retaining all exploration snapshots. Keep units, periods, full relevant lists and necessary qualifications. Do not select unrelated exploration. The reviewer checks relevance as well as support. read_body_catalog preserves short navigation previews and exact reread pointers for earlier complete blocks; do not restart discovery because the latest observation changed. Feedback from a prior sealed review preserves the original question/scope and directs a new complete evidence package, not just an addendum.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nFor purpose=question_answer, use kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.\n\nAn answer must declare model_claimed_coverage, coverage_note and unresolved_questions. partial requires concrete unresolved questions; claimed_complete requires none but remains a model judgment. The host validates references, never semantic completeness. No answer prevents finish unless an explicit gap is recorded; a partial answer seals a partial result. research_answers persists bounded candidate answers and artifact pointers across later reading. Revising an answer preserves old versions; changing only statement or label is not new evidence. Worker answers are untrusted candidates and do not satisfy the parent's requirements.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nWhen available_financial_extract is true, inspect the host's financial_tasks catalog. Each task fixes the company, source, frozen selection, method policy and available table batches. Use source_excerpt to select the pending batch relevant to the user's request; excerpts are navigation, not body-reading receipts. The financial_task_catalog artifact retains the full initial catalog. This task reuses its explicitly registered selection; it does not establish whole-filing recall.\n\nPlan a separate kind=financial_extract requirement with financial_task_id and batch_index. Execute action=financial_extract with financial_extraction={task_id,batch_index,method_id?}, referencing exactly that requirement. Omit method_id to select the task default, or choose only an allowed_method_ids entry. The execution host loads that method's versioned Skill and Prompt before extracting; do not send paths, jobs, financial answers, period replacements or model settings. Respect max_new_batches. Successful batches show candidate status and their receipt; do not rerun them merely to repeat a completed task.\n\nA candidate_financial_extraction receipt means a separate candidate dataset was generated. It does not update the active query baseline, satisfy a numeric query, prove source body was delivered to you, or approve financial semantics. Check returned raw/normalized counts and gaps; zero normalized records and unresolved drafts remain visible limitations. Only the matching task/catalog/batch receipt can complete its financial_extract requirement. Failed or unavailable execution requires an explicit gap. A run containing only these completed requirements ends candidate_ready; all outputs still need independent review and adoption.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": true,
+  "available_financial_extract": false,
+  "financial_tasks": [],
+  "financial_task_catalog": null,
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req_revenue_query",
+        "reason": "evidence_or_explicit_gap_required"
+      },
+      {
+        "requirement_id": "req_revenue_query",
+        "reason": "numeric_requirement_incomplete"
+      },
+      {
+        "requirement_id": "req_revenue_query",
+        "reason": "record_selection_required"
+      },
+      {
+        "requirement_id": "req_revenue_source",
+        "reason": "evidence_or_explicit_gap_required"
+      },
+      {
+        "requirement_id": "req_revenue_source",
+        "reason": "source_body_not_delivered"
+      },
+      {
+        "requirement_id": "req_revenue_source",
+        "reason": "delivery_selection_required"
+      }
+    ],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [],
+    "omitted_count": 0,
+    "byte_limit": 12000
+  },
+  "read_body_catalog": {
+    "navigation_only": true,
+    "items": [],
+    "omitted_count": 0,
+    "byte_limit": 15000
+  },
+  "source_leads": [],
+  "source_lead_count": 0,
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 1,
+      "action": "invalid",
+      "status": "rejected"
+    },
+    {
+      "step": 2,
+      "action": "load_skill",
+      "status": "skill_loaded"
+    },
+    {
+      "step": 3,
+      "action": "invalid",
+      "status": "rejected"
+    },
+    {
+      "step": 4,
+      "action": "plan",
+      "status": "planned"
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 36
+}

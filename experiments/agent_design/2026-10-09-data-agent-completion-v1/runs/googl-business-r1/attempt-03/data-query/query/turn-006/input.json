@@ -1,0 +1,2077 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "Alphabet 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {},
+  "record_selection": {},
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-business-r1/attempt-02/data-query/query",
+      "manifest_sha256": "a8d5814751fab0bb43cb5e28d628faa34e7db0e95942e5f88fd0e5957a1534bb"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-business-r1/attempt-02/review-01",
+      "manifest_sha256": "ae3a13f0efd7522b5ace8d351e8dd9b8cb1c0066649d980884ba58aa641c4ca9"
+    },
+    "assessment": {
+      "packet_id": "data-review-76867b666023dc0bf46e1311",
+      "facts": [],
+      "requirements": [
+        {
+          "requirement_id": "req-segments",
+          "verdict": "insufficient_evidence",
+          "rationale": "No source bodies, selected blocks or facts were delivered. The requirement lists evidence IDs, but no original text is available to verify the reportable segments, their main businesses, the full lists, or the qualifiers. The query gap reports no literal match and program gaps show the delivery selection is missing.",
+          "citations": []
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "verdict": "requires_more_source_content",
+          "rationale": "source_documents is empty, so no body text from googl-2025-10k was delivered. Nothing can be cited, and the question cannot be answered or verified from this packet.",
+          "citations": []
+        }
+      ],
+      "question_coverage": "incomplete",
+      "coverage_reason": "The packet has no delivered original paragraphs. The Business-section descriptions of Google Services, Google Cloud and Other Bets, the use-case list, the Alphabet-level qualifier and the segment note cannot be checked. Program gaps confirm that no reviewable blocks or facts exist.",
+      "missing_information": [
+        "Original 10-K text naming the reportable segments (Google Services, Google Cloud, Other Bets)",
+        "Business-section descriptions of the main businesses in each segment, including full product and revenue-category lists",
+        "Complete Google Cloud offerings and use-case list",
+        "Other Bets business description",
+        "Alphabet-level activities qualifier",
+        "Segment-reporting note on reportable segments"
+      ],
+      "revision_requests": [
+        "Deliver the selected original source blocks from googl-2025-10k that support req-segments, including the complete lists, qualifiers and the segment note.",
+        "Provide facts tied to the delivered blocks so they can be checked for support and relevance."
+      ],
+      "body_checks": [],
+      "limitations": [
+        "Image contents were not read; none were relevant here because no text was delivered.",
+        "Query status is limited with a document_search no_literal_match gap."
+      ]
+    }
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0001652044",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0999c153d4fe5680",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "goog:YouTubeAdvertisingRevenueMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0e4cf3e26bdf2542",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "us-gaap:AllOtherSegmentsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f4778c293e99d93",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-0f8e85426ccbad02",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ConsolidationItemsAxis": "us-gaap:OperatingSegmentsMember",
+              "us-gaap:StatementBusinessSegmentsAxis": "goog:GoogleCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-2beab2839ba28e39",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "goog:AmericasExcludingUnitedStatesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0001652044-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0001652044",
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "Cash payments for property and equipment / 固定资产购置现金支出",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported cash payments to acquire property, plant and equipment. Not total investment, accrual additions, or free cash flow; do not reverse the cash-payment sign.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments",
+            "capex cash payments",
+            "payments to acquire property plant and equipment",
+            "固定资产购置现金支出",
+            "PaymentsToAcquirePropertyPlantAndEquipment"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "Net income / 净利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported net income or loss for the stated scope and period. Preserve the source attribution; do not substitute an adjusted or attributable-income concept.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income",
+            "net income",
+            "net loss",
+            "净利润",
+            "净亏损",
+            "NetIncomeLoss"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "Operating cash flow / 经营现金流",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Net cash provided by or used in operating activities for the stated duration. Not operating profit, free cash flow, or an ending cash balance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow",
+            "operating cash flow",
+            "cash from operations",
+            "经营现金流",
+            "经营活动现金流量净额",
+            "NetCashProvidedByUsedInOperatingActivities"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "Operating income / 营业利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported operating income or loss after operating costs and expenses. Not net income, EBITDA, or operating cash flow.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income",
+            "operating income",
+            "operating loss",
+            "income from operations",
+            "营业利润",
+            "经营利润",
+            "OperatingIncomeLoss"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "Revenue / 收入",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported revenue under the mapped revenue concept; preserve consolidated versus dimensional scope. Not cash receipts, bookings, or guidance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue",
+            "revenues",
+            "net sales",
+            "收入",
+            "营业收入",
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "Revenues",
+            "SalesRevenueNet"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-7d95f8d35723138498f123ab6c2e2b8e675d13bb9a7a1dae0fda631376a0f962",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        },
+        {
+          "item_id": "fiscal-a0159795ad844be9110c771f07f29319585ff103ad0cd9a42d1f56ecba7a8bd5",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2023,
+          "period": {
+            "kind": "year",
+            "start": "2023-01-01",
+            "end": "2023-12-31"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-4290691e78da1e2a42fb5351",
+            "block_id": "block-000753-53762a3b",
+            "header": {
+              "row": 2,
+              "column": 3,
+              "text": "2023"
+            },
+            "annual_caption": {
+              "row": 1,
+              "column": 3,
+              "text": "Year Ended December 31,"
+            }
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        },
+        {
+          "item_id": "fiscal-bef82c1ed9da6f1409ee8c3553e8726f31f767ee84b2f201ec210714bf7eb1ba",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2024,
+          "period": {
+            "kind": "year",
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-e114a7300acd536d7bd2f07c",
+            "block_id": "block-000753-53762a3b",
+            "header": {
+              "row": 2,
+              "column": 9,
+              "text": "2024"
+            },
+            "annual_caption": {
+              "row": 1,
+              "column": 3,
+              "text": "Year Ended December 31,"
+            }
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "googl-2025-10k",
+          "company_id": "sec-0001652044",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+          "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "document_id": "googl-2025-10k",
+          "index_id": "didx-77aca7159c9571b7",
+          "index_folder": "indexes/googl-2025-10k",
+          "raw_file": "raw/googl-2025-10k.html",
+          "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+          "form": "10-K",
+          "period_end": "2025-12-31",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2026-02-05",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+              }
+            },
+            {
+              "fiscal_year": 2023,
+              "period": {
+                "kind": "year",
+                "start": "2023-01-01",
+                "end": "2023-12-31"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-4290691e78da1e2a42fb5351",
+                "block_id": "block-000753-53762a3b",
+                "header": {
+                  "row": 2,
+                  "column": 3,
+                  "text": "2023"
+                },
+                "annual_caption": {
+                  "row": 1,
+                  "column": 3,
+                  "text": "Year Ended December 31,"
+                }
+              }
+            },
+            {
+              "fiscal_year": 2024,
+              "period": {
+                "kind": "year",
+                "start": "2024-01-01",
+                "end": "2024-12-31"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-e114a7300acd536d7bd2f07c",
+                "block_id": "block-000753-53762a3b",
+                "header": {
+                  "row": 2,
+                  "column": 9,
+                  "text": "2024"
+                },
+                "annual_caption": {
+                  "row": 1,
+                  "column": 3,
+                  "text": "Year Ended December 31,"
+                }
+              }
+            }
+          ],
+          "parsed_package": {
+            "export_version": "uteki-parsed-document-v1",
+            "package_id": "parsed-e5c568989414ee95a62d38a3",
+            "manifest_path": "indexes/googl-2025-10k/manifest.json",
+            "manifest_sha256": "468b4a4e7afd55dbc04ffc5bebccf3c264f838c6f478ae0a2e88f1223ced7a89",
+            "source_path": "indexes/googl-2025-10k/source.json",
+            "document_path": "indexes/googl-2025-10k/document.html",
+            "status": "candidate_parsed_material",
+            "semantic_review": "not_reviewed"
+          },
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes",
+            "html_table_structure",
+            "parsed_document_package"
+          ],
+          "stage_coverage": {
+            "schema_version": "source-stage-coverage-v1",
+            "original": {
+              "status": "hash_verified",
+              "byte_count": 2616499,
+              "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161"
+            },
+            "reading": {
+              "status": "indexed",
+              "parser_version": "sec-source-blocks-v0.1.11",
+              "block_count": 1338,
+              "block_type_counts": {
+                "heading_candidate": 273,
+                "image": 2,
+                "list_item": 148,
+                "other": 11,
+                "page_marker": 97,
+                "paragraph": 622,
+                "table": 185
+              },
+              "index_diagnostic_count": 1
+            },
+            "tables": {
+              "status": "structure_parsed",
+              "table_node_count": 185,
+              "tables_with_cells": 185,
+              "tables_without_cells": 0,
+              "cell_count": 10015,
+              "layout_role_counts": {
+                "running_header": 97,
+                "table_of_contents": 1,
+                "unclassified": 87
+              },
+              "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+              "financial_table_semantics": "not_evaluated"
+            },
+            "numeric": {
+              "status": "candidate_records",
+              "record_count": 111,
+              "evidence_count": 111,
+              "gap_count": 1521,
+              "adapter": "us-gaap-inline-v1",
+              "supported_taxonomy": "US_GAAP",
+              "supported_currencies": [
+                "USD"
+              ],
+              "supported_metric_ids": [
+                "capex_cash_payments",
+                "net_income",
+                "operating_cash_flow",
+                "operating_income",
+                "revenue",
+                "revenue_including_assessed_tax"
+              ],
+              "period_support": "complete_month_boundaries_only",
+              "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+              "financial_package_completeness": "not_evaluated",
+              "semantic_review": "not_evaluated",
+              "adoption": "candidate"
+            }
+          },
+          "image_block_count": 2
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 3426,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 8,
+        "total_count": 21,
+        "bytes_returned": 2957,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "scope_id": "scope-6e33cd9d940b822849d88367",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "f52047ae48ebf93aabbb651de919eab578f9baa6d8ad257e4d37bda50302f502",
+          "offset": 8,
+          "checksum": "9bda42d7d87b929583d316b17be1a99cbbb3b3142b1c4e0e092c2df4071a81e7"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 3304,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "returned_count": 3,
+        "total_count": 3,
+        "bytes_returned": 1367,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segments",
+      "description": "Original 10-K text from googl-2025-10k naming Alphabet's reportable segments (Google Services, Google Cloud, Other Bets), the Business-section descriptions of the main businesses in each segment including complete product/offering/use-case lists, the Alphabet-level activities qualifier, and the segment-reporting note on reportable segments."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "googl-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segments",
+      "description": "Original 10-K text from googl-2025-10k naming Alphabet's reportable segments (Google Services, Google Cloud, Other Bets), the Business-section descriptions of the main businesses in each segment including complete product/offering/use-case lists, the Alphabet-level activities qualifier, and the segment-reporting note on reportable segments.",
+      "evidence_ids": [
+        "ev-5a3d32530597a388d7e77065"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-ba90ede9516c1ddf7fccb6579a2c0c47",
+    "kind": "run_state",
+    "path": "artifacts/art-ba90ede9516c1ddf7fccb6579a2c0c47.json",
+    "sha256": "00647e59a4e22d8130f0f1aeaeaacccd403da64114dc7b22e96b0c6a8619290b",
+    "size_bytes": 1855,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+      "company_ids": [
+        "sec-0001652044"
+      ],
+      "source_snapshot_ids": [
+        "googl-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    },
+    "scope_id": "scope-6e33cd9d940b822849d88367",
+    "created_step": 6,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+      "kind": "context",
+      "path": "artifacts/art-cde89026c3e4356d6095adaac71b168e.json",
+      "sha256": "b9ce62846812d4d93420bd17a76d8599aced49d28c8fbcc3c142c93aeaedfef5",
+      "size_bytes": 22747,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-6e33cd9d940b822849d88367",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-5a3d32530597a388d7e77065"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-35b331606f90cea8e94a560a9c17c9ab",
+    "sha256": "f6d9db25c836a70d5cb72ca39875a0d84dac09472af9c1cc01f9267dc4ae94d4",
+    "scope_id": "scope-6e33cd9d940b822849d88367",
+    "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 1,
+    "total_count": 1,
+    "returned_count": 1,
+    "bytes_returned": 730,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "status": "tool_returned",
+    "evidence_ids": [
+      "ev-5a3d32530597a388d7e77065"
+    ],
+    "cache_hit": false,
+    "result": {
+      "index_id": "didx-77aca7159c9571b7",
+      "node_id": "didx-77aca7159c9571b7-part-i-item-1",
+      "reading_group_version": "reading-groups-v0.4",
+      "reading_groups": [],
+      "expansion_note": "Complete list/table/turn/Q&A context may exceed requested count; original blocks unchanged.",
+      "blocks": [
+        {
+          "block_id": "block-000061-5c0c0c66",
+          "dom_path": "/html/body/div[67]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 61,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_16",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "700"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "padding-left",
+              "54pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "-54pt"
+            ]
+          ],
+          "table": null,
+          "text": "ITEM 1.BUSINESS",
+          "text_hash": "5c0c0c66085acdce4a7a67d4882a64e61ceed1d7430c9bffd8ab304b5f8253ee",
+          "type": "heading_candidate"
+        },
+        {
+          "block_id": "block-000062-d4b1ea57",
+          "dom_path": "/html/body/div[69]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 62,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "700"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "Overview",
+          "text_hash": "d4b1ea5708dd532930a85188b45aff6f0a3ed458500c7577e0127a538eb0d100",
+          "type": "heading_candidate"
+        },
+        {
+          "block_id": "block-000063-0c6683ca",
+          "dom_path": "/html/body/div[70]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 63,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "text": "As our founders Larry and Sergey wrote in the original founders' letter, \"Google is not a conventional company. We do not intend to become one.\" That unconventional spirit has been a driving force throughout our history, inspiring us to tackle big problems and invest in moonshots. It led us to be a pioneer in the development of artificial intelligence (AI) and, since 2016, be an AI-first company. We continue this work under the leadership of Alphabet and Google CEO, Sundar Pichai.",
+          "text_hash": "0c6683ca3ecc8367796b5d5934b2864ce71d473e85fbba2b931887e8144790c8",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000064-ab2556c8",
+          "dom_path": "/html/body/div[71]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 64,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "115%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "text": "Alphabet is a collection of businesses — the largest of which is Google. We report Google in two segments, Google Services and Google Cloud, and all non-Google businesses collectively as Other Bets. Supporting these businesses, we have centralized certain AI-related research and development focused on advanced research in AI and developing the frontier models that serve our businesses, which is reported in Alphabet-level activities. Alphabet's structure is about helping each of our businesses prosper through strong leaders and independence.",
+          "text_hash": "ab2556c8c13f84c98da87bfca59a6ac497b3b7fe3850f9bc849621e872e9dddc",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000065-068fa324",
+          "dom_path": "/html/body/div[72]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 65,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-style",
+              "italic"
+            ],
+            [
+              "font-weight",
+              "700"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "Access and Technology for Everyone",
+          "text_hash": "068fa324640fb2b537c22bbcb2cf22e143f71d0e65a5001b1572b759272f92de",
+          "type": "heading_candidate"
+        },
+        {
+          "block_id": "block-000066-5f2ed3aa",
+          "dom_path": "/html/body/div[73]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 66,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "text": "The Internet is one of the world’s most powerful equalizers; it propels ideas, people, and businesses large and small. Our mission to organize the world’s information and make it universally accessible and useful is as relevant today as it was when we were founded in 1998. Since then, we have evolved from a company that helps people find answers to a company that also helps people get things done.",
+          "text_hash": "5f2ed3aa2e92eb17b139afd9de88454624c870c84dd6be9f05f133ad55991d7a",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000067-ab181097",
+          "dom_path": "/html/body/div[74]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 67,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "text": "We are focused on building an even more helpful Google for everyone, and we aspire to give everyone the tools they need to increase their knowledge, health, happiness, and success. Google Search helps people find information and make sense of the world in more natural and intuitive ways, with trillions of searches on Google every year. YouTube provides people with entertainment, information, and opportunities to learn something new and helps support the creator economy through the YouTube Partner Program. Google Cloud helps customers build for the future, improve productivity, reduce costs, and unlock new growth engines. We continually innovate and build new products and features to help our users, partners, customers, and communities and have invested more than $200 billion in research and development in the last five years in support of these efforts.",
+          "text_hash": "ab181097c313f6cf2a0e7dec1c9af49d699588114f66f70364289c8239d8b305",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000068-267c2369",
+          "dom_path": "/html/body/div[75]/div/div",
+          "image_asset_id": null,
+          "layout_role": "reported_page_number",
+          "ordinal": 68,
+          "reported_page": 3,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "center"
+            ]
+          ],
+          "table": null,
+          "text": "3.",
+          "text_hash": "267c23695b6e8fc29bd88b9f5d1962d3d208fa9c2fafd974614e6ab3b84fa55c",
+          "type": "page_marker"
+        },
+        {
+          "block_id": "block-000069-2f8c99ac",
+          "dom_path": "/html/body/div[76]/div/table",
+          "image_asset_id": null,
+          "layout_role": "running_header",
+          "ordinal": 69,
+          "reported_page": 4,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [],
+          "table": {
+            "cells": [
+              {
+                "colspan": 1,
+                "column": 0,
+                "is_header": false,
+                "row": 0,
+                "rowspan": 1,
+                "text": ""
+              },
+              {
+                "colspan": 1,
+                "column": 1,
+                "is_header": false,
+                "row": 0,
+                "rowspan": 1,
+                "text": ""
+              },
+              {
+                "colspan": 1,
+                "column": 2,
+                "is_header": false,
+                "row": 0,
+                "rowspan": 1,
+                "text": ""
+              },
+              {
+                "colspan": 1,
+                "column": 3,
+                "is_header": false,
+                "row": 0,
+                "rowspan": 1,
+                "text": ""
+              },
+              {
+                "colspan": 1,
+                "column": 4,
+                "is_header": false,
+                "row": 0,
+                "rowspan": 1,
+                "text": ""
+              },
+              {
+                "colspan": 1,
+                "column": 5,
+                "is_header": false,
+                "row": 0,
+                "rowspan": 1,
+                "text": ""
+              },
+              {
+                "colspan": 3,
+                "column": 0,
+                "is_header": false,
+                "row": 1,
+                "rowspan": 1,
+                "text": "Table of Contents"
+              },
+              {
+                "colspan": 3,
+                "column": 3,
+                "is_header": false,
+                "row": 1,
+                "rowspan": 1,
+                "text": "Alphabet Inc."
+              }
+            ],
+            "column_count": 6,
+            "row_count": 2
+          },
+          "text": "Table of ContentsAlphabet Inc.",
+          "text_hash": "2f8c99ac0bba90fcf6bfbc211cf5f2a488da9b5f380b95023f9e4d2c09546ec6",
+          "type": "table"
+        },
+        {
+          "block_id": "block-000070-2012752f",
+          "dom_path": "/html/body/div[77]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 70,
+          "reported_page": 4,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-style",
+              "italic"
+            ],
+            [
+              "font-weight",
+              "700"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "Making AI Helpful for Everyone",
+          "text_hash": "2012752f97d68832276ba98b871fdf7b4bd00fcceae9d42d3e567f6ef0e4618c",
+          "type": "heading_candidate"
+        },
+        {
+          "block_id": "block-000071-46037f96",
+          "dom_path": "/html/body/div[78]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 71,
+          "reported_page": 4,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "text": "We believe AI is a profound platform shift that can bring meaningful and positive change to people and societies across the world, and to our business. We aim to build the most advanced, safe, and responsible AI through our full-stack approach, which spans AI-optimized infrastructure; world-class research, including models and tooling; and our products and platforms that bring AI to billions of people, developers, and enterprises.",
+          "text_hash": "46037f96e9a42e04c3de8e91e2ea63e4e35ae207d0c7f57cdd4eda9cfa16640a",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000072-8371f0be",
+          "dom_path": "/html/body/div[79]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 72,
+          "reported_page": 4,
+          "source_anchor": "i6be430fe3ebf411481dcec8b0abe9149_19",
+          "style_signature": [
+            [
+              "font-family",
+              "'arial',sans-serif"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-weight",
+              "400"
+            ],
+            [
+              "line-height",
+              "120%"
+            ],
+            [
+              "margin-top",
+              "6pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ],
+            [
+              "text-indent",
+              "22.5pt"
+            ]
+          ],
+          "table": null,
+          "text": "At the foundation of our full-stack approach is our AI-optimized infrastructure — a key differentiator enabling us to power our own products, such as Search and YouTube, and support the services we provide to our Google Cloud customers. Our technical infrastructure allows us to use and offer our customers a range of AI accelerator options, including specialized Graphics Processing Units (GPUs) and our own custom-built Tensor Processing Units (TPUs), such as Ironwood, our seventh-generation TPU. We are focused on driving efficiencies in our data centers, allowing us to leverage our technical infrastructure to deliver our products and services at an increasing scale while simultaneously enabling world-class research and model development.",
+          "text_hash": "8371f0be8b31f9fb79c01de33a080d5633ac7e7012ba58492daa0baaf088dd58",
+          "type": "paragraph"
+        }
+      ],
+      "previous_block_id": null,
+      "next_block_id": "block-000073-cb9cb3f3",
+      "context_note": "Check preceding heading/introduction and following list continuation; tables retain cells and XBRL.",
+      "execution_schema_version": "research-execution-v1",
+      "scope_id": "scope-6e33cd9d940b822849d88367",
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "candidate_data": true,
+      "source": {
+        "source_snapshot_id": "googl-2025-10k",
+        "company_id": "sec-0001652044",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+        "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "document_id": "googl-2025-10k",
+        "index_id": "didx-77aca7159c9571b7",
+        "index_folder": "indexes/googl-2025-10k",
+        "raw_file": "raw/googl-2025-10k.html",
+        "raw_file_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+        "form": "10-K",
+        "period_end": "2025-12-31",
+        "declared_mime_type": "text/html",
+        "parsed_mime_type": "text/html",
+        "available_at": "2026-02-05",
+        "status": "candidate",
+        "fiscal_periods": [
+          {
+            "fiscal_year": 2025,
+            "period": {
+              "kind": "year",
+              "start": "2025-01-01",
+              "end": "2025-12-31"
+            }
+          },
+          {
+            "fiscal_year": 2023,
+            "period": {
+              "kind": "year",
+              "start": "2023-01-01",
+              "end": "2023-12-31"
+            },
+            "basis_evidence": {
+              "method": "inline-table-year-v1",
+              "evidence_id": "ev-4290691e78da1e2a42fb5351",
+              "block_id": "block-000753-53762a3b",
+              "header": {
+                "row": 2,
+                "column": 3,
+                "text": "2023"
+              },
+              "annual_caption": {
+                "row": 1,
+                "column": 3,
+                "text": "Year Ended December 31,"
+              }
+            }
+          },
+          {
+            "fiscal_year": 2024,
+            "period": {
+              "kind": "year",
+              "start": "2024-01-01",
+              "end": "2024-12-31"
+            },
+            "basis_evidence": {
+              "method": "inline-table-year-v1",
+              "evidence_id": "ev-e114a7300acd536d7bd2f07c",
+              "block_id": "block-000753-53762a3b",
+              "header": {
+                "row": 2,
+                "column": 9,
+                "text": "2024"
+              },
+              "annual_caption": {
+                "row": 1,
+                "column": 3,
+                "text": "Year Ended December 31,"
+              }
+            }
+          }
+        ],
+        "parsed_package": {
+          "export_version": "uteki-parsed-document-v1",
+          "package_id": "parsed-e5c568989414ee95a62d38a3",
+          "manifest_path": "indexes/googl-2025-10k/manifest.json",
+          "manifest_sha256": "468b4a4e7afd55dbc04ffc5bebccf3c264f838c6f478ae0a2e88f1223ced7a89",
+          "source_path": "indexes/googl-2025-10k/source.json",
+          "document_path": "indexes/googl-2025-10k/document.html",
+          "status": "candidate_parsed_material",
+          "semantic_review": "not_reviewed"
+        },
+        "capabilities": [
+          "read_context",
+          "literal_search",
+          "source_bytes",
+          "html_table_structure",
+          "parsed_document_package"
+        ],
+        "stage_coverage": {
+          "schema_version": "source-stage-coverage-v1",
+          "original": {
+            "status": "hash_verified",
+            "byte_count": 2616499,
+            "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161"
+          },
+          "reading": {
+            "status": "indexed",
+            "parser_version": "sec-source-blocks-v0.1.11",
+            "block_count": 1338,
+            "block_type_counts": {
+              "heading_candidate": 273,
+              "image": 2,
+              "list_item": 148,
+              "other": 11,
+              "page_marker": 97,
+              "paragraph": 622,
+              "table": 185
+            },
+            "index_diagnostic_count": 1
+          },
+          "tables": {
+            "status": "structure_parsed",
+            "table_node_count": 185,
+            "tables_with_cells": 185,
+            "tables_without_cells": 0,
+            "cell_count": 10015,
+            "layout_role_counts": {
+              "running_header": 97,
+              "table_of_contents": 1,
+              "unclassified": 87
+            },
+            "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+            "financial_table_semantics": "not_evaluated"
+          },
+          "numeric": {
+            "status": "candidate_records",
+            "record_count": 111,
+            "evidence_count": 111,
+            "gap_count": 1521,
+            "adapter": "us-gaap-inline-v1",
+            "supported_taxonomy": "US_GAAP",
+            "supported_currencies": [
+              "USD"
+            ],
+            "supported_metric_ids": [
+              "capex_cash_payments",
+              "net_income",
+              "operating_cash_flow",
+              "operating_income",
+              "revenue",
+              "revenue_including_assessed_tax"
+            ],
+            "period_support": "complete_month_boundaries_only",
+            "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+            "financial_package_completeness": "not_evaluated",
+            "semantic_review": "not_evaluated",
+            "adoption": "candidate"
+          }
+        },
+        "image_block_count": 2
+      },
+      "source_snapshot_id": "googl-2025-10k",
+      "company_id": "sec-0001652044",
+      "source_period_end": "2025-12-31",
+      "available_at": "2026-02-05",
+      "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1652044/000165204426000018/goog-20251231.htm",
+      "status": "read",
+      "gaps": [],
+      "requested_start_block_id": "block-000061-5c0c0c66",
+      "block_ids": [
+        "block-000061-5c0c0c66",
+        "block-000062-d4b1ea57",
+        "block-000063-0c6683ca",
+        "block-000064-ab2556c8",
+        "block-000065-068fa324",
+        "block-000066-5f2ed3aa",
+        "block-000067-ab181097",
+        "block-000068-267c2369",
+        "block-000069-2f8c99ac",
+        "block-000070-2012752f",
+        "block-000071-46037f96",
+        "block-000072-8371f0be"
+      ],
+      "next_cursor": {
+        "cursor_version": "document-cursor-v1",
+        "scope_id": "scope-6e33cd9d940b822849d88367",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "source_snapshot_id": "googl-2025-10k",
+        "index_id": "didx-77aca7159c9571b7",
+        "node_id": "didx-77aca7159c9571b7-part-i-item-1",
+        "kind": "read",
+        "start_block_id": "block-000073-cb9cb3f3"
+      },
+      "node_complete": false,
+      "coverage": "Returned full blocks only; reaching the node end does not prove all earlier blocks were read."
+    },
+    "result_artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+      "kind": "context",
+      "path": "artifacts/art-cde89026c3e4356d6095adaac71b168e.json",
+      "sha256": "b9ce62846812d4d93420bd17a76d8599aced49d28c8fbcc3c142c93aeaedfef5",
+      "size_bytes": 22747,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-6e33cd9d940b822849d88367",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "googl-2025-10k"
+      ],
+      "evidence_id": "ev-5a3d32530597a388d7e77065"
+    },
+    "preview_truncated": false,
+    "reads": [],
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 5,
+      "action": "read_source",
+      "requirement_ids": [
+        "req-segments"
+      ],
+      "request_fingerprint": "f7aaed620a7ac2e8b7848bef4b0a906b3fdb5bc83fb516bb89f7ecb47aedc263",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "reading",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 17452,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-2139329f6d876e4633b8e999cc416529",
+      "kind": "tool_output",
+      "path": "artifacts/art-2139329f6d876e4633b8e999cc416529.json",
+      "sha256": "dabfd11ad3d179bd8783abae1dad3fac793122a15c752259ac91e19911750b11",
+      "size_bytes": 24411,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+        "company_ids": [
+          "sec-0001652044"
+        ],
+        "source_snapshot_ids": [
+          "googl-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-6e33cd9d940b822849d88367",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "0c46dd6c9fa8a0f8b5f3ba4ffaf1561f3c54b702496a9c997244c07ef1698e33",
+    "content": "---\nname: data-agent-query\nversion: 10\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nFor purpose=analysis_evidence, the Data Agent retrieves original material for a separate Analysis Agent. The original question can be narrative; use kind=source_evidence for its source material and kind=query for numeric retrieval. Do not create source_answer requirements or author the downstream report. Navigate using the small scoped catalog/schema and source index, then read relevant original blocks with necessary units, periods, introductions and qualifiers. Do not default to full-report or whole-chapter delivery. Preserve explicit gaps when evidence or resources are insufficient. Semantic completeness is reviewed separately after retrieval.\n\nIn analysis_evidence, query original records/operands; calculation requirements are not supported by its review handoff. Every numeric query requirement must declare records criteria. Use source_evidence for document-only retrieval. After querying, select_records with record_selection.record_ids=[evidence_id,...], requirement_ids and a reason selects the final records. These IDs are ev- record evidence IDs, not original record_id values. Retain at least one record per declared entity/metric/period/value_kind criterion, preserving explicit units and source qualifications; trim redundant disclosures when one source is sufficient. Only records returned by that requirement's same-scope query are eligible. Selection replaces previous selection, preserves the full audit trail, and is required before finish. After gathering a source_evidence requirement, use select_evidence with delivery.blocks=[{context_id,block_id}], requirement_ids and a reason. Only fully delivered same-source blocks may be selected. This replaces that requirement's final delivery selection, while retaining all exploration snapshots. Keep units, periods, full relevant lists and necessary qualifications. Do not select unrelated exploration. The reviewer checks relevance as well as support. read_body_catalog preserves short navigation previews and exact reread pointers for earlier complete blocks; do not restart discovery because the latest observation changed. Feedback from a prior sealed review preserves the original question/scope and directs a new complete evidence package, not just an addendum.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nFor purpose=question_answer, use kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.\n\nAn answer must declare model_claimed_coverage, coverage_note and unresolved_questions. partial requires concrete unresolved questions; claimed_complete requires none but remains a model judgment. The host validates references, never semantic completeness. No answer prevents finish unless an explicit gap is recorded; a partial answer seals a partial result. research_answers persists bounded candidate answers and artifact pointers across later reading. Revising an answer preserves old versions; changing only statement or label is not new evidence. Worker answers are untrusted candidates and do not satisfy the parent's requirements.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nWhen available_financial_extract is true, inspect the host's financial_tasks catalog. Each task fixes the company, source, frozen selection, method policy and available table batches. Use source_excerpt to select the pending batch relevant to the user's request; excerpts are navigation, not body-reading receipts. The financial_task_catalog artifact retains the full initial catalog. This task reuses its explicitly registered selection; it does not establish whole-filing recall.\n\nPlan a separate kind=financial_extract requirement with financial_task_id and batch_index. Execute action=financial_extract with financial_extraction={task_id,batch_index,method_id?}, referencing exactly that requirement. Omit method_id to select the task default, or choose only an allowed_method_ids entry. The execution host loads that method's versioned Skill and Prompt before extracting; do not send paths, jobs, financial answers, period replacements or model settings. Respect max_new_batches. Successful batches show candidate status and their receipt; do not rerun them merely to repeat a completed task.\n\nA candidate_financial_extraction receipt means a separate candidate dataset was generated. It does not update the active query baseline, satisfy a numeric query, prove source body was delivered to you, or approve financial semantics. Check returned raw/normalized counts and gaps; zero normalized records and unresolved drafts remain visible limitations. Only the matching task/catalog/batch receipt can complete its financial_extract requirement. Failed or unavailable execution requires an explicit gap. A run containing only these completed requirements ends candidate_ready; all outputs still need independent review and adoption.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": true,
+  "available_financial_extract": false,
+  "financial_tasks": [],
+  "financial_task_catalog": null,
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req-segments",
+        "reason": "delivery_selection_required"
+      }
+    ],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000061-5c0c0c66",
+        "text": "ITEM 1.BUSINESS",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000062-d4b1ea57",
+        "text": "Overview",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000063-0c6683ca",
+        "text": "As our founders Larry and Sergey wrote in the original founders' letter, \"Google is not a conventional company. We do not intend to become one.\" That unconventional spirit has been a driving force throughout our history, inspiring us to tackle big problems and invest in moonshots. It led us to be a pioneer in the development of artificial intelligence (AI) and, since 2016, be an AI-first company. We continue this work under the leadership of Alphabet and Google CEO, Sundar Pichai.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000064-ab2556c8",
+        "text": "Alphabet is a collection of businesses — the largest of which is Google. We report Google in two segments, Google Services and Google Cloud, and all non-Google businesses collectively as Other Bets. Supporting these businesses, we have centralized certain AI-related research and development focused on advanced research in AI and developing the frontier models that serve our businesses, which is reported in Alphabet-level activities. Alphabet's structure is about helping each of our businesses prosper through strong leaders and independence.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000065-068fa324",
+        "text": "Access and Technology for Everyone",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000066-5f2ed3aa",
+        "text": "The Internet is one of the world’s most powerful equalizers; it propels ideas, people, and businesses large and small. Our mission to organize the world’s information and make it universally accessible and useful is as relevant today as it was when we were founded in 1998. Since then, we have evolved from a company that helps people find answers to a company that also helps people get things done.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000067-ab181097",
+        "text": "We are focused on building an even more helpful Google for everyone, and we aspire to give everyone the tools they need to increase their knowledge, health, happiness, and success. Google Search helps people find information and make sense of the world in more natural and intuitive ways, with trillions of searches on Google every year. YouTube provides people with entertainment, information, and opportunities to learn something new and helps support the creator economy through the YouTube Partner Program. Google Cloud helps customers build for the future, improve productivity, reduce costs, and unlock new growth engines. We continually innovate and build new products and features to help our users, partners, customers, and communities and have invested more than $200 billion in research and development in the last five years in support of these efforts.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000068-267c2369",
+        "text": "3.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000069-2f8c99ac",
+        "text": "Table of ContentsAlphabet Inc.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/8/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000070-2012752f",
+        "text": "Making AI Helpful for Everyone",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000071-46037f96",
+        "text": "We believe AI is a profound platform shift that can bring meaningful and positive change to people and societies across the world, and to our business. We aim to build the most advanced, safe, and responsible AI through our full-stack approach, which spans AI-optimized infrastructure; world-class research, including models and tooling; and our products and platforms that bring AI to billions of people, developers, and enterprises.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/10/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-5a3d32530597a388d7e77065",
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000072-8371f0be",
+        "text": "At the foundation of our full-stack approach is our AI-optimized infrastructure — a key differentiator enabling us to power our own products, such as Search and YouTube, and support the services we provide to our Google Cloud customers. Our technical infrastructure allows us to use and offer our customers a range of AI accelerator options, including specialized Graphics Processing Units (GPUs) and our own custom-built Tensor Processing Units (TPUs), such as Ironwood, our seventh-generation TPU. We are focused on driving efficiencies in our data centers, allowing us to leverage our technical infrastructure to deliver our products and services at an increasing scale while simultaneously enabling world-class research and model development.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+          "company_ids": [
+            "sec-0001652044"
+          ],
+          "source_snapshot_ids": [
+            "googl-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/11/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 0,
+    "byte_limit": 12000
+  },
+  "read_body_catalog": {
+    "navigation_only": true,
+    "items": [
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000061-5c0c0c66",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "ITEM 1.BUSINESS",
+        "text_characters": 15,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000062-d4b1ea57",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "Overview",
+        "text_characters": 8,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000063-0c6683ca",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "As our founders Larry and Sergey wrote in the original founders' letter, \"Google is not a conventional company. We do not intend to become one.\" That unconventi",
+        "text_characters": 485,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000064-ab2556c8",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "Alphabet is a collection of businesses — the largest of which is Google. We report Google in two segments, Google Services and Google Cloud, and all non-Google ",
+        "text_characters": 546,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000065-068fa324",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "Access and Technology for Everyone",
+        "text_characters": 34,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000066-5f2ed3aa",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "The Internet is one of the world’s most powerful equalizers; it propels ideas, people, and businesses large and small. Our mission to organize the world’s infor",
+        "text_characters": 400,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000067-ab181097",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "We are focused on building an even more helpful Google for everyone, and we aspire to give everyone the tools they need to increase their knowledge, health, hap",
+        "text_characters": 865,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000070-2012752f",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "Making AI Helpful for Everyone",
+        "text_characters": 30,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000071-46037f96",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "We believe AI is a profound platform shift that can bring meaningful and positive change to people and societies across the world, and to our business. We aim t",
+        "text_characters": 434,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/10/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-5a3d32530597a388d7e77065",
+        "block_id": "block-000072-8371f0be",
+        "source_snapshot_id": "googl-2025-10k",
+        "text_preview": "At the foundation of our full-stack approach is our AI-optimized infrastructure — a key differentiator enabling us to power our own products, such as Search and",
+        "text_characters": 746,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-cde89026c3e4356d6095adaac71b168e",
+          "pointer": "/blocks/11/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 0,
+    "byte_limit": 15000
+  },
+  "source_leads": [],
+  "source_lead_count": 0,
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 1,
+      "action": "invalid",
+      "status": "rejected"
+    },
+    {
+      "step": 2,
+      "action": "load_skill",
+      "status": "skill_loaded"
+    },
+    {
+      "step": 3,
+      "action": "plan",
+      "status": "planned"
+    },
+    {
+      "step": 4,
+      "action": "outline_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 5,
+      "action": "read_source",
+      "status": "tool_returned"
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 35
+}

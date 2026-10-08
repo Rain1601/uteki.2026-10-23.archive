@@ -1,6 +1,6 @@
 # Uteki Beta
 
-换机器继续开发：先读 [2026-10-08交接入口](docs/MACHINE_HANDOFF.zh-CN.md)，包含安装、启动、私密状态恢复、当前Todo和费用边界。
+2026-10-09：Data Agent 已完成两份 FY2025 HTML 10-K 的准备、独立取材、复核补查与精确引用闭环。六题及一次目录分页复跑通过独立原文验收。[查看结果](http://127.0.0.1:8769/docs/design/data-agent-acceptance/data-agent-evidence-v1/) · [交付与费用](experiments/agent_design/2026-10-09-data-agent-completion-v1/DELIVERY.zh-CN.md) · [换机接续](docs/MACHINE_HANDOFF.zh-CN.md)。旧历史记录保持原样，范围不自动扩展到任意新公司或文档。
 
 An evaluation-driven AI investment research system.
 

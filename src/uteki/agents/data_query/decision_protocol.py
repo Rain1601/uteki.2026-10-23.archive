@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 
 
-DECISION_PROTOCOL_VERSION = 'data-agent-decision-v1'
+DECISION_PROTOCOL_VERSION = 'data-agent-decision-v3-record-selection'
 
 
 @dataclass(frozen=True)
@@ -21,6 +21,8 @@ ACTION_RULES = {
     'read_context': ActionRule('context', references=True),
     'reread': ActionRule('evidence_ids', references=True),
     'extract': ActionRule('extracts', references=True),
+    'select_evidence': ActionRule('delivery', references=True, reason=True),
+    'select_records': ActionRule('record_selection', references=True, reason=True),
     'answer': ActionRule('answer', references=True),
     'acquire': ActionRule('arguments', references=True),
     'materialize': ActionRule('arguments', references=True),

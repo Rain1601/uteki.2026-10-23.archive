@@ -1,0 +1,70 @@
+{
+  "action": "plan",
+  "delivery": null,
+  "delegation": null,
+  "financial_extraction": null,
+  "catalog": null,
+  "schema_probe": null,
+  "artifact_read": null,
+  "skill": null,
+  "requirement_ids": [],
+  "requirements": [
+    {
+      "kind": "query",
+      "query": {
+        "records": [
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          },
+          {
+            "entity_id": "sec-0000789019",
+            "metric_id": "revenue",
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "value_kind": "actual"
+          }
+        ],
+        "documents": [],
+        "calculations": []
+      },
+      "source_id": null,
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-revenue-query",
+      "description": "Microsoft consolidated total revenue for FY2025 (2024-07-01 to 2025-06-30) and FY2024 (2023-07-01 to 2024-06-30), with units, period and accounting basis from the FY2025 10-K."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-revenue-source",
+      "description": "Original 10-K income statement or table text showing total revenue for FY2025 and FY2024 (year ended June 30), including units (in millions USD) and period headings, for verification."
+    }
+  ],
+  "reason": "Plan numeric query for consolidated revenue and source evidence for original table verification.",
+  "plan": null,
+  "outline": null,
+  "read": null,
+  "search": null,
+  "context": null,
+  "evidence_ids": [],
+  "extracts": [],
+  "answer": null,
+  "arguments": null
+}

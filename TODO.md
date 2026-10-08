@@ -1,14 +1,22 @@
 # 开发待办与交接
 
-换机入口：[安装、恢复与接续说明](docs/MACHINE_HANDOFF.zh-CN.md)。当前代码与公开产物随Git交付；原预算、运行日志及私密Claude会话需单独恢复迁移包。09未通过，费用决定尚待确认。
+## 2026-10-09 最终交付 · 当前权威入口
 
-## 当前阅读入口 · 2026-10-09 · 01–09，暂缓 06
+**本轮完成：Data 独立取材与精确证据闭环。** 范围为既有 Microsoft / Alphabet FY2025 HTML 10-K。准备层核验2,739块、270表、213条现有记录；原六题与导航修复后的微软业务复跑均通过独立原件验收。系统自主选材、复核和修订，Codex负责工程及独立审查，没有运行时注入选段或答案。
 
-**当前行动已调整：先修系统自主取材，后修业务提取规则。** 旧Microsoft103块材料由Codex实验脚本预选，之前“独立执行”仅指给定材料后的模型生成/修订。新增 `agent business` 连接系统目录选材、全文阅读核验和业务提取，共享预算并保留实际输入。离线工程验证不等于真实模型验收；09仍未通过。[本轮接口与产物](docs/DATA_AGENT_RUNTIME_MATERIALS.zh-CN.md)。本轮无新增API调用，旧$8账本及unknown占用保留。下面2026-10-08及更早候选是历史记录，不能当新版自主结果。
+[结果、原文与过程](http://127.0.0.1:8769/docs/design/data-agent-acceptance/data-agent-evidence-v1/) · [交付、费用和限制](experiments/agent_design/2026-10-09-data-agent-completion-v1/DELIVERY.zh-CN.md) · [八项Todo当前边界](docs/DATA_AGENT_EXTRACTION_TODO.zh-CN.md)。本轮累计已知估算$47.007462，未知预留$1.244776；已停止付费任务。不是供应商实际账单。
+
+有序后续：**1）新公司/新问题保留验收** → 2）07扩展财务提取范围 → 3）Analysis消费证据包，推进08精编/09业务图 → 4）02扩展10-Q及官方来源。顺序不全部代表技术依赖；后续事项未冒充本轮完成。06暂缓，10–16继续后置。完整历史保留在下方。
+
+换机入口：[安装、恢复与接续说明](docs/MACHINE_HANDOFF.zh-CN.md)。当前代码与公开产物随Git交付；原预算、运行日志及私密Claude会话需单独恢复迁移包。2026-10-09最新授权：本次Data Agent闭环无人干预推进，不设费用/token人为上限；继续完整记账、保留失败及unknown，避免无效循环。下方旧额度仅代表历史授权。
+
+## 阶段历史 · 2026-10-09 · 以下由上方最终交付替代
+
+**当前行动：完成并验收Data独立取材闭环。** 范围固定为已有Microsoft、Alphabet FY2025 HTML 10-K。准备层已修复并重建，独立核对2,739块、270表、213条现有财务记录；真实模型循环已启动。Data提供最小充分材料，Analysis负责报告/图；Codex只实现、测试、独立审查。单条Query不是整体验收。[当前计划与运行问题](experiments/agent_design/2026-10-09-data-agent-completion-v1/PLAN.zh-CN.md) · [准备层审查](experiments/agent_design/2026-10-09-data-agent-completion-v1/preparation-review/README.md) · [验收标准](docs/DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)。六题尚在迭代，不能声称全面通过。
 
 当前权威摘要：[Data Agent 八项待办](docs/DATA_AGENT_EXTRACTION_TODO.zh-CN.md)。范围为 **01、02、03、04、05、07、08、09**；06暂缓，10–16不展开。下方旧日期段落为阶段历史。
 
-本阶段最新范围收紧为**显式选定 HTML 10-K**。PDF、20-F、季度和电话会不作为当前验收阻塞。
+**最新首关：Microsoft / Google 的材料获取与解析。** 用户已确认先只验已有两份 FY2025 10-K，10-Q 后置。先核对选定原件身份、主来源，再验收逐材料解析及重复处置；季度扩展时另建官方应收—实收清单。[本轮审查](experiments/agent_design/2026-10-09-material-acquisition-audit-v1/README.zh-CN.md)。现有两份年报复用成功不代表材料收齐；历史仅 HTML 10-K 的范围不能自动覆盖季度报告。其余格式不自动扩入。
 
 09已确认过碎主要来自graph-stage/覆盖契约与默认全量渲染。新增[Microsoft总览](http://127.0.0.1:8769/docs/design/data-agent-acceptance/microsoft-business-overview-v1/)：默认13节点12关系，明细保留全部79节点86关系；没有改变系统Agent原事实或内容评价。[官方核查、Claude第16轮复核和工程记录](experiments/agent_design/2026-10-08-business-granularity-v1/README.zh-CN.md)。该历史页保留。新覆盖契约已实现，系统Agent按新Skill生成[Microsoft 19对象候选](http://127.0.0.1:8769/docs/design/data-agent-acceptance/microsoft-business-products-v1/)，产品/客户/收费明细进入属性，总览13节点；一次协议修复已完成。系统自审已真实运行，但属性引用对齐未通过程序校验，原答保留。随后已完成系统修订：19对象、18关系、76产品属性；全新自审截断。独立Opus完整复核153项提出16个问题。两轮对象修订已完成，最新13条补丁、19对象16关系；独立核查仍有引文和已知信息承接缺口，09未通过。[最新页](http://127.0.0.1:8769/docs/design/data-agent-acceptance/microsoft-opus-guided-business-v2/)。下一全新复核已去除重复声明，预留$1.027704仍超过原任务余额$0.311528，未发网，需用户决定同一$8上限。Google新同规则运行尚未开始。最新记录见[阶段交付](experiments/agent_design/2026-10-08-business-granularity-v2/README.zh-CN.md)。
 

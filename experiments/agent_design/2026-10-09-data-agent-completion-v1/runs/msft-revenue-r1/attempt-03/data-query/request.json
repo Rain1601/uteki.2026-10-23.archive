@@ -1,0 +1,244 @@
+{
+  "question": "请从 Microsoft FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+  "purpose": "analysis_evidence",
+  "dataset": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/msft",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "msft-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "prepared_run": null,
+  "company_config": null,
+  "include_candidates": null,
+  "limits": {
+    "max_steps": 40,
+    "max_packet_bytes": 120000,
+    "observation_bytes": 24000,
+    "page_items": 8,
+    "turn_timeout": 240
+  },
+  "financial_tasks": [],
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-revenue-r1/attempt-02/data-query/query",
+      "manifest_sha256": "8683ee589ec4e54466c78e15abd6ba9b2933a71bb3c7f822f184b79abba61e1f"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-revenue-r1/attempt-02/review-01",
+      "manifest_sha256": "a289a83fa8bb9edb5e4570c545f33f67cc79481290821ad9a99efdf29e0fdb8d"
+    },
+    "assessment": {
+      "packet_id": "data-review-f61906b14538c9004dc029aa",
+      "facts": [
+        {
+          "fact_id": "ev-bd265ede7bbcf0467e098962",
+          "verdict": "supported",
+          "rationale": "The FY2025 value 281,724 appears in the 'Total' row of the product/service revenue note table, under the 2025 column and headed '(In millions)'. This matches 281,724,000,000 USD. The duplicate adds nothing beyond the income statement figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-001226-283de46e",
+              "quote": "Total $ 281,724 $ 245,122 $ 211,915"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "ev-0f0d534526e008dece6e074f",
+          "verdict": "supported",
+          "rationale": "The income statement shows 'Total revenue 281,724' for the year ended June 30, 2025, in millions. This matches 281,724,000,000 USD. It is the primary, directly relevant source for FY2025.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ],
+          "relevance": "necessary"
+        },
+        {
+          "fact_id": "ev-8add01b341f353b50ee5326b",
+          "verdict": "supported",
+          "rationale": "The segment table's total revenue row shows 281,724 for 2025, in millions. It repeats the income statement figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-001217-90dfc72b",
+              "quote": "Total Revenue $ 281,724 $ 245,122 $ 211,915"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "ev-860219cebe718f9d19041c1c",
+          "verdict": "supported",
+          "rationale": "The geographic revenue table's total shows 281,724 for 2025, in millions. It repeats the income statement figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-001219-8fbdd09e",
+              "quote": "Total $ 281,724 $ 245,122 $ 211,915"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "ev-3b6a430338507e70671ce832",
+          "verdict": "supported",
+          "rationale": "The FY2024 value 245,122 appears in the 'Total' row of the product/service revenue note table, under the 2024 column, in millions. This matches 245,122,000,000 USD. It repeats the income statement figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-001226-283de46e",
+              "quote": "Total $ 281,724 $ 245,122 $ 211,915"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "ev-36fab0af3579301a8032bcd5",
+          "verdict": "supported",
+          "rationale": "The income statement shows 'Total revenue' of 245,122 for the year ended June 30, 2024, in millions. This matches 245,122,000,000 USD. It is the primary, directly relevant source for FY2024.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ],
+          "relevance": "necessary"
+        },
+        {
+          "fact_id": "ev-a052331f155bbf576f70c10f",
+          "verdict": "supported",
+          "rationale": "The geographic table total for 2024 is 245,122, in millions. It repeats the income statement figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-001219-8fbdd09e",
+              "quote": "Total $ 281,724 $ 245,122 $ 211,915"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "ev-bd937f974a8dce79b3314464",
+          "verdict": "supported",
+          "rationale": "The segment table's total revenue for 2024 is 245,122, in millions. It repeats the income statement figure.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-001217-90dfc72b",
+              "quote": "Total Revenue $ 281,724 $ 245,122 $ 211,915"
+            }
+          ],
+          "relevance": "redundant"
+        },
+        {
+          "fact_id": "source-block-7cc9e4cbd522852e61343fff",
+          "verdict": "supported",
+          "rationale": "The block is the Item 8 heading on reported page 50. It places the income statement within the financial statements, which helps locate the source.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000779-9d7720d5",
+              "quote": "ITEM 8. FINANCIAL STATEMENTS AND SUPPLEMENTARY DATA"
+            }
+          ],
+          "relevance": "supporting_context"
+        },
+        {
+          "fact_id": "source-block-36dd63aebc36e1f1817a7b5f",
+          "verdict": "supported",
+          "rationale": "The block is the 'INCOME STATEMENTS' heading directly above the table. It identifies the statement from which the revenue figures are taken.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000780-cdef2bac",
+              "quote": "INCOME STATEMENTS"
+            }
+          ],
+          "relevance": "supporting_context"
+        },
+        {
+          "fact_id": "source-block-2d979a86981a8ee330cfe61f",
+          "verdict": "supported",
+          "rationale": "The block text matches the original table. It carries the '(In millions, except per share amounts)' unit, the 'Year Ended June 30' period headings and the Total revenue row for 2025 and 2024. The table also includes 2023 and other lines beyond the question, but it is the essential original citation.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023 Revenue: Product $ 63,946 $ 64,773 $ 64,699 Service and other 217,778 180,349 147,216 Total revenue 281,724 245,122 211,915"
+            }
+          ],
+          "relevance": "necessary"
+        }
+      ],
+      "requirements": [
+        {
+          "requirement_id": "req-revenue-query",
+          "verdict": "complete",
+          "rationale": "Both required periods are covered. FY2025 (year ended 2025-06-30) is 281,724 million USD and FY2024 (year ended 2024-06-30) is 245,122 million USD. Both figures are corroborated in the original income statement, the segment note, the geographic note and the product/service note. Units are 'In millions' and the periods are fiscal years ended June 30.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ]
+        },
+        {
+          "requirement_id": "req-revenue-source",
+          "verdict": "complete",
+          "rationale": "The original income statement block is delivered together with the Item 8 and 'INCOME STATEMENTS' headings, the unit line, the period headings and the Total revenue row, so the figures are verifiable against the filing.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000780-cdef2bac",
+              "quote": "INCOME STATEMENTS"
+            },
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023"
+            }
+          ]
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "verdict": "text_sufficient",
+          "rationale": "The delivered text blocks contain the income statement table with the unit, period headings and total revenue for both years. The segment, geographic and product/service tables corroborate the totals. No image content is needed for this question.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ]
+        }
+      ],
+      "question_coverage": "complete",
+      "coverage_reason": "The question asks for FY2025 and FY2024 total company revenue with unit, period, accounting basis and verifiable source. The delivered original income statement gives 281,724 and 245,122 (USD millions, years ended June 30). The structured records give 281,724,000,000 and 245,122,000,000 USD with a 'reported_consolidated' basis. The segment table total of 281,724 / 245,122 is consistent with this.",
+      "missing_information": [],
+      "revision_requests": [
+        "Reduce the final bundle. For each year, keep only the income statement record (ev-0f0d534526e008dece6e074f for FY2025, ev-36fab0af3579301a8032bcd5 for FY2024). Drop the six duplicate records from the segment, geographic and product/service tables, or label them as corroboration only.",
+        "If a reader needs the accounting basis stated in the original wording, cite a source block that explicitly says 'consolidated' or the US GAAP basis. The Income Statements heading alone does not."
+      ],
+      "limitations": [
+        "The 'reported_consolidated' accounting basis is a label from the record. The delivered blocks show only the 'INCOME STATEMENTS' heading and do not explicitly say 'consolidated' or 'US GAAP'. Income statements in a 10-K are consolidated, but that wording is not in the delivered text.",
+        "Only selected query evidence was delivered, not the full filing, so any note-level qualifications elsewhere in the 10-K were not reviewed.",
+        "The records are candidate status, not independently adopted."
+      ]
+    }
+  }
+}

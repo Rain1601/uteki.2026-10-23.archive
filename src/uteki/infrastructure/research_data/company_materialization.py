@@ -19,6 +19,7 @@ import duckdb
 from lxml import html, etree
 
 from uteki.agents.reading.document_reader import DocumentReader
+from uteki.agents.reading.reading_groups import build_reading_groups
 from uteki.domain.research_data.query_contract import (
     DataQuery, QueryResult, ResearchRecord, Period, SOURCE_PERIOD_VERSION, export_query_schema,
 )
@@ -32,6 +33,7 @@ from uteki.infrastructure.document_sources.company_acquisition import _mime
 from uteki.infrastructure.document_sources.sec import normalize_text
 from .financial_records import digest, local_name, one_text, parse_number, dom_path_query
 from .query_dataset import DDL, contained, save
+from .materialization_metadata import METRIC_DESCRIPTIONS, METRIC_DESCRIPTION_VERSION, table_year_evidence
 
 ADAPTER = 'us-gaap-inline-v1'
 
@@ -40,7 +42,7 @@ def implementation_fingerprint():
     """Invalidate reuse when a parser, normalizer or exported contract changes."""
     paths = {Path(__file__), *(Path(inspect.getfile(obj)) for obj in (
         parse_sec_source, earnings_outline, _mime, normalize_text, parse_number,
-        ResearchRecord, save, DocumentReader, build_parsed_package, SourceBlock))}
+        ResearchRecord, save, DocumentReader, build_reading_groups, build_parsed_package, SourceBlock, table_year_evidence))}
     return digest({path.name: digest(path.read_bytes()) for path in sorted(paths)})
 
 
@@ -64,9 +66,10 @@ CONCEPTS = {
 
 
 def metric_catalog():
-    return {m: {'metric_id': m, 'label': m, 'unit': 'USD', 'denominator': None,
-                'definition': ('Positive cash payments to acquire PPE; not total investment.' if m == 'capex_cash_payments' else m),
-                'definition_version': ADAPTER, 'aggregation': 'no_implicit_sum', 'aliases': [m]}
+    return {m: {'metric_id': m, 'label': METRIC_DESCRIPTIONS[m][0], 'unit': 'USD', 'denominator': None,
+                'definition': METRIC_DESCRIPTIONS[m][1], 'definition_version': METRIC_DESCRIPTION_VERSION,
+                'aggregation': 'no_implicit_sum', 'aliases': list(dict.fromkeys(
+                    [m, *METRIC_DESCRIPTIONS[m][2], *(c for c, metric in CONCEPTS.items() if metric == m)]))}
             for m in sorted(set(CONCEPTS.values()))}
 
 
@@ -154,7 +157,7 @@ def extract_inline_records(raw, doc, company, index, blocks, artifact):
             found = tree.xpath(dom_path_query(block['dom_path']))
             if len(found) == 1:
                 block_elements[found[0]] = block
-    records, evidence, gaps, fiscal = [], {}, [], []
+    records, evidence, gaps, fiscal, annual_columns = [], {}, [], [], []
     namespace_values = {}
     for element in tree.iter():
         for key, value in element.attrib.items():
@@ -227,6 +230,12 @@ def extract_inline_records(raw, doc, company, index, blocks, artifact):
                                      'Candidate source fact; not independently adopted.')).model_dump(mode='json')
             records.append(row)
             evidence[eid] = source_evidence
+            if (not dimensions and fiscal_year and fiscal_quarter is None and period.kind == 'year'
+                    and doc['form'] in {'10-K', '10-K/A', '20-F', '20-F/A'}):
+                header = table_year_evidence(tag, block)
+                if header and (period.end.month, period.end.day) == (header['month'], header['day']):
+                    annual_columns.append({'block_id': block['block_id'], 'period': period,
+                                           'evidence_id': eid, **header})
             if not dimensions and fiscal_year and str(period.end) == doc.get('period_end'):
                 value = None
                 if period.kind == 'year' and fiscal_quarter is None:
@@ -237,6 +246,26 @@ def extract_inline_records(raw, doc, company, index, blocks, artifact):
                     fiscal.append(value)
         except (ValueError, KeyError) as error:
             gaps.append({'layer': 'normalization', 'reason': str(error), 'source_snapshot_id': doc['source_id'], 'concept': concept, 'fact_id': tag.get('id')})
+    # A comparative year label is adopted only in a table that also ties the
+    # declared current fiscal year to the exact report end. Unknown calendars
+    # and unrelated/mislabeled annual tables cannot supply inferred years.
+    calibrated = {c['block_id'] for c in annual_columns if c['fiscal_year'] == fiscal_year
+                  and str(c['period'].end) == doc.get('period_end')}
+    existing = {(v['fiscal_year'], digest(v['period'])) for v in fiscal}
+    for column in annual_columns:
+        period = column['period']
+        if column['block_id'] not in calibrated:
+            continue
+        if column['fiscal_year'] - period.end.year != fiscal_year - date.fromisoformat(doc['period_end']).year:
+            gaps.append({'layer': 'metadata', 'reason': 'table_fiscal_year_context_conflict',
+                         'source_snapshot_id': doc['source_id'], 'block_id': column['block_id']})
+            continue
+        key = (column['fiscal_year'], digest(period.model_dump(mode='json')))
+        if key not in existing:
+            fiscal.append({'fiscal_year': column['fiscal_year'], 'period': period.model_dump(mode='json'),
+                'basis_evidence': {'method': 'inline-table-year-v1', 'evidence_id': column['evidence_id'],
+                    'block_id': column['block_id'], 'header': column['header'], 'annual_caption': column['annual_caption']}})
+            existing.add(key)
     return records, evidence, gaps, fiscal
 
 

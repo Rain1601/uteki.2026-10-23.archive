@@ -1,0 +1,475 @@
+{
+  "schema_version": "autonomous-result-v2",
+  "status": "limited",
+  "stop_reason": "no_progress_limit",
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "请依据指定公司的年度报告，说明其报告分部，以及云业务的收入披露口径如何与报告分部区分。请取得回答这个问题所需的原始段落和必要表格，供后续分析 Agent 使用；Data 阶段不做投资判断。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-4d314d745f9fd88f96536ada",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "msft-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "purpose": "question_answer",
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-4d314d745f9fd88f96536ada",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "msft-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "plan_origin": "model",
+  "plans": [
+    {
+      "version": 1,
+      "requirements": [
+        {
+          "kind": "source_answer",
+          "query": null,
+          "source_id": "msft-2025-10k",
+          "node_id": null,
+          "financial_task_id": null,
+          "batch_index": null,
+          "requirement_id": "req_segments_answer",
+          "description": "说明微软FY2025年度报告中披露的报告分部（reportable segments），以及云业务（如Microsoft Cloud）的收入披露口径如何与报告分部区分，需基于原始段落和必要表格。"
+        }
+      ],
+      "reason": "该问题是需要叙述性回答的问题，需要读取指定年度报告原文中关于报告分部及云收入披露口径的段落与表格，故使用 source_answer 需求。",
+      "origin": "model",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "sha256": "39a6b2dfb9a5a9c1702a2da5b1871a76df584b876f52c20f52a6128f1f6bc47f"
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "source_answer",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req_segments_answer",
+      "description": "说明微软FY2025年度报告中披露的报告分部（reportable segments），以及云业务（如Microsoft Cloud）的收入披露口径如何与报告分部区分，需基于原始段落和必要表格。",
+      "evidence_ids": [
+        "ev-bf347b54f5feba73292f6b6d",
+        "ev-4be8aa018e4ead8d1309b3dc",
+        "ev-38bfa599c20a5695cd93d9be",
+        "ev-b01b95fa214b77338a71ab34",
+        "ev-58a69b4833b192965604cbe0",
+        "ev-473b6ec0d5df2827686c269f",
+        "ev-16bf8e15231248471c3e34b6",
+        "ev-167780936b3043ba87894c26",
+        "ev-5e4196c834d0845ce3281455",
+        "ev-0554c8554bfaf8f31378fb9a",
+        "ev-baab6351996a3d12aa8f17d3",
+        "ev-e6f8d3e7c800b8d9de847ad7"
+      ],
+      "gap_ids": [
+        "gap-7fcc5b13dc19ddcdb0f464cf"
+      ],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4d314d745f9fd88f96536ada",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "program_check": "source_answer_missing"
+    }
+  ],
+  "gaps": [
+    {
+      "gap_id": "gap-7fcc5b13dc19ddcdb0f464cf",
+      "reason": "source_answer_missing",
+      "detail": null,
+      "requirement_ids": [
+        "req_segments_answer"
+      ],
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4d314d745f9fd88f96536ada",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    }
+  ],
+  "evidence_bundle": {
+    "path": "evidence-bundle.json",
+    "bundle_id": "bundle-d274901574f1c9c7928bb1d0",
+    "item_count": 12
+  },
+  "artifact_index": {
+    "path": "artifact-index.json",
+    "count": 70
+  },
+  "semantic_completeness": "not_evaluated",
+  "trace": [
+    {
+      "step": 1,
+      "action": "load_skill",
+      "status": "skill_loaded",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 12361,
+      "receipt": "turn-001/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-001/feedback.json"
+    },
+    {
+      "step": 2,
+      "action": "plan",
+      "status": "planned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 29227,
+      "receipt": "turn-002/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-002/feedback.json"
+    },
+    {
+      "step": 3,
+      "action": "outline_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 23785,
+      "receipt": "turn-003/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-003/feedback.json"
+    },
+    {
+      "step": 4,
+      "action": "search_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 42606,
+      "receipt": "turn-004/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-004/feedback.json"
+    },
+    {
+      "step": 5,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 31159,
+      "receipt": "turn-005/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-005/feedback.json"
+    },
+    {
+      "step": 6,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 35976,
+      "receipt": "turn-006/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-006/feedback.json"
+    },
+    {
+      "step": 7,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 34564,
+      "receipt": "turn-007/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-007/feedback.json"
+    },
+    {
+      "step": 8,
+      "action": "search_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 36048,
+      "receipt": "turn-008/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-008/feedback.json"
+    },
+    {
+      "step": 9,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 38318,
+      "receipt": "turn-009/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-009/feedback.json"
+    },
+    {
+      "step": 10,
+      "action": "read_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 39742,
+      "receipt": "turn-010/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-010/feedback.json"
+    },
+    {
+      "step": 11,
+      "action": "read_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 51145,
+      "receipt": "turn-011/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-011/feedback.json"
+    },
+    {
+      "step": 12,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 59165,
+      "receipt": "turn-012/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-012/feedback.json"
+    },
+    {
+      "step": 13,
+      "action": "read_artifact",
+      "status": "tool_returned",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 50753,
+      "receipt": "turn-013/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-013/feedback.json"
+    },
+    {
+      "step": 14,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 49491,
+      "receipt": "turn-014/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-014/feedback.json"
+    },
+    {
+      "step": 15,
+      "action": "read_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 51811,
+      "receipt": "turn-015/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-015/feedback.json"
+    },
+    {
+      "step": 16,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 63645,
+      "receipt": "turn-016/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-016/feedback.json"
+    },
+    {
+      "step": 17,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 52606,
+      "receipt": "turn-017/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-017/feedback.json"
+    },
+    {
+      "step": 18,
+      "action": "search_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 52241,
+      "receipt": "turn-018/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-018/feedback.json"
+    },
+    {
+      "step": 19,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 52369,
+      "receipt": "turn-019/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-019/feedback.json"
+    },
+    {
+      "step": 20,
+      "action": "read_source",
+      "status": "tool_returned",
+      "consecutive_no_progress": 0,
+      "packet_bytes": 52194,
+      "receipt": "turn-020/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-020/feedback.json"
+    },
+    {
+      "step": 21,
+      "action": "read_context",
+      "status": "tool_returned",
+      "consecutive_no_progress": 1,
+      "packet_bytes": 61012,
+      "receipt": "turn-021/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-021/feedback.json"
+    },
+    {
+      "step": 22,
+      "action": "reread",
+      "status": null,
+      "consecutive_no_progress": 2,
+      "packet_bytes": 55362,
+      "receipt": "turn-022/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-022/feedback.json"
+    },
+    {
+      "step": 23,
+      "action": "reread",
+      "status": null,
+      "consecutive_no_progress": 3,
+      "packet_bytes": 67981,
+      "receipt": "turn-023/receipt.json",
+      "skill_hashes": {
+        "acquire": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6",
+        "materialize": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8",
+        "query": "523a666f4b30899c06b5d49cb46ad2767de70b15e6d3f8d939e7b665181753a2"
+      },
+      "feedback": "turn-023/feedback.json"
+    }
+  ],
+  "role": "planner",
+  "worker_runs": [],
+  "financial_extractions": [],
+  "pending_body_reads": [],
+  "decision_budget": {
+    "limit": 40,
+    "used": 23
+  },
+  "evidence_budget": {
+    "limit_bytes": 8000000,
+    "used_bytes": 104349
+  }
+}

@@ -1,0 +1,169 @@
+{
+  "question": "请从 Microsoft FY2025 10-K 获取 FY2025 与 FY2024 的公司总收入，保留单位、期间、会计口径与可核对的原文出处。",
+  "purpose": "analysis_evidence",
+  "dataset": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/msft",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "msft-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "prepared_run": null,
+  "company_config": null,
+  "include_candidates": null,
+  "limits": {
+    "max_steps": 40,
+    "max_packet_bytes": 120000,
+    "observation_bytes": 24000,
+    "page_items": 8,
+    "turn_timeout": 240
+  },
+  "financial_tasks": [],
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-revenue-r2/attempt-02/data-query/query",
+      "manifest_sha256": "1833a5afc029b658503facc31a5b28257068b813e2f8ab59112de11b9d9bf1ba"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-revenue-r2/attempt-02/review-01",
+      "manifest_sha256": "b24dab7bee50fa1f9dc58c7a803e61f48d315b4d6b3c2ae26d701f0d7f41f6a7"
+    },
+    "assessment": {
+      "packet_id": "data-review-338d188ea6efe71da2b14c39",
+      "facts": [
+        {
+          "fact_id": "ev-0f0d534526e008dece6e074f",
+          "verdict": "supported",
+          "rationale": "The income statement table shows Total revenue 281,724 for the year ended June 30, 2025, in millions. This equals USD 281,724,000,000, consolidated as reported. The period and unit match the record.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ],
+          "relevance": "necessary"
+        },
+        {
+          "fact_id": "ev-36fab0af3579301a8032bcd5",
+          "verdict": "supported",
+          "rationale": "The income statement shows Total revenue 245,122 in millions for the year ended June 30, 2024, which equals USD 245,122,000,000. This matches the record.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ],
+          "relevance": "necessary"
+        },
+        {
+          "fact_id": "source-block-36dd63aebc36e1f1817a7b5f",
+          "verdict": "supported",
+          "rationale": "The heading 'INCOME STATEMENTS' is present and identifies the statement. It is under Item 8, Financial Statements. Useful as a statement title for provenance.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000780-cdef2bac",
+              "quote": "INCOME STATEMENTS"
+            }
+          ],
+          "relevance": "supporting_context"
+        },
+        {
+          "fact_id": "source-block-2d979a86981a8ee330cfe61f",
+          "verdict": "supported",
+          "rationale": "The table block contains the units (In millions), the Year Ended June 30 column headings, and Total revenue for 2025 and 2024. It also includes 2023 and other lines that are not needed for the question, but the block is the necessary original source for provenance.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023"
+            }
+          ],
+          "relevance": "necessary"
+        }
+      ],
+      "requirements": [
+        {
+          "requirement_id": "req_revenue_query",
+          "verdict": "complete",
+          "rationale": "Both FY2025 (281,724) and FY2024 (245,122) total revenue are given, with the period (year ended June 30), unit (USD, from millions), and reported consolidated basis. They are verified against the income statement.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ]
+        },
+        {
+          "requirement_id": "req_revenue_source",
+          "verdict": "complete",
+          "rationale": "The original income statement heading and table are delivered, with units in millions, the Year Ended June 30 period headings, and the Total revenue values.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000780-cdef2bac",
+              "quote": "INCOME STATEMENTS"
+            },
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023"
+            }
+          ]
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "verdict": "text_sufficient",
+          "rationale": "The income statement table is delivered as text and includes units, period headings and Total revenue for 2025 and 2024. No images are needed. The accounting basis is the consolidated income statement in the Item 8 financial statements.",
+          "citations": [
+            {
+              "source_snapshot_id": "msft-2025-10k",
+              "block_id": "block-000781-9ee5633d",
+              "quote": "Total revenue 281,724 245,122 211,915"
+            }
+          ]
+        }
+      ],
+      "question_coverage": "complete",
+      "coverage_reason": "The FY2025 and FY2024 total revenue values are both supported by the original income statement, with units (millions of USD), the Year Ended June 30 periods, and the consolidated reported basis. Citations point to the source blocks.",
+      "missing_information": [],
+      "revision_requests": [],
+      "body_checks": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000779-9d7720d5",
+          "relevance": "irrelevant",
+          "rationale": "The Item 8 heading is not needed beyond the income statement heading and table. It is only marginal context."
+        },
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000780-cdef2bac",
+          "relevance": "supporting_context",
+          "rationale": "The statement title identifies the table as the income statement."
+        },
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "block_id": "block-000781-9ee5633d",
+          "relevance": "necessary",
+          "rationale": "It contains the units, period headings and Total revenue for FY2025 and FY2024."
+        }
+      ],
+      "limitations": [
+        "The table block also includes the 2023 column and unrelated lines, which are not needed for the question.",
+        "The accounting basis is inferred from the consolidated income statement in Item 8, not from a separate accounting-policy disclosure in the delivered blocks."
+      ]
+    }
+  }
+}

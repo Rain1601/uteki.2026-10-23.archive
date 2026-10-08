@@ -207,7 +207,10 @@ class MeteredModel(Model):
                             'visible_text_secret_redacted', 'transport_error_type', 'transport_phase',
                             'headers_received', 'headers_received_elapsed_seconds',
                             'first_event_elapsed_seconds', 'stream_complete', 'stream_event_count',
-                            'stream_error_type', 'provider_error_type'):
+                            'stream_error_type', 'provider_error_type', 'schema_protocol',
+                            'wire_schema_sha256', 'host_output_schema_sha256', 'transport_decode',
+                            'transport_decode_error', 'host_decision_sha256',
+                            'host_schema_validation', 'provider_enforced_schema'):
                     if key in metadata:
                         record[key] = metadata[key]
                 raw_usage = metadata.get('raw_usage')

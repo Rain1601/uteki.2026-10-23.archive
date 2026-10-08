@@ -1,0 +1,1560 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "Microsoft 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-4244ad2daa731c37f05cee53",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "msft-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "msft-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {},
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-business-r2/attempt-01/data-query/query",
+      "manifest_sha256": "5f7690184a0a2447f31becad3c657314593f5a34cf948d5a69af20824c30f1ad"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-business-r2/attempt-01/review-01",
+      "manifest_sha256": "5f794f224cf4307a1326fdf21c610b6fa22598fe8a2add64217a2a40b83c3d81"
+    },
+    "assessment": {
+      "packet_id": "data-review-b2c3f32183c8228c32cd53fe",
+      "facts": [],
+      "requirements": [
+        {
+          "requirement_id": "req-segments",
+          "verdict": "insufficient_evidence",
+          "rationale": "No source bodies, selected blocks or facts were delivered (source_documents is empty; program gaps: delivery_selection_missing, no_reviewable_source_blocks, no_reviewable_facts). The segments and their main businesses cannot be verified, and no original passage can be cited.",
+          "citations": []
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "verdict": "requires_more_source_content",
+          "rationale": "No body text was delivered for msft-2025-10k, so the source cannot be reviewed. No citation is invented.",
+          "citations": []
+        }
+      ],
+      "question_coverage": "incomplete",
+      "coverage_reason": "The packet contains no source documents, selected blocks or facts. The question about Microsoft's FY2025 10-K reportable segments and the main businesses in each cannot be answered or checked from the delivered material.",
+      "missing_information": [
+        "Deliver the original 10-K passages from Item 1 Business that describe the three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing.",
+        "Deliver the segment note passages (Note on Segment Information and Geographic Data) with the complete lists of products and services for each segment, including introductory text and qualifiers.",
+        "Provide facts tied to selected source blocks with block_ids and quotes for ev-be6eb2d409f3a59510930d82, ev-2531a66c2296f2248f5a872e and ev-5f6ae6b4493916f644bbc326."
+      ],
+      "limitations": [
+        "Review was limited to the packet; no source text was available.",
+        "The segment names above come from general knowledge and are not verified against the source."
+      ]
+    }
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0000789019",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-08727d67db4596da",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "msft:IntelligentCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-4e381c5389e0f256",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-4e381c5389e0f256",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "us-gaap:ServiceOtherMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "msft:MorePersonalComputingMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-6d6570373dc9e275",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-6d6570373dc9e275",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "msft:DynamicsProductsAndCloudServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-785b7959aae57be8",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-785b7959aae57be8",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "msft:MicrosoftThreeSixFiveCommercialProductsAndCloudServicesMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "Cash payments for property and equipment / 固定资产购置现金支出",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported cash payments to acquire property, plant and equipment. Not total investment, accrual additions, or free cash flow; do not reverse the cash-payment sign.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments",
+            "capex cash payments",
+            "payments to acquire property plant and equipment",
+            "固定资产购置现金支出",
+            "PaymentsToAcquirePropertyPlantAndEquipment"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "Net income / 净利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported net income or loss for the stated scope and period. Preserve the source attribution; do not substitute an adjusted or attributable-income concept.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income",
+            "net income",
+            "net loss",
+            "净利润",
+            "净亏损",
+            "NetIncomeLoss"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "Operating cash flow / 经营现金流",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Net cash provided by or used in operating activities for the stated duration. Not operating profit, free cash flow, or an ending cash balance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow",
+            "operating cash flow",
+            "cash from operations",
+            "经营现金流",
+            "经营活动现金流量净额",
+            "NetCashProvidedByUsedInOperatingActivities"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "Operating income / 营业利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported operating income or loss after operating costs and expenses. Not net income, EBITDA, or operating cash flow.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income",
+            "operating income",
+            "operating loss",
+            "income from operations",
+            "营业利润",
+            "经营利润",
+            "OperatingIncomeLoss"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "Revenue / 收入",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported revenue under the mapped revenue concept; preserve consolidated versus dimensional scope. Not cash receipts, bookings, or guidance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue",
+            "revenues",
+            "net sales",
+            "收入",
+            "营业收入",
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "Revenues",
+            "SalesRevenueNet"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-2c47acb505bfba8c823ccda57bee8cd05cb0da6e68a220dc9f95e0948fa236bb",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2024-07-01",
+            "end": "2025-06-30",
+            "basis": "source"
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        },
+        {
+          "item_id": "fiscal-f10b51768e2351d13aa6e49a028d966b958a1d2be3cd84e4d5428dfc7fc1ecb3",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2024,
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-1bff3951f450e51f3bc44229",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 6,
+              "text": "2024"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        },
+        {
+          "item_id": "fiscal-2a3f37b173179f13337aa1d1eb0a3283be35b03a6fd59d952e1a464d05d94022",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2023,
+          "period": {
+            "kind": "year",
+            "start": "2022-07-01",
+            "end": "2023-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-bafd309f8e61f1dc49dce14b",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 10,
+              "text": "2023"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "company_id": "sec-0000789019",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+          "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "document_id": "msft-2025-10k",
+          "index_id": "didx-692376daa635828b",
+          "index_folder": "indexes/msft-2025-10k",
+          "raw_file": "raw/msft-2025-10k.html",
+          "raw_file_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "form": "10-K",
+          "period_end": "2025-06-30",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2025-07-30",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2024-07-01",
+                "end": "2025-06-30",
+                "basis": "source"
+              }
+            },
+            {
+              "fiscal_year": 2024,
+              "period": {
+                "kind": "year",
+                "start": "2023-07-01",
+                "end": "2024-06-30",
+                "basis": "source"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-1bff3951f450e51f3bc44229",
+                "block_id": "block-000781-9ee5633d",
+                "header": {
+                  "row": 4,
+                  "column": 6,
+                  "text": "2024"
+                },
+                "annual_caption": {
+                  "row": 4,
+                  "column": 0,
+                  "text": "Year Ended June 30,"
+                }
+              }
+            },
+            {
+              "fiscal_year": 2023,
+              "period": {
+                "kind": "year",
+                "start": "2022-07-01",
+                "end": "2023-06-30",
+                "basis": "source"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-bafd309f8e61f1dc49dce14b",
+                "block_id": "block-000781-9ee5633d",
+                "header": {
+                  "row": 4,
+                  "column": 10,
+                  "text": "2023"
+                },
+                "annual_caption": {
+                  "row": 4,
+                  "column": 0,
+                  "text": "Year Ended June 30,"
+                }
+              }
+            }
+          ],
+          "parsed_package": {
+            "export_version": "uteki-parsed-document-v1",
+            "package_id": "parsed-8a26ae25481f1c674ad3e154",
+            "manifest_path": "indexes/msft-2025-10k/manifest.json",
+            "manifest_sha256": "112f5e6f7b109f4e3b42e43f87da484920055665d9a5418d287bdca77c8eda94",
+            "source_path": "indexes/msft-2025-10k/source.json",
+            "document_path": "indexes/msft-2025-10k/document.html",
+            "status": "candidate_parsed_material",
+            "semantic_review": "not_reviewed"
+          },
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes",
+            "html_table_structure",
+            "parsed_document_package"
+          ],
+          "stage_coverage": {
+            "schema_version": "source-stage-coverage-v1",
+            "original": {
+              "status": "hash_verified",
+              "byte_count": 8158179,
+              "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6"
+            },
+            "reading": {
+              "status": "indexed",
+              "parser_version": "sec-source-blocks-v0.1.11",
+              "block_count": 1401,
+              "block_type_counts": {
+                "heading_candidate": 402,
+                "list_item": 114,
+                "other": 13,
+                "page_marker": 100,
+                "paragraph": 687,
+                "table": 85
+              },
+              "index_diagnostic_count": 25
+            },
+            "tables": {
+              "status": "structure_parsed",
+              "table_node_count": 85,
+              "tables_with_cells": 85,
+              "tables_without_cells": 0,
+              "cell_count": 19065,
+              "layout_role_counts": {
+                "table_of_contents": 1,
+                "unclassified": 84
+              },
+              "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+              "financial_table_semantics": "not_evaluated"
+            },
+            "numeric": {
+              "status": "candidate_records",
+              "record_count": 102,
+              "evidence_count": 102,
+              "gap_count": 1449,
+              "adapter": "us-gaap-inline-v1",
+              "supported_taxonomy": "US_GAAP",
+              "supported_currencies": [
+                "USD"
+              ],
+              "supported_metric_ids": [
+                "capex_cash_payments",
+                "net_income",
+                "operating_cash_flow",
+                "operating_income",
+                "revenue",
+                "revenue_including_assessed_tax"
+              ],
+              "period_support": "complete_month_boundaries_only",
+              "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+              "financial_package_completeness": "not_evaluated",
+              "semantic_review": "not_evaluated",
+              "adoption": "candidate"
+            }
+          },
+          "image_block_count": 0
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 3430,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 8,
+        "total_count": 20,
+        "bytes_returned": 2841,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "3a829f78c1fe9a237abd427fd7e26b95a6f942980a43c94ef06d04167d7381f8",
+          "offset": 8,
+          "checksum": "198953fbd500f03c268767bc1a937bddb38d1cbcc5011a670d2b8bef2694159b"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 3299,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 3,
+        "total_count": 3,
+        "bytes_returned": 1408,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segments",
+      "description": "Microsoft FY2025 10-K: reportable segments and the main businesses/products and services included in each segment, with complete lists, introductory text and qualifiers (Item 1 Business and segment note)."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segments",
+      "description": "Microsoft FY2025 10-K: reportable segments and the main businesses/products and services included in each segment, with complete lists, introductory text and qualifiers (Item 1 Business and segment note).",
+      "evidence_ids": [
+        "ev-0bad08649836d78a2823851b",
+        "ev-50b301577f60ece44599eac6",
+        "ev-1a138ec26c292ced18f5de62"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-9cb0dbd47752e0eab981fde336991160",
+    "kind": "run_state",
+    "path": "artifacts/art-9cb0dbd47752e0eab981fde336991160.json",
+    "sha256": "4ada61d66f2e2815a895f9649c4fd706dc84b65e8e9aca148725a3735e49021c",
+    "size_bytes": 2448,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-4244ad2daa731c37f05cee53",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "msft-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    },
+    "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+    "created_step": 8,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-e509b608292d915cc58a8d1cbe91467e",
+      "kind": "context",
+      "path": "artifacts/art-e509b608292d915cc58a8d1cbe91467e.json",
+      "sha256": "4f28e4c3392ca8775c4e61aee52e737febef769374606f86e40b114239407e53",
+      "size_bytes": 8108,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 5,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-0bad08649836d78a2823851b"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-8c74e37fbc50e0fe6fbec711e8fc7554",
+      "kind": "context",
+      "path": "artifacts/art-8c74e37fbc50e0fe6fbec711e8fc7554.json",
+      "sha256": "1ad762c95c9379d95c7ed338fd60a0b9665c7cc29a297ca721aef93e72476d57",
+      "size_bytes": 19405,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 6,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-50b301577f60ece44599eac6"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+      "kind": "context",
+      "path": "artifacts/art-8728cc1feeee90ef88794ffafab91226.json",
+      "sha256": "d22118bd5ffe092937fce81fea9ab23154b4e5c4e8d399eed36563fe3e00202f",
+      "size_bytes": 19838,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 7,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-1a138ec26c292ced18f5de62"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-9ce23d96ad5b97eeefe3818a92124dfc",
+    "sha256": "40cdb9e8b1086788cbd861bd67e55945ed42b5b69f458a5c697fca1670fbc124",
+    "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 3,
+    "total_count": 3,
+    "returned_count": 3,
+    "bytes_returned": 2183,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "items": [
+      {
+        "evidence_id": "ev-0bad08649836d78a2823851b",
+        "kind": "context",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "sha256": "0bad08649836d78a2823851bc1f70ce54cad46d0b711de0d3527c3f197350776",
+        "value": {
+          "index_id": "didx-692376daa635828b",
+          "node_id": "didx-692376daa635828b-document",
+          "reading_group_version": "reading-groups-v0.4",
+          "reading_groups": [],
+          "expansion_note": "Complete list/table/turn/Q&A context may exceed requested count; original blocks unchanged.",
+          "blocks": [
+            {
+              "block_id": "block-000086-935d6090",
+              "dom_path": "/html/body/div[15]/p[2]",
+              "image_asset_id": null,
+              "layout_role": null,
+              "ordinal": 86,
+              "reported_page": 5,
+              "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+              "style_signature": [
+                [
+                  "font-family",
+                  "times new roman"
+                ],
+                [
+                  "font-size",
+                  "10pt"
+                ],
+                [
+                  "margin-top",
+                  "9pt"
+                ],
+                [
+                  "text-align",
+                  "justify"
+                ]
+              ],
+              "table": null,
+              "text": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses.",
+              "text_hash": "935d60904eb39710e00cb0d07e9c8f15556ba7d4792be8f0e005e28fdcc9c92f",
+              "type": "paragraph"
+            }
+          ],
+          "previous_block_id": "block-000085-2f5cfd00",
+          "next_block_id": "block-000087-44aabdcd",
+          "context_note": "Check preceding heading/introduction and following list continuation; tables retain cells and XBRL.",
+          "execution_schema_version": "research-execution-v1",
+          "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-4244ad2daa731c37f05cee53",
+            "company_ids": [
+              "sec-0000789019"
+            ],
+            "source_snapshot_ids": [
+              "msft-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-10-09",
+            "include_candidates": true
+          },
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "candidate_data": true,
+          "source": {
+            "source_snapshot_id": "msft-2025-10k",
+            "company_id": "sec-0000789019",
+            "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+            "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+            "document_id": "msft-2025-10k",
+            "index_id": "didx-692376daa635828b",
+            "index_folder": "indexes/msft-2025-10k",
+            "raw_file": "raw/msft-2025-10k.html",
+            "raw_file_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+            "form": "10-K",
+            "period_end": "2025-06-30",
+            "declared_mime_type": "text/html",
+            "parsed_mime_type": "text/html",
+            "available_at": "2025-07-30",
+            "status": "candidate",
+            "fiscal_periods": [
+              {
+                "fiscal_year": 2025,
+                "period": {
+                  "kind": "year",
+                  "start": "2024-07-01",
+                  "end": "2025-06-30",
+                  "basis": "source"
+                }
+              },
+              {
+                "fiscal_year": 2024,
+                "period": {
+                  "kind": "year",
+                  "start": "2023-07-01",
+                  "end": "2024-06-30",
+                  "basis": "source"
+                },
+                "basis_evidence": {
+                  "method": "inline-table-year-v1",
+                  "evidence_id": "ev-1bff3951f450e51f3bc44229",
+                  "block_id": "block-000781-9ee5633d",
+                  "header": {
+                    "row": 4,
+                    "column": 6,
+                    "text": "2024"
+                  },
+                  "annual_caption": {
+                    "row": 4,
+                    "column": 0,
+                    "text": "Year Ended June 30,"
+                  }
+                }
+              },
+              {
+                "fiscal_year": 2023,
+                "period": {
+                  "kind": "year",
+                  "start": "2022-07-01",
+                  "end": "2023-06-30",
+                  "basis": "source"
+                },
+                "basis_evidence": {
+                  "method": "inline-table-year-v1",
+                  "evidence_id": "ev-bafd309f8e61f1dc49dce14b",
+                  "block_id": "block-000781-9ee5633d",
+                  "header": {
+                    "row": 4,
+                    "column": 10,
+                    "text": "2023"
+                  },
+                  "annual_caption": {
+                    "row": 4,
+                    "column": 0,
+                    "text": "Year Ended June 30,"
+                  }
+                }
+              }
+            ],
+            "parsed_package": {
+              "export_version": "uteki-parsed-document-v1",
+              "package_id": "parsed-8a26ae25481f1c674ad3e154",
+              "manifest_path": "indexes/msft-2025-10k/manifest.json",
+              "manifest_sha256": "112f5e6f7b109f4e3b42e43f87da484920055665d9a5418d287bdca77c8eda94",
+              "source_path": "indexes/msft-2025-10k/source.json",
+              "document_path": "indexes/msft-2025-10k/document.html",
+              "status": "candidate_parsed_material",
+              "semantic_review": "not_reviewed"
+            },
+            "capabilities": [
+              "read_context",
+              "literal_search",
+              "source_bytes",
+              "html_table_structure",
+              "parsed_document_package"
+            ],
+            "stage_coverage": {
+              "schema_version": "source-stage-coverage-v1",
+              "original": {
+                "status": "hash_verified",
+                "byte_count": 8158179,
+                "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6"
+              },
+              "reading": {
+                "status": "indexed",
+                "parser_version": "sec-source-blocks-v0.1.11",
+                "block_count": 1401,
+                "block_type_counts": {
+                  "heading_candidate": 402,
+                  "list_item": 114,
+                  "other": 13,
+                  "page_marker": 100,
+                  "paragraph": 687,
+                  "table": 85
+                },
+                "index_diagnostic_count": 25
+              },
+              "tables": {
+                "status": "structure_parsed",
+                "table_node_count": 85,
+                "tables_with_cells": 85,
+                "tables_without_cells": 0,
+                "cell_count": 19065,
+                "layout_role_counts": {
+                  "table_of_contents": 1,
+                  "unclassified": 84
+                },
+                "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+                "financial_table_semantics": "not_evaluated"
+              },
+              "numeric": {
+                "status": "candidate_records",
+                "record_count": 102,
+                "evidence_count": 102,
+                "gap_count": 1449,
+                "adapter": "us-gaap-inline-v1",
+                "supported_taxonomy": "US_GAAP",
+                "supported_currencies": [
+                  "USD"
+                ],
+                "supported_metric_ids": [
+                  "capex_cash_payments",
+                  "net_income",
+                  "operating_cash_flow",
+                  "operating_income",
+                  "revenue",
+                  "revenue_including_assessed_tax"
+                ],
+                "period_support": "complete_month_boundaries_only",
+                "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+                "financial_package_completeness": "not_evaluated",
+                "semantic_review": "not_evaluated",
+                "adoption": "candidate"
+              }
+            },
+            "image_block_count": 0
+          },
+          "source_snapshot_id": "msft-2025-10k",
+          "company_id": "sec-0000789019",
+          "source_period_end": "2025-06-30",
+          "available_at": "2025-07-30",
+          "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+          "status": "read",
+          "gaps": [],
+          "requested_start_block_id": "block-000086-935d6090",
+          "block_ids": [
+            "block-000086-935d6090"
+          ],
+          "next_cursor": {
+            "cursor_version": "document-cursor-v1",
+            "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+            "snapshot_id": "query-4244ad2daa731c37f05cee53",
+            "source_snapshot_id": "msft-2025-10k",
+            "index_id": "didx-692376daa635828b",
+            "node_id": "didx-692376daa635828b-document",
+            "kind": "read",
+            "start_block_id": "block-000087-44aabdcd"
+          },
+          "node_complete": false,
+          "coverage": "Returned full blocks only; reaching the node end does not prove all earlier blocks were read."
+        },
+        "truncated": false,
+        "reads": [],
+        "artifact": {
+          "schema_version": "run-artifact-v1",
+          "artifact_id": "art-e509b608292d915cc58a8d1cbe91467e",
+          "kind": "context",
+          "path": "artifacts/art-e509b608292d915cc58a8d1cbe91467e.json",
+          "sha256": "4f28e4c3392ca8775c4e61aee52e737febef769374606f86e40b114239407e53",
+          "size_bytes": 8108,
+          "scope": {
+            "execution_schema_version": "research-execution-v1",
+            "snapshot_id": "query-4244ad2daa731c37f05cee53",
+            "company_ids": [
+              "sec-0000789019"
+            ],
+            "source_snapshot_ids": [
+              "msft-2025-10k"
+            ],
+            "source_policy_id": "local-frozen-v1",
+            "knowledge_cutoff": "2026-10-09",
+            "include_candidates": true
+          },
+          "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+          "created_step": 5,
+          "parent_ids": [],
+          "source_ids": [
+            "msft-2025-10k"
+          ],
+          "evidence_id": "ev-0bad08649836d78a2823851b"
+        }
+      }
+    ],
+    "evidence_ids": [
+      "ev-0bad08649836d78a2823851b"
+    ],
+    "preview_truncated": false,
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 11,
+      "action": "reread",
+      "requirement_ids": [
+        "req-segments"
+      ],
+      "request_fingerprint": "e7c537c81cb915d2bbfc3f8cdbfc7415dec2055c6170198582b2d60b26116982",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "artifact",
+      "retryable": false,
+      "progress_delta": false,
+      "observation_bytes": 7768,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-328dd65b2840858b0ad87be8d4aecc0c",
+      "kind": "tool_output",
+      "path": "artifacts/art-328dd65b2840858b0ad87be8d4aecc0c.json",
+      "sha256": "1b3d4215758b02c9eead612e11cbc646d29f428da821705503089891c3d72119",
+      "size_bytes": 11277,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 11,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "f885fa8a4a0398178a5e2ac4039a6bb3fbb98557c11020f63ad514f46021edb7"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "f885fa8a4a0398178a5e2ac4039a6bb3fbb98557c11020f63ad514f46021edb7",
+    "content": "---\nname: data-agent-query\nversion: 8\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nFor purpose=analysis_evidence, the Data Agent retrieves original material for a separate Analysis Agent. The original question can be narrative; use kind=source_evidence for its source material and kind=query for numeric retrieval. Do not create source_answer requirements or author the downstream report. Navigate using the small scoped catalog/schema and source index, then read relevant original blocks with necessary units, periods, introductions and qualifiers. Do not default to full-report or whole-chapter delivery. Preserve explicit gaps when evidence or resources are insufficient. Semantic completeness is reviewed separately after retrieval.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nFor purpose=question_answer, use kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.\n\nAn answer must declare model_claimed_coverage, coverage_note and unresolved_questions. partial requires concrete unresolved questions; claimed_complete requires none but remains a model judgment. The host validates references, never semantic completeness. No answer prevents finish unless an explicit gap is recorded; a partial answer seals a partial result. research_answers persists bounded candidate answers and artifact pointers across later reading. Revising an answer preserves old versions; changing only statement or label is not new evidence. Worker answers are untrusted candidates and do not satisfy the parent's requirements.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nWhen available_financial_extract is true, inspect the host's financial_tasks catalog. Each task fixes the company, source, frozen selection, method policy and available table batches. Use source_excerpt to select the pending batch relevant to the user's request; excerpts are navigation, not body-reading receipts. The financial_task_catalog artifact retains the full initial catalog. This task reuses its explicitly registered selection; it does not establish whole-filing recall.\n\nPlan a separate kind=financial_extract requirement with financial_task_id and batch_index. Execute action=financial_extract with financial_extraction={task_id,batch_index,method_id?}, referencing exactly that requirement. Omit method_id to select the task default, or choose only an allowed_method_ids entry. The execution host loads that method's versioned Skill and Prompt before extracting; do not send paths, jobs, financial answers, period replacements or model settings. Respect max_new_batches. Successful batches show candidate status and their receipt; do not rerun them merely to repeat a completed task.\n\nA candidate_financial_extraction receipt means a separate candidate dataset was generated. It does not update the active query baseline, satisfy a numeric query, prove source body was delivered to you, or approve financial semantics. Check returned raw/normalized counts and gaps; zero normalized records and unresolved drafts remain visible limitations. Only the matching task/catalog/batch receipt can complete its financial_extract requirement. Failed or unavailable execution requires an explicit gap. A run containing only these completed requirements ends candidate_ready; all outputs still need independent review and adoption.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": true,
+  "available_financial_extract": false,
+  "financial_tasks": [],
+  "financial_task_catalog": null,
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req-segments",
+        "reason": "delivery_selection_required"
+      }
+    ],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [
+      {
+        "context_evidence_id": "ev-0bad08649836d78a2823851b",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000086-935d6090",
+        "text": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Computing. Our segments provide management with a comprehensive financial view of our key businesses. The segments enable the alignment of strategies and objectives across the development, sales, marketing, and services organizations, and they provide a framework for timely and rational allocation of resources within businesses.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-e509b608292d915cc58a8d1cbe91467e",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000111-44930333",
+        "text": "Competition",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/11/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000110-99cc951e",
+        "text": "Dynamics provides cloud-based and on-premises business solutions for financial management, enterprise resource planning (“ERP”), customer relationship management (“CRM”), and supply chain management, as well as agentic AI and other low code application development platforms, for small and medium businesses, large organizations, and divisions of global enterprises. Dynamics revenue is driven by the number of users licensed and applications consumed, expansion of average revenue per user, and the continued shift to Dynamics 365, a unified set of cloud-based intelligent business applications, including our low code development platforms, such as Power Apps and Power Automate.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/10/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000109-5aca154a",
+        "text": "Dynamics Products and Cloud Services",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000108-ec73690d",
+        "text": "LinkedIn connects the world’s professionals to make them more productive and successful and transforms the way companies hire, market, sell, and learn. In addition to LinkedIn’s free services, LinkedIn offers monetized solutions designed to offer AI-enabled insights and productivity: Talent Solutions, Marketing Solutions, Premium Subscriptions, and Sales Solutions. Growth will depend on our ability to increase LinkedIn member engagement on the platform and our ability to continue offering insight and AI-enabled services that provide value for our members and customers. LinkedIn revenue is mainly affected by demand from enterprises and professionals for subscriptions to Talent Solutions, Sales Solutions, and Premium Subscriptions offerings, as well as member engagement and the quality of the sponsored content delivered to those members to drive Marketing Solutions.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/8/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000107-dd84425b",
+        "text": "LinkedIn",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000106-c5ddfeff",
+        "text": "Item 1",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000105-495768bd",
+        "text": "PART I",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000104-ef2d127d",
+        "text": "5",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000103-a597bcd9",
+        "text": "Microsoft 365 Consumer is designed to increase personal productivity and creativity through a range of products and services. Growth depends on our ability to reach new users, add value to our core product set with new features including AI tools, and continue to expand our product and service offerings into new markets. Microsoft 365 Consumer cloud revenue and Office Consumer products revenue is mainly affected by the percentage of customers that buy Office with their new devices and the continued shift from Office licensed on-premises to Microsoft 365 Consumer subscriptions. Microsoft 365 Consumer cloud revenue is also affected by the demand for communication and storage through Outlook.com and OneDrive, which is largely driven by subscriptions and advertising.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000102-83762012",
+        "text": "Microsoft 365 Consumer Products and Cloud Services",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000101-67803298",
+        "text": "Microsoft 365 Commercial is an AI-powered business and productivity solutions platform that brings together Office, Windows, Microsoft 365 Copilot, and Enterprise Mobility + Security to help organizations empower their employees. Growth depends on our ability to reach new users in new markets such as frontline workers, small and medium businesses, and growth markets, as well as add AI-enabled tools, features, and agentic scenarios to our core product and service offerings across communication, collaboration, analytics, security, compliance, and other AI business productivity categories. Microsoft 365 Commercial revenue is mainly affected by a combination of continued installed base growth and average revenue per user expansion, as well as the continued shift from Office licensed on-premises to Microsoft 365.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-1a138ec26c292ced18f5de62",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000100-36240328",
+        "text": "Microsoft 365 Commercial Products and Cloud Services",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8728cc1feeee90ef88794ffafab91226",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-50b301577f60ece44599eac6",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000099-da3d48eb",
+        "text": "Dynamics products and cloud services, including Dynamics 365, comprising a set of intelligent, cloud-based applications across ERP, CRM, Power Apps, and Power Automate; and on-premises ERP and CRM applications.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-8c74e37fbc50e0fe6fbec711e8fc7554",
+          "pointer": "/blocks/12/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 12,
+    "byte_limit": 12000
+  },
+  "source_leads": [
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000086-935d6090",
+      "index_id": "didx-692376daa635828b",
+      "origin": "search",
+      "requirement_ids": [
+        "req-segments"
+      ],
+      "read_request": {
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000086-935d6090"
+      },
+      "read_status": "body_delivered"
+    }
+  ],
+  "source_lead_count": 1,
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 6,
+      "action": "read_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 7,
+      "action": "read_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 8,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 9,
+      "action": "read_artifact",
+      "status": "tool_returned"
+    },
+    {
+      "step": 10,
+      "action": "outline_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 11,
+      "action": "reread",
+      "status": null
+    }
+  ],
+  "consecutive_no_progress": 2,
+  "no_progress_limit": 3,
+  "steps_remaining": 29
+}

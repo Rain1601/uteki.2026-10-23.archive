@@ -1,7 +1,7 @@
 """Bounded native Claude Messages transport for one host-owned planner decision.
 
-This adapter does not execute tools or continue provider turns. Output schemas
-are instructions plus local validation, not a claim of provider-enforced JSON.
+This adapter does not execute tools or continue provider turns. An opt-in small
+native decision envelope constrains wire JSON; full decisions remain locally validated.
 """
 import asyncio
 from contextlib import contextmanager
@@ -12,6 +12,7 @@ import logging
 import math
 import os
 import re
+import ssl
 from threading import Lock
 import time
 
@@ -38,6 +39,20 @@ _TRANSPORT_ERROR_TYPES = frozenset({
 _LOG_LOCK = Lock()
 _LOG_USERS = 0
 _LOG_PREVIOUS_DISABLE = 0
+
+
+class ClaudeTransientTransportError(RuntimeError):
+    """A classified transient request failure; retries belong above the call meter."""
+
+
+def _certificate_failure(error):
+    seen = set()
+    while error is not None and id(error) not in seen:
+        seen.add(id(error))
+        if isinstance(error, ssl.SSLCertVerificationError):
+            return True
+        error = error.__cause__ or error.__context__
+    return False
 
 
 @contextmanager
@@ -121,14 +136,65 @@ def _user_text(value):
     return value
 
 
+def decision_envelope_schema():
+    from uteki.agents.data_query.decision_protocol import ACTION_RULES
+    return {'type': 'object', 'properties': {
+        'action': {'type': 'string', 'enum': list(ACTION_RULES)},
+        'requirement_ids': {'type': 'array', 'items': {'type': 'string'}},
+        'reason': {'anyOf': [{'type': 'string'}, {'type': 'null'}]},
+        'payload_json': {'anyOf': [{'type': 'string'}, {'type': 'null'}]}},
+        'required': ['action', 'requirement_ids', 'reason', 'payload_json'], 'additionalProperties': False}
+
+
+def decode_decision_envelope(text):
+    """Decode without repairing the wire JSON or relaxing the host contract."""
+    from uteki.agents.data_query.decision_protocol import ACTION_RULES
+    value = parse_json_object(text)
+    if set(value) != {'action', 'requirement_ids', 'reason', 'payload_json'}:
+        raise StrictJSONError('invalid_decision_envelope_fields')
+    action, refs, reason, payload = (value[k] for k in ('action', 'requirement_ids', 'reason', 'payload_json'))
+    if (type(action) is not str or action not in ACTION_RULES or type(refs) is not list
+            or any(type(ref) is not str for ref in refs)
+            or (reason is not None and type(reason) is not str)
+            or (payload is not None and type(payload) is not str)):
+        raise StrictJSONError('invalid_decision_envelope_types')
+    result = {'action': action, 'requirement_ids': refs, 'reason': reason}
+    field = ACTION_RULES[action].payload
+    if field is None:
+        if payload is not None:
+            raise StrictJSONError('unexpected_decision_payload')
+    else:
+        if payload is None:
+            raise StrictJSONError('missing_decision_payload')
+        # Payloads may be objects, arrays or strings. The wrapper delegates all
+        # lexical checks to the same strict parser (including duplicate keys).
+        wrapper = parse_json_object('{"payload":' + payload + '}')
+        if set(wrapper) != {'payload'}:
+            raise StrictJSONError('invalid_decision_payload')
+        result[field] = wrapper['payload']
+    encoded = None
+    try:
+        encoded = _canonical(result)
+    except UnicodeEncodeError:
+        pass
+    # Raise outside the encoding handler: raw payload must not survive as
+    # exception context or appear in the host's bounded validation hints.
+    if encoded is None:
+        raise StrictJSONError('invalid_decision_unicode')
+    return encoded.decode('utf-8')
+
+
 class ClaudeMessagesModel(Model):
     native_usage_format = 'anthropic_messages'
 
     def __init__(self, model, *, timeout_seconds, reasoning_effort='high', client_factory=None,
                  max_request_bytes=400000, stream=False, max_output_tokens_limit=16000,
-                 thinking_type='adaptive'):
+                 thinking_type='adaptive', schema_protocol='host_decision'):
         if not isinstance(model, str) or model not in MODELS:
             raise ValueError('Explicit supported Claude model required')
+        if schema_protocol not in {'host_decision', 'json_object', 'native_decision_envelope'}:
+            raise ValueError('Explicit supported Claude schema protocol required')
+        self.schema_protocol = schema_protocol
         if not isinstance(reasoning_effort, str) or reasoning_effort not in {'low', 'medium', 'high'}:
             raise ValueError('Claude effort must be low, medium or high')
         if not isinstance(thinking_type, str) or thinking_type not in {'adaptive', 'between_tools'}:
@@ -182,7 +248,21 @@ class ClaudeMessagesModel(Model):
             raise ValueError('System instructions must be text')
         schema = output_schema.json_schema() if output_schema and not output_schema.is_plain_text() else None
         system = system_instructions or ''
-        if schema is not None:
+        if self.schema_protocol == 'native_decision_envelope':
+            from uteki.agents.data_query.decision_protocol import ACTION_RULES
+            if schema is None or set(schema.get('properties', {}).get('action', {}).get('enum', ())) != set(ACTION_RULES):
+                raise ValueError('Native decision envelope requires the host AutonomousDecision schema')
+            system += ('\nThis endpoint offers no tools. Return the native JSON decision envelope, not XML or tool-call markup. '
+                'All four envelope fields are required. action is the host action name; requirement_ids is an array '
+                '(use [] when no references are needed); reason is the short task explanation or null. '
+                'payload_json is a JSON-encoded string containing ONLY the selected action payload value, '
+                'not a whole decision and not an object wrapping the payload field. For actions without payload, '
+                'payload_json must be null. The host decodes that string into the selected action field and validates '
+                'the complete decision against the original schema below. Do not include unrelated fields. '
+                'The outer native schema guarantees only the envelope; all inner constraints still apply. '
+                'Action-to-payload-field mapping:\n' + _canonical({a:r.payload for a,r in ACTION_RULES.items()}).decode('utf-8')
+                + '\nOriginal host decision JSON Schema (applies AFTER envelope decoding):\n' + _canonical(schema).decode('utf-8'))
+        elif schema is not None and self.schema_protocol == 'host_decision':
             system += ('\nYou are in a stateless host decision protocol. This endpoint offers no tools. '
                        'Tool names describe host actions, not tools you can invoke. '
                        'Select an action by putting its name in the JSON action field; '
@@ -194,9 +274,16 @@ class ClaudeMessagesModel(Model):
                        'Choose the action and its payload from the current packet and permitted schema. '
                        'Follow this JSON Schema; all required fields must be present:\n'
                        + _canonical(schema).decode('utf-8'))
+        elif schema is not None:
+            system += ('\nReturn exactly one JSON object matching the supplied JSON Schema. '
+                       'Return no prose, Markdown fences, XML or tool-call markup outside that object. '
+                       'This endpoint offers no tools. Follow the task instructions and include every '
+                       'required field. JSON Schema:\n' + _canonical(schema).decode('utf-8'))
         body = {'model': self.model, 'messages': [{'role': 'user', 'content': _user_text(input)}],
                 'max_tokens': maximum, 'thinking': {'type': self.thinking_type},
                 'output_config': {'effort': self.reasoning_effort}, 'stream': self.stream}
+        if self.schema_protocol == 'native_decision_envelope':
+            body['output_config']['format'] = {'type': 'json_schema', 'schema': decision_envelope_schema()}
         if system:
             body['system'] = system
         raw = _canonical(body)
@@ -215,18 +302,27 @@ class ClaudeMessagesModel(Model):
             fingerprints['system_sha256'] = _sha(body['system'].encode('utf-8'))
         if schema is not None:
             fingerprints['output_schema_sha256'] = _sha(_canonical(schema))
+        native = self.schema_protocol == 'native_decision_envelope'
+        if native:
+            fingerprints['output_schema_sha256'] = _sha(_canonical(body['output_config']['format']['schema']))
         return build_configuration_snapshot(
             {'provider': 'aihubmix', 'model': self.model, 'api_format': 'anthropic_messages',
              'base_url': 'https://aihubmix.com', 'max_tokens': body['max_tokens'],
              'thinking': body['thinking'], 'reasoning_effort': self.reasoning_effort,
-             'stream': self.stream, 'timeout_seconds': self.timeout_seconds, 'max_retries': 0},
+             'stream': self.stream, 'timeout_seconds': self.timeout_seconds, 'max_retries': 0,
+             **({'response_format': {'type': 'json_schema'}} if native else {})},
             capture_kind='before_dispatch', capture_layer='http_request_before_dispatch', source='http_request',
+            sources={'response_format': 'http_request.output_config.format'} if native else None,
             statuses={name: 'not_sent' for name in ('temperature', 'top_p', 'top_k', 'seed',
-                      'response_format', 'tool_choice', 'parallel_tool_calls')}, fingerprints=fingerprints)
+                      *(() if native else ('response_format',)), 'tool_choice', 'parallel_tool_calls')}, fingerprints=fingerprints)
 
     def _stream_error(self, category):
         self.response_metadata['stream_error_type'] = category
         self.response_metadata['stream_complete'] = False
+        if category in {'incomplete_stream', 'incomplete_event'} or (
+                category == 'provider_error_event' and self.response_metadata.get('provider_error_type')
+                in {'overloaded_error', 'api_error', 'rate_limit_error', 'timeout_error'}):
+            raise ClaudeTransientTransportError('Claude Messages stream interrupted')
         raise ModelBehaviorError('Claude Messages stream is incomplete or invalid')
 
     async def _collect_stream(self, response, key, started):
@@ -398,6 +494,8 @@ class ClaudeMessagesModel(Model):
                 headers_received_elapsed_seconds=time.monotonic() - started,
                 request_id=_identifier(response.headers.get('request-id') or response.headers.get('x-request-id'), key),
                 transport_phase='reading_stream' if self.stream else 'reading_body')
+            if response.status_code in {408, 429, 500, 502, 503, 504, 529}:
+                raise ClaudeTransientTransportError('Claude Messages temporary HTTP failure')
             if response.status_code != 200:
                 raise ModelBehaviorError('Claude Messages returned a non-success status')
             if self.stream:
@@ -421,12 +519,18 @@ class ClaudeMessagesModel(Model):
             raise ValueError('Claude planner calls must be sequential')
         self.response_text = None
         self.response_metadata = None
-        _, raw, _ = self._request(system_instructions, input, model_settings, tools, output_schema,
+        body, raw, schema = self._request(system_instructions, input, model_settings, tools, output_schema,
             handoffs, tracing, previous_response_id=previous_response_id, conversation_id=conversation_id, prompt=prompt)
         self.response_metadata = {'request_sha256': _sha(raw), 'request_bytes': len(raw),
             'dispatch_status': 'not_sent', 'actual_upstream_model': None, 'response_id': None,
             'request_id': None, 'stop_reason': None, 'raw_usage': None, 'usage_presence': 'absent',
             'headers_received': False, 'transport_phase': 'not_sent'}
+        if self.schema_protocol == 'native_decision_envelope':
+            self.response_metadata.update(schema_protocol=self.schema_protocol,
+                wire_schema_sha256=_sha(_canonical(body['output_config']['format']['schema'])),
+                host_output_schema_sha256=_sha(_canonical(schema)),
+                provider_enforced_schema='decision_envelope_only', host_schema_validation='local',
+                transport_decode='not_started')
         key = os.environ.get('AIHUBMIX_API_KEY')
         if not isinstance(key, str) or not key:
             raise ValueError('AIHUBMIX_API_KEY must already be loaded')
@@ -437,6 +541,8 @@ class ClaudeMessagesModel(Model):
                     transport=httpx.AsyncHTTPTransport(retries=0), trust_env=False)
             headers = {'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json'}
             failure = None
+            transient = False
+            certificate_failure = False
             started = time.monotonic()
             with _suppress_transport_logging():
                 try:
@@ -447,8 +553,17 @@ class ClaudeMessagesModel(Model):
                     name = type(error).__name__
                     self.response_metadata['transport_error_type'] = (
                         name if name in _TRANSPORT_ERROR_TYPES else 'TimeoutError')
+                except ssl.SSLError as error:
+                    failure = 'transport'
+                    certificate_failure = _certificate_failure(error)
+                    transient = not certificate_failure
+                    self.response_metadata['transport_error_type'] = (
+                        'SSLCertVerificationError' if certificate_failure else 'SSLError')
                 except httpx.HTTPError as error:
                     failure = 'transport'
+                    certificate_failure = _certificate_failure(error)
+                    transient = (not certificate_failure and isinstance(error, (
+                        httpx.ConnectError, httpx.ReadError, httpx.WriteError, httpx.RemoteProtocolError)))
                     name = type(error).__name__
                     # Never persist exception messages, request objects or an
                     # arbitrary class name. Only stable transport categories.
@@ -461,6 +576,8 @@ class ClaudeMessagesModel(Model):
             if failure:
                 if self.response_metadata.get('transport_error_type') == 'ConnectError' and not self.response_metadata['headers_received']:
                     self.response_metadata['dispatch_status'] = 'not_sent'
+                if transient:
+                    raise ClaudeTransientTransportError('Claude Messages temporary transport failure')
                 raise RuntimeError('Claude Messages transport failed')
             if not self.stream:
                 usage, presence = _numeric_usage(payload.get('usage'))
@@ -477,21 +594,33 @@ class ClaudeMessagesModel(Model):
             self.response_metadata['visible_text_secret_redacted'] = key in visible or self.response_metadata.get('visible_text_secret_redacted', False)
             if self.response_metadata['stop_reason'] != 'end_turn' or not self.response_text.strip():
                 raise ModelBehaviorError('Claude Messages response incomplete or empty')
+            host_text = self.response_text
+            if self.schema_protocol == 'native_decision_envelope':
+                try:
+                    host_text = decode_decision_envelope(self.response_text)
+                except StrictJSONError as error:
+                    self.response_metadata.update(transport_decode='rejected', transport_decode_error=error.code)
+                    raise ModelBehaviorError('Native decision envelope rejected: ' + error.code) from None
+                self.response_metadata.update(transport_decode='decoded', host_decision_sha256=_sha(host_text.encode('utf-8')))
             invalid_schema = False
             if output_schema and not output_schema.is_plain_text():
                 syntax_error = None
                 try:
-                    parse_json_object(self.response_text)
+                    parse_json_object(host_text)
                 except StrictJSONError as error:
                     syntax_error = error.code
                 if syntax_error:
                     raise ModelBehaviorError('JSON output rejected: ' + syntax_error)
                 try:
-                    output_schema.validate_json(self.response_text)
+                    output_schema.validate_json(host_text)
                 except Exception:
                     invalid_schema = True
             if invalid_schema:
+                if self.schema_protocol == 'native_decision_envelope':
+                    self.response_metadata['host_schema_validation'] = 'rejected'
                 raise ModelBehaviorError('Claude Messages response does not match the output schema')
+            if self.schema_protocol == 'native_decision_envelope':
+                self.response_metadata['host_schema_validation'] = 'passed'
             safe_usage = usage or {}
             # SDK requires integer usage defaults. MeteredModel uses raw counters,
             # never these placeholders, to settle costs.
@@ -502,7 +631,7 @@ class ClaudeMessagesModel(Model):
             input_tokens = uncached + cached + created
             return ModelResponse(output=[ResponseOutputMessage(id=self.response_metadata['response_id'] or 'native-message',
                 role='assistant', type='message', status='completed', content=[ResponseOutputText(
-                    type='output_text', text=self.response_text, annotations=[])])],
+                    type='output_text', text=host_text, annotations=[])])],
                 usage=Usage(requests=1, input_tokens=input_tokens, output_tokens=output_tokens,
                     total_tokens=input_tokens + output_tokens,
                     input_tokens_details={'cached_tokens': cached, 'cache_write_tokens': created}),

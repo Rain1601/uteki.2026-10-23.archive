@@ -197,6 +197,13 @@ class AnswerHandoffTests(unittest.TestCase):
         self.assertEqual(analyzed['semantic_review'], 'pending')
         self.assertEqual(analyzed['publication'], 'not_published')
         self.assertTrue(analyzed['answer']['interpretations'][0]['source_citations'])
+        report = (self.root / 'analysis' / 'report.md').read_text()
+        self.assertIn(analyzed['answer']['interpretations'][0]['statement'], report)
+        self.assertIn(ACTUAL, report)
+        self.assertIn('acme-annual', report)
+        self.assertEqual(analyzed['report_path'], 'report.md')
+        manifest = json.loads((self.root / 'analysis' / 'manifest.json').read_text())
+        self.assertEqual(manifest['files']['report.md'], digest(report.encode()))
         self.assertEqual(reviewer.snapshot_usage()['model_requests'] + analyst.snapshot_usage()['model_requests'], 0)
 
     def test_fixture_review_cannot_be_used_as_formal_analysis_by_default(self):

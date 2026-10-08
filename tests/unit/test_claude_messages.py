@@ -17,7 +17,7 @@ from agents.retry import ModelRetrySettings
 import httpx2 as httpx
 from pydantic import BaseModel
 
-from uteki.agents.runtime.claude_messages import ClaudeMessagesModel, ENDPOINT
+from uteki.agents.runtime.claude_messages import ClaudeMessagesModel, ClaudeTransientTransportError, ENDPOINT
 from uteki.agents.runtime.model_configuration import validate_configuration_snapshot
 
 
@@ -514,7 +514,7 @@ class ClaudeMessagesTests(unittest.TestCase):
                 return httpx.Response(429, text='private-error-body ' + self.secret)
             self.respond = respond
             before = len(self.requests)
-            with self.assertRaises((ModelBehaviorError, TimeoutError)) as error:
+            with self.assertRaises((ModelBehaviorError, TimeoutError, ClaudeTransientTransportError)) as error:
                 self.execute()
             self.assertEqual(len(self.requests), before + 1)
             self.assertNotIn(self.secret, str(error.exception) + json.dumps(self.model.response_metadata))

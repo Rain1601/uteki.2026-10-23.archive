@@ -1,0 +1,33 @@
+{
+  "packet_id": "data-review-66c387d4eeef2e635313358c",
+  "facts": [],
+  "requirements": [
+    {
+      "requirement_id": "req-segments",
+      "verdict": "insufficient_evidence",
+      "rationale": "No source blocks or facts were delivered (source_documents and selected_blocks are empty; program gaps: delivery_selection_missing, no_reviewable_source_blocks, no_reviewable_facts). The segment names and their business lists cannot be verified against original 10-K text, and no original paragraphs or full enumerations are available to review.",
+      "citations": []
+    }
+  ],
+  "source_checks": [
+    {
+      "source_snapshot_id": "msft-2025-10k",
+      "verdict": "requires_more_source_content",
+      "rationale": "No text from this source snapshot was delivered in the packet (source_documents is empty). The delivered text is insufficient to answer the question about reporting segments and their main businesses.",
+      "citations": []
+    }
+  ],
+  "question_coverage": "incomplete",
+  "coverage_reason": "The packet contains no source bodies, selected blocks or facts. The original paragraphs and complete enumerations for the three segments cannot be checked, so the question is not covered.",
+  "missing_information": [
+    "Deliver the original 10-K source blocks that identify the reporting segments (Productivity and Business Processes, Intelligent Cloud, More Personal Computing).",
+    "Deliver the complete lists of products and services in each segment, with their introductory text and qualifiers, from the segment description or segment note.",
+    "Provide reviewable facts that cite those blocks, each limited to what is needed to answer the question.",
+    "Resolve the program gaps: delivery_selection_missing:req-segments, no_reviewable_source_blocks:req-segments, no_reviewable_facts."
+  ],
+  "limitations": [
+    "The review is limited to the supplied packet, which contains no source text.",
+    "Evidence IDs referenced in the requirement could not be checked because no corresponding blocks were delivered.",
+    "The expected segment names come from the requirement description and are not verified against the source."
+  ]
+}

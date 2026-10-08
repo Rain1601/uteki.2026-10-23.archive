@@ -1,0 +1,275 @@
+{
+  "schema_version": "data-answer-review-result-v1",
+  "status": "needs_revision",
+  "packet_id": "data-review-94788dae3ce822149065081a",
+  "input_sha256": "df9c1cd0bafe5880e7c817eec027fe06a631602d2093f822c9be882a7829f22b",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "msft-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "assessment": {
+    "packet_id": "data-review-94788dae3ce822149065081a",
+    "facts": [],
+    "requirements": [
+      {
+        "requirement_id": "req-segments",
+        "verdict": "insufficient_evidence",
+        "rationale": "No source bodies, selected blocks or facts were delivered; program gaps report delivery_selection_missing and no_reviewable_source_blocks. The segment disclosures cannot be verified, and no source quotes are available to cite.",
+        "citations": []
+      }
+    ],
+    "source_checks": [
+      {
+        "source_snapshot_id": "msft-2025-10k",
+        "verdict": "requires_more_source_content",
+        "rationale": "source_documents is empty and selected_blocks is empty, so the Item 1 Business text and the segment note were not delivered. The text is insufficient to answer which reportable segments exist or what each includes.",
+        "citations": []
+      }
+    ],
+    "question_coverage": "incomplete",
+    "coverage_reason": "The packet has no reviewable source text or facts. The reportable segments, the main businesses in each, the complete lists and the qualifiers cannot be confirmed from the delivered material.",
+    "missing_information": [
+      "Deliver the original Item 1 Business paragraphs and segment note text from the FY2025 10-K that list the reportable segments (e.g., Productivity and Business Processes, Intelligent Cloud, More Personal Computing) and the products and services in each.",
+      "Include the complete enumerations with their introductory text and qualifiers.",
+      "Provide extracted facts tied to source block_ids so each can be checked.",
+      "Resolve program gaps: delivery_selection_missing:req-segments, no_reviewable_source_blocks:req-segments, no_reviewable_facts."
+    ],
+    "limitations": [
+      "No source body was delivered, so the review is limited to the packet metadata.",
+      "The segment names mentioned in the missing information are from general knowledge, not from the delivered sources, and are not verified."
+    ]
+  },
+  "analysis_eligible": false,
+  "adoption": "unchanged_candidate",
+  "plan_origin": "model",
+  "failures": [],
+  "usage": {
+    "artifact_root": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-business-r2/attempt-03/review-01/model",
+    "path": "usage-0002.json",
+    "sha256": "7dbfdde90e5b0191eca884b597675dc80eb7f8fbada3b34c762bad992a3b03d0",
+    "summary": {
+      "schema_version": "record-review-model-usage-v1",
+      "plan_origin": "model",
+      "provider": "aihubmix",
+      "model": "claude-sonnet-5-5",
+      "reasoning_effort": "high",
+      "thinking_mode": "adaptive",
+      "max_request_bytes": 220000,
+      "model_config_sha256": "98ea5e0dcc72e314475bac760f356fba14c442c8860c161dccabbb102f26f547",
+      "prompt_sha256": "b66417a5e38b753125862a4e2461c40e272498d55809ab7ddefb1afe5f1ca764",
+      "calls": {
+        "requests": 1,
+        "unknown_cost_requests": 0,
+        "known_estimated_usd": "0.01268",
+        "actual_billed_usd": null,
+        "records": [
+          {
+            "call_id": "fcdf6021-9eb6-43e2-8ca1-20f101230556",
+            "stage": "record_review",
+            "provider": "aihubmix",
+            "requested_model": "claude-sonnet-5-5",
+            "actual_upstream_model": "claude-sonnet-5-5",
+            "reasoning_effort": "high",
+            "started_at": "2026-10-08T18:00:09.709421+00:00",
+            "pricing_snapshot": {
+              "provider": "aihubmix",
+              "model": "claude-sonnet-5-5",
+              "currency": "USD",
+              "input_per_million": "2",
+              "output_per_million": "10",
+              "cached_input_per_million": "0.2",
+              "source": "https://aihubmix.com/model/claude-sonnet-5-5",
+              "checked_on": "2026-10-06",
+              "basis": "Uncached public list price estimate; excludes cache discounts, cache-writing charges, fees and account discounts"
+            },
+            "actual_billed_usd": null,
+            "status": "succeeded",
+            "usage": {
+              "input_tokens": 3370,
+              "output_tokens": 594,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0
+            },
+            "estimated_usd": "0.01268",
+            "usage_presence": "reported",
+            "usage_source": "provider_raw",
+            "configuration_snapshot": {
+              "schema_version": "model-call-config-v1",
+              "capture_kind": "before_dispatch",
+              "capture_layer": "http_request_before_dispatch",
+              "effective_configuration": "unverified",
+              "fields": {
+                "provider": {
+                  "value": "aihubmix",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "model": {
+                  "value": "claude-sonnet-5-5",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "api_format": {
+                  "value": "anthropic_messages",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "base_url": {
+                  "value": "https://aihubmix.com",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "max_tokens": {
+                  "value": 12000,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "thinking": {
+                  "value": {
+                    "type": "adaptive"
+                  },
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "reasoning_effort": {
+                  "value": "high",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "temperature": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "top_p": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "top_k": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "seed": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "response_format": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "tool_choice": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "parallel_tool_calls": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "stream": {
+                  "value": false,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "timeout_seconds": {
+                  "value": 180,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "max_retries": {
+                  "value": 0,
+                  "status": "explicit",
+                  "source": "http_request"
+                }
+              },
+              "fingerprints": {
+                "system_sha256": "5def31aafdac2fdf848e9a0e89b0c98595bba375017f4ac0bf41fca24beb2df1",
+                "input_sha256": "16b86bbdbfeda7704cf227f8cc1307d685a99e84985513fb8ea20e3f8c9de099",
+                "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                "output_schema_sha256": "a5b40594956efa68025345dff1740a03f3e3252184dea80fdcb2f1df672803b8"
+              },
+              "sha256": "2692d915ddae7cdcb0951942b7b6da85e743fbd4f7a410fae45daab54e8c9252"
+            },
+            "cost_basis": "anthropic_raw_input_output_cache_read_public_price_estimate_not_bill",
+            "budget_reservation_id": "7376caca-5735-4cef-a3ab-27cd29e8e8e2",
+            "reserved_usd": "0.170348",
+            "request_sha256": "d6542417602f00ba273c2f1a41d13191c4ceec78a602b5d2c5869aefd10f57d2",
+            "request_bytes": 9174,
+            "response_id": "msg_bdrk_aqq3wpywa7xl6e4f54smpwgzgudtsgob6uto3t55jrhnf5mdcspq",
+            "request_id": null,
+            "stop_reason": "end_turn",
+            "raw_usage": {
+              "input_tokens": 3370,
+              "output_tokens": 594,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 0
+              }
+            },
+            "dispatch_status": "sent",
+            "http_status": 200,
+            "visible_text_secret_redacted": false,
+            "transport_phase": "body_complete",
+            "headers_received": true,
+            "headers_received_elapsed_seconds": 5.242852833122015,
+            "ended_at": "2026-10-08T18:00:14.953389+00:00",
+            "elapsed_seconds": 5.243771207984537
+          }
+        ]
+      },
+      "shared_budget": {
+        "limit_usd": null,
+        "estimated_spent_usd": "3.362070",
+        "held_usd": "0",
+        "unknown_requests": 0,
+        "in_flight_requests": 0,
+        "requests": 52,
+        "actual_billed_usd": null,
+        "enforcement": "record_only"
+      },
+      "artifacts": [
+        {
+          "path": "calls/fcdf6021-9eb6-43e2-8ca1-20f101230556-end.json",
+          "sha256": "1a6a8b910b93df7b59638f1faaad9a59ad8c9ed32548646bc0dd413fcd459c6e"
+        },
+        {
+          "path": "calls/fcdf6021-9eb6-43e2-8ca1-20f101230556-start.json",
+          "sha256": "e035f4307e21a96755b2e34032a368e815fe4ca2b7b29b3ba2311263eb17f9b1"
+        },
+        {
+          "path": "model-config.json",
+          "sha256": "98ea5e0dcc72e314475bac760f356fba14c442c8860c161dccabbb102f26f547"
+        },
+        {
+          "path": "review-0001-attempt-01.json",
+          "sha256": "ba43e4c1ce2bf5cb16d03d1b2b766a8ac2d2dcedb34f786cfccbe2f8b280f929"
+        },
+        {
+          "path": "review-0001-input.json",
+          "sha256": "65fd53890bc94243500f198a175b710a03ec229be84d880b4b3756fa41fec6dd"
+        },
+        {
+          "path": "review-0001-parsed.json",
+          "sha256": "687c810925b834c6f9890e39690bdb84c84931e49a99600c8e4a4126454b2db9"
+        }
+      ],
+      "business_validation": "not_evaluated"
+    }
+  }
+}

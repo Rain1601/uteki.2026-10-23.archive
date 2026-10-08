@@ -1,0 +1,391 @@
+{
+  "schema_version": "independent-data-content-review-v1",
+  "case_id": "msft-cloud",
+  "run_id": "msft-cloud-r2",
+  "matrix_version": "v4",
+  "reviewed_at": "2026-10-08T19:24:21.567065+00:00",
+  "reviewer": "Codex independent source review",
+  "model_calls": 0,
+  "network_calls": 0,
+  "verdict": "pass",
+  "human_acceptance": "not_performed",
+  "analysis_called": false,
+  "held_out": false,
+  "question": "Microsoft FY2025 10-K 中 Microsoft Cloud、Intelligent Cloud 和 Azure and other cloud services 的披露口径有什么不同？请取得回答所需原始定义和收入披露材料，供分析 Agent 使用。",
+  "question_sha256": "b455f9ef7684e9167c68d14095958dcb4ab9458fae5450a7ea615ae47be49da2",
+  "cycle_ref": {
+    "path": "experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-cloud-r2",
+    "manifest_sha256": "7857d19e53a1f4a1778e679c159dcf64d37ccce17c5547c534b33aed2488d683"
+  },
+  "final_query_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-cloud-r2/attempt-02/data-query/query",
+    "manifest_sha256": "9e5d1b3d18a14ff373eed5091470005ec6dc7f8cb3ba18ee648856135d235b02"
+  },
+  "final_review_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-cloud-r2/attempt-02/review-01",
+    "manifest_sha256": "4f84d4a70a80d37e9a5fbf459e5517f5876e48c16f7264365713d0fefaac6447"
+  },
+  "packet_id": "data-review-d4d9db01ea4da442525cb814",
+  "packet_sha256": "e26bd59f608ef085cdaab574511eb313d5ded8d58f2a261aa0877ff5fe23d21f",
+  "review_result_sha256": "67384fe61f013f76bd0b9b4fada89f781c9d28bac52131cad6ca5676469f80d2",
+  "delivery_schema_version": "selected-originals-v3",
+  "dataset_ref": {
+    "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/datasets/msft",
+    "manifest_sha256": "d5f4c63ae4a8c8524610d2b51cfde10a52de4fd3a47223d049bc7f6cc41c509b"
+  },
+  "source": {
+    "source_snapshot_id": "msft-2025-10k",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+    "raw_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+    "index_blocks_sha256": "0f89b470fa423ca6369be61f27a5fd574dc193103a6d5293e8c4feae2881788c",
+    "source_period_end": "2025-06-30",
+    "parser_version": "sec-source-blocks-v0.1.11"
+  },
+  "attempt_count": 2,
+  "revision_rounds": 1,
+  "blocks": 18,
+  "source_characters": 4741,
+  "citations_verified": 18,
+  "citation_precision": "18 exact whole-block citations bound to source/block/DOM; both table grids reconstructed from raw DOM using the frozen parser semantics, with every cell and span compared. No substring guessing.",
+  "semantic_checks": [
+    {
+      "id": "microsoft-cloud-definition",
+      "status": "pass",
+      "ordinals": [
+        1227,
+        93,
+        97,
+        99
+      ],
+      "reason": "Definition explicitly restricts LinkedIn to its commercial portion, Microsoft 365 to Commercial cloud, and Dynamics to Dynamics 365. Microsoft Cloud amounts are included within multiple product/service lines; PBP originals show cross-segment membership."
+    },
+    {
+      "id": "microsoft-cloud-revenue",
+      "status": "pass",
+      "ordinals": [
+        515,
+        517,
+        1227
+      ],
+      "values": {
+        "FY2025": "$168.9 billion",
+        "FY2024": "$137.7 billion",
+        "FY2023": "$111.6 billion",
+        "FY2025_growth": "23%"
+      },
+      "reason": "Periods and the fiscal-year comparison introduction are retained. Growth is distinct from the amounts."
+    },
+    {
+      "id": "intelligent-cloud",
+      "status": "pass",
+      "ordinals": [
+        86,
+        117,
+        118,
+        120,
+        122,
+        587
+      ],
+      "values": {
+        "FY2025": "$106,265 million",
+        "FY2024": "$87,464 million"
+      },
+      "table_coordinates_zero_based": {
+        "block_587": {
+          "unit_header_row": 1,
+          "segment_heading_row": 14,
+          "revenue_row": 16,
+          "FY2025_amount_column": 3,
+          "FY2024_amount_column": 7
+        }
+      },
+      "reason": "Reportable segment identity, complete two-item composition, years and million unit preserved; segment also includes on-premises server products and enterprise/partner services."
+    },
+    {
+      "id": "azure-and-other-cloud",
+      "status": "pass",
+      "ordinals": [
+        120,
+        613,
+        1225,
+        1226
+      ],
+      "values": {
+        "FY2025_growth": "34%"
+      },
+      "reason": "Component of Server products and cloud services, including consumption services/GitHub/Nuance/virtual desktop. 34% remains growth, not an amount; 98,435/79,828 million in product table are Server products and cloud services, not Azure."
+    },
+    {
+      "id": "non-additive-scope",
+      "status": "pass",
+      "ordinals": [
+        86,
+        91,
+        93,
+        97,
+        99,
+        118,
+        120,
+        122,
+        1227
+      ],
+      "reason": "Original definitions allow downstream Analysis to distinguish intersecting scopes. No invented fourth reportable segment or additive peer partition is introduced."
+    }
+  ],
+  "block_checks": [
+    {
+      "block_id": "block-000086-935d6090",
+      "ordinal": 86,
+      "text_hash": "935d60904eb39710e00cb0d07e9c8f15556ba7d4792be8f0e005e28fdcc9c92f",
+      "chars": 487,
+      "dom_path": "/html/body/div[15]/p[2]",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000090-94a2e06c",
+      "ordinal": 90,
+      "text_hash": "94a2e06cbe413c1e0742016cfc2688049e77680cbbe06c7bdca7fa26fbcded88",
+      "chars": 35,
+      "dom_path": "/html/body/div[15]/p[6]",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000091-d993f813",
+      "ordinal": 91,
+      "text_hash": "d993f813170ccba6b56ef55f21d23a571600f3e3997733ba6230381a8cdeb7b2",
+      "chars": 235,
+      "dom_path": "/html/body/div[15]/p[7]",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000093-7018adaa",
+      "ordinal": 93,
+      "text_hash": "7018adaab1771400d012d62f1d71beaaf43645407f6d794872fd87001e9c4bde",
+      "chars": 458,
+      "dom_path": "/html/body/div[15]/div[1]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000095-61bd513b",
+      "ordinal": 95,
+      "text_hash": "61bd513b7ff69104bce0b7c1e0bdb29e8d8f9ada2b9b0d1368f2554de078f784",
+      "chars": 157,
+      "dom_path": "/html/body/div[15]/div[2]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000097-13124fb7",
+      "ordinal": 97,
+      "text_hash": "13124fb73864f984aa690440624343f61d9931b2c234a3120641d0110adf30c3",
+      "chars": 102,
+      "dom_path": "/html/body/div[15]/div[3]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000099-da3d48eb",
+      "ordinal": 99,
+      "text_hash": "da3d48ebd71ff1df7005f49ca5852c5cee82aade24fd23ab92c60502783a2355",
+      "chars": 210,
+      "dom_path": "/html/body/div[15]/div[4]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000117-925ee601",
+      "ordinal": 117,
+      "text_hash": "925ee6010a3a345fe7254c4a0afd9d3d6ee895065adf6733491fdfc7ea81b29e",
+      "chars": 17,
+      "dom_path": "/html/body/div[18]/p[11]",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000118-5e917062",
+      "ordinal": 118,
+      "text_hash": "5e917062d98a0c16faaba740b5332ca48d66d29ec417085265ec93005789e273",
+      "chars": 185,
+      "dom_path": "/html/body/div[18]/p[12]",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000120-c34f7245",
+      "ordinal": 120,
+      "text_hash": "c34f7245fa9e88e6ae478ced0a0998fbba3c5cdfbf20ee4c78ae1a0d47c747bb",
+      "chars": 403,
+      "dom_path": "/html/body/div[18]/div[1]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000122-c07a987e",
+      "ordinal": 122,
+      "text_hash": "c07a987eb7f09b3a5158f3aa698c357965655a36d0d8f79f9559316e17d1a1cc",
+      "chars": 173,
+      "dom_path": "/html/body/div[18]/div[2]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000515-bbf3475b",
+      "ordinal": 515,
+      "text_hash": "bbf3475b77b88437ec9e5393be351b72b4285d9ddc7f6482726bb7141d907a7d",
+      "chars": 73,
+      "dom_path": "/html/body/div[105]/p[6]",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000517-e428a3ca",
+      "ordinal": 517,
+      "text_hash": "e428a3ca91622c380e5745a09346cdcc326d0714299f663f3d1f1d9dde673980",
+      "chars": 56,
+      "dom_path": "/html/body/div[105]/div[1]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000587-59d50164",
+      "ordinal": 587,
+      "text_hash": "59d501645f4054e0344e5fd0abce5189fdc7f12c0f48f774e8d7c99ff863b6cb",
+      "chars": 705,
+      "dom_path": "/html/body/div[117]/table",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-000613-2b412f2d",
+      "ordinal": 613,
+      "text_hash": "2b412f2dcf2414593e033d7da216e09c6ef3e6404c6f384e297ea2ec54798f8e",
+      "chars": 347,
+      "dom_path": "/html/body/div[120]/div[1]/div",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-001225-3895f129",
+      "ordinal": 1225,
+      "text_hash": "3895f129f8bbca52974180f958a942a07d7c980123e62cde605fb1a12a67cddd",
+      "chars": 81,
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[1]",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-001226-283de46e",
+      "ordinal": 1226,
+      "text_hash": "283de46ecdb49aaf06e035894a9b7cd920233aa2ff4c28f80764d1c768c259fb",
+      "chars": 558,
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/table",
+      "dom_and_index_match": true
+    },
+    {
+      "block_id": "block-001227-3bdf0315",
+      "ordinal": 1227,
+      "text_hash": "3bdf03150bb94dc96d22058a5c8e734030f084f563c29f318eb3bdce3c84894e",
+      "chars": 459,
+      "dom_path": "/html/body/div[255]/div[1]/ix:continuation/div[1]/ix:nonnumeric/p[4]",
+      "dom_and_index_match": true
+    }
+  ],
+  "runtime_provenance": {
+    "caller_semantic_selection": false,
+    "caller_input_checked": "company/source scope, dataset, original question and limits; no block/chapter selection",
+    "plan_origin": "model",
+    "review_origin": "model",
+    "revision_feedback_matches_prior_model_assessment": true,
+    "evaluation_artifact_names_absent_from_runtime_turn_inputs": true,
+    "final_trace": [
+      {
+        "action": "invalid",
+        "status": "rejected"
+      },
+      {
+        "action": "load_skill",
+        "status": "skill_loaded"
+      },
+      {
+        "action": "plan",
+        "status": "planned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "search_source",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_artifact",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "select_evidence",
+        "status": "delivery_selected"
+      },
+      {
+        "action": "select_evidence",
+        "status": "delivery_selected"
+      },
+      {
+        "action": "read_context",
+        "status": "tool_returned"
+      },
+      {
+        "action": "read_artifact",
+        "status": "tool_returned"
+      },
+      {
+        "action": "select_evidence",
+        "status": "delivery_selected"
+      },
+      {
+        "action": "select_evidence",
+        "status": "delivery_selected"
+      },
+      {
+        "action": "finish",
+        "status": "evidence_ready"
+      }
+    ],
+    "boundary": "Audit supports system-selected and system-revised retrieval. This known-material debugging matrix does not establish generalization."
+  },
+  "notes": [
+    {
+      "id": "bounded-originals-not-mathematical-minimum",
+      "severity": "nonblocking",
+      "detail": "18 blocks / 4741 characters, including two complete source tables with context. Unused cells/other segment rows remain because this delivery preserves original table blocks. Microsoft Cloud highlight 517 repeats the amount but adds period-framed growth; PBP Consumer is boundary context. This is bounded sufficient material, not the absolute smallest possible packet."
+    },
+    {
+      "id": "negative-disclosure-scope",
+      "severity": "nonblocking",
+      "detail": "Azure dollar revenue is not separately shown in the supplied tables/passages. Do not generalize this to all company disclosures or future reports. A keyword audit of this frozen 10-K found Azure narrative/growth/definition mentions, but is not proof of universal non-disclosure."
+    },
+    {
+      "id": "requirements-versus-evidence",
+      "severity": "nonblocking",
+      "detail": "The generated requirement requested gross-margin context and any explicit non-segment statement; these are not original user requirements and need not expand the final bundle. The final reviewer correctly treated them as unnecessary. The non-segment distinction is a downstream inference from disclosed segment names and metric scope, not a claimed verbatim quote."
+    }
+  ],
+  "blocking_findings": [],
+  "criteria_policy": "Evaluate the original three-scope data question. Do not force unrequested product detail, gross margin or a verbatim negative-disclosure statement."
+}

@@ -1,0 +1,9 @@
+Offline scripted regression; no model/API calls.
+Command: PYTHONPATH=src:. .venv/bin/python -m unittest tests.unit.test_read_body_catalog_pagination tests.unit.test_analysis_evidence_runtime tests.unit.test_autonomous_source_evidence tests.unit.test_autonomous_data_agent tests.unit.test_autonomous_worker tests.unit.test_run_artifacts -q
+Initial run: 87 tests, 1 failure: expanded Skill crossed default preview bytes, so loaded_skill.content was absent.
+Correction: shortened only the new generic catalog-navigation instruction; no input limit increase or runtime reading change.
+Final run: Ran 87 tests in 9.501s; OK.
+git diff --check: passed.
+Runtime analysis_evidence prompt: autonomous-data-agent-v14-read-catalog-pagination. Query Skill version: 13 (11709 bytes). Legacy question_answer prompt remains v8.
+New checks: 60 delivered block directory rows page completely; early original exact pointer reopens; unchanged catalog ID reused independent of call/order; new snapshot does not change old cursor; invalid cursor hash/scope/snapshot/ID rejects; active scope/source/unread/layout/blank/duplicate filtering; navigation artifact has no evidence ID, no body payload, cannot grant unread block selection.
+This verifies host wiring, not real model navigation quality. Parent will run the affected original Microsoft business question separately.

@@ -1,0 +1,54 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 1,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "aihubmix",
+  "model": "claude-sonnet-5-5",
+  "request": {
+    "path": "review-0001-input.json",
+    "sha256": "5ecf312b1386515bc4e578e80a234288d1e46e0b12259836c46c1e9ab4271d24"
+  },
+  "status": "json_returned",
+  "started_at": "2026-10-08T19:09:31.460052+00:00",
+  "raw_text": "{\"packet_id\":\"data-review-b54a45bb619ca542ee734010\",\"facts\":[],\"requirements\":[{\"requirement_id\":\"req-segments\",\"verdict\":\"insufficient_evidence\",\"rationale\":\"No source bodies or selected blocks were delivered (source_documents is empty; program gaps include delivery_selection_missing and no_reviewable_source_blocks). The reportable segments cannot be verified against the original 10-K text.\"},{\"requirement_id\":\"req-segment-businesses\",\"verdict\":\"insufficient_evidence\",\"rationale\":\"No original passages enumerating each segment's products, services and activities were delivered, so the full enumeration, qualifiers and affiliations cannot be checked. Evidence IDs are listed but no bodies are provided.\"}],\"source_checks\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"verdict\":\"requires_more_source_content\",\"rationale\":\"The source is in scope, but no body text was delivered in source_documents. No citation can be made and no review is possible.\"}],\"question_coverage\":\"incomplete\",\"coverage_reason\":\"The packet has no delivered source documents, selected blocks or facts. The question asks for the reportable segments and the complete list of principal businesses in each segment, with original passages and qualifiers. None of this can be verified or supported from the delivered material.\",\"missing_information\":[\"Original 10-K text identifying the three reportable segments (segment note and/or Business section).\",\"Original 10-K enumeration of the products, services and activities in each segment (e.g. Productivity and Business Processes, Intelligent Cloud, More Personal Computing), with qualifiers and affiliations.\",\"Selected source blocks delivered for evidence IDs ev-8544ccbe13ee4a483094555a, ev-2531a66c2296f2248f5a872e, ev-4c331ae164cd13b88ff99033, ev-41490e9252251bbe4ab42d5f and ev-5671465b23816074b4ade4dd.\"],\"limitations\":[\"Segment names and contents mentioned in the requirement descriptions are not evidence and were not adopted.\",\"The query_status is limited. With no delivered bodies, relevance and minimality of blocks cannot be assessed.\"],\"revision_requests\":[\"Deliver the selected original source blocks for both requirements, including the segment definitions and the full per-segment product/service enumerations with their introductions and qualifiers.\"],\"body_checks\":[]}",
+  "response_text": "{\"packet_id\":\"data-review-b54a45bb619ca542ee734010\",\"facts\":[],\"requirements\":[{\"requirement_id\":\"req-segments\",\"verdict\":\"insufficient_evidence\",\"rationale\":\"No source bodies or selected blocks were delivered (source_documents is empty; program gaps include delivery_selection_missing and no_reviewable_source_blocks). The reportable segments cannot be verified against the original 10-K text.\"},{\"requirement_id\":\"req-segment-businesses\",\"verdict\":\"insufficient_evidence\",\"rationale\":\"No original passages enumerating each segment's products, services and activities were delivered, so the full enumeration, qualifiers and affiliations cannot be checked. Evidence IDs are listed but no bodies are provided.\"}],\"source_checks\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"verdict\":\"requires_more_source_content\",\"rationale\":\"The source is in scope, but no body text was delivered in source_documents. No citation can be made and no review is possible.\"}],\"question_coverage\":\"incomplete\",\"coverage_reason\":\"The packet has no delivered source documents, selected blocks or facts. The question asks for the reportable segments and the complete list of principal businesses in each segment, with original passages and qualifiers. None of this can be verified or supported from the delivered material.\",\"missing_information\":[\"Original 10-K text identifying the three reportable segments (segment note and/or Business section).\",\"Original 10-K enumeration of the products, services and activities in each segment (e.g. Productivity and Business Processes, Intelligent Cloud, More Personal Computing), with qualifiers and affiliations.\",\"Selected source blocks delivered for evidence IDs ev-8544ccbe13ee4a483094555a, ev-2531a66c2296f2248f5a872e, ev-4c331ae164cd13b88ff99033, ev-41490e9252251bbe4ab42d5f and ev-5671465b23816074b4ade4dd.\"],\"limitations\":[\"Segment names and contents mentioned in the requirement descriptions are not evidence and were not adopted.\",\"The query_status is limited. With no delivered bodies, relevance and minimality of blocks cannot be assessed.\"],\"revision_requests\":[\"Deliver the selected original source blocks for both requirements, including the segment definitions and the full per-segment product/service enumerations with their introductions and qualifiers.\"],\"body_checks\":[]}",
+  "response_metadata": {
+    "request_sha256": "e2cece00793d896cc2345484a76e32817449d33cc701b6b00bffa13913ec1617",
+    "request_bytes": 14559,
+    "dispatch_status": "sent",
+    "actual_upstream_model": "claude-sonnet-5-5",
+    "response_id": "msg_bdrk_bdlb7tyw53bf4nkps36twhmbjokrehf3exgbqj2mzpocpvzryqjq",
+    "request_id": null,
+    "stop_reason": "end_turn",
+    "raw_usage": {
+      "input_tokens": 5221,
+      "output_tokens": 796,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "usage_presence": "reported",
+    "headers_received": true,
+    "transport_phase": "body_complete",
+    "http_status": 200,
+    "headers_received_elapsed_seconds": 7.655369041021913,
+    "visible_text_secret_redacted": false
+  },
+  "elapsed_seconds": 7.666503583081067,
+  "ended_at": "2026-10-08T19:09:39.126493+00:00",
+  "calls": [
+    {
+      "path": "calls/9a34bfd7-0601-4bc1-95fc-669cdcc1d286-end.json",
+      "sha256": "ceba19d7a4742ea2a7b6ca22a91dbf14192ffe159846b96ecff5bb7080ab21c8"
+    },
+    {
+      "path": "calls/9a34bfd7-0601-4bc1-95fc-669cdcc1d286-start.json",
+      "sha256": "921458fc3ff2e5bd3e307e32edd4d12b381c9cf4c3179a820c259e78e8a5cad5"
+    }
+  ]
+}

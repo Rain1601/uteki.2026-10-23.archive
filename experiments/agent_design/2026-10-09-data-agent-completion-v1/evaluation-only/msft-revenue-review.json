@@ -1,0 +1,175 @@
+{
+  "schema_version": "evaluation-only-msft-revenue-review-v1",
+  "purpose": "Codex independent offline content review; MUST NOT feed runtime/model prompts",
+  "model_calls": 0,
+  "network_calls": 0,
+  "packet_path": "runs/msft-revenue-r2/attempt-03/review-packet.json",
+  "packet_sha256": "c52a44eb606fbb6bbed00af5daac6d09a9cae3fa9b28c604041247bdbb12c091",
+  "packet_id": "data-review-be4422cdd6806e6a65b28d79",
+  "dataset_manifest_sha256": "d5f4c63ae4a8c8524610d2b51cfde10a52de4fd3a47223d049bc7f6cc41c509b",
+  "raw_path": "datasets/msft/raw/msft-2025-10k.html",
+  "raw_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+  "gold_sha256": "7edc8e26e02395450bffe25860e713dc0d6d6d48748381f9d3488be756b409a1",
+  "verdict": "pass_for_reported_company_total_with_claim_boundary",
+  "numeric_facts": "pass",
+  "period_unit_and_total_scope": "pass",
+  "original_identity_and_coordinates": "pass",
+  "minimum_semantic_coverage": "sufficient_for_reported_company_total",
+  "short_provenance_heading": "acceptable_supporting_context_not_a_blocker",
+  "source_body_count": 3,
+  "record_fact_count": 2,
+  "source_block_fact_count": 2,
+  "checks": {
+    "dataset_manifest_binding": true,
+    "all_dataset_files_hash_match": true,
+    "raw_source_hash_match": true
+  },
+  "body_checks": [
+    {
+      "block_id": "block-000779-9d7720d5",
+      "dom_path": "/html/body/div[150]/p[1]",
+      "reported_page": 50,
+      "text_chars": 51,
+      "text_matches_frozen_original": true,
+      "table_cells_match_frozen_original": null,
+      "relevance": "supporting_context"
+    },
+    {
+      "block_id": "block-000780-cdef2bac",
+      "dom_path": "/html/body/div[150]/p[2]",
+      "reported_page": 50,
+      "text_chars": 17,
+      "text_matches_frozen_original": true,
+      "table_cells_match_frozen_original": null,
+      "relevance": "supporting_context"
+    },
+    {
+      "block_id": "block-000781-9ee5633d",
+      "dom_path": "/html/body/div[150]/table",
+      "reported_page": 50,
+      "text_chars": 889,
+      "text_matches_frozen_original": true,
+      "table_cells_match_frozen_original": true,
+      "relevance": "necessary"
+    }
+  ],
+  "record_checks": [
+    {
+      "record_id": "obs-107558c6718ab9be97c91714",
+      "year": 2025,
+      "raw_literal": "281,724",
+      "raw_scale": "6",
+      "normalized_usd": "281724000000",
+      "period": {
+        "kind": "year",
+        "start": "2024-07-01",
+        "end": "2025-06-30",
+        "basis": "source"
+      },
+      "block_id": "block-000781-9ee5633d",
+      "cell": {
+        "row": 11,
+        "column": 3
+      },
+      "char_start": 175,
+      "char_end": 182,
+      "fact_dom_path": "/html/body/div[150]/table/tr[12]/td[4]/p/span/ix:nonfraction",
+      "context_ref": "C_7102029d-8d6c-44c5-b166-04cf41443b1e",
+      "checks": {
+        "value_matches_original_xbrl": true,
+        "unit_matches_original_xbrl": true,
+        "period_matches_original_xbrl": true,
+        "issuer_matches_original_xbrl": true,
+        "no_dimensions_original_xbrl": true,
+        "standard_revenue_concept": true,
+        "exact_citation_span": true,
+        "exact_citation_cell": true
+      }
+    },
+    {
+      "record_id": "obs-4a6f24cd302134f51f78cd1e",
+      "year": 2024,
+      "raw_literal": "245,122",
+      "raw_scale": "6",
+      "normalized_usd": "245122000000",
+      "period": {
+        "kind": "year",
+        "start": "2023-07-01",
+        "end": "2024-06-30",
+        "basis": "source"
+      },
+      "block_id": "block-000781-9ee5633d",
+      "cell": {
+        "row": 11,
+        "column": 7
+      },
+      "char_start": 183,
+      "char_end": 190,
+      "fact_dom_path": "/html/body/div[150]/table/tr[12]/td[8]/p/span/ix:nonfraction",
+      "context_ref": "C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862",
+      "checks": {
+        "value_matches_original_xbrl": true,
+        "unit_matches_original_xbrl": true,
+        "period_matches_original_xbrl": true,
+        "issuer_matches_original_xbrl": true,
+        "no_dimensions_original_xbrl": true,
+        "standard_revenue_concept": true,
+        "exact_citation_span": true,
+        "exact_citation_cell": true
+      }
+    }
+  ],
+  "unmet_semantics": [],
+  "verified_example_support_not_unique_path": [
+    {
+      "block_id": "block-000813-86814fe3",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/div[1]/ix:nonnumeric/p[2]",
+      "text_hash": "86814fe3bba9973fca40ff5bcb68c4e4a2dfb9b58b4f931fb4211ae75f2089e3",
+      "quote": "Our consolidated financial statements and accompanying notes are prepared in accordance with accounting principles generally accepted in the United States of America (“GAAP”).",
+      "not_in_packet": true
+    },
+    {
+      "block_id": "block-000815-a9d394c1",
+      "dom_path": "/html/body/div[165]/div/ix:nonnumeric/p[2]",
+      "text_hash": "a9d394c1ec3d4f0f9c16e1e298109702bed81fe20f33caf866a440975ea60a3d",
+      "quote": "The consolidated financial statements include the accounts of Microsoft Corporation and its subsidiaries. Intercompany transactions and balances have been eliminated.",
+      "not_in_packet": true
+    }
+  ],
+  "limitations": [
+    "This is a targeted content evaluation, not a full annual-report audit or a live model review.",
+    "The complete original income-statement table contains rows beyond revenue; justified by current original-table atomic delivery. Not byte-minimal; future verified row slices may reduce it.",
+    "Recast qualification is conditional and is not required when reporting company total without recast claims.",
+    "Accounting-policy examples are evaluation-only and cannot be injected into the autonomous retrieval plan.",
+    "This pass applies to the original retrieval question with narrow reported-company-total wording, not an accounting-policy explanation or unseen-company generalization."
+  ],
+  "accounting_basis_assessment": {
+    "required_by_this_question": "Preserve the actual company-total income-statement basis, not segment/product totals, forecast or adjusted amounts.",
+    "supported": "reported_consolidated understood narrowly as issuer-wide total revenue reported in the primary financial income statement; backed jointly by Item 8/INCOME STATEMENTS, Total revenue row and matching undimensioned issuer XBRL.",
+    "not_supported_by_this_packet": [
+      "Explicit statement of US GAAP preparation",
+      "Subsidiary consolidation perimeter",
+      "Intercompany elimination policy"
+    ],
+    "conditional_additional_evidence": "Needed if the final answer asserts these further policies. The broad gold examples do not make all policy details mandatory for a two-year total-revenue retrieval.",
+    "adapter_limit": "The adapter sets reported_consolidated whenever there are no dimensions. That rule alone is not independent proof of consolidation or GAAP; the original statement context was checked here."
+  },
+  "gold_interpretation": "Evaluate the original question and stated claim boundary. accounting-scope examples are a richer support set, not mandatory prose or exact-block hits; do not silently extend narrow reported basis into GAAP/policy claims.",
+  "accepted_cycle_binding": {
+    "path": "runs/msft-revenue-r3/result.json",
+    "status": "reviewed_data_ready",
+    "sha256": "f73ad7a2857bbf4d7ba6934a55169d566fc2d18b3adf99ca9a1b7352e321fe41",
+    "final_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-revenue-r2/attempt-03/data-query/query",
+      "manifest_sha256": "e6cb6551d52461949cd9670a31bb5206ab694f0ccc190ec68c8cffd511594a33"
+    },
+    "final_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-revenue-r3/attempt-01/review-01",
+      "manifest_sha256": "bc2e155125ee954968a561b189160e0d17d1e694b746b0e94d7bee4ac365d63b"
+    },
+    "accepted_packet_path": "runs/msft-revenue-r3/attempt-01/review-packet.json",
+    "packet_bytes_identical": true,
+    "review_input_bytes_identical": true,
+    "model_review_analysis_eligible": true
+  }
+}

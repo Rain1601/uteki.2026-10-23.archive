@@ -1,0 +1,392 @@
+{
+  "schema_version": "data-answer-review-result-v1",
+  "status": "reviewed",
+  "packet_id": "data-review-e9960af26932bcc38159f951",
+  "input_sha256": "2c932e04ddfba4321122d16f263b469aeeec88cba8872095bc03542b4cb932aa",
+  "scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-025a1b23302b3227b44ac8c3",
+    "company_ids": [
+      "sec-0001652044"
+    ],
+    "source_snapshot_ids": [
+      "googl-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "assessment": {
+    "packet_id": "data-review-e9960af26932bcc38159f951",
+    "facts": [
+      {
+        "fact_id": "ev-67189f4cd4dcee452cb83ab2",
+        "verdict": "supported",
+        "rationale": "The income statement table shows Revenues of $402,836 (millions) in the 2025 column, matching the record value of 402,836,000,000 USD, FY2025, consolidated.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000753-53762a3b",
+            "quote": "Revenues$307,394 $350,018 $402,836"
+          }
+        ],
+        "relevance": "necessary"
+      },
+      {
+        "fact_id": "ev-3a5c83fac5b23e1d158f3492",
+        "verdict": "supported",
+        "rationale": "The income statement table shows Revenues of $350,018 (millions) in the 2024 column, matching the record value of 350,018,000,000 USD, FY2024, consolidated.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000753-53762a3b",
+            "quote": "Revenues$307,394 $350,018 $402,836"
+          }
+        ],
+        "relevance": "necessary"
+      },
+      {
+        "fact_id": "source-block-6d38eb62e6e73089d8452206",
+        "verdict": "supported",
+        "rationale": "The heading identifies the table as the consolidated statements of income, which provides the accounting basis.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000751-1e6373dd",
+            "quote": "CONSOLIDATED STATEMENTS OF INCOME"
+          }
+        ],
+        "relevance": "supporting_context"
+      },
+      {
+        "fact_id": "source-block-3106f0481f5c969a0956e926",
+        "verdict": "supported",
+        "rationale": "The unit line states that amounts are in millions, except per share amounts, which is needed to read the revenue figures.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000752-dfe26017",
+            "quote": "(in millions, except per share amounts)"
+          }
+        ],
+        "relevance": "necessary"
+      },
+      {
+        "fact_id": "source-block-ff738279896d3dc0249381f7",
+        "verdict": "supported",
+        "rationale": "The table body contains the period header (Year Ended December 31) and the revenue figures for 2024 and 2025. It also contains 2023 data and other lines that are unneeded but belong to the same table block.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000753-53762a3b",
+            "quote": "Year Ended December 31, 202320242025Revenues$307,394 $350,018 $402,836"
+          }
+        ],
+        "relevance": "necessary"
+      }
+    ],
+    "requirements": [
+      {
+        "requirement_id": "rev_query",
+        "verdict": "complete",
+        "rationale": "The records give FY2025 and FY2024 revenue in USD, with periods resolved, basis reported_consolidated, and source citations that match the table cells.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000753-53762a3b",
+            "quote": "Revenues$307,394 $350,018 $402,836"
+          }
+        ]
+      },
+      {
+        "requirement_id": "rev_source",
+        "verdict": "complete",
+        "rationale": "The original statement heading, unit line and table are delivered. Together they cover the years ended December 31, the units in millions, and the consolidated income statement basis.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000752-dfe26017",
+            "quote": "(in millions, except per share amounts)"
+          },
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000751-1e6373dd",
+            "quote": "CONSOLIDATED STATEMENTS OF INCOME"
+          }
+        ]
+      }
+    ],
+    "source_checks": [
+      {
+        "source_snapshot_id": "googl-2025-10k",
+        "verdict": "text_sufficient",
+        "rationale": "The delivered text blocks of the consolidated statements of income suffice for FY2025 and FY2024 total revenue, with unit, period and basis. No images are needed.",
+        "citations": [
+          {
+            "source_snapshot_id": "googl-2025-10k",
+            "block_id": "block-000753-53762a3b",
+            "quote": "Revenues$307,394 $350,018 $402,836"
+          }
+        ]
+      }
+    ],
+    "question_coverage": "complete",
+    "coverage_reason": "Both years' consolidated revenue (350,018 and 402,836 million USD) are supported by the income statement, with units, year-ended-December-31 periods and consolidated statement basis.",
+    "missing_information": [],
+    "revision_requests": [],
+    "body_checks": [
+      {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000750-9faf493a",
+        "relevance": "supporting_context",
+        "rationale": "Short company-name heading that identifies the statement's issuer."
+      },
+      {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000751-1e6373dd",
+        "relevance": "supporting_context",
+        "rationale": "Statement title gives the accounting basis (consolidated income statement)."
+      },
+      {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000752-dfe26017",
+        "relevance": "necessary",
+        "rationale": "Gives the unit (millions)."
+      },
+      {
+        "source_snapshot_id": "googl-2025-10k",
+        "block_id": "block-000753-53762a3b",
+        "relevance": "necessary",
+        "rationale": "Contains the period headers and the revenue values for 2024 and 2025."
+      }
+    ],
+    "limitations": [
+      "The table block also contains 2023 and non-revenue lines, which cannot be split at the available block granularity.",
+      "The company name heading block is delivered as optional provenance context only."
+    ]
+  },
+  "analysis_eligible": true,
+  "adoption": "unchanged_candidate",
+  "plan_origin": "model",
+  "failures": [],
+  "usage": {
+    "artifact_root": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/googl-revenue-r3/attempt-01/review-01/model",
+    "path": "usage-0002.json",
+    "sha256": "56a7d1dc33f687ad5a14e87b933cdaf36c021033a41ea238b9d77d9e265ec273",
+    "summary": {
+      "schema_version": "record-review-model-usage-v1",
+      "plan_origin": "model",
+      "provider": "aihubmix",
+      "model": "claude-sonnet-5-5",
+      "reasoning_effort": "high",
+      "thinking_mode": "adaptive",
+      "max_request_bytes": 220000,
+      "model_config_sha256": "c44b00f8a61b716cf6a999a8926ea3016d159cfdf8cc106e2e1a52daedddbaba",
+      "prompt_sha256": "193bec0aadc64a99209fb5f50aa574c8b933980f4aa9396552aabf79fb497bd4",
+      "calls": {
+        "requests": 1,
+        "unknown_cost_requests": 0,
+        "known_estimated_usd": "0.051186",
+        "actual_billed_usd": null,
+        "records": [
+          {
+            "call_id": "010d0017-95c8-4001-ae01-dae3753888a3",
+            "stage": "record_review",
+            "provider": "aihubmix",
+            "requested_model": "claude-sonnet-5-5",
+            "actual_upstream_model": "claude-sonnet-5-5",
+            "reasoning_effort": "high",
+            "started_at": "2026-10-08T19:13:27.326809+00:00",
+            "pricing_snapshot": {
+              "provider": "aihubmix",
+              "model": "claude-sonnet-5-5",
+              "currency": "USD",
+              "input_per_million": "2",
+              "output_per_million": "10",
+              "cached_input_per_million": "0.2",
+              "source": "https://aihubmix.com/model/claude-sonnet-5-5",
+              "checked_on": "2026-10-06",
+              "basis": "Uncached public list price estimate; excludes cache discounts, cache-writing charges, fees and account discounts"
+            },
+            "actual_billed_usd": null,
+            "status": "succeeded",
+            "usage": {
+              "input_tokens": 16313,
+              "output_tokens": 1856,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0
+            },
+            "estimated_usd": "0.051186",
+            "usage_presence": "reported",
+            "usage_source": "provider_raw",
+            "configuration_snapshot": {
+              "schema_version": "model-call-config-v1",
+              "capture_kind": "before_dispatch",
+              "capture_layer": "http_request_before_dispatch",
+              "effective_configuration": "unverified",
+              "fields": {
+                "provider": {
+                  "value": "aihubmix",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "model": {
+                  "value": "claude-sonnet-5-5",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "api_format": {
+                  "value": "anthropic_messages",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "base_url": {
+                  "value": "https://aihubmix.com",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "max_tokens": {
+                  "value": 12000,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "thinking": {
+                  "value": {
+                    "type": "adaptive"
+                  },
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "reasoning_effort": {
+                  "value": "high",
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "temperature": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "top_p": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "top_k": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "seed": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "response_format": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "tool_choice": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "parallel_tool_calls": {
+                  "value": null,
+                  "status": "not_sent",
+                  "source": "request.omitted"
+                },
+                "stream": {
+                  "value": false,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "timeout_seconds": {
+                  "value": 120,
+                  "status": "explicit",
+                  "source": "http_request"
+                },
+                "max_retries": {
+                  "value": 0,
+                  "status": "explicit",
+                  "source": "http_request"
+                }
+              },
+              "fingerprints": {
+                "system_sha256": "d0e5baa55385290493a5fea9a57d744c62249abd8e5becc3ef96fc1aace77b8d",
+                "input_sha256": "965b82cbb9b275433e8c7fa87b491a2b4dadd367b3e5eca42f0ff3fafcf83990",
+                "tools_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+                "output_schema_sha256": "d9c32c0be8b474089c605b786ca6719d37f2f997c772552325e6eb6460e5ea74"
+              },
+              "sha256": "c7fcbecc3fbfa3c568c2e6c573f8f1ae2d79a08c8ff4f22b2059a7cd884823d9"
+            },
+            "cost_basis": "anthropic_raw_input_output_cache_read_public_price_estimate_not_bill",
+            "budget_reservation_id": "98385621-e558-47d8-a591-e1c29032ee17",
+            "reserved_usd": "0.227876",
+            "request_sha256": "e83c841ea294ccc625264b55b5fc4d716fd0c9e2d5855cbcb48c2def38c04efe",
+            "request_bytes": 37938,
+            "response_id": "msg_bdrk_m7cgbbdg5n5vkivk4a35pkbslhvm2lzzztqz3fhn3o74qjyo3pha",
+            "request_id": null,
+            "stop_reason": "end_turn",
+            "raw_usage": {
+              "input_tokens": 16313,
+              "output_tokens": 1856,
+              "cache_read_input_tokens": 0,
+              "cache_creation_input_tokens": 0,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 0
+              }
+            },
+            "dispatch_status": "sent",
+            "http_status": 200,
+            "visible_text_secret_redacted": false,
+            "transport_phase": "body_complete",
+            "headers_received": true,
+            "headers_received_elapsed_seconds": 11.271422958001494,
+            "ended_at": "2026-10-08T19:13:38.599728+00:00",
+            "elapsed_seconds": 11.272722458932549
+          }
+        ]
+      },
+      "shared_budget": {
+        "limit_usd": null,
+        "estimated_spent_usd": "38.185070",
+        "held_usd": "0.797104",
+        "unknown_requests": 3,
+        "in_flight_requests": 0,
+        "requests": 472,
+        "actual_billed_usd": null,
+        "enforcement": "record_only"
+      },
+      "artifacts": [
+        {
+          "path": "calls/010d0017-95c8-4001-ae01-dae3753888a3-end.json",
+          "sha256": "5f1006f3b62c0c2c3e4fd660023fae34615f3a2b8d55f44768429853f03fc6b1"
+        },
+        {
+          "path": "calls/010d0017-95c8-4001-ae01-dae3753888a3-start.json",
+          "sha256": "1af94120816ff8569b95eccb69f40784b36a95e33609dd038f8da2260aaa3ed3"
+        },
+        {
+          "path": "model-config.json",
+          "sha256": "c44b00f8a61b716cf6a999a8926ea3016d159cfdf8cc106e2e1a52daedddbaba"
+        },
+        {
+          "path": "review-0001-attempt-01.json",
+          "sha256": "4a602de320360d593d0a43514b452fe5e796151eb47b28b8f2a3df1df6f63889"
+        },
+        {
+          "path": "review-0001-input.json",
+          "sha256": "84f586c9744237faae660afa0e13d5204dbd3388d3dcc1ffe05c32ac84a5e132"
+        },
+        {
+          "path": "review-0001-parsed.json",
+          "sha256": "42dd0a85818c4a7f209fd0df2b168122742eb4e092c8abb5409eac84c0d446f5"
+        }
+      ],
+      "business_validation": "not_evaluated"
+    }
+  }
+}

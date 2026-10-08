@@ -46,6 +46,53 @@ def _dataset_ref(path):
             'snapshot_id': manifest['snapshot_id'], 'source_count': len(_load(path/'sources.json'))}
 
 
+def _verify_review_feedback(feedback, request, scope, dataset):
+    """Bind diagnostic feedback to actual prior execution, not review self-description."""
+    if request.purpose != 'analysis_evidence' or set(feedback) != {'prior_query_ref', 'prior_review_ref', 'assessment'}:
+        raise ValueError('review feedback requires pinned query/review references and analysis_evidence purpose')
+    for key in ('prior_query_ref', 'prior_review_ref'):
+        ref = feedback[key]
+        if not isinstance(ref, dict) or set(ref) != {'path', 'manifest_sha256'}:
+            raise ValueError('invalid review feedback reference')
+        bound = _verify_manifest(Path(ref['path']), ref['manifest_sha256'])
+        required = ({'input.json', 'result.json'} if key == 'prior_review_ref'
+                    else {'result.json', 'evidence-bundle.json', 'artifact-index.json'})
+        if not required <= set(bound['files']):
+            raise ValueError('review feedback reference omits required frozen files')
+    scope_json = scope.model_dump(mode='json')
+    prior_query = _load(Path(feedback['prior_query_ref']['path'])/'result.json')
+    if (prior_query.get('schema_version') != 'autonomous-result-v2'
+            or prior_query.get('purpose') != request.purpose
+            or prior_query.get('request', {}).get('question') != request.question
+            or prior_query.get('request', {}).get('scope') != scope_json
+            or prior_query.get('active_scope') != scope_json):
+        raise ValueError('prior query does not match current question, purpose and scope')
+    previous = _load(Path(feedback['prior_review_ref']['path'])/'result.json')
+    previous_input = _load(Path(feedback['prior_review_ref']['path'])/'input.json')
+    dataset = Path(dataset).resolve()
+    expected_dataset = {'path':str(dataset), 'manifest_sha256':digest((dataset/'manifest.json').read_bytes())}
+    if (previous_input.get('scope') != scope_json or previous_input.get('purpose') != request.purpose
+            or previous_input.get('question') != request.question
+            or previous_input.get('query_ref') != feedback['prior_query_ref']
+            or previous_input.get('dataset_ref') != expected_dataset
+            or previous.get('input_sha256') != digest(previous_input)
+            or previous.get('packet_id') != previous_input.get('packet_id')
+            or previous.get('assessment') != feedback['assessment']
+            or previous.get('status') != 'needs_revision' or previous.get('failures')):
+        raise ValueError('review feedback differs from frozen same-question same-scope assessment')
+    # Local import avoids the module import cycle; this is a read-only bounded
+    # reconstruction, not a model call or a new source-selection operation.
+    from .answer_handoff import prepare_review_packet, validate_assessment
+    fresh = prepare_review_packet(feedback['prior_query_ref']['path'], dataset, expected_scope=scope,
+        max_packet_bytes=previous_input['max_packet_bytes'],
+        source_delivery=previous_input.get('source_delivery', 'full_indexed_text_v1'))
+    if fresh != previous_input:
+        raise ValueError('review feedback input does not match its frozen query and dataset')
+    _, eligible = validate_assessment(fresh, feedback['assessment'])
+    if eligible:
+        raise ValueError('needs_revision feedback disagrees with validated assessment')
+
+
 def _seal(output, result):
     write_new(output/'result.json', result)
     write_new(output/'manifest.json', {'schema_version': 'company-agent-run-v1',
@@ -616,7 +663,8 @@ class CompanyDataCoordinator:
                 managed_planner = self._planner(model_config, output/'model', credential_root, purpose=request.purpose)
                 planner = managed_planner
             if worker_model_config is not None:
-                managed_worker = self._planner(worker_model_config, output/'worker-model', credential_root, role='worker')
+                managed_worker = self._planner(worker_model_config, output/'worker-model', credential_root,
+                                               role='worker', purpose=request.purpose)
                 worker_planner = managed_worker
             preparation = None if source is None or config is None else {'filing_catalog': source.get('filing_catalog', []),
                 'acquisition_gaps': source['gaps'], 'callbacks': {
@@ -624,8 +672,12 @@ class CompanyDataCoordinator:
                         'annual_form': '10-K or 20-F; copy the base form from the selected filing_catalog item',
                         'report_period_end': 'ISO date from filing_catalog'}},
                     'materialize': {'source_run_id': 'ID returned by acquire'}}}
+            feedback = request.review_feedback
+            if feedback is not None:
+                _verify_review_feedback(feedback, request, scope, owner.dataset)
             agent = AutonomousDataAgent(owner, planner, limits=limits, worker_planner=worker_planner,
                 purpose=request.purpose,
+                review_feedback=feedback,
                 acquire=acquire if source and config is not None else None,
                 materialize=materialize if source and config is not None else None, preparation=preparation,
                 financial_extract=financial_gateway.extract if financial_gateway else None,
@@ -671,15 +723,17 @@ class CompanyDataCoordinator:
     @staticmethod
     def _validate_model_config(config):
         required = {'provider', 'model', 'budget_ledger', 'budget_usd', 'budget_policy', 'max_requests_total'}
-        allowed = required | {'max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort'}
+        allowed = required | {'max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort', 'allow_unknown_reservations'}
         if not required <= set(config) or set(config) - allowed or config['budget_policy'] not in {'enforced', 'record_only'}:
             raise ValueError('explicit model, shared ledger and budget policy are required')
         if any(not isinstance(config[key], str) or not config[key].strip() for key in ('provider', 'model', 'budget_ledger')):
             raise ValueError('provider/model/ledger must be nonempty')
+        if type(config.get('allow_unknown_reservations', False)) is not bool:
+            raise ValueError('allow_unknown_reservations must be a boolean')
         from .autonomous_model import reasoning_configuration
         _, _, native = reasoning_configuration(config['provider'], config['model'], config.get('reasoning_effort'))
-        if native and config.get('max_retries', 0) != 0:
-            raise ValueError('Native Claude currently requires explicit retries disabled')
+        if native and (type(config.get('max_retries', 0)) is not int or not 0 <= config.get('max_retries', 0) <= 3):
+            raise ValueError('Explicit native retries must be within 0..3')
         if config['max_requests_total'] is not None and (type(config['max_requests_total']) is not int or config['max_requests_total'] < 1):
             raise ValueError('positive shared request allowance or explicit None required')
         from decimal import Decimal, InvalidOperation
@@ -702,15 +756,17 @@ class CompanyDataCoordinator:
             return None if value is None else Decimal(str(value))
         if (Path(config['budget_ledger']).resolve() != Path(worker_config['budget_ledger']).resolve()
                 or amount(config['budget_usd']) != amount(worker_config['budget_usd'])
-                or any(config[key] != worker_config[key] for key in ('budget_policy', 'max_requests_total'))):
-            raise ValueError('planner and worker must share the same budget ledger, USD limit, policy and request allowance')
+                or any(config[key] != worker_config[key] for key in ('budget_policy', 'max_requests_total'))
+                or config.get('allow_unknown_reservations', False) != worker_config.get('allow_unknown_reservations', False)):
+            raise ValueError('planner and worker must share the same budget ledger, USD limit, enforcement/recovery policy and request allowance')
 
     @staticmethod
     def _planner(config, output, credential_root, *, role='planner', purpose='question_answer'):
         from uteki.agents.runtime.run_budget import RunBudget
         from .autonomous_model import SdkAutonomousPlanner
         CompanyDataCoordinator._validate_model_config(config)
-        budget = RunBudget(config['budget_ledger'], config['budget_usd'], enforce=config['budget_policy'] == 'enforced')
+        budget = RunBudget(config['budget_ledger'], config['budget_usd'], enforce=config['budget_policy'] == 'enforced',
+                           allow_unknown_reservations=config.get('allow_unknown_reservations', False))
         return SdkAutonomousPlanner(config['provider'], config['model'], budget=budget,
             max_requests_total=config['max_requests_total'], output=output, credentials_root=credential_root,
             max_tokens=config.get('max_tokens', 4096), request_timeout=config.get('request_timeout', 60),

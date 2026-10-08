@@ -13,6 +13,7 @@ from apps.review_workbench.data.workspace_state import read_state, material_task
 from apps.review_workbench.data.workspace_financials import build_financial_table, build_dataset_table
 from apps.review_workbench.pages.dataset_view import render_block, field_table
 from apps.review_workbench.pages.direct_extractions import processing_record
+from uteki.infrastructure.research_data.evidence_coordinates import character_span
 
 TABS = {'original': ('原件', 'Original'), 'financials': ('财务数据', 'Financial data'),
         'blocks': ('章节与表格', 'Sections & tables'), 'brief': ('材料精编', 'Filing brief'),
@@ -158,8 +159,21 @@ def version_controls(tasks, args):
     return body + '</div>'
 
 
-def locate_button(block_id, label, *, quote=None):
-    return '<button class="dw-locate" data-locate="' + e(block_id) + '"' + (' data-quote="' + e(quote) + '"' if quote else '') + '>' + bi(*label) + '</button>'
+def locate_button(block_id, label, *, quote=None, evidence=None):
+    attrs = {'locate': block_id}
+    if quote: attrs['quote'] = quote
+    if evidence:
+        span = character_span(evidence)
+        if span is not None:
+            attrs.update({'char-start': span[0], 'char-end': span[1]})
+        if evidence.get('cell') is not None:
+            cell = evidence['cell']
+            if not isinstance(cell, dict) or any(type(cell.get(k)) is not int or cell[k] < 0 for k in ('row', 'column')):
+                raise ValueError('Explicit evidence cell coordinates required')
+            attrs.update({'cell-row': cell['row'], 'cell-column': cell['column']})
+        for key in ('text_hash', 'source_sha256'):
+            if evidence.get(key) is not None: attrs[key.replace('_', '-')] = evidence[key]
+    return '<button class="dw-locate"' + ''.join(' data-' + key + '="' + e(value) + '"' for key, value in attrs.items()) + '>' + bi(*label) + '</button>'
 
 
 def financial_view(matrix, args, version_labels=None):
@@ -206,7 +220,7 @@ def financial_view(matrix, args, version_labels=None):
                 for ref in refs:
                     body += '<div class="dw-citation"><strong>' + bi(*role) + '</strong><blockquote>' + e(ref.get('quote', '')) + '</blockquote>'
                     if ref.get('block_id'):
-                        body += locate_button(ref['block_id'], ('定位原文', 'Locate in original'), quote=ref.get('quote'))
+                        body += locate_button(ref['block_id'], ('定位原文', 'Locate in original'), quote=ref.get('quote'), evidence=ref)
                     body += '</div>'
             if not candidate.get('evidence_refs'):
                 body += empty('这条记录缺少可定位证据。', 'No locatable evidence is available for this record.')

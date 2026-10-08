@@ -1,0 +1,54 @@
+{
+  "schema_version": "record-review-attempt-v1",
+  "review": 1,
+  "attempt": 1,
+  "retry": false,
+  "plan_origin": "model",
+  "provider": "aihubmix",
+  "model": "claude-sonnet-5-5",
+  "request": {
+    "path": "review-0001-input.json",
+    "sha256": "f2c0b4311a5c07d735af5fc06fdf27cd15d97d561c37ec6a7fe4b76e7b27dad9"
+  },
+  "status": "json_returned",
+  "started_at": "2026-10-08T18:24:24.295798+00:00",
+  "raw_text": "{\"packet_id\":\"data-review-be4422cdd6806e6a65b28d79\",\"facts\":[{\"fact_id\":\"ev-0f0d534526e008dece6e074f\",\"verdict\":\"supported\",\"rationale\":\"FY2025 (year ended June 30, 2025) total revenue 281,724 in millions of USD matches the record value 281,724,000,000 USD, consolidated reported basis. The table header says '(In millions...)'.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}],\"relevance\":\"necessary\"},{\"fact_id\":\"ev-36fab0af3579301a8032bcd5\",\"verdict\":\"supported\",\"rationale\":\"FY2024 (year ended June 30, 2024) total revenue 245,122 in millions of USD matches the record value 245,122,000,000 USD.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}],\"relevance\":\"necessary\"},{\"fact_id\":\"source-block-36dd63aebc36e1f1817a7b5f\",\"verdict\":\"supported\",\"rationale\":\"The heading 'INCOME STATEMENTS' identifies the statement, giving accounting-basis provenance for the table.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000780-cdef2bac\",\"quote\":\"INCOME STATEMENTS\"}],\"relevance\":\"supporting_context\"},{\"fact_id\":\"source-block-2d979a86981a8ee330cfe61f\",\"verdict\":\"supported\",\"rationale\":\"The table block contains the unit '(In millions...)', the 'Year Ended June 30' period headings 2025/2024, and the Total revenue row. It also includes the 2023 column and other lines, which are not needed, but the whole table is the minimal available block granularity.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023\"}],\"relevance\":\"necessary\"}],\"requirements\":[{\"requirement_id\":\"req_revenue_query\",\"verdict\":\"complete\",\"rationale\":\"Both FY2025 and FY2024 total revenue records are present with period, USD unit, consolidated reported basis, and cell-level citations that match the source table.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}]},{\"requirement_id\":\"req_revenue_source\",\"verdict\":\"complete\",\"rationale\":\"The income statement heading and the table with unit, period headings and total revenue are delivered as original blocks.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000780-cdef2bac\",\"quote\":\"INCOME STATEMENTS\"},{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Year Ended June 30, 2025 2024 2023\"}]}],\"source_checks\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"verdict\":\"text_sufficient\",\"rationale\":\"The delivered text includes the income statement heading, units, period headings and the Total revenue row for FY2025 and FY2024. No image is needed for this question.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}]}],\"question_coverage\":\"complete\",\"coverage_reason\":\"FY2025 revenue of $281,724 million and FY2024 revenue of $245,122 million (years ended June 30) are both supported, with units, periods, consolidated reported basis and source citations.\",\"missing_information\":[],\"limitations\":[\"The 'Item 8' heading block is also delivered; it is only short provenance context.\",\"The table includes the FY2023 column and unrelated lines because the original table block is delivered whole.\",\"The accounting basis 'reported_consolidated' is inferred from the income statement; the delivered text does not explicitly say 'US GAAP'.\"],\"revision_requests\":[],\"body_checks\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000779-9d7720d5\",\"relevance\":\"supporting_context\",\"rationale\":\"Short Item 8 heading identifying the financial statements section; provenance context only.\"},{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000780-cdef2bac\",\"relevance\":\"supporting_context\",\"rationale\":\"Statement title 'INCOME STATEMENTS' identifies the basis of the table.\"},{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"relevance\":\"necessary\",\"rationale\":\"Contains the units, period headings and Total revenue values for 2025 and 2024.\"}]}",
+  "response_text": "{\"packet_id\":\"data-review-be4422cdd6806e6a65b28d79\",\"facts\":[{\"fact_id\":\"ev-0f0d534526e008dece6e074f\",\"verdict\":\"supported\",\"rationale\":\"FY2025 (year ended June 30, 2025) total revenue 281,724 in millions of USD matches the record value 281,724,000,000 USD, consolidated reported basis. The table header says '(In millions...)'.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}],\"relevance\":\"necessary\"},{\"fact_id\":\"ev-36fab0af3579301a8032bcd5\",\"verdict\":\"supported\",\"rationale\":\"FY2024 (year ended June 30, 2024) total revenue 245,122 in millions of USD matches the record value 245,122,000,000 USD.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}],\"relevance\":\"necessary\"},{\"fact_id\":\"source-block-36dd63aebc36e1f1817a7b5f\",\"verdict\":\"supported\",\"rationale\":\"The heading 'INCOME STATEMENTS' identifies the statement, giving accounting-basis provenance for the table.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000780-cdef2bac\",\"quote\":\"INCOME STATEMENTS\"}],\"relevance\":\"supporting_context\"},{\"fact_id\":\"source-block-2d979a86981a8ee330cfe61f\",\"verdict\":\"supported\",\"rationale\":\"The table block contains the unit '(In millions...)', the 'Year Ended June 30' period headings 2025/2024, and the Total revenue row. It also includes the 2023 column and other lines, which are not needed, but the whole table is the minimal available block granularity.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"(In millions, except per share amounts) Year Ended June 30, 2025 2024 2023\"}],\"relevance\":\"necessary\"}],\"requirements\":[{\"requirement_id\":\"req_revenue_query\",\"verdict\":\"complete\",\"rationale\":\"Both FY2025 and FY2024 total revenue records are present with period, USD unit, consolidated reported basis, and cell-level citations that match the source table.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}]},{\"requirement_id\":\"req_revenue_source\",\"verdict\":\"complete\",\"rationale\":\"The income statement heading and the table with unit, period headings and total revenue are delivered as original blocks.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000780-cdef2bac\",\"quote\":\"INCOME STATEMENTS\"},{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Year Ended June 30, 2025 2024 2023\"}]}],\"source_checks\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"verdict\":\"text_sufficient\",\"rationale\":\"The delivered text includes the income statement heading, units, period headings and the Total revenue row for FY2025 and FY2024. No image is needed for this question.\",\"citations\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"quote\":\"Total revenue 281,724 245,122 211,915\"}]}],\"question_coverage\":\"complete\",\"coverage_reason\":\"FY2025 revenue of $281,724 million and FY2024 revenue of $245,122 million (years ended June 30) are both supported, with units, periods, consolidated reported basis and source citations.\",\"missing_information\":[],\"limitations\":[\"The 'Item 8' heading block is also delivered; it is only short provenance context.\",\"The table includes the FY2023 column and unrelated lines because the original table block is delivered whole.\",\"The accounting basis 'reported_consolidated' is inferred from the income statement; the delivered text does not explicitly say 'US GAAP'.\"],\"revision_requests\":[],\"body_checks\":[{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000779-9d7720d5\",\"relevance\":\"supporting_context\",\"rationale\":\"Short Item 8 heading identifying the financial statements section; provenance context only.\"},{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000780-cdef2bac\",\"relevance\":\"supporting_context\",\"rationale\":\"Statement title 'INCOME STATEMENTS' identifies the basis of the table.\"},{\"source_snapshot_id\":\"msft-2025-10k\",\"block_id\":\"block-000781-9ee5633d\",\"relevance\":\"necessary\",\"rationale\":\"Contains the units, period headings and Total revenue values for 2025 and 2024.\"}]}",
+  "response_metadata": {
+    "request_sha256": "6864458be3abd635ad951bafe5998297d4307eee9a533883af677d4d49ac71a8",
+    "request_bytes": 43229,
+    "dispatch_status": "sent",
+    "actual_upstream_model": "claude-sonnet-5-5",
+    "response_id": "msg_bdrk_s6wkt3gnmgwqqgmlfjqdwz2zcvzdsk7xox4qzccri2jcksgzpilq",
+    "request_id": null,
+    "stop_reason": "end_turn",
+    "raw_usage": {
+      "input_tokens": 20559,
+      "output_tokens": 1729,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      }
+    },
+    "usage_presence": "reported",
+    "headers_received": true,
+    "transport_phase": "body_complete",
+    "http_status": 200,
+    "headers_received_elapsed_seconds": 12.470287750009447,
+    "visible_text_secret_redacted": false
+  },
+  "elapsed_seconds": 12.516218250151724,
+  "ended_at": "2026-10-08T18:24:36.811872+00:00",
+  "calls": [
+    {
+      "path": "calls/997492e0-52c4-4a5e-810a-2fe5d0282291-end.json",
+      "sha256": "de412dc204e7644037fb913ddca402d3499142f4b1a0b6adda331b98879899b2"
+    },
+    {
+      "path": "calls/997492e0-52c4-4a5e-810a-2fe5d0282291-start.json",
+      "sha256": "73b98cd14a98abed95acf7c09b9a8917bfb1cac339b42b083794202b9059a018"
+    }
+  ]
+}

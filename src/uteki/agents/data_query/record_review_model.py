@@ -9,15 +9,17 @@ from pathlib import Path
 import time
 
 from agents import Agent, AgentOutputSchema, ModelSettings, Runner, RunConfig
+from agents.retry import ModelRetrySettings
 from openai import AsyncOpenAI, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError
 
 from uteki.agents.runtime.call_costs import MeteredModel, pricing_snapshot, summarize
+from uteki.agents.runtime.claude_messages import ClaudeTransientTransportError
 from uteki.agents.runtime.local_credentials import load_provider_key
 from uteki.agents.runtime.model_factory import model_adapter
 from uteki.agents.runtime.run_budget import RunBudget
 from uteki.infrastructure.research_data.financial_records import digest
 from .artifacts import write_new
-from .autonomous_model import _RequestLimitedBudget
+from .autonomous_model import _RequestLimitedBudget, reasoning_configuration
 
 
 REVIEW_INPUT_FORMATS = ('packet_json_v1', 'review_turns_v1')
@@ -59,23 +61,22 @@ def review_model_input(packet, input_format):
 
 
 class SdkRecordReviewer:
-    """DeepSeek raw capture is supported; the caller owns business validation and authorization."""
+    """Registered DeepSeek/Claude capture; callers own validation and authorization."""
     def __init__(self, provider, model, *, budget, max_requests_total, output, credentials_root, prompt,
                  max_tokens=8192, request_timeout=180, max_retries=0, client_factory=None, output_schema=None,
                  input_format='packet_json_v1', reasoning_effort=None, max_request_bytes=400000):
-        if reasoning_effort is not None and (not isinstance(reasoning_effort, str)
-                or provider != 'deepseek' or reasoning_effort not in {'none', 'low', 'high', 'max'}):
-            raise ValueError('Explicit reasoning effort is supported only for DeepSeek: none, low, high, max')
-        effort = (reasoning_effort or 'none') if provider == 'deepseek' else None
-        thinking = 'enabled' if effort not in {None, 'none'} else 'disabled'
+        effort, thinking, native = reasoning_configuration(provider, model, reasoning_effort)
+        if native and input_format != 'packet_json_v1':
+            raise ValueError('Native Claude review requires packet_json_v1 input')
         if not isinstance(budget, RunBudget):
             raise ValueError('An explicit shared RunBudget is required')
         if max_requests_total is not None and (type(max_requests_total) is not int or max_requests_total < 1):
             raise ValueError('Shared request limit must be positive or explicitly None')
         if not isinstance(prompt, str) or not prompt.strip():
             raise ValueError('Explicit nonblank record-review prompt required')
-        if type(max_tokens) is not int or not 256 <= max_tokens <= 16384:
-            raise ValueError('Output token limit must be within 256..16384')
+        output_limit = 16000 if native else 16384
+        if type(max_tokens) is not int or not 256 <= max_tokens <= output_limit:
+            raise ValueError(f'Output token limit must be within 256..{output_limit}')
         if isinstance(request_timeout, bool) or not isinstance(request_timeout, (int, float)) or not 0 < request_timeout <= 300:
             raise ValueError('Request timeout must be within 0..300 seconds')
         if type(max_retries) is not int or not 0 <= max_retries <= 3:
@@ -85,8 +86,8 @@ class SdkRecordReviewer:
         if input_format not in REVIEW_INPUT_FORMATS:
             raise ValueError('Unsupported review input format')
         pricing = pricing_snapshot(provider, model)
-        if provider != 'deepseek' or not pricing:
-            raise ValueError('Raw record-review capture requires a registered DeepSeek model')
+        if (provider != 'deepseek' and not native) or not pricing:
+            raise ValueError('Raw record-review capture requires a registered DeepSeek or native Claude model')
         schema = AgentOutputSchema(output_schema or dict, strict_json_schema=False)
         self.output = Path(output).resolve()
         if self.output.exists():
@@ -97,6 +98,7 @@ class SdkRecordReviewer:
         credential_origin = load_provider_key(credentials_root, provider)
         self.output.mkdir(parents=True, exist_ok=False)
         self._clients = []
+        self._native_model = None
         factory = client_factory or AsyncOpenAI
         def create_client(**kwargs):
             if kwargs.get('max_retries') != 0:
@@ -105,12 +107,20 @@ class SdkRecordReviewer:
             client = factory(**kwargs)
             self._clients.append(client)
             return client
-        self._inner = model_adapter(model, provider, client_factory=create_client)
+        if native:
+            from uteki.agents.runtime.claude_messages import ClaudeMessagesModel
+            self._inner = self._native_model = ClaudeMessagesModel(model, timeout_seconds=request_timeout,
+                reasoning_effort=effort, client_factory=client_factory, max_request_bytes=max_request_bytes,
+                schema_protocol='json_object')
+            settings = ModelSettings(max_tokens=max_tokens, retry=ModelRetrySettings(max_retries=0))
+        else:
+            self._inner = model_adapter(model, provider, client_factory=create_client)
+            settings = ModelSettings(max_tokens=max_tokens, temperature=None if thinking == 'enabled' else 0, store=False,
+                extra_body={'thinking': {'type': thinking}, 'reasoning_effort': effort})
         metered = MeteredModel(self._inner, self.output/'calls', 'record_review', provider, model, pricing, cap,
                                max_request_bytes=max_request_bytes)
         self._agent = Agent(name='RecordReviewer', instructions=prompt, model=metered, output_type=schema,
-            model_settings=ModelSettings(max_tokens=max_tokens, temperature=None if thinking == 'enabled' else 0, store=False,
-                extra_body={'thinking': {'type': thinking}, 'reasoning_effort': effort} if provider == 'deepseek' else None))
+            model_settings=settings)
         self._config = {'schema_version': 'record-review-model-config-v1', 'plan_origin': self.plan_origin,
             'provider': provider, 'model': model, 'prompt': prompt, 'prompt_sha256': digest(prompt),
             'input_format': input_format,
@@ -118,9 +128,12 @@ class SdkRecordReviewer:
             'business_validation': 'caller_responsibility', 'pricing_snapshot': deepcopy(pricing),
             'max_tokens': max_tokens, 'request_timeout': request_timeout, 'max_retries': max_retries,
             'max_request_bytes': max_request_bytes,
-            'reasoning_effort': effort, 'thinking_mode': thinking if provider == 'deepseek' else None,
+            'reasoning_effort': effort, 'thinking_mode': thinking,
+            'api_format': 'anthropic_messages' if native else 'chat_completions',
+            'schema_protocol': 'json_object' if native else 'json_mode',
             'provider_sdk_retries': 0, 'max_requests_total': max_requests_total,
             'budget_ledger': str(budget.path.resolve()), 'budget_policy': 'enforced' if budget.enforce else 'record_only',
+            'allow_unknown_reservations': budget.allow_unknown_reservations,
             'credential_origin': credential_origin, 'budget_at_start': budget.summary()}
         write_new(self.output/'model-config.json', self._config)
         self._config_sha256 = digest((self.output/'model-config.json').read_bytes())
@@ -195,10 +208,12 @@ class SdkRecordReviewer:
                 except BaseException as error:
                     record.update(status='timed_out' if isinstance(error, (TimeoutError, APITimeoutError)) else 'failed_or_cancelled',
                                   error_type=type(error).__name__)
-                    retry = isinstance(error, (TimeoutError, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError)) and attempt < self._config['max_retries']
+                    retry = isinstance(error, (TimeoutError, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError, ClaudeTransientTransportError)) and attempt < self._config['max_retries']
+                    if retry and self._native_model is not None:
+                        record.update(retry_scheduled=True, retry_delay_seconds=min(2, 0.25 * 2**attempt))
                     if not retry: raise
                 finally:
-                    # DeepSeek captures text/metadata before rejecting finish_reason or invalid content.
+                    # Transports capture visible text/metadata before rejecting invalid output.
                     record.update(raw_text=self._inner.response_text,
                                   response_text=self._inner.response_text,
                                   response_metadata=deepcopy(self._inner.response_metadata),
@@ -213,6 +228,8 @@ class SdkRecordReviewer:
                         parsed = self.output/f'review-{self._reviews:04d}-parsed.json'
                         if parsed.exists():
                             observation_context.publish(parsed, kind='model_output', owned_by_context=True)
+                if retry and self._native_model is not None:
+                    await asyncio.sleep(min(2, 0.25 * 2**attempt))
 
     async def aclose(self):
         async with self._lock:
@@ -220,3 +237,5 @@ class SdkRecordReviewer:
                 self._closed = True
                 for client in self._clients:
                     await client.close()
+                if self._native_model is not None:
+                    await self._native_model.aclose()

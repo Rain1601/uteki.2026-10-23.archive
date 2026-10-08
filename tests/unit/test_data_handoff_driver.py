@@ -51,6 +51,48 @@ class DataHandoffDriverTests(unittest.TestCase):
         self.assertFalse(self.output.exists())
         self.assertFalse((self.root / 'costs.sqlite').exists())
 
+    def test_native_claude_review_and_analysis_validate_without_calls_or_credentials(self):
+        for model in ('claude-sonnet-5-5', 'claude-opus-5-5'):
+            with self.subTest(model=model):
+                config = deepcopy(self.config)
+                for role in ('reviewer', 'analyst'):
+                    config[role].update(provider='aihubmix', model=model,
+                                        reasoning_effort='high', max_tokens=16000)
+                driver.validate(config, self.output)
+                self.assertFalse(self.output.exists())
+                self.assertFalse((self.root / 'costs.sqlite').exists())
+
+    def test_native_claude_invalid_modes_fail_before_data_calls(self):
+        for role in ('reviewer', 'analyst'):
+            for changes in ({'max_tokens': 16384}, {'max_retries': 1},
+                            {'reasoning_effort': None}, {'reasoning_effort': 'max'}):
+                with self.subTest(role=role, changes=changes):
+                    config = deepcopy(self.config)
+                    config[role].update(provider='aihubmix', model='claude-sonnet-5-5',
+                                        reasoning_effort='high')
+                    config[role].update(changes)
+                    self.reject_before_run(config)
+
+    def test_role_factory_preserves_claude_budget_envelope_and_configuration(self):
+        config = deepcopy(self.config)
+        config['analyst'].update(provider='aihubmix', model='claude-sonnet-5-5',
+                                reasoning_effort='high', allow_unknown_reservations=True)
+        config['request_envelope_limits'] = {'reviewer': 200000, 'analyst': 120000}
+        with patch.object(driver, 'SdkRecordReviewer') as reviewer:
+            driver.role_factory(config, 'analyst', 'Analyze facts', dict)(self.output)
+            args, options = reviewer.call_args
+            self.assertEqual(args, ('aihubmix', 'claude-sonnet-5-5'))
+            self.assertEqual(options['max_request_bytes'], 120000)
+            self.assertEqual(options['reasoning_effort'], 'high')
+            self.assertEqual(options['budget'].path.resolve(), (self.root/'costs.sqlite').resolve())
+            self.assertTrue(options['budget'].allow_unknown_reservations)
+            self.assertEqual(options['budget'].summary()['requests'], 0)
+
+    def test_unsupported_source_delivery_fails_before_query(self):
+        config = deepcopy(self.config)
+        config['source_delivery'] = 'silent_full_report_fallback'
+        self.reject_before_run(config)
+
     def test_missing_role_setting_fails_before_query_and_output(self):
         for role in ('planner', 'worker', 'reviewer', 'analyst'):
             for field in ('max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort'):
@@ -120,6 +162,7 @@ class DataHandoffDriverTests(unittest.TestCase):
         async def review(packet, output, *, reviewer_factory):
             self.assertEqual(packet['query_ref']['manifest_sha256'], sha)
             self.assertEqual(packet['question'], config['request']['question'])
+            self.assertEqual(packet['source_delivery'], 'query_evidence_v1')
             return {'status': 'needs_revision', 'analysis_eligible': False,
                     'review_ref': {'path': str(output), 'manifest_sha256': 'f'*64}}
         analysis_calls = []

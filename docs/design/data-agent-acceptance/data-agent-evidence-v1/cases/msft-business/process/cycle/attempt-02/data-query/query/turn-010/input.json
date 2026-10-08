@@ -1,0 +1,2455 @@
+{
+  "request": {
+    "agent_schema_version": "data-agent-query-v0.3",
+    "question": "Microsoft 的 FY2025 10-K 披露了哪些报告分部，各自包括哪些主要业务？请提供足以回答的原始段落和完整的相关列举，保留必要限定。",
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-4244ad2daa731c37f05cee53",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "msft-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    }
+  },
+  "active_scope": {
+    "execution_schema_version": "research-execution-v1",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "company_ids": [
+      "sec-0000789019"
+    ],
+    "source_snapshot_ids": [
+      "msft-2025-10k"
+    ],
+    "source_policy_id": "local-frozen-v1",
+    "knowledge_cutoff": "2026-10-09",
+    "include_candidates": true
+  },
+  "purpose": "analysis_evidence",
+  "delivery_selection": {},
+  "record_selection": {},
+  "review_feedback": {
+    "prior_query_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-business-r5/attempt-01/data-query/query",
+      "manifest_sha256": "3c14fb9dc72d47ccf7605e340aee495a48608e7b0ef551a4339a715b723eac49"
+    },
+    "prior_review_ref": {
+      "path": "/Users/rain/Documents/ChatGPT/uteki.beta/experiments/agent_design/2026-10-09-data-agent-completion-v1/runs/msft-business-r5/attempt-01/review-01",
+      "manifest_sha256": "730cb7a4156dd6ebe8381f368b43ef7d17498d6d819679df8a62262dd6c4c697"
+    },
+    "assessment": {
+      "packet_id": "data-review-b54a45bb619ca542ee734010",
+      "facts": [],
+      "requirements": [
+        {
+          "requirement_id": "req-segments",
+          "verdict": "insufficient_evidence",
+          "rationale": "No source bodies or selected blocks were delivered (source_documents is empty; program gaps include delivery_selection_missing and no_reviewable_source_blocks). The reportable segments cannot be verified against the original 10-K text.",
+          "citations": []
+        },
+        {
+          "requirement_id": "req-segment-businesses",
+          "verdict": "insufficient_evidence",
+          "rationale": "No original passages enumerating each segment's products, services and activities were delivered, so the full enumeration, qualifiers and affiliations cannot be checked. Evidence IDs are listed but no bodies are provided.",
+          "citations": []
+        }
+      ],
+      "source_checks": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "verdict": "requires_more_source_content",
+          "rationale": "The source is in scope, but no body text was delivered in source_documents. No citation can be made and no review is possible.",
+          "citations": []
+        }
+      ],
+      "question_coverage": "incomplete",
+      "coverage_reason": "The packet has no delivered source documents, selected blocks or facts. The question asks for the reportable segments and the complete list of principal businesses in each segment, with original passages and qualifiers. None of this can be verified or supported from the delivered material.",
+      "missing_information": [
+        "Original 10-K text identifying the three reportable segments (segment note and/or Business section).",
+        "Original 10-K enumeration of the products, services and activities in each segment (e.g. Productivity and Business Processes, Intelligent Cloud, More Personal Computing), with qualifiers and affiliations.",
+        "Selected source blocks delivered for evidence IDs ev-8544ccbe13ee4a483094555a, ev-2531a66c2296f2248f5a872e, ev-4c331ae164cd13b88ff99033, ev-41490e9252251bbe4ab42d5f and ev-5671465b23816074b4ade4dd."
+      ],
+      "revision_requests": [
+        "Deliver the selected original source blocks for both requirements, including the segment definitions and the full per-segment product/service enumerations with their introductions and qualifiers."
+      ],
+      "body_checks": [],
+      "limitations": [
+        "Segment names and contents mentioned in the requirement descriptions are not evidence and were not adopted.",
+        "The query_status is limited. With no delivered bodies, relevance and minimality of blocks cannot be assessed."
+      ]
+    }
+  },
+  "role": "planner",
+  "delegation_instruction": null,
+  "catalog": {
+    "schema": {
+      "entities": [
+        {
+          "item_id": "sec-0000789019",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_consolidated"
+          ],
+          "reported_dimensions": []
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-08727d67db4596da",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-08727d67db4596da",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "msft:IntelligentCloudMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-1c2864a339a54fb9",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-1c2864a339a54fb9",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:StatementGeographicalAxis": "country:US"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-3ac1a904909574a0",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-3ac1a904909574a0",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementEquityComponentsAxis": "us-gaap:RetainedEarningsMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-4e381c5389e0f256",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-4e381c5389e0f256",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "us-gaap:ServiceOtherMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-5b1b9c3c62f8d7a7",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "us-gaap:StatementBusinessSegmentsAxis": "msft:MorePersonalComputingMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-6d6570373dc9e275",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-6d6570373dc9e275",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "msft:DynamicsProductsAndCloudServicesMember"
+            }
+          ]
+        },
+        {
+          "item_id": "sec-0000789019-dimensions-785b7959aae57be8",
+          "kind": "entity",
+          "status": "available_candidate",
+          "entity_id": "sec-0000789019-dimensions-785b7959aae57be8",
+          "company_id": "sec-0000789019",
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "accounting_bases": [
+            "reported_dimensioned"
+          ],
+          "reported_dimensions": [
+            {
+              "srt:ProductOrServiceAxis": "msft:MicrosoftThreeSixFiveCommercialProductsAndCloudServicesMember"
+            }
+          ]
+        }
+      ],
+      "metrics": {
+        "capex_cash_payments": {
+          "metric_id": "capex_cash_payments",
+          "label": "Cash payments for property and equipment / 固定资产购置现金支出",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported cash payments to acquire property, plant and equipment. Not total investment, accrual additions, or free cash flow; do not reverse the cash-payment sign.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "capex_cash_payments",
+            "capex cash payments",
+            "payments to acquire property plant and equipment",
+            "固定资产购置现金支出",
+            "PaymentsToAcquirePropertyPlantAndEquipment"
+          ]
+        },
+        "net_income": {
+          "metric_id": "net_income",
+          "label": "Net income / 净利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported net income or loss for the stated scope and period. Preserve the source attribution; do not substitute an adjusted or attributable-income concept.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "net_income",
+            "net income",
+            "net loss",
+            "净利润",
+            "净亏损",
+            "NetIncomeLoss"
+          ]
+        },
+        "operating_cash_flow": {
+          "metric_id": "operating_cash_flow",
+          "label": "Operating cash flow / 经营现金流",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Net cash provided by or used in operating activities for the stated duration. Not operating profit, free cash flow, or an ending cash balance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_cash_flow",
+            "operating cash flow",
+            "cash from operations",
+            "经营现金流",
+            "经营活动现金流量净额",
+            "NetCashProvidedByUsedInOperatingActivities"
+          ]
+        },
+        "operating_income": {
+          "metric_id": "operating_income",
+          "label": "Operating income / 营业利润",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported operating income or loss after operating costs and expenses. Not net income, EBITDA, or operating cash flow.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "operating_income",
+            "operating income",
+            "operating loss",
+            "income from operations",
+            "营业利润",
+            "经营利润",
+            "OperatingIncomeLoss"
+          ]
+        },
+        "revenue": {
+          "metric_id": "revenue",
+          "label": "Revenue / 收入",
+          "unit": "USD",
+          "denominator": null,
+          "definition": "Reported revenue under the mapped revenue concept; preserve consolidated versus dimensional scope. Not cash receipts, bookings, or guidance.",
+          "definition_version": "us-gaap-data-description-v2",
+          "aggregation": "no_implicit_sum",
+          "aliases": [
+            "revenue",
+            "revenues",
+            "net sales",
+            "收入",
+            "营业收入",
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "Revenues",
+            "SalesRevenueNet"
+          ]
+        }
+      },
+      "fiscal_periods": [
+        {
+          "item_id": "fiscal-2c47acb505bfba8c823ccda57bee8cd05cb0da6e68a220dc9f95e0948fa236bb",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2024-07-01",
+            "end": "2025-06-30",
+            "basis": "source"
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        },
+        {
+          "item_id": "fiscal-f10b51768e2351d13aa6e49a028d966b958a1d2be3cd84e4d5428dfc7fc1ecb3",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2024,
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-1bff3951f450e51f3bc44229",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 6,
+              "text": "2024"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        },
+        {
+          "item_id": "fiscal-2a3f37b173179f13337aa1d1eb0a3283be35b03a6fd59d952e1a464d05d94022",
+          "kind": "fiscal_period",
+          "status": "available_candidate",
+          "fiscal_year": 2023,
+          "period": {
+            "kind": "year",
+            "start": "2022-07-01",
+            "end": "2023-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-bafd309f8e61f1dc49dce14b",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 10,
+              "text": "2023"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        }
+      ]
+    },
+    "discovery": {
+      "sources": [
+        {
+          "source_snapshot_id": "msft-2025-10k",
+          "company_id": "sec-0000789019",
+          "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+          "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "document_id": "msft-2025-10k",
+          "index_id": "didx-692376daa635828b",
+          "index_folder": "indexes/msft-2025-10k",
+          "raw_file": "raw/msft-2025-10k.html",
+          "raw_file_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+          "form": "10-K",
+          "period_end": "2025-06-30",
+          "declared_mime_type": "text/html",
+          "parsed_mime_type": "text/html",
+          "available_at": "2025-07-30",
+          "status": "candidate",
+          "fiscal_periods": [
+            {
+              "fiscal_year": 2025,
+              "period": {
+                "kind": "year",
+                "start": "2024-07-01",
+                "end": "2025-06-30",
+                "basis": "source"
+              }
+            },
+            {
+              "fiscal_year": 2024,
+              "period": {
+                "kind": "year",
+                "start": "2023-07-01",
+                "end": "2024-06-30",
+                "basis": "source"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-1bff3951f450e51f3bc44229",
+                "block_id": "block-000781-9ee5633d",
+                "header": {
+                  "row": 4,
+                  "column": 6,
+                  "text": "2024"
+                },
+                "annual_caption": {
+                  "row": 4,
+                  "column": 0,
+                  "text": "Year Ended June 30,"
+                }
+              }
+            },
+            {
+              "fiscal_year": 2023,
+              "period": {
+                "kind": "year",
+                "start": "2022-07-01",
+                "end": "2023-06-30",
+                "basis": "source"
+              },
+              "basis_evidence": {
+                "method": "inline-table-year-v1",
+                "evidence_id": "ev-bafd309f8e61f1dc49dce14b",
+                "block_id": "block-000781-9ee5633d",
+                "header": {
+                  "row": 4,
+                  "column": 10,
+                  "text": "2023"
+                },
+                "annual_caption": {
+                  "row": 4,
+                  "column": 0,
+                  "text": "Year Ended June 30,"
+                }
+              }
+            }
+          ],
+          "parsed_package": {
+            "export_version": "uteki-parsed-document-v1",
+            "package_id": "parsed-8a26ae25481f1c674ad3e154",
+            "manifest_path": "indexes/msft-2025-10k/manifest.json",
+            "manifest_sha256": "112f5e6f7b109f4e3b42e43f87da484920055665d9a5418d287bdca77c8eda94",
+            "source_path": "indexes/msft-2025-10k/source.json",
+            "document_path": "indexes/msft-2025-10k/document.html",
+            "status": "candidate_parsed_material",
+            "semantic_review": "not_reviewed"
+          },
+          "capabilities": [
+            "read_context",
+            "literal_search",
+            "source_bytes",
+            "html_table_structure",
+            "parsed_document_package"
+          ],
+          "stage_coverage": {
+            "schema_version": "source-stage-coverage-v1",
+            "original": {
+              "status": "hash_verified",
+              "byte_count": 8158179,
+              "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6"
+            },
+            "reading": {
+              "status": "indexed",
+              "parser_version": "sec-source-blocks-v0.1.11",
+              "block_count": 1401,
+              "block_type_counts": {
+                "heading_candidate": 402,
+                "list_item": 114,
+                "other": 13,
+                "page_marker": 100,
+                "paragraph": 687,
+                "table": 85
+              },
+              "index_diagnostic_count": 25
+            },
+            "tables": {
+              "status": "structure_parsed",
+              "table_node_count": 85,
+              "tables_with_cells": 85,
+              "tables_without_cells": 0,
+              "cell_count": 19065,
+              "layout_role_counts": {
+                "table_of_contents": 1,
+                "unclassified": 84
+              },
+              "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+              "financial_table_semantics": "not_evaluated"
+            },
+            "numeric": {
+              "status": "candidate_records",
+              "record_count": 102,
+              "evidence_count": 102,
+              "gap_count": 1449,
+              "adapter": "us-gaap-inline-v1",
+              "supported_taxonomy": "US_GAAP",
+              "supported_currencies": [
+                "USD"
+              ],
+              "supported_metric_ids": [
+                "capex_cash_payments",
+                "net_income",
+                "operating_cash_flow",
+                "operating_income",
+                "revenue",
+                "revenue_including_assessed_tax"
+              ],
+              "period_support": "complete_month_boundaries_only",
+              "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+              "financial_package_completeness": "not_evaluated",
+              "semantic_review": "not_evaluated",
+              "adoption": "candidate"
+            }
+          },
+          "image_block_count": 0
+        }
+      ]
+    },
+    "pages": {
+      "sources": {
+        "status": "complete",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 1,
+        "total_count": 1,
+        "bytes_returned": 3430,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "entities": {
+        "status": "limited",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 8,
+        "total_count": 20,
+        "bytes_returned": 2841,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": {
+          "version": "query-catalog-cursor-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+          "filter_hash": "6626b0bb11f7156d7b55d0b9aae2ffbe7d963aac59f3bde56f96d245712a23ec",
+          "content_hash": "3a829f78c1fe9a237abd427fd7e26b95a6f942980a43c94ef06d04167d7381f8",
+          "offset": 8,
+          "checksum": "198953fbd500f03c268767bc1a937bddb38d1cbcc5011a670d2b8bef2694159b"
+        },
+        "gaps": []
+      },
+      "metrics": {
+        "status": "complete",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 5,
+        "total_count": 5,
+        "bytes_returned": 3299,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      },
+      "fiscal_periods": {
+        "status": "complete",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "returned_count": 3,
+        "total_count": 3,
+        "bytes_returned": 1408,
+        "byte_budget_scope": "items_json_utf8",
+        "next_cursor": null,
+        "gaps": []
+      }
+    }
+  },
+  "requirements": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segments",
+      "description": "Original 10-K passages identifying Microsoft's reportable segments for FY2025 (Business section overview and segment note), with period and qualifiers."
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segment-businesses",
+      "description": "Business composition: the source's complete enumeration of the principal products, services and activities included in each reportable segment (Productivity and Business Processes, Intelligent Cloud, More Personal Computing), with introductions, affiliations and necessary qualifiers."
+    }
+  ],
+  "coverage": [
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segments",
+      "description": "Original 10-K passages identifying Microsoft's reportable segments for FY2025 (Business section overview and segment note), with period and qualifiers.",
+      "evidence_ids": [
+        "ev-8544ccbe13ee4a483094555a",
+        "ev-2531a66c2296f2248f5a872e",
+        "ev-4c331ae164cd13b88ff99033",
+        "ev-41490e9252251bbe4ab42d5f"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    },
+    {
+      "kind": "source_evidence",
+      "query": null,
+      "source_id": "msft-2025-10k",
+      "node_id": null,
+      "financial_task_id": null,
+      "batch_index": null,
+      "requirement_id": "req-segment-businesses",
+      "description": "Business composition: the source's complete enumeration of the principal products, services and activities included in each reportable segment (Productivity and Business Processes, Intelligent Cloud, More Personal Computing), with introductions, affiliations and necessary qualifiers.",
+      "evidence_ids": [
+        "ev-8544ccbe13ee4a483094555a",
+        "ev-2531a66c2296f2248f5a872e",
+        "ev-4c331ae164cd13b88ff99033",
+        "ev-41490e9252251bbe4ab42d5f"
+      ],
+      "gap_ids": [],
+      "semantic_review": "pending",
+      "source_scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      }
+    }
+  ],
+  "gaps": [],
+  "state_artifact": {
+    "schema_version": "run-artifact-v1",
+    "artifact_id": "art-c3f3998df2fc9a9d4e74c96078dd1f4c",
+    "kind": "run_state",
+    "path": "artifacts/art-c3f3998df2fc9a9d4e74c96078dd1f4c.json",
+    "sha256": "d7a3040ce9985ef22e53e961dbdc6e0d78f7b497f456123c2e36108a7451ec41",
+    "size_bytes": 7453,
+    "scope": {
+      "execution_schema_version": "research-execution-v1",
+      "snapshot_id": "query-4244ad2daa731c37f05cee53",
+      "company_ids": [
+        "sec-0000789019"
+      ],
+      "source_snapshot_ids": [
+        "msft-2025-10k"
+      ],
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "include_candidates": true
+    },
+    "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+    "created_step": 10,
+    "parent_ids": [],
+    "source_ids": [],
+    "evidence_id": null
+  },
+  "state_reads": [],
+  "evidence_index": [
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+      "kind": "context",
+      "path": "artifacts/art-3722b998458225d540ce7fde0d846ed6.json",
+      "sha256": "fdd05abb64f1346ed1e8f71235445c11b7f94df750c22e4766fe2bd9a2b4ea0b",
+      "size_bytes": 20649,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 6,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-8544ccbe13ee4a483094555a"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+      "kind": "context",
+      "path": "artifacts/art-e4e5a6634db2e191de4071166b361ef1.json",
+      "sha256": "0cd48bed3671238b9857cfc5b65f2e4ae4ab43dbae1b6823162a0d3fb6d22211",
+      "size_bytes": 19848,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 7,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-2531a66c2296f2248f5a872e"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+      "kind": "context",
+      "path": "artifacts/art-4da0be7151a1e76b5a4ebaea10fec805.json",
+      "sha256": "5ddda75c20793c2835a5b8ca016dfaacb82739068fce62f4f16fd3d7a29a709d",
+      "size_bytes": 18638,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 8,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-4c331ae164cd13b88ff99033"
+    },
+    {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+      "kind": "context",
+      "path": "artifacts/art-002087950f46b6f8a6c3b525ad19b298.json",
+      "sha256": "a90670e8baa716479c6dafb6e7323939c18daa472a45f937e61ad126d569f9e4",
+      "size_bytes": 15638,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-41490e9252251bbe4ab42d5f"
+    }
+  ],
+  "evidence_index_page": {
+    "status": "read",
+    "artifact_id": "art-315b1b40cfacbfdd06130e0d71263d93",
+    "sha256": "025887dd0ab88772c5093a1b9fa36b09225a5c3d6c914f776b61d3908cf392c0",
+    "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+    "snapshot_id": "query-4244ad2daa731c37f05cee53",
+    "pointer": "",
+    "unit": "items",
+    "offset": 0,
+    "end_offset": 4,
+    "total_count": 4,
+    "returned_count": 4,
+    "bytes_returned": 2912,
+    "next_cursor": null,
+    "gaps": []
+  },
+  "observation": {
+    "status": "tool_returned",
+    "evidence_ids": [
+      "ev-41490e9252251bbe4ab42d5f"
+    ],
+    "cache_hit": false,
+    "result": {
+      "index_id": "didx-692376daa635828b",
+      "node_id": "didx-692376daa635828b-part-i-item-1",
+      "reading_group_version": "reading-groups-v0.4",
+      "reading_groups": [],
+      "expansion_note": "Complete list/table/turn/Q&A context may exceed requested count; original blocks unchanged.",
+      "blocks": [
+        {
+          "block_id": "block-000124-495768bd",
+          "dom_path": "/html/body/div[20]/p[1]",
+          "image_asset_id": null,
+          "layout_role": "running_header",
+          "ordinal": 124,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "margin-top",
+              "0"
+            ],
+            [
+              "text-align",
+              "center"
+            ]
+          ],
+          "table": null,
+          "text": "PART I",
+          "text_hash": "495768bd3d6957619d4fbe2457811a0483df9e815938bdd9fb195935ece1b264",
+          "type": "heading_candidate"
+        },
+        {
+          "block_id": "block-000125-c5ddfeff",
+          "dom_path": "/html/body/div[20]/p[2]",
+          "image_asset_id": null,
+          "layout_role": "running_header",
+          "ordinal": 125,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "margin-top",
+              "0"
+            ],
+            [
+              "text-align",
+              "center"
+            ]
+          ],
+          "table": null,
+          "text": "Item 1",
+          "text_hash": "c5ddfeffb275254140796b8c080f372d65ebb1b0590e238b191f595d5fcd32ca",
+          "type": "heading_candidate"
+        },
+        {
+          "block_id": "block-000126-60d9b18e",
+          "dom_path": "/html/body/div[21]/p[1]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 126,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-style",
+              "italic"
+            ],
+            [
+              "font-weight",
+              "bold"
+            ],
+            [
+              "margin-top",
+              "13.5pt"
+            ],
+            [
+              "text-align",
+              "left"
+            ]
+          ],
+          "table": null,
+          "text": "Server Products and Cloud Services",
+          "text_hash": "60d9b18e7bf65cd843e329daceee7f92b39cab3dc17d37ece480254c2707e3a2",
+          "type": "heading_candidate"
+        },
+        {
+          "block_id": "block-000127-93a9159b",
+          "dom_path": "/html/body/div[21]/p[2]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 127,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "margin-top",
+              "9pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use Azure through our global network of datacenters for computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning. Azure enables customers to devote more resources to development and use of applications that benefit their organizations, rather than managing on-premises hardware and software. Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services.",
+          "text_hash": "93a9159b81c6d7c3a672279e63cea873f307a130c4ecd124e226024ab092e374",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000128-edef168d",
+          "dom_path": "/html/body/div[21]/p[3]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 128,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "margin-top",
+              "9pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents.",
+          "text_hash": "edef168d00440bbe2b7ce09f7119b21cf4f00fa8754203706fd4e17038a83970",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000129-264fa06b",
+          "dom_path": "/html/body/div[21]/p[4]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 129,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "margin-top",
+              "9pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "Our server products are designed to make IT professionals, developers, and their systems more productive and efficient. Server software is integrated server infrastructure and middleware designed to support software applications built on the Windows Server operating system. This includes the server platform, database, business intelligence, storage, management and operations, virtualization, service-oriented architecture platform, security, and identity software. We also license standalone and software development lifecycle tools for software architects, developers, testers, and project managers. Server products revenue is mainly affected by purchases through volume licensing programs, licenses sold to OEMs, and retail packaged products. CALs provide access rights to certain server products, including SQL Server and Windows Server, and revenue is reported along with the associated server product.",
+          "text_hash": "264fa06b62f591e7ae1ae6fbc329d721f61da563df05e416ba1a13873de86d12",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000130-8d7ff1f7",
+          "dom_path": "/html/body/div[21]/p[5]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 130,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "margin-top",
+              "9pt"
+            ],
+            [
+              "text-align",
+              "justify"
+            ]
+          ],
+          "table": null,
+          "text": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry.",
+          "text_hash": "8d7ff1f71b25f9da9e0bee5f5ae71b58ab1d7f70e6284af848eb159f1d414905",
+          "type": "paragraph"
+        },
+        {
+          "block_id": "block-000131-155cf0a6",
+          "dom_path": "/html/body/div[21]/p[6]",
+          "image_asset_id": null,
+          "layout_role": null,
+          "ordinal": 131,
+          "reported_page": 7,
+          "source_anchor": "F_52de2956-2cf6-4683-90c8-0b4adeb07187",
+          "style_signature": [
+            [
+              "font-family",
+              "times new roman"
+            ],
+            [
+              "font-size",
+              "10pt"
+            ],
+            [
+              "font-style",
+              "italic"
+            ],
+            [
+              "font-weight",
+              "bold"
+            ],
+            [
+              "margin-top",
+              "13.5pt"
+            ],
+            [
+              "text-align",
+              "left"
+            ]
+          ],
+          "table": null,
+          "text": "Enterprise and Partner Services",
+          "text_hash": "155cf0a62a7525bb79bf13d0f8cb9060af3c53dcf3678fd1b41abfd0d863d591",
+          "type": "heading_candidate"
+        }
+      ],
+      "previous_block_id": "block-000123-e7f6c011",
+      "next_block_id": "block-000132-f2659d3c",
+      "context_note": "Check preceding heading/introduction and following list continuation; tables retain cells and XBRL.",
+      "execution_schema_version": "research-execution-v1",
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "snapshot_id": "query-4244ad2daa731c37f05cee53",
+      "source_policy_id": "local-frozen-v1",
+      "knowledge_cutoff": "2026-10-09",
+      "candidate_data": true,
+      "source": {
+        "source_snapshot_id": "msft-2025-10k",
+        "company_id": "sec-0000789019",
+        "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+        "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+        "document_id": "msft-2025-10k",
+        "index_id": "didx-692376daa635828b",
+        "index_folder": "indexes/msft-2025-10k",
+        "raw_file": "raw/msft-2025-10k.html",
+        "raw_file_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+        "form": "10-K",
+        "period_end": "2025-06-30",
+        "declared_mime_type": "text/html",
+        "parsed_mime_type": "text/html",
+        "available_at": "2025-07-30",
+        "status": "candidate",
+        "fiscal_periods": [
+          {
+            "fiscal_year": 2025,
+            "period": {
+              "kind": "year",
+              "start": "2024-07-01",
+              "end": "2025-06-30",
+              "basis": "source"
+            }
+          },
+          {
+            "fiscal_year": 2024,
+            "period": {
+              "kind": "year",
+              "start": "2023-07-01",
+              "end": "2024-06-30",
+              "basis": "source"
+            },
+            "basis_evidence": {
+              "method": "inline-table-year-v1",
+              "evidence_id": "ev-1bff3951f450e51f3bc44229",
+              "block_id": "block-000781-9ee5633d",
+              "header": {
+                "row": 4,
+                "column": 6,
+                "text": "2024"
+              },
+              "annual_caption": {
+                "row": 4,
+                "column": 0,
+                "text": "Year Ended June 30,"
+              }
+            }
+          },
+          {
+            "fiscal_year": 2023,
+            "period": {
+              "kind": "year",
+              "start": "2022-07-01",
+              "end": "2023-06-30",
+              "basis": "source"
+            },
+            "basis_evidence": {
+              "method": "inline-table-year-v1",
+              "evidence_id": "ev-bafd309f8e61f1dc49dce14b",
+              "block_id": "block-000781-9ee5633d",
+              "header": {
+                "row": 4,
+                "column": 10,
+                "text": "2023"
+              },
+              "annual_caption": {
+                "row": 4,
+                "column": 0,
+                "text": "Year Ended June 30,"
+              }
+            }
+          }
+        ],
+        "parsed_package": {
+          "export_version": "uteki-parsed-document-v1",
+          "package_id": "parsed-8a26ae25481f1c674ad3e154",
+          "manifest_path": "indexes/msft-2025-10k/manifest.json",
+          "manifest_sha256": "112f5e6f7b109f4e3b42e43f87da484920055665d9a5418d287bdca77c8eda94",
+          "source_path": "indexes/msft-2025-10k/source.json",
+          "document_path": "indexes/msft-2025-10k/document.html",
+          "status": "candidate_parsed_material",
+          "semantic_review": "not_reviewed"
+        },
+        "capabilities": [
+          "read_context",
+          "literal_search",
+          "source_bytes",
+          "html_table_structure",
+          "parsed_document_package"
+        ],
+        "stage_coverage": {
+          "schema_version": "source-stage-coverage-v1",
+          "original": {
+            "status": "hash_verified",
+            "byte_count": 8158179,
+            "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6"
+          },
+          "reading": {
+            "status": "indexed",
+            "parser_version": "sec-source-blocks-v0.1.11",
+            "block_count": 1401,
+            "block_type_counts": {
+              "heading_candidate": 402,
+              "list_item": 114,
+              "other": 13,
+              "page_marker": 100,
+              "paragraph": 687,
+              "table": 85
+            },
+            "index_diagnostic_count": 25
+          },
+          "tables": {
+            "status": "structure_parsed",
+            "table_node_count": 85,
+            "tables_with_cells": 85,
+            "tables_without_cells": 0,
+            "cell_count": 19065,
+            "layout_role_counts": {
+              "table_of_contents": 1,
+              "unclassified": 84
+            },
+            "counting_basis": "HTML table nodes; parent cell text may include nested table text",
+            "financial_table_semantics": "not_evaluated"
+          },
+          "numeric": {
+            "status": "candidate_records",
+            "record_count": 102,
+            "evidence_count": 102,
+            "gap_count": 1449,
+            "adapter": "us-gaap-inline-v1",
+            "supported_taxonomy": "US_GAAP",
+            "supported_currencies": [
+              "USD"
+            ],
+            "supported_metric_ids": [
+              "capex_cash_payments",
+              "net_income",
+              "operating_cash_flow",
+              "operating_income",
+              "revenue",
+              "revenue_including_assessed_tax"
+            ],
+            "period_support": "complete_month_boundaries_only",
+            "counting_basis": "candidate inline fact occurrences, not unique reviewed financial facts",
+            "financial_package_completeness": "not_evaluated",
+            "semantic_review": "not_evaluated",
+            "adoption": "candidate"
+          }
+        },
+        "image_block_count": 0
+      },
+      "source_snapshot_id": "msft-2025-10k",
+      "company_id": "sec-0000789019",
+      "source_period_end": "2025-06-30",
+      "available_at": "2025-07-30",
+      "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+      "status": "read",
+      "gaps": [],
+      "requested_start_block_id": "block-000124-495768bd",
+      "block_ids": [
+        "block-000124-495768bd",
+        "block-000125-c5ddfeff",
+        "block-000126-60d9b18e",
+        "block-000127-93a9159b",
+        "block-000128-edef168d",
+        "block-000129-264fa06b",
+        "block-000130-8d7ff1f7",
+        "block-000131-155cf0a6"
+      ],
+      "next_cursor": {
+        "cursor_version": "document-cursor-v1",
+        "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "source_snapshot_id": "msft-2025-10k",
+        "index_id": "didx-692376daa635828b",
+        "node_id": "didx-692376daa635828b-part-i-item-1",
+        "kind": "read",
+        "start_block_id": "block-000132-f2659d3c"
+      },
+      "node_complete": false,
+      "coverage": "Returned full blocks only; reaching the node end does not prove all earlier blocks were read."
+    },
+    "result_artifact": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+      "kind": "context",
+      "path": "artifacts/art-002087950f46b6f8a6c3b525ad19b298.json",
+      "sha256": "a90670e8baa716479c6dafb6e7323939c18daa472a45f937e61ad126d569f9e4",
+      "size_bytes": 15638,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [
+        "msft-2025-10k"
+      ],
+      "evidence_id": "ev-41490e9252251bbe4ab42d5f"
+    },
+    "preview_truncated": false,
+    "reads": [],
+    "receipt": {
+      "schema_version": "data-tool-receipt-v1",
+      "step": 9,
+      "action": "read_source",
+      "requirement_ids": [
+        "req-segments",
+        "req-segment-businesses"
+      ],
+      "request_fingerprint": "86f3530c80b8b655c9782119a96c22213cef3f1fc30f7dacee73cbb418103344",
+      "status": "tool_returned",
+      "error_code": null,
+      "layer": "reading",
+      "retryable": false,
+      "progress_delta": true,
+      "observation_bytes": 13013,
+      "execution_limited": false,
+      "preview_truncated": false
+    },
+    "full_output": {
+      "schema_version": "run-artifact-v1",
+      "artifact_id": "art-f364e297bb172c0f90137128451361ce",
+      "kind": "tool_output",
+      "path": "artifacts/art-f364e297bb172c0f90137128451361ce.json",
+      "sha256": "b4f446d5742bc03041077185df8c74cce0570698bf8b6eb8f8402f6b7365de68",
+      "size_bytes": 16720,
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "scope_id": "scope-1e9e9bea569cf1952f3bb3aa",
+      "created_step": 9,
+      "parent_ids": [],
+      "source_ids": [],
+      "evidence_id": null
+    }
+  },
+  "skills": {
+    "acquire": {
+      "path": "acquire/SKILL.md",
+      "sha256": "75c68969c25b1b3ce0643d90aaa49c836eebdcabaa79a9cc90d3ee8543c2cfd6"
+    },
+    "materialize": {
+      "path": "materialize/SKILL.md",
+      "sha256": "016e72df92052d0a3036ddceee1228dccac7d81538521102ff204990aa8093f8"
+    },
+    "query": {
+      "path": "query/SKILL.md",
+      "sha256": "91ec3ff7194d162a2b46d26cd97267a5825915b2f16468335205989025950451"
+    }
+  },
+  "loaded_skill": {
+    "name": "query",
+    "path": "query/SKILL.md",
+    "sha256": "91ec3ff7194d162a2b46d26cd97267a5825915b2f16468335205989025950451",
+    "content": "---\nname: data-agent-query\nversion: 12\n---\nLoad this skill when planning or querying. Its content and hash stay frozen for the run.\n\nBusiness composition and revenue composition are distinct question dimensions. For business-composition requests, plan and obtain the source's definition of each requested business/segment's principal products, services or activities, their affiliation and necessary qualifiers. Revenue or monetization categories alone are insufficient. A product/platform can define the business even without a separately reported revenue line. Preserve the relevant definitional enumeration, not every product mention across the report. Verify this coverage before trimming material. For pure revenue requests, retain the numbers and necessary period/unit/accounting context without forcing a product catalog. Describe the requested dimension in requirement descriptions; do not narrow the original question to what the first search happened to find.\n\nrecord_origins shows the latest query's record evidence IDs with immutable original citation locations and short quote previews. It stays available after reading source blocks; use its exact continuation cursor for omitted entries and each citation's read_request for complete metadata. These are navigation aids, not body reading. Inspect the original locations before selecting equivalent occurrences. A reviewer's cross-check citation does not replace a record's original source. Selecting or omitting source_evidence does not change a selected record's citation or its table context. To remove an unnecessary table, select another already-queried occurrence satisfying the same entity/metric/period/value_kind criterion with sufficient original evidence; never rewrite its source identity. Keep necessary units, headings and qualifiers.\n\nPlan explicit requirements. Use kind=read_node with source_id and node_id whenever complete chapter reading is required. The host tracks required, returned and unread body IDs, rejects premature finish and preserves remaining gaps.\n\nUse kind=query with an explicit QueryPlan for numeric requirements. Records, entity, periods and formula must match that requirement and its pinned execution scope. The host verifies returned records, source citations, registered calculation and exact operands; Business text alone cannot satisfy a margin requirement. QueryPlan does not select currency: record units remain explicit in results and the registered calculation rejects incompatible operand units or accounting bases. Fiscal-year mappings must belong to the requested entity's company; another company's mapping cannot fill a missing mapping.\n\nFor purpose=analysis_evidence, the Data Agent retrieves original material for a separate Analysis Agent. The original question can be narrative; use kind=source_evidence for its source material and kind=query for numeric retrieval. Do not create source_answer requirements or author the downstream report. Navigate using the small scoped catalog/schema and source index, then read relevant original blocks with necessary units, periods, introductions and qualifiers. Do not default to full-report or whole-chapter delivery. Preserve explicit gaps when evidence or resources are insufficient. Semantic completeness is reviewed separately after retrieval.\n\nIn analysis_evidence, query original records/operands; calculation requirements are not supported by its review handoff. Every numeric query requirement must declare records criteria. Use source_evidence for document-only retrieval. After querying, select_records with record_selection.record_ids=[evidence_id,...], requirement_ids and a reason selects the final records. These IDs are ev- record evidence IDs, not original record_id values. Retain at least one record per declared entity/metric/period/value_kind criterion, preserving explicit units and source qualifications; trim redundant disclosures when one source is sufficient. Only records returned by that requirement's same-scope query are eligible. Selection replaces previous selection, preserves the full audit trail, and is required before finish. After gathering a source_evidence requirement, use select_evidence with delivery.blocks=[{context_id,block_id}], requirement_ids and a reason. Only fully delivered same-source blocks may be selected. This replaces that requirement's final delivery selection, while retaining all exploration snapshots. Keep units, periods, full relevant lists and necessary qualifications. Do not select unrelated exploration. The reviewer checks relevance as well as support. read_body_catalog preserves short navigation previews and exact reread pointers for earlier complete blocks; do not restart discovery because the latest observation changed. Feedback from a prior sealed review preserves the original question/scope and directs a new complete evidence package, not just an addendum.\n\nUse kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.\n\nFor purpose=question_answer, use kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.\n\nAn answer must declare model_claimed_coverage, coverage_note and unresolved_questions. partial requires concrete unresolved questions; claimed_complete requires none but remains a model judgment. The host validates references, never semantic completeness. No answer prevents finish unless an explicit gap is recorded; a partial answer seals a partial result. research_answers persists bounded candidate answers and artifact pointers across later reading. Revising an answer preserves old versions; changing only statement or label is not new evidence. Worker answers are untrusted candidates and do not satisfy the parent's requirements.\n\nGeneral information requirements only check metadata references and remain semantically unreviewed; do not use them to represent original-body verification. Plan revisions append requirements, preserving earlier requirements and gaps. If a new source or snapshot is required, retain the original requirement and explain its gap, then append a requirement bound to the new scope.\n\nOutline and search return navigation only. New node/hit locations and validated source/snapshot transitions count as exploration progress, never as body reading. Read indicated body blocks before citing; use retained IDs to reread evidence. Reaching a chapter end does not establish earlier coverage. Repeated results, repeated errors and reworded reasons do not reset the three-turn no-progress limit.\n\nsource_leads persists already-located blocks with exact read_context parameters and role-local reading status. Use those entries instead of repeatedly reopening the outline. pending_body_reads identifies requested target text omitted from previews; follow its exact artifact pointer until delivered. retained_body re-presents bounded complete blocks already read by this role, including nearby units, so they remain available together. Omitted blocks are explicitly counted, not summarized. An index_id is not a node_id; use actual outline node IDs.\n\nThe initial catalog contains first pages only. Use discover_catalog(kind, cursor) and probe_schema(filters, cursor) to inspect additional sources, entities, metrics, fiscal mappings and scoped examples. Preserve filters when continuing a catalog cursor. A missing first-page item does not establish missing data. Full legacy query/task schemas are not repeated in each input.\n\nWhen preparation metadata is supplied, inspect its filing catalog and callback contracts through the registered preparation artifact. The newest annual filing may not cover the requested year's Business chapter. Acquire the explicitly discovered reporting period, then materialize the returned source_run_id, before using its data; confirm the fiscal-year label from that source rather than extrapolating a calendar. Missing or incomplete filing discovery remains an explicit gap.\n\nTool receipts distinguish execution limits from preview truncation and link to the complete saved output. Use read_artifact(artifact_id, pointer, cursor) for bounded JSON array items, object entries or text character ranges; list_artifacts discovers other saved outputs. Respect the original artifact scope/hash. Read the evidence index's next page when needed; indexes themselves are immutable paginated artifacts. An oversized item exposes a child pointer or the budget needed to read it. Saving text to disk does not count as reading it: only complete blocks, or all character ranges of a block, actually delivered in planner inputs advance body coverage. Extraction is restricted to delivered source blocks. The final v2 evidence bundle references immutable artifacts; consumers may load original content separately.\n\nWhen available_financial_extract is true, inspect the host's financial_tasks catalog. Each task fixes the company, source, frozen selection, method policy and available table batches. Use source_excerpt to select the pending batch relevant to the user's request; excerpts are navigation, not body-reading receipts. The financial_task_catalog artifact retains the full initial catalog. This task reuses its explicitly registered selection; it does not establish whole-filing recall.\n\nPlan a separate kind=financial_extract requirement with financial_task_id and batch_index. Execute action=financial_extract with financial_extraction={task_id,batch_index,method_id?}, referencing exactly that requirement. Omit method_id to select the task default, or choose only an allowed_method_ids entry. The execution host loads that method's versioned Skill and Prompt before extracting; do not send paths, jobs, financial answers, period replacements or model settings. Respect max_new_batches. Successful batches show candidate status and their receipt; do not rerun them merely to repeat a completed task.\n\nA candidate_financial_extraction receipt means a separate candidate dataset was generated. It does not update the active query baseline, satisfy a numeric query, prove source body was delivered to you, or approve financial semantics. Check returned raw/normalized counts and gaps; zero normalized records and unresolved drafts remain visible limitations. Only the matching task/catalog/batch receipt can complete its financial_extract requirement. Failed or unavailable execution requires an explicit gap. A run containing only these completed requirements ends candidate_ready; all outputs still need independent review and adoption.\n\nFor broad questions, record uncovered requirements as gaps instead of declaring completion. Finish means the explicit host checks passed, not that research semantics were approved. Never invent numeric arithmetic or automatically adopt evidence.\n"
+  },
+  "available_callbacks": [],
+  "available_worker": true,
+  "available_financial_extract": false,
+  "financial_tasks": [],
+  "financial_task_catalog": null,
+  "completion": {
+    "reference_checks_passed": false,
+    "unmet": [
+      {
+        "requirement_id": "req-segments",
+        "reason": "delivery_selection_required"
+      },
+      {
+        "requirement_id": "req-segment-businesses",
+        "reason": "delivery_selection_required"
+      }
+    ],
+    "partial_answer_requirements": [],
+    "semantic_completeness": "not_evaluated"
+  },
+  "research_answers": {
+    "items": [],
+    "omitted_requirement_ids": [],
+    "byte_limit": 12000
+  },
+  "retained_body": {
+    "items": [
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000124-495768bd",
+        "text": "PART I",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000125-c5ddfeff",
+        "text": "Item 1",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000126-60d9b18e",
+        "text": "Server Products and Cloud Services",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000127-93a9159b",
+        "text": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any platform or device. Customers can use Azure through our global network of datacenters for computing, networking, storage, mobile and web application services, AI, Internet of Things, cognitive services, and machine learning. Azure enables customers to devote more resources to development and use of applications that benefit their organizations, rather than managing on-premises hardware and software. Azure revenue is mainly affected by infrastructure-as-a-service and platform-as-a-service consumption-based services.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000128-edef168d",
+        "text": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at scale to run large workloads, complemented by our rapidly expanding portfolio of AI cloud services (including the latest models) and hardware, which includes custom-built silicon and strong partnerships with chip manufacturers. Azure AI Foundry is a unified platform for developers to design, customize, and manage AI applications and agents.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000129-264fa06b",
+        "text": "Our server products are designed to make IT professionals, developers, and their systems more productive and efficient. Server software is integrated server infrastructure and middleware designed to support software applications built on the Windows Server operating system. This includes the server platform, database, business intelligence, storage, management and operations, virtualization, service-oriented architecture platform, security, and identity software. We also license standalone and software development lifecycle tools for software architects, developers, testers, and project managers. Server products revenue is mainly affected by purchases through volume licensing programs, licenses sold to OEMs, and retail packaged products. CALs provide access rights to certain server products, including SQL Server and Windows Server, and revenue is reported along with the associated server product.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000130-8d7ff1f7",
+        "text": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporate AI and agent-based tools across the software development lifecycle. Nuance Healthcare provides AI solutions to the healthcare industry.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-41490e9252251bbe4ab42d5f",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000131-155cf0a6",
+        "text": "Enterprise and Partner Services",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-4c331ae164cd13b88ff99033",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000112-7c427d3a",
+        "text": "Competitors to Office include software and global application vendors, web-based and mobile application companies, AI-first application companies, as well as local application developers. We compete by providing secure, integrated industry-specific, and easy-to-use productivity and collaboration tools and services that create comprehensive solutions and work well with technologies our customers already have both on-premises or in the cloud.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-4c331ae164cd13b88ff99033",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000113-bc876fa1",
+        "text": "Windows faces competition from various software products and from alternative platforms and devices. Microsoft Defender for Endpoint competes with endpoint security solution providers.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-4c331ae164cd13b88ff99033",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000114-0cdf0fbd",
+        "text": "Our Enterprise Mobility + Security offerings compete with products from a range of competitors including identity vendors, security solution vendors, and numerous other security point solution vendors.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-4c331ae164cd13b88ff99033",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000115-aeccb0a6",
+        "text": "LinkedIn faces competition from online professional networks; recruiting, talent management, and human resource services companies; job boards; companies that provide learning and development products and services; online and offline outlets that generate revenue from advertisers and marketers; and online and offline outlets for companies with lead generation and customer intelligence and insights.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-4c331ae164cd13b88ff99033",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000116-338416e5",
+        "text": "Dynamics competes with cloud-based and on-premises business solution providers.",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_evidence_id": "ev-4c331ae164cd13b88ff99033",
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000117-925ee601",
+        "text": "Intelligent Cloud",
+        "scope": {
+          "execution_schema_version": "research-execution-v1",
+          "snapshot_id": "query-4244ad2daa731c37f05cee53",
+          "company_ids": [
+            "sec-0000789019"
+          ],
+          "source_snapshot_ids": [
+            "msft-2025-10k"
+          ],
+          "source_policy_id": "local-frozen-v1",
+          "knowledge_cutoff": "2026-10-09",
+          "include_candidates": true
+        },
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 32,
+    "byte_limit": 12000
+  },
+  "read_body_catalog": {
+    "navigation_only": true,
+    "items": [
+      {
+        "context_id": "ev-41490e9252251bbe4ab42d5f",
+        "block_id": "block-000126-60d9b18e",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Server Products and Cloud Services",
+        "text_characters": 34,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-41490e9252251bbe4ab42d5f",
+        "block_id": "block-000127-93a9159b",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Azure is a comprehensive set of cloud services that offer developers, IT professionals, and enterprises freedom to build, deploy, and manage applications on any",
+        "text_characters": 681,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-41490e9252251bbe4ab42d5f",
+        "block_id": "block-000128-edef168d",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Azure AI offerings provide a competitive advantage as companies seek ways to optimize and scale their business with AI. We offer supercomputing power for AI at ",
+        "text_characters": 502,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-41490e9252251bbe4ab42d5f",
+        "block_id": "block-000129-264fa06b",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Our server products are designed to make IT professionals, developers, and their systems more productive and efficient. Server software is integrated server inf",
+        "text_characters": 909,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-41490e9252251bbe4ab42d5f",
+        "block_id": "block-000130-8d7ff1f7",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "GitHub and Nuance Healthcare include both cloud and on-premises offerings. GitHub provides a collaboration platform for developers to manage code and incorporat",
+        "text_characters": 297,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-41490e9252251bbe4ab42d5f",
+        "block_id": "block-000131-155cf0a6",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Enterprise and Partner Services",
+        "text_characters": 31,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-002087950f46b6f8a6c3b525ad19b298",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000112-7c427d3a",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Competitors to Office include software and global application vendors, web-based and mobile application companies, AI-first application companies, as well as lo",
+        "text_characters": 444,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000113-bc876fa1",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Windows faces competition from various software products and from alternative platforms and devices. Microsoft Defender for Endpoint competes with endpoint secu",
+        "text_characters": 184,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000114-0cdf0fbd",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Our Enterprise Mobility + Security offerings compete with products from a range of competitors including identity vendors, security solution vendors, and numero",
+        "text_characters": 201,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000115-aeccb0a6",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "LinkedIn faces competition from online professional networks; recruiting, talent management, and human resource services companies; job boards; companies that p",
+        "text_characters": 401,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000116-338416e5",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Dynamics competes with cloud-based and on-premises business solution providers.",
+        "text_characters": 79,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000117-925ee601",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Intelligent Cloud",
+        "text_characters": 17,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000118-5e917062",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Our Intelligent Cloud segment consists of our public, private, and hybrid server products and cloud services that power modern business and developers. This seg",
+        "text_characters": 185,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000119-4f8865ab",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000120-c34f7245",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Server products and cloud services, including Azure and other cloud services, comprising cloud and AI consumption-based services, GitHub cloud services, Nuance ",
+        "text_characters": 403,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/8/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000121-4f8865ab",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-4c331ae164cd13b88ff99033",
+        "block_id": "block-000122-c07a987e",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Enterprise and partner services, including Enterprise Support Services, Industry Solutions, Nuance professional services, Microsoft Partner Network, and Learnin",
+        "text_characters": 173,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-4da0be7151a1e76b5a4ebaea10fec805",
+          "pointer": "/blocks/10/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000100-36240328",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Microsoft 365 Commercial Products and Cloud Services",
+        "text_characters": 52,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000101-67803298",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Microsoft 365 Commercial is an AI-powered business and productivity solutions platform that brings together Office, Windows, Microsoft 365 Copilot, and Enterpri",
+        "text_characters": 819,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000102-83762012",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Microsoft 365 Consumer Products and Cloud Services",
+        "text_characters": 50,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000103-a597bcd9",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Microsoft 365 Consumer is designed to increase personal productivity and creativity through a range of products and services. Growth depends on our ability to r",
+        "text_characters": 773,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000107-dd84425b",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "LinkedIn",
+        "text_characters": 8,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000108-ec73690d",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "LinkedIn connects the world’s professionals to make them more productive and successful and transforms the way companies hire, market, sell, and learn. In addit",
+        "text_characters": 876,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/8/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000109-5aca154a",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Dynamics Products and Cloud Services",
+        "text_characters": 36,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000110-99cc951e",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Dynamics provides cloud-based and on-premises business solutions for financial management, enterprise resource planning (“ERP”), customer relationship managemen",
+        "text_characters": 681,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/10/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-2531a66c2296f2248f5a872e",
+        "block_id": "block-000111-44930333",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Competition",
+        "text_characters": 11,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-e4e5a6634db2e191de4071166b361ef1",
+          "pointer": "/blocks/11/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000086-935d6090",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "We operate our business and report our financial performance using three segments: Productivity and Business Processes, Intelligent Cloud, and More Personal Com",
+        "text_characters": 487,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/0/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000087-44aabdcd",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "In August 2024, we announced changes to the composition of our segments. These changes align our segments with how we currently manage our business, most notabl",
+        "text_characters": 490,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/1/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000088-8339c382",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Additional information on our operating segments and geographic and product information is contained in Note 18 – Segment Information and Geographic Data of the",
+        "text_characters": 227,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/2/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000089-352d4c96",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Our reportable segments are described below.",
+        "text_characters": 44,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/3/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000090-94a2e06c",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Productivity and Business Processes",
+        "text_characters": 35,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/4/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000091-d993f813",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Our Productivity and Business Processes segment consists of products and services in our portfolio of productivity, communication, and information services, spa",
+        "text_characters": 235,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/5/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000092-4f8865ab",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/6/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000093-7018adaa",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Microsoft 365 Commercial products and cloud services, including Microsoft 365 Commercial cloud, comprising Microsoft 365 Commercial, Enterprise Mobility + Secur",
+        "text_characters": 458,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/7/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000094-4f8865ab",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "•",
+        "text_characters": 1,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/8/text",
+          "limit": 1000
+        }
+      },
+      {
+        "context_id": "ev-8544ccbe13ee4a483094555a",
+        "block_id": "block-000095-61bd513b",
+        "source_snapshot_id": "msft-2025-10k",
+        "text_preview": "Microsoft 365 Consumer products and cloud services, including Microsoft 365 Consumer subscriptions, Office licensed on-premises, and other consumer services.",
+        "text_characters": 157,
+        "fully_delivered": true,
+        "read_request": {
+          "artifact_id": "art-3722b998458225d540ce7fde0d846ed6",
+          "pointer": "/blocks/9/text",
+          "limit": 1000
+        }
+      }
+    ],
+    "omitted_count": 4,
+    "byte_limit": 15000
+  },
+  "source_leads": [
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000058-e9e83f3a",
+      "index_id": "didx-692376daa635828b",
+      "origin": "search",
+      "requirement_ids": [
+        "req-segment-businesses",
+        "req-segments"
+      ],
+      "read_request": {
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000058-e9e83f3a"
+      },
+      "read_status": "located"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000086-935d6090",
+      "index_id": "didx-692376daa635828b",
+      "origin": "search",
+      "requirement_ids": [
+        "req-segment-businesses",
+        "req-segments"
+      ],
+      "read_request": {
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000086-935d6090"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000087-44aabdcd",
+      "index_id": "didx-692376daa635828b",
+      "origin": "search",
+      "requirement_ids": [
+        "req-segment-businesses",
+        "req-segments"
+      ],
+      "read_request": {
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000087-44aabdcd"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000090-94a2e06c",
+      "index_id": "didx-692376daa635828b",
+      "origin": "search",
+      "requirement_ids": [
+        "req-segment-businesses",
+        "req-segments"
+      ],
+      "read_request": {
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000090-94a2e06c"
+      },
+      "read_status": "body_delivered"
+    },
+    {
+      "scope": {
+        "execution_schema_version": "research-execution-v1",
+        "snapshot_id": "query-4244ad2daa731c37f05cee53",
+        "company_ids": [
+          "sec-0000789019"
+        ],
+        "source_snapshot_ids": [
+          "msft-2025-10k"
+        ],
+        "source_policy_id": "local-frozen-v1",
+        "knowledge_cutoff": "2026-10-09",
+        "include_candidates": true
+      },
+      "source_snapshot_id": "msft-2025-10k",
+      "block_id": "block-000091-d993f813",
+      "index_id": "didx-692376daa635828b",
+      "origin": "search",
+      "requirement_ids": [
+        "req-segment-businesses",
+        "req-segments"
+      ],
+      "read_request": {
+        "source_snapshot_id": "msft-2025-10k",
+        "block_id": "block-000091-d993f813"
+      },
+      "read_status": "body_delivered"
+    }
+  ],
+  "source_lead_count": 5,
+  "delegations": [],
+  "pending_body_reads": [],
+  "pending_body_read_count": 0,
+  "recent_actions": [
+    {
+      "step": 4,
+      "action": "outline_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 5,
+      "action": "search_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 6,
+      "action": "read_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 7,
+      "action": "read_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 8,
+      "action": "read_source",
+      "status": "tool_returned"
+    },
+    {
+      "step": 9,
+      "action": "read_source",
+      "status": "tool_returned"
+    }
+  ],
+  "consecutive_no_progress": 0,
+  "no_progress_limit": 3,
+  "steps_remaining": 31
+}
