@@ -2,6 +2,8 @@
 
 ## 当前：E1 双年材料独立评测与换机交付
 
+用户已确认：关键方案、进度、已知问题与下一步以本交接文档及下列 PLAN、DELIVERY、README 为准，**原始私密 Claude 对话不提交到 Git**，保留本机即可。接续代码开发不要求恢复完整顾问聊天上下文；只有希望续接原顾问会话时才需要该历史。费用账本与被忽略的运行材料是另一类状态，继续原实验时仍须按下文恢复，不能用文档摘要替代真实账本或原件。现有完整私密包保持本地，不上传。
+
 最新入口为 [E1计划与状态](../experiments/agent_design/2026-10-09-e1-benchmark-v1/PLAN.zh-CN.md)、[E1阶段报告](../experiments/agent_design/2026-10-09-e1-benchmark-v1/DELIVERY.zh-CN.md) 和 [E1换机重放说明](../experiments/agent_design/2026-10-09-e1-benchmark-v1/README.md)。本轮新增 API 总授权上限为 **$100**，目前在**同一账本分段释放到累计 $40**，不是追加 $40。必须保留失败费用和未知预留。不要沿用下方历史 completion-v1 的无限额度配置，也不要缺账本时新建空额度。
 
 当前只验系统 Data Agent 的材料交付。系统自行查询、读取、选择和复核；Codex 的预期答案与独立评审保留在 `evaluation-only/`，不得作为运行配置、查询输入或选段提示。
