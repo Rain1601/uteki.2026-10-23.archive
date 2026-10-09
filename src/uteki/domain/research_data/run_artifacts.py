@@ -4,6 +4,8 @@ from pydantic import Field
 from .query_contract import Contract
 from .execution_scope import ExecutionScope
 
+ARTIFACT_READ_MAX_BYTES = 100000
+
 
 class ArtifactRef(Contract):
     schema_version: Literal['run-artifact-v1'] = 'run-artifact-v1'
@@ -36,7 +38,7 @@ class ArtifactReadRequest(Contract):
     offset: int | None = Field(default=None, ge=0)
     cursor: ArtifactCursor | None = None
     limit: int = Field(default=12, ge=1, le=1000)
-    max_bytes: int = Field(default=12000, ge=512, le=100000)
+    max_bytes: int = Field(default=12000, ge=512, le=ARTIFACT_READ_MAX_BYTES)
 
 
 class ToolReceipt(Contract):

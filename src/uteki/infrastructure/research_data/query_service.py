@@ -310,7 +310,10 @@ class QueryDataPort:
         return {"request": spec, "status": status, "total_literal_hits": hits, "contexts": contexts,
                 "coverage": "bounded literal retrieval; not exhaustive semantic recall", "not_disclosed": False}
 
-    def read_context(self, *, source_snapshot_id, block_id, snapshot_id, knowledge_cutoff, include_candidates=False):
+    def read_context(self, *, source_snapshot_id, block_id, snapshot_id, knowledge_cutoff, include_candidates=False,
+                     representation="full"):
+        if representation not in {"full", "compact"}:
+            raise ValueError("unsupported source representation")
         if snapshot_id != self.snapshot_id:
             raise ValueError("snapshot mismatch")
         if not include_candidates:
@@ -321,6 +324,8 @@ class QueryDataPort:
             raise KeyError("source unavailable at cutoff")
         reader = self._reader(source)
         result = reader.read(self._document_node(reader), block_id, count=1)
+        if representation == "compact":
+            result = compact_table_cells(result)
         return {"snapshot_id": self.snapshot_id, "source_snapshot_id": source_snapshot_id, "source_sha256": source["source_sha256"],
                 "source_url": source["source_url"], **result}
 
@@ -669,6 +674,7 @@ class ScopedQueryDataPort(QueryDataPort):
         if start not in reader.positions:
             raise ValueError("unknown read block")
         result = reader.read(request.node_id, start, count=request.count)
+        full_bytes = len(json.dumps(result, ensure_ascii=False).encode())
         if request.representation == "compact":
             result = compact_table_cells(result)
         lo, hi = reader._range(request.node_id)
@@ -685,10 +691,27 @@ class ScopedQueryDataPort(QueryDataPort):
             return self._empty(source, "context_crosses_node", node_id=request.node_id,
                                requested_start_block_id=start, context_group_ids=crossing,
                                detail="Complete context crosses this node; explicitly select a containing node before reading.")
-        if len(json.dumps(result, ensure_ascii=False).encode()) > MAX_DOCUMENT_BYTES:
+        required_bytes = len(json.dumps(result, ensure_ascii=False).encode())
+        if required_bytes > MAX_DOCUMENT_BYTES:
+            compact_bytes = (required_bytes if request.representation == "compact" else
+                             len(json.dumps(compact_table_cells(result), ensure_ascii=False).encode()))
+            # Encoding changes preserve this exact atomic range. A failed read
+            # supplies no body and does not advance source or reading coverage.
+            retry_representation = ("compact" if request.representation == "full" and compact_bytes <= MAX_DOCUMENT_BYTES
+                                    else "full" if full_bytes <= MAX_DOCUMENT_BYTES else None)
+            retry = ({**request.model_dump(mode="json"), "representation": retry_representation}
+                     if retry_representation else None)
             return self._empty(source, "context_too_large", node_id=request.node_id,
                                requested_start_block_id=start,
-                               detail="Full atomic context exceeds the response limit; no blocks read or continuation advanced.")
+                               representation=request.representation, required_bytes=required_bytes,
+                               max_bytes=MAX_DOCUMENT_BYTES,
+                               representation_bytes={"full": full_bytes, "compact": compact_bytes},
+                               retry_request=retry,
+                               detail=("Atomic context exceeds the response limit; no blocks read or continuation advanced. "
+                                       f"Retry the same source range with representation={retry_representation}; all text and cells are retained."
+                                       if retry else
+                                       "Atomic context exceeds the response limit; no blocks read or continuation advanced. "
+                                       "Neither supported representation fits. Report a capacity gap for this atomic range."))
         following = result["next_block_id"]
         cursor = ReadCursor(**self._cursor_header(source, reader, request.node_id), start_block_id=following) if following else None
         layout_only = not result['blocks'] and bool(result.get('omitted_block_count'))

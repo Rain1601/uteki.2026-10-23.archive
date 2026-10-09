@@ -99,7 +99,7 @@ async def execute(*, root, prior_failed_run, output, observation_root,
         raise ValueError('missing_index_projection_required')
     draft_model = validate_draft(projected, prepared['packet'], expected_version=parent['output_contract_version'])
     draft = draft_model.model_dump()
-    budget_path = base.local_file(root, prior.get('budget_path') or prior_path.parent/'budget.sqlite')
+    budget_path = run._existing_budget_path(root, prior_path.parent, prior)
     budget = RunBudget(budget_path, prior['budget']['limit_usd'], allow_unknown_reservations=True)
     if budget.summary() != prior['budget'] or prior['budget']['in_flight_requests']:
         raise ValueError('prior_budget_snapshot_mismatch_or_in_flight')

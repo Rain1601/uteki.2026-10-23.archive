@@ -91,6 +91,48 @@ class RecordOriginsTests(unittest.TestCase):
         self.assertIn('does not change the record',prompt)
         self.assertIn('Selecting source_evidence does not replace',prompt)
 
+    def test_origins_accumulate_across_requirements_without_selecting_or_rewriting(self):
+        first, second = [fixtures.criterion(2030)], [fixtures.criterion(2031)]
+        plan = fixtures.plan(first, 'prior')
+        plan['requirements'] += fixtures.plan(second, 'current')['requirements']
+        plan['requirements'] += fixtures.plan(second, 'same-current')['requirements']
+        saved = {}
+        def after_first(packet):
+            origins = packet['record_origins']
+            saved['first'] = origins
+            self.assertEqual(len(origins['items']), 1)
+            self.assertEqual(origins['items'][0]['requirement_ids'], ['prior'])
+            self.assertEqual(origins['items'][0]['value_kind'], 'actual')
+            return fixtures.query(second, 'current')
+        def after_second(packet):
+            origins = packet['record_origins']
+            self.assertEqual(len(origins['items']), 3)
+            self.assertEqual({r['period']['end'] for r in origins['items']}, {'2030-12-31', '2031-12-31'})
+            self.assertEqual(saved['first']['returned_count'], 1)
+            self.assertIn('record_selection_required', {r['reason'] for r in packet['completion']['unmet']})
+            return fixtures.query(second, 'same-current')
+        def select_prior(packet):
+            origins = packet['record_origins']
+            self.assertEqual(len(origins['items']), 3)  # repeated query adds eligibility, not duplicates
+            for row in origins['items']:
+                self.assertEqual(row['requirement_ids'], ['prior'] if row['period']['end'] == '2030-12-31'
+                                 else ['current', 'same-current'])
+            saved['last'] = origins
+            eid = next(r['evidence_id'] for r in origins['items'] if r['period']['end'] == '2030-12-31')
+            return {'action': 'select_records', 'requirement_ids': ['prior'],
+                    'record_selection': {'record_ids': [eid]}, 'reason': 'Select original prior-period fixture.'}
+        def select_current(packet):
+            eid = next(r['evidence_id'] for r in saved['last']['items'] if r['period']['end'] == '2031-12-31')
+            return {'action': 'select_records', 'requirement_ids': ['current', 'same-current'],
+                    'record_selection': {'record_ids': [eid]}, 'reason': 'Select a returned original fixture.'}
+        result, _ = self.run_actions([plan, fixtures.query(first, 'prior'), after_first, after_second,
+                                      select_prior, select_current, {'action': 'finish'}])
+        self.assertEqual(result['status'], 'evidence_ready', result['trace'])
+        old = saved['first']['artifact_id']
+        original = json.loads((self.root/'run/artifacts'/f'{old}.json').read_text())
+        self.assertEqual(len(original), 1)
+        self.assertEqual(original[0]['requirement_ids'], ['prior'])
+
 
 class FrozenRecordOriginTests(unittest.TestCase):
     def test_google_ten_occurrences_have_visible_correct_origins_without_index_pagination(self):

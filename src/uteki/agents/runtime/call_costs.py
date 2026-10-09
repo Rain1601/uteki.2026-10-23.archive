@@ -30,7 +30,7 @@ def pricing_snapshot(provider, model):
                 'input_per_million': input_rate, 'output_per_million': output_rate,
                 'cached_input_per_million': cached_rate,
                 'source': 'https://api-docs.deepseek.com/quick_start/pricing',
-                'checked_on': '2026-09-22',
+                'checked_on': '2026-10-09',
                 'basis': 'Peak list price estimate; no cache or off-peak discounts applied'}
     if provider == 'aihubmix' and model in ('claude-opus-5-5', 'claude-sonnet-5-5'):
         input_rate, output_rate = ('4', '20') if model == 'claude-opus-5-5' else ('2', '10')

@@ -103,9 +103,11 @@ class AutonomousDataAgentTests(unittest.TestCase):
         self.assertEqual(len(result['coverage']), 2)
         self.assertEqual(result['coverage'][1]['program_check'], 'missing_evidence')
 
-    def test_revision_cannot_remove_old_requirements(self):
+    def test_omitted_old_requirements_remain_in_accumulated_plan(self):
         result, _ = self.run_actions([plan('business', 'missing'), plan('business'), read(), {'action': 'finish'}])
-        self.assertEqual(len(result['plans']), 1)
+        self.assertEqual(len(result['plans']), 2)
+        self.assertEqual([r['requirement_id'] for r in result['plans'][-1]['requirements']], ['business', 'missing'])
+        self.assertEqual([r['requirement_id'] for r in result['coverage']], ['business', 'missing'])
         self.assertEqual(result['status'], 'limited')
 
     def test_cross_company_source_and_missing_callback_rejected(self):
@@ -209,11 +211,23 @@ class AutonomousDataAgentTests(unittest.TestCase):
         self.assertEqual(len(load_evidence_bundle(self.root / 'run')['items']), 1)
 
     def test_skills_are_loaded_on_demand(self):
-        result, planner = self.run_actions([{'action': 'load_skill', 'skill': 'query'}, plan('business'), read(), {'action': 'finish'}])
+        def read_loaded_skill(packet):
+            loaded = packet['loaded_skill']
+            return {'action': 'read_artifact',
+                    'artifact_read': {'artifact_id': loaded['artifact']['artifact_id'],
+                                      'pointer': '/content', 'max_bytes': 100000}}
+        result, planner = self.run_actions([{'action': 'load_skill', 'skill': 'query'},
+            read_loaded_skill, plan('business'), read(), {'action': 'finish'}])
         self.assertNotIn('content', planner.packets[0]['skills']['query'])
         self.assertIsNone(planner.packets[0]['loaded_skill'])
-        self.assertIn('content', planner.packets[1]['loaded_skill'])
         self.assertEqual(planner.packets[1]['loaded_skill']['name'], 'query')
+        # Full skills may exceed the bounded preview; their exact body remains readable.
+        loaded = planner.packets[1]['loaded_skill']
+        content = json.loads((self.root / 'run' / loaded['artifact']['path']).read_text())['content']
+        page = planner.packets[2]['observation']['result']
+        self.assertEqual(page['items'], content[page['offset']:page['end_offset']])
+        self.assertGreater(page['returned_count'], 0)
+        self.assertLessEqual(page['bytes_returned'], 12000 // 2)
         self.assertEqual(result['status'], 'evidence_ready')
 
 

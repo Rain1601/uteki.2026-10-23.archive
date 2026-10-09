@@ -15,6 +15,9 @@ from unittest.mock import AsyncMock, Mock, patch
 import httpx2 as httpx
 from uteki.agents.business_map import coverage_contract as contract, coverage_run, product_run as base
 from uteki.agents.business_map.product_contract import BUSINESS_DRAFT_VERSION
+from uteki.agents.business_map.semantic_critic import _existing_budget
+from uteki.agents.runtime.run_budget import BudgetExceeded, RunBudget
+from decimal import Decimal
 
 spec = importlib.util.spec_from_file_location('coverage_fixture', Path(__file__).with_name('test_business_only_run.py'))
 fixture = importlib.util.module_from_spec(spec)
@@ -194,13 +197,93 @@ class CoverageRunTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result['budget']['held_usd'],failed['budget']['held_usd'])
         self.assertEqual((self.root/'coverage/summary.json').read_bytes(),old)
 
+    async def test_recovery_and_original_budget_owner_share_one_spending_limit(self):
+        await self.candidate()
+        def broken(_): raise httpx.RemoteProtocolError('offline')
+        self.responses = [broken]
+        await coverage_run.execute(root=self.root, input_run='original', output=self.root/'coverage',
+            observation_root=self.root/'observations', budget_limit_usd='1',
+            inventory_max_tokens=3000, audit_max_tokens=3000, max_attempts=1)
+        frozen = (self.root/'coverage/summary.json').read_bytes()
+        self.responses = [self.answer(self.inventory()), self.audit_response]
+        recovered = await coverage_run.execute(root=self.root, input_run='original', output=self.root/'recovered',
+            observation_root=self.root/'observations', budget_limit_usd='1',
+            inventory_max_tokens=3000, audit_max_tokens=3000, prior_failed_run='coverage')
+        original_owner = _existing_budget(self.root, 'coverage/budget.sqlite', '1')
+        # Use the historical fallback too: this fails against the old copied ledger.
+        recovered_owner = RunBudget(self.root/recovered.get('budget_path', 'recovered/budget.sqlite'),
+            '1', allow_unknown_reservations=True)
+        token = original_owner.reserve('0.6')
+        original_owner.settle(token, '0.6')
+        with self.assertRaises(BudgetExceeded):
+            recovered_owner.reserve('0.6')
+        self.assertEqual(original_owner.summary(), recovered_owner.summary())
+        state = recovered_owner.summary()
+        self.assertLessEqual(Decimal(state['estimated_spent_usd'])+Decimal(state['held_usd']), Decimal('1'))
+        self.assertEqual(state['unknown_requests'], 1)
+        self.assertEqual(recovered['budget_path'], 'coverage/budget.sqlite')
+        self.assertFalse((self.root/'recovered/budget.sqlite').exists())
+        self.assertEqual((self.root/'coverage/summary.json').read_bytes(), frozen)
+
+    async def test_repeated_recovery_keeps_original_ledger_and_legacy_first_run(self):
+        await self.candidate()
+        def broken(_): raise httpx.RemoteProtocolError('offline')
+        self.responses = [broken]
+        failed = await coverage_run.execute(root=self.root, input_run='original', output=self.root/'coverage',
+            observation_root=self.root/'observations', budget_limit_usd='1',
+            inventory_max_tokens=3000, audit_max_tokens=3000, max_attempts=1)
+        self.assertEqual(failed['budget_path'], 'coverage/budget.sqlite')
+        # A legacy original has no path field, but has never copied its ledger.
+        failed.pop('budget_path')
+        (self.root/'coverage/summary.json').write_text(json.dumps(failed))
+        frozen = (self.root/'coverage/summary.json').read_bytes()
+        self.responses = [broken]
+        again = await coverage_run.execute(root=self.root, input_run='original', output=self.root/'recovered',
+            observation_root=self.root/'observations', budget_limit_usd='1',
+            inventory_max_tokens=3000, audit_max_tokens=3000, max_attempts=1, prior_failed_run='coverage')
+        self.assertEqual(again['status'], 'failed')
+        self.responses = [self.answer(self.inventory()), self.audit_response]
+        final = await coverage_run.execute(root=self.root, input_run='original', output=self.root/'next',
+            observation_root=self.root/'observations', budget_limit_usd='1',
+            inventory_max_tokens=3000, audit_max_tokens=3000, max_attempts=1, prior_failed_run='recovered')
+        self.assertEqual(final['status'], 'candidate')
+        self.assertEqual(final['budget_path'], 'coverage/budget.sqlite')
+        self.assertEqual(final['budget']['requests'], 4)
+        self.assertEqual(final['budget']['unknown_requests'], 2)
+        self.assertEqual(final['budget']['held_usd'], again['budget']['held_usd'])
+        self.assertFalse((self.root/'recovered/budget.sqlite').exists())
+        self.assertFalse((self.root/'next/budget.sqlite').exists())
+        self.assertEqual((self.root/'coverage/summary.json').read_bytes(), frozen)
+
+    async def test_legacy_copied_ledger_and_later_pointer_are_blocked_before_dispatch(self):
+        await self.candidate()
+        def broken(_): raise httpx.RemoteProtocolError('offline')
+        self.responses = [broken]
+        failed = await coverage_run.execute(root=self.root, input_run='original', output=self.root/'coverage',
+            observation_root=self.root/'observations', budget_limit_usd='1',
+            inventory_max_tokens=3000, audit_max_tokens=3000, max_attempts=1)
+        # Synthetic legacy-copy lineage; no live historical ledger is modified.
+        (self.root/'coverage/recovery.json').write_text(json.dumps({'prior_failed_run':'older'}))
+        failed.pop('budget_path')
+        (self.root/'coverage/summary.json').write_text(json.dumps(failed))
+        self.requests.clear()
+        for name, value in [('legacy', failed), ('later', dict(failed, budget_path='coverage/budget.sqlite'))]:
+            (self.root/'coverage/summary.json').write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, 'legacy_copied_budget_requires_reconciliation'):
+                await coverage_run.execute(root=self.root, input_run='original', output=self.root/name,
+                    observation_root=self.root/'observations', budget_limit_usd='1',
+                    inventory_max_tokens=3000, audit_max_tokens=3000, prior_failed_run='coverage')
+            self.assertFalse((self.root/name).exists())
+            self.assertFalse((self.root/'coverage/recovery-claim.json').exists())
+        self.assertEqual(self.requests, [])
+
     async def test_recovery_cannot_fork_the_same_failed_budget_twice(self):
         await self.candidate()
         def broken(_): raise httpx.RemoteProtocolError('offline')
         self.responses = [broken, broken]
         failed = await self.run_coverage()
         frozen = {p.relative_to(self.root/'coverage'): p.read_bytes()
-                  for p in (self.root/'coverage').rglob('*') if p.is_file()}
+                  for p in (self.root/'coverage').rglob('*') if p.is_file() and p.name != 'budget.sqlite'}
         self.responses = [self.answer(self.inventory()), self.audit_response]
         recovered = await coverage_run.execute(root=self.root, input_run='original', output=self.root/'recovered',
             observation_root=self.root/'observations', budget_limit_usd='1',
@@ -280,7 +363,7 @@ class CoverageRunTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([a['status'] for a in failed['attempts']], ['completed', 'failed'])
         self.assertEqual(failed['budget']['requests'], 3)
         frozen = {p.relative_to(self.root/'coverage'): p.read_bytes()
-                  for p in (self.root/'coverage').rglob('*') if p.is_file()}
+                  for p in (self.root/'coverage').rglob('*') if p.is_file() and p.name != 'budget.sqlite'}
         revised = copy.deepcopy(self.draft)
         revised['summary'] = 'Revised from the source and own unresolved audit.'
         self.responses = [self.answer(revised), self.audit_response]

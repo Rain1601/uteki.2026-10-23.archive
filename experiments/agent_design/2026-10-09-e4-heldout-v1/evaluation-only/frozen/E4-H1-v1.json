@@ -1,0 +1,504 @@
+{
+  "schema_version": "independent-original-draft-v1",
+  "case_id": "E4-H1",
+  "status": "frozen_before_case_model_run",
+  "reviewed_at": "2026-10-09T08:51:20.238752+00:00",
+  "query_zh": "以 2025-08-01 为资料可得截止日，仅依据所选 Microsoft 原始年报和季报，分别提供全年 2023-07-01 至 2024-06-30、累计期间 2024-07-01 至 2025-03-31 的经营活动净现金流与购置固定资产现金支出。请保留精确起止、金额单位、流入或流出含义、来源报告及季报未审计标记和原文出处；不要将两个不同跨度相加，不要求计算自由现金流或分析增长。",
+  "company_id": "sec-0000789019",
+  "available_as_of": "2025-08-01",
+  "dataset_manifest_sha256": "9b397dee0b7061d5908bea48c294b520efbc909ca152bf0781032f22a1ba2e7b",
+  "runtime_gold_access": "forbidden",
+  "review_basis_zh": "Codex 独立精读三份已校验原件的现金流表全文，并直接定位 inline facts、期间 context、USD unit 和现金流行。候选数据用于交叉核对，不能代替原件。",
+  "heldout_qualification": {
+    "claim": "当前 query Skill v16、typed-periods、persistent-origins、R8/R9 迭代未使用此题答案整理；不是绝对首次接触公司或原件的严格盲测。",
+    "checked_paths": [
+      "skills/data-agent/query/SKILL.md",
+      "src/uteki/domain/research_data/period_scope.py",
+      "src/uteki/agents/data_query/autonomous.py",
+      "tests/unit/test_record_origins.py",
+      "experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-01-v1.json",
+      "experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-02-v1.json",
+      "experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-03-v1.json",
+      "experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-04-v1.json",
+      "experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-05-v1.json",
+      "experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-06-v1.json",
+      "experiments/agent_design/2026-10-09-e1-benchmark-v1/evaluation-only/frozen/E1-07-v1.json"
+    ],
+    "findings": [
+      "E1 七题涵盖收入、分部与 Cloud 口径，没有经营现金流/固定资产现金支出题。",
+      "当前 query Skill 与相关修改未出现四个目标金额或 cash/capex 实例。",
+      "同一公司年报原件已经在 E1/E3 阅读和检索，旧全财务包/现金桥任务可能接触现金流；未宣称全历史绝无曝光。",
+      "草稿路径修正：autonomous 实际位于 src/uteki/agents/data_query/autonomous.py；已在此真实文件重新检索现金流/付款关键词及四目标金额，无命中。原列出的不存在路径不算已核查。"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "R1",
+      "required": true,
+      "metric_id": "operating_cash_flow",
+      "meaning_zh": "经营活动净现金流入；独立核验金额与对应期间、币种、流向。",
+      "period": {
+        "kind": "year",
+        "start": "2023-07-01",
+        "end": "2024-06-30",
+        "basis": "source"
+      },
+      "amount_million_usd": "118548",
+      "normalized_decimal_usd": "118548000000",
+      "cashflow_signed_decimal_usd": "118548000000",
+      "flow_direction": "inflow",
+      "reviewed_equivalent_occurrences": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000883-c8d8c1f9",
+          "record_id": "obs-d4ab30594c43af9217d0b723",
+          "evidence_id": "ev-0129a437815fb02cd70638ae",
+          "reported_page": 59
+        },
+        {
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+          "block_id": "block-000799-7b0b8477",
+          "record_id": "obs-851168654da0547a103b7ad9",
+          "evidence_id": "ev-d55a01bba75131b7fed94b0e",
+          "reported_page": 53
+        }
+      ],
+      "equivalence_rule_zh": "允许同一事实的其他精确原文出处；此处列出的出处是已核验示例，并非唯一允许的块 ID。"
+    },
+    {
+      "id": "R2",
+      "required": true,
+      "metric_id": "capex_cash_payments",
+      "meaning_zh": "购置固定资产现金支出；独立核验金额与对应期间、币种、流向。",
+      "period": {
+        "kind": "year",
+        "start": "2023-07-01",
+        "end": "2024-06-30",
+        "basis": "source"
+      },
+      "amount_million_usd": "44477",
+      "normalized_decimal_usd": "44477000000",
+      "cashflow_signed_decimal_usd": "-44477000000",
+      "flow_direction": "outflow",
+      "reviewed_equivalent_occurrences": [
+        {
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "block_id": "block-000883-c8d8c1f9",
+          "record_id": "obs-de62f051e29d572c4a5723a1",
+          "evidence_id": "ev-5ff102ffb9f5d8f6c3d40623",
+          "reported_page": 59
+        },
+        {
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+          "block_id": "block-000799-7b0b8477",
+          "record_id": "obs-edc6e4b1c7afdeac58adf3f5",
+          "evidence_id": "ev-9b7eb03b4f50d5ba36d52855",
+          "reported_page": 53
+        }
+      ],
+      "equivalence_rule_zh": "允许同一事实的其他精确原文出处；此处列出的出处是已核验示例，并非唯一允许的块 ID。"
+    },
+    {
+      "id": "R3",
+      "required": true,
+      "metric_id": "operating_cash_flow",
+      "meaning_zh": "经营活动净现金流入；独立核验金额与对应期间、币种、流向。",
+      "period": {
+        "kind": "ytd",
+        "start": "2024-07-01",
+        "end": "2025-03-31",
+        "basis": "source"
+      },
+      "amount_million_usd": "93515",
+      "normalized_decimal_usd": "93515000000",
+      "cashflow_signed_decimal_usd": "93515000000",
+      "flow_direction": "inflow",
+      "reviewed_equivalent_occurrences": [
+        {
+          "source_snapshot_id": "source-d0da7641843c5cbf83d8d90a",
+          "block_id": "block-000050-131d80d0",
+          "record_id": "obs-6f9fcbf4a445e73f7090eb3a",
+          "evidence_id": "ev-074d4bf98b25b59430c754ab",
+          "reported_page": 6
+        }
+      ],
+      "equivalence_rule_zh": "允许同一事实的其他精确原文出处；此处列出的出处是已核验示例，并非唯一允许的块 ID。"
+    },
+    {
+      "id": "R4",
+      "required": true,
+      "metric_id": "capex_cash_payments",
+      "meaning_zh": "购置固定资产现金支出；独立核验金额与对应期间、币种、流向。",
+      "period": {
+        "kind": "ytd",
+        "start": "2024-07-01",
+        "end": "2025-03-31",
+        "basis": "source"
+      },
+      "amount_million_usd": "47472",
+      "normalized_decimal_usd": "47472000000",
+      "cashflow_signed_decimal_usd": "-47472000000",
+      "flow_direction": "outflow",
+      "reviewed_equivalent_occurrences": [
+        {
+          "source_snapshot_id": "source-d0da7641843c5cbf83d8d90a",
+          "block_id": "block-000050-131d80d0",
+          "record_id": "obs-35b1adced0aaa3fb0ce13f02",
+          "evidence_id": "ev-88590116100af17b0bb62254",
+          "reported_page": 6
+        }
+      ],
+      "equivalence_rule_zh": "允许同一事实的其他精确原文出处；此处列出的出处是已核验示例，并非唯一允许的块 ID。"
+    }
+  ],
+  "required_context": [
+    {
+      "id": "C1",
+      "meaning_zh": "保留 year 与 ytd 的不同跨度以及精确起止；2024-07-01 至 2025-03-31 是九个月累计，不能选择同表三个月列。"
+    },
+    {
+      "id": "C2",
+      "meaning_zh": "保留 million USD / USD scale 6 与合并公司总额身份；原文行必须与实际金额列对应。"
+    },
+    {
+      "id": "C3",
+      "meaning_zh": "经营净现金为流入；固定资产支出是现金流出。表内括号表示流出；PaymentsToAcquirePropertyPlantAndEquipment 的正数为付款金额，不能误判为流入。正金额加明确支出/流出语义或负现金流均可。"
+    },
+    {
+      "id": "C4",
+      "meaning_zh": "保留各来源版本、表名/金额行/列与出处；FY2024 事实可来自 FY2024 10-K 或截止日前 FY2025 10-K 的比较列，不能把 FY2025 报告期误作该观察期。保留所选 10-Q 的 Unaudited 标记。"
+    }
+  ],
+  "optional_evidence": [
+    "同事实另一份年报的比较列，用于核对一致性；不要求两份都交付。",
+    "MD&A 对经营现金流约数与变化原因，仅能补充语境，不能以 118.5/93.5 billion 替代问题所需的精确值。",
+    "相邻 Refer to accompanying notes 常规提示可随原表保留；本题没有发现改变四项数值含义的特定脚注。"
+  ],
+  "redundancy_rules": [
+    "不要求解释全部净利润调节项、其他融资或投资现金流、增长原因、战略及未来投资计划。",
+    "完整现金流表是可接受的原始表交付；同表伴随行不因字符数自动判冗余，必要性评估应看额外独立章节与重复出处是否有解释需求。",
+    "避免重复全年两个版本的等价表；无明确核对需求时优先足够支持事实和语义的出处。",
+    "不计算 FCF、资本开支含融资租赁指标，也不相加全年与九个月累计。"
+  ],
+  "scope_limit_zh": "仅评估现金流表 Additions to property and equipment 的现金付款；不代表全部固定资产增加、含非现金融资租赁的资本开支或一切投资活动现金支出。现有 capex_cash_payments 能表示该正付款金额，不能表示更广义资本开支合计。",
+  "acceptance_axes": [
+    "四项必需事实与 C1-C4 语义覆盖独立评分，可选材料不能抵消遗漏。",
+    "真实性/公司/期间/报告可得日/精确来源与金额列绑定独立评分。",
+    "聚焦与冗余独立评分，不按唯一块 ID 或最少字符数评分。"
+  ],
+  "source_reviews": [
+    {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017024087843/msft-20240630.htm",
+      "source_sha256": "cdcc8db91bc8ac88239ffd09c19afc85a65460b0a981604ebcc4dd9ebdac8e76",
+      "raw_file": "raw/source-8602d79f703e48c18c2f27c3.html",
+      "raw_sha_verified": true,
+      "form": "10-K",
+      "source_period_end": "2024-06-30",
+      "available_at": "2024-07-30",
+      "tables_read_in_full": [
+        {
+          "block_id": "block-000883-c8d8c1f9",
+          "reported_page": 59,
+          "dom_path": "/html/body/table[28]",
+          "text_hash": "c8d8c1f93c3b49ffa8ad49c1c9b15eaddf144df4cbe67c904ab7b307c7cc5fe5",
+          "full_original_table_text": "(In millions) Year Ended June 30, 2024 2023 2022 Operations Net income $ 88,136 $ 72,361 $ 72,738 Adjustments to reconcile net income to net cash from operations: Depreciation, amortization, and other 22,287 13,861 14,460 Stock-based compensation expense 10,734 9,611 7,502 Net recognized losses (gains) on investments and derivatives 305 196 (409 ) Deferred income taxes (4,738 ) (6,059 ) (5,702 ) Changes in operating assets and liabilities: Accounts receivable (7,191 ) (4,087 ) (6,834 ) Inventories 1,284 1,242 (1,123 ) Other current assets (1,648 ) (1,991 ) (709 ) Other long-term assets (6,817 ) (2,833 ) (2,805 ) Accounts payable 3,545 (2,721 ) 2,943 Unearned revenue 5,348 5,535 5,109 Income taxes 1,687 (358 ) 696 Other current liabilities 4,867 2,272 2,344 Other long-term liabilities 749 553 825 Net cash from operations 118,548 87,582 89,035 Financing Proceeds from issuance of debt, maturities of 90 days or less, net 5,250 0 0 Proceeds from issuance of debt 24,395 0 0 Repayments of debt (29,070 ) (2,750 ) (9,023 ) Common stock issued 2,002 1,866 1,841 Common stock repurchased (17,254 ) (22,245 ) (32,696 ) Common stock cash dividends paid (21,771 ) (19,800 ) (18,135 ) Other, net (1,309 ) (1,006 ) (863 ) Net cash used in financing (37,757 ) (43,935 ) (58,876 ) Investing Additions to property and equipment (44,477 ) (28,107 ) (23,886 ) Acquisition of companies, net of cash acquired, and purchases of intangible and other assets (69,132 ) (1,670 ) (22,038 ) Purchases of investments (17,732 ) (37,651 ) (26,456 ) Maturities of investments 24,775 33,510 16,451 Sales of investments 10,894 14,354 28,443 Other, net (1,298 ) (3,116 ) (2,825 ) Net cash used in investing (96,970 ) (22,680 ) (30,311 ) Effect of foreign exchange rates on cash and cash equivalents (210 ) (194 ) (141 ) Net change in cash and cash equivalents (16,389 ) 20,773 (293 ) Cash and cash equivalents, beginning of period 34,704 13,931 14,224 Cash and cash equivalents, end of period $ 18,315 $ 34,704 $ 13,931",
+          "adjacent_heading": {
+            "block_id": "block-000883-c8d8c1f9",
+            "text": "(In millions) Year Ended June 30, 2024 2023 2022 Operations Net income $ 88,136 $ 72,361 $ 72,738 Adjustments to reconcile net income to net cash from operations: Depreciation, amortization, and other 22,287 13,861 14,460 Stock-based compensation expense 10,734 9,611 7,502 Net recognized losses (gains) on investments and derivatives 305 196 (409 ) Deferred income taxes (4,738 ) (6,059 ) (5,702 ) Changes in operating assets and liabilities: Accounts receivable (7,191 ) (4,087 ) (6,834 ) Inventories 1,284 1,242 (1,123 ) Other current assets (1,648 ) (1,991 ) (709 ) Other long-term assets (6,817 ) (2,833 ) (2,805 ) Accounts payable 3,545 (2,721 ) 2,943 Unearned revenue 5,348 5,535 5,109 Income taxes 1,687 (358 ) 696 Other current liabilities 4,867 2,272 2,344 Other long-term liabilities 749 553 825 Net cash from operations 118,548 87,582 89,035 Financing Proceeds from issuance of debt, maturities of 90 days or less, net 5,250 0 0 Proceeds from issuance of debt 24,395 0 0 Repayments of debt (29,070 ) (2,750 ) (9,023 ) Common stock issued 2,002 1,866 1,841 Common stock repurchased (17,254 ) (22,245 ) (32,696 ) Common stock cash dividends paid (21,771 ) (19,800 ) (18,135 ) Other, net (1,309 ) (1,006 ) (863 ) Net cash used in financing (37,757 ) (43,935 ) (58,876 ) Investing Additions to property and equipment (44,477 ) (28,107 ) (23,886 ) Acquisition of companies, net of cash acquired, and purchases of intangible and other assets (69,132 ) (1,670 ) (22,038 ) Purchases of investments (17,732 ) (37,651 ) (26,456 ) Maturities of investments 24,775 33,510 16,451 Sales of investments 10,894 14,354 28,443 Other, net (1,298 ) (3,116 ) (2,825 ) Net cash used in investing (96,970 ) (22,680 ) (30,311 ) Effect of foreign exchange rates on cash and cash equivalents (210 ) (194 ) (141 ) Net change in cash and cash equivalents (16,389 ) 20,773 (293 ) Cash and cash equivalents, beginning of period 34,704 13,931 14,224 Cash and cash equivalents, end of period $ 18,315 $ 34,704 $ 13,931",
+            "text_hash": "c8d8c1f93c3b49ffa8ad49c1c9b15eaddf144df4cbe67c904ab7b307c7cc5fe5"
+          },
+          "following_reference_note": {
+            "block_id": "block-000885-3e1e967e",
+            "text": "59",
+            "text_hash": "3e1e967e9b793e908f8eae83c74dba9bcccce6a5535b4b462bd9994537bfe15c"
+          }
+        }
+      ],
+      "proofs": [
+        {
+          "requirement_id": "R1",
+          "record_id": "obs-d4ab30594c43af9217d0b723",
+          "evidence_id": "ev-0129a437815fb02cd70638ae",
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "form": "10-K",
+          "source_period_end": "2024-06-30",
+          "available_at": "2024-07-30",
+          "reported_page": 59,
+          "block_id": "block-000883-c8d8c1f9",
+          "dom_path": "/html/body/table[28]",
+          "text_hash": "c8d8c1f93c3b49ffa8ad49c1c9b15eaddf144df4cbe67c904ab7b307c7cc5fe5",
+          "fact_dom_path": "/html/body/table[28]/tr[26]/td[4]/p/span/ix:nonfraction",
+          "fact_id": "F_5e3b81df-e81c-454e-a9d2-a11ba652f66b",
+          "fact_attributes": {
+            "id": "F_5e3b81df-e81c-454e-a9d2-a11ba652f66b",
+            "contextref": "C_6dbdb3a2-9baf-41b4-922d-f59879124337",
+            "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+            "unitref": "U_USD",
+            "scale": "6",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "fact_text": "118,548",
+          "source_row_text": "Net cash from operations 118,548 87,582 89,035",
+          "context_xml": "<xbrli:context id=\"C_6dbdb3a2-9baf-41b4-922d-f59879124337\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "normalized_decimal": "118548000000",
+          "flow_direction": "inflow"
+        },
+        {
+          "requirement_id": "R2",
+          "record_id": "obs-de62f051e29d572c4a5723a1",
+          "evidence_id": "ev-5ff102ffb9f5d8f6c3d40623",
+          "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+          "form": "10-K",
+          "source_period_end": "2024-06-30",
+          "available_at": "2024-07-30",
+          "reported_page": 59,
+          "block_id": "block-000883-c8d8c1f9",
+          "dom_path": "/html/body/table[28]",
+          "text_hash": "c8d8c1f93c3b49ffa8ad49c1c9b15eaddf144df4cbe67c904ab7b307c7cc5fe5",
+          "fact_dom_path": "/html/body/table[28]/tr[43]/td[4]/p/span[2]/ix:nonfraction",
+          "fact_id": "F_71ff2950-cbd3-4c83-bb23-32de50415b63",
+          "fact_attributes": {
+            "id": "F_71ff2950-cbd3-4c83-bb23-32de50415b63",
+            "contextref": "C_6dbdb3a2-9baf-41b4-922d-f59879124337",
+            "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+            "unitref": "U_USD",
+            "scale": "6",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "fact_text": "44,477",
+          "source_row_text": "Additions to property and equipment ( 44,477 ) ( 28,107 ) ( 23,886 )",
+          "context_xml": "<xbrli:context id=\"C_6dbdb3a2-9baf-41b4-922d-f59879124337\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "normalized_decimal": "44477000000",
+          "flow_direction": "outflow"
+        }
+      ]
+    },
+    {
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025100235/msft-20250630.htm",
+      "source_sha256": "56d41ecc0adc114c7fcda813d41f5911b244a7e448b545f6dca52dfba9801008",
+      "raw_file": "raw/source-360182cbf562dcf9a8ab9c4e.html",
+      "raw_sha_verified": true,
+      "form": "10-K",
+      "source_period_end": "2025-06-30",
+      "available_at": "2025-07-30",
+      "tables_read_in_full": [
+        {
+          "block_id": "block-000799-7b0b8477",
+          "reported_page": 53,
+          "dom_path": "/html/body/div[159]/table",
+          "text_hash": "7b0b8477e06bfeaae481e8d697a09d462c75580266a23c49028ca7e3dc11dc5d",
+          "full_original_table_text": "(In millions) Year Ended June 30, 2025 2024 2023 Operations Net income $ 101,832 $ 88,136 $ 72,361 Adjustments to reconcile net income to net cash from operations: Depreciation, amortization, and other 34,153 22,287 13,861 Stock-based compensation expense 11,974 10,734 9,611 Net recognized losses on investments and derivatives 609 305 196 Deferred income taxes (7,056 ) (4,738 ) (6,059 ) Changes in operating assets and liabilities: Accounts receivable (10,581 ) (7,191 ) (4,087 ) Inventories 309 1,284 1,242 Other current assets (3,044 ) (1,648 ) (1,991 ) Other long-term assets (2,950 ) (6,817 ) (2,833 ) Accounts payable 569 3,545 (2,721 ) Unearned revenue 5,438 5,348 5,535 Income taxes (38 ) 1,687 (358 ) Other current liabilities 5,922 4,867 2,272 Other long-term liabilities (975 ) 749 553 Net cash from operations 136,162 118,548 87,582 Financing Proceeds from issuance (repayments) of debt, maturities of 90 days or less, net (5,746 ) 5,250 0 Proceeds from issuance of debt 0 24,395 0 Repayments of debt (3,216 ) (29,070 ) (2,750 ) Common stock issued 2,056 2,002 1,866 Common stock repurchased (18,420 ) (17,254 ) (22,245 ) Common stock cash dividends paid (24,082 ) (21,771 ) (19,800 ) Other, net (2,291 ) (1,309 ) (1,006 ) Net cash used in financing (51,699 ) (37,757 ) (43,935 ) Investing Additions to property and equipment (64,551 ) (44,477 ) (28,107 ) Acquisition of companies, net of cash acquired and divestitures, and purchases of intangible and other assets (5,978 ) (69,132 ) (1,670 ) Purchases of investments (29,775 ) (17,732 ) (37,651 ) Maturities of investments 16,079 24,775 33,510 Sales of investments 9,309 10,894 14,354 Other, net 2,317 (1,298 ) (3,116 ) Net cash used in investing (72,599 ) (96,970 ) (22,680 ) Effect of foreign exchange rates on cash and cash equivalents 63 (210 ) (194 ) Net change in cash and cash equivalents 11,927 (16,389 ) 20,773 Cash and cash equivalents, beginning of period 18,315 34,704 13,931 Cash and cash equivalents, end of period $ 30,242 $ 18,315 $ 34,704",
+          "adjacent_heading": {
+            "block_id": "block-000799-7b0b8477",
+            "text": "(In millions) Year Ended June 30, 2025 2024 2023 Operations Net income $ 101,832 $ 88,136 $ 72,361 Adjustments to reconcile net income to net cash from operations: Depreciation, amortization, and other 34,153 22,287 13,861 Stock-based compensation expense 11,974 10,734 9,611 Net recognized losses on investments and derivatives 609 305 196 Deferred income taxes (7,056 ) (4,738 ) (6,059 ) Changes in operating assets and liabilities: Accounts receivable (10,581 ) (7,191 ) (4,087 ) Inventories 309 1,284 1,242 Other current assets (3,044 ) (1,648 ) (1,991 ) Other long-term assets (2,950 ) (6,817 ) (2,833 ) Accounts payable 569 3,545 (2,721 ) Unearned revenue 5,438 5,348 5,535 Income taxes (38 ) 1,687 (358 ) Other current liabilities 5,922 4,867 2,272 Other long-term liabilities (975 ) 749 553 Net cash from operations 136,162 118,548 87,582 Financing Proceeds from issuance (repayments) of debt, maturities of 90 days or less, net (5,746 ) 5,250 0 Proceeds from issuance of debt 0 24,395 0 Repayments of debt (3,216 ) (29,070 ) (2,750 ) Common stock issued 2,056 2,002 1,866 Common stock repurchased (18,420 ) (17,254 ) (22,245 ) Common stock cash dividends paid (24,082 ) (21,771 ) (19,800 ) Other, net (2,291 ) (1,309 ) (1,006 ) Net cash used in financing (51,699 ) (37,757 ) (43,935 ) Investing Additions to property and equipment (64,551 ) (44,477 ) (28,107 ) Acquisition of companies, net of cash acquired and divestitures, and purchases of intangible and other assets (5,978 ) (69,132 ) (1,670 ) Purchases of investments (29,775 ) (17,732 ) (37,651 ) Maturities of investments 16,079 24,775 33,510 Sales of investments 9,309 10,894 14,354 Other, net 2,317 (1,298 ) (3,116 ) Net cash used in investing (72,599 ) (96,970 ) (22,680 ) Effect of foreign exchange rates on cash and cash equivalents 63 (210 ) (194 ) Net change in cash and cash equivalents 11,927 (16,389 ) 20,773 Cash and cash equivalents, beginning of period 18,315 34,704 13,931 Cash and cash equivalents, end of period $ 30,242 $ 18,315 $ 34,704",
+            "text_hash": "7b0b8477e06bfeaae481e8d697a09d462c75580266a23c49028ca7e3dc11dc5d"
+          },
+          "following_reference_note": {
+            "block_id": "block-000801-2858dcd1",
+            "text": "53",
+            "text_hash": "2858dcd1057d3eae7f7d5f782167e24b61153c01551450a628cee722509f6529"
+          }
+        }
+      ],
+      "proofs": [
+        {
+          "requirement_id": "R1",
+          "record_id": "obs-851168654da0547a103b7ad9",
+          "evidence_id": "ev-d55a01bba75131b7fed94b0e",
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+          "form": "10-K",
+          "source_period_end": "2025-06-30",
+          "available_at": "2025-07-30",
+          "reported_page": 53,
+          "block_id": "block-000799-7b0b8477",
+          "dom_path": "/html/body/div[159]/table",
+          "text_hash": "7b0b8477e06bfeaae481e8d697a09d462c75580266a23c49028ca7e3dc11dc5d",
+          "fact_dom_path": "/html/body/div[159]/table/tr[26]/td[8]/p/span/ix:nonfraction",
+          "fact_id": "F_fdf4d759-618a-4c9d-892e-bf24a3d47f1f",
+          "fact_attributes": {
+            "id": "F_fdf4d759-618a-4c9d-892e-bf24a3d47f1f",
+            "contextref": "C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862",
+            "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+            "unitref": "U_USD",
+            "scale": "6",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "fact_text": "118,548",
+          "source_row_text": "Net cash from operations 136,162 118,548 87,582",
+          "context_xml": "<xbrli:context id=\"C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "normalized_decimal": "118548000000",
+          "flow_direction": "inflow"
+        },
+        {
+          "requirement_id": "R2",
+          "record_id": "obs-edc6e4b1c7afdeac58adf3f5",
+          "evidence_id": "ev-9b7eb03b4f50d5ba36d52855",
+          "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+          "form": "10-K",
+          "source_period_end": "2025-06-30",
+          "available_at": "2025-07-30",
+          "reported_page": 53,
+          "block_id": "block-000799-7b0b8477",
+          "dom_path": "/html/body/div[159]/table",
+          "text_hash": "7b0b8477e06bfeaae481e8d697a09d462c75580266a23c49028ca7e3dc11dc5d",
+          "fact_dom_path": "/html/body/div[159]/table/tr[43]/td[8]/p/span[2]/ix:nonfraction",
+          "fact_id": "F_a1a33139-223f-47ac-b99a-b40c4a6b0da9",
+          "fact_attributes": {
+            "id": "F_a1a33139-223f-47ac-b99a-b40c4a6b0da9",
+            "contextref": "C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862",
+            "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+            "unitref": "U_USD",
+            "scale": "6",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "fact_text": "44,477",
+          "source_row_text": "Additions to property and equipment ( 64,551 ) ( 44,477 ) ( 28,107 )",
+          "context_xml": "<xbrli:context id=\"C_c19fe6c0-0e87-44b0-aa2a-d9c6e40a5862\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2023-07-01</xbrli:startdate><xbrli:enddate>2024-06-30</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "normalized_decimal": "44477000000",
+          "flow_direction": "outflow"
+        }
+      ]
+    },
+    {
+      "source_snapshot_id": "source-d0da7641843c5cbf83d8d90a",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017025061046/msft-20250331.htm",
+      "source_sha256": "33b37f4af3e98c28c7ada1167eefb002e2862e69850e02fa4888d1ad83ee58aa",
+      "raw_file": "raw/source-d0da7641843c5cbf83d8d90a.html",
+      "raw_sha_verified": true,
+      "form": "10-Q",
+      "source_period_end": "2025-03-31",
+      "available_at": "2025-04-30",
+      "tables_read_in_full": [
+        {
+          "block_id": "block-000050-131d80d0",
+          "reported_page": 6,
+          "dom_path": "/html/body/div[18]/table",
+          "text_hash": "131d80d0186a7d128023b3af54abdea5421e824f0a8ed0dd04f73c29aa17fa1e",
+          "full_original_table_text": "(In millions) (Unaudited) Three Months EndedMarch 31, Nine Months EndedMarch 31, 2025 2024 2025 2024 Operations Net income $ 25,824 $ 21,939 $ 74,599 $ 66,100 Adjustments to reconcile net income to net cash from operations: Depreciation, amortization, and other 8,740 6,027 22,950 15,907 Stock-based compensation expense 2,980 2,703 8,901 8,038 Net recognized losses (gains) on investments and derivatives (298 ) 49 553 261 Deferred income taxes (2,244 ) (1,323 ) (4,835 ) (3,593 ) Changes in operating assets and liabilities: Accounts receivable (2,461 ) (2,028 ) 5,598 6,055 Inventories 52 260 390 1,229 Other current assets 1,076 951 642 880 Other long-term assets (518 ) (2,137 ) (3,368 ) (5,577 ) Accounts payable 1,179 648 1,221 (659 ) Unearned revenue (1,032 ) (645 ) (12,923 ) (10,309 ) Income taxes 1,298 2,622 (1,081 ) 2,493 Other current liabilities 2,839 2,803 576 215 Other long-term liabilities (391 ) 48 292 313 Net cash from operations 37,044 31,917 93,515 81,353 Financing Proceeds from issuance (repayments) of debt, maturities of 90 days or less, net 0 (3,810 ) (5,746 ) 6,392 Proceeds from issuance of debt 0 6,352 0 24,198 Repayments of debt (2,250 ) (11,589 ) (3,216 ) (16,005 ) Common stock issued 546 522 1,508 1,468 Common stock repurchased (4,781 ) (4,213 ) (13,874 ) (13,044 ) Common stock cash dividends paid (6,169 ) (5,572 ) (17,913 ) (16,197 ) Other, net (382 ) (498 ) (1,614 ) (1,006 ) Net cash used in financing (13,036 ) (18,808 ) (40,855 ) (14,194 ) Investing Additions to property and equipment (16,745 ) (10,952 ) (47,472 ) (30,604 ) Acquisition of companies, net of cash acquired and divestitures, and purchases of intangible and other assets (981 ) (1,575 ) (4,235 ) (67,790 ) Purchases of investments (4,474 ) (2,183 ) (8,144 ) (14,901 ) Maturities of investments 6,721 3,350 11,461 23,218 Sales of investments 2,161 1,941 6,688 8,871 Other, net 604 (1,281 ) (325 ) (916 ) Net cash used in investing (12,714 ) (10,700 ) (42,027 ) (82,122 ) Effect of foreign exchange rates on cash and cash equivalents 52 (80 ) (120 ) (107 ) Net change in cash and cash equivalents 11,346 2,329 10,513 (15,070 ) Cash and cash equivalents, beginning of period 17,482 17,305 18,315 34,704 Cash and cash equivalents, end of period $ 28,828 $ 19,634 $ 28,828 $ 19,634",
+          "adjacent_heading": {
+            "block_id": "block-000050-131d80d0",
+            "text": "(In millions) (Unaudited) Three Months EndedMarch 31, Nine Months EndedMarch 31, 2025 2024 2025 2024 Operations Net income $ 25,824 $ 21,939 $ 74,599 $ 66,100 Adjustments to reconcile net income to net cash from operations: Depreciation, amortization, and other 8,740 6,027 22,950 15,907 Stock-based compensation expense 2,980 2,703 8,901 8,038 Net recognized losses (gains) on investments and derivatives (298 ) 49 553 261 Deferred income taxes (2,244 ) (1,323 ) (4,835 ) (3,593 ) Changes in operating assets and liabilities: Accounts receivable (2,461 ) (2,028 ) 5,598 6,055 Inventories 52 260 390 1,229 Other current assets 1,076 951 642 880 Other long-term assets (518 ) (2,137 ) (3,368 ) (5,577 ) Accounts payable 1,179 648 1,221 (659 ) Unearned revenue (1,032 ) (645 ) (12,923 ) (10,309 ) Income taxes 1,298 2,622 (1,081 ) 2,493 Other current liabilities 2,839 2,803 576 215 Other long-term liabilities (391 ) 48 292 313 Net cash from operations 37,044 31,917 93,515 81,353 Financing Proceeds from issuance (repayments) of debt, maturities of 90 days or less, net 0 (3,810 ) (5,746 ) 6,392 Proceeds from issuance of debt 0 6,352 0 24,198 Repayments of debt (2,250 ) (11,589 ) (3,216 ) (16,005 ) Common stock issued 546 522 1,508 1,468 Common stock repurchased (4,781 ) (4,213 ) (13,874 ) (13,044 ) Common stock cash dividends paid (6,169 ) (5,572 ) (17,913 ) (16,197 ) Other, net (382 ) (498 ) (1,614 ) (1,006 ) Net cash used in financing (13,036 ) (18,808 ) (40,855 ) (14,194 ) Investing Additions to property and equipment (16,745 ) (10,952 ) (47,472 ) (30,604 ) Acquisition of companies, net of cash acquired and divestitures, and purchases of intangible and other assets (981 ) (1,575 ) (4,235 ) (67,790 ) Purchases of investments (4,474 ) (2,183 ) (8,144 ) (14,901 ) Maturities of investments 6,721 3,350 11,461 23,218 Sales of investments 2,161 1,941 6,688 8,871 Other, net 604 (1,281 ) (325 ) (916 ) Net cash used in investing (12,714 ) (10,700 ) (42,027 ) (82,122 ) Effect of foreign exchange rates on cash and cash equivalents 52 (80 ) (120 ) (107 ) Net change in cash and cash equivalents 11,346 2,329 10,513 (15,070 ) Cash and cash equivalents, beginning of period 17,482 17,305 18,315 34,704 Cash and cash equivalents, end of period $ 28,828 $ 19,634 $ 28,828 $ 19,634",
+            "text_hash": "131d80d0186a7d128023b3af54abdea5421e824f0a8ed0dd04f73c29aa17fa1e"
+          },
+          "following_reference_note": {
+            "block_id": "block-000052-e7f6c011",
+            "text": "6",
+            "text_hash": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683"
+          }
+        }
+      ],
+      "proofs": [
+        {
+          "requirement_id": "R3",
+          "record_id": "obs-6f9fcbf4a445e73f7090eb3a",
+          "evidence_id": "ev-074d4bf98b25b59430c754ab",
+          "source_snapshot_id": "source-d0da7641843c5cbf83d8d90a",
+          "form": "10-Q",
+          "source_period_end": "2025-03-31",
+          "available_at": "2025-04-30",
+          "reported_page": 6,
+          "block_id": "block-000050-131d80d0",
+          "dom_path": "/html/body/div[18]/table",
+          "text_hash": "131d80d0186a7d128023b3af54abdea5421e824f0a8ed0dd04f73c29aa17fa1e",
+          "fact_dom_path": "/html/body/div[18]/table/tr[26]/td[12]/p/span/ix:nonfraction",
+          "fact_id": "F_b6746724-14b7-49b7-be02-085ae8d0bf41",
+          "fact_attributes": {
+            "id": "F_b6746724-14b7-49b7-be02-085ae8d0bf41",
+            "contextref": "C_d3bd9e88-a02c-41b2-9d3d-eeb55d3a1689",
+            "name": "us-gaap:NetCashProvidedByUsedInOperatingActivities",
+            "unitref": "U_USD",
+            "scale": "6",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "fact_text": "93,515",
+          "source_row_text": "Net cash from operations 37,044 31,917 93,515 81,353",
+          "context_xml": "<xbrli:context id=\"C_d3bd9e88-a02c-41b2-9d3d-eeb55d3a1689\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2024-07-01</xbrli:startdate><xbrli:enddate>2025-03-31</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "period": {
+            "kind": "ytd",
+            "start": "2024-07-01",
+            "end": "2025-03-31",
+            "basis": "source"
+          },
+          "normalized_decimal": "93515000000",
+          "flow_direction": "inflow"
+        },
+        {
+          "requirement_id": "R4",
+          "record_id": "obs-35b1adced0aaa3fb0ce13f02",
+          "evidence_id": "ev-88590116100af17b0bb62254",
+          "source_snapshot_id": "source-d0da7641843c5cbf83d8d90a",
+          "form": "10-Q",
+          "source_period_end": "2025-03-31",
+          "available_at": "2025-04-30",
+          "reported_page": 6,
+          "block_id": "block-000050-131d80d0",
+          "dom_path": "/html/body/div[18]/table",
+          "text_hash": "131d80d0186a7d128023b3af54abdea5421e824f0a8ed0dd04f73c29aa17fa1e",
+          "fact_dom_path": "/html/body/div[18]/table/tr[43]/td[12]/p/span[2]/ix:nonfraction",
+          "fact_id": "F_45e5b23b-11f4-49f7-9d2d-f30eb1449473",
+          "fact_attributes": {
+            "id": "F_45e5b23b-11f4-49f7-9d2d-f30eb1449473",
+            "contextref": "C_d3bd9e88-a02c-41b2-9d3d-eeb55d3a1689",
+            "name": "us-gaap:PaymentsToAcquirePropertyPlantAndEquipment",
+            "unitref": "U_USD",
+            "scale": "6",
+            "decimals": "-6",
+            "format": "ixt:num-dot-decimal"
+          },
+          "fact_text": "47,472",
+          "source_row_text": "Additions to property and equipment ( 16,745 ) ( 10,952 ) ( 47,472 ) ( 30,604 )",
+          "context_xml": "<xbrli:context id=\"C_d3bd9e88-a02c-41b2-9d3d-eeb55d3a1689\"><xbrli:entity><xbrli:identifier scheme=\"http://www.sec.gov/CIK\">0000789019</xbrli:identifier></xbrli:entity><xbrli:period><xbrli:startdate>2024-07-01</xbrli:startdate><xbrli:enddate>2025-03-31</xbrli:enddate></xbrli:period></xbrli:context>",
+          "unit_xml": "<xbrli:unit id=\"U_USD\"><xbrli:measure>iso4217:USD</xbrli:measure></xbrli:unit>",
+          "period": {
+            "kind": "ytd",
+            "start": "2024-07-01",
+            "end": "2025-03-31",
+            "basis": "source"
+          },
+          "normalized_decimal": "47472000000",
+          "flow_direction": "outflow"
+        }
+      ]
+    }
+  ],
+  "api_calls": 0,
+  "external_api_cost_usd": 0,
+  "created_before_case_model_run": true,
+  "knowledge_cutoff": "2025-08-01"
+}

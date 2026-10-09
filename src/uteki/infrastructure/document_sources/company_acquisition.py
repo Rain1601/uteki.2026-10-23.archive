@@ -213,6 +213,11 @@ def _filing_selection(config, as_of):
     period_range = None
     # The two existing explicitly named modes retain their 10-K semantics.
     annual_form = '10-K'
+    if mode == 'filing_period':
+        if (set(selection) != {'mode', 'form_type', 'report_period_end'}
+                or selection['form_type'] not in ('10-K', '20-F', '10-Q')):
+            raise ValueError('filing_period requires form_type 10-K, 20-F or 10-Q and explicit report_period_end')
+        annual_form = selection['form_type']
     if mode in ('annual_filing_period', 'annual_filings_range'):
         dates = {'report_period_end'} if mode == 'annual_filing_period' else {'report_period_end_from', 'report_period_end_to'}
         if set(selection) != {'mode', 'annual_form'} | dates or selection['annual_form'] not in ('10-K', '20-F'):
@@ -224,7 +229,7 @@ def _filing_selection(config, as_of):
         if start > end or end > as_of:
             raise ValueError('annual_filings_range requires report_period_end_from <= report_period_end_to <= as_of')
         period_range = (start, end)
-    elif (mode == 'annual_report_period' and set(selection) == {'mode', 'report_period_end'}) or mode == 'annual_filing_period':
+    elif (mode == 'annual_report_period' and set(selection) == {'mode', 'report_period_end'}) or mode in ('annual_filing_period', 'filing_period'):
         target_period = _day(selection['report_period_end'], 'report_period_end')
         if target_period > as_of:
             raise ValueError('report_period_end cannot exceed as_of')
@@ -317,6 +322,10 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     annual_filings_range selects original annuals and their amendments within
     explicit inclusive report-period-end bounds. An explicit cik bypasses the
     ticker directory; SEC submissions must still match cik, symbol and market.
+    filing_period requires form_type (10-K, 20-F or 10-Q) and report_period_end;
+    only that period's original and amendments available at as_of are selected.
+    An amendment cannot substitute for a missing original. Legacy annual modes
+    retain their original selection and scope fields.
     should_stop cooperatively cancels before requests, after responses and
     before freezing; cancelled runs retain prior receipts and originals.
     Official pages with unknown dates are retained but not
@@ -369,6 +378,9 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
               'retrieved_at': started_at.isoformat()}
     if target_period is not None:
         report['scope']['report_period_end'] = target_period.isoformat()
+    if mode == 'filing_period':
+        report['scope'].pop('annual_form')
+        report['scope']['form_type'] = annual_form
     if period_range:
         report['scope'].update(report_period_end_from=period_range[0].isoformat(),
                                report_period_end_to=period_range[1].isoformat())
@@ -718,7 +730,8 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                              'filed_at': filed.isoformat(), 'accession': filing['accessionNumber']}
                     items[tuple(value.values())] = value
             except (ValueError, KeyError):
-                diagnostic = {'reason': 'invalid_annual_filing_metadata', 'accession': filing.get('accessionNumber')}
+                diagnostic = {'reason': 'invalid_filing_metadata' if mode == 'filing_period' else 'invalid_annual_filing_metadata',
+                              'accession': filing.get('accessionNumber')}
                 if diagnostic not in report['filing_catalog']['gaps']:
                     report['filing_catalog']['gaps'].append(diagnostic)
         report['filing_catalog']['items'] = sorted(items.values(), key=lambda r: (r['filed_at'], r['accession']), reverse=True)
@@ -843,8 +856,16 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                         and r.get('reportDate') == target_period.isoformat()] if annuals else []
             selected.sort(key=lambda r: (r['filingDate'], r['accessionNumber']))
             if not annuals:
-                gap('annual_report_period_not_found', annual_form=annual_form,
-                    report_period_end=target_period.isoformat())
+                if mode == 'filing_period':
+                    if any(r['form'] == annual_form + '/A' and r.get('reportDate') == target_period.isoformat()
+                           for r in eligible):
+                        gap('filing_original_not_found_for_amendment', form_type=annual_form,
+                            report_period_end=target_period.isoformat())
+                    gap('filing_report_period_not_found', form_type=annual_form,
+                        report_period_end=target_period.isoformat())
+                else:
+                    gap('annual_report_period_not_found', annual_form=annual_form,
+                        report_period_end=target_period.isoformat())
         elif not annuals:
             gap('no_10k_at_as_of')
             selected = []

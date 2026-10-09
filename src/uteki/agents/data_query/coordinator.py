@@ -289,6 +289,10 @@ class CompanyDataCoordinator:
         if not isinstance(policy, dict) or any(not isinstance(policy.get(k), list) for k in ('official', 'third_party')):
             raise ValueError('explicit acquisition source policy required')
         _, mode, target_period, annual_form, period_range = _filing_selection(scope, cutoff)
+        if mode == 'filing_period' and (scope.get('form_type') != annual_form
+                or scope.get('report_period_end') != target_period.isoformat()
+                or 'annual_form' in scope):
+            raise ValueError('filing_period scope declarations conflict with explicit selection')
         documents, acquisition_gaps = acquired.get('documents'), acquired.get('gaps')
         if not isinstance(documents, list) or not isinstance(acquisition_gaps, list) or any(not isinstance(g, dict) for g in acquisition_gaps):
             raise ValueError('explicit acquisition documents and gaps required')

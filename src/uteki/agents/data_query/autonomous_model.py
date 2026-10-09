@@ -50,6 +50,13 @@ def reasoning_configuration(provider, model, reasoning_effort):
 # Match only contract-owned literal messages. Never echo an exception message,
 # context or rejected input into the next model packet.
 _DECISION_RULE_HINTS = {
+    'Value error, pilot supports calendar fiscal periods only': (
+        'explicit_period_basis',
+        'basis=calendar requires calendar boundaries: quarter starts in January/April/July/October, '
+        'YTD starts in January of the same year, and year runs January through December. '
+        'For explicitly requested non-calendar dates or a verified source fiscal mapping, set '
+        'period.basis=source and preserve the exact kind/start/end. The selected dataset protocol '
+        'still validates those dates. Do not change dates or infer them from available coverage.'),
     'Value error, unrelated action payloads are not allowed': (
         'one_action_payload',
         'Return only the selected action payload. requirements is allowed only with action=plan; '
@@ -126,7 +133,13 @@ def _decision_validation_hints(content):
                  'suggestion': 'Return exactly one valid JSON object; no prose, Markdown fences, '
                                'duplicate keys, NaN, Infinity or multiple concatenated JSON objects.'}]
     except ValidationError as error:
+        schema = AutonomousDecision.model_json_schema()
+        # Only schema-owned field names may appear in locations. Include nested
+        # protocol fields so a valid query/records/period path remains usable;
+        # arbitrary rejected keys and input values stay redacted.
         fields = set(AutonomousDecision.model_fields)
+        for definition in (schema, *schema.get('$defs', {}).values()):
+            fields.update(definition.get('properties', {}))
         hints = []
         for item in error.errors(include_url=False, include_context=False, include_input=False)[:8]:
             hint = {'type': item['type'],

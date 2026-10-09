@@ -7,8 +7,6 @@ from __future__ import annotations
 
 import json
 import re
-import sqlite3
-from contextlib import closing
 from decimal import Decimal
 from pathlib import Path
 
@@ -96,6 +94,19 @@ The host applies the replacement set and validates the entire original inventory
 
 def _json(value):
     return json.dumps(value, ensure_ascii=False)
+
+
+def _existing_budget_path(root, run_directory, summary):
+    """Reuse live accounting; legacy copied balances need explicit reconciliation."""
+    path = base.local_file(root, summary.get('budget_path') or Path(run_directory)/'budget.sqlite')
+    # Check the ledger's owner, not just the immediate run: later shared-ledger
+    # continuations can still point at a balance copied by the old recovery code.
+    recovery_path = path.parent/'recovery.json'
+    if recovery_path.exists():
+        recovery = json.loads(base.local_file(root, recovery_path).read_text())
+        if recovery.get('prior_failed_run') and not recovery.get('budget_path'):
+            raise ValueError('legacy_copied_budget_requires_reconciliation')
+    return path
 
 
 def verify_published_artifacts(*, root, observation_root, stage, trace_id, relative_paths):
@@ -225,13 +236,14 @@ async def execute(*, root, input_run, output, observation_root, budget_limit_usd
         reusable_failed_stage = reuse_inventory if len(attempts)==1 else reuse_audit
         if not transient_failure(metadata) and not expanded_output and reusable_failed_stage is None:
             raise ValueError('prior_failure_not_transient')
-        previous_budget = RunBudget(base.local_file(root, prior_path.parent/'budget.sqlite'), str(limit))
+        budget_path = _existing_budget_path(root, prior_path.parent, prior)
+        previous_budget = RunBudget(budget_path, str(limit))
         if previous_budget.summary() != prior['budget'] or prior['budget']['in_flight_requests']:
             raise ValueError('prior_budget_snapshot_mismatch_or_in_flight')
     output.mkdir(parents=True)
     if prior is not None:
-        # One frozen ledger can have only one successor. Without this claim,
-        # concurrent/new directories could each spend a copy of the same balance.
+        # One successor may reuse the failed stage. All owners still spend from
+        # the same live ledger; the claim alone does not protect copied balances.
         claim = dict(successor=str(output.relative_to(root)),
             prior_summary_sha256=base.digest(prior_path.read_bytes()),
             policy='one_successor_per_failed_run')
@@ -240,15 +252,15 @@ async def execute(*, root, input_run, output, observation_root, budget_limit_usd
                 json.dump(claim, file, ensure_ascii=False, indent=2)
         except FileExistsError:
             raise ValueError('prior_failed_run_already_has_successor') from None
-        with closing(sqlite3.connect(f'file:{previous_budget.path}?mode=ro', uri=True)) as source_db:
-            with closing(sqlite3.connect(output/'budget.sqlite')) as destination_db:
-                source_db.backup(destination_db)
         base.write_json(output/'recovery.json', dict(prior_failed_run=str(prior_path.parent.relative_to(root)),
             prior_summary_sha256=base.digest(prior_path.read_bytes()), inherited_budget=prior['budget'],
+            budget_path=str(budget_path.relative_to(root)),
             recovery_reason=('resume_validated_audit' if reuse_audit else 'repair_complete_inventory' if reuse_inventory else
                 'expanded_inventory_output_limit' if expanded_output else 'transient_transport_retry'),
             policy='carry_all_reservations_keep_unknown_not_provider_bill'))
-    budget = RunBudget(output/'budget.sqlite', str(limit), allow_unknown_reservations=True)
+    else:
+        budget_path = output/'budget.sqlite'
+    budget = RunBudget(budget_path, str(limit), allow_unknown_reservations=True)
     if prior is not None:
         # Reconcile only connection establishment failures in the inherited
         # ledger. A stream/read failure remains fully reserved and unknown.
@@ -292,6 +304,7 @@ async def execute(*, root, input_run, output, observation_root, budget_limit_usd
             unknown_cost='retain_full_reservation', prior_failed_run=prior_failed_run and str(prior_failed_run)),
         independent_evaluation=False, semantic_acceptance='not_evaluated',
         input_run=str(original.relative_to(root)), input_trace_id=parent['trace_id'],
+        budget_path=str(budget_path.relative_to(root)),
         candidate_path=str(original.relative_to(root)), candidate_sha256=contract.canonical_hash(draft),
         original_candidate_preserved=True, source_packet_sha256=parent['source_packet_sha256'],
         skill_sha256=parent['skill_sha256'], attempts=[], stop_reason='not_started',

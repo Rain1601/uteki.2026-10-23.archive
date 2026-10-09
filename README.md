@@ -1,310 +1,46 @@
 # Uteki Beta
 
-2026-10-09：Data Agent 已完成两份 FY2025 HTML 10-K 的准备、独立取材、复核补查与精确引用闭环。六题及一次目录分页复跑通过独立原文验收。[查看结果](http://127.0.0.1:8769/docs/design/data-agent-acceptance/data-agent-evidence-v1/) · [交付与费用](experiments/agent_design/2026-10-09-data-agent-completion-v1/DELIVERY.zh-CN.md) · [换机接续](docs/MACHINE_HANDOFF.zh-CN.md)。旧历史记录保持原样，范围不自动扩展到任意新公司或文档。
+基于原件证据的投资研究系统。当前维护两个本地入口：
 
-An evaluation-driven AI investment research system.
+| 入口 | 地址 | 当前范围 |
+|---|---|---|
+| 数据与 Agent 结果工作台 | <http://127.0.0.1:8765/> | 原件、冻结候选、引用、查询过程与审核状态；首页跳转当前结果 |
+| 投资界面 Swiss C | <http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/> | 已命名的模拟公司/报告/组合/风险；尚未连接真实发布 API |
+| Data 验收结果 | <http://127.0.0.1:8769/docs/design/data-agent-acceptance/e1-evidence-benchmark-v3/> | 双年度七题阶段结果、出处、缺失/多余与费用 |
 
-## Active workspaces · 2026-10-06
+2026-10-09：E2季度收入、E3混合收入/版本重列及E4现金流/新公司地理收入指定题已通过独立内容验收与最终双审，R15/R16历史消费兼容与期间误拒已修。**当前下一项E5：冻结多公司问题及各公司独立范围/覆盖。** 最新结果从[E2](experiments/agent_design/2026-10-09-e2-msft-10q-v1/DELIVERY.zh-CN.md)、[E3](experiments/agent_design/2026-10-09-e3-mixed-sources-v1/DELIVERY.zh-CN.md)、[E4](experiments/agent_design/2026-10-09-e4-heldout-v1/DELIVERY.zh-CN.md)进入；尚未接入专用结果页。
 
-| Interface | Local entry | Responsibility |
-| --- | --- | --- |
-| Investor frontend (Swiss C) | <http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/> | Company, Manager, report, portfolio and risk views; currently named simulated data |
-| Real data workbench | <http://127.0.0.1:8765/data-workspace> | Original materials, financial candidates, evidence, versions and processing records |
+Data 的真实流程、G0–G4 关口、逐题标准及 E1–E7 扩展状态已[统一](docs/DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)。两公司 FY2025 六题及 E1 七题有通过的独立内容验收；部分含恢复/补审，不是同一版本从零一次通过。完整财务、任意公司/格式、严格最小材料及稳定泛化仍未证明。Data 交材料，Analysis 的报告/图另验。
 
-These are the two maintained interfaces. Other standalone UI prototypes have
-been retired. Shared report fixtures, company icons, original brand assets and
-frozen historical records remain. The workbench's source, evaluation, extraction
-and report-review routes remain supporting tools. The old attention homepage
-has been removed; `/` redirects to `/data-workspace` with HTTP 303. See the
-[code overview and boundaries](docs/CODE_OVERVIEW.zh-CN.md).
-Both interfaces and the Python backend stay in this repository; a shared API
-connecting Swiss C to real published artifacts is a future integration step.
+## 启动与检查
 
-## Current code handoff · 2026-10-06
-
-The current checkout includes the Swiss C investor-facing prototype, the real
-data review workbench, scoped acquisition/extraction/query tools, and a read-only
-Data MCP server. These have different validation boundaries: the investor
-prototype uses named simulated reports, decisions, holdings, and risks; it is
-not a live investment account. The older milestone and experiment notes below
-retain their original dates and do not describe every subsequent increment.
-
-- Frontend: [Swiss C and its checks](docs/design/company-workspace-swiss-c/README.md).
-- Data work: [current tasks and remaining gaps](TODO.md),
-  [CLI](docs/DATA_AGENT_CLI.zh-CN.md), and [MCP](docs/DATA_AGENT_MCP.zh-CN.md).
-- Research policy: [core investment questions](docs/INVESTMENT_CORE_QUESTIONS.zh-CN.md).
-
-This repository handoff includes reviewed source code, designs, public filing
-archives, experiment records, ordinary configuration, and report/brand samples.
-Credentials, private operator contact settings, usage ledgers, machine caches,
-and internal reference copies remain local. Frozen files that contain sensitive
-settings are omitted without redacting or rewriting the original run hashes.
-Some historical manifests or absolute run paths therefore still require the
-original local environment; the checkout alone does not independently establish
-every recorded live result.
-
-In particular, the six prepare/refresh manifests for AMD and TSMC under
-`data/company_workspace/official-filing-preparations/` retain references to
-omitted private `source-config.json` files. Their public `dataset/` artifacts
-remain included. Do not claim the parent run bundles are fully replayable or
-edit their hashes to hide that omission.
-
-The catalogs in `data/evaluation_views/` and `config/data-mcp-readonly-v1.json`
-select explicit frozen datasets. Preserve their company/source scopes and
-validate their hashes; do not silently substitute another company or the latest
-version. Source acquisition requires your own private SEC contact configuration.
-Missing inputs are reported as gaps. The Swiss C README documents the explicit
-build command for the included PDF sample.
-
-For a local frontend preview, run from the repository root:
-
-```bash
-python3 -m http.server 8769 --bind 127.0.0.1
-```
-
-Open `http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/`.
-For offline code checks, use the existing `scripts/run_offline_checks.py` entry
-point after installing the locked `analysis`, `data`, and `mcp` extras. Its
-`--integration` option additionally exercises local-data tests; see
-[offline test boundaries](docs/OFFLINE_TESTS.md) before interpreting skips or
-missing historical inputs.
-
-Uteki starts from a research question and evidence, then builds the data and
-automation needed to answer it. The first milestone is deliberately small:
-make one capability measurable before making the agent larger.
-
-Product planning: [long-term roadmap](docs/ROADMAP.zh-CN.md),
-[agent responsibilities and investment workflow](docs/AGENT_SYSTEM_DESIGN.zh-CN.md),
-[active v0.2 plan](docs/releases/V0_2_PLAN.zh-CN.md), and
-[release acceptance record](docs/releases/ACCEPTANCE_TEMPLATE.zh-CN.md).
-These plans preserve the active M0 scope and do not imply milestone acceptance.
-
-Next development steps and cross-machine handoff: [development TODO](TODO.md).
-
-Investment governance: [investment and evaluation charter](docs/INVESTMENT_EVALUATION_CHARTER.zh-CN.md)
-and [quarterly review template](docs/INVESTMENT_REVIEW_TEMPLATE.zh-CN.md).
-Review quarterly, attribute annually, and assess the strategy over rolling 3–5
-year windows. Research quality, position decisions, and returns are separate.
-System-origin, manual, and unclassified positions require quantity-level attribution
-and distinct reporting; manual tagging does not prove system performance.
-Account parameters and benchmarks remain to be frozen. These documents do not
-enable trading, implement position tagging, or expand M0.
-
-The first v0.2 development batch now includes a newly acquired complete SEC
-filing, a verified candidate index, and a portable G0 review package. See the
-[R2-A execution record](docs/releases/V0_2_R2A_EXECUTION.zh-CN.md) and
-[human review packet](data/evaluation/m0_r2a/2026-09-18-candidate/REVIEW.zh-CN.md).
-Validate that package without network or model calls:
-
-```bash
-.venv/bin/python scripts/prepare_m0_review.py --verify data/evaluation/m0_r2a/2026-09-18-candidate
-```
-
-This package carries its own original source and legacy inputs. It is a new
-candidate pending human review; it does not restore the old populated workbench
-or complete the M0 evaluation gates.
-
-## Research workbench
-
-The local workbench opens at `/data-workspace`: select a company, a frozen
-dataset and a material to inspect originals, financial candidates, evidence,
-display versions and saved processing records. Missing outputs remain explicit.
-
-Company and report review remain supporting workflows under `/companies`.
-Navigation: **Companies → Company research → Reports**. Company pages
-prioritize reading and editing analysis; source materials, document indexes
-and structured business/financial data provide supporting evidence. Human
-and agent edits retain separate revisions and do not overwrite or automatically
-adopt the original report.
-
-```bash
-uv sync --locked --extra analysis
-.venv/bin/python scripts/run_offline_checks.py
-.venv/bin/python scripts/smoke_research_workflow.py
-.venv/bin/python scripts/check_workspace.py
-```
-
-Start with [local setup and data recovery](docs/LOCAL_DEVELOPMENT.md) and
-[the offline test boundary](docs/OFFLINE_TESTS.md). Python 3.11+, Node.js 20+
-and macOS/Linux are required for these checks. The analysis extra is needed
-for the offline SDK/fake-model tests; no model calls or credentials are used.
-The workspace check exits with code 2 when required data is missing. After
-restoring the inputs, launch the workbench:
+已有环境从仓库根目录启动（首次安装见[本地开发](docs/LOCAL_DEVELOPMENT.md)）：
 
 ```bash
 PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 --port 8765
+.venv/bin/python -m http.server 8769 --bind 127.0.0.1
 ```
 
-Open `http://127.0.0.1:8765/data-workspace`. Startup checks required inputs
-before creating review state or starting the server. Use `--check` for a read-only
-preflight. Full local regression remains available with
-`.venv/bin/python scripts/run_offline_checks.py --integration`.
-Selected public-source materials, indexes, Data Agent snapshots and saved query
-runs are now included in Git. Other local datasets may still be required for
-the full historical workspace; use the workspace check to identify actual gaps.
-Credentials, personal review state, run budgets, generated translations/exports
-and temporary files also stay local. Research coverage and
-review status remain explicit; this interface does not imply milestone
-acceptance or completed coverage of every watchlist company.
-
-## Local Data Agent query pilot
-
-The [query pilot report](docs/DATA_AGENT_QUERY_PILOT_REPORT.zh-CN.md) links the
-versioned schema, coverage catalog, SQL traces, financial calculations, and
-document evidence. It uses four frozen Alphabet sources and candidate records.
-Agent clients can discover the schema and submit typed query plans through the
-same Python/JSON CLI interface. Autonomous natural-language planning, OCR, and
-external acquisition were outside that original pilot. The subsequent
-[natural-language canary report](docs/DATA_AGENT_NL_CANARY_REPORT.zh-CN.md)
-records the implemented planner/tool loop, two live DeepSeek runs, fixes, costs,
-and the remaining acceptance failures. Broader rollout, OCR, and external
-acquisition remain future work.
-
-Install the optional query dependencies with
-`uv sync --locked --extra analysis --extra data`. With the pilot data restored:
+两个服务分别运行。只读预检及核心离线检查：
 
 ```bash
-.venv/bin/python scripts/query_research_data.py schema \
-  --dataset experiments/data_agent_query/2026-09-22-pilot-04/dataset
+PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --check
+.venv/bin/python scripts/run_offline_checks.py
 ```
 
-## End state
+Python 3.11+、Node.js 20+；按锁文件安装 analysis/data/mcp 所需依赖。核心检查不调用模型；完整历史集成另见[测试边界](docs/OFFLINE_TESTS.md)，当前不能宣称全部通过。
 
-1. **Research Outcome** — a defensible thesis, drivers, evidence, risks,
-   variant perception, trackers, and falsification conditions.
-2. **Research Data Infrastructure** — traceable filings, calls, news, industry
-   data, claims, metrics, evidence, events, relationships, and timelines.
-3. **Evaluation & Experiment System** — versioned benchmarks, baselines,
-   metrics, error analysis, and experiment logs.
-4. **AI Research Agent** — observable automation of the validated research
-   loop, with humans retaining final judgment.
-5. **Methodology** — a transferable way to define questions, manage evidence,
-   evaluate systems, and update theses.
+## 当前入口与保留规则
 
-## Current milestone: M0
+- [当前行动与完整精简路线](TODO.md)
+- [统一 Data 流程与验收](docs/DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md) · [原 01–16 状态](docs/DATA_AGENT_EXTRACTION_TODO.zh-CN.md)
+- [两公司六题](docs/design/data-agent-acceptance/data-agent-evidence-v1/) · [E1 七题](docs/design/data-agent-acceptance/e1-evidence-benchmark-v3/) · [单题模型对照](docs/design/data-agent-acceptance/e1-model-comparison-v1/)
+- [CLI](docs/DATA_AGENT_CLI.zh-CN.md) · [只读 MCP](docs/DATA_AGENT_MCP.zh-CN.md) · [代码总览](docs/CODE_OVERVIEW.zh-CN.md)
+- [备份、瘦身清单与恢复](docs/REPOSITORY_RETENTION.zh-CN.md) · [换机接续](docs/MACHINE_HANDOFF.zh-CN.md)
+- [Agent 职责](docs/AGENT_SYSTEM_DESIGN.zh-CN.md) · [投资与评测约定](docs/INVESTMENT_EVALUATION_CHARTER.zh-CN.md)
 
-> Know exactly how weak the first baseline is.
+历史实验与旧页面按依赖清理，清理前完整提交保存在本地 `codex/backup-20261009-before-cleanup`。冻结原件、当前结果和测试依赖保留；备份未推送。旧文档的归档路径需恢复后访问。
 
-M0 proves the minimum loop:
+代码、公开材料与普通配置随 Git；凭据、私密会话、联系人设置、费用账本及机器缓存单独保留。AMD/TSMC 历史准备 manifest 的私密 source-config 未随仓库交付，不能声称仅靠 checkout 可完整重放所有历史结果。不修改冻结 hash 掩盖缺件。
 
-```text
-fixed benchmark -> baseline predictions -> deterministic scoring
-                -> error analysis -> hypothesis -> next experiment
-```
-
-The active boundary and five acceptance gates are defined in English and
-Chinese in [`docs/M0_SCOPE.md`](docs/M0_SCOPE.md) and
-[`docs/M0_SCOPE.zh-CN.md`](docs/M0_SCOPE.zh-CN.md). In short: Alphabet's latest
-10-K, one decision-useful Company Business Map, and one complete evaluation
-loop.
-
-The modular-monolith boundaries and dependency rules are defined in
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and
-[`docs/ARCHITECTURE.zh-CN.md`](docs/ARCHITECTURE.zh-CN.md).
-
-Earlier development referenced approved M1 and Data Agent / Analysis Agent
-handoff documents, but those files and their English companions are not included
-in this checkout. See the [missing-document inventory](docs/LOCAL_DEVELOPMENT.md)
-before relying on them for implementation. M1 remains a later milestone.
-
-The included metric-extraction fixture predates the current M0 definition. It
-is only a technical evaluator check and is not the active benchmark or a claim
-of system quality. The Alphabet Business Map remains a reviewed candidate.
-
-### Spike D0: Document Navigator
-
-D0 adds a parallel, source-faithful index for the frozen Alphabet FY2025 10-K:
-
-```text
-SEC HTML → Source Blocks → Document → Part → Item
-```
-
-It deliberately uses no LLM and does not infer hierarchy inside an Item.
-Tables, source anchors, page markers, style signatures, and the filing's two
-images remain inspectable in the populated local workspace. Its immutable index lives under
-`data/source_documents/alphabet_2025_10k/indexes/v0.1/`; its reviewed
-`v0.1-candidate` predecessor supplies provenance. These local index artifacts
-are not included in a fresh clone.
-
-### Data Agent handoff candidate
-
-The separately provisioned local-file `EvidenceBundle` lives under
-`data/research_data/alphabet_2025_10k/v0.2-candidate/`. It publishes the
-current Business Map, Claims, normalized FY2025 Metrics, exact Evidence Links,
-and known Unknowns through `LocalResearchDataPort`. The earlier
-`v0.1-candidate` remains unchanged for comparison. The current release is
-still a candidate pending full human review and contains no Thesis or Analysis
-Agent judgment.
-
-## Run it
-
-The following research commands require their original local datasets and
-review records. They are not bootstrap commands for a fresh clone.
-Google Cloud's source-only rule spike has an implementation entry point at
-`PYTHONPATH=src .venv/bin/python scripts/run_cloud_spike.py`, then open
-`http://127.0.0.1:8765/result?view=cloud-spike`.
-
-The same inspector now supports the source-only LLM comparison and pinned run selection.
-The minimal Analysis Agent has a separate `/analysis` view. The Cloud rule/LLM
-spike and Analysis A0/A1 scope documents are missing from this checkout;
-[local development notes](docs/LOCAL_DEVELOPMENT.md) record the missing files.
-Candidate-reference matching
-does not constitute human approval or a generalization claim.
-Evaluate a completed run separately with
-`PYTHONPATH=src .venv/bin/python scripts/evaluate_cloud_spike.py <run-directory>`.
-This is a rule baseline pending human review, not an autonomous LLM extraction run.
-
-Requires Python 3.11+. The only document parsing dependency is `lxml`.
-
-```bash
-PYTHONPATH=src python3 -m uteki_eval evaluate \
-  --benchmark benchmarks/metric_extraction/v0.1/dataset.jsonl \
-  --predictions benchmarks/metric_extraction/v0.1/baseline_predictions.jsonl
-
-PYTHONPATH=src python3 -m unittest discover -s tests -v
-
-PYTHONPATH=src python3 scripts/build_document_index.py
-
-PYTHONPATH=src python3 scripts/build_research_data_bundle.py \
-  --adapter alphabet-fy2025-business-map-v1 \
-  --benchmark benchmarks/alphabet_2025_business_map/v0.3-candidate \
-  --source data/source_documents/alphabet_2025_10k \
-  --destination /tmp/uteki-research-data-new \
-  --generated-at 2026-09-13T01:34:55+08:00
-```
-
-Preview and review the current M0 pilot locally:
-
-```bash
-PYTHONPATH=src:. python3 apps/review_workbench/app.py
-```
-
-Then open `http://127.0.0.1:8765/result` for the Data Agent structured-data
-Inspector or `http://127.0.0.1:8765/document-index` for the read-only D0
-Inspector. `/result` reads the current published `EvidenceBundle`; Business
-Map is one visualization of that data, not a Benchmark or Analysis Agent
-result. The Document Index is frozen independently from both.
-
-The evaluator reports exact-match accuracy, coverage, and an error manifest.
-Its exit code is non-zero when input contracts are invalid, not when a model
-scores poorly.
-
-## Repository map
-
-```text
-benchmarks/       Versioned questions, ground truth, and baseline outputs
-docs/             Project constitution, evolution, and experiment protocol
-experiments/      Immutable experiment records (one directory per run)
-src/uteki_eval/   Small evaluation kernel
-src/uteki/        Research domain and SEC document infrastructure
-tests/            Contract and metric tests
-```
-
-## Next gate
-
-Complete the prepared G0 pilot with actual human research decisions, then
-freeze the source policy, inclusion/exclusion rules, ambiguity policy and
-review rubric. Public-contract and source-preparation development is in
-progress; human Gold, paid baseline execution and release acceptance remain
-pending. The [baseline design](docs/releases/V0_2_BASELINE_DESIGN.zh-CN.md)
-records current exposure, input-scope differences and the unset model budget.
+数据注册与只读 MCP 使用显式冻结范围；缺输入报错，不替换公司、期间或来源。获取 SEC 原件需自行配置私密联系信息。E1 原账本缺件，不能恢复调用或清零历史费用。E2–E4原共享账本累计176请求、保守估算$2.0569908，unknown/在途0，$3硬上限未提高；原账本须私密迁移。本次整理提交未调用模型。

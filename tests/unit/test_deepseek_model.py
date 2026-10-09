@@ -12,6 +12,7 @@ from openai.types.shared import Reasoning
 from pydantic import BaseModel
 
 from uteki.agents.runtime.deepseek_model import DeepSeekChatCompletionsModel
+from uteki.agents.runtime.model_configuration import capture_model_configuration
 
 
 class Answer(BaseModel):
@@ -63,6 +64,13 @@ class DeepSeekModelTests(unittest.TestCase):
                 self.assertEqual(body['thinking'], {'type': 'enabled'})
                 self.assertEqual(body['reasoning_effort'], effort)
                 self.assertEqual(body['response_format'], {'type': 'json_object'})
+                captured = capture_model_configuration(
+                    'deepseek', 'deepseek-flash', self.model, (), {
+                        'model_settings': ModelSettings(extra_body=extra_body),
+                        'output_schema': AgentOutputSchema(Answer, strict_json_schema=False),
+                    })
+                self.assertEqual(captured['fields']['response_format']['value'],
+                                 body['response_format'])
                 self.assertEqual(body['max_tokens'], 3000)
                 self.assertEqual(len(body['messages']), 2)
                 self.assertIn('Use the planner role and source evidence.', body['messages'][0]['content'])

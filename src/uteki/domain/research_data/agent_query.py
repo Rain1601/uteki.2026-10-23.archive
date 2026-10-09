@@ -39,6 +39,10 @@ class QueryPlan(Contract):
 class ContextRequest(Contract):
     source_snapshot_id: str
     block_id: str
+    # Default full reads keep their historical serialized request and hash.
+    representation: Literal["full", "compact"] = Field(
+        default="full", exclude_if=lambda value: value == "full",
+        description="compact preserves complete text and every table cell as tuples with cell_fields; no cells are omitted.")
 
 
 class AnswerPart(Contract):

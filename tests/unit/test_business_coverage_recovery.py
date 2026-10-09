@@ -83,6 +83,18 @@ class RecoveryTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.requests, [])
         self.assertFalse((self.root/'coverage/recovery-claim.json').exists())
 
+    async def test_legacy_copied_ledger_is_rejected_before_projection_or_dispatch(self):
+        await self.failed_revision()
+        ledger = self.root/'coverage/budget.sqlite'
+        frozen = ledger.read_bytes()
+        (self.root/'coverage/recovery.json').write_text(json.dumps({'prior_failed_run':'older'}))
+        with self.assertRaisesRegex(ValueError, 'legacy_copied_budget_requires_reconciliation'):
+            await self.recover()
+        self.assertEqual(self.requests, [])
+        self.assertFalse((self.root/'coverage/recovery-claim.json').exists())
+        self.assertFalse((self.root/'recovered').exists())
+        self.assertEqual(ledger.read_bytes(), frozen)
+
     async def test_failed_final_audit_keeps_valid_projected_candidate(self):
         await self.failed_revision()
         self.responses = [self.answer({'wrong':'schema'})]
