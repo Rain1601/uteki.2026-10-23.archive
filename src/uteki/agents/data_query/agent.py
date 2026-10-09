@@ -78,7 +78,7 @@ class DataQueryAgent:
         allowed_periods = explicit_periods(request.question)
         period_scope = {"version": PERIOD_SCOPE_VERSION,
                         "periods": [p.model_dump(mode="json") for p in allowed_periods],
-                        "basis": "Literal question text only; calendar years/quarters. Other syntax requires clarification."}
+                        "basis": "Literal question text only; calendar years/quarters or typed explicit date ranges. Source dates must satisfy the dataset protocol. Other syntax requires clarification."}
         catalog = {"entities": list(entities.values()), "metrics": schema["metrics"],
                    "period_scope": period_scope,
                    "plan_schema": decision_type.model_json_schema(), "sources": sources,
@@ -199,7 +199,7 @@ class DataQueryAgent:
                         navigation.append({"tool": decision.action, **value})
                 elif scoped:
                     context = decision.context
-                    value = port.read_context(source_snapshot_id=context.source_snapshot_id, block_id=context.block_id)
+                    value = port.read_context(**context.model_dump())
                     add_gaps(value)
                     if value.get("blocks"):
                         value = add_context(value)
@@ -212,8 +212,7 @@ class DataQueryAgent:
                                             if s["period_end"] in {str(p.end) for p in allowed_periods})
                     if context.source_snapshot_id not in grounded_sources:
                         raise ValueError("context source has no grounded reporting period or retrieved record")
-                    value = port.read_context(source_snapshot_id=context.source_snapshot_id,
-                            block_id=context.block_id, snapshot_id=scope.snapshot_id,
+                    value = port.read_context(**context.model_dump(), snapshot_id=scope.snapshot_id,
                             knowledge_cutoff=str(scope.knowledge_cutoff), include_candidates=scope.include_candidates)
                     value = add_context(value)
                 write_new(output / f"turn-{step:02d}/tool-result.json", value)

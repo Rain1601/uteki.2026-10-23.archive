@@ -96,7 +96,7 @@ async def execute(*, root, prior_run, output, observation_root, authorization_pa
         raise ValueError('prior_audit_has_no_revision_request')
     audit = published_audit
     initial_draft, initial_audit = deepcopy(draft), deepcopy(audit)
-    budget_path = base.local_file(root,prior['budget_path'])
+    budget_path = run._existing_budget_path(root, prior_path.parent, prior)
     budget = RunBudget(budget_path,prior['budget']['limit_usd'],allow_unknown_reservations=True)
     if budget.summary()!=prior['budget'] or prior['budget']['in_flight_requests']:
         raise ValueError('prior_budget_snapshot_mismatch_or_in_flight')

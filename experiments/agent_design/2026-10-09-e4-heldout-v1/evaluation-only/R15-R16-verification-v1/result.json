@@ -1,0 +1,203 @@
+{
+  "status": "pass",
+  "created_at": "2026-10-09T11:28:20.437191+00:00",
+  "R15": {
+    "transcripts": [
+      {
+        "path": "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r2/attempt-01/review-01/question-repair-input.json",
+        "schema_version": "question-review-protocol-repair-v1",
+        "sha256": "cfade86f5a4a3fcb09ec02097fbf07bb0edc35154952edd051f0a287c3d616d2",
+        "exact_protocol_replay": "pass"
+      },
+      {
+        "path": "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r1/attempt-01/review-01/question-repair-input.json",
+        "schema_version": "question-review-protocol-repair-v1",
+        "sha256": "97c9cf74be4b6cca4951bada5e77babb7c05fdd88023b47cab8cbdabf22b10c5",
+        "exact_protocol_replay": "pass"
+      },
+      {
+        "path": "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-01/review-01/question-repair-input.json",
+        "schema_version": "question-review-protocol-repair-v1",
+        "sha256": "e19b9adc9d6a53ae58b67f87b8fbf797443e87a11485a847baf777df0f551aba",
+        "exact_protocol_replay": "pass"
+      },
+      {
+        "path": "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-02/review-01/question-repair-input.json",
+        "schema_version": "question-review-protocol-repair-v1",
+        "sha256": "e30e5d68a3ba62acfbea8bf2e1e4f650677d847040de48af4b5d47b7f7c48d75",
+        "exact_protocol_replay": "pass"
+      },
+      {
+        "path": "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-M1-review-recovery-r2/attempt-01/review-01/question-repair-input.json",
+        "schema_version": "question-review-protocol-repair-v1",
+        "sha256": "63a526053af3fd665c6f6c0c0600da69f79dbbc612be07a5ae0f8a5be2a292da",
+        "exact_protocol_replay": "pass"
+      },
+      {
+        "path": "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-V1-r2/attempt-01/review-01/question-repair-input.json",
+        "schema_version": "question-review-protocol-repair-v1",
+        "sha256": "2878be01507ec121bce6741fd344c7aa40f778db7632c00d0132298d5f135a4d",
+        "exact_protocol_replay": "pass"
+      },
+      {
+        "path": "experiments/agent_design/2026-10-09-e2-msft-10q-v1/runs/E2-Q1-r3/attempt-01/review-01/question-repair-input.json",
+        "schema_version": "question-review-protocol-repair-v1",
+        "sha256": "b0ed7b9c296b98f71912041014ea098c1ed4e983d50448a8bd76be92c5925080",
+        "exact_protocol_replay": "pass"
+      }
+    ],
+    "successful_consumption": [
+      {
+        "run": "E2-Q1-r3",
+        "frozen_status": "reviewed_data_ready",
+        "current_consumption": "pass"
+      },
+      {
+        "run": "E3-V1-r2",
+        "frozen_status": "reviewed_data_ready",
+        "current_consumption": "pass"
+      },
+      {
+        "run": "E3-M1-review-recovery-r2",
+        "frozen_status": "reviewed_data_ready",
+        "current_consumption": "pass"
+      },
+      {
+        "run": "E4-H1-r3",
+        "frozen_status": "reviewed_data_ready",
+        "current_consumption": "pass"
+      },
+      {
+        "run": "E4-H2-r2",
+        "frozen_status": "reviewed_data_ready",
+        "current_consumption": "pass"
+      }
+    ],
+    "failed_runs_stay_rejected": [
+      {
+        "run": "E4-H1-r1",
+        "frozen_status": "blocked_by_review_failure",
+        "current_consumption": "rejected",
+        "reason": "required files missing from frozen manifest"
+      },
+      {
+        "run": "E4-H1-r2",
+        "frozen_status": "blocked_by_review_failure",
+        "current_consumption": "rejected",
+        "reason": "required files missing from frozen manifest"
+      }
+    ],
+    "new_repair_version": "question-review-protocol-repair-v2",
+    "known_v1_variants": [
+      "original",
+      "scope",
+      "located"
+    ],
+    "comparison": "full equality plus canonical JSON hash; no bool/integer or float/integer substitution"
+  },
+  "R16": {
+    "period_scope_version": "explicit-periods-v5-fiscal-quarter-token-boundary",
+    "cases": [
+      {
+        "input": "FY2031 quality review",
+        "accepted": true,
+        "periods": [
+          {
+            "kind": "year",
+            "start": "2031-01-01",
+            "end": "2031-12-31"
+          }
+        ]
+      },
+      {
+        "input": "FY2031 question",
+        "accepted": true,
+        "periods": [
+          {
+            "kind": "year",
+            "start": "2031-01-01",
+            "end": "2031-12-31"
+          }
+        ]
+      },
+      {
+        "input": "FY2031 Q5",
+        "accepted": false,
+        "periods": []
+      },
+      {
+        "input": "FY2031 Q0",
+        "accepted": false,
+        "periods": []
+      },
+      {
+        "input": "FY2031 Q 5",
+        "accepted": false,
+        "periods": []
+      }
+    ]
+  },
+  "historical_fingerprints_unchanged": {
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r2/attempt-01/review-01/question-response-01.json": "bf91aadd6e2f4569c2815c97fe4af643ad8bd954d4a7c67a3ba6b03cf0d780a5",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-01/review-01/question-response-01.json": "a4d879e36385aee4c4c32ef29ad3b28ca69dadd01f46af005da41a3fbc5df9c3",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-M1-review-recovery-r2/attempt-01/review-01/question-input.json": "b29fbaec25b8ea751f87b9ccbabf8d064341da78a425ef939f6c8cffe485fb3a",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r2/attempt-01/review-01/question-input.json": "0a6fb0240a494eaf493002634467509b6c556700511715ee31afd85cbe2badff",
+    "experiments/agent_design/2026-10-09-e2-msft-10q-v1/runs/E2-Q1-r3/attempt-01/review-01/question-response-01.json": "b7f16222d7cf142f06c0d52dfe862362bc2d5c311c2397a8c56c58367bf10058",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-V1-r2/attempt-01/review-01/manifest.json": "9f43654704af6f8cf51efdacfc946462a184f56405941a62055a7244876d9899",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-02/review-01/question-repair-input.json": "e30e5d68a3ba62acfbea8bf2e1e4f650677d847040de48af4b5d47b7f7c48d75",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-02/review-01/manifest.json": "4cd369fafb8ea8b0c783006e7738d90826f2ad7c8b075ea439d28236648ee301",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-01/review-01/question-repair-input.json": "e19b9adc9d6a53ae58b67f87b8fbf797443e87a11485a847baf777df0f551aba",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-V1-r2/attempt-01/review-01/question-response-01.json": "a7cc0ebc07dc679eea144146efd41e58639c5c34d56a48ac1974f106cac07328",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-01/review-01/manifest.json": "fa009e57ce22e0b0b75de27e6381dc32502da153de1f25bbbb60f67ab89c8f5e",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-01/review-01/question-input.json": "d6784f96d9e7294d2a763d4263e7c35810b1cdcbfb0ce8f4247ecb2fb549144b",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r1/attempt-01/review-01/question-input.json": "cef5ef7b5d36150088135a1c7ef7de8ad6c9d691ab64cf8e3cad8b4e7186f049",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-M1-review-recovery-r2/attempt-01/review-01/question-response-01.json": "00d8940c9e5a3b878c5452d46665b3fa50655effbff67bb33603ecfa21d26367",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r1/attempt-01/review-01/manifest.json": "94a92bec8813bdc496b579b0f76257093e87601286ce018fb14ea8f5800d170b",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-02/review-01/question-input.json": "1bb6c7871e34dc44d1189e29b065978d6c2bd624900790ed647824f2cb09fc24",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-V1-r2/attempt-01/review-01/question-input.json": "304966fe849edd3717c495820db2ea7bf288a32dc82d9a050d7d671d8bd34ce9",
+    "experiments/agent_design/2026-10-09-e2-msft-10q-v1/runs/E2-Q1-r3/attempt-01/review-01/manifest.json": "3eb3c4cf021c099cfccf50b2d6cd21e9d6d48827772cee1a63653190562f6b43",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r2/attempt-01/review-01/manifest.json": "870e9f1259eddf3ded2cd430a9c0c6166ceb7ef22b25e9b0aad8e8985d0cd8bc",
+    "experiments/agent_design/2026-10-09-e2-msft-10q-v1/runs/E2-Q1-r3/attempt-01/review-01/question-input.json": "dd097c787b789e3e5d159f042f5c67aef6044565a083f1839dc80ea2d67daa1d",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-V1-r2/attempt-01/review-01/question-repair-input.json": "2878be01507ec121bce6741fd344c7aa40f778db7632c00d0132298d5f135a4d",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-M1-review-recovery-r2/attempt-01/review-01/question-repair-input.json": "63a526053af3fd665c6f6c0c0600da69f79dbbc612be07a5ae0f8a5be2a292da",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r2/attempt-01/review-01/question-repair-input.json": "cfade86f5a4a3fcb09ec02097fbf07bb0edc35154952edd051f0a287c3d616d2",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r1/attempt-01/review-01/question-repair-input.json": "97c9cf74be4b6cca4951bada5e77babb7c05fdd88023b47cab8cbdabf22b10c5",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r1/attempt-01/review-01/question-response-01.json": "786f526deab31a4cf2ec3c687b63e1a8bc5d89e23c002cf64ddfcb8a15976c32",
+    "experiments/agent_design/2026-10-09-e2-msft-10q-v1/runs/E2-Q1-r3/attempt-01/review-01/question-repair-input.json": "b0ed7b9c296b98f71912041014ea098c1ed4e983d50448a8bd76be92c5925080",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-M1-review-recovery-r2/attempt-01/review-01/manifest.json": "b8007ce9d4040095f5972cf1ee79c06d5890b656396fe466d5a4773ca4509ff1",
+    "experiments/agent_design/2026-10-09-e1-benchmark-v1/runs/E1-06-sonnet-question-audit-r2/attempt-02/review-01/question-response-01.json": "f11952b8975e9689fc28ba6c3f450207adb3a19700c50a3889ff491934757f53",
+    "experiments/agent_design/2026-10-09-e2-msft-10q-v1/runs/E2-Q1-r3/manifest.json": "b5ef8e6f6d689fac23347dfb713f1f4beecfa7a5ba6e04b01d35da82a9902a58",
+    "experiments/agent_design/2026-10-09-e2-msft-10q-v1/runs/E2-Q1-r3/result.json": "299e5eadbb6e934353607438f257ff1adc246d087d5c09fc71f53f9671afcc1f",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-V1-r2/manifest.json": "f39a9ce10e2f58c85273a58c3de31d430857b6c780c120e961bdd8c92750efb5",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-V1-r2/result.json": "d1beb76adde89c2ef25d8cc425df16bfb0c078e8c87056fb13d27bd70642ab08",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-M1-review-recovery-r2/manifest.json": "41a69532babf7578eb0703a716c5c32ae26f4cbcc702fb2147fe46fd635ca7f6",
+    "experiments/agent_design/2026-10-09-e3-mixed-sources-v1/runs/E3-M1-review-recovery-r2/result.json": "b3f50fd9e075eeb0e11dda9901c3dfb766468a0f3b847da85122928ccfe56599",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r3/manifest.json": "ce325ce312eea196e4f1435ba879f08b9a0923bdb891f089b46761c5eac313f2",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r3/result.json": "4cda5111f1f128a14e0e874201be72382efaa721ab4efa1acc6362a37f6d67a8",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H2-r2/manifest.json": "d4540eb7daf4fe14a3d6df637c52516b1a06dd9146e39ae3d4dd8c5391fe41f3",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H2-r2/result.json": "6cbab3d89a715a37aa22ffe596e7982bcbe878ebee8f9bfb901226d11d56feb2",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r1/manifest.json": "58414f77f56ece191bdd4021f4e21719b864d19f2a0bee0eb6a5baff526081bc",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r1/result.json": "99126578c5e1c00a01d5ac22442e9ba728be8e43a5fe673edb42176d8ca5749d",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r2/manifest.json": "653a7321604452680c0872148d6beb0a14ad1272655d0344becb226c18d3671c",
+    "experiments/agent_design/2026-10-09-e4-heldout-v1/runs/E4-H1-r2/result.json": "64680003c3c8df326fde8c77ac93abd9de59eb02a84767383d9e0767b93df7b6"
+  },
+  "implementation_sha256": {
+    "src/uteki/agents/data_query/question_coverage_review.py": "3980e62c94ba518471e3466eb0eb20942b9753015648b9dec321fa0848ae4128",
+    "src/uteki/agents/data_query/answer_handoff.py": "b1b56047b28f57e8bdbeff2b54207c67c5979ba33ca5e3913c07a5d24bc7040c",
+    "src/uteki/domain/research_data/period_scope.py": "a4080b406fdeff5f112fcfa6c8bb4a9fc0a424b683bab529b14e5c24b5fa369e"
+  },
+  "engineering_checks": {
+    "R15_affected_modules": 82,
+    "R15_final_type_boundary_module": 5,
+    "R16_affected_modules": 76,
+    "R16_final_version_module": 14,
+    "note": "Overlapping rechecks; do not sum counts as unique tests."
+  },
+  "api_calls_added": 0,
+  "shared_requests": 176,
+  "shared_estimated_usd": "2.0569908",
+  "unknown_reserved_usd": "0",
+  "inflight": 0,
+  "hard_cap_usd": "3",
+  "scope": "Engineering and read-only consumer replay; no new model evaluation or Analysis execution; no changed frozen standards/originals."
+}

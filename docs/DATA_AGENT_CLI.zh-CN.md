@@ -45,7 +45,31 @@ PYTHONPATH=src:. .venv/bin/python -m uteki.infrastructure.research_data.query_cl
 
 该模式只取得对应年报和修订；其他官方材料仍由基线准备管理。未发现该期间则返回缺口，不替换为最新年报。获取产物的 `filing_catalog` 保留已发现年份及未遍历的范围。
 
+2026-10-09 新增按类型与报告期选择：`filing_period` 必须显式给出 `form_type`
+（支持 `10-Q`、`10-K`、`20-F`）和 `report_period_end`，以及公司与 `as_of`。
+只取得该期间、截止日前可得的原报告及修订，不附带其他季度、年报或8-K。
+只有修订而未发现原报告时返回缺口，不把修订当成原报告，也不替换为最新材料。
+例如，已明确选择截至2025-03-31的季报时，新配置可写：
+
+```json
+{"filing_selection":{"mode":"filing_period","form_type":"10-Q","report_period_end":"2025-03-31"}}
+```
+
+`agent acquire` 支持该配置；其冻结产物可由 `agent prepare --from-acquisition`
+按原 manifest hash 和明确 source IDs 无网络重放。新 scope 使用 `form_type`，
+与嵌套选择和报告期必须一致。季度获取和身份核验不证明季度解析、模型自主获取
+或内容评测已通过；这几项分别验收。
+
 ## 查询
+
+数值问题支持显式日历年/季度、已验证的来源财年映射，以及**期间类型加完整起止日**。
+例如 `单季度 2034-02-01 至 2034-04-30；累计期间 2033-11-01 至 2034-04-30`，
+或 `quarter from 2034-02-01 to 2034-04-30; ytd from 2033-11-01 to 2034-04-30`。
+这两种期间可以同末日而不同起点；类型和日期保持原样，不从申报日补出观察期间。
+日期范围仍受所选数据集协议约束：v0.3只支持日历期间，v0.4支持完整月份边界，
+v0.5支持有序的精确来源日期。裸YTD、缺类型/起止日、无效日期和相对期间仍需澄清。
+v4支持中文动词紧邻的“提供全年/单季度”。日期范围附FY标签时，仅所选来源给出唯一财年/财季映射、且kind/start/end/basis与已写日期范围完全一致才接受；未知、冲突或不一致仍需澄清。日历标签与日期范围混用仍不解释同义关系。
+资料截止日与观察期间分开校验；另一公司、另一期间或最新资料不能替补缺口。
 
 ### 年报按表提取：Uteki 实际加载 Skill
 
@@ -56,10 +80,10 @@ PYTHONPATH=src:. .venv/bin/python -m uteki.infrastructure.research_data.query_cl
   --dataset /path/to/frozen-dataset \
   --job /path/to/explicit-extraction-job.json \
   --task-profile config/data_tasks/annual-financial-v1.json \
-  --method-root /Users/bytedance/Documents/ChatGPT/uteki \
+  --method-root "$PWD" \
   --batch-index 0 \
   --model-config /path/to/extractor-model-config.json \
-  --credentials-root /Users/bytedance/Documents/ChatGPT/uteki \
+  --credentials-root "$PWD" \
   --output /path/to/new-batch-run
 ```
 
@@ -153,8 +177,8 @@ PYTHONPATH=src:. .venv/bin/python -m uteki.infrastructure.research_data.query_cl
   --request /path/to/financial-query-request.json \
   --model-config /path/to/planner-model-config.json \
   --extractor-model-config /path/to/extractor-model-config.json \
-  --method-root /Users/bytedance/Documents/ChatGPT/uteki \
-  --credentials-root /Users/bytedance/Documents/ChatGPT/uteki \
+  --method-root "$PWD" \
+  --credentials-root "$PWD" \
   --workspace /path/to/source-store \
   --output /path/to/new-financial-query-run
 ```
@@ -418,3 +442,23 @@ flowchart LR
 每版保存输入、原始/归一化意见、生成和 critic 的实际 prompt/模型配置、逐次反馈、调用及费用、关键实现源码副本和 manifest。历史意见、数据及失败运行保持不变。源码副本用于对照，尚非完整依赖环境归档。实际质量与版本差异见[v3 报告](../experiments/data_agent_query/semantic-review-v3/README.md)。
 
 独立合成 benchmark 的输入与答案分开保存在 `benchmarks/data_agent/semantic_review/v1/`；准备/评分入口见该目录 README。它与三家公司 13 道 query benchmark 是不同测试，不能相互代替。
+
+### 完整表超限后的读取恢复（R11）
+
+`read_context` 与 `read_source` 均可显式选择 `representation=compact`。紧凑编码保留完整正文、全部单元格、空单元格及行列/跨度；tuple字段由`cell_fields`标明。默认full请求的历史序列化保持兼容。读取上限仍为80000，超限反馈给出两种表达的必要字节、上限及同一原子范围的可执行重读参数；不截断、不换范围、不推进阅读覆盖。两种表达都超限时返回明确容量缺口。成功存入artifact仍不等于正文送达Agent，须按`pending_body_reads`完成续读。临时容量失败保留原始回执，成功恢复后不永久污染任务缺口；未恢复仍不能通过必需正文验收。
+
+### 共享问题句的审核身份（R12）
+
+问题审核可用`requested_scope_quotes`分别记录原问题中的连续期间/主体等限定；`requested_subject`仍是连续原文指标。限定按无序集合参与检查身份，排列不产生新身份；未知、拼接、重复限定与错引原文/事实字段继续拒绝。可选字段缺省保留旧响应兼容。这是协议表达及程序验证，不替代独立内容验收。
+
+### 增量计划追加（R13）
+
+`action=plan`可只提交新`requirement_id`，或提交包含原项的完整union。省略原项不会删除它；同ID必须与原要求逐字一致。全部新项通过原公司/来源/期间/purpose/schema校验后才原子追加，已有coverage/evidence/gaps、记录及原文选择不重置。累计最多32项；重复ID、改写原ID、越界及无进展循环仍拒绝。
+
+### 表组导航投影一致性（R14）
+
+交接从冻结reader与所选表确定预期表组，再按reader原有规则省略parser标记的重复导航`block_ids`；完整冻结组仍记录为溯源元数据。单位/脚注附件、正文、单元格、位置/跨度及其他组字段保持严格比对。候选组改kind/table_id/group_id或删掉整个组不能跳过验证。该修复不修改原件/索引，也不把部分材料变成业务完成。
+
+### 审核历史兼容与财年token · R15/R16
+
+新问题审核修订输入使用question-review-protocol-repair-v2。加载历史v1仅接受原始、scope、定位三个已知生成器的完整重建结果；字段及规范JSON hash精确比较，未知版本或篡改拒绝。嵌套合成保留可选requested_scope_quotes缺省；不修改旧输入、响应、manifest或费用。期间解析v5仅将季度token作为FY后缀校验，普通quality/question等词不再误触发，Q5等非法季度及缺失/冲突财年映射继续拒绝。该修复为工程兼容与离线/真实历史消费验证，不是新模型评测。

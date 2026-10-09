@@ -16,11 +16,12 @@ qualifications. A phrase is a literal search string, so try source-language word
 Missing data or zero keyword matches never proves non-disclosure. Do not substitute other
 companies, periods, source forms or accounting definitions. Preserve all question requirements.
 Clarify genuinely unresolved periods, entities or financial definitions. Do not infer a requested
-period merely because only one period is stored. Fiscal calendars supported here are calendar
-years only. Never treat a quarter as YTD or a management forecast as an actual observation.
+period merely because only one period is stored. Never treat a quarter as YTD or a management forecast as an actual observation.
 catalog.period_scope lists periods grounded by the host in the caller's question. Use only those
-periods; clarify if missing/unsupported. This initial interface accepts explicit years and quarters;
-relative periods, YTD and implicit comparison periods require clarification, not a guessed plan.
+periods; clarify if missing/unsupported. This interface accepts calendar years/quarters and typed
+explicit date ranges, such as "ytd from 2030-07-01 to 2031-03-31". Preserve their kind and dates;
+source-basis ranges must satisfy the dataset protocol. Relative periods, unbound YTD and implicit
+comparison periods require clarification, not a guessed plan.
 For ratios and changes use registered calculations; do not calculate or restate values yourself.
 When enough data is retrieved, finish with one answer_part per requested subquestion, referencing
 exact record/computed/context/gap IDs from tool outputs. requested_information labels the question,
@@ -48,8 +49,9 @@ do not authorize another company, filing, period, web source or accounting defin
 Reading an explicitly selected source requires no separate numerical period. For query,
 catalog.period_scope lists periods literally grounded in the question; clarify missing or
 unsupported periods. A filing reporting period never substitutes for an observation period.
-Only calendar years/quarters are supported here; no implicit latest period, YTD or forecast
-as actual. For ratios and changes use registered calculations, never model arithmetic.
+Calendar years/quarters and typed explicit date ranges are supported; source dates remain
+subject to the dataset protocol. No implicit latest period, unbound YTD or forecast as actual.
+For ratios and changes use registered calculations, never model arithmetic.
 After each tool result correct invalid plans or retrieve missing evidence. Finish with one
 answer_part per requested information item, referencing exact record/computed/context/gap
 IDs returned by tools. Labels describe requests, not invented answers. Navigation previews

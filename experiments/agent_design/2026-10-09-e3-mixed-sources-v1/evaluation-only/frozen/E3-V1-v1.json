@@ -1,0 +1,103 @@
+{
+  "schema_version": "e3-semantic-criteria-v1",
+  "case_id": "E3-V1",
+  "created_before_case_run": true,
+  "query_zh": "以2025-08-01为资料可得截止日，仅使用所选Microsoft报告，请提供全年 2023-07-01 至 2024-06-30 三个报告分部的收入：分别保留该年度原年报中的列报与下一年度年报对同期间的重列，注明金额单位、两种报告版本及其可得日。提供解释差异原因、该FY2024期间在两种版本中的公司整体收入以及重列对合并财务报表影响所需的原文依据。不要把不同版本的同期间金额相加，也不要用后来的重列冒充当时原列报。",
+  "company_id": "sec-0000789019",
+  "knowledge_cutoff": "2025-08-01",
+  "period": {
+    "kind": "year",
+    "start": "2023-07-01",
+    "end": "2024-06-30"
+  },
+  "dataset_manifest_sha256": "9b397dee0b7061d5908bea48c294b520efbc909ca152bf0781032f22a1ba2e7b",
+  "versions": {
+    "original": {
+      "source_snapshot_id": "source-8602d79f703e48c18c2f27c3",
+      "available_at": "2024-07-30",
+      "report_period_end": "2024-06-30"
+    },
+    "later_recast": {
+      "source_snapshot_id": "source-360182cbf562dcf9a8ab9c4e",
+      "available_at": "2025-07-30",
+      "report_period_end": "2025-06-30"
+    }
+  },
+  "required": [
+    {
+      "id": "R1",
+      "need": "six segment revenue figures bound to correct source version and same FY2024 period",
+      "unit": "USD millions",
+      "rows": [
+        {
+          "segment": "Productivity and Business Processes",
+          "original": "77728",
+          "later_recast": "106820"
+        },
+        {
+          "segment": "Intelligent Cloud",
+          "original": "105362",
+          "later_recast": "87464"
+        },
+        {
+          "segment": "More Personal Computing",
+          "original": "62032",
+          "later_recast": "50838"
+        }
+      ],
+      "acceptance": "All six independently necessary; quoted original table amounts may satisfy without normalized dimensional records."
+    },
+    {
+      "id": "R2",
+      "need": "FY2024 consolidated revenue in both versions, 245122 USD millions; unchanged consolidated total, no summing duplicate versions",
+      "acceptance": "One complete segment table in each version can cover both segment and total; no need extra income tables."
+    },
+    {
+      "id": "R3",
+      "need": "August 2024 announced segment composition changes, commercial Microsoft 365 brought together in Productivity and Business Processes; FY2025 CODM resource/performance review reflects new segments; prior segment information recast to that management basis",
+      "acceptance": "Semantic coverage may span equivalent paragraphs; not require exact phrasing/block ID."
+    },
+    {
+      "id": "R4",
+      "need": "Recast did not impact consolidated balance sheets, consolidated income statements or consolidated cash flow statements",
+      "acceptance": "All three stated financial statements; attribution to later report. Do not expand this into no business/economic impact."
+    },
+    {
+      "id": "R5",
+      "need": "Original FY2024 report and later FY2025 report version dates correctly distinguished as 2024-07-30 and 2025-07-30; both before cutoff, later version not pretended available at first date",
+      "acceptance": "Source metadata verified against frozen acquisition acceptable; no extra cover blocks mandatory."
+    }
+  ],
+  "necessary_context": [
+    {
+      "id": "C1",
+      "need": "Revenue row vs operating income/other metrics, segment names, year column association, USD and millions, fiscal year ended June 30 and exact FY2024 dates"
+    },
+    {
+      "id": "C2",
+      "need": "For an MD&A bare-year table, same-source annual-period context is necessary; each source identity/version bound separately"
+    },
+    {
+      "id": "C3",
+      "need": "Recast reason/no-impact assertion bound to later report and management reporting basis; not described as erroneous original financials or 10-K/A without evidence; FY2024旧Note1相似重列句不能替代FY2025本次分部重列影响说明"
+    }
+  ],
+  "optional": [
+    "Specific differences calculated with clear newer-minus-original basis",
+    "Affected Notes 8, 12 and 18",
+    "Detailed component movements not requested by this bounded question"
+  ],
+  "redundancy": [
+    "Complete financial table structural extra columns and costs/profit rows allowed and explained",
+    "Extra equivalent tables with no ambiguity resolved are unnecessary repetition",
+    "Quarterly figures, goodwill/unearned-revenue/OCI/hedge tables do not satisfy required segment revenue and should not be selected merely because they mention recast/reclassification"
+  ],
+  "evaluation_axes": [
+    "Required semantic coverage independently assessed; optional cannot offset omissions",
+    "Truth, exact original spans, version/source/scope/cutoff and period binding",
+    "Focus: relevant interpretation context retained, unnecessary repeated tables diagnosed; no min-char or unique block rule"
+  ],
+  "original_review": "E3-V1-original-review-v1.json",
+  "answer_isolation": "Only config task/scope/source/library/model/resources go to runtime; this gold and original-review files never go to model.",
+  "independent_pre_review": "../E3-V1-original-independent.md"
+}

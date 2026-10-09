@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, create_model
 
 from uteki.domain.research_data.execution_scope import ExecutionScope
 from uteki.domain.research_data.query_contract import Contract, ResearchRecord
@@ -18,7 +18,7 @@ from .artifacts import write_new
 from .autonomous import SourceAnswer
 from .question_coverage_review import (QuestionCoverageAssessment, project_question_review,
                                       validate_question_review, QuestionReviewProtocolError,
-                                      question_review_repair_input)
+                                      question_review_repair_input, validate_saved_question_review_repair)
 from .coordinator import _verify_manifest, CompanyDataCoordinator
 
 
@@ -46,6 +46,10 @@ questions do not require product catalogs. Explain the requested dimension in re
 do not merely accept the author's narrowed requirements. Reading-group metadata cannot replace
 undelivered original bodies.
 Review every fact_id and requirement_id exactly once. Return the specified JSON schema.
+Return only fields permitted by that schema, including nested objects. Never add placeholder
+or helper fields. Every citation quote must be a literal contiguous substring of its block.
+Do not insert ellipses, omit words, merge separated spans or paraphrase inside a quote.
+Use separate citations for separated spans. Describe your interpretation in the rationale.
 For source_review_policy=delivered-sources-v2, source_check_ids is the exact output allowlist.
 Return one source_checks entry for EACH ID in source_check_ids, and NO OTHER entries.
 An ID appearing in scope or scope_source_availability is NOT permission to emit a source check.
@@ -64,6 +68,9 @@ Image contents are NOT read. Explicitly decide whether the delivered text suffic
 supporting text evidence. If charts/images or omitted non-text material might be necessary,
 use requires_more_source_content; do not infer that an unread image is irrelevant.
 Use source_snapshot_id, block_id and short exact quotes only from source_documents.
+Validated record period metadata may establish fiscal start/end when bound to the cited
+original fact. A period caption alone must not be used to invent a start date; distinguish
+original structured metadata from a start date written in visible body text.
 Every fact verdict and requirement verdict needs a rationale. A supported fact needs a source
 citation; contradicted also needs evidence. If evidence is missing, say insufficient_evidence.
 An incomplete question or unresolved material gap MUST NOT be marked complete.
@@ -228,6 +235,21 @@ class SourceCheck(Contract):
 
 
 AnswerAssessment.model_rebuild()
+
+
+def source_assessment_schema(packet):
+    """Expose the existing body-review obligation in this request's JSON schema.
+
+    Count is protocol completeness only. Identity, citations and semantic verdicts
+    remain independently validated; the host supplies no relevance answers.
+    """
+    if packet.get('delivery_schema_version') not in _EXACT_DELIVERY_VERSIONS:
+        return AnswerAssessment
+    count = sum(len(document['blocks']) for document in packet.get('source_documents', []))
+    return create_model('DeliveredBodyAssessment', __base__=AnswerAssessment,
+        body_checks=(tuple[BodyCheck, ...], Field(..., min_length=count, max_length=count,
+            description='Review every delivered (source_snapshot_id, block_id) exactly once. '
+                        'This length is protocol coverage only; assess each relevance and rationale independently.')))
 
 
 class AuditedAnswerAssessment(AnswerAssessment):
@@ -448,13 +470,33 @@ def _query_evidence_documents(port, scope, bundle, coverage, max_packet_bytes,
             required = {bid}
             # Tables retain their unit/header/footnote attachments. Selecting a
             # narrative heading never recursively delivers the following list.
-            for group in page.get('reading_groups', []):
-                if group.get('kind') == 'table_context' and group.get('table_id') == bid:
+            table_groups = [g for g in page.get('reading_groups', [])
+                            if g.get('kind') == 'table_context' and g.get('table_id') == bid]
+            expected_groups = {}
+            if exclude_automatic_layout:
+                reader, _ = port._navigation(port._source(sid))
+                expected_groups = {g['group_id']: g for g in reader.groups
+                    if g.get('kind') == 'table_context' and g.get('table_id') == bid}
+                table_groups = [g for g in page.get('reading_groups', [])
+                    if g.get('group_id') in expected_groups or
+                    (g.get('kind') == 'table_context' and g.get('table_id') == bid)]
+                if (len(table_groups) != len(expected_groups)
+                        or {g.get('group_id') for g in table_groups} != set(expected_groups)):
+                    raise ValueError('table context differs from frozen index')
+            for group in table_groups:
+                if group.get('kind') == 'table_context' or exclude_automatic_layout:
                     required.update(group['block_ids'])
                     if exclude_automatic_layout:
-                        reader, _ = port._navigation(port._source(sid))
-                        verified = next((g for g in reader.groups if g['group_id'] == group['group_id']), None)
-                        if verified != group:
+                        verified = expected_groups[group['group_id']]
+                        # DocumentReader.read projects out only parser-labelled
+                        # repeated navigation from a group's visible block IDs.
+                        # Compare that exact projection, while retaining the full
+                        # frozen group below for attachment/exclusion provenance.
+                        visible = verified
+                        if verified is not None and reader.filter_navigation:
+                            visible = {**verified, 'block_ids': [member for member in verified['block_ids']
+                                if not reader._omitted(reader.blocks[reader.positions[member]])]}
+                        if visible != group:
                             raise ValueError('table context differs from frozen index')
                         group_metadata[(sid, group['group_id'])] = {**deepcopy(verified),
                             'validation': 'recomputed_from_frozen_index',
@@ -935,6 +977,11 @@ def compose_audited_assessment(packet, source_response, question_response, quest
         revision_requests=list(dict.fromkeys([*source.get('revision_requests', []),
             *('Independent question review: ' + gap for gap in gaps)])))
     value = AuditedAnswerAssessment.model_validate(value).model_dump(mode='json')
+    # Nested model serialization must not inject R12's optional scope field into
+    # frozen pre-R12 assessments. Preserve absence after full schema validation.
+    for original, normalized in zip(question['checks'], value['question_review']['checks']):
+        if 'requested_scope_quotes' not in original:
+            normalized.pop('requested_scope_quotes')
     return value, bool(source_ok and question_ok)
 
 
@@ -972,10 +1019,8 @@ def validate_saved_assessment(root, packet):
         first = _read(root/'question-response-01.json')
         final = first
         if 'question-repair-input.json' in required:
-            repair = question_review_repair_input(components['question_input'], first,
-                                                  max_bytes=packet['max_packet_bytes'])
-            if repair != _read(root/'question-repair-input.json'):
-                raise ValueError('question protocol repair differs from original mechanical feedback')
+            validate_saved_question_review_repair(components['question_input'], first,
+                _read(root/'question-repair-input.json'), max_bytes=packet['max_packet_bytes'])
             final = _read(root/'question-response-02.json')
         if final != components['question_response']:
             raise ValueError('question final response differs from frozen model attempt')

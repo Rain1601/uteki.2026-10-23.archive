@@ -88,6 +88,20 @@ class ContinuationTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse((self.root/'recovered/recovery-claim.json').exists())
         self.assertEqual(self.requests,[])
 
+    async def test_legacy_copied_ancestor_blocks_authorized_continuation(self):
+        await self.prepared_prior()
+        ledger = self.root/'coverage/budget.sqlite'
+        frozen = ledger.read_bytes()
+        # The immediate recovered run already has budget_path, but its ledger
+        # owner can still be a legacy copy; the authorization must not mask it.
+        (self.root/'coverage/recovery.json').write_text(json.dumps({'prior_failed_run':'older'}))
+        with self.assertRaisesRegex(ValueError, 'legacy_copied_budget_requires_reconciliation'):
+            await self.execute()
+        self.assertEqual(self.requests, [])
+        self.assertFalse((self.root/'recovered/recovery-claim.json').exists())
+        self.assertFalse((self.root/'continued').exists())
+        self.assertEqual(ledger.read_bytes(), frozen)
+
     async def test_invalid_revision_retains_previous_candidate_and_skips_audit(self):
         prior=await self.prepared_prior()
         self.responses=[self.answer({'wrong':'contract'})]

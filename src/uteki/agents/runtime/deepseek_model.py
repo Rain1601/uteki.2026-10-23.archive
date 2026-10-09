@@ -51,6 +51,7 @@ def _validated_extra_body(model_settings):
 class DeepSeekChatCompletionsModel(OpenAIChatCompletionsModel):
     strict_visible_json = True
     raw_chat_usage = True
+    wire_response_format = 'json_object'
     # SDK-normalized usage defaults missing counters to zero. Keep the provider's
     # raw metadata so missing usage never becomes a free request in the ledger.
     response_metadata = None

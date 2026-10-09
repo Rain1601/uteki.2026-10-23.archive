@@ -13,7 +13,7 @@ import sqlite3
 from .artifacts import write_new
 from . import answer_handoff as handoff_module, coordinator as coordinator_module
 from .coordinator import CompanyDataCoordinator, _verify_manifest
-from .answer_handoff import AnswerAssessment, QUESTION_REVIEW_POLICY, review_prompt, prepare_review_packet, review_data_answer
+from .answer_handoff import AnswerAssessment, QUESTION_REVIEW_POLICY, review_prompt, source_assessment_schema, prepare_review_packet, review_data_answer
 from .autonomous_model import reasoning_configuration
 from .record_review_model import SdkRecordReviewer
 from uteki.agents.runtime.run_budget import RunBudget
@@ -212,8 +212,44 @@ def _review_role_factory(config, role, prompt, output_schema):
 
 
 
-def reviewer_factory(config, packet=None):
-    return _review_role_factory(config, 'reviewer', review_prompt(packet if packet is not None else {}), AnswerAssessment)
+_SOURCE_REVIEW_FAILURE_TYPES = frozenset({
+    'ValidationError', 'ModelBehaviorError', 'ReviewProtocolError', 'StrictJSONError',
+    'ValueError', 'APIConnectionError', 'APITimeoutError', 'RateLimitError',
+    'InternalServerError', 'ClaudeTransientTransportError', 'TimeoutError',
+})
+_SOURCE_REVIEW_FAILURE_CODES = frozenset({
+    'source_checks_identity_mismatch', 'body_checks_identity_mismatch',
+})
+_SOURCE_REVIEW_RETRY_INSTRUCTIONS = (
+    '\nHost-authored source-review retry feedback (protocol codes only):\n'
+    'Re-evaluate the SAME supplied packet and return a complete assessment using only '
+    'the fields in its JSON schema. Use literal contiguous quotes copied from each '
+    'cited delivered source block. Do not insert ellipses or other text into quotes. '
+    'For separated source spans, use separate citations. These failure codes establish '
+    'no financial facts and supply no preferred verdict or answer.\n'
+)
+
+
+def reviewer_factory(config, packet=None, *, prior_failures=None):
+    prompt = review_prompt(packet if packet is not None else {})
+    failures = []
+    for failure in prior_failures[:8] if isinstance(prior_failures, list) else ():
+        if not isinstance(failure, dict):
+            continue
+        stage, kind = failure.get('stage'), failure.get('error_type')
+        if (not isinstance(stage, str) or stage not in {'source_review', 'review'}
+                or not isinstance(kind, str) or kind not in _SOURCE_REVIEW_FAILURE_TYPES):
+            continue
+        safe = {'stage': stage, 'error_type': kind}
+        diagnostic = failure.get('diagnostic')
+        code = diagnostic.get('code') if isinstance(diagnostic, dict) else None
+        if isinstance(code, str) and code in _SOURCE_REVIEW_FAILURE_CODES:
+            safe['code'] = code
+        if safe not in failures:
+            failures.append(safe)
+    if failures:
+        prompt += _SOURCE_REVIEW_RETRY_INSTRUCTIONS + json.dumps(failures, sort_keys=True)
+    return _review_role_factory(config, 'reviewer', prompt, source_assessment_schema(packet or {}))
 
 
 def question_reviewer_factory(config):
@@ -315,9 +351,10 @@ async def run_retrieval_cycle(config, output):
                 review = None
                 for review_ordinal in (1, 2):
                     review_path = folder/f'review-{review_ordinal:02d}'
+                    prior_failures = review.get('failures') if review is not None else None
                     try:
                         review = await review_data_answer(packet, review_path,
-                            reviewer_factory=reviewer_factory(config, packet),
+                            reviewer_factory=reviewer_factory(config, packet, prior_failures=prior_failures),
                             **({'question_reviewer_factory': question_reviewer_factory(config)}
                                if 'question_reviewer' in config else {}))
                     except asyncio.CancelledError:

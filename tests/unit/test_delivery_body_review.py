@@ -37,7 +37,7 @@ class DeliveryBodyReviewTests(unittest.TestCase):
         for bad in ([], self.response['body_checks'][:1], self.response['body_checks']*2,
                     [*self.response['body_checks'], {'source_snapshot_id':'other-source',
                      'block_id':'b3','relevance':'necessary','rationale':'Foreign block.'}]):
-            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'every delivered source body'):
+            with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, 'body_checks_identity_mismatch'):
                 validate_assessment(self.packet, {**self.response, 'body_checks':bad})
 
     def test_only_sufficient_relevant_body_delivery_is_eligible(self):

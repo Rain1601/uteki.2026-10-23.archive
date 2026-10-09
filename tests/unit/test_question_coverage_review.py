@@ -134,6 +134,91 @@ class QuestionCoverageReviewTests(unittest.TestCase):
             output_constraints=[],uncovered_requests=[],question_coverage='complete')
         self.assertTrue(validate_question_review(projected,v)[1])
 
+    def scoped_grid(self):
+        packet=deepcopy(self.packet)
+        question='For divisions Beacon and Cinder, provide revenue and cash flow in FY2031 and FY2030.'
+        packet['question']=question
+        rows=[(entity,metric,year,f'{entity} {metric} in FY{year} was {amount}.')
+            for entity in ('Beacon','Cinder') for metric in ('revenue','cash flow')
+            for year,amount in (('2031','42'),('2030','40'))]
+        text=' '.join(row[3] for row in rows)
+        packet['source_documents'][0]['blocks'][0].update(text=text,text_hash=digest(text.encode()))
+        projected=project_question_review(packet)
+        value=self.response()
+        value.update(projection_id=projected['projection_id'],checks=[],output_constraints=[],
+                     uncovered_requests=[],question_coverage='complete')
+        for entity,metric,year,quote in rows:
+            value['checks'].append({'question_quote':question,'requested_subject':metric,
+                'requested_dimension':'metric','requested_scope_quotes':[entity,'FY'+year],
+                'source_subject':entity+' '+metric,'relation':'same','coverage':'complete',
+                'support_basis':'direct','citations':[{'kind':'block_quote','source_snapshot_id':'annual',
+                    'block_id':'definition','quote':quote}], 'gap':None,
+                'rationale':'The requested division, metric and period are disclosed.'})
+        return projected,value
+
+    def test_shared_clause_supports_entity_period_metric_grid_without_joined_subject(self):
+        projected,value=self.scoped_grid()
+        before=deepcopy(value)
+        normalized,eligible=validate_question_review(projected,value)
+        self.assertTrue(eligible)
+        self.assertEqual(len(normalized['checks']),8)
+        self.assertEqual(value,before)
+        self.assertIn('do not replace a requested metric with its period',QUESTION_REVIEW_PROMPT)
+        for check in normalized['checks']:
+            self.assertIn(check['requested_subject'],projected['question'])
+            self.assertTrue(all(scope in projected['question'] for scope in check['requested_scope_quotes']))
+
+    def test_scope_quotes_reject_unknown_joined_empty_and_repeated_qualifiers(self):
+        for scopes,code in ((['Other','FY2031'],'scope_quotes_require_verbatim'),
+                            (['Beacon FY2031'],'scope_quotes_require_verbatim'),
+                            ([''],'scope_quotes_require_verbatim'),
+                            (['Beacon','Beacon'],'scope_quotes_require_unique')):
+            projected,value=self.scoped_grid()
+            value['checks'][0]['requested_scope_quotes']=scopes
+            with self.subTest(scopes=scopes),self.assertRaises(QuestionReviewProtocolError) as error:
+                validate_question_review(projected,value)
+            self.assertEqual(error.exception.diagnostic['code'],code)
+            repair=question_review_repair_input(projected,value)
+            self.assertIn(code,{d['code'] for d in repair['host_protocol_diagnostics']})
+            self.assertEqual(repair['projection'],projected)
+            self.assertEqual(repair['previous_assessment'],value)
+
+    def test_scope_order_and_repetition_cannot_hide_duplicate_checks(self):
+        for scopes in (['FY2031','Beacon'],['Beacon','FY2031','Beacon']):
+            projected,value=self.scoped_grid()
+            duplicate=deepcopy(value['checks'][0]);duplicate['requested_scope_quotes']=scopes
+            value['checks'].append(duplicate)
+            with self.subTest(scopes=scopes),self.assertRaises(QuestionReviewProtocolError):
+                validate_question_review(projected,value)
+            diagnostics=question_review_repair_input(projected,value)['host_protocol_diagnostics']
+            self.assertIn('duplicate_check_requires_distinct_scope',{d['code'] for d in diagnostics})
+
+    def test_scopes_never_relax_source_quotes_or_record_fields(self):
+        projected,value=self.scoped_grid()
+        value['checks'][0]['citations'][0]['quote']='Beacon revenue ... 42.'
+        with self.assertRaises(ValueError) as error:
+            question_review_repair_input(projected,value)
+        self.assertNotIsInstance(error.exception,QuestionReviewProtocolError)
+        packet=self.record_packet();projected=project_question_review(packet)
+        value=self.response();check=value['checks'][0]
+        check.update(question_quote=packet['question'],requested_subject='revenue',requested_dimension='metric',
+            requested_scope_quotes=['Beacon','FY2031'],citations=[{'kind':'record_field',
+                'source_snapshot_id':'annual','record_id':'row-1','field_path':'period.start','value':'2030-01-01'}])
+        value.update(projection_id=projected['projection_id'],output_constraints=[])
+        with self.assertRaises(ValueError) as error:
+            validate_question_review(projected,value)
+        self.assertNotIsInstance(error.exception,QuestionReviewProtocolError)
+
+    def test_old_response_keeps_optional_scope_absent_and_duplicate_is_repairable(self):
+        value=self.response()
+        normalized,_=validate_question_review(self.projected,value)
+        self.assertNotIn('requested_scope_quotes',normalized['checks'][0])
+        value['checks'].append(deepcopy(value['checks'][0]))
+        with self.assertRaises(QuestionReviewProtocolError) as error:
+            validate_question_review(self.projected,value)
+        self.assertEqual(error.exception.diagnostic['code'],'duplicate_check_requires_distinct_scope')
+        self.assertEqual(question_review_repair_input(self.projected,value)['previous_assessment'],value)
+
     def test_v1_projection_and_response_still_validate_without_new_fields(self):
         projected=project_question_review(self.packet,version='question-coverage-input-v1')
         self.assertNotIn('selected_records',projected)
@@ -258,6 +343,52 @@ class QuestionCoverageReviewTests(unittest.TestCase):
         v['checks'][0]['citations'][0]['quote']='Invented original evidence'
         with self.assertRaises(ValueError) as error:
             question_review_repair_input(self.projected,v)
+        self.assertNotIsInstance(error.exception,QuestionReviewProtocolError)
+
+    def test_enumeration_repair_locates_rejected_subject_and_scope_without_replacement(self):
+        packet=deepcopy(self.packet)
+        packet['question']='Preserve units, timing and evidence labels.'
+        projected=project_question_review(packet)
+        value=self.response();check=value['checks'][0]
+        check.update(question_quote=packet['question'],requested_subject='units and evidence labels',
+            requested_dimension='other',requested_scope_quotes=['units and evidence labels'])
+        value.update(projection_id=projected['projection_id'],output_constraints=[],
+                     uncovered_requests=[],question_coverage='complete')
+        before=deepcopy(value)
+        with self.assertRaises(QuestionReviewProtocolError) as error:
+            validate_question_review(projected,value)
+        self.assertEqual(error.exception.diagnostic['field_pointer'],
+                         '/previous_assessment/checks/0/requested_subject')
+        repair=question_review_repair_input(projected,value)
+        diagnostics=repair['host_protocol_diagnostics']
+        self.assertEqual([d['field_pointer'] for d in diagnostics],[
+            '/previous_assessment/checks/0/requested_subject',
+            '/previous_assessment/checks/0/requested_scope_quotes/0'])
+        self.assertEqual([d['constraint_pointer'] for d in diagnostics],[
+            '/previous_assessment/checks/0/question_quote','/projection/question'])
+        self.assertTrue(all(d['rejected_value']=='units and evidence labels' for d in diagnostics))
+        self.assertTrue(all(set(d)=={'check_index','code','rule','field_pointer','rejected_value',
+                                    'constraint_pointer'} for d in diagnostics))
+        self.assertEqual(repair['previous_assessment'],before)
+        self.assertEqual(repair['projection'],projected)
+        self.assertEqual(repair['repair_attempt'],1)
+        self.assertIn('separate checks for individual continuous entries',repair['instruction'])
+        self.assertIn('not suggested answers',repair['instruction'])
+        self.assertNotIn('replacement_value',str(repair))
+        # Both representations are chosen by a reviewer, not generated by the host.
+        for subjects in (['units, timing and evidence labels'],['units','evidence labels']):
+            fixed=deepcopy(value);fixed['checks']=[]
+            for subject in subjects:
+                item=deepcopy(check);item.update(requested_subject=subject,requested_scope_quotes=[])
+                fixed['checks'].append(item)
+            self.assertTrue(validate_question_review(projected,fixed)[1])
+        self.assertEqual(value,before)
+
+    def test_exact_diagnostic_does_not_turn_invalid_evidence_into_a_repairable_quote(self):
+        value=self.response();value['checks'][0]['requested_subject']='Beacon definition'
+        value['checks'][0]['citations'][0]['quote']='Beacon ... compute platform.'
+        with self.assertRaises(ValueError) as error:
+            question_review_repair_input(self.projected,value)
         self.assertNotIsInstance(error.exception,QuestionReviewProtocolError)
 
 
