@@ -140,7 +140,8 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
                 reader = readers[entry.source_snapshot_id]
                 rows, refs, diagnostics, fiscal = extract_inline_records(input_bytes,
                     {"source_id": entry.source_snapshot_id, "source_url": source["source_url"],
-                     "filed_at": source["available_at"], "period_end": source["period_end"], "mime_type": "text/html"},
+                     "filed_at": source["available_at"], "period_end": source["period_end"],
+                     "form": source["form"], "mime_type": "text/html"},
                     {"company_id": binding.company_id, "cik": binding.company_id[4:]}, reader.index, reader.blocks, relative)
                 source["fiscal_periods"] = fiscal
                 normalization_gaps.extend(diagnostics)

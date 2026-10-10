@@ -214,6 +214,13 @@ class CompanyMaterializationTests(unittest.TestCase):
                     self.assertEqual(digest((root/'source.html').read_bytes()), original)
                 with QueryDataPort(root/'built') as port:
                     self.assertEqual(port.get_schema()['schema_version'], SOURCE_PERIOD_VERSION)
+                    self.assertTrue(any(mapping['fiscal_year'] == 2025
+                        and mapping['company_id'] == 'sec-0000000123'
+                        and mapping['period']['start'] == start
+                        and mapping['period']['end'] == end
+                        for mapping in port.get_schema()['fiscal_periods']))
+                    self.assertFalse(any(gap.get('reason') == "'form'"
+                        for gap in manifest['normalization_gaps']))
                     schema = port.get_schema()['record']
                     self.assertEqual(schema, export_query_schema(ResearchRecord, version=SOURCE_PERIOD_VERSION))
                     result = port.query_data({'query_id': 'inline-build', 'snapshot_id': port.snapshot_id,

@@ -1,0 +1,31 @@
+{
+  "schema_version": "e5-builder-form-regression-before-v1",
+  "status": "reproduced",
+  "model_calls": 0,
+  "expected": "Each synthetic issuer retains its independently disclosed FY2031 mapping",
+  "observed": {
+    "record_count": 2,
+    "fiscal_mapping_counts": {
+      "sec-0000000123": 0,
+      "sec-0000000456": 0
+    },
+    "normalization_gaps": [
+      {
+        "layer": "normalization",
+        "reason": "'form'",
+        "source_snapshot_id": "issuer-123",
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "fact_id": "rev"
+      },
+      {
+        "layer": "normalization",
+        "reason": "'form'",
+        "source_snapshot_id": "issuer-456",
+        "concept": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+        "fact_id": "rev"
+      }
+    ]
+  },
+  "root_cause": "query_dataset.build_dataset passed no form into extract_inline_records; KeyError after candidate record creation prevented fiscal mappings.",
+  "test": "test_full_originals_and_company_fiscal_mappings_survive"
+}

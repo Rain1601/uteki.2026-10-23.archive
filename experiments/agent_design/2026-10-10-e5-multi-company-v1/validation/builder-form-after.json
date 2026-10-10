@@ -1,0 +1,188 @@
+{
+  "schema_version": "e5-builder-form-verification-v1",
+  "status": "passed",
+  "model_calls": 0,
+  "production_change": "Pass source form metadata through build_dataset into extract_inline_records.",
+  "test_commands": [
+    {
+      "command": ".venv/bin/python experiments/agent_design/2026-10-10-e5-multi-company-v1/test_build_preparation.py",
+      "exit_code": 0,
+      "tests": 4
+    },
+    {
+      "command": "PYTHONPATH=src:tests/unit .venv/bin/python -m unittest test_company_materialization.CompanyMaterializationTests.test_explicit_inline_build_adapter_publishes_consistent_new_protocol test_autonomous_data_agent.AutonomousDataAgentTests.test_fiscal_mapping_is_grounded_per_entity_company test_autonomous_data_agent.AutonomousDataAgentTests.test_other_company_fiscal_mapping_cannot_fill_missing_mapping",
+      "exit_code": 0,
+      "tests": 3
+    }
+  ],
+  "preparation_result": "output/e5-multi-company-20261010/preparation-v2/result.json",
+  "preparation_manifest_sha256": "406ce8b6e209f987da1ad3a01affd1a5221e4ee3e41ca7c1217a15c5576e43e2",
+  "dataset_manifest_sha256": "1f3e3d56c7c75a9466f05bef9730deeb1240ed6638952cda5c858e5cb19f6de1",
+  "full_original_and_navigation_preservation": [
+    {
+      "source_snapshot_id": "msft-2025-10k",
+      "company_id": "sec-0000789019",
+      "source_sha256": "0edfaac937bf7042c8cf7901924ccb9cc291ccfab92f83dd0b689b7912089bf6",
+      "full_index_block_count": 1401,
+      "original_and_navigation_bytes_preserved": true
+    },
+    {
+      "source_snapshot_id": "googl-2025-10k",
+      "company_id": "sec-0001652044",
+      "source_sha256": "c2f6301004f35411a20611c14ff01d80a85c0bcbab6053c80d8cc7f6fc747161",
+      "full_index_block_count": 1338,
+      "original_and_navigation_bytes_preserved": true
+    }
+  ],
+  "input_files_unchanged": 52,
+  "record_count": 213,
+  "normalization_gap_count": 2970,
+  "normalization_gap_reasons": {
+    "unmapped_concept": 2970
+  },
+  "form_keyerror_gaps": 0,
+  "company_scoped_fiscal_periods": [
+    {
+      "company_id": "sec-0000789019",
+      "fiscal_periods": [
+        {
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2024-07-01",
+            "end": "2025-06-30",
+            "basis": "source"
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        },
+        {
+          "fiscal_year": 2024,
+          "period": {
+            "kind": "year",
+            "start": "2023-07-01",
+            "end": "2024-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-1bff3951f450e51f3bc44229",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 6,
+              "text": "2024"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        },
+        {
+          "fiscal_year": 2023,
+          "period": {
+            "kind": "year",
+            "start": "2022-07-01",
+            "end": "2023-06-30",
+            "basis": "source"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-bafd309f8e61f1dc49dce14b",
+            "block_id": "block-000781-9ee5633d",
+            "header": {
+              "row": 4,
+              "column": 10,
+              "text": "2023"
+            },
+            "annual_caption": {
+              "row": 4,
+              "column": 0,
+              "text": "Year Ended June 30,"
+            }
+          },
+          "company_id": "sec-0000789019",
+          "source_snapshot_id": "msft-2025-10k"
+        }
+      ],
+      "requested_periods": [
+        "kind='year' start=datetime.date(2024, 7, 1) end=datetime.date(2025, 6, 30) basis='source'",
+        "kind='year' start=datetime.date(2023, 7, 1) end=datetime.date(2024, 6, 30) basis='source'"
+      ]
+    },
+    {
+      "company_id": "sec-0001652044",
+      "fiscal_periods": [
+        {
+          "fiscal_year": 2025,
+          "period": {
+            "kind": "year",
+            "start": "2025-01-01",
+            "end": "2025-12-31"
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        },
+        {
+          "fiscal_year": 2023,
+          "period": {
+            "kind": "year",
+            "start": "2023-01-01",
+            "end": "2023-12-31"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-4290691e78da1e2a42fb5351",
+            "block_id": "block-000753-53762a3b",
+            "header": {
+              "row": 2,
+              "column": 3,
+              "text": "2023"
+            },
+            "annual_caption": {
+              "row": 1,
+              "column": 3,
+              "text": "Year Ended December 31,"
+            }
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        },
+        {
+          "fiscal_year": 2024,
+          "period": {
+            "kind": "year",
+            "start": "2024-01-01",
+            "end": "2024-12-31"
+          },
+          "basis_evidence": {
+            "method": "inline-table-year-v1",
+            "evidence_id": "ev-e114a7300acd536d7bd2f07c",
+            "block_id": "block-000753-53762a3b",
+            "header": {
+              "row": 2,
+              "column": 9,
+              "text": "2024"
+            },
+            "annual_caption": {
+              "row": 1,
+              "column": 3,
+              "text": "Year Ended December 31,"
+            }
+          },
+          "company_id": "sec-0001652044",
+          "source_snapshot_id": "googl-2025-10k"
+        }
+      ],
+      "requested_periods": [
+        "kind='year' start=datetime.date(2025, 1, 1) end=datetime.date(2025, 12, 31) basis='calendar'",
+        "kind='year' start=datetime.date(2024, 1, 1) end=datetime.date(2024, 12, 31) basis='calendar'"
+      ]
+    }
+  ],
+  "historical_preparation_v1": "Retained. Its result summary lacked explicit normalization-gap status/count; use preparation-v2."
+}
