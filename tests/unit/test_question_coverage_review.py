@@ -193,6 +193,36 @@ class QuestionCoverageReviewTests(unittest.TestCase):
             diagnostics=question_review_repair_input(projected,value)['host_protocol_diagnostics']
             self.assertIn('duplicate_check_requires_distinct_scope',{d['code'] for d in diagnostics})
 
+    def test_cross_clause_entity_scope_survives_local_subject_quote_repair(self):
+        projected,value=self.scoped_grid()
+        # Entity names are outside the shared metric clause. A field-local
+        # quote repair must still allow their exact full-question qualifiers.
+        for check in value['checks']:
+            check['question_quote']='provide revenue and cash flow in FY2031 and FY2030'
+        self.assertTrue(validate_question_review(projected,value)[1])
+        draft=deepcopy(value)
+        for check in draft['checks']:
+            entity,period=check['requested_scope_quotes']
+            check['requested_subject']=entity+' '+period+' '+check['requested_subject']
+            check['requested_scope_quotes']=[period]
+        before=deepcopy(draft)
+        repair=question_review_repair_input(projected,draft)
+        self.assertEqual(repair['previous_assessment'],before)
+        self.assertEqual(repair['projection'],projected)
+        self.assertEqual(repair['schema_version'],'question-review-protocol-repair-v3')
+        self.assertTrue(all(d['code']=='requested_subject_requires_verbatim'
+                            for d in repair['host_protocol_diagnostics']))
+        self.assertTrue(validate_question_review(projected,value)[1])
+        # Keeping different source subjects, citations and rationales does not
+        # recover requested identity after removing the entity qualifier.
+        collapsed=deepcopy(value)
+        for check in collapsed['checks']:
+            check['requested_scope_quotes']=check['requested_scope_quotes'][1:]
+        with self.assertRaises(QuestionReviewProtocolError) as error:
+            validate_question_review(projected,collapsed)
+        self.assertEqual(error.exception.diagnostic['code'],'duplicate_check_requires_distinct_scope')
+        self.assertEqual(draft,before)
+
     def test_scopes_never_relax_source_quotes_or_record_fields(self):
         projected,value=self.scoped_grid()
         value['checks'][0]['citations'][0]['quote']='Beacon revenue ... 42.'

@@ -193,4 +193,4 @@ class TypedDatePeriodTests(unittest.TestCase):
             with self.subTest(suffix=suffix):
                 self.assertEqual(self.periods('请提供全年2033-05-01至2034-04-30' + suffix,
                                              fiscal_periods=mapping), ())
-        self.assertEqual(PERIOD_SCOPE_VERSION, 'explicit-periods-v5-fiscal-quarter-token-boundary')
+        self.assertEqual(PERIOD_SCOPE_VERSION, 'explicit-periods-v6-bound-availability-cutoff')

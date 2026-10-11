@@ -7,6 +7,7 @@ import re
 from lxml import html
 
 from uteki.infrastructure.document_sources.sec import normalize_text
+from uteki.infrastructure.document_sources.company_acquisition import _mime
 from uteki.infrastructure.document_sources.sec_index import (
     _hidden, _tag, _visible_text, _LINE_BREAK_PARSERS, _VISIBLE_PARSERS,
     _NEAREST_TABLE_PARSERS, _table_rows, _table_structure, validate_parser_version,
@@ -79,7 +80,13 @@ def resolve_record_locator(dataset_dir, evidence):
     explicit = character_span(evidence, text=block['text'])
     located_cell = None
     if evidence.get('fact_dom_path') is not None:
-        if source.get('parsed_mime_type', source.get('declared_mime_type')) != 'text/html':
+        source_mime = source.get('parsed_mime_type', source.get('declared_mime_type'))
+        # Legacy builder snapshots omitted both format fields. Identify their
+        # already hash-verified original bytes; never substitute a file suffix
+        # or replace an explicitly unsupported format. DOM guards remain exact.
+        if 'parsed_mime_type' not in source and 'declared_mime_type' not in source:
+            source_mime = _mime(raw)
+        if source_mime != 'text/html':
             raise ValueError('Fact DOM locator requires frozen HTML')
         parser = index.get('parser_version')
         validate_parser_version(parser)

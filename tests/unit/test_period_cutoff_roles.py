@@ -47,6 +47,37 @@ class CutoffRolesTests(unittest.TestCase):
         conflict=[{'fiscal_year':2031,'period':year(2031)}]
         self.assertEqual(self.periods('Information available as of 2032-05-01, FY2030 revenue',mapping=conflict),())
 
+    def test_availability_role_without_material_noun_keeps_each_fiscal_calendar(self):
+        alternate = [{'fiscal_year':2031,'period':year(2031)}]
+        for prefix in ('以2032-05-01为可得截止日，', '以2032-05-01为可用截止日期，',
+                       '可得截止日为2032-05-01，', '可用截止日期：2032-05-01，'):
+            with self.subTest(prefix=prefix):
+                source, = self.periods(prefix+'FY2031 revenue')
+                calendar, = self.periods(prefix+'FY2031 revenue',mapping=alternate)
+                self.assertEqual((str(source.start),str(source.end)),('2030-07-01','2031-06-30'))
+                self.assertEqual((str(calendar.start),str(calendar.end)),('2031-01-01','2031-12-31'))
+                self.assertEqual(self.periods(prefix+'FY2031 revenue',mapping=[]),())
+
+    def test_short_availability_clause_cannot_override_or_supply_period(self):
+        for text, cutoff in (
+            ('以2032-05-01为可得截止日，FY2031 revenue',None),
+            ('以2032-05-02为可得截止日，FY2031 revenue','2032-05-01'),
+            ('可用截止日期：2032-02-30，FY2031 revenue','2032-05-01'),
+            ('以2032-05-01为可得截止日，资料截止日为2032-05-02，FY2031 revenue','2032-05-01'),
+            ('以2032-05-01为可得截止日，revenue','2032-05-01'),
+            ('以2032-05-01为可得截止日，FY2031 YTD revenue','2032-05-01'),
+            ('以2032-05-01为可得截止日，FY2031 debt as of 2031-06-30','2032-05-01'),
+            ('以2032-05-01为截止日，FY2031 revenue','2032-05-01'),
+            ('不可得截止日期：2032-05-01，FY2031 revenue','2032-05-01'),
+            ('未可用截止日为2032-05-01，FY2031 revenue','2032-05-01'),
+            ('非可得截止日期：2032-05-01，FY2031 revenue','2032-05-01'),
+            ('无资料可得截止日期：2032-05-01，FY2031 revenue','2032-05-01'),
+            ('非材料 可用截止日期：2032-05-01，FY2031 revenue','2032-05-01'),
+            ('不以2032-05-01为可得截止日，FY2031 revenue','2032-05-01'),
+            ('identifier_可得截止日期：2032-05-01，FY2031 revenue','2032-05-01'),
+        ):
+            with self.subTest(text=text):self.assertEqual(self.periods(text,cutoff),())
+
     def test_autonomous_plan_uses_immutable_cutoff_and_keeps_scope(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);dataset=root/'dataset';dataset.mkdir();make_scoped_dataset(dataset);attach_synthetic_quotes(dataset)
@@ -56,9 +87,10 @@ class CutoffRolesTests(unittest.TestCase):
                 actions=[{'action':'load_skill','skill':'query'},{'action':'plan','reason':'Explicit independent synthetic scope',
                     'requirements':[{'kind':'query','requirement_id':'revenue','description':'Year revenue',
                         'query':{'records':[{'entity_id':'acme-services','metric_id':'revenue','period':year(2031)}]}}]}]
-                for n,cutoff in enumerate(('2032-05-01','2032-05-02')):
+                for n,(prefix,cutoff) in enumerate((('资料可得','2032-05-01'),('可得','2032-05-01'),
+                                                     ('可用','2032-05-01'),('可得','2032-05-02'))):
                     agent=AutonomousDataAgent(port,ScriptedPlanner(actions),limits={'max_steps':2},purpose='analysis_evidence')
-                    result=asyncio.run(agent.run({'question':f'以{cutoff}为资料可得截止日，查询2031年收入',
+                    result=asyncio.run(agent.run({'question':f'以{cutoff}为{prefix}截止日，查询2031年收入',
                         'scope':scope.model_dump(mode='json')},output=root/f'run{n}'))
-                    self.assertEqual(bool(result['plans']),n==0)
-                    if n: self.assertEqual(result['trace'][-1]['status'],'rejected')
+                    self.assertEqual(bool(result['plans']),cutoff=='2032-05-01')
+                    if cutoff!='2032-05-01':self.assertEqual(result['trace'][-1]['status'],'rejected')

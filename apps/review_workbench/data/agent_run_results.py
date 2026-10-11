@@ -4,6 +4,7 @@ No extraction, scoring, adoption or model calls occur at this boundary. A result
 identity is its root Trace ID; provider request IDs remain call-level metadata.
 """
 from copy import deepcopy
+from datetime import datetime
 import hashlib
 import json
 from pathlib import PurePosixPath
@@ -15,6 +16,20 @@ from .agent_runs_shared import _clean, summarize_calls
 
 def _digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+
+
+def _run_start(row):
+    def stamp(value):
+        try:
+            parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+            return parsed.timestamp() if parsed.tzinfo is not None else None
+        except (ValueError, TypeError, AttributeError, OverflowError):
+            return None
+    explicit = stamp(row.get('started_at'))
+    if explicit is not None:
+        return explicit
+    calls = [value for call in row.get('calls') or [] if (value := stamp(call.get('started_at'))) is not None]
+    return min(calls) if calls else float('-inf')
 
 
 def _models(calls, *, include_configuration=True):
@@ -62,7 +77,7 @@ def load_result(root, identity, *, observation_root=None, output_roots=(), revis
         'reason': 'No explicit shared input, task and output contract registration; this run is not a controlled A/B arm.',
         'input_sha256': None, 'task_sha256': None, 'contract_sha256': None, 'scope_sha256': None}
     result = {k: deepcopy(run.get(k)) for k in ('title', 'agent', 'origin', 'live', 'root_terminal', 'revision', 'state',
-                'scope', 'usage', 'artifacts', 'configs', 'calls', 'integrity', 'diagnostics', 'links')}
+                'scope', 'usage', 'artifacts', 'configs', 'calls', 'integrity', 'diagnostics', 'links', 'steps', 'inputs', 'evaluation', 'started_at')}
     result.update(schema_version='agent-result-view-v1', id=identity, trace_id=run['root_run_id'], task=task,
                   models=_models(run.get('calls', [])), result_view=output, comparison=comparison,
                   process_url='/agent-runs?' + urlencode({'agent': run['agent'], 'run': run['root_run_id']}))
@@ -72,8 +87,13 @@ def load_result(root, identity, *, observation_root=None, output_roots=(), revis
     inspection_refs = {ref['id']: ref for ref in [*output['artifacts'], *run.get('configs', []),
                       *(ref for call in run.get('calls', []) for ref in call.get('files', []))]
                       if ref.get('availability') == 'available'}
-    for ref in inspection_refs.values():
-        agent_runs.read_artifact(root, identity, ref['id'], **options)
+    # Sealed evaluation import already verifies every listed byte and caches
+    # a file identity stamp. Re-reading all refs would repeat the complete
+    # immutable-tree check once per call; scoped artifact requests still hash
+    # their individual bytes before displaying them.
+    if run.get('integrity', {}).get('adapter') != 'sealed-data-evaluation-v1':
+        for ref in inspection_refs.values():
+            agent_runs.read_artifact(root, identity, ref['id'], **options)
     stable = {k: result[k] for k in ('trace_id', 'revision', 'task', 'scope', 'models', 'configs', 'result_view')}
     stable['state'] = {k: run.get('state', {}).get(k) for k in ('execution', 'delivery', 'quality', 'adoption', 'stop_reason')}
     # Preserve scores on unchanged historical evidence. A reconstructed snapshot
@@ -96,8 +116,11 @@ def list_results(root, *, observation_root=None, output_roots=(), agent='data'):
     if agent not in {'data', 'analysis', 'risk', 'portfolio'}:
         raise ValueError('Unknown Agent selection')
     options = {'observation_root': observation_root, 'output_roots': output_roots}
-    rows = [load_result(root, row['id'], **options) for row in agent_runs.list_runs(root, **options) if row.get('agent') == agent]
-    return {'results': rows, 'total': len(rows)}
+    from . import agent_runs_e6
+    rows = [(agent_runs_e6.result_summary(root, row['id']) if row.get('integrity', {}).get('adapter') == agent_runs_e6.ADAPTER
+             else load_result(root, row['id'], **options))
+            for row in agent_runs.list_runs(root, **options) if row.get('agent') == agent]
+    return {'results': sorted(rows, key=lambda row: (_run_start(row), row['id']), reverse=True), 'total': len(rows)}
 
 
 def compare_results(root, left, right, *, observation_root=None, output_roots=()):

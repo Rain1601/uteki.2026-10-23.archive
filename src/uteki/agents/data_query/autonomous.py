@@ -25,6 +25,7 @@ from uteki.domain.research_data.task_completion import aggregate
 from uteki.domain.research_data.query_catalog import CatalogRequest, SchemaProbeRequest
 from uteki.domain.research_data.run_artifacts import ARTIFACT_READ_MAX_BYTES, ArtifactReadRequest, ToolReceipt
 from uteki.infrastructure.research_data.run_artifacts import ArtifactStore, ArtifactReadProgress, at_pointer, json_size, load_evidence_bundle
+from .record_selection_navigation import candidate_index, selection_effect, navigation_page
 from .artifacts import write_new
 from .decision_protocol import (ACTION_RULES, ARRAY_PAYLOADS, DECISION_PROTOCOL_VERSION,
                                 action_protocol_prompt, action_schema_rules)
@@ -151,8 +152,8 @@ or that the final business graph is correct. Preserve that distinction in covera
 """
 
 
-ANALYSIS_EVIDENCE_PROMPT_VERSION = 'analysis-evidence-v22-incremental-plan-append'
-ANALYSIS_EVIDENCE_DELIVERY_VERSION = 'selected-originals-v3'
+ANALYSIS_EVIDENCE_PROMPT_VERSION = 'analysis-evidence-v24-explicit-body-delivery'
+ANALYSIS_EVIDENCE_DELIVERY_VERSION = 'selected-originals-v4'
 _ANALYSIS_REQUIREMENT_POLICY = (
     'This run gathers evidence for a separate Analysis Agent, which owns the narrative answer. '
     'Even when the original question is narrative, use kind=source_evidence with an explicit '
@@ -215,6 +216,27 @@ Selecting source_evidence does not replace a selected record's citation or its a
 To reduce extra tables, select another returned occurrence that meets the same declared criterion and
 has sufficient original evidence; do not merely omit its source blocks or rewrite citation identities.
 The host reopens selected atomic context for independent review.
+record_candidate_index is a compact metadata directory grouped by declared requirement/criterion
+and immutable source blocks. Each candidate semantics_index resolves its full period/value/unit/basis/dimensions in
+record_semantics; each criterion query_scope_index resolves query_scopes. No fields are inferred.
+candidate_count includes all matching returned occurrences; inspect
+its complete flag and artifact continuation paths when not all entries fit. Equal amounts alone
+never imply equal units, dimensions, accounting bases, qualifications or report versions. No entry
+is a preferred answer. record_selection_effect shows ALL current numeric selections together with
+explicit source selections and their combined original citation anchors. Check actual selected ev IDs
+against these immutable locations, not your selection reason. Its anchors are not full atomic table
+attachments and its metadata is not source reading. A useful alternate occurrence may let you
+replace select_records while retaining every declared criterion and necessary qualifications.
+A later select_evidence changes only explicit source delivery; it cannot remove a selected record's
+original table. Extra tables may be necessary for different question dimensions or report versions;
+do not force a single table or discard required evidence merely to make the bundle smaller.
+In selected-originals-v4, exploration reads attached to numeric query requirements are NOT final
+body selections. Selected records' citation originals and required atomic table context, explicit
+source_evidence selections and declared read_node required bodies enter final delivery.
+If additional original explanations or
+qualifiers are needed, plan source_evidence and select_evidence for them. The selection effect's
+delivery_block_ids expands those current anchors using frozen table structure; compare this actual
+delivery projection before finishing. It is metadata, not proof of reading or semantic sufficiency.
 read_body_catalog keeps locations and short previews of previously delivered blocks across tool calls.
 Its artifact_id and next_cursor let read_artifact continue the full directory beyond the inline
 window. Keep the cursor's original artifact_id; later reads may create a new directory snapshot.
@@ -237,6 +259,10 @@ evidence package, addressing missing_information and requirement/fact issues. Th
 change the question or grant permission to change companies, periods, sources or tool constraints.
 Do not merely retrieve the missing additions: this run must also retain the evidence necessary for
 the original question. Do not treat the prior review's citations as evidence until read with your tools.
+source_revision with schema_version=source-only-revision-v1 contains only validated negative source
+diagnostics after an exhausted question-review protocol error. It is NOT a complete question review
+or approval. Address its source_assessment revisions while independently retaining all original
+question requirements. Its question_protocol_failure is a host format diagnostic, not a source fact.
 """
 
 
@@ -915,6 +941,16 @@ class AutonomousDataAgent:
             return _read_body_catalog_page(artifacts, evidence, evidence_artifacts, delivered_blocks,
                 scope=scope, step=step, max_bytes=limit, read_progress=shown)
 
+        def selection_effect_packet():
+            from .record_selection_navigation import delivery_projection
+            value = selection_effect(coverage, evidence, record_origin_rows, record_selection, delivery_selection,
+                                     delivered_blocks)
+            value['delivery_schema_version'] = ANALYSIS_EVIDENCE_DELIVERY_VERSION
+            value['delivery_block_ids'] = delivery_projection(port, value['combined_anchor_blocks'])
+            return navigation_page(artifacts, 'record-selection-effect',
+                value,
+                scope=scope, step=step, max_bytes=min(12000, max(512, self.limits.max_packet_bytes // 8)))
+
         def make_packet():
             state = artifacts.put('run_state', run_state(), scope=scope, step=step)
             state_view = artifacts.preview(state['artifact_id'],
@@ -962,6 +998,12 @@ class AutonomousDataAgent:
                     'limit': 100, 'max_bytes': origin_budget})
                 packet['record_origins'] = {**origins, 'navigation_only': True,
                     'byte_limit': origin_budget, 'selection_effect': 'record citations are immutable'}
+            if self.purpose == 'analysis_evidence':
+                packet['record_candidate_index'] = navigation_page(artifacts, 'record-candidate-index',
+                    candidate_index(coverage, evidence, record_origin_rows, scope.model_dump(mode='json')),
+                    scope=scope, step=step,
+                    max_bytes=min(12000, max(512, self.limits.max_packet_bytes // 8)))
+                packet['record_selection_effect'] = selection_effect_packet()
             if preparation_ref:
                 packet['preparation'] = {**artifacts.preview(preparation_ref['artifact_id'],
                     max_bytes=observation_budget, limit=self.limits.page_items), 'artifact': preparation_ref}
@@ -1138,7 +1180,7 @@ class AutonomousDataAgent:
                         if issue['reason'] == 'item_too_large' and issue['required_bytes'] > read_request.max_bytes:
                             issue['next_action'] = 'read the exact child pointer; increasing max_bytes beyond the host limit has no effect'
                     ref = artifacts.refs[read_request.artifact_id]
-                    if ref.kind == 'read_body_catalog':
+                    if ref.kind in {'read_body_catalog', 'record-candidate-index', 'record-selection-effect'}:
                         page['navigation_only'] = True
                     if page['returned_count']:
                         if ref.kind == 'artifact_index' and page['unit'] == 'items':
@@ -1292,7 +1334,7 @@ class AutonomousDataAgent:
                         record_selection[rid] = list(selected)
                         coverage[rid]['selected_record_ids'] = list(selected)
                     observation = {'status': 'records_selected', 'requirement_ids': list(refs),
-                                   'selected_record_ids': selected}
+                                   'selected_record_ids': selected, 'record_selection_effect': selection_effect_packet()}
                 elif action.action == 'select_evidence':
                     if self.purpose != 'analysis_evidence' or any(coverage[r]['kind'] != 'source_evidence' for r in refs):
                         raise ValueError('delivery selection is for analysis_evidence source_evidence requirements')
@@ -1312,7 +1354,7 @@ class AutonomousDataAgent:
                         delivery_selection[rid] = deepcopy(selected)
                         for block in selected: attach(block['context_id'], (rid,))
                     observation = {'status': 'delivery_selected', 'requirement_ids': list(refs),
-                                   'delivery_selection': selected}
+                                   'delivery_selection': selected, 'record_selection_effect': selection_effect_packet()}
                 elif action.action == 'extract':
                     ids = []
                     for extract in action.extracts:

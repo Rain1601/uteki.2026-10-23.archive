@@ -6,6 +6,7 @@ from pathlib import Path
 from apps.review_workbench.data import agent_runs_history as history
 from apps.review_workbench.data import agent_runs_live as live
 from apps.review_workbench.data import agent_runs_experiments as experiments
+from apps.review_workbench.data import agent_runs_e6 as e6
 
 
 def _history_ids(root):
@@ -19,18 +20,19 @@ def _source(root, identity, observation_root):
     historical = identity in _history_ids(root)
     observed = identity in live.registered_ids(observation_root)
     trial = identity in experiments.registered_ids(root)
-    if sum((historical, observed, trial)) > 1:
+    evaluation = identity in e6.registered_ids(root)
+    if sum((historical, observed, trial, evaluation)) > 1:
         raise ValueError('Run identity appears in multiple registries')
-    if not historical and not observed and not trial:
+    if not historical and not observed and not trial and not evaluation:
         raise KeyError('Unknown registered run')
-    return 'history' if historical else 'experiment' if trial else 'live'
+    return 'history' if historical else 'experiment' if trial else 'e6' if evaluation else 'live'
 
 
 def list_runs(root, *, observation_root=None, output_roots=()):
     historical = history.list_runs(root) if _history_ids(root) else []
     observed = live.list_runs(observation_root, output_roots=output_roots)
     trials = experiments.list_runs(root)
-    rows = [*historical, *observed, *trials]
+    rows = [*historical, *observed, *trials, *e6.list_runs(root)]
     if len({r['id'] for r in rows}) != len(rows):
         raise ValueError('Run identity appears in multiple registries')
     return sorted(rows, key=lambda r: r['id'])
@@ -57,8 +59,8 @@ def list_page(root, *, agent='data', cursor=None, limit=50, observation_root=Non
 
 def load_run(root, identity, *, observation_root=None, output_roots=(), revision=None):
     source = _source(root, identity, observation_root)
-    if source in {'history', 'experiment'}:
-        result = (history if source == 'history' else experiments).load_run(root, identity)
+    if source in {'history', 'experiment', 'e6'}:
+        result = (history if source == 'history' else e6 if source == 'e6' else experiments).load_run(root, identity)
         if revision is not None and str(revision) != str(result['revision']):
             raise ValueError('Historical run revision does not match')
         return result
@@ -67,19 +69,19 @@ def load_run(root, identity, *, observation_root=None, output_roots=(), revision
 
 def load_step(root, identity, step_id, *, observation_root=None, output_roots=(), revision=None):
     source = _source(root, identity, observation_root)
-    if source in {'history', 'experiment'}:
+    if source in {'history', 'experiment', 'e6'}:
         if revision is not None:
             load_run(root, identity, revision=revision)
-        return (history if source == 'history' else experiments).load_step(root, identity, step_id)
+        return (history if source == 'history' else e6 if source == 'e6' else experiments).load_step(root, identity, step_id)
     return live.load_step(observation_root, identity, step_id, output_roots=output_roots, revision=revision)
 
 
 def read_artifact(root, identity, artifact_id, *, cursor=None, browse=None, observation_root=None, output_roots=(), revision=None):
     source = _source(root, identity, observation_root)
-    if source in {'history', 'experiment'}:
+    if source in {'history', 'experiment', 'e6'}:
         if revision is not None:
             load_run(root, identity, revision=revision)
-        return (history if source == 'history' else experiments).read_artifact(root, identity, artifact_id, cursor=cursor, browse=browse)
+        return (history if source == 'history' else e6 if source == 'e6' else experiments).read_artifact(root, identity, artifact_id, cursor=cursor, browse=browse)
     return live.read_artifact(observation_root, identity, artifact_id, output_roots=output_roots,
                               revision=revision, cursor=cursor, browse=browse)
 

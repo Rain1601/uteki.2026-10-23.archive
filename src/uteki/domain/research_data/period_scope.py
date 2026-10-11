@@ -10,7 +10,7 @@ import re
 from .query_contract import Period
 
 
-PERIOD_SCOPE_VERSION = "explicit-periods-v5-fiscal-quarter-token-boundary"
+PERIOD_SCOPE_VERSION = "explicit-periods-v6-bound-availability-cutoff"
 # A sentence-ending period is punctuation, while a decimal suffix is not a year.
 _YEAR = r"(?<![\d.])(?P<year>[1-9]\d{3})(?!\d|\.\d)"
 _QUARTER = r"(?:Q(?P<q>[1-4])|第?\s*(?P<cq>[一二三四1234])\s*季度)"
@@ -37,9 +37,13 @@ _FISCAL_LABEL = re.compile(
     r"(?:\s*(?:Q(?P<quarter>[1-4])|第?\s*(?P<cquarter>[一二三四1234])\s*季度))?"
     r"(?![A-Za-z\d_]|\.\d)", re.I)
 _FISCAL_MARKER = re.compile(r"(?<![A-Za-z\d_])FY(?=\s*\d)", re.I)
+# An explicit availability role may stand alone (可得/可用) or qualify a
+# material noun. Bare 截止日 remains ambiguous and must not mask a report date.
+_AVAILABILITY_ROLE = r"(?:(?:资料|材料|信息)\s*(?:可得|可用)?|(?:可得|可用))"
+_CUTOFF_ROLE_START = r"(?<![A-Za-z\d_不未非无])"
 _CUTOFF_CLAUSES = (
-    re.compile(r"以\s*(?P<date>" + _ISO_DATE + r")\s*为\s*(?:资料|材料|信息)\s*(?:可得|可用)?\s*截止(?:日|日期)"),
-    re.compile(r"(?:资料|材料|信息)\s*(?:可得|可用)?\s*截止(?:日期|日)\s*(?:为|是|[:：])?\s*(?P<date>" + _ISO_DATE + r")(?![\dTtZz:+]|-\d)"),
+    re.compile(_CUTOFF_ROLE_START + r"以\s*(?P<date>" + _ISO_DATE + r")\s*为\s*" + _AVAILABILITY_ROLE + r"\s*截止(?:日|日期)"),
+    re.compile(_CUTOFF_ROLE_START + _AVAILABILITY_ROLE + r"\s*截止(?:日期|日)\s*(?:为|是|[:：])?\s*(?P<date>" + _ISO_DATE + r")(?![\dTtZz:+]|-\d)"),
     re.compile(r"\b(?:(?:knowledge|information|material)\s+cutoff(?:\s+date)?\s*[:=]?|information\s+available\s+as\s+of)\s*(?P<date>" + _ISO_DATE + r")(?![\dTtZz:+]|-\d)", re.I),
 )
 
@@ -58,6 +62,10 @@ def _without_bound_cutoff(question, knowledge_cutoff):
         raise ValueError('knowledge_cutoff must be an explicit ISO date') from None
     matches = [m for pattern in _CUTOFF_CLAUSES for m in pattern.finditer(question)]
     for match in matches:
+        # A short 可得/可用 match must not recover inside a negated material
+        # phrase, e.g. 无资料 可得截止日, after its longer form was rejected.
+        if re.search(r"[不未非无]\s*(?:(?:资料|材料|信息)\s*)?$", question[:match.start()]):
+            return None
         try:
             declared = date.fromisoformat(match['date'])
         except ValueError:

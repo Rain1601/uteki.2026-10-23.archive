@@ -95,6 +95,12 @@
     }
     return (data.current.length ? data.current.map(recordHTML).join('') : '<p class="rr-note">' + bi('当前结果尚无人工评分。','No human review for this result yet.') + '</p>') + (data.stale.length ? '<details><summary>' + bi('旧版本评分（不计入当前结果）','Reviews of older revisions (not current)') + ' · ' + data.stale.length + '</summary>' + data.stale.map(recordHTML).join('') + '</details>' : '');
   }
+  function setWorkspaceTab(card,name) {
+    if (!['result','process','config'].includes(name)) return false;
+    for (const button of card.querySelectorAll('[data-workspace-tab]')) button.setAttribute('aria-selected',String(button.dataset.workspaceTab===name));
+    for (const panel of card.querySelectorAll('[data-workspace-panel]')) panel.hidden=panel.dataset.workspacePanel!==name;
+    return true;
+  }
   function bootstrap(document, config = null) {
     config = config || JSON.parse(document.querySelector('#rr-config').textContent);
     const q = selector => document.querySelector(selector), all = selector => Array.from(document.querySelectorAll(selector));
@@ -119,6 +125,13 @@
       const card = all('[data-result]').find(node=>node.dataset.result === detail.id);
       if (!card) continue;
       const within = selector=>card.querySelector(selector);
+      card.addEventListener('click',event=>{
+        const tab=event.target.closest('[data-workspace-tab]');
+        if (!tab || !card.contains(tab)) return;
+        const name=tab.dataset.workspaceTab;
+        if (!setWorkspaceTab(card,name)) return;
+        try { const address=new URL(environment.location.href);address.searchParams.set('tab',name);environment.history.replaceState(null,'',address); } catch(_) {}
+      });
       const form = within('[data-score-form]'), status = within('[data-score-status]');
       const formValues = () => {
         const value = name=>form.elements.namedItem(name).value;
@@ -172,7 +185,7 @@
         if (state.status === 'error') { status.innerHTML=bi('文件读取失败。未替换成其他结果；可重新点击文件。','File could not be read. No other result was substituted; select the file to retry.');more.disabled=false; }
       }});
       controllers.push(artifact);
-      const refs=[...(detail.artifacts||[]),...(detail.configs||[]),...(detail.result_view?.artifacts||[])];
+      const refs=[...(detail.artifacts||[]),...(detail.inputs||[]),...(detail.configs||[]),...(detail.result_view?.artifacts||[]),...(detail.evaluation?.artifacts||[]),...(detail.steps||[]).flatMap(step=>step.files||[]),...(detail.calls||[]).flatMap(call=>call.files||[])];
       card.addEventListener('click',event=>{
         const trigger=event.target.closest('[data-artifact]');
         if (trigger && card.contains(trigger)) {
@@ -189,7 +202,7 @@
     environment.addEventListener?.('pagehide',()=>controllers.forEach(controller=>controller.stop()));
     return {controllers};
   }
-  const exported = {artifactURL,scorePayload,createScoreController,createArtifactReader,scoreHistoryHTML,sameBinding,draftKey,bootstrap,escape};
+  const exported = {artifactURL,scorePayload,createScoreController,createArtifactReader,scoreHistoryHTML,sameBinding,draftKey,setWorkspaceTab,bootstrap,escape};
   if (typeof module !== 'undefined' && module.exports) module.exports=exported;
   if (environment.document) {
     if (environment.document.readyState === 'loading') environment.document.addEventListener('DOMContentLoaded',()=>bootstrap(environment.document));

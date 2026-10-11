@@ -213,6 +213,7 @@ class CompanyMaterializationTests(unittest.TestCase):
                                      (root/'built/records.json').read_bytes())
                     self.assertEqual(digest((root/'source.html').read_bytes()), original)
                 with QueryDataPort(root/'built') as port:
+                    self.assertEqual(port.sources[0]['parsed_mime_type'], 'text/html')
                     self.assertEqual(port.get_schema()['schema_version'], SOURCE_PERIOD_VERSION)
                     self.assertTrue(any(mapping['fiscal_year'] == 2025
                         and mapping['company_id'] == 'sec-0000000123'
@@ -221,6 +222,10 @@ class CompanyMaterializationTests(unittest.TestCase):
                         for mapping in port.get_schema()['fiscal_periods']))
                     self.assertFalse(any(gap.get('reason') == "'form'"
                         for gap in manifest['normalization_gaps']))
+                    from uteki.infrastructure.research_data.record_locator import resolve_record_locator
+                    for item in json.loads((root/'built/evidence.json').read_text()).values():
+                        locator = resolve_record_locator(root/'built', item)
+                        self.assertGreater(locator['char_end'], locator['char_start'])
                     schema = port.get_schema()['record']
                     self.assertEqual(schema, export_query_schema(ResearchRecord, version=SOURCE_PERIOD_VERSION))
                     result = port.query_data({'query_id': 'inline-build', 'snapshot_id': port.snapshot_id,

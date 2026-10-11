@@ -94,6 +94,27 @@ class RecordLocatorTests(unittest.TestCase):
                 resolve_record_locator(self.root, self.evidence)
             path.write_bytes(original)
 
+    def test_legacy_missing_mime_uses_verified_bytes_without_changing_snapshot(self):
+        self.source.pop('parsed_mime_type')
+        self.save('sources.json', [self.source])
+        manifest=json.loads((self.root/'manifest.json').read_text())
+        manifest['files']['sources.json']=digest((self.root/'sources.json').read_bytes())
+        self.save('manifest.json',manifest)
+        before = {str(p.relative_to(self.root)):digest(p.read_bytes()) for p in self.root.rglob('*') if p.is_file()}
+        self.assertEqual(resolve_record_locator(self.root,self.evidence)['cell'],{'row':3,'column':1})
+        self.assertEqual(before,{str(p.relative_to(self.root)):digest(p.read_bytes()) for p in self.root.rglob('*') if p.is_file()})
+
+    def test_explicit_unsupported_mime_is_not_reinterpreted_as_html(self):
+        for mime in ('application/pdf','application/xml','application/octet-stream','',None):
+            self.source['parsed_mime_type'] = mime
+            self.source['declared_mime_type'] = 'application/pdf'
+            self.save('sources.json', [self.source])
+            manifest=json.loads((self.root/'manifest.json').read_text())
+            manifest['files']['sources.json']=digest((self.root/'sources.json').read_bytes())
+            self.save('manifest.json',manifest)
+            with self.subTest(mime=mime),self.assertRaisesRegex(ValueError,'requires frozen HTML'):
+                resolve_record_locator(self.root,self.evidence)
+
 
 class RealRecordLocatorTests(unittest.TestCase):
     def test_real_msft_and_googl_fact_dom_and_duplicate_values(self):

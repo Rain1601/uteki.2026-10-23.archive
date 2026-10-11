@@ -48,7 +48,9 @@ def _dataset_ref(path):
 
 def _verify_review_feedback(feedback, request, scope, dataset):
     """Bind diagnostic feedback to actual prior execution, not review self-description."""
-    if request.purpose != 'analysis_evidence' or set(feedback) != {'prior_query_ref', 'prior_review_ref', 'assessment'}:
+    partial = 'source_revision' in feedback
+    payload_key = 'source_revision' if partial else 'assessment'
+    if request.purpose != 'analysis_evidence' or set(feedback) != {'prior_query_ref', 'prior_review_ref', payload_key}:
         raise ValueError('review feedback requires pinned query/review references and analysis_evidence purpose')
     for key in ('prior_query_ref', 'prior_review_ref'):
         ref = feedback[key]
@@ -77,12 +79,13 @@ def _verify_review_feedback(feedback, request, scope, dataset):
             or previous_input.get('dataset_ref') != expected_dataset
             or previous.get('input_sha256') != digest(previous_input)
             or previous.get('packet_id') != previous_input.get('packet_id')
-            or previous.get('assessment') != feedback['assessment']
-            or previous.get('status') != 'needs_revision' or previous.get('failures')):
+            or (not partial and (previous.get('assessment') != feedback['assessment']
+                or previous.get('status') != 'needs_revision' or previous.get('failures')))):
         raise ValueError('review feedback differs from frozen same-question same-scope assessment')
     # Local import avoids the module import cycle; this is a read-only bounded
     # reconstruction, not a model call or a new source-selection operation.
-    from .answer_handoff import prepare_review_packet, validate_assessment, validate_saved_assessment
+    from .answer_handoff import (prepare_review_packet, validate_assessment, validate_saved_assessment,
+                                 validate_source_revision_feedback)
     fresh = prepare_review_packet(feedback['prior_query_ref']['path'], dataset, expected_scope=scope,
         max_packet_bytes=previous_input['max_packet_bytes'],
         source_delivery=previous_input.get('source_delivery', 'full_indexed_text_v1'),
@@ -90,6 +93,11 @@ def _verify_review_feedback(feedback, request, scope, dataset):
         question_review_policy=previous_input.get('question_review_policy'))
     if fresh != previous_input:
         raise ValueError('review feedback input does not match its frozen query and dataset')
+    if partial:
+        validated = validate_source_revision_feedback(feedback['prior_review_ref']['path'], fresh)
+        if validated != feedback['source_revision']:
+            raise ValueError('source-only feedback differs from validated original review responses')
+        return
     validated, eligible = (validate_saved_assessment(feedback['prior_review_ref']['path'], fresh)
                            if 'question_review_policy' in fresh
                            else validate_assessment(fresh, feedback['assessment']))

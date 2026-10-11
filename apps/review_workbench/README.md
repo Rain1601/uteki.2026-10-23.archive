@@ -10,6 +10,33 @@ The dated sections below retain their original implementation and check records.
 Their references to static Agent Workbench demos are historical; those standalone
 pages have been retired.
 
+## E6 three-pane inspection (2026-10-10)
+
+The single-run Results page now keeps the run list on the left, Result / Process /
+Configuration tabs in the middle, and evaluation plus human review on the right.
+Each pane uses native independent scrolling. Comparison mode keeps the existing
+two-result inspection. Switching tabs reads saved data and never calls a model.
+
+[`e6-runs-v1.json`](../../data/evaluation_views/e6-runs-v1.json) explicitly pins 16
+historical E6 records: three B1 runs, nine V1 runs, two source-review repairs, one
+fresh S3 run and the original network failure. Original attempts, recovery calls,
+model reviews, independent acceptance and frozen standards remain separate.
+Four correct revenue facts do not turn the failed V1 R3-S3 into a successful run.
+The initial R1 network failure retains two unknown calls and USD 0.1004304 reserved.
+These are local historical artifacts; a checkout without the private E6 outputs
+cannot substitute another result or reconstruct them from the public assessment.
+
+Start the server with the command above, then inspect:
+
+- [Original failed V1 R3-S3](http://127.0.0.1:8765/agent-results?run=e6-v1-r3-s3).
+- [Duplicate selection and recovery](http://127.0.0.1:8765/agent-results?run=e6-v1-r2-s1&tab=process).
+- [New S3 after the citation repair](http://127.0.0.1:8765/agent-results?run=e6-r1-fresh-s3).
+- [Network failure and unknown-cost reserve](http://127.0.0.1:8765/agent-results?run=e6-r1-repair-01).
+
+Evaluation files are a read-only display input, never extraction model input.
+Human reviews retain their existing trace/revision/output-hash binding and separate
+local storage. This integration does not rerun E6 or change its success denominator.
+
 ## Results, model comparison and reviews (2026-10-06)
 
 Each result has the same root Trace ID as its process. Results show saved outputs,

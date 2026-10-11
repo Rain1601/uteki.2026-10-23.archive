@@ -10,6 +10,7 @@ import tempfile
 import duckdb
 
 from uteki.agents.reading.document_reader import DocumentReader
+from uteki.infrastructure.document_sources.company_acquisition import _mime
 from uteki.domain.research_data.query_contract import (
     DataQuery, ResearchRecord, QueryResult, VERSION, SOURCE_PERIOD_VERSION, export_query_schema, validate_period_version,
 )
@@ -114,7 +115,10 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
                       "available_at_precision": "date", "publication_note": source_manifest.get("publication_note"),
                       "index_folder": str(folder.relative_to(work)), "raw_file": str((folder / raw_name).relative_to(work)),
                       "raw_file_sha256": digest(raw), "capabilities": ["literal_search", "read_context", "source_bytes"],
+                      "parsed_mime_type": _mime(content),
                       "block_count": len(reader.blocks), "image_block_count": sum(b.get("type") == "image" for b in reader.blocks)}
+            if "declared_mime_type" in source_manifest:
+                source["declared_mime_type"] = source_manifest["declared_mime_type"]
             sources.append(source)
             readers[sid] = reader
         catalog = metric_catalog()
@@ -137,6 +141,8 @@ def build_dataset(repo: Path, destination: Path, *, spec: Path):
                 from .company_materialization import extract_inline_records
                 if digest(input_bytes) != source["source_sha256"] or not re.fullmatch(r"sec-\d+", binding.company_id):
                     raise ValueError("generic inline adapter requires original HTML bytes and explicit SEC issuer")
+                if source["parsed_mime_type"] != "text/html":
+                    raise ValueError("generic inline adapter requires a supported original HTML format")
                 reader = readers[entry.source_snapshot_id]
                 rows, refs, diagnostics, fiscal = extract_inline_records(input_bytes,
                     {"source_id": entry.source_snapshot_id, "source_url": source["source_url"],

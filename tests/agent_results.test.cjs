@@ -1,10 +1,22 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
-const {artifactURL,scorePayload,createScoreController,createArtifactReader,scoreHistoryHTML,draftKey} = require('../apps/review_workbench/static/js/agent_results.js');
+const {artifactURL,scorePayload,createScoreController,createArtifactReader,scoreHistoryHTML,draftKey,setWorkspaceTab} = require('../apps/review_workbench/static/js/agent_results.js');
 const binding={trace_id:'orchard-2033',revision:'rev3',result_sha256:'a'.repeat(64)};
 const values={reviewer:'Rain',scores:{accuracy:0,coverage:'5',analysis:'',evidence:null},notes:'Check source'};
 const record={id:'review1',binding,rubric_version:'agent-result-v1',reviewer:'Rain',scores:{accuracy:0,coverage:5,analysis:null,evidence:null},notes:'Check source'};
 const page={binding,rubric_version:'agent-result-v1',current:[record],stale:[]};
+
+test('workspace tabs preserve the selected trace and review draft without requests',()=>{
+  const tabs=['result','process','config'].map(name=>({dataset:{workspaceTab:name},setAttribute(key,value){this[key]=value;}}));
+  const panels=['result','process','config'].map(name=>({dataset:{workspacePanel:name},hidden:name!=='result'}));
+  const card={dataset:{result:'orchard-2033'},draft:'keep review',querySelectorAll(selector){return selector==='[data-workspace-tab]' ? tabs : panels;}};
+  assert.equal(setWorkspaceTab(card,'process'),true);
+  assert.deepEqual(panels.map(panel=>panel.hidden),[true,false,true]);
+  assert.equal(tabs[1]['aria-selected'],'true');
+  assert.equal(card.dataset.result,'orchard-2033');assert.equal(card.draft,'keep review');
+  assert.equal(setWorkspaceTab(card,'foreign'),false);
+  assert.deepEqual(panels.map(panel=>panel.hidden),[true,false,true]);
+});
 
 test('reviews retain zero and null separately, reject invalid values, and bind to one result',()=>{
   const payload=scorePayload(binding,values);

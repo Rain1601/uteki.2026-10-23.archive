@@ -64,7 +64,7 @@ def url(**values):
 
 
 def parse_selection(selection):
-    if not isinstance(selection, dict) or set(selection) - {'agent', 'run', 'compare', 'artifact'}:
+    if not isinstance(selection, dict) or set(selection) - {'agent', 'run', 'compare', 'artifact', 'tab'}:
         raise ValueError('Unknown Agent result selection')
     args = {}
     for key, values in selection.items():
@@ -74,6 +74,8 @@ def parse_selection(selection):
         args[key] = values[0]
     if args.get('agent', 'data') not in AGENTS:
         raise ValueError('Unknown Agent')
+    if args.get('tab', 'result') not in {'result', 'process', 'config'}:
+        raise ValueError('Unknown result workspace tab')
     if (args.get('compare') or args.get('artifact')) and not args.get('run'):
         raise ValueError('An explicit primary run is required')
     if args.get('compare') == args.get('run') and args.get('run'):
@@ -91,7 +93,12 @@ def _scope(scope):
 def _refs(detail):
     """Keep the root Trace ID separate from the artifact's actual child owner."""
     seen, result = set(), []
-    for ref in (detail.get('artifacts') or []) + (detail.get('configs') or []) + (detail.get('result_view', {}).get('artifacts') or []):
+    candidates = ((detail.get('artifacts') or []) + (detail.get('inputs') or [])
+        + (detail.get('configs') or []) + (detail.get('result_view', {}).get('artifacts') or [])
+        + ((detail.get('evaluation') or {}).get('artifacts') or [])
+        + [ref for step in detail.get('steps') or [] for ref in step.get('files') or []]
+        + [ref for call in detail.get('calls') or [] for ref in call.get('files') or []])
+    for ref in candidates:
         key = (ref['id'], ref['run_id'])
         if key not in seen:
             result.append(ref)
@@ -117,7 +124,7 @@ def _model_summary(detail):
         body += '<tr><td><strong>' + known(model.get('model')) + '</strong><small>' + known(model.get('role')) + '</small></td><td>' + known(model.get('provider')) + '</td><td>' + known(model.get('reasoning_effort')) + '<small>' + mode + '</small></td><td class="rr-number">' + number(model.get('call_count')) + '</td></tr>'
     usage = detail.get('usage') or {}
     body += '</tbody></table></div><dl class="rr-metrics">'
-    for key, zh, en in [('input_tokens', '输入 Token', 'Input tokens'), ('output_tokens', '输出 Token', 'Output tokens'), ('known_estimated_usd', '已知估算 USD', 'Known estimate USD'), ('unknown_cost_requests', '费用未知调用', 'Unknown-cost calls')]:
+    for key, zh, en in [('input_tokens', '输入 Token', 'Input tokens'), ('output_tokens', '输出 Token', 'Output tokens'), ('known_estimated_usd', '已知估算 USD', 'Known estimate USD'), ('unknown_cost_requests', '费用未知调用', 'Unknown-cost calls'), ('unknown_reserved_usd', '未知费用预留 USD', 'Unknown-cost reserve USD'), ('known_plus_held_usd', '已知加预留 USD', 'Known plus reserved USD')]:
         body += '<div><dt>' + bi(zh, en) + '</dt><dd>' + number(usage.get(key)) + '</dd></div>'
     body += '</dl><p class="rr-note">' + bi('包含子任务调用。未记录的档位不推定为默认值；估算费用不是账单。', 'Includes child calls. Missing effort is not inferred as a default; estimated cost is not a bill.') + '</p>'
     if detail.get('configs'):
@@ -138,8 +145,22 @@ def _result_body(detail):
         body += '<h4>' + bi('提取事实', 'Extracted facts') + '</h4><div class="rr-table-scroll"><table class="rr-table rr-facts"><thead><tr>'
         body += ''.join('<th>' + bi(*label) + '</th>' for label in [('指标', 'Metric'), ('期间', 'Period'), ('数值 / 单位', 'Value / unit'), ('证据', 'Evidence')]) + '</tr></thead><tbody>'
         for fact in view['facts']:
-            body += '<tr><td>' + e(fact.get('metric')) + '</td><td>' + known(fact.get('period')) + '<small>' + known(fact.get('period_end')) + '</small></td><td class="rr-number">' + number(fact.get('value')) + '<small>' + known(fact.get('unit')) + ' · ' + known(fact.get('currency')) + '</small></td><td><details><summary>' + e(fact.get('block_id')) + '</summary><p>' + bi('行 / 列', 'Row / column') + ': ' + known(fact.get('row')) + ' / ' + known(fact.get('column')) + '</p><blockquote>' + e(fact.get('quote')) + '</blockquote></details></td></tr>'
+            period = fact.get('period')
+            period = ' — '.join(str(v) for v in (period.get('start'), period.get('end')) if v) if isinstance(period, dict) else period
+            company = fact.get('company') or fact.get('company_id')
+            value = fact.get('value')
+            display_value = number(int(value)) if isinstance(value, str) and value.lstrip('-').isdigit() and len(value) < 30 else number(value)
+            citations = fact.get('citations') or [fact]
+            evidence = ''
+            for citation in citations:
+                cell = citation.get('cell') or {}
+                evidence += '<details><summary>' + e(citation.get('block_id')) + '</summary><p>' + e(citation.get('source_snapshot_id') or fact.get('source_id')) + '</p><p>' + bi('行 / 列（记录索引）', 'Row / column (recorded index)') + ': ' + known(cell.get('row', fact.get('row'))) + ' / ' + known(cell.get('column', fact.get('column'))) + '</p><blockquote>' + e(citation.get('quote')) + '</blockquote></details>'
+            body += '<tr><td>' + e(fact.get('metric')) + ('<small>' + e(company) + '</small>' if company else '') + '</td><td>' + known(period) + '</td><td class="rr-number">' + display_value + '<small>' + known(fact.get('unit')) + '</small></td><td>' + evidence + '</td></tr>'
         body += '</tbody></table></div>'
+    if view.get('documents'):
+        body += '<h4>' + bi('实际交付原文', 'Delivered original text') + '</h4>'
+        for block in view['documents']:
+            body += '<details class="rr-delivered-block"><summary>' + e(block.get('source_id')) + ' · ' + e(block.get('block_id')) + '</summary><pre>' + e(block.get('text')) + '</pre></details>'
     if view.get('analysis'):
         body += '<h4>' + bi('分析', 'Analysis') + '</h4><ol class="rr-analysis">'
         for item in view['analysis']:
@@ -180,10 +201,81 @@ def _scores(detail):
     return body
 
 
-def _card(detail, label):
+def _process_body(detail):
+    body = '<section class="rr-process"><h3>' + bi('真实调用过程', 'Recorded execution process') + '</h3>'
+    body += '<p class="rr-note">' + bi('按保存的执行顺序展示；展开步骤可查看实际输入、决策、工具结果与模型调用。失败和修订均保留。', 'Recorded execution order. Expand steps to inspect actual inputs, decisions, tool results and calls. Failures and revisions remain visible.') + '</p>'
+    calls = {call['call_id']: call for call in detail.get('calls') or []}
+    steps = detail.get('steps') or []
+    for step in steps:
+        body += '<details class="rr-step" data-process-step="' + e(step['id']) + '"><summary><strong>' + e(step.get('ordinal')) + ' · ' + e(step.get('action') or step.get('phase') or step['id']) + '</strong><small>' + known(step.get('status')) + '</small></summary>'
+        if step.get('error_code'):
+            body += '<p class="rr-warning">' + e(step['error_code']) + '</p>'
+        body += '<p class="rr-note">' + bi('所属运行', 'Owning run') + ': ' + e(step.get('run_id')) + ' · ' + bi('耗时（秒）', 'Elapsed seconds') + ': ' + known(step.get('elapsed_seconds')) + '</p>'
+        body += _ref_buttons(step.get('files') or [])
+        for identity in step.get('call_ids') or []:
+            call = calls.get(identity)
+            if call:
+                body += call_configuration_record(call) + '<p class="rr-note">' + e(call.get('status')) + ' · ' + e(identity) + '</p>' + _ref_buttons(call.get('files') or [])
+        body += '</details>'
+    if not steps:
+        body += '<p class="rr-empty">' + bi('该记录没有结构化步骤；已有调用和原始文件仍可检查。', 'No structured steps are recorded; calls and original files remain inspectable.') + '</p>'
+    assigned = {identity for step in steps for identity in step.get('call_ids') or []}
+    remaining = [call for call in calls.values() if call['call_id'] not in assigned]
+    if remaining:
+        body += '<h4>' + bi('其他已记录调用', 'Other recorded calls') + '</h4>'
+        for call in remaining:
+            body += '<details><summary>' + e(call.get('role')) + ' · ' + e(call['call_id']) + ' · ' + known(call.get('status')) + '</summary>' + call_configuration_record(call) + _ref_buttons(call.get('files') or []) + '</details>'
+    return body + '</section>'
+
+
+EVALUATION_LABELS = {'overall_verdict': ('独立验收结论', 'Independent verdict'),
+    'mandatory_coverage': ('必需信息覆盖', 'Mandatory coverage'), 'focus': ('材料聚焦', 'Focus'),
+    'source_scope': ('来源范围', 'Source scope'), 'authenticity': ('真实性', 'Authenticity'),
+    'provenance': ('出处', 'Provenance'), 'actual_reading': ('实际读取', 'Actual reading'),
+    'verdict': ('判定', 'Verdict'), 'required': ('必需项', 'Required'), 'correct': ('正确项', 'Correct'),
+    'missing_or_incorrect': ('遗漏或错误', 'Missing or incorrect'), 'errors': ('错误', 'Errors')}
+
+
+def _evaluation_value(value, depth=0):
+    if isinstance(value, dict):
+        content = '<dl class="rr-evaluation-fields">' + ''.join('<div><dt>' + (bi(*EVALUATION_LABELS[key]) if key in EVALUATION_LABELS else e(key)) + '</dt><dd>' + _evaluation_value(item, depth + 1) + '</dd></div>' for key, item in value.items()) + '</dl>'
+        return '<details><summary>' + bi('查看记录详情', 'Inspect record details') + '</summary>' + content + '</details>' if depth >= 2 and len(value) > 4 else content
+    if isinstance(value, list):
+        if not value:
+            return '<span class="rr-note">' + bi('无记录项', 'No recorded items') + '</span>'
+        content = '<ul>' + ''.join('<li>' + _evaluation_value(item, depth + 1) + '</li>' for item in value) + '</ul>'
+        return '<details><summary>' + bi(f'查看 {len(value)} 项记录', f'Inspect {len(value)} items') + '</summary>' + content + '</details>' if depth >= 1 and any(isinstance(item, (dict, list)) for item in value) else content
+    return '<span>' + e(json.dumps(value, ensure_ascii=False) if isinstance(value, bool) or value is None else value) + '</span>'
+
+
+def _evaluation_body(detail):
+    evaluation = detail.get('evaluation') or {}
+    body = '<section class="rr-evaluation-summary"><h2>' + bi('评估与证据', 'Evaluation & evidence') + '</h2><p class="rr-note">Trace ID · ' + e(detail['id']) + '</p>'
+    if evaluation.get('summary'):
+        body += '<p>' + e(evaluation['summary']) + '</p>'
+    usage = detail.get('usage') or {}
+    body += '<dl class="rr-metrics">'
+    for key, zh, en in [('known_estimated_usd', '本运行已知估算 USD', 'Run known estimate USD'), ('unknown_reserved_usd', '未知费用预留 USD', 'Unknown-cost reserve USD'), ('unknown_cost_requests', '费用未知调用', 'Unknown-cost calls')]:
+        body += '<div><dt>' + bi(zh, en) + '</dt><dd>' + number(usage.get(key)) + '</dd></div>'
+    body += '</dl><p class="rr-note">' + bi('费用包含本运行的失败与恢复；估算和预留均非供应商账单。', 'Includes failed calls and recovery in this run. Estimates and reserves are not provider bills.') + '</p>'
+    if not evaluation:
+        body += '<p class="rr-note">' + bi('这次运行尚未接入独立验收记录；可在下方填写人工意见。', 'No independent acceptance record is attached; human review is available below.') + '</p>'
+    for key, zh, en in [('program_checks', '程序校验', 'Program checks'), ('model_reviews', '模型审核', 'Model reviews'), ('independent_assessment', 'Codex 独立验收', 'Codex independent acceptance')]:
+        if key in evaluation:
+            body += '<h3>' + bi(zh, en) + '</h3>' + _evaluation_value(evaluation[key])
+    if evaluation.get('standard'):
+        body += '<details><summary>' + bi('冻结验收标准', 'Frozen acceptance standard') + '</summary>' + _evaluation_value(evaluation['standard']) + '</details>'
+    if evaluation.get('limitations'):
+        body += '<h3>' + bi('范围与限制', 'Scope & limitations') + '</h3>' + _evaluation_value(evaluation['limitations'])
+    if evaluation.get('artifacts'):
+        body += '<details><summary>' + bi('评估原始文件', 'Original evaluation files') + '</summary>' + _ref_buttons(evaluation['artifacts']) + '</details>'
+    return body + '</section>'
+
+
+def _card(detail, label, *, split=False, tab='result'):
     identity = detail['id']
     process_url = '/agent-runs?' + urlencode({'agent': detail.get('agent', 'data'), 'run': identity})
-    body = '<article class="rr-result" data-result="' + e(identity) + '"><header><p class="rr-eyebrow">' + e(label) + ' · ' + e(detail.get('origin')) + '</p><h2>' + e(detail.get('title') or identity) + '</h2><a class="rr-trace" href="' + e(process_url) + '">Trace ID · ' + e(identity) + ' ↗</a><p class="rr-scope">' + e(_scope(detail.get('scope') or {})) + '</p></header>'
+    body = '<article class="rr-result' + (' rr-single' if split else '') + '" data-result="' + e(identity) + '">' + ('<div class="rr-center-pane">' if split else '') + '<header><p class="rr-eyebrow">' + e(label) + ' · ' + e(detail.get('origin')) + '</p><h2>' + e(detail.get('title') or identity) + '</h2><a class="rr-trace" href="' + e(process_url) + '">Trace ID · ' + e(identity) + ' ↗</a><p class="rr-scope">' + e(_scope(detail.get('scope') or {})) + '</p></header>'
     task = detail.get('task')
     if task:
         body += '<details class="rr-task"><summary>' + bi('任务输入', 'Task input') + '</summary><pre>' + e(task if isinstance(task, str) else json.dumps(task, ensure_ascii=False, indent=2)) + '</pre></details>'
@@ -194,9 +286,19 @@ def _card(detail, label):
     body += '</dl><p class="rr-note">' + bi('停止原因', 'Stop reason') + ': ' + known((detail.get('state') or {}).get('stop_reason')) + '</p>'
     if detail.get('live'):
         body += '<p class="rr-note">' + bi('当前显示已读取的运行版本。查看实时过程或刷新以读取新结果；评分绑定当前版本。', 'Showing the loaded revision. Open the live process or refresh for newer results; reviews are bound to this revision.') + '</p>'
-    body += _model_summary(detail) + _result_body(detail)
+    if split:
+        body += '<div class="rr-workspace-tabs" role="tablist" aria-label="' + e('结果与调用过程') + '">'
+        for key, zh, en in [('result', '结果', 'Result'), ('process', '调用过程', 'Process'), ('config', '模型与配置', 'Models & configuration')]:
+            body += '<button type="button" role="tab" id="rr-tab-' + key + '" aria-controls="rr-panel-' + key + '" aria-selected="' + str(key == tab).lower() + '" data-workspace-tab="' + key + '">' + bi(zh, en) + '</button>'
+        body += '</div>'
+        for key, content in [('result', _result_body(detail)), ('process', _process_body(detail)), ('config', _model_summary(detail))]:
+            body += '<div role="tabpanel" id="rr-panel-' + key + '" aria-labelledby="rr-tab-' + key + '" data-workspace-panel="' + key + '"' + (' hidden' if key != tab else '') + '>' + content + '</div>'
+    else:
+        body += _model_summary(detail) + _result_body(detail)
     body += '<section class="rr-artifact-view" data-artifact-view hidden><div class="rr-controls"><h3 data-artifact-title></h3><button type="button" data-close-artifact>' + bi('关闭文件', 'Close file') + '</button></div><p data-artifact-status class="rr-note" role="status"></p><div data-artifact-children></div><pre data-artifact-content></pre><button type="button" data-more-artifact hidden>' + bi('继续读取', 'Read more') + '</button></section>'
-    return body + _scores(detail) + '</article>'
+    if split:
+        return body + '</div><aside class="rr-evaluation-pane">' + _evaluation_body(detail) + _scores(detail) + '</aside></article>'
+    return body + _evaluation_body(detail) + _scores(detail) + '</article>'
 
 
 @workbench_page('agent-results')
@@ -245,9 +347,9 @@ def render_agent_results(root, selection, *, observation_root=None, output_roots
             content += ''.join('<p class="rr-note">' + e(reason) + '</p>' for reason in comparison.get('reasons') or []) + '</section>'
             if comparison.get('limitations'):
                 content += '<div class="rr-note">' + ''.join('<p>' + e(item) + '</p>' for item in comparison['limitations']) + '</div>'
-        content += '<div class="rr-results' + (' rr-pair' if comparison else '') + '">' + ''.join(_card(detail, 'A' if i == 0 and comparison else 'B' if comparison else 'Result') for i, detail in enumerate(details)) + '</div>'
+        content += '<div class="rr-results' + (' rr-pair' if comparison else '') + '">' + ''.join(_card(detail, 'A' if i == 0 and comparison else 'B' if comparison else 'Result', split=not comparison, tab=args.get('tab', 'result')) for i, detail in enumerate(details)) + '</div>'
     else:
         content = '<p class="rr-empty">' + (bi('选择一次运行，查看产物、模型配置和评分。每个 Trace ID 都连接到对应过程。', 'Select a run to inspect its output, model settings and reviews. Each Trace ID links to its process.') if agent == 'data' else bi(AGENTS[agent][1], AGENTS[agent][2])) + '</p>'
     config = {'selection': args, 'details': details, 'api': '/api/agent-results', 'artifact_api': '/api/agent-runs'}
     payload = json.dumps(config, ensure_ascii=False).replace('<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
-    return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent 运行结果 · Uteki</title><style>' + asset_text('agent_results.css') + '</style></head><body><div class="rr-workspace"><aside class="rr-directory">' + directory + '</aside><main class="rr-main">' + toolbar + content + '</main></div><script type="application/json" id="rr-config">' + payload + '</script><script>' + asset_text('agent_results.js') + '</script></body></html>'
+    return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Agent 运行结果 · Uteki</title><style>' + asset_text('agent_results.css') + '</style></head><body><div class="rr-workspace"><aside class="rr-directory">' + directory + '</aside><main class="rr-main' + (' rr-main-single' if details and not comparison else '') + '">' + toolbar + content + '</main></div><script type="application/json" id="rr-config">' + payload + '</script><script>' + asset_text('agent_results.js') + '</script></body></html>'

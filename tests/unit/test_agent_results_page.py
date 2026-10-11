@@ -96,7 +96,7 @@ class AgentResultsPageTests(unittest.TestCase):
         self.assertIn('Not delivered: no visible answer', notice.text_content())
         self.assertIn('4,000', notice.text_content())
         self.assertIn('were reasoning tokens', notice.text_content())
-        self.assertTrue(notice.xpath('following-sibling::section[contains(@class,"rr-models")]'))
+        self.assertTrue(notice.xpath('following-sibling::div[@data-workspace-panel="config"]//section[contains(@class,"rr-models")]'))
         self.assertIn('Not delivered', doc.xpath('//*[@data-state="delivery"]')[0].text_content())
         for reasoning in (None, 2000):
             self.left['usage']['reasoning_tokens'] = reasoning
@@ -143,6 +143,35 @@ class AgentResultsPageTests(unittest.TestCase):
         self.assertIn('Partial historical record', cards[1].text_content())
         self.assertEqual(cards[1].xpath('.//tr[@data-config-field="max_tokens"]/td[2]')[0].text_content(), '4000')
         self.assertIn('Not recorded', cards[1].xpath('.//*[@data-call-time]/dl/div[2]/dd')[0].text_content())
+
+    def test_three_panes_keep_process_evaluation_and_artifacts_on_same_trace(self):
+        ref = self.left['artifacts'][0]
+        self.left['steps'] = [{'id': 'step-01', 'ordinal': 1, 'run_id': self.left['id'],
+            'action': 'query', 'status': 'rejected', 'error_code': 'quote_mismatch', 'files': [ref], 'call_ids': []}]
+        self.left['evaluation'] = {'summary': 'Failed original, recovered delivery',
+            'program_checks': {'strict_load': 'pass'}, 'model_reviews': {'source': 'pass'},
+            'independent_assessment': {'mandatory_coverage': {'required': 4, 'correct': 4}, 'focus': 'fail'},
+            'standard': {'version': 'frozen-v1'}, 'limitations': ['One question only'], 'artifacts': [ref]}
+        _, doc = self.render(run=self.left['id'], tab='process')
+        card = doc.xpath('//*[@data-result]')[0]
+        self.assertEqual(len(card.xpath('./div[@class="rr-center-pane"]')), 1)
+        pane = card.xpath('./aside[@class="rr-evaluation-pane"]')[0]
+        self.assertIn(self.left['id'], pane.text_content())
+        self.assertIn('4', pane.text_content())
+        self.assertIn('focus', pane.text_content().lower())
+        self.assertIn('One question only', pane.text_content())
+        self.assertTrue(pane.xpath('.//*[@data-score-form]'))
+        self.assertFalse(card.xpath('.//*[@data-workspace-panel="process"]')[0].get('hidden'))
+        self.assertIsNotNone(card.xpath('.//*[@data-workspace-panel="result"]')[0].get('hidden'))
+        self.assertIn('quote_mismatch', card.xpath('.//*[@data-process-step]')[0].text_content())
+        self.assertEqual(pane.xpath('.//*[@data-artifact]')[0].get('data-artifact-owner'), ref['run_id'])
+        with self.assertRaises(ValueError): self.render(run=self.left['id'], tab='unknown')
+
+    def test_evaluation_text_cannot_inject_markup(self):
+        self.left['evaluation'] = {'summary': '<script>bad()</script>',
+            'independent_assessment': {'<img>': ['<svg onload=bad()>']}}
+        _, doc = self.render(run=self.left['id'])
+        self.assertFalse(doc.xpath('//img|//svg|//script[text()="bad()"]'))
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ import sqlite3
 from .artifacts import write_new
 from . import answer_handoff as handoff_module, coordinator as coordinator_module
 from .coordinator import CompanyDataCoordinator, _verify_manifest
-from .answer_handoff import AnswerAssessment, QUESTION_REVIEW_POLICY, review_prompt, source_assessment_schema, prepare_review_packet, review_data_answer
+from .answer_handoff import AnswerAssessment, QUESTION_REVIEW_POLICY, review_prompt, source_assessment_schema, prepare_review_packet, review_data_answer, validate_source_revision_feedback
 from .autonomous_model import reasoning_configuration
 from .record_review_model import SdkRecordReviewer
 from uteki.agents.runtime.run_budget import RunBudget
@@ -275,7 +275,8 @@ async def run_retrieval_cycle(config, output):
 
     SDK retry settings apply within a review call. In addition, a failed review
     stage can run once more in a fresh directory, using the same budget ledger.
-    An unreviewed partial response never becomes follow-up instructions.
+    Validated source-only negative feedback can request bounded retrieval after
+    question protocol failure; it never grants Analysis approval.
     """
     config = deepcopy(config)
     request = validate(config, output)
@@ -286,6 +287,7 @@ async def run_retrieval_cycle(config, output):
     write_new(output/'config.json', config)
     write_new(output/'original-request.json', original)
     component_modules = ('uteki.agents.data_query.autonomous', 'uteki.agents.data_query.autonomous_model',
+        'uteki.agents.data_query.record_selection_navigation',
         'uteki.infrastructure.research_data.query_completion',
         'uteki.agents.data_query.question_coverage_review',
         'uteki.agents.data_query.decision_protocol', 'uteki.agents.runtime.claude_messages',
@@ -355,6 +357,7 @@ async def run_retrieval_cycle(config, output):
                     try:
                         review = await review_data_answer(packet, review_path,
                             reviewer_factory=reviewer_factory(config, packet, prior_failures=prior_failures),
+                            allow_source_protocol_repair=review_ordinal == 1,
                             **({'question_reviewer_factory': question_reviewer_factory(config)}
                                if 'question_reviewer' in config else {}))
                     except asyncio.CancelledError:
@@ -376,6 +379,13 @@ async def run_retrieval_cycle(config, output):
                 if review['status'] == 'reviewed' and review['analysis_eligible']:
                     attempt['status'] = result['status'] = 'reviewed_data_ready'
                     break
+                if review['status'] == 'failed' and review.get('revision_feedback'):
+                    partial = validate_source_revision_feedback(review_path, packet)
+                    feedback = {'prior_query_ref': packet['query_ref'], 'prior_review_ref': review['review_ref'],
+                                'source_revision': partial}
+                    attempt['status'] = 'needs_revision_from_source_only'
+                    result['status'] = 'attempts_exhausted'
+                    continue
                 if review['status'] != 'needs_revision' or not review.get('assessment'):
                     attempt['status'] = result['status'] = 'blocked_by_review_failure'
                     break

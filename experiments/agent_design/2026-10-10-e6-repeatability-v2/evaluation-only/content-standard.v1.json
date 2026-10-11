@@ -1,0 +1,117 @@
+{
+  "schema_version": "e6-fixed-question-content-standard-v1",
+  "case_id": "E6-Q1",
+  "status": "reviewed_before_model_execution",
+  "question_sha256": "9439e3f24ad7fcab3af78f7d10bec788a31db95b7bd5f729df2dc00ba80e3efd",
+  "mandatory": [
+    {
+      "requirement_id": "sec-0000789019-FY2025",
+      "company_id": "sec-0000789019",
+      "source_snapshot_id": "msft-2025-10k",
+      "fiscal_year": 2025,
+      "period": {
+        "kind": "year",
+        "start": "2024-07-01",
+        "end": "2025-06-30"
+      },
+      "metric": "consolidated_total_revenue",
+      "value_usd": "281724000000",
+      "original_unit": "USD million",
+      "required_context": [
+        "company_identity",
+        "consolidated_total",
+        "fiscal_year_and_exact_dates",
+        "USD_and_scale",
+        "precise_source_location"
+      ]
+    },
+    {
+      "requirement_id": "sec-0000789019-FY2024",
+      "company_id": "sec-0000789019",
+      "source_snapshot_id": "msft-2025-10k",
+      "fiscal_year": 2024,
+      "period": {
+        "kind": "year",
+        "start": "2023-07-01",
+        "end": "2024-06-30"
+      },
+      "metric": "consolidated_total_revenue",
+      "value_usd": "245122000000",
+      "original_unit": "USD million",
+      "required_context": [
+        "company_identity",
+        "consolidated_total",
+        "fiscal_year_and_exact_dates",
+        "USD_and_scale",
+        "precise_source_location"
+      ]
+    },
+    {
+      "requirement_id": "sec-0001652044-FY2025",
+      "company_id": "sec-0001652044",
+      "source_snapshot_id": "googl-2025-10k",
+      "fiscal_year": 2025,
+      "period": {
+        "kind": "year",
+        "start": "2025-01-01",
+        "end": "2025-12-31"
+      },
+      "metric": "consolidated_total_revenue",
+      "value_usd": "402836000000",
+      "original_unit": "USD million",
+      "required_context": [
+        "company_identity",
+        "consolidated_total",
+        "fiscal_year_and_exact_dates",
+        "USD_and_scale",
+        "precise_source_location"
+      ]
+    },
+    {
+      "requirement_id": "sec-0001652044-FY2024",
+      "company_id": "sec-0001652044",
+      "source_snapshot_id": "googl-2025-10k",
+      "fiscal_year": 2024,
+      "period": {
+        "kind": "year",
+        "start": "2024-01-01",
+        "end": "2024-12-31"
+      },
+      "metric": "consolidated_total_revenue",
+      "value_usd": "350018000000",
+      "original_unit": "USD million",
+      "required_context": [
+        "company_identity",
+        "consolidated_total",
+        "fiscal_year_and_exact_dates",
+        "USD_and_scale",
+        "precise_source_location"
+      ]
+    }
+  ],
+  "equivalence_policy": "Accept any original occurrence proving same company, consolidated metric, exact period, unit and value. The independently reviewed DOM locations are examples, not an exclusive block-ID whitelist.",
+  "necessary_context": "Keep table headers, unit captions and total grouping where required. Inline source contexts or unambiguous annual fiscal headers may establish exact dates.",
+  "focus_policy": {
+    "allowed": "A whole atomic table may retain structural comparison columns and unrelated rows; explain this overhead. No score for optional context.",
+    "reject": [
+      "unrequested company sources",
+      "whole report delivery",
+      "duplicate equivalent tables without a stated evidential need",
+      "missing one requested company or year",
+      "substitute segment revenue for consolidated revenue",
+      "independent unrequested calculations or analysis",
+      "cross-company fiscal-date substitution"
+    ]
+  },
+  "evaluation_axes": [
+    "mandatory_coverage_4_of_4",
+    "scope_truth_provenance",
+    "focus"
+  ],
+  "reference_access": "evaluation-only; never runtime input or correction feedback",
+  "temporal_boundary": "Source available_at verified against pinned local metadata and original identity; no new SEC network acquisition or acceptance-time audit performed.",
+  "generalization_boundary": "Known E5 question, fresh runs at nested corpus sizes. One realization per tier is exploratory; no repeatability or isolated volume-only causal claim.",
+  "corpus_policy": "All tier sources discoverable and queryable; answer evidence restricted by fixed original question to the two FY2025 filings. Exploratory reads of distractors are measured, not automatically a content failure; unrequested delivered evidence remains rejected.",
+  "optional_evidence": "No optional material offsets any mandatory omission. Required context can be supplied by any sufficient original occurrence.",
+  "failure_policy": "Keep failed outputs and all costs. No change to code, prompts, limits or standards between primary tier runs. Any repair starts a separately frozen experiment; incomplete budget execution remains incomplete."
+}
