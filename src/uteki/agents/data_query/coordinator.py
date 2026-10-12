@@ -69,6 +69,13 @@ def _verify_review_feedback(feedback, request, scope, dataset):
             or prior_query.get('request', {}).get('scope') != scope_json
             or prior_query.get('active_scope') != scope_json):
         raise ValueError('prior query does not match current question, purpose and scope')
+    prior_bundle = _load(Path(feedback['prior_query_ref']['path'])/'evidence-bundle.json')
+    prior_figure_ref = prior_bundle.get('source_selection_contract', {}).get('figure_bundle_ref')
+    figure_ref = request.figure_bundle_ref.model_dump(mode='json') if request.figure_bundle_ref else None
+    if figure_ref is not None:
+        figure_ref['path'] = str(Path(figure_ref['path']).resolve())
+    if prior_figure_ref != figure_ref:
+        raise ValueError('review feedback cannot change the frozen figure supplement')
     previous = _load(Path(feedback['prior_review_ref']['path'])/'result.json')
     previous_input = _load(Path(feedback['prior_review_ref']['path'])/'input.json')
     dataset = Path(dataset).resolve()
@@ -496,6 +503,8 @@ class CompanyDataCoordinator:
                     method_root=None, financial_extractor=None, observation_root=None):
         checked = CompanyQueryInput.model_validate(request)
         protected = [self.workspace, checked.dataset, checked.prepared_run]
+        if checked.figure_bundle_ref is not None:
+            protected.append(checked.figure_bundle_ref.path)
         if observation_root is not None and checked.prepared_run:
             prepared = inspect_run(checked.prepared_run)['result']
             if prepared.get('dataset'):
@@ -542,6 +551,10 @@ class CompanyDataCoordinator:
             raise ValueError('financial execution configuration requires registered financial tasks')
         target = Path(output).resolve()
         protected = [Path(request.dataset).resolve()] if request.dataset else []
+        if request.figure_bundle_ref is not None:
+            protected.append(Path(request.figure_bundle_ref.path).resolve())
+            if self.workspace.is_relative_to(protected[-1]):
+                raise ValueError('workspace must be outside the frozen figure supplement')
         prepared_result = None
         if request.prepared_run:
             prepared = Path(request.prepared_run).resolve()
@@ -589,6 +602,8 @@ class CompanyDataCoordinator:
                 if output.is_relative_to(active_dataset): raise ValueError('query output is inside frozen dataset')
                 owner = self.port_factory(active_dataset); owners.append(owner)
                 scope = request.scope
+                if request.figure_bundle_ref is not None:
+                    owner.bind_figures(request.figure_bundle_ref)
                 owner.scoped(scope).discover_data()
             else:
                 prepared = Path(request.prepared_run).resolve() if request.prepared_run else output/'prepare'
@@ -704,7 +719,8 @@ class CompanyDataCoordinator:
                 materialize=materialize if source and config is not None else None, preparation=preparation,
                 financial_extract=financial_gateway.extract if financial_gateway else None,
                 financial_tasks=financial_gateway.catalog if financial_gateway else None, observation_context=observation_context)
-            query_result = await agent.run({'question': request.question, 'scope': scope.model_dump(mode='json')}, output=output/'query')
+            query_result = await agent.run({'question': request.question, 'scope': scope.model_dump(mode='json'),
+                **({'figure_bundle_ref': owner.figure_bundle_ref} if request.figure_bundle_ref is not None else {})}, output=output/'query')
             final_owner = next(p for p in owners if p.snapshot_id == query_result['active_scope']['snapshot_id'])
             result.update(status=query_result['status'], stop_reason=query_result['stop_reason'],
                 query_run='query', dataset=_dataset_ref(final_owner.dataset), gaps=query_result['gaps'],

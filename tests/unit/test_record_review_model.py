@@ -65,6 +65,47 @@ class RecordReviewModelTests(unittest.TestCase):
         self.assertNotIn('reasoning_content', artifacts)
         return ref['summary']
 
+    def test_figure_projection_sdk_preserves_typed_citations_and_repair_context(self):
+        from uteki.agents.data_query.question_review_generation import (
+            PROJECTION_FIGURES, question_generation_schema)
+        projected = {'schema_version': 'question-coverage-input-v3', 'packet_id': 'figure-packet',
+                     'projection_id': 'figure-projection'}
+        schema = question_generation_schema(projected)
+        self.assertIs(schema, question_generation_schema(projected))
+        generated = {'packet_id': 'figure-packet', 'projection_id': 'figure-projection', 'checks': [{
+            'request': {'question_quote': 'Identify the legend', 'requested_subject': 'legend',
+                'requested_dimension': 'definition',
+                'scope': {'kind': 'self_contained', 'reason': 'The synthetic question names a single legend.'}},
+            'judgment': {'source_subject': 'Legend A', 'relation': 'same', 'coverage': 'complete',
+                'support_basis': 'direct', 'citations': [{'kind': 'figure_text',
+                    'source_snapshot_id': 'synthetic-source', 'figure_id': 'synthetic-figure',
+                    'text_id': 'legend-a', 'quote': 'Legend A'}], 'gap': None,
+                'rationale': 'The supplied synthetic transcription contains this label.'}}],
+            'output_constraints': [], 'uncovered_requests': [], 'question_coverage': 'complete',
+            'coverage_reason': 'This transport fixture preserves one literal figure citation.'}
+        raw = json.dumps(generated)
+        reviewer = self.reviewer(lambda request: self.response(request, raw=raw),
+            output_schema=schema, output_projection=PROJECTION_FIGURES)
+        expected = project_question_generation(generated, projected)
+        repair = {'schema_version': 'question-review-repair-v3', 'projection': projected,
+                  'previous_assessment': expected}
+        async def run():
+            try:
+                self.assertEqual(await reviewer.review(projected), expected)
+                self.assertEqual(await reviewer.review(repair), expected)
+            finally:
+                await reviewer.aclose()
+        asyncio.run(run())
+        self.assertEqual(reviewer.frozen_config['output_projection'], PROJECTION_FIGURES)
+        for number in (1, 2):
+            stored = json.loads((reviewer.output/f'review-{number:04d}-parsed.json').read_text())
+            self.assertEqual(stored['checks'][0]['citations'][0]['kind'], 'figure_text')
+            self.assertEqual(stored['checks'][0]['citations'][0]['quote'], 'Legend A')
+        self.close_and_snapshot(reviewer)
+        with self.assertRaisesRegex(ValueError, 'projection or schema'):
+            self.reviewer(name='wrong-projection', output_schema=schema, output_projection=PROJECTION)
+        self.assertFalse((self.root/'wrong-projection').exists())
+
     def test_success_keeps_exact_raw_text_request_and_independent_parsed_result(self):
         reviewer = self.reviewer()
         packet = {'record_id': 'candidate-1', 'original_quote': '收入 100'}

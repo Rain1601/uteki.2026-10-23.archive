@@ -17,7 +17,8 @@ from uteki.infrastructure.research_data.run_artifacts import load_evidence_bundl
 from .artifacts import write_new
 from .autonomous import SourceAnswer
 from .question_coverage_review import (QuestionCoverageAssessment, project_question_review,
-                                      validate_question_review, QuestionReviewProtocolError,
+                                      validate_question_review, QuestionReviewProtocolError, FigureTextCitation, FigureFieldCitation,
+                                      FigureQuestionCoverageAssessment, validate_figure_citation,
                                       question_review_repair_input, validate_saved_question_review_repair)
 from .coordinator import _verify_manifest, CompanyDataCoordinator
 
@@ -112,7 +113,7 @@ Use required_block_ids and all_required_blocks_delivered for structural delivery
 """
 
 
-_EXACT_DELIVERY_VERSIONS = frozenset({'selected-originals-v2', 'selected-originals-v3', 'selected-originals-v4'})
+_EXACT_DELIVERY_VERSIONS = frozenset({'selected-originals-v2', 'selected-originals-v3', 'selected-originals-v4', 'selected-originals-v5'})
 _ORIGINAL_DELIVERY_VERSIONS = frozenset({'selected-originals-v1', *_EXACT_DELIVERY_VERSIONS})
 _SOURCE_REVIEW_POLICY = 'delivered-sources-v2'
 _SOURCE_REVIEW_POLICIES = frozenset({'delivered-sources-v1', _SOURCE_REVIEW_POLICY})
@@ -133,6 +134,15 @@ _LAYOUT_EXCLUSION_REASONS = {
     'repeated_navigation': 'frozen_repeated_navigation',
     'table_of_contents': 'frozen_table_of_contents',
 }
+
+
+def _validate_figure_review_policy(packet):
+    if packet.get('delivery_schema_version') == 'selected-originals-v5' and (
+            packet.get('purpose') != 'analysis_evidence'
+            or packet.get('source_delivery') != 'query_evidence_v1'
+            or packet.get('source_review_policy') != _SOURCE_REVIEW_POLICY
+            or packet.get('question_review_policy') != QUESTION_REVIEW_POLICY):
+        raise ValueError('v5 figure delivery requires delivered-sources-v2 and independent question review')
 
 
 def review_prompt(packet):
@@ -181,6 +191,30 @@ def review_prompt(packet):
             'justify a separate paragraph of historical, managerial or unrelated substantive content. '
             'If only part of an indivisible block is excessive, describe that limitation separately; '
             'do not remove the whole block when that would lose required evidence.\n')
+    if packet.get('delivery_schema_version') == 'selected-originals-v5':
+        prompt = prompt.replace('Image contents are NOT read.', 'Only selected source_figures transcriptions are read; unselected image contents are NOT read.')
+        prompt = prompt.replace('selected-originals-v3 or selected-originals-v4', 'selected-originals-v3, selected-originals-v4 or selected-originals-v5')
+        prompt += """
+FIGURE CONTRACT figure-evidence-v1: source_figures are separately selected source-bound
+transcriptions, not original HTML text. Provenance/OCR validation does not itself establish
+semantic visual accuracy or independent acceptance; pending remains pending. Review every
+selected figure exactly once in figure_checks by source_snapshot_id + figure_id. Report
+source_bound only when the supplied provenance supports it, supported only when its actual
+transcribed content supports the requested material, and assess relevance of the whole figure.
+Figure source_blocks/document_context record provenance and navigation only; they are not
+selected prose bodies and cannot supply unselected assumptions. Return original-source block
+quotes from source_documents for prose assumptions. Figure citations use kind=figure_text
+with source_snapshot_id, figure_id, text_id, exact continuous quote from that transcribed text;
+or kind=figure_field with source_snapshot_id, figure_id, field_path and exact string value.
+Fields are transcription.kind, transcription.texts.N.id/role/text,
+transcription.series.N.legend_id/color, transcription.printed_values.N.text_id/series_legend_id/period_text_id.
+N is a zero-based integer. Bounding boxes/coordinates, OCR confidence, alt text and estimated
+curve heights cannot establish printed observations. Ticks and legends are not data points.
+Empty printed_values means no printed point labels were transcribed, not global nondisclosure.
+text_sufficient is retained as the wire verdict for same-source sufficient delivered material:
+in this v5 contract citations may support text or selected figure material. No unseen pixels or
+undelivered context may be inferred. Missing/redundant/irrelevant material still blocks eligibility.
+"""
     return prompt
 
 
@@ -245,6 +279,42 @@ class SourceCheck(Contract):
 AnswerAssessment.model_rebuild()
 
 
+class FigureFactCheck(FactCheck):
+    citations: tuple[SourceQuote | FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
+
+
+class FigureRequirementCheck(RequirementCheck):
+    citations: tuple[SourceQuote | FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
+
+
+class FigureSourceCheck(SourceCheck):
+    citations: tuple[SourceQuote | FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
+
+
+class FigureCheck(Contract):
+    source_snapshot_id: str = Field(min_length=1, pattern=r"\S")
+    figure_id: str = Field(min_length=1, pattern=r"\S")
+    authenticity: Literal['source_bound', 'insufficient_evidence']
+    support: Literal['supported', 'contradicted', 'insufficient_evidence']
+    relevance: Literal['necessary', 'supporting_context', 'redundant', 'irrelevant']
+    rationale: str = Field(min_length=1, max_length=2000, pattern=r"\S")
+    citations: tuple[FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
+
+
+class FigureAnswerAssessment(AnswerAssessment):
+    facts: tuple[FigureFactCheck, ...]
+    requirements: tuple[FigureRequirementCheck, ...]
+    source_checks: tuple[FigureSourceCheck, ...]
+    figure_checks: tuple[FigureCheck, ...]
+
+
+class AuditedFigureAnswerAssessment(FigureAnswerAssessment):
+    composition_origin: Literal['program-composed-independent-question-v2']
+    source_response_sha256: str
+    question_response_sha256: str
+    question_review: FigureQuestionCoverageAssessment
+
+
 def source_assessment_schema(packet):
     """Expose the existing body-review obligation in this request's JSON schema.
 
@@ -254,10 +324,16 @@ def source_assessment_schema(packet):
     if packet.get('delivery_schema_version') not in _EXACT_DELIVERY_VERSIONS:
         return AnswerAssessment
     count = sum(len(document['blocks']) for document in packet.get('source_documents', []))
-    return create_model('DeliveredBodyAssessment', __base__=AnswerAssessment,
-        body_checks=(tuple[BodyCheck, ...], Field(..., min_length=count, max_length=count,
-            description='Review every delivered (source_snapshot_id, block_id) exactly once. '
-                        'This length is protocol coverage only; assess each relevance and rationale independently.')))
+    base = FigureAnswerAssessment if packet.get('delivery_schema_version') == 'selected-originals-v5' else AnswerAssessment
+    fields = {'body_checks': (tuple[BodyCheck, ...], Field(..., min_length=count, max_length=count,
+        description='Review every delivered (source_snapshot_id, block_id) exactly once. '
+                    'This length is protocol coverage only; assess each relevance and rationale independently.'))}
+    if packet.get('delivery_schema_version') == 'selected-originals-v5':
+        figure_count = len(packet.get('source_figures', []))
+        fields['figure_checks'] = (tuple[FigureCheck, ...], Field(..., min_length=figure_count, max_length=figure_count,
+            description='Review every selected (source_snapshot_id, figure_id) exactly once; '
+                        'independently judge authenticity, support and relevance.'))
+    return create_model('DeliveredBodyAssessment', __base__=base, **fields)
 
 
 class AuditedAnswerAssessment(AnswerAssessment):
@@ -374,7 +450,7 @@ def _query_evidence_documents(port, scope, bundle, coverage, max_packet_bytes,
         raise ValueError('duplicate evidence identities')
     selected = {eid for row in coverage for eid in row['evidence_ids']}
     exact_selection = delivery_schema_version in _EXACT_DELIVERY_VERSIONS
-    exclude_automatic_layout = delivery_schema_version in {'selected-originals-v3', 'selected-originals-v4'}
+    exclude_automatic_layout = delivery_schema_version in {'selected-originals-v3', 'selected-originals-v4', 'selected-originals-v5'}
     selected_records = set()
     for row in coverage:
         if row['kind'] != 'query':
@@ -390,7 +466,7 @@ def _query_evidence_documents(port, scope, bundle, coverage, max_packet_bytes,
                     or item['kind'] != 'record' or item['scope'] != scope_json):
                 raise ValueError('selected record differs from scoped query evidence')
             selected_records.add(eid)
-    explicit_body_only = delivery_schema_version == 'selected-originals-v4'
+    explicit_body_only = delivery_schema_version in {'selected-originals-v4', 'selected-originals-v5'}
     selected_body = {} if explicit_body_only else None
     explicit_selection = any('selected_blocks' in row for row in coverage)
     if explicit_body_only or any('selected_blocks' in row or (row['kind'] == 'read_node' and 'required_block_ids' in row)
@@ -638,7 +714,92 @@ def _query_evidence_documents(port, scope, bundle, coverage, max_packet_bytes,
     return list(documents.values())
 
 
+def _selected_figure_materials(port, scope, result, bundle, documents):
+    """Reopen only explicit, role-read final figures through the frozen scoped consumer."""
+    from uteki.domain.research_data.figure_evidence import FigureBundleRef, FIGURE_EVIDENCE_VERSION
+    scope_json = scope.model_dump(mode='json')
+    if result.get('role') != 'planner' or result.get('purpose') != 'analysis_evidence':
+        raise ValueError('figure handoff requires the parent analysis-evidence role')
+    ref = FigureBundleRef.model_validate(result.get('figure_bundle_ref')).model_dump(mode='json')
+    if result['request'].get('figure_bundle_ref') != ref:
+        raise ValueError('figure bundle differs from caller input')
+    port.bind_figures(ref)
+    if port.figure_bundle_ref != ref:
+        raise ValueError('figure bundle path must be canonical and explicitly pinned')
+    scoped = port.scoped(scope)
+    selected = []
+    ownership = {}
+    rows = result.get('figure_delivery_selection')
+    if not isinstance(rows, dict):
+        raise ValueError('figure delivery selection required for v5')
+    items = {item['evidence_id']: item for item in bundle['items']}
+    delivered = bundle.get('delivered_figures')
+    if not isinstance(delivered, list) or len(delivered) != len(set(delivered)):
+        raise ValueError('figure reading receipt is invalid')
+    requirements = {row['requirement_id']: row for row in result['coverage']}
+    if set(rows) - requirements.keys():
+        raise ValueError('unknown figure requirement selection')
+    for rid, row in requirements.items():
+        choices = row.get('selected_figures', [])
+        if rows.get(rid, []) != choices or (choices and row['kind'] != 'source_evidence'):
+            raise ValueError('figure selection differs from source requirement')
+        if not isinstance(choices, list):
+            raise ValueError('invalid figure selection')
+        seen = set()
+        for choice in choices:
+            if set(choice) != {'evidence_id', 'figure_id', 'source_snapshot_id', 'figure_bundle_ref'}:
+                raise ValueError('invalid selected figure fields')
+            eid = choice['evidence_id']
+            if eid in seen or eid not in row['evidence_ids'] or eid not in delivered:
+                raise ValueError('figure not fully read by selected requirement role')
+            seen.add(eid)
+            item = items.get(eid)
+            if (not item or item['kind'] != 'figure' or item['scope'] != scope_json
+                    or choice['source_snapshot_id'] != row['source_id'] or choice['figure_bundle_ref'] != ref):
+                raise ValueError('selected figure source, scope or bundle mismatch')
+            value = item['value']
+            if (value.get('status') != 'read' or value.get('material_type') != FIGURE_EVIDENCE_VERSION
+                    or value.get('figure_bundle_ref') != ref or value.get('scope') != scope_json):
+                raise ValueError('invalid read figure evidence')
+            canonical = scoped.read_figure({'source_snapshot_id': choice['source_snapshot_id'], 'figure_id': choice['figure_id']})
+            if value != canonical:
+                raise ValueError('selected figure differs from reopened frozen material')
+            figure = canonical['figure']
+            if figure.get('coordinate_status') != 'ocr_grounded' or figure.get('status') != 'ocr_grounded':
+                raise ValueError('v5 figure review requires image-bound OCR grounding')
+            key = (choice['source_snapshot_id'], choice['figure_id'])
+            if key in ownership and ownership[key]['evidence_id'] != eid:
+                raise ValueError('duplicate figure identity through different evidence')
+            if key not in ownership:
+                ownership[key] = {**choice, 'requirement_ids': [], 'figure': figure, 'source_header': canonical}
+                selected.append(deepcopy(choice))
+            ownership[key]['requirement_ids'].append(rid)
+    contract = {'version': 'selected-originals-v5', 'figure_bundle_ref': ref, 'selected_figures': selected}
+    if (bundle.get('source_selection_contract') != contract or result.get('source_selection_contract') != contract
+            or bundle.get('selected_figures') != selected):
+        raise ValueError('figure final selection manifest differs from requirement choices')
+    figures = []
+    for row in ownership.values():
+        value = {**deepcopy(row['figure']), 'figure_bundle_ref': deepcopy(ref),
+                 'evidence_id': row['evidence_id'], 'requirement_ids': row['requirement_ids']}
+        figures.append(value)
+        sid = value['source_snapshot_id']
+        if not any(doc['source_snapshot_id'] == sid for doc in documents):
+            header = row['source_header']
+            fields = ('source_snapshot_id', 'index_id', 'source_sha256', 'company_id', 'source_url',
+                      'source_period_end', 'available_at')
+            if any(key not in header or not isinstance(header[key], str) or not header[key].strip() for key in fields):
+                raise ValueError('selected figure source lacks required dataset/index metadata')
+            documents.append({key: deepcopy(header[key]) for key in fields})
+            documents[-1].update(coverage='selected_figure_material_only', blocks=[], nontext_gaps=[])
+    return figures
+
+
 def _quote(packet, citation):
+    if citation.get('kind') in {'figure_text', 'figure_field'}:
+        if packet.get('delivery_schema_version') != 'selected-originals-v5':
+            raise ValueError('figure citations require v5 original delivery')
+        return validate_figure_citation(packet.get('source_figures', []), citation)
     quote = SourceQuote.model_validate(citation).model_dump(mode='json')
     matches = [d for d in packet['source_documents'] if d['source_snapshot_id'] == quote['source_snapshot_id']]
     if len(matches) != 1:
@@ -683,11 +844,13 @@ def prepare_review_packet(query_run, dataset, *, expected_scope, max_packet_byte
     if (result.get('schema_version') != 'autonomous-result-v2'
             or result['active_scope'] != scope_json or result['request']['scope'] != scope_json):
         raise ValueError('query scope/version mismatch; scope-transition review is not supported')
+    _validate_figure_review_policy({**result, 'source_delivery': source_delivery,
+        'source_review_policy': source_review_policy, 'question_review_policy': question_review_policy})
     bundle = load_evidence_bundle(root)
     if bundle['bundle_id'] != result['evidence_bundle']['bundle_id']:
         raise ValueError('query and evidence bundle differ')
     owner = QueryDataPort(dataset)
-    canonical = {}
+    canonical, source_figures = {}, []
     try:
         scoped = owner.scoped(scope)
         scoped.discover_data()
@@ -701,6 +864,10 @@ def prepare_review_packet(query_run, dataset, *, expected_scope, max_packet_byte
             if source_delivery == 'full_indexed_text_v1' else
             _query_evidence_documents(scoped, scope, bundle, result['coverage'], max_packet_bytes,
                                       result.get('delivery_schema_version')))
+        if result.get('delivery_schema_version') == 'selected-originals-v5':
+            if source_delivery != 'query_evidence_v1':
+                raise ValueError('figure evidence requires selected source delivery')
+            source_figures = _selected_figure_materials(owner, scope, result, bundle, documents)
         for row in result['coverage']:
             if row['kind'] == 'query':
                 if row['query'].get('calculations'):
@@ -729,6 +896,9 @@ def prepare_review_packet(query_run, dataset, *, expected_scope, max_packet_byte
                 packet['source_check_ids'] = [d['source_snapshot_id'] for d in documents]
         if result.get('delivery_schema_version') in _ORIGINAL_DELIVERY_VERSIONS:
             packet['delivery_schema_version'] = result['delivery_schema_version']
+    if result.get('delivery_schema_version') == 'selected-originals-v5':
+        packet['source_figures'] = source_figures
+        packet['figure_bundle_ref'] = deepcopy(result['figure_bundle_ref'])
     evidence = {e['evidence_id']: e for e in bundle['items']}
     if len(evidence) != len(bundle['items']):
         raise ValueError('duplicate evidence identities')
@@ -739,13 +909,15 @@ def prepare_review_packet(query_run, dataset, *, expected_scope, max_packet_byte
         packet['program_gaps'].append('no_requirements')
     if result.get('purpose') == 'analysis_evidence':
         for row in result['coverage']:
-            if row['kind'] == 'source_evidence' and not row.get('selected_blocks'):
+            if row['kind'] == 'source_evidence' and not row.get('selected_blocks') and not (
+                    packet.get('delivery_schema_version') == 'selected-originals-v5' and row.get('selected_figures')):
                 packet['program_gaps'].append('delivery_selection_missing:' + row['requirement_id'])
     for row in result['coverage']:
         rid = row['requirement_id']
         packet['requirements'].append(deepcopy(row))
         if row.get('gap_ids') or row.get('program_check') not in {
                 'satisfied', 'answer_references_valid', 'source_body_delivered', 'body_complete',
+                *({'source_material_delivered'} if packet.get('delivery_schema_version') == 'selected-originals-v5' else set()),
                 *({'references_present'} if source_delivery == 'query_evidence_v1' and row['kind'] == 'information' else set())}:
             packet['program_gaps'].append('requirement_incomplete:' + rid)
         for pin in ('query_scope', 'source_scope'):
@@ -787,11 +959,11 @@ def prepare_review_packet(query_run, dataset, *, expected_scope, max_packet_byte
                 item = evidence[eid]
                 if item['kind'] != 'context':
                     continue
-                if (packet.get('delivery_schema_version') == 'selected-originals-v4'
+                if (packet.get('delivery_schema_version') in {'selected-originals-v4', 'selected-originals-v5'}
                         and row['kind'] == 'source_evidence' and not any(
                             s['context_id'] == eid for s in row.get('selected_blocks', []))):
                     continue
-                if (packet.get('delivery_schema_version') == 'selected-originals-v4'
+                if (packet.get('delivery_schema_version') in {'selected-originals-v4', 'selected-originals-v5'}
                         and row['kind'] == 'read_node'
                         and item['value']['source_snapshot_id'] != row['source_id']):
                     continue
@@ -822,7 +994,7 @@ def prepare_review_packet(query_run, dataset, *, expected_scope, max_packet_byte
                             'quote': block['text'][:20000]})]}
                     active_blocks[key] = fact
                     packet['facts'].append(fact)
-            if not found:
+            if not found and not any(rid in figure['requirement_ids'] for figure in source_figures):
                 packet['program_gaps'].append('no_reviewable_source_blocks:' + rid)
         elif row['kind'] == 'query':
             if row['query'].get('calculations'):
@@ -866,6 +1038,11 @@ def prepare_review_packet(query_run, dataset, *, expected_scope, max_packet_byte
                     raise ValueError('record has no source citations')
                 packet['facts'].append({'fact_id': eid, 'kind': 'record', 'requirement_ids': [rid],
                     'value': record.model_dump(mode='json'), 'citations': refs})
+    for figure in source_figures:
+        packet['facts'].append({'fact_id': 'source-figure-' + digest((figure['source_snapshot_id'], figure['figure_id']))[:24],
+            'kind': 'figure_material', 'requirement_ids': figure['requirement_ids'], 'value': deepcopy(figure),
+            'citations': [{'kind': 'figure_field', 'source_snapshot_id': figure['source_snapshot_id'],
+                'figure_id': figure['figure_id'], 'field_path': 'transcription.kind', 'value': figure['transcription']['kind']}]})
     if not packet['facts']:
         packet['program_gaps'].append('no_reviewable_facts')
     if question_review_policy is not None:
@@ -902,7 +1079,9 @@ def _review_source_ids(packet):
     selected = {d['source_snapshot_id'] for d in documents}
     if len(selected) != len(documents) or not selected <= metadata.keys():
         raise ValueError('delivered sources differ from retrieval scope')
-    if any(not d['blocks'] or metadata[d['source_snapshot_id']]['status'] != 'available_candidate'
+    if any((not d['blocks'] and not (packet.get('delivery_schema_version') == 'selected-originals-v5' and any(
+            f['source_snapshot_id'] == d['source_snapshot_id'] for f in packet.get('source_figures', []))))
+           or metadata[d['source_snapshot_id']]['status'] != 'available_candidate'
            for d in documents):
         raise ValueError('review body source is empty or unavailable at cutoff')
     if policy == _SOURCE_REVIEW_POLICY and packet.get('source_check_ids') != [d['source_snapshot_id'] for d in documents]:
@@ -911,7 +1090,9 @@ def _review_source_ids(packet):
 
 
 def _validate_source_assessment(packet, response):
-    assessment = AnswerAssessment.model_validate(response).model_dump(mode='json')
+    _validate_figure_review_policy(packet)
+    schema = FigureAnswerAssessment if packet.get('delivery_schema_version') == 'selected-originals-v5' else AnswerAssessment
+    assessment = schema.model_validate(response).model_dump(mode='json')
     # Preserve canonical hashes/equality for frozen responses predating this optional field.
     for optional in ('revision_requests', 'body_checks'):
         if optional not in response:
@@ -948,6 +1129,10 @@ def _validate_source_assessment(packet, response):
                     # bodies. Never find a replacement quote or a preferred block.
                     error = {'field_pointer': f'/{field}/{row_index}/citations/{citation_index}',
                              'code': 'citation_source_not_delivered'}
+                    if citation.get('kind') in {'figure_text', 'figure_field'}:
+                        error['code'] = 'citation_figure_not_exact'
+                        citation_errors.append(error)
+                        continue
                     documents = [(i, d) for i, d in enumerate(packet['source_documents'])
                                  if d['source_snapshot_id'] == citation['source_snapshot_id']]
                     if len(documents) == 1:
@@ -985,7 +1170,29 @@ def _validate_source_assessment(packet, response):
                 'unknown_body_count': len(set(reviewed_bodies) - expected_bodies),
                 'duplicate_body_count': len(reviewed_bodies) - len(set(reviewed_bodies)),
             })
-    eligible = (packet['query_status'] == 'evidence_ready' and not packet['query_gaps']
+    figures_ok = True
+    if packet.get('delivery_schema_version') == 'selected-originals-v5':
+        expected_figures = {(f['source_snapshot_id'], f['figure_id']) for f in packet.get('source_figures', [])}
+        checked_figures = [(f['source_snapshot_id'], f['figure_id']) for f in assessment['figure_checks']]
+        if len(checked_figures) != len(set(checked_figures)) or set(checked_figures) != expected_figures:
+            raise ValueError('figure checks must cover every selected figure exactly once')
+        figure_citation_errors = []
+        for check_index, check in enumerate(assessment['figure_checks']):
+            if check['support'] == 'supported' and not check['citations']:
+                raise ValueError('supported figure check requires exact figure citations')
+            for citation_index, citation in enumerate(check['citations']):
+                try:
+                    if (citation['source_snapshot_id'], citation['figure_id']) != (check['source_snapshot_id'], check['figure_id']):
+                        raise ValueError('figure check cites another selected figure')
+                    validate_figure_citation(packet['source_figures'], citation)
+                except ValueError:
+                    figure_citation_errors.append({'field_pointer': f'/figure_checks/{check_index}/citations/{citation_index}',
+                        'code': 'citation_figure_not_exact'})
+        if figure_citation_errors:
+            raise SourceCitationProtocolError(figure_citation_errors)
+        figures_ok = all(check['authenticity'] == 'source_bound' and check['support'] == 'supported'
+            and check['relevance'] in {'necessary', 'supporting_context'} for check in assessment['figure_checks'])
+    eligible = (figures_ok and packet['query_status'] == 'evidence_ready' and not packet['query_gaps']
         and not packet['program_gaps'] and assessment['question_coverage'] == 'complete'
         and not assessment.get('revision_requests')
         and all(b['relevance'] in {'necessary', 'supporting_context'} for b in body_checks)
@@ -1003,10 +1210,12 @@ def _validate_source_assessment(packet, response):
 
 
 def _question_projection(packet):
+    _validate_figure_review_policy(packet)
     if packet.get('question_review_policy') != QUESTION_REVIEW_POLICY:
         raise ValueError('explicit supported question review policy required')
     return project_question_review(packet, expected_scope=packet['scope'],
-        max_bytes=packet['max_packet_bytes'], version='question-coverage-input-v2')
+        max_bytes=packet['max_packet_bytes'], version=('question-coverage-input-v3'
+            if packet.get('delivery_schema_version') == 'selected-originals-v5' else 'question-coverage-input-v2'))
 
 
 def compose_audited_assessment(packet, source_response, question_response, question_input):
@@ -1030,7 +1239,8 @@ def compose_audited_assessment(packet, source_response, question_response, quest
         missing_information=list(dict.fromkeys([*source['missing_information'], *gaps])),
         revision_requests=list(dict.fromkeys([*source.get('revision_requests', []),
             *('Independent question review: ' + gap for gap in gaps)])))
-    value = AuditedAnswerAssessment.model_validate(value).model_dump(mode='json')
+    schema = AuditedFigureAnswerAssessment if packet.get('delivery_schema_version') == 'selected-originals-v5' else AuditedAnswerAssessment
+    value = schema.model_validate(value).model_dump(mode='json')
     # Nested model serialization must not inject R12's optional scope field into
     # frozen pre-R12 assessments. Preserve absence after full schema validation.
     for original, normalized in zip(question['checks'], value['question_review']['checks']):
@@ -1041,6 +1251,7 @@ def compose_audited_assessment(packet, source_response, question_response, quest
 
 def validate_assessment(packet, response, *, source_response=None, question_response=None, question_input=None):
     """New policies fail closed without both original reviews; legacy shape stays unchanged."""
+    _validate_figure_review_policy(packet)
     if 'question_review_policy' not in packet:
         return _validate_source_assessment(packet, response)
     if any(value is None for value in (source_response, question_response, question_input)):
@@ -1072,6 +1283,11 @@ def source_review_repair_input(packet, response, *, max_bytes):
                   'or concatenate separated spans. Select evidence yourself from delivered bodies. '
                   'Diagnostics supply no replacement quote, financial fact or preferred verdict. '
                   'Independently reassess under every original scope and semantic rule, not a patch.')}
+    if packet.get('delivery_schema_version') == 'selected-originals-v5':
+        repair['instruction'] += (' For typed figure citations, use only final source_figures: '
+            'figure_text must quote one exact text_id; figure_field must match a permitted transcribed '
+            'scalar path and value. Coordinates, tick/legend labels and curve estimates do not '
+            'establish printed observations. No replacement fact or preferred verdict is supplied.')
     if json_size(repair) > max_bytes:
         raise ValueError('source citation repair exceeds explicit limit; no content silently dropped')
     return repair
@@ -1126,6 +1342,7 @@ def _saved_review_components(root, packet):
 
 def validate_saved_assessment(root, packet):
     """Full approval still requires the sealed deterministic joint assessment."""
+    _validate_figure_review_policy(packet)
     components = _saved_review_components(root, packet)
     _bound_files(Path(root), ['response.json'])
     return validate_assessment(packet, _read(Path(root)/'response.json'), **components)
@@ -1136,7 +1353,9 @@ def _source_revision(source, eligible, diagnostic):
         or any(r['verdict'] != 'supported' for r in source['facts'])
         or any(r['verdict'] != 'complete' for r in source['requirements'])
         or any(r['verdict'] != 'text_sufficient' for r in source['source_checks'])
-        or any(r['relevance'] in {'redundant', 'irrelevant'} for r in source.get('body_checks', [])))
+        or any(r['relevance'] in {'redundant', 'irrelevant'} for r in source.get('body_checks', []))
+        or any(r['authenticity'] != 'source_bound' or r['support'] != 'supported'
+               or r['relevance'] in {'redundant', 'irrelevant'} for r in source.get('figure_checks', [])))
     if eligible or not actionable:
         raise ValueError('source review has no independently validated revision need')
     return {'schema_version': 'source-only-revision-v1', 'source_assessment': source,
@@ -1361,6 +1580,11 @@ def load_reviewed_data(review_run, *, expected_scope, expected_review_manifest_s
         value['source_documents'] = deepcopy(packet['source_documents'])
         value['limitations'][1] = ('Selected query evidence and atomic context only; unselected source text '
             'was not reviewed. No automatic global adoption or publication.')
+    if packet.get('delivery_schema_version') == 'selected-originals-v5':
+        value['source_figures'] = deepcopy(packet['source_figures'])
+        value['figure_bundle_ref'] = deepcopy(packet['figure_bundle_ref'])
+        value['limitations'][2] = ('Only selected source-bound transcriptions were read; unselected images were not read. '
+            'OCR/provenance and model reviews do not guarantee visual accuracy or change recorded independent acceptance.')
     value['handoff_id'] = 'handoff-' + digest(value)[:24]
     if packet.get('source_delivery') == 'query_evidence_v1' and json_size(value) > packet['max_packet_bytes']:
         raise ValueError('reviewed handoff exceeds explicit packet limit; no truncation')

@@ -81,8 +81,16 @@ def discover_catalog(port, request):
     status = 'available_candidate' if port.scope.include_candidates else 'quality_filtered'
     items = []
     if request.kind == 'sources':
+        figure_inventory = port.list_figures() if port.figure_bundle_ref is not None else None
         for source in sources:
             metadata = {k: v for k, v in source.items() if k != 'fiscal_periods' or port.scope.include_candidates}
+            if figure_inventory is not None:
+                metadata['figure_inventory'] = {
+                    'status': figure_inventory['status'], 'read_operation': 'read_figure',
+                    'figures': [figure for figure in figure_inventory['figures']
+                        if figure['source_snapshot_id'] == source['source_snapshot_id']],
+                    'gaps': [gap for gap in figure_inventory['gaps']
+                        if gap.get('source_snapshot_id') in (None, source['source_snapshot_id'])]}
             items.append({'item_id': source['source_snapshot_id'], 'kind': 'source', 'status': status,
                           'metadata': metadata})
     elif request.kind == 'entities':

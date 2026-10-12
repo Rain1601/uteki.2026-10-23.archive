@@ -24,11 +24,14 @@ from uteki.infrastructure.research_data.query_completion import QueryCompletionE
 from uteki.domain.research_data.task_plan import QueryRequirement
 from uteki.domain.research_data.task_completion import aggregate
 from uteki.domain.research_data.query_catalog import CatalogRequest, SchemaProbeRequest
+from uteki.domain.research_data.figure_evidence import FigureReadRequest, FigureDelivery
 from uteki.domain.research_data.run_artifacts import ARTIFACT_READ_MAX_BYTES, ArtifactReadRequest, ToolReceipt
 from uteki.infrastructure.research_data.run_artifacts import ArtifactStore, ArtifactReadProgress, at_pointer, json_size, load_evidence_bundle
 from .record_selection_navigation import candidate_index, selection_effect, navigation_page
 from .artifacts import write_new
 from .selection_contract import SelectionContractError, validate_source_selection
+from .figure_selection import (bundle_reference, validate_figure_result, validate_figure_requirements,
+                               fully_consumed, validate_figure_selection)
 from .decision_protocol import (ACTION_RULES, ARRAY_PAYLOADS, DECISION_PROTOCOL_VERSION,
                                 action_protocol_prompt, action_schema_rules)
 
@@ -117,7 +120,7 @@ Successful extraction is candidate generation, not semantic approval or adoption
 receipts rather than repeating an extraction. The full catalog is available through its artifact.
 """
 
-AUTONOMOUS_PROMPT_VERSION = 'autonomous-data-agent-v15-selection-ownership'
+AUTONOMOUS_PROMPT_VERSION = 'autonomous-data-agent-v16-explicit-figure-supplement'
 
 WORKER_PROMPT = AUTONOMOUS_PROMPT + """
 You are the bounded evidence Worker. Your packet has role=worker and fixed requirements from the
@@ -154,7 +157,7 @@ or that the final business graph is correct. Preserve that distinction in covera
 """
 
 
-ANALYSIS_EVIDENCE_PROMPT_VERSION = 'analysis-evidence-v25-selection-ownership'
+ANALYSIS_EVIDENCE_PROMPT_VERSION = 'analysis-evidence-v26-explicit-figure-supplement'
 ANALYSIS_EVIDENCE_DELIVERY_VERSION = 'selected-originals-v4'
 _ANALYSIS_REQUIREMENT_POLICY = (
     'This run gathers evidence for a separate Analysis Agent, which owns the narrative answer. '
@@ -394,8 +397,10 @@ class AutonomousDecision(Contract):
     model_config = ConfigDict(json_schema_extra=action_schema_rules)
     action: Literal['plan', 'query', 'outline_source', 'read_source', 'search_source', 'read_context',
                     'reread', 'extract', 'answer', 'acquire', 'materialize', 'load_skill', 'gap', 'finish',
-                    'discover_catalog', 'probe_schema', 'read_artifact', 'list_artifacts', 'delegate', 'financial_extract', 'select_evidence', 'select_records']
+                    'discover_catalog', 'probe_schema', 'read_artifact', 'list_artifacts', 'delegate', 'financial_extract', 'select_evidence', 'select_records', 'read_figure', 'select_figures']
     delivery: EvidenceDelivery | None = None
+    figure_read: FigureReadRequest | None = None
+    figure_delivery: FigureDelivery | None = None
     record_selection: RecordDelivery | None = None
     delegation: WorkerDelegation | None = None
     financial_extraction: FinancialExtractionAction | None = None
@@ -648,10 +653,25 @@ class AutonomousDataAgent:
         allowance = allowance or _RunAllowance(self.limits.max_steps, self.limits.max_evidence_bytes)
         scope, base = request.scope, self.port
         port = base.scoped(scope)
+        figure_bundle_ref = bundle_reference(getattr(port, 'figure_bundle_ref', None))
+        requested_figures = bundle_reference(request.figure_bundle_ref)
+        if requested_figures is not None:
+            requested_figures['path'] = str(Path(requested_figures['path']).resolve())
+        if requested_figures != figure_bundle_ref:
+            raise ValueError('Caller figure supplement differs from the explicitly bound data port')
+        if requested_figures is not None:
+            request = request.model_copy(update={'figure_bundle_ref': request.figure_bundle_ref.model_copy(
+                update={'path': requested_figures['path']})})
+        delivery_version = 'selected-originals-v5' if figure_bundle_ref else ANALYSIS_EVIDENCE_DELIVERY_VERSION
         financial_tasks = self._financial_catalog(port, scope) if role == 'planner' else {}
         output = Path(output).resolve()
         if output.is_relative_to(Path(base.dataset).resolve()):
             raise ValueError('output must be outside frozen dataset')
+        if figure_bundle_ref is not None:
+            if self.purpose != 'analysis_evidence':
+                raise ValueError('figure supplements require analysis_evidence purpose')
+            if output.is_relative_to(Path(figure_bundle_ref['path']).resolve()):
+                raise ValueError('output must be outside the frozen figure supplement')
         output.mkdir(parents=True, exist_ok=False)
         write_new(output / 'request.json', request.model_dump(mode='json'))
         skills = self._skills()
@@ -663,6 +683,8 @@ class AutonomousDataAgent:
         requirements, coverage, evidence, gaps, revisions, trace = {}, {}, {}, {}, [], []
         delivery_selection = {}
         record_selection = {}
+        figure_delivery_selection = {}
+        delivered_figures = set()
         record_origins_ref = None
         record_origin_rows = {}
         artifacts = ArtifactStore(output, observation_context=observer)
@@ -813,9 +835,12 @@ class AutonomousDataAgent:
                     unmet.append({'requirement_id': rid, 'reason': 'numeric_requirement_incomplete'})
                 if row['kind'] == 'financial_extract' and not financial_complete(row):
                     unmet.append({'requirement_id': rid, 'reason': 'candidate_financial_batch_missing'})
-                if row['kind'] in {'source_evidence', 'source_answer'} and not source_body_complete(row):
-                    unmet.append({'requirement_id': rid, 'reason': 'source_body_not_delivered'})
-                if self.purpose == 'analysis_evidence' and row['kind'] == 'source_evidence' and not delivery_selection.get(rid):
+                if row['kind'] in {'source_evidence', 'source_answer'}:
+                    material_complete = source_material_complete(rid, row) if row['kind'] == 'source_evidence' else source_body_complete(row)
+                    if not material_complete:
+                        unmet.append({'requirement_id': rid, 'reason': 'source_material_not_delivered' if figure_bundle_ref and row['kind'] == 'source_evidence' else 'source_body_not_delivered'})
+                if (self.purpose == 'analysis_evidence' and row['kind'] == 'source_evidence'
+                        and not delivery_selection.get(rid) and not figure_delivery_selection.get(rid)):
                     unmet.append({'requirement_id': rid, 'reason': 'delivery_selection_required'})
                 if self.purpose == 'analysis_evidence' and row['kind'] == 'query' and not record_selection.get(rid):
                     unmet.append({'requirement_id': rid, 'reason': 'record_selection_required'})
@@ -854,6 +879,13 @@ class AutonomousDataAgent:
                             and body['scope'] == row['source_scope'] and delivered_blocks.get(body_id)):
                         return True
             return False
+
+        def source_material_complete(rid, row):
+            # v5 permits an explicitly selected supplement as source material.
+            # This never changes text-body, chapter or numeric reading receipts.
+            return source_body_complete(row) or bool(figure_bundle_ref and figure_delivery_selection.get(rid)
+                and all(selection['evidence_id'] in delivered_figures
+                        for selection in figure_delivery_selection[rid]))
 
         def checked_quote(extract, row=None):
             parent = evidence.get(extract.context_id)
@@ -936,7 +968,20 @@ class AutonomousDataAgent:
         def run_state():
             return {'requirements': list(requirements.values()), 'coverage': list(coverage.values()), 'gaps': list(gaps.values()),
                     'delegations': deepcopy(worker_runs), 'pending_body_reads': pending_body_reads(),
-                    'source_leads': lead_packet()}
+                    'source_leads': lead_packet(),
+                    **({'figure_delivery_selection': deepcopy(figure_delivery_selection),
+                        'delivered_figures': sorted(delivered_figures)} if figure_bundle_ref else {})}
+
+        def selected_figures():
+            chosen = {}
+            for selections in figure_delivery_selection.values():
+                for selection in selections:
+                    chosen[selection['evidence_id']] = deepcopy(selection)
+            return list(chosen.values())
+
+        def figure_selection_contract():
+            return {'version': delivery_version, 'figure_bundle_ref': deepcopy(figure_bundle_ref),
+                    'selected_figures': selected_figures()}
 
         def body_catalog():
             limit = min(18000, max(512, self.limits.max_packet_bytes // 8))
@@ -950,7 +995,7 @@ class AutonomousDataAgent:
             from .record_selection_navigation import delivery_projection
             value = selection_effect(coverage, evidence, record_origin_rows, record_selection, delivery_selection,
                                      delivered_blocks)
-            value['delivery_schema_version'] = ANALYSIS_EVIDENCE_DELIVERY_VERSION
+            value['delivery_schema_version'] = delivery_version
             value['delivery_block_ids'] = delivery_projection(port, value['combined_anchor_blocks'])
             return navigation_page(artifacts, 'record-selection-effect',
                 value,
@@ -1009,6 +1054,16 @@ class AutonomousDataAgent:
                     scope=scope, step=step,
                     max_bytes=min(12000, max(512, self.limits.max_packet_bytes // 8)))
                 packet['record_selection_effect'] = selection_effect_packet()
+            if figure_bundle_ref:
+                inventory = port.list_figures()
+                figure_catalog_ref = artifacts.put('figure_catalog', inventory, scope=scope, step=step)
+                figure_catalog = artifacts.preview(figure_catalog_ref['artifact_id'],
+                    max_bytes=min(4000, max(512, self.limits.max_packet_bytes // 12)), limit=self.limits.page_items)
+                packet.update(figure_bundle_ref=deepcopy(figure_bundle_ref),
+                    source_selection_contract=figure_selection_contract(),
+                    figure_catalog={**figure_catalog, 'artifact': figure_catalog_ref, 'navigation_only': True},
+                    figure_delivery_selection=deepcopy(figure_delivery_selection),
+                    delivered_figures=sorted(delivered_figures))
             if preparation_ref:
                 packet['preparation'] = {**artifacts.preview(preparation_ref['artifact_id'],
                     max_bytes=observation_budget, limit=self.limits.page_items), 'artifact': preparation_ref}
@@ -1098,7 +1153,8 @@ class AutonomousDataAgent:
             rows = {rid: {'evidence_ids': sorted({semantic_id(eid) for eid in row['evidence_ids']}), 'has_gap': bool(row['gap_ids']),
                           'returned': row.get('returned_block_ids', [])} for rid, row in coverage.items()}
             return digest({'coverage': rows, 'exploration': sorted(exploration), 'skill_reads': sorted(skill_reads),
-                           'delivery_selection': delivery_selection, 'record_selection': record_selection})
+                           'delivery_selection': delivery_selection, 'record_selection': record_selection,
+                           'figure_delivery_selection': figure_delivery_selection, 'delivered_figures': sorted(delivered_figures)})
 
         def navigation_progress(action_name, value):
             prefix = [scope.snapshot_id, value.get('source_snapshot_id'), value.get('index_id')]
@@ -1129,10 +1185,16 @@ class AutonomousDataAgent:
             # Commit reading only if the projected body is actually delivered to
             # the next planner call, including when it reports a timeout/error.
             previous_coverage, previous_blocks, previous_text = deepcopy(coverage), deepcopy(delivered_blocks), deepcopy(delivered_text)
+            previous_figures = set(delivered_figures)
             for item in pending_delivery: apply_delivery(item)
+            shown = deepcopy(read_progress)
+            for mark in pending_views: shown.apply(mark)
+            delivered_figures.update(eid for eid, item in evidence.items() if item['kind'] == 'figure'
+                and fully_consumed(shown, evidence_artifacts[eid]['artifact_id'], item['value']))
             packet = make_packet()
             if json_size(packet) > self.limits.max_packet_bytes:
                 coverage, delivered_blocks, delivered_text = previous_coverage, previous_blocks, previous_text
+                delivered_figures = previous_figures
                 stop_reason = 'context_limit'; break
             for mark in pending_views: read_progress.apply(mark)
             pending_views = []
@@ -1143,6 +1205,7 @@ class AutonomousDataAgent:
             action, refs, pending_read_mark = None, (), None
             step_observer = observer.for_step(step) if observer else None
             step_started = time.monotonic()
+            planner_invoked = False
             try:
                 if step_observer:
                     step_observer.guard()
@@ -1152,6 +1215,7 @@ class AutonomousDataAgent:
                 allowance.decisions_used += 1
                 decision_kwargs = ({'observation_context': step_observer}
                     if step_observer and 'observation_context' in inspect.signature(self.planner.decide).parameters else {})
+                planner_invoked = True
                 raw = await asyncio.wait_for(self.planner.decide(deepcopy(packet), **decision_kwargs), self.limits.turn_timeout)
                 action = AutonomousDecision.model_validate(raw)
                 write_new(folder / 'decision.json', action.model_dump(mode='json'))
@@ -1198,7 +1262,17 @@ class AutonomousDataAgent:
                             # does not trigger the repetitive-action stop early.
                             if self.purpose == 'analysis_evidence' and page['unit'] == 'items' and page['pointer'] == '/blocks':
                                 exploration.add(digest(['explicit_artifact_review', page['artifact_id']]))
+                    elif page['total_count'] == 0:
+                        # An explicitly delivered empty container is complete;
+                        # an omitted container is not. Preserve that distinction.
+                        pending_read_mark = read_progress.page_mark(page)
                     if ref.evidence_id:
+                        if ref.kind == 'figure':
+                            item = evidence[ref.evidence_id]
+                            validate_figure_requirements(refs, coverage, item['scope'],
+                                item['value']['figure']['source_snapshot_id'])
+                            if item['scope'] != scope.model_dump(mode='json'):
+                                raise ValueError('Figure artifact differs from active scope')
                         attach(ref.evidence_id, refs)
                         if ref.kind == 'context': pending_delivery.append(page_delivery(ref.evidence_id, page))
                     observation = {'status': 'tool_returned', 'result': page, 'artifact': ref.model_dump(mode='json')}
@@ -1301,6 +1375,13 @@ class AutonomousDataAgent:
                     observation = {'status': 'gap_recorded', 'gap_id': gap(action.reason, refs)}
                 elif action.action == 'reread':
                     if any(eid not in evidence for eid in action.evidence_ids): raise ValueError('unknown evidence ID')
+                    for eid in action.evidence_ids:
+                        item = evidence[eid]
+                        if item['kind'] == 'figure':
+                            validate_figure_requirements(refs, coverage, item['scope'],
+                                item['value']['figure']['source_snapshot_id'])
+                            if item['scope'] != scope.model_dump(mode='json'):
+                                raise ValueError('Figure reread differs from active scope')
                     observation = {'items': [], 'evidence_ids': list(action.evidence_ids)}
                     for eid in action.evidence_ids:
                         view = preview_evidence(eid)
@@ -1350,6 +1431,24 @@ class AutonomousDataAgent:
                         for block in selected: attach(block['context_id'], (rid,))
                     observation = {'status': 'delivery_selected', 'requirement_ids': list(refs),
                                    'delivery_selection': selected, 'record_selection_effect': selection_effect_packet()}
+                elif action.action == 'read_figure':
+                    if self.purpose != 'analysis_evidence' or figure_bundle_ref is None:
+                        raise ValueError('read_figure requires an explicit analysis_evidence figure supplement')
+                    validate_figure_requirements(refs, coverage, scope.model_dump(mode='json'),
+                        action.figure_read.source_snapshot_id)
+                    value = port.read_figure(action.figure_read)
+                    validate_figure_result(value, action.figure_read, scope.model_dump(mode='json'), figure_bundle_ref)
+                    eid = store('figure', value, refs)
+                    observation = {'status': 'tool_returned', 'evidence_ids': [eid], 'result': value}
+                elif action.action == 'select_figures':
+                    if self.purpose != 'analysis_evidence':
+                        raise ValueError('Figure selection is for analysis_evidence source_evidence requirements')
+                    selected = validate_figure_selection(refs, action.figure_delivery.evidence_ids,
+                        coverage, evidence, delivered_figures, scope.model_dump(mode='json'), figure_bundle_ref)
+                    for rid in refs:
+                        figure_delivery_selection[rid] = deepcopy(selected)
+                    observation = {'status': 'figures_selected', 'requirement_ids': list(refs),
+                        'selected_figures': selected, 'source_selection_contract': figure_selection_contract()}
                 elif action.action == 'extract':
                     ids = []
                     for extract in action.extracts:
@@ -1601,12 +1700,14 @@ class AutonomousDataAgent:
                 if isinstance(error, ModelOutputLimitExceeded):
                     observation['output_limit'] = deepcopy(error.diagnostic)
             full_observation = observation
+            if not planner_invoked:
+                delivered_figures = previous_figures
             full_artifact = artifacts.put('tool_output', full_observation, scope=scope, step=step)
             truncated = bool(observation.get('preview_truncated', False))
             if 'result' in full_observation:
                 value = full_observation['result']
                 matching = [eid for eid in full_observation.get('evidence_ids', [])
-                            if evidence[eid]['kind'] == 'context' and evidence[eid]['value'] == value]
+                            if evidence[eid]['kind'] in {'context', 'figure'} and evidence[eid]['value'] == value]
                 result_artifact = evidence_artifacts[matching[0]] if matching else artifacts.put('tool_payload', value, scope=scope, step=step)
                 projected = artifacts.preview(result_artifact['artifact_id'], max_bytes=observation_budget, limit=self.limits.page_items)
                 observation = {k: v for k, v in full_observation.items() if k != 'result'}
@@ -1620,7 +1721,8 @@ class AutonomousDataAgent:
                     pending_read_mark = None
                 pending_views.append(read_progress.preview_mark(result_artifact['artifact_id'], value, projected['value']))
                 for eid in matching:
-                    pending_delivery.append({'evidence_id': eid, 'blocks': visible_blocks(projected['value'])})
+                    if evidence[eid]['kind'] == 'context':
+                        pending_delivery.append({'evidence_id': eid, 'blocks': visible_blocks(projected['value'])})
                 # Document query contexts are evidence too, but only contexts in
                 # the actual preview are delivered to the planner.
                 for doc in projected['value'].get('documents', []) if isinstance(projected['value'], dict) else []:
@@ -1653,6 +1755,7 @@ class AutonomousDataAgent:
                      {'query': 'query', 'acquire': 'acquisition', 'materialize': 'materialization',
                       'financial_extract': 'financial_extraction',
                       'read_source': 'reading', 'read_context': 'reading', 'search_source': 'reading',
+                      'read_figure': 'reading', 'select_figures': 'selection',
                       'outline_source': 'reading', 'discover_catalog': 'catalog', 'probe_schema': 'catalog',
                       'read_artifact': 'artifact', 'reread': 'artifact'}.get(action_name, 'runtime'))
             receipt = ToolReceipt(step=step, action=action_name, requirement_ids=refs,
@@ -1685,6 +1788,8 @@ class AutonomousDataAgent:
         for rid, row in coverage.items():
             if self.purpose == 'analysis_evidence' and row['kind'] == 'source_evidence':
                 row['selected_blocks'] = deepcopy(delivery_selection.get(rid, []))
+                if figure_bundle_ref:
+                    row['selected_figures'] = deepcopy(figure_delivery_selection.get(rid, []))
             if self.purpose == 'analysis_evidence' and row['kind'] == 'query':
                 row['selected_record_ids'] = list(record_selection.get(rid, []))
             unread_targets = [item for item in pending_body_reads() if rid in item['requirement_ids']]
@@ -1708,9 +1813,9 @@ class AutonomousDataAgent:
                     gap('source_answer_partial', (rid,), evidence[eid]['value']['unresolved_questions'])
                 continue
             if row['kind'] == 'source_evidence':
-                complete = source_body_complete(row)
-                row['program_check'] = 'source_body_delivered' if complete else 'source_body_not_delivered'
-                if not complete and not row['gap_ids']: gap('source_body_not_delivered', (rid,))
+                complete = source_material_complete(rid, row)
+                row['program_check'] = ('source_material_delivered' if complete else 'source_material_not_delivered') if figure_bundle_ref else ('source_body_delivered' if complete else 'source_body_not_delivered')
+                if not complete and not row['gap_ids']: gap(row['program_check'], (rid,))
                 continue
             if row['kind'] == 'query':
                 row['program_check'] = aggregate(c['status'] for c in row['query_checks'])
@@ -1724,6 +1829,8 @@ class AutonomousDataAgent:
                   'items': [{**{k: v for k, v in item.items() if k != 'value'}, 'artifact': evidence_artifacts[eid]}
                             for eid, item in evidence.items()],
                   'delivered_body': {eid: sorted(ids) for eid, ids in delivered_blocks.items()},
+                  **({'delivered_figures': sorted(delivered_figures), 'selected_figures': selected_figures(),
+                      'source_selection_contract': figure_selection_contract()} if figure_bundle_ref else {}),
                   'scope_history': [t['feedback'] for t in trace if t['action'] in self.callbacks],
                   'candidate_only': True, 'semantic_completeness': 'not_evaluated'}
         bundle['bundle_id'] = 'bundle-' + digest(bundle)[:24]
@@ -1732,7 +1839,10 @@ class AutonomousDataAgent:
         result = {'schema_version': 'autonomous-result-v2', 'status': status, 'stop_reason': stop_reason, 'request': request.model_dump(mode='json'),
             'purpose': self.purpose,
             **({'delivery_selection': delivery_selection} if self.purpose == 'analysis_evidence' else {}),
-            **({'delivery_schema_version': ANALYSIS_EVIDENCE_DELIVERY_VERSION} if self.purpose == 'analysis_evidence' else {}),
+            **({'delivery_schema_version': delivery_version} if self.purpose == 'analysis_evidence' else {}),
+            **({'figure_bundle_ref': deepcopy(figure_bundle_ref),
+                'figure_delivery_selection': deepcopy(figure_delivery_selection),
+                'source_selection_contract': figure_selection_contract()} if figure_bundle_ref else {}),
             'active_scope': scope.model_dump(mode='json'), 'plan_origin': self.planner.plan_origin,
             'plans': revisions, 'coverage': list(coverage.values()), 'gaps': list(gaps.values()),
             'evidence_bundle': {'path': 'evidence-bundle.json', 'bundle_id': bundle['bundle_id'], 'item_count': len(bundle['items'])},

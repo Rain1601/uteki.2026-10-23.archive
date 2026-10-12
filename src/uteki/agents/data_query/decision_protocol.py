@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 
 
-DECISION_PROTOCOL_VERSION = 'data-agent-decision-v6-selection-ownership'
+DECISION_PROTOCOL_VERSION = 'data-agent-decision-v7-explicit-figure-supplement'
 
 SOURCE_SELECTION_RULE = (
     'select_evidence applies one identical delivery.blocks list to EVERY requirement_id; '
@@ -37,6 +37,8 @@ ACTION_RULES = {
     'extract': ActionRule('extracts', references=True),
     'select_evidence': ActionRule('delivery', references=True, reason=True),
     'select_records': ActionRule('record_selection', references=True, reason=True),
+    'read_figure': ActionRule('figure_read', references=True),
+    'select_figures': ActionRule('figure_delivery', references=True, reason=True),
     'answer': ActionRule('answer', references=True),
     'acquire': ActionRule('arguments', references=True),
     'materialize': ActionRule('arguments', references=True),
@@ -87,6 +89,13 @@ def action_protocol_prompt():
         rows.append(f'{action} | {rule.payload or "none"} | {", ".join(required) or "none"}')
     rows.extend([
         SOURCE_SELECTION_RULE,
+        'When an explicit figure bundle is available, figure_catalog is navigation only. '
+        'read_figure uses figure_read={source_snapshot_id,figure_id}; complete omitted fields with '
+        'read_artifact. select_figures uses figure_delivery={evidence_ids:[ev-...]} and applies the '
+        'same explicit list to every source_evidence requirement. Only fully consumed figures '
+        'owned by this role, requirement, source, scope and bundle are eligible. Figures never '
+        'establish text-body reading, read_node coverage or numeric query completion. Explicitly '
+        'selected figures may complete source_evidence material requirements under v5.',
         'select_records likewise applies the entire record_ids list to every requirement_id; '
         'each must have returned every selected record in its own pinned query. Use separate actions '
         'when the intended record sets differ. Source ownership does not establish semantic relevance.',

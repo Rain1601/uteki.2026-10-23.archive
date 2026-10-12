@@ -1,5 +1,7 @@
 # 换机接续开发 · 2026-10-10
 
+2026-10-12 **当前位置：03-M3 工程接入已完成，真实原图/模型验收待执行。** R25–R29 已先回归、提交并上传 `0319a2ed`，远端同 SHA 已核验。随后完成调用方显式图片包绑定、scoped 导航/按需读取、角色实际完整阅读、显式选择、v5 原件重组、双审精确引用和恢复同包绑定。354 项定向整合检查、最终 84 项双审/公开调用链（有重叠）、576 Python + 37 JavaScript core 回归通过；fixture/SDK mock 是工程证据，不是模型实测。本轮 0 API / $0，未调用 AiHubMix。**紧接着：恢复 03-M2 原图片包及对应 v5 datasets，独立精读原图后冻结具体问题、重复次数、验收标准、官方模型配置及任务预算，再真实运行。** 原包缺失时不勾完 03-M3、不追认旧另一机器成绩、不重建费用历史。[工程交付与剩余验收](FIGURE_QUERY_DELIVERY_2026-10-12.zh-CN.md)。
+
 2026-10-12 **R25–R29 五项 review 根因修复与整合回归完成**：依赖锁、SEC 私密身份入口、全角度 OCR 消费判据、行为组件指纹与非法费用单记录隔离。118 项定向检查、576 Python + 37 JavaScript core、实际 --locked 安装通过；0 API。**当前位置：修复收尾，下一 03-M3 图片按需消费**。本机缺原图片包/v5 dataset/原 E1 费用证据，真实原图未重验；图片生产入口仍使用被禁用的 AiHubMix，本轮不会调用。旧 03-M2 为另一机器的历史验收，保留原记录。[修复与回归边界](CODE_REVIEW_FIXES_2026-10-12-v2.zh-CN.md)。
 
 2026-10-12 **03-M2 图片材料缺口已补齐；微软/Alphabet FY2025 10-K 主文材料准备按本轮范围通过。** 系统独立扫描获取两张原图，Sonnet 两批4次真实转录；68项文字/8图例颜色/原文上下文正确。首批模型位置错位，改为通用本机 OCR 实测坐标、精确文本匹配和消费者重放校验，未放宽标准、未写公司特例。最终 v3 是同模型原稿的确定性坐标重建，原 v1/v2 留存；文字/表格沿03-M1原验收。含顾问合计估算 **$0.517494**。**下一03-M3：图片材料接入主 Query Agent 的按需消费验收**；这部分未运行。07仍有2,970个事实未映射，任意格式/全文财务语义不在本次通过范围。依赖 Pillow + Tesseract eng；运行包 `output/figure-materials-20261012` 和基础 v5 dataset须一起迁移。[验收与原图入口](../experiments/agent_design/2026-10-12-figure-materials-v1/ACCEPTANCE.zh-CN.md)。
@@ -54,12 +56,14 @@ E6-B1 完成时点历史：三档 2/3/4 完整年报、2,739/4,289/5,636 导航�
 
 1. 阅读[工作约定](../AGENTS.md)、本文件、[统一验收标准](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)和[逐题交付](../experiments/agent_design/2026-10-09-e4-heldout-v1/DELIVERY.zh-CN.md)。
 2. 检查代码、公开交付和私密状态是否齐全。Git可恢复代码和公开解释；继续原实验还需要本机迁移包中的原件、冻结运行和真实账本。
-3. 从[主待办当前队列](../TODO.md#有序待办)的E6-R4接续：先读[V3交付](../experiments/agent_design/2026-10-10-e6-repeatability-v3/PUBLIC_DELIVERY.zh-CN.md)及`evaluation-only/R3-S1-failure-trace.v1.json`，定位8192输出中8012推理占用、JSON截断和length失败处置的责任层，做可证伪最小复现与通用修复，另行冻结再按原输入/标准回归和独立验证。不要盲加重试/额度或重跑V3旧样本。E6-R5另留要求归属误用，不与输出截断混成一个原因。参考答案、精确必需块与验收批评不得传入运行Agent；V1/V2/R3/V3原分母及失败保持。
+3. 从[主待办当前队列](../TODO.md#有序待办)的 **03-M3** 接续，先读[工程交付](FIGURE_QUERY_DELIVERY_2026-10-12.zh-CN.md)与[冻结消费契约](FIGURE_QUERY_CONTRACT_V1.zh-CN.md)。恢复 03-M2 原图片包和对应 v5 datasets 后，Codex 独立核验原图、冻结具体问题/重复次数/必要与冗余标准、官方模型及预算，再运行 Agent；参考答案、必需图 ID 和评测批评不传入。历史 E6-R4/R5 保留在队列后方，旧失败与原分母不改写；不要根据下方历史“下一步”启动调用。
 
 ## 已完成与剩余范围
 
 | ID | 状态 / 依赖 | 可查看交付 |
 |---|---|---|
+| **03-M3** | **当前：工程完成；真实原图/模型验收待原包** | [工程交付及下一验收](FIGURE_QUERY_DELIVERY_2026-10-12.zh-CN.md) |
+| R25–R29 | 已修、回归并上传 `0319a2ed` | [五项根因修复](CODE_REVIEW_FIXES_2026-10-12-v2.zh-CN.md) |
 | C1–C3 | 验收统一、清理备份、本地启动完成 | [统一标准](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)、[归档清单](REPOSITORY_RETENTION.zh-CN.md) |
 | E1 | 双年度七题受限基线；旧账本及私密包缺失 | [历史阶段报告](../experiments/agent_design/2026-10-09-e1-benchmark-v1/DELIVERY.zh-CN.md) |
 | E2 | 指定10-Q收入题r3必要4/4、原件/范围/聚焦及双审通过 | [季度逐题结果与失败](../experiments/agent_design/2026-10-09-e2-msft-10q-v1/DELIVERY.zh-CN.md) |

@@ -1,6 +1,6 @@
 ---
 name: data-agent-query
-version: 17
+version: 18
 ---
 Load this skill when planning or querying. Its content and hash stay frozen for the run.
 
@@ -23,6 +23,22 @@ In analysis_evidence, query original records/operands; calculation requirements 
 Use kind=source_evidence with an explicit scoped source_id and no node_id when the task only asks to deliver or verify original text/table. The host requires complete body blocks from that source actually delivered to this role; a record, citation, navigation hit or Worker handoff cannot satisfy it. This does not require reading a full chapter and does not establish semantic correctness by itself.
 
 Selection ownership: one select_evidence action applies its identical delivery.blocks list to EVERY requirement_id; it does not partition a combined list among them. Prefer one requirement per action. Batch only requirements with the same source_id and pinned scope that need identical blocks. Different sources, report versions or intended block sets require separate actions. Check source_id on the requirements and the selected contexts, not company names or equal amounts. No invalid action changes previous selections. A selection_diagnostic distinguishes source/scope mismatch from incomplete reading; source mismatch alone does not require rereading. The Agent must choose each group's blocks itself. select_records likewise applies the entire record_ids list to each requirement; only records returned by every selected requirement are eligible.
+
+An explicit figure_bundle_ref enables the independent figure supplement (selected-originals-v5).
+figure_catalog contains source-bound navigation metadata only; no transcription or image is
+automatically delivered. Choose the relevant figure yourself, then read_figure with
+figure_read={source_snapshot_id,figure_id} and matching source_evidence requirement_ids.
+Read every omitted field through its exact read_artifact pointer, including transcription,
+document_context and provenance. Partial JSON, a disk file or another role's reading does not
+establish complete figure consumption. After reading, explicitly select_figures with
+figure_delivery={evidence_ids:[ev-...]} and a reason. This replaces those requirements' figure
+selection, independently of select_evidence; it never changes text/block or numeric selections.
+Only fully consumed, same-role, same-requirement/source/scope/bundle figures are eligible.
+Keep image transcription and nearby document context distinct from reported numeric records.
+Explicitly selected figures may complete source_evidence material requirements under v5; they
+cannot establish original text-body reading, read_node coverage or numeric query completion. Preserve
+independent_acceptance, coordinate_status and gaps; protocol validation or OCR grounding does not
+prove visual accuracy. No explicit supplement keeps the original selected-originals-v4 contract.
 
 For purpose=question_answer, use kind=source_answer when the task asks a narrative question, such as the categories or reasons disclosed in a source. Reading a related paragraph is insufficient. Submit action=answer for exactly one requirement, with claims containing statement, temporal_basis, period_context and citations using the Extraction fields (context_id, block_id, quote, label). Every quote must come from a fully delivered block in that requirement's pinned source and scope. Separate reported_actual, forward_looking, not_period_specific and unclear. Read the introduction and full list when the task requires categories; do not infer completeness from one relevant passage.
 

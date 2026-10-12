@@ -3,6 +3,7 @@ from typing import Literal
 from pydantic import Field, model_validator
 
 from .execution_scope import ExecutionScope
+from .figure_evidence import FigureBundleRef
 from .query_contract import Contract
 
 
@@ -20,6 +21,7 @@ class CompanyQueryInput(Contract):
     purpose: Literal['question_answer', 'business_materials', 'analysis_evidence'] = 'question_answer'
     dataset: str | None = Field(default=None, min_length=1, pattern=r'\S')
     scope: ExecutionScope | None = None
+    figure_bundle_ref: FigureBundleRef | None = Field(default=None, exclude_if=lambda value: value is None)
     prepared_run: str | None = Field(default=None, min_length=1, pattern=r'\S')
     company_config: dict | None = None
     include_candidates: bool | None = None
@@ -29,6 +31,11 @@ class CompanyQueryInput(Contract):
 
     @model_validator(mode='after')
     def explicit_input(self):
+        if self.figure_bundle_ref is not None:
+            if self.dataset is None:
+                raise ValueError('figure supplement requires an explicitly selected frozen dataset')
+            if self.purpose != 'analysis_evidence':
+                raise ValueError('figure supplement requires analysis_evidence purpose')
         if len({task.task_id for task in self.financial_tasks}) != len(self.financial_tasks):
             raise ValueError('financial task IDs must be unique')
         if sum(x is not None for x in (self.dataset, self.prepared_run, self.company_config)) != 1:

@@ -6,6 +6,7 @@ from pydantic import Field, model_validator
 from .agent_query import AnswerPart, ContextRequest, QueryPlan
 from .execution_scope import ExecutionScope, SourceOutlineRequest, SourceReadRequest, SourceSearchRequest
 from .query_contract import Contract
+from .figure_evidence import FigureBundleRef
 
 SCOPED_AGENT_VERSION = "data-agent-query-v0.3"
 
@@ -14,6 +15,7 @@ class ScopedAgentQuery(Contract):
     agent_schema_version: Literal["data-agent-query-v0.3"] = SCOPED_AGENT_VERSION
     question: str = Field(min_length=1, max_length=4000, pattern=r"\S")
     scope: ExecutionScope
+    figure_bundle_ref: FigureBundleRef | None = Field(default=None, exclude_if=lambda value: value is None)
 
 
 class ScopedPlannerDecision(Contract):

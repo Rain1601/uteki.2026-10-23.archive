@@ -199,7 +199,10 @@ class FigureMaterialReader:
                 'original_image_path': str(_contained(self.bundle, row['original'])),
                 'original_document_path': str(_contained(self.dataset, source['raw_file'])),
                 'locations': wanted['locations'], 'source_blocks': source_blocks,
-                'transcription': transcription, 'document_context': origin['document_context'],
+                'transcription': transcription,
+                'transcription_sha256': files[row['transcription']],
+                'figure_bundle_manifest_sha256': self._manifest_sha256,
+                'document_context': origin['document_context'],
                 'status': row['status'], 'bundle_status': manifest['status'],
                 'independent_acceptance': manifest.get('independent_acceptance', 'pending'),
                 'coordinate_status': ('ocr_grounded' if manifest['version'] == 'figure-materials-v3'
@@ -207,6 +210,27 @@ class FigureMaterialReader:
                     else 'unverified_model_coordinates'),
             }
         return result
+
+    def inventory(self):
+        """Source-bound metadata and gaps, without transcription in the result."""
+        records = self._load()
+        manifest_raw = (self.bundle / 'manifest.json').read_bytes()
+        if _sha(manifest_raw) != self._manifest_sha256:
+            raise ValueError('Figure bundle manifest changed during inventory read')
+        manifest = json.loads(manifest_raw)
+        discovered = discover_figures(self.dataset)
+        if discovered['dataset_manifest_sha256'] != manifest['dataset_manifest_sha256']:
+            raise ValueError('Figure dataset binding changed during inventory read')
+        expected = {figure['figure_id']: figure for figure in discovered['figures']}
+        gaps = []
+        for gap in manifest['gaps']:
+            source = expected.get(gap.get('figure_id'), {})
+            gaps.append({**gap, **{key: source[key] for key in ('company_id', 'source_snapshot_id') if key in source}})
+        fields = ('figure_id', 'company_id', 'source_snapshot_id', 'source_url',
+            'document_source_url', 'source_sha256', 'image_sha256', 'status',
+            'bundle_status', 'independent_acceptance', 'coordinate_status')
+        return {'status': manifest['status'], 'figures': [
+            {key: value[key] for key in fields} for value in records.values()], 'gaps': gaps}
 
     def list(self):
         """Small inventory; full transcripts are only loaded through read()."""

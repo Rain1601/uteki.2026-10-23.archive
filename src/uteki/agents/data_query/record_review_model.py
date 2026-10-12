@@ -90,8 +90,12 @@ class SdkRecordReviewer:
         if (provider != 'deepseek' and not native) or not pricing:
             raise ValueError('Raw record-review capture requires a registered DeepSeek or native Claude model')
         if output_projection is not None:
-            from .question_review_generation import PROJECTION, QuestionCoverageGeneration
-            if output_projection != PROJECTION or output_schema is not QuestionCoverageGeneration:
+            from .question_review_generation import (PROJECTION, PROJECTION_FIGURES,
+                QuestionCoverageGeneration, question_generation_schema)
+            expected = (QuestionCoverageGeneration if output_projection == PROJECTION
+                else question_generation_schema({'schema_version': 'question-coverage-input-v3'})
+                if output_projection == PROJECTION_FIGURES else None)
+            if expected is None or output_schema is not expected:
                 raise ValueError('Unsupported review output projection or schema')
         schema = AgentOutputSchema(output_schema or dict, strict_json_schema=False)
         self._output_projection = output_projection
@@ -211,11 +215,17 @@ class SdkRecordReviewer:
                     if hasattr(value, 'model_dump'): value = value.model_dump(mode='json')
                     if not isinstance(value, dict): raise ValueError('Record-review output must be a JSON object')
                     if self._output_projection is not None:
-                        from .question_review_generation import project_question_generation
+                        from .question_review_generation import PROJECTION_FIGURES, project_question_generation
                         generated_path = self.output/f'review-{self._reviews:04d}-generated.json'
                         write_new(generated_path, value)
                         generated_sha = digest(value)
-                        value = project_question_generation(value)
+                        if self._output_projection == PROJECTION_FIGURES:
+                            projected = packet.get('projection', packet)
+                            if projected.get('schema_version') != 'question-coverage-input-v3':
+                                raise ValueError('Figure output projection requires a v3 question input')
+                            value = project_question_generation(value, projected)
+                        else:
+                            value = project_question_generation(value)
                         write_new(self.output/f'review-{self._reviews:04d}-projection.json', {
                             'protocol': self._output_projection, 'generated_sha256': generated_sha,
                             'canonical_sha256': digest(value),

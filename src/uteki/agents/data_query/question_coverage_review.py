@@ -196,6 +196,109 @@ class QuestionCoverageAssessment(QuestionCoverageAssessmentV1):
     checks: tuple[QuestionCoverageCheckV2, ...] = Field(max_length=64)
 
 
+class FigureTextCitation(Contract):
+    kind: Literal['figure_text']
+    source_snapshot_id: str = Field(min_length=1, pattern=r"\S")
+    figure_id: str = Field(min_length=1, pattern=r"\S")
+    text_id: str = Field(min_length=1, pattern=r"\S")
+    quote: str = Field(min_length=1, max_length=20000, pattern=r"\S")
+
+
+class FigureFieldCitation(Contract):
+    kind: Literal['figure_field']
+    source_snapshot_id: str = Field(min_length=1, pattern=r"\S")
+    figure_id: str = Field(min_length=1, pattern=r"\S")
+    field_path: str = Field(min_length=1, pattern=r"\S")
+    value: str = Field(min_length=1, max_length=20000, pattern=r"\S")
+
+
+class FigureQuestionCoverageCheck(QuestionCoverageCheckV2):
+    citations: tuple[BlockQuoteCitation | RecordFieldCitation | FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
+    qualification_citations: tuple[BlockQuoteCitation | FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
+
+
+class FigureQuestionCoverageAssessment(QuestionCoverageAssessment):
+    checks: tuple[FigureQuestionCoverageCheck, ...] = Field(max_length=64)
+
+
+_FIGURE_FIELDS = ('figure_id', 'company_id', 'source_snapshot_id', 'source_url',
+    'document_source_url', 'source_sha256', 'image_sha256', 'locations', 'transcription',
+    'status', 'bundle_status', 'independent_acceptance', 'coordinate_status', 'figure_bundle_ref',
+    'transcription_sha256', 'figure_bundle_manifest_sha256')
+
+
+def question_assessment_schema(projected):
+    return (FigureQuestionCoverageAssessment if projected.get('schema_version') == 'question-coverage-input-v3'
+            else QuestionCoverageAssessment if projected.get('schema_version') == 'question-coverage-input-v2'
+            else QuestionCoverageAssessmentV1)
+
+
+def validate_figure_citation(figures, citation):
+    """Only literal transcribed labels and explicit scalar fields, never geometry-derived values."""
+    kind = citation.get('kind')
+    model = FigureTextCitation if kind == 'figure_text' else FigureFieldCitation if kind == 'figure_field' else None
+    if model is None:
+        raise ValueError('unsupported figure citation kind')
+    ref = model.model_validate(citation).model_dump(mode='json')
+    rows = [row for row in figures if row['source_snapshot_id'] == ref['source_snapshot_id']
+            and row['figure_id'] == ref['figure_id']]
+    if len(rows) != 1:
+        raise ValueError('figure citation is outside selected original figures')
+    transcription = rows[0]['transcription']
+    if kind == 'figure_text':
+        labels = [text for text in transcription['texts'] if text['id'] == ref['text_id']]
+        if len(labels) != 1 or ref['quote'] not in labels[0]['text']:
+            raise ValueError('figure quotation differs from its exact transcribed text identity')
+    else:
+        path = ref['field_path']
+        if path == 'transcription.kind':
+            value = transcription['kind']
+        else:
+            matched = re.fullmatch(r'transcription\.(texts|series|printed_values)\.(0|[1-9][0-9]*)\.(id|role|text|legend_id|color|text_id|series_legend_id|period_text_id)', path)
+            fields = {'texts': {'id', 'role', 'text'}, 'series': {'legend_id', 'color'},
+                      'printed_values': {'text_id', 'series_legend_id', 'period_text_id'}}
+            if not matched or matched[3] not in fields[matched[1]]:
+                raise ValueError('figure field path is not a transcribed scalar; coordinates cannot supply observations')
+            values = transcription[matched[1]]
+            if int(matched[2]) >= len(values):
+                raise ValueError('figure field index outside selected transcription')
+            value = values[int(matched[2])].get(matched[3])
+        if type(value) is not str or value != ref['value']:
+            raise ValueError('figure field citation differs from selected transcription')
+    return ref
+
+
+def project_source_figures(figures, scope, documents):
+    from uteki.agents.figure_materials import Figure
+    from uteki.domain.research_data.figure_evidence import FigureBundleRef
+    projected, seen, bundle_ref = [], set(), None
+    source_ids = {doc['source_snapshot_id'] for doc in documents}
+    for row in figures:
+        value = {key: deepcopy(row[key]) for key in _FIGURE_FIELDS}
+        key = (value['source_snapshot_id'], value['figure_id'])
+        if (key in seen or value['source_snapshot_id'] not in source_ids
+                or value['source_snapshot_id'] not in scope.source_snapshot_ids
+                or value['company_id'] not in scope.company_ids
+                or value['status'] != 'ocr_grounded' or value['coordinate_status'] != 'ocr_grounded'
+                or any(not re.fullmatch('[a-f0-9]{64}', value[key]) for key in ('source_sha256', 'image_sha256', 'transcription_sha256', 'figure_bundle_manifest_sha256'))):
+            raise ValueError('selected figure identity, scope or grounding is invalid')
+        source = next(doc for doc in documents if doc['source_snapshot_id'] == value['source_snapshot_id'])
+        if (value['company_id'] != source['company_id'] or value['source_sha256'] != source['source_sha256']
+                or value['document_source_url'] != source['source_url']):
+            raise ValueError('selected figure differs from its source document')
+        ref = FigureBundleRef.model_validate(value['figure_bundle_ref'])
+        if bundle_ref is not None and ref != bundle_ref:
+            raise ValueError('question figure materials use different supplements')
+        bundle_ref = ref
+        if ref.manifest_sha256 != value['figure_bundle_manifest_sha256']:
+            raise ValueError('figure manifest hash differs from explicit supplement')
+        if Figure.model_validate(value['transcription']).model_dump(mode='json') != value['transcription']:
+            raise ValueError('figure transcription differs from canonical schema')
+        seen.add(key)
+        projected.append(value)
+    return projected
+
+
 _COMBINATION_RULES = {
     'definition_requires_direct_same': 'A complete definition must use support_basis=direct and relation=same. Qualified disclosures and analysis premises cannot establish an individual definition.',
     'direct_requires_same': 'Complete direct support requires relation=same.',
@@ -302,7 +405,7 @@ def project_question_review(packet, *, expected_scope=None, max_bytes=400000, ve
             or packet.get('purpose') != 'analysis_evidence'
             or packet.get('source_delivery') != 'query_evidence_v1'):
         raise ValueError('selected original analysis-evidence packet required')
-    if version not in ('question-coverage-input-v1', 'question-coverage-input-v2'):
+    if version not in ('question-coverage-input-v1', 'question-coverage-input-v2', 'question-coverage-input-v3'):
         raise ValueError('unsupported question coverage projection version')
     scope = ExecutionScope.model_validate(packet['scope'])
     if expected_scope is not None and scope != ExecutionScope.model_validate(expected_scope):
@@ -335,13 +438,16 @@ def project_question_review(packet, *, expected_scope=None, max_bytes=400000, ve
                 if not isinstance(table, dict) or set(table) != {'cells', 'column_count', 'row_count', 'cell_fields'}:
                     raise ValueError('unsupported original table representation')
             doc['blocks'].append(value)
-        if not doc['blocks']:
-            raise ValueError('delivered source has no original blocks')
+        if not doc['blocks'] and not (version == 'question-coverage-input-v3' and any(
+                row.get('source_snapshot_id') == doc['source_snapshot_id'] for row in packet.get('source_figures', []))):
+            raise ValueError('delivered source has no original material')
         documents.append(doc)
     projected = {'schema_version': version, 'packet_id': identity,
         'question': question, 'scope': scope.model_dump(mode='json'), 'source_documents': documents}
-    if version == 'question-coverage-input-v2':
+    if version in ('question-coverage-input-v2', 'question-coverage-input-v3'):
         projected['selected_records'] = _project_records(packet.get('facts', []), scope, documents)
+    if version == 'question-coverage-input-v3':
+        projected['source_figures'] = project_source_figures(packet.get('source_figures', []), scope, documents)
     projected['projection_id'] = 'question-review-' + digest(projected)[:24]
     if type(max_bytes) is not int or max_bytes <= 0 or json_size(projected) > max_bytes:
         raise ValueError('question review exceeds explicit byte limit; no truncation')
@@ -383,11 +489,14 @@ def _project_records(facts, scope, documents):
 def validate_question_review(projected, response):
     """Validate protocol only; eligible means the model reports complete coverage."""
     version = projected.get('schema_version')
-    v2 = version == 'question-coverage-input-v2'
+    v3 = version == 'question-coverage-input-v3'
+    v2 = version in ('question-coverage-input-v2', 'question-coverage-input-v3')
     fields = {'schema_version', 'packet_id', 'projection_id', 'question', 'scope', 'source_documents'}
     if v2:
         fields.add('selected_records')
-    if set(projected) != fields or version not in ('question-coverage-input-v1', 'question-coverage-input-v2'):
+    if v3:
+        fields.add('source_figures')
+    if set(projected) != fields or version not in ('question-coverage-input-v1', 'question-coverage-input-v2', 'question-coverage-input-v3'):
         raise ValueError('invalid question review projection')
     # Reapply source/text/scope checks, including the content-derived identity.
     # Reconstruct required internal record-contract fields only for shape checking.
@@ -400,7 +509,7 @@ def validate_question_review(projected, response):
         max_bytes=max(1, json_size(projected)), version=version)
     if rebuilt != projected:
         raise ValueError('question review projection changed')
-    schema = QuestionCoverageAssessment if v2 else QuestionCoverageAssessmentV1
+    schema = question_assessment_schema(projected)
     value = schema.model_validate(response).model_dump(mode='json')
     if v2:
         # Preserve normalized historical responses that predate optional scopes.
@@ -414,7 +523,11 @@ def validate_question_review(projected, response):
               for d in projected['source_documents'] for b in d['blocks']}
     records = {(r['source_snapshot_id'], r['record_id']):r for r in projected.get('selected_records', [])}
     def citation_valid(ref):
-        if ref.get('kind') == 'record_field':
+        if ref.get('kind') in {'figure_text', 'figure_field'}:
+            if not v3:
+                raise ValueError('figure citations require question coverage v3')
+            validate_figure_citation(projected['source_figures'], ref)
+        elif ref.get('kind') == 'record_field':
             record = records.get((ref['source_snapshot_id'], ref['record_id']))
             if record is None or ref['field_path'] not in _RECORD_CITABLE_FIELDS:
                 raise ValueError('unknown record identity or field path')
@@ -459,7 +572,7 @@ def validate_question_review(projected, response):
             raise ValueError('constraint quote is not an original question substring')
     if any(not item.strip() for item in value['uncovered_requests']):
         raise ValueError('uncovered requests must be explicit')
-    complete = (bool(value['checks']) and bool(blocks) and not value['uncovered_requests']
+    complete = (bool(value['checks']) and bool(blocks or projected.get('source_figures')) and not value['uncovered_requests']
                 and all(c['coverage'] == 'complete' for c in value['checks']))
     if value['question_coverage'] == 'complete' and not complete:
         raise ValueError('complete question contradicts missing/partial/empty checks')
@@ -554,7 +667,7 @@ def _repair_input(projected, response, *, max_bytes, variant, schema_version):
     try:
         validate_question_review(projected, response)
     except QuestionReviewProtocolError:
-        value = QuestionCoverageAssessment.model_validate(response).model_dump(mode='json')
+        value = question_assessment_schema(projected).model_validate(response).model_dump(mode='json')
         for original, normalized in zip(response['checks'], value['checks']):
             if 'requested_scope_quotes' not in original:
                 normalized.pop('requested_scope_quotes')

@@ -21,6 +21,7 @@ from uteki.domain.research_data.execution_scope import (
     EXECUTION_VERSION, ExecutionScope, ReadCursor, SearchCursor,
     SourceOutlineRequest, SourceReadRequest, SourceSearchRequest,
 )
+from uteki.domain.research_data.figure_evidence import FigureBundleRef, FigureReadRequest, FIGURE_EVIDENCE_VERSION
 from uteki.domain.research_data.evidence_package import EvidencePackage
 from uteki.domain.research_data.task_plan import TaskPlan, TaskStep, ProgressSnapshot
 from uteki.domain.research_data.task_completion import CompletionAssessment
@@ -54,6 +55,8 @@ def compact_table_cells(result):
 class QueryDataPort:
     def __init__(self, dataset: Path):
         self.dataset = dataset.resolve()
+        self._dataset_manifest_sha256 = digest((self.dataset / "manifest.json").read_bytes())
+        self._figure_bundle_ref = None
         self.manifest = load(self.dataset / "manifest.json")
         if self.manifest["schema_version"] not in SUPPORTED_VERSIONS:
             raise ValueError(f"unsupported dataset schema version: {self.manifest['schema_version']}; "
@@ -89,6 +92,39 @@ class QueryDataPort:
         except Exception:
             self._db.close()
             raise
+
+    @property
+    def figure_bundle_ref(self):
+        return self._figure_bundle_ref.model_dump(mode='json') if self._figure_bundle_ref else None
+
+    def bind_figures(self, ref):
+        """Explicitly bind an immutable supplement to this exact dataset."""
+        ref = FigureBundleRef.model_validate(ref)
+        pinned = ref.model_copy(update={'path': str(Path(ref.path).resolve())})
+        if self._figure_bundle_ref is not None and self._figure_bundle_ref != pinned:
+            raise ValueError('Figure binding is immutable; open a new port to select another bundle')
+        self._checked_figure_reader(pinned)
+        self._figure_bundle_ref = pinned
+        return self
+
+    def _checked_figure_reader(self, ref=None):
+        ref = ref or self._figure_bundle_ref
+        if ref is None:
+            raise ValueError('Figure supplement is unconfigured; an explicit bundle reference is required')
+        if digest((self.dataset / 'manifest.json').read_bytes()) != self._dataset_manifest_sha256:
+            raise ValueError('Dataset manifest changed after opening query port')
+        figure_manifest_raw = (Path(ref.path) / 'manifest.json').read_bytes()
+        if digest(figure_manifest_raw) != ref.manifest_sha256:
+            raise ValueError('Figure bundle manifest differs from its explicit pin')
+        if json.loads(figure_manifest_raw).get('version') != 'figure-materials-v3':
+            raise ValueError('Query figure evidence requires the strong figure-materials-v3 coordinate contract')
+        from uteki.infrastructure.document_sources.figure_reader import FigureMaterialReader
+        reader = FigureMaterialReader(ref.path, self.dataset)
+        if reader._manifest_sha256 != ref.manifest_sha256:
+            raise ValueError('Figure bundle manifest changed while opening its explicit pin')
+        if digest((self.dataset / 'manifest.json').read_bytes()) != self._dataset_manifest_sha256:
+            raise ValueError('Dataset manifest changed while opening figure reader')
+        return reader
 
     def close(self):
         self._db.close()
@@ -461,6 +497,8 @@ class ScopedQueryDataPort(QueryDataPort):
         if set(scope.company_ids) != {s["company_id"] for s in selected}:
             raise ValueError("each requested company requires an explicitly selected source")
         self.dataset, self.manifest, self.metrics = port.dataset, port.manifest, port.metrics
+        self._dataset_manifest_sha256 = port._dataset_manifest_sha256
+        self._figure_bundle_ref = port._figure_bundle_ref
         self._db, self._readers = port._db, port._readers
         self.sources = selected
         self.scope = scope
@@ -529,6 +567,40 @@ class ScopedQueryDataPort(QueryDataPort):
         from .query_catalog import discover_catalog
         return discover_catalog(self, request)
 
+    def list_figures(self):
+        """Scoped navigation metadata only; never image alt or transcription."""
+        if self.figure_bundle_ref is None:
+            return {**self._header(), 'status': 'unconfigured', 'figures': [],
+                'gaps': [{'scope': 'figure', 'reason': 'explicit_figure_bundle_required'}]}
+        inventory = self._checked_figure_reader().inventory()
+        permitted = {source['source_snapshot_id']: source for source in self.sources}
+        visible = {sid for sid, source in permitted.items() if not self._blocked_source(source)}
+        figures = [figure for figure in inventory['figures']
+            if figure['source_snapshot_id'] in visible
+            and figure['company_id'] == permitted[figure['source_snapshot_id']]['company_id']]
+        gaps = [{'scope': 'figure', 'source_snapshot_id': source['source_snapshot_id'],
+            'reason': self._blocked_source(source)} for source in self.sources if self._blocked_source(source)]
+        gaps.extend(gap for gap in inventory['gaps']
+            if gap.get('source_snapshot_id') in visible or gap.get('source_snapshot_id') is None)
+        return {**self._header(), 'status': 'with_gaps' if gaps else 'complete',
+            'figures': figures, 'gaps': gaps,
+            'figure_bundle_ref': self.figure_bundle_ref}
+
+    def read_figure(self, request):
+        request = FigureReadRequest.model_validate(request)
+        source = self._source(request.source_snapshot_id)
+        blocked = self._blocked_source(source)
+        if blocked:
+            raise PermissionError('Figure source is not readable: ' + blocked)
+        figure = self._checked_figure_reader().read(request.figure_id)
+        if (figure['source_snapshot_id'] != source['source_snapshot_id']
+                or figure['company_id'] != source['company_id']
+                or figure['source_sha256'] != source['source_sha256']):
+            raise ValueError('Figure identity is outside the requested source')
+        return {**self._source_header(source), 'status': 'read',
+            'material_type': FIGURE_EVIDENCE_VERSION, 'figure': figure,
+            'figure_bundle_ref': self.figure_bundle_ref}
+
     def probe_schema(self, request):
         """Bounded data semantics/examples, without full execution protocols."""
         from .query_catalog import probe_schema
@@ -548,12 +620,18 @@ class ScopedQueryDataPort(QueryDataPort):
                                       "task_completion": CompletionAssessment.model_json_schema()}
         result["execution_contracts"] = {name: model.model_json_schema() for name, model in (
             ("scope", ExecutionScope), ("outline_source", SourceOutlineRequest),
-            ("read_source", SourceReadRequest), ("search_source", SourceSearchRequest))}
+            ("read_source", SourceReadRequest), ("search_source", SourceSearchRequest),
+            ("read_figure", FigureReadRequest))}
         # Separate discovery avoids expanding legacy planner packets before the
         # task-driven ReAct integration is implemented.
         result["task_contracts"] = {"plan": TaskPlan.model_json_schema(), "step": TaskStep.model_json_schema()}
         result["capabilities"] += ["explicit_source_scope", "source_outline", "chapter_read_with_continuation",
                                    "paginated_literal_source_search"]
+        result['figure_materials'] = {'status': 'configured' if self.figure_bundle_ref else 'unconfigured',
+            'material_type': FIGURE_EVIDENCE_VERSION,
+            'bundle_ref': self.figure_bundle_ref if self.figure_bundle_ref else None,
+            'navigation_operation': 'list_figures', 'read_operation': 'read_figure'}
+        result['capabilities'] += ['scoped_figure_inventory', 'explicit_pinned_figure_read']
         result["notes"] += ["Frozen query/record/result schemas describe v0.3 storage; execution_contracts describe current scoped tools.",
                             "Source reporting dates do not substitute for explicitly requested observation periods.",
                             "Outline and search previews are navigation, not evidence of complete chapter reading."]

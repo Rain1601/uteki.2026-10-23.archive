@@ -44,6 +44,8 @@ def validate(config, output):
     request = CompanyQueryInput.model_validate(config['request'])
     if not request.dataset or request.scope is None or request.purpose != 'analysis_evidence':
         raise ValueError('Data retrieval requires frozen dataset, explicit scope and analysis_evidence purpose')
+    if request.figure_bundle_ref is not None and 'question_reviewer' not in review_roles(config):
+        raise ValueError('figure retrieval requires independent source and question review')
     if request.review_feedback:
         raise ValueError('initial request cannot contain externally supplied review feedback')
     if request.financial_tasks:
@@ -55,8 +57,14 @@ def validate(config, output):
     output, dataset = Path(output).resolve(), Path(request.dataset).resolve()
     if output.exists() or output.is_relative_to(dataset):
         raise ValueError('output must be new and outside frozen dataset')
+    if request.figure_bundle_ref is not None:
+        bundle = Path(request.figure_bundle_ref.path).resolve()
+        if output.is_relative_to(bundle) or Path(config['workspace']).resolve().is_relative_to(bundle):
+            raise ValueError('output and workspace must be outside the frozen figure supplement')
     _verify_manifest(dataset)
     with QueryDataPort(dataset) as port:
+        if request.figure_bundle_ref is not None:
+            port.bind_figures(request.figure_bundle_ref)
         port.scoped(request.scope).discover_data()
     for role in review_roles(config):
         model = config[role]
@@ -79,7 +87,8 @@ def validate(config, output):
         if pricing_snapshot(model['provider'], model['model']) is None:
             raise ValueError(role + ' has no registered pricing')
         ledger = Path(model['budget_ledger']).resolve()
-        if ledger.is_relative_to(output) or ledger.is_relative_to(dataset):
+        if (ledger.is_relative_to(output) or ledger.is_relative_to(dataset)
+                or (request.figure_bundle_ref is not None and ledger.is_relative_to(bundle))):
             raise ValueError('shared ledger must be outside frozen data and retrieval output')
     prepare_initial_query(config, request, output)
     return request
@@ -253,12 +262,15 @@ def reviewer_factory(config, packet=None, *, prior_failures=None):
     return _review_role_factory(config, 'reviewer', prompt, source_assessment_schema(packet or {}))
 
 
-def question_reviewer_factory(config):
-    from .question_review_generation import PROJECTION, QUESTION_GENERATION_PROMPT, QuestionCoverageGeneration
+def question_reviewer_factory(config, packet=None):
+    from .question_review_generation import PROJECTION, PROJECTION_FIGURES, question_generation_prompt
     if 'question_reviewer' not in review_roles(config):
         raise ValueError('independent question reviewer is not configured')
-    return _review_role_factory(config, 'question_reviewer', QUESTION_GENERATION_PROMPT,
-                                QuestionCoverageGeneration, output_projection=PROJECTION)
+    from .question_review_generation import question_generation_schema
+    projected = handoff_module._question_projection(packet) if packet else {}
+    projection = PROJECTION_FIGURES if projected.get('schema_version') == 'question-coverage-input-v3' else PROJECTION
+    return _review_role_factory(config, 'question_reviewer', question_generation_prompt(projected),
+                                question_generation_schema(projected), output_projection=projection)
 
 
 def _reference(path):
@@ -294,6 +306,14 @@ async def run_retrieval_cycle(config, output):
         'uteki.agents.data_query.question_coverage_review',
         'uteki.agents.data_query.question_review_generation',
         'uteki.agents.data_query.selection_contract', 'uteki.agents.runtime.output_limit',
+        'uteki.agents.data_query.figure_selection',
+        'uteki.domain.research_data.figure_evidence',
+        'uteki.domain.research_data.scoped_agent_query',
+        'uteki.domain.research_data.company_agent',
+        'uteki.infrastructure.document_sources.figure_reader',
+        'uteki.infrastructure.document_sources.figure_grounding',
+        'uteki.infrastructure.document_sources.figure_acquisition',
+        'uteki.agents.figure_materials',
         'uteki.agents.data_query.decision_protocol', 'uteki.agents.runtime.claude_messages',
         'uteki.domain.research_data.period_scope', 'uteki.agents.runtime.qwen_model',
         'uteki.agents.runtime.deepseek_model', 'uteki.agents.runtime.model_factory',
@@ -362,7 +382,7 @@ async def run_retrieval_cycle(config, output):
                         review = await review_data_answer(packet, review_path,
                             reviewer_factory=reviewer_factory(config, packet, prior_failures=prior_failures),
                             allow_source_protocol_repair=review_ordinal == 1,
-                            **({'question_reviewer_factory': question_reviewer_factory(config)}
+                            **({'question_reviewer_factory': question_reviewer_factory(config, packet)}
                                if 'question_reviewer' in config else {}))
                     except asyncio.CancelledError:
                         raise
