@@ -62,6 +62,30 @@ class SealedEvaluationTests(unittest.TestCase):
         self.a = self.fixture.add('cedar-a', failed=True)
         self.b = self.fixture.add('maple-b', company='maple')
 
+    def bind_saved_cost(self, *, estimate=None, reservation=None):
+        """Seal a call and optional cost audit, including independent-review binding."""
+        base = self.a['path']
+        manifest = json.loads((self.root/base/'manifest.json').read_text())
+        call_path = 'calls/saved-call-end.json'
+        call = {'call_id': 'saved-call', 'provider': 'deepseek', 'requested_model': 'deepseek-flash',
+                'started_at': '2032-01-01T00:00:00+00:00', 'status': 'failed',
+                'estimated_usd': estimate, 'usage': {}, 'usage_presence': 'absent'}
+        manifest['files'][call_path] = self.fixture.write(base+'/'+call_path, call)['sha256']
+        bound = self.fixture.write(base+'/manifest.json', manifest)
+        self.a['manifest_sha256'] = bound['sha256']
+        assessment = {'overall_verdict': 'fail', 'evidence_refs': {
+            'run': base, 'run_manifest_sha256': bound['sha256'],
+            'standard_sha256': self.a['evaluation']['standard']['sha256']}}
+        self.a['evaluation']['independent_assessment'] = self.fixture.write(
+            'experiments/fixture/cedar-a.json', assessment)
+        if estimate is None:
+            self.a['evaluation']['cost_audit'] = self.fixture.write('experiments/fixture/cost-audit.json',
+                {'calls': [{'call_id': 'saved-call', 'ledger_state': 'unknown',
+                            'reserved_usd': reservation}]})
+        else:
+            self.a['evaluation'].pop('cost_audit', None)
+        self.fixture.register()
+
     def test_actual_packet_candidates_remain_distinct_from_failed_acceptance(self):
         v = agent_run_results.load_result(self.root, 'cedar-a')
         self.assertEqual(v['state']['quality'], 'fail')
@@ -163,6 +187,38 @@ class SealedEvaluationTests(unittest.TestCase):
         self.assert_isolated('invalid_evidence')
         with self.assertRaisesRegex(ValueError, 'manifest must be an object'):
             e6.load_run(self.root, 'cedar-a')
+
+    def test_invalid_saved_cost_is_isolated_and_strict_reads_stay_closed(self):
+        previous = e6.load_run(self.root, 'cedar-a')
+        for field in ('estimate', 'reservation'):
+            invalid = ['invalid', 'NaN', 'sNaN', 'Infinity', '-Infinity', '-0.1', True, {}, []]
+            if field == 'reservation':
+                invalid.append(None)
+            for value in invalid:
+                with self.subTest(field=field, value=value):
+                    self.bind_saved_cost(**{field: value})
+                    self.assert_isolated('invalid_evidence')
+                    with self.assertRaises(ValueError):
+                        e6.load_run(self.root, 'cedar-a')
+                    with self.assertRaises(ValueError):
+                        agent_runs.read_artifact(self.root, 'cedar-a', previous['artifacts'][0]['id'])
+
+    def test_zero_estimate_and_finite_unknown_reservation_are_preserved(self):
+        self.bind_saved_cost(estimate='0')
+        view = e6.load_run(self.root, 'cedar-a')
+        self.assertEqual(view['usage']['known_estimated_usd'], '0')
+        self.assertEqual(view['usage']['unknown_cost_requests'], 0)
+        self.assertEqual(view['usage']['unknown_reserved_usd'], '0')
+        for reservation in ('0', '0.25', 0):
+            with self.subTest(reservation=reservation):
+                self.bind_saved_cost(reservation=reservation)
+                rows = {row['id']: row for row in e6.list_runs(self.root)}
+                self.assertEqual(rows['cedar-a']['integrity']['status'], 'verified')
+                self.assertEqual(rows['maple-b']['integrity']['status'], 'verified')
+                usage = rows['cedar-a']['usage']
+                self.assertEqual(usage['unknown_cost_requests'], 1)
+                self.assertEqual(usage['unknown_reserved_usd'], str(reservation))
+                self.assertEqual(usage['known_plus_held_usd'], str(reservation))
 
 
 class E6ActualHistoryTests(unittest.TestCase):

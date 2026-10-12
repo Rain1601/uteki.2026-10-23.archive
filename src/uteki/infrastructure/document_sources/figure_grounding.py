@@ -41,45 +41,40 @@ def _overlapping_location(a, b):
     return intersection >= .5 * min(areas)
 
 
-def locate_texts(image_path, texts, output):
-    output=Path(output); output.mkdir(exist_ok=False)
-    executable=shutil.which('tesseract')
-    if not executable:
-        raise ValueError('Explicit OCR adapter requires tesseract with eng data')
-    version=subprocess.run([executable,'--version'],capture_output=True,text=True,check=True,timeout=15).stdout.splitlines()[0]
-    with Image.open(image_path) as opened:
-        image=opened.convert('RGB')
-    candidates={t['id']:[] for t in texts}
-    targets={t['id']:norm(t['text']) for t in texts}
-    runs=[]
-    for number,angle in enumerate(ANGLES):
-        raster=image.rotate(angle,expand=True,fillcolor='white')
-        # Use a real resolved path: Leptonica does not reliably resolve macOS /tmp.
-        path=(output/f'deskew-{number}.png').resolve(); raster.save(path)
-        call=subprocess.run([executable,str(path),'stdout','-l','eng','--psm','11','tsv'],capture_output=True,text=True,check=True,timeout=45)
-        (output/f'ocr-{number}.tsv').write_text(call.stdout)
-        path.unlink()  # reversible derived pixels; retained TSV + transform reproduces them
-        lines={}
-        for row in csv.DictReader(StringIO(call.stdout),delimiter='\t'):
-            if row['level']=='5' and row.get('text','').strip():
-                lines.setdefault(tuple(row[k] for k in ('page_num','block_num','par_num','line_num')),[]).append(row)
+def replay_text_grounding(texts, runs, tsvs, original_size):
+    """Apply the same deterministic location contract to every frozen OCR run.
+
+    No OCR process or image conversion runs here. Both generation and consumption
+    use these exact candidates, location clusters and physical-occurrence checks.
+    """
+    candidates = {text['id']: [] for text in texts}
+    targets = {text['id']: norm(text['text']) for text in texts}
+    for run in runs:
+        lines = {}
+        for row in csv.DictReader(StringIO(tsvs[run['tsv']]), delimiter='\t'):
+            if row['level'] == '5' and row.get('text', '').strip():
+                key = tuple(row[key] for key in ('page_num', 'block_num', 'par_num', 'line_num'))
+                lines.setdefault(key, []).append(row)
         for words in lines.values():
             for start in range(len(words)):
-                for end in range(start+1,min(len(words),start+20)+1):
-                    part=words[start:end]; text=norm(' '.join(r['text'] for r in part))
-                    confidences=[float(r['conf']) for r in part]
+                for end in range(start + 1, min(len(words), start + 20) + 1):
+                    part = words[start:end]
+                    text = norm(' '.join(word['text'] for word in part))
+                    confidences = [float(word['conf']) for word in part]
                     if any(not math.isfinite(value) or not 80 <= value <= 100 for value in confidences):
                         continue
-                    confidence=min(confidences)
-                    for identity,target in targets.items():
-                        if text!=target:
+                    confidence = min(confidences)
+                    for identity, target in targets.items():
+                        if text != target:
                             continue
-                        left=min(int(r['left']) for r in part); top=min(int(r['top']) for r in part)
-                        right=max(int(r['left'])+int(r['width']) for r in part)
-                        bottom=max(int(r['top'])+int(r['height']) for r in part)
-                        candidates[identity].append({'box':original_box((left,top,right,bottom),angle,raster.size,image.size),
-                            'angle':angle,'confidence':confidence,'ocr_file':f'ocr-{number}.tsv','text':text})
-        runs.append({'angle':angle,'size':raster.size,'tsv':f'ocr-{number}.tsv'})
+                        pixel_box = (min(int(word['left']) for word in part),
+                            min(int(word['top']) for word in part),
+                            max(int(word['left']) + int(word['width']) for word in part),
+                            max(int(word['top']) + int(word['height']) for word in part))
+                        candidates[identity].append({
+                            'box': original_box(pixel_box, run['angle'], run['size'], original_size),
+                            'angle': run['angle'], 'confidence': confidence,
+                            'ocr_file': run['tsv'], 'text': text})
     matches={}; gaps=[]
     for text in texts:
         hits=candidates[text['id']]
@@ -106,6 +101,30 @@ def locate_texts(image_path, texts, output):
             for identity in identities:
                 matches.pop(identity)
                 gaps.append({'text_id':identity,'code':'ocr_location_reused','text_ids':identities})
+    return matches, gaps
+
+
+def locate_texts(image_path, texts, output):
+    output=Path(output); output.mkdir(exist_ok=False)
+    executable=shutil.which('tesseract')
+    if not executable:
+        raise ValueError('Explicit OCR adapter requires tesseract with eng data')
+    version=subprocess.run([executable,'--version'],capture_output=True,text=True,check=True,timeout=15).stdout.splitlines()[0]
+    with Image.open(image_path) as opened:
+        image=opened.convert('RGB')
+    runs=[]
+    tsvs={}
+    for number,angle in enumerate(ANGLES):
+        raster=image.rotate(angle,expand=True,fillcolor='white')
+        # Use a real resolved path: Leptonica does not reliably resolve macOS /tmp.
+        path=(output/f'deskew-{number}.png').resolve(); raster.save(path)
+        call=subprocess.run([executable,str(path),'stdout','-l','eng','--psm','11','tsv'],capture_output=True,text=True,check=True,timeout=45)
+        name=f'ocr-{number}.tsv'
+        (output/name).write_text(call.stdout)
+        tsvs[name]=call.stdout
+        path.unlink()  # reversible derived pixels; retained TSV + transform reproduces them
+        runs.append({'angle':angle,'size':raster.size,'tsv':name})
+    matches, gaps = replay_text_grounding(texts, runs, tsvs, image.size)
     report={'image_sha256':hashlib.sha256(Path(image_path).read_bytes()).hexdigest(),'adapter':'tesseract-multiangle-v1','version':version,'language':'eng','angles':list(ANGLES),
             'image_size':image.size,'coordinate_space':'normalized_original_0_1000','runs':runs,
             'matches':matches,'gaps':gaps,'status':'grounded' if not gaps else 'with_gaps'}

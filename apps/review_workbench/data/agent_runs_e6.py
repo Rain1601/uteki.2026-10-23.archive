@@ -5,7 +5,7 @@ model calls, reconciliation, scoring or edits enter this adapter.
 """
 from copy import deepcopy
 from datetime import datetime, timezone
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
@@ -80,6 +80,19 @@ def _compact(value):
     if isinstance(value, list):
         return [_compact(v) for v in value]
     return value
+
+
+def _reserved_cost(value):
+    """Reject invalid saved amounts before they enter display cost totals."""
+    if type(value) not in (str, int, float):
+        raise ValueError('Invalid saved cost reservation')
+    try:
+        amount = Decimal(str(value))
+    except DecimalException as error:
+        raise ValueError('Invalid saved cost reservation') from error
+    if not amount.is_finite() or amount < 0:
+        raise ValueError('Invalid saved cost reservation')
+    return amount
 
 
 def _build(root, entry):
@@ -272,12 +285,16 @@ def _build(root, entry):
                       'currency': value.get('unit') if value.get('unit') in {'USD', 'EUR', 'CNY'} else None,
                       'quote': ' | '.join(c.get('quote', '') for c in fact.get('citations', [])),
                       'citations': fact.get('citations', []), 'record': value})
-    usage = summarize_calls(calls)
     cost = evaluation_values.get('cost_audit', {})
     cost_rows = [c for c in cost.get('calls', []) if c.get('call_id') in call_groups and c.get('ledger_state') == 'unknown']
-    held = sum((Decimal(c['reserved_usd']) for c in cost_rows), Decimal('0'))
+    try:
+        usage = summarize_calls(calls)
+        held = sum((_reserved_cost(c['reserved_usd']) for c in cost_rows), Decimal('0'))
+        known_plus_held = str(Decimal(usage['known_estimated_usd']) + held)
+    except DecimalException as error:
+        raise ValueError('Invalid saved cost total') from error
     if cost_rows:
-        usage.update(unknown_reserved_usd=str(held), known_plus_held_usd=str(Decimal(usage['known_estimated_usd']) + held))
+        usage.update(unknown_reserved_usd=str(held), known_plus_held_usd=known_plus_held)
         for call in calls:
             matches = [c for c in cost_rows if c['call_id'] == call['call_id']]
             if matches: call['reserved_usd'] = matches[0]['reserved_usd']
@@ -292,7 +309,7 @@ def _build(root, entry):
                   'limitations': limitations, 'artifacts': evaluation_refs}
     unknown_bound = usage['unknown_cost_requests'] == len(cost_rows)
     usage['unknown_reserved_usd'] = str(held) if unknown_bound else None
-    usage['known_plus_held_usd'] = str(Decimal(usage['known_estimated_usd']) + held) if unknown_bound else None
+    usage['known_plus_held_usd'] = known_plus_held if unknown_bound else None
     evaluation['costs']['unknown_reserved_usd'] = usage['unknown_reserved_usd']
     public_scope = {'company_ids': scope['company_ids'], 'company_id': scope['company_ids'][0] if len(scope['company_ids']) == 1 else None,
                     'source_snapshot_ids': scope['source_snapshot_ids'], 'snapshot_id': scope['snapshot_id'],

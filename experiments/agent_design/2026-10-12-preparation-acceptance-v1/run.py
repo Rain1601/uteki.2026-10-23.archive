@@ -3,14 +3,22 @@ import argparse
 import json
 from pathlib import Path
 from uteki.agents.data_query.coordinator import CompanyDataCoordinator
+from uteki.infrastructure.document_sources.sec_settings import resolve_sec_contact
 ROOT = Path(__file__).resolve().parents[3]
 BASE = ROOT/'output/preparation-acceptance-20261012'
 
-def main():
+def main(argv=None):
     parser=argparse.ArgumentParser()
     parser.add_argument('--version', required=True)
     parser.add_argument('--replay', type=Path)
-    args=parser.parse_args()
+    parser.add_argument('--sec-user-agent', help='Explicit SEC application/contact identity; otherwise use private settings')
+    parser.add_argument('--settings-root', type=Path, default=ROOT, help='Directory containing a private mode-600 .env')
+    args=parser.parse_args(argv)
+    contact = None
+    if args.replay is None:
+        contact, _ = resolve_sec_contact(explicit=args.sec_user_agent, settings_root=args.settings_root)
+        if contact is None:
+            parser.error('Configure UTEKI_SEC_USER_AGENT in private settings or provide --sec-user-agent')
     out=BASE/args.version
     out.mkdir(parents=True, exist_ok=False)
     rows=[]
@@ -19,9 +27,10 @@ def main():
           'filing_selection':{'mode':'filing_period','form_type':'10-K','report_period_end':end},
           'document_validation':'sec_inline_identity_v1','download_policy':'revalidate',
           'source_policy':{'official':[],'third_party':[]},
-          'sec_user_agent':'Uteki research rain1104@foxmail.com',
           'limits':{'max_requests':12,'max_documents':4,'timeout_seconds':30,'retries':1},
           'transport':{'mode':'trusted_local_http_proxy','proxy_url':'http://127.0.0.1:7897','destination_hosts':['data.sec.gov','www.sec.gov']}}
+        if contact is not None:
+            config['sec_user_agent'] = contact
         print(symbol, 'system preparation starting',flush=True)
         coordinator=CompanyDataCoordinator(BASE/'workspace')
         if args.replay:

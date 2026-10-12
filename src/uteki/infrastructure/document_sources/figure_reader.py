@@ -24,7 +24,7 @@ def _sha(raw):
 def _validate_grounding(row, transcription, raw, info, verified, *, require_image_hash):
     from PIL import Image
     from uteki.agents.figure_materials import Figure
-    from .figure_grounding import ANGLES, norm, original_box
+    from .figure_grounding import ANGLES, norm, original_box, replay_text_grounding
 
     grounding_path = row.get('grounding')
     grounding = json.loads(verified(grounding_path))
@@ -41,12 +41,14 @@ def _validate_grounding(row, transcription, raw, info, verified, *, require_imag
     if not isinstance(runs, list) or len(runs) != len(ANGLES):
         raise ValueError('Figure grounding requires every bounded OCR run')
     ocr_runs = {}
+    tsvs = {}
     for number, (run, angle) in enumerate(zip(runs, ANGLES)):
         expected_size = list(Image.new('1', (info['width'], info['height'])).rotate(angle, expand=True).size)
         if run.get('angle') != angle or run.get('tsv') != f'ocr-{number}.tsv' or run.get('size') != expected_size:
             raise ValueError('Figure OCR transform metadata mismatch')
         relative = (Path(grounding_path).parent / run['tsv']).as_posix()
         tsv = verified(relative).decode('utf-8')
+        tsvs[run['tsv']] = tsv
         lines = {}
         for word in csv.DictReader(StringIO(tsv), delimiter='\t'):
             if word['level'] == '5' and word.get('text', '').strip():
@@ -82,6 +84,17 @@ def _validate_grounding(row, transcription, raw, info, verified, *, require_imag
                         found = True
         if not found:
             raise ValueError('Figure grounding match is absent from the pinned OCR words')
+    if require_image_hash:
+        # v3's strong coordinate status requires the producer's whole-inventory
+        # decision, not just existence of a selected hit. Legacy v2 retains its
+        # explicitly weaker historical validation and status.
+        replayed, gaps = replay_text_grounding(transcription['texts'], runs, tsvs,
+            (info['width'], info['height']))
+        if gaps:
+            codes = sorted({gap['code'] for gap in gaps})
+            raise ValueError('Figure OCR replay has unresolved coordinates: ' + ', '.join(codes))
+        if replayed != matches:
+            raise ValueError('Figure grounding differs from the complete pinned OCR replay')
     model_path = (Path(row['transcription']).parent / 'model-transcription.json').as_posix()
     model = Figure.model_validate_json(verified(model_path)).model_dump()
     if {text['id'] for text in model['texts']} != set(matches):

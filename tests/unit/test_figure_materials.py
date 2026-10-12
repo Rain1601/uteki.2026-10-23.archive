@@ -257,6 +257,68 @@ class FigureMaterialsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'absent from the pinned OCR'):
             FigureMaterialReader(self.bundle, self.dataset)
 
+    def repin_ocr(self, row, number, words, *, append=False):
+        relative = (Path(row['grounding']).parent / f'ocr-{number}.tsv').as_posix()
+        path = self.bundle / relative
+        changed = tsv(words)
+        path.write_text(path.read_text() + changed.split('\n', 1)[1] if append else changed)
+        manifest_path = self.bundle / 'manifest.json'
+        manifest = json.loads(manifest_path.read_text())
+        manifest['files'][relative] = sha(path.read_bytes())
+        manifest_path.write_text(json.dumps(manifest))
+
+    def test_reader_rejects_resealed_multiple_locations_in_selected_ocr_run(self):
+        manifest, _ = self.run_materials()
+        row = manifest['figures'][0]
+        self.repin_ocr(row, 0, [('Series', 1, 10, 3, 1, 99, 3), ('A', 5, 10, 2, 1, 99, 3)], append=True)
+        with self.assertRaisesRegex(ValueError, 'ocr_ambiguous'):
+            FigureMaterialReader(self.bundle, self.dataset)
+
+    def test_reader_replays_other_angles_before_accepting_selected_location(self):
+        manifest, _ = self.run_materials()
+        row = manifest['figures'][0]
+        # At +90 degrees this returns an original location y=12..13, far from
+        # the selected zero-degree location y=1..2. The selected TSV is intact.
+        self.repin_ocr(row, 8, [('Series A', 12, 3, 1, 6, 99, 1)])
+        with self.assertRaisesRegex(ValueError, 'ocr_ambiguous'):
+            FigureMaterialReader(self.bundle, self.dataset)
+
+    def test_reader_accepts_same_physical_occurrence_across_angles_without_ocr(self):
+        manifest, _ = self.run_materials()
+        row = manifest['figures'][0]
+        # A second angle confirms the same occurrence, with lower confidence.
+        self.repin_ocr(row, 8, [('Series A', 1, 3, 1, 6, 98, 1)])
+        with patch('uteki.infrastructure.document_sources.figure_grounding.subprocess.run') as process:
+            result = FigureMaterialReader(self.bundle, self.dataset).read(row['figure_id'])
+        process.assert_not_called()
+        self.assertEqual(result['coordinate_status'], 'ocr_grounded')
+
+    def test_reader_rejects_resealed_duplicate_identities_for_one_occurrence(self):
+        manifest, _ = self.run_materials()
+        row = manifest['figures'][0]
+        model_path = (Path(row['transcription']).parent / 'model-transcription.json').as_posix()
+        for relative in (row['transcription'], model_path):
+            value = json.loads((self.bundle / relative).read_text())
+            duplicate = copy.deepcopy(value['texts'][0]); duplicate['id'] = 'second-legend'
+            value['texts'].append(duplicate)
+            value['series'].append(dict(legend_id='second-legend', color='blue'))
+            self.rewrite_bundle_file(relative, value)
+        grounding = json.loads((self.bundle / row['grounding']).read_text())
+        grounding['matches']['second-legend'] = copy.deepcopy(grounding['matches']['legend'])
+        self.rewrite_bundle_file(row['grounding'], grounding)
+        with self.assertRaisesRegex(ValueError, 'ocr_location_reused'):
+            FigureMaterialReader(self.bundle, self.dataset)
+
+    def test_legacy_v2_retains_explicit_weaker_selected_location_validation(self):
+        manifest, _ = self.run_materials()
+        row = manifest['figures'][0]
+        self.repin_ocr(row, 8, [('Series A', 12, 3, 1, 6, 99, 1)])
+        current = json.loads((self.bundle / 'manifest.json').read_text())
+        current['version'] = 'figure-materials-v2'
+        (self.bundle / 'manifest.json').write_text(json.dumps(current))
+        result = FigureMaterialReader(self.bundle, self.dataset).read(row['figure_id'])
+        self.assertEqual(result['coordinate_status'], 'ocr_grounded_legacy_no_required_image_hash')
+
     def test_reader_rejects_fact_changes_between_model_and_grounded_artifact(self):
         manifest, _ = self.run_materials()
         row = manifest['figures'][0]

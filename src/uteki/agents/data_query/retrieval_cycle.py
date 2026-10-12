@@ -293,6 +293,7 @@ async def run_retrieval_cycle(config, output):
         'uteki.infrastructure.research_data.query_completion',
         'uteki.agents.data_query.question_coverage_review',
         'uteki.agents.data_query.question_review_generation',
+        'uteki.agents.data_query.selection_contract', 'uteki.agents.runtime.output_limit',
         'uteki.agents.data_query.decision_protocol', 'uteki.agents.runtime.claude_messages',
         'uteki.domain.research_data.period_scope', 'uteki.agents.runtime.qwen_model',
         'uteki.agents.runtime.deepseek_model', 'uteki.agents.runtime.model_factory',

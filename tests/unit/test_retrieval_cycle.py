@@ -3,6 +3,7 @@ import asyncio
 from copy import deepcopy
 import json
 from pathlib import Path
+from types import SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -92,6 +93,41 @@ class RetrievalCycleTests(unittest.TestCase):
         self.assertEqual(self.config, before)
         cycle._reference(self.output)
         self.assertEqual(result['final_review_ref'], cycle._reference(self.reviews[0]))
+
+    def test_run_binds_selection_and_output_limit_implementation(self):
+        self.run_fixture(['reviewed'])
+        implementation = json.loads((self.output/'implementation.json').read_text())
+        for name in ('uteki.agents.data_query.selection_contract', 'uteki.agents.runtime.output_limit'):
+            source = Path(cycle.import_module(name).__file__).resolve()
+            self.assertEqual(implementation[str(source)], digest(source.read_bytes()))
+
+    def test_changed_component_copy_changes_run_fingerprint(self):
+        # Substitute temporary source copies at the import boundary. No production
+        # files are changed; the actual cycle still writes and seals each run.
+        names = ('uteki.agents.data_query.selection_contract', 'uteki.agents.runtime.output_limit')
+        original_import = cycle.import_module
+        copies = {}
+        for name in names:
+            source = Path(original_import(name).__file__)
+            copied = self.root/source.name
+            copied.write_bytes(source.read_bytes())
+            copies[name] = copied
+        def substitute(name):
+            return SimpleNamespace(__file__=str(copies[name])) if name in copies else original_import(name)
+        with patch.object(cycle, 'import_module', side_effect=substitute):
+            snapshots = []
+            for ordinal in range(3):
+                if ordinal:
+                    copied = copies[names[ordinal - 1]]
+                    copied.write_bytes(copied.read_bytes() + b'\n# Independent implementation change.\n')
+                self.output = self.root/f'fingerprint-run-{ordinal}'
+                self.calls.clear(); self.reviews.clear()
+                self.run_fixture(['reviewed'])
+                snapshots.append(json.loads((self.output/'implementation.json').read_text()))
+        for ordinal, name in enumerate(names, 1):
+            changed = {key for key in snapshots[ordinal]
+                       if snapshots[ordinal][key] != snapshots[ordinal - 1][key]}
+            self.assertEqual(changed, {str(copies[name].resolve())})
 
     def test_reviewer_factory_preserves_shared_unknown_reservations(self):
         budget = cycle.RunBudget(self.config['reviewer']['budget_ledger'], None, enforce=False)
