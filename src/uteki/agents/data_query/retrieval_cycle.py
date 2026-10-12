@@ -68,6 +68,8 @@ def validate(config, output):
         port.scoped(request.scope).discover_data()
     for role in review_roles(config):
         model = config[role]
+        if role in {'reviewer','question_reviewer'} and 'output_capacity_recovery' in model:
+            raise ValueError('review roles do not support output_capacity_recovery')
         CompanyDataCoordinator._validate_shared_model_configs(config['planner'], model)
         _, _, native = reasoning_configuration(model['provider'], model['model'], model.get('reasoning_effort'))
         if not {'max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort'} <= model.keys():
@@ -207,6 +209,8 @@ def prepare_initial_query(config, request, output):
 
 def _review_role_factory(config, role, prompt, output_schema, *, output_projection=None):
     model = config[role]
+    if 'output_capacity_recovery' in model:
+        raise ValueError('review roles do not support output_capacity_recovery')
     def make(output):
         budget = RunBudget(model['budget_ledger'], model['budget_usd'],
             enforce=model['budget_policy'] == 'enforced',
@@ -306,6 +310,7 @@ async def run_retrieval_cycle(config, output):
         'uteki.agents.data_query.question_coverage_review',
         'uteki.agents.data_query.question_review_generation',
         'uteki.agents.data_query.selection_contract', 'uteki.agents.runtime.output_limit',
+        'uteki.agents.data_query.coordinator',
         'uteki.agents.data_query.figure_selection',
         'uteki.domain.research_data.figure_evidence',
         'uteki.domain.research_data.scoped_agent_query',

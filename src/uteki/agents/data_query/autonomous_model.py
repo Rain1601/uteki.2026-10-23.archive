@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 from copy import deepcopy
+from dataclasses import replace
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -21,7 +22,8 @@ from uteki.agents.runtime.model_factory import model_adapter
 from uteki.agents.runtime.run_budget import RunBudget, BudgetExceeded
 from uteki.agents.runtime.claude_messages import ClaudeTransientTransportError
 from uteki.agents.runtime.strict_json import StrictJSONError, parse_json_object
-from uteki.agents.runtime.output_limit import ModelOutputLimitExceeded
+from uteki.agents.runtime.output_limit import (ModelOutputLimitExceeded,
+    validate_capacity_recovery, validate_capacity_settlement)
 from uteki.infrastructure.research_data.financial_records import digest
 from .artifacts import write_new
 from .decision_protocol import DECISION_PROTOCOL_VERSION
@@ -199,7 +201,8 @@ class SdkAutonomousPlanner:
     """
     def __init__(self, provider, model, *, budget, max_requests_total, output, credentials_root,
                  max_tokens=3000, request_timeout=90, max_retries=0, pricing=None, client_factory=None,
-                 role='planner', reasoning_effort=None, purpose='question_answer'):
+                 role='planner', reasoning_effort=None, purpose='question_answer',
+                 output_capacity_recovery=None):
         if role not in {'planner', 'worker'}:
             raise ValueError('Role must be planner or worker')
         prompt = runtime_prompt(role, purpose)
@@ -210,6 +213,9 @@ class SdkAutonomousPlanner:
             raise ValueError('Shared request limit must be positive or explicitly None')
         if type(max_tokens) is not int or not 256 <= max_tokens <= 8192:
             raise ValueError('Output token limit must be within 256..8192')
+        capacity_policy = validate_capacity_recovery(output_capacity_recovery,
+            provider=provider, model=model, base_max_tokens=max_tokens)
+        self._effective_max_tokens, self._capacity_recoveries = max_tokens, 0
         if isinstance(request_timeout, bool) or not isinstance(request_timeout, (int, float)) or not 0 < request_timeout <= 300:
             raise ValueError('Request timeout must be within 0..300 seconds')
         if type(max_retries) is not int or not 0 <= max_retries <= 3:
@@ -277,6 +283,8 @@ class SdkAutonomousPlanner:
             'budget_ledger': str(budget.path.resolve()), 'budget_policy': 'enforced' if budget.enforce else 'record_only',
             'allow_unknown_reservations': budget.allow_unknown_reservations,
             'credential_origin': credential_origin, 'budget_at_start': budget.summary()}
+        if capacity_policy is not None:
+            self._config['output_capacity_recovery'] = capacity_policy
         write_new(self.output/'model-config.json', self._config)
         self._config_sha256 = digest((self.output/'model-config.json').read_bytes())
         self._lock = asyncio.Lock()
@@ -305,6 +313,7 @@ class SdkAutonomousPlanner:
             'shared_budget': self._budget.summary(),
             'artifacts': self._references([self.output/'model-config.json', *(self.output/'calls').glob('*.json'),
                                          *self.output.glob('decision-*-attempt-*.json'),
+                                         *self.output.glob('decision-*-capacity-*.json'),
                                          *self.output.glob('decision-*-output.json')]),
             'benchmark_status': 'not_evaluated'}
         path = self.output/f'usage-{self._snapshots:04d}.json'
@@ -320,7 +329,9 @@ class SdkAutonomousPlanner:
                 raise ValueError('Frozen model configuration changed')
             self._decisions += 1
             encoded = json.dumps(packet, ensure_ascii=False)
-            for attempt in range(self._config['max_retries'] + 1):
+            attempt, network_retry_index, capacity_request, prior_terminal = -1, 0, False, None
+            while True:
+                attempt += 1
                 # A failed reservation can happen before the adapter is invoked.
                 # Do not attribute a previous call's response to this attempt.
                 if self._strict_visible_json:
@@ -332,10 +343,16 @@ class SdkAutonomousPlanner:
                 record = {'decision': self._decisions, 'attempt': attempt + 1, 'retry': attempt > 0,
                     'plan_origin': self.plan_origin, 'role': self._config['role'], 'packet_sha256': digest(encoded),
                     'started_at': datetime.now(timezone.utc).isoformat(), 'status': 'started'}
+                record.update(effective_max_tokens=self._effective_max_tokens,
+                    network_retry_index=network_retry_index, capacity_recovery=capacity_request,
+                    capacity_recoveries_used=self._capacity_recoveries, prior_terminal=prior_terminal)
+                capacity_request = False
                 retry = False
+                recover_capacity = False
                 output_limit_error = None
                 try:
-                    agent = self._agent
+                    agent = self._agent.clone(model_settings=replace(self._agent.model_settings,
+                        max_tokens=self._effective_max_tokens))
                     if observation_context:
                         observation_context.guard()
                         agent = agent.clone(model=self._model.with_observation(observation_context.for_attempt(attempt + 1)))
@@ -377,10 +394,10 @@ class SdkAutonomousPlanner:
                         record.update(status='invalid_model_decision', validation=hints)
                         raise ValueError('invalid_model_decision; visible_output=' + output_path.name
                                          + '; validation=' + json.dumps(hints, ensure_ascii=True)) from None
-                    retry = isinstance(error, (TimeoutError, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError, ClaudeTransientTransportError)) and attempt < self._config['max_retries']
+                    retry = isinstance(error, (TimeoutError, APIConnectionError, APITimeoutError, RateLimitError, InternalServerError, ClaudeTransientTransportError)) and network_retry_index < self._config['max_retries']
                     if retry and self._native_model is not None:
                         record.update(retry_scheduled=True, retry_delay_seconds=min(2, 0.25 * 2**attempt))
-                    if not retry: raise
+                    if not retry and output_limit_error is None: raise
                 finally:
                     content = getattr(self._model.inner, 'response_text', None)
                     if (self._strict_visible_json) and isinstance(content, str):
@@ -404,8 +421,42 @@ class SdkAutonomousPlanner:
                             kind='model_attempt', owned_by_context=True)
                         if output_path.exists():
                             observation_context.publish(output_path, kind='model_visible_output', owned_by_context=True)
+                if output_limit_error is not None:
+                    policy = self._config.get('output_capacity_recovery')
+                    if policy is None or self._capacity_recoveries >= policy['max_recoveries']:
+                        raise output_limit_error
+                    gate = {'version':'output-capacity-recovery-v1','decision':self._decisions,
+                        'after_attempt':attempt+1,'effective_max_tokens':self._effective_max_tokens,
+                        'target_max_tokens':policy['max_tokens'],'model_config_sha256':self._config_sha256}
+                    gate_path = self.output/f'decision-{self._decisions:04d}-capacity-{attempt+1:02d}.json'
+                    try:
+                        prior_terminal = validate_capacity_settlement(
+                            set((self.output/'calls').glob('*.json')) - before,
+                            budget=self._budget, expected_ledger=self._config['budget_ledger'],
+                            effective_max_tokens=self._effective_max_tokens,
+                            diagnostic=output_limit_error.diagnostic, artifact_root=self.output)
+                    except ValueError:
+                        write_new(gate_path,{**gate,'status':'denied',
+                            'reason':'settlement_or_usage_not_verified'})
+                        self.snapshot_usage()
+                        raise output_limit_error
+                    prior_terminal.update(attempt=self._references([
+                        self.output/f'decision-{self._decisions:04d}-attempt-{attempt+1:02d}.json'])[0],
+                        visible_output=record.get('visible_output'))
+                    write_new(gate_path,{**gate,'status':'authorized','prior_terminal':prior_terminal})
+                    prior_terminal['capacity_gate'] = self._references([gate_path])[0]
+                    # The failed output, attempt, usage and gate are sealed first.
+                    # Consume before the next reservation; budget/cancel cannot refund it.
+                    self._capacity_recoveries += 1
+                    self._effective_max_tokens = policy['max_tokens']
+                    recover_capacity = True
+                    self.snapshot_usage()
                 if retry and self._native_model is not None:
                     await asyncio.sleep(min(2, 0.25 * 2**attempt))
+                if retry:
+                    network_retry_index += 1
+                    prior_terminal = {'calls':record['calls']}
+                capacity_request = recover_capacity
 
     async def aclose(self):
         async with self._lock:

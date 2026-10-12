@@ -540,6 +540,8 @@ class CompanyDataCoordinator:
         if request.financial_tasks:
             if method_root is None or extractor_model_config is None or credential_root is None:
                 raise ValueError('financial tasks require explicit method-root, extractor model config and credentials-root')
+            if 'output_capacity_recovery' in extractor_model_config:
+                raise ValueError('financial extractor does not support output_capacity_recovery')
             self._validate_model_config(extractor_model_config)
             if model_config is not None:
                 if financial_extractor is not None:
@@ -761,13 +763,16 @@ class CompanyDataCoordinator:
     @staticmethod
     def _validate_model_config(config):
         required = {'provider', 'model', 'budget_ledger', 'budget_usd', 'budget_policy', 'max_requests_total'}
-        allowed = required | {'max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort', 'allow_unknown_reservations'}
+        allowed = required | {'max_tokens', 'request_timeout', 'max_retries', 'reasoning_effort', 'allow_unknown_reservations', 'output_capacity_recovery'}
         if not required <= set(config) or set(config) - allowed or config['budget_policy'] not in {'enforced', 'record_only'}:
             raise ValueError('explicit model, shared ledger and budget policy are required')
         if any(not isinstance(config[key], str) or not config[key].strip() for key in ('provider', 'model', 'budget_ledger')):
             raise ValueError('provider/model/ledger must be nonempty')
         if type(config.get('allow_unknown_reservations', False)) is not bool:
             raise ValueError('allow_unknown_reservations must be a boolean')
+        from uteki.agents.runtime.output_limit import validate_capacity_recovery
+        validate_capacity_recovery(config.get('output_capacity_recovery'), provider=config['provider'],
+            model=config['model'],base_max_tokens=config.get('max_tokens',4096))
         from .autonomous_model import reasoning_configuration
         _, _, native = reasoning_configuration(config['provider'], config['model'], config.get('reasoning_effort'))
         if native and (type(config.get('max_retries', 0)) is not int or not 0 <= config.get('max_retries', 0) <= 3):
@@ -808,4 +813,5 @@ class CompanyDataCoordinator:
         return SdkAutonomousPlanner(config['provider'], config['model'], budget=budget,
             max_requests_total=config['max_requests_total'], output=output, credentials_root=credential_root,
             max_tokens=config.get('max_tokens', 4096), request_timeout=config.get('request_timeout', 60),
-            max_retries=config.get('max_retries', 0), role=role, reasoning_effort=config.get('reasoning_effort'), purpose=purpose)
+            max_retries=config.get('max_retries', 0), role=role, reasoning_effort=config.get('reasoning_effort'), purpose=purpose,
+            output_capacity_recovery=config.get('output_capacity_recovery'))

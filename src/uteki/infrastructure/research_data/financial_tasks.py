@@ -42,6 +42,8 @@ class FinancialTaskGateway:
 
     def __init__(self, dataset, scope, tasks, *, method_root, output, model_config,
                  credentials_root, model_call=None):
+        if isinstance(model_config, dict) and 'output_capacity_recovery' in model_config:
+            raise ValueError('financial extractor does not support output_capacity_recovery')
         self.dataset = Path(dataset).resolve()
         self.scope = ExecutionScope.model_validate(scope)
         self.output = Path(output).resolve()

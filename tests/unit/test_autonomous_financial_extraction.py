@@ -8,7 +8,8 @@ import unittest
 
 from pydantic import ValidationError
 
-from uteki.agents.data_query.autonomous import AutonomousDataAgent, AutonomousDecision, Requirement
+from uteki.agents.data_query.autonomous import (AutonomousDataAgent, AutonomousDecision, Requirement,
+    runtime_prompt, runtime_prompt_version)
 from uteki.agents.data_query.autonomous_model import _decision_validation_hints
 from uteki.domain.research_data.execution_scope import ExecutionScope
 from uteki.infrastructure.research_data.financial_records import digest
@@ -143,7 +144,8 @@ class AutonomousFinancialExtractionTests(unittest.TestCase):
         self.assertEqual(result['semantic_completeness'], 'not_evaluated')
         self.assertTrue(result['financial_extractions'][0]['candidate_only'])
         config = json.loads((output / 'config.json').read_text())
-        self.assertIn('financial-extraction', config['prompt_version'])
+        self.assertEqual(config['prompt_version'], runtime_prompt_version())
+        self.assertIn('host-registered extraction tasks', runtime_prompt('planner', 'question_answer'))
 
     def test_missing_scope_rejected_before_planner(self):
         with self.assertRaises(ValueError):

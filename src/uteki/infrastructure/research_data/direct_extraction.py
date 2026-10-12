@@ -177,6 +177,8 @@ def _write_projection(dataset, run, packet, normalized, output):
 async def run_direct_extraction(dataset, job, output, *, strategy, model_config=None,
                                 credentials_root=None, model_call=None, observation_root=None,
                                 observation_context=None):
+    if isinstance(model_config, dict) and 'output_capacity_recovery' in model_config:
+        raise ValueError('direct extractor does not support output_capacity_recovery')
     with observed_run(output=output, kind='extraction', role='extractor',
             origin='scripted_fixture' if model_call else 'model', observation_root=observation_root,
             observation_context=observation_context, scope=job, title=job.get('task', ''),
@@ -189,6 +191,8 @@ async def run_direct_extraction(dataset, job, output, *, strategy, model_config=
 async def _run_direct_extraction(dataset, job, output, *, strategy, model_config=None,
                                 credentials_root=None, model_call=None, observation_context=None):
     """One immutable run; injected model_call is explicitly marked a fixture."""
+    if isinstance(model_config, dict) and 'output_capacity_recovery' in model_config:
+        raise ValueError('direct extractor does not support output_capacity_recovery')
     with observed_step(observation_context, 1, phase='build_extraction_packet', namespace='extraction-packet'):
         packet = build_extraction_packet(dataset, job)
     prompt_spec = job.get('prompt', {'version': PROMPT_VERSION, 'text': DIRECT_PROMPT})

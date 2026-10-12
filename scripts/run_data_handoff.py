@@ -20,6 +20,9 @@ from uteki.infrastructure.research_data.financial_records import digest
 
 
 def validate(config, output):
+    for role in ('reviewer', 'analyst'):
+        if 'output_capacity_recovery' in config.get(role, {}):
+            raise ValueError(f'{role} does not support output_capacity_recovery')
     required = {'request', 'planner', 'worker', 'reviewer', 'analyst', 'credential_root',
                 'workspace', 'max_review_packet_bytes'}
     if not required <= set(config) or set(config) - required - {'request_envelope_limits', 'source_delivery'}:
@@ -75,6 +78,8 @@ def validate(config, output):
 
 def role_factory(config, name, prompt, schema):
     model = config[name]
+    if 'output_capacity_recovery' in model:
+        raise ValueError(f'{name} does not support output_capacity_recovery')
     def make(output):
         budget = RunBudget(model['budget_ledger'], model['budget_usd'],
                           enforce=model['budget_policy'] == 'enforced',

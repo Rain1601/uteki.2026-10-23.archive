@@ -1,5 +1,14 @@
 # 换机接续开发 · 2026-10-10
 
+2026-10-12 **E6-R4 本轮有界容量恢复机制与新批次有限验收完成：压力三次3/3、正常控制1/1。** 先冻结显式一次升档契约，修复 Planner/Worker 状态与非支持角色配置静默忽略；183项工程回归通过。两份完整FY2025 10-K、原题/原业务标准/原件独立gold不传Agent；压力256→8192每次升档一次后四项收入/精确日期/USD/出处、全文实际输入、投影、聚焦、双审和严格加载均通过，无额外格式/业务纠错；正常8192未触发恢复也通过。三条B首决策仅诊断，不计完整成功率。R1检查器误禁公开Skill字段已修，旧报告保留、同原运行零API重审。新增59请求/$0.8081016，原M3同账本累计141/$1.6561587，$3/200不变、unknown/inflight=0。**当前位置：本轮机制/新批次验收闭合；历史V3原包回归、8192→16384真实触发及长期稳定仍未验。下一E6-R5b记录ID引用/分组与动作归属契约。** [本轮交付与边界](../experiments/agent_design/2026-10-12-e6-r4-capacity-v1/DELIVERY.zh-CN.md)。
+
+本轮换机需同时迁移 `output/e6-r4-capacity-20261012-r1` 和 `output/m3-rebuild-20261012-r2`：后者保存本轮继承并更新到141次的同一账本。旧 M3 迁移包仅保存82次历史快照，不能用于继续消费新额度。新版包路径使用 `output/machine-handoff-20261012-e6-r4/private-state-v2.tar.gz`，逐文件校验记录放同目录；M3找回原图和首次失败也继续显式收取。不得改写冻结文件内绝对路径、hash或重建空账本。
+
+```bash
+.venv/bin/python scripts/transfer_local_state.py create --root . --output output/machine-handoff-20261012-e6-r4/private-state-v2.tar.gz --include-output output/e6-r4-capacity-20261012-r1 --include-output output/m3-rebuild-20261012-r2 --include-output output/m3-recovery-20261012 --include-output output/m3-rebuild-20261012-r1
+.venv/bin/python scripts/transfer_local_state.py verify output/machine-handoff-20261012-e6-r4/private-state-v2.tar.gz
+```
+
 2026-10-12 **03-M3 新重建批次真实验收完成：最终交付 3/3，首个取材 attempt 合格 2/3，全链无纠错 1/3。** 用户确认另一机器原图片转录/OCR包及 v5 数据集丢失；两张原图找回且 SHA 一致，Microsoft/Alphabet 全材料重新获取并独立核验，新 dataset/hash 不冒充旧包恢复。官方 DeepSeek 完成新图片转录，通用 host_ocr_v1 分离语义与坐标；集合事实缺少类型化引用导致旧 Query v1 R1 审核失败，新增严格 figure_collection_count 后原题同输入/原标准三次执行，必要信息全覆盖、实际完整阅读/双审/严格加载/独立原件验收通过，无无关业务正文。R1 JSON 自主纠正、R3 重复阅读停止及二次审核恢复均保留；旧失败和未跑槽位不替换。整任务 82 请求/$0.8480571，unknown/inflight=0，同一 $3 护栏；清理可再生缓存约207.85 MiB。**当前位置：本题有限验收完成；下一 E6-R4 显式容量恢复契约，历史原包缺失时旧失败重验仍未完成。** [逐题交付与全部费用](../experiments/agent_design/2026-10-12-m3-figure-query-v1/DELIVERY.zh-CN.md)。
 
 本次 M3 私密迁移入口：`output/machine-handoff-20261012-m3/private-state-v2.tar.gz`，逐文件校验和 SHA 记录在同目录 `verification.json` / `creation.json`。显式包含 `output/m3-rebuild-20261012-r2`（所有 dataset、转录、原调用、失败、两版源码快照、总账及独立验收）、`output/m3-recovery-20261012`（找回原图/清理清单）和首次 SEC 失败 `output/m3-rebuild-20261012-r1`；默认忽略材料按迁移脚本收取，原包不覆盖。API 密钥、`.env`、平台原生 OCR 安装前缀未加入；OCR 可从公开显式锁重装。模型写入停止后创建，验证成功后使用用户控制的私密渠道传输。
@@ -68,7 +77,7 @@ E6-B1 完成时点历史：三档 2/3/4 完整年报、2,739/4,289/5,636 导航�
 
 1. 阅读[工作约定](../AGENTS.md)、本文件、[统一验收标准](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)和[逐题交付](../experiments/agent_design/2026-10-09-e4-heldout-v1/DELIVERY.zh-CN.md)。
 2. 检查代码、公开交付和私密状态是否齐全。Git可恢复代码和公开解释；继续原实验还需要本机迁移包中的原件、冻结运行和真实账本。
-3. 从[主待办当前队列](../TODO.md#有序待办)的 **E6-R4** 接续：先冻结显式容量恢复契约，再做通用实现与边界回归。03-M3新批次本题三次已闭合，先读顶部真实交付；完整数据/原图/原调用/失败/账本须一起迁移。历史V3原包缺失时原失败重验保持未完成，不依旧“下一步”启动调用。
+3. 从[主待办当前队列](../TODO.md#有序待办)的 **E6-R5b** 接续：先冻结记录ID引用/分组与动作归属共同契约，再做通用修复与原标准回归。E6-R4本轮机制和新批次压力/正常控制已闭合，原包回归保持未完成。03-M3新批次本题三次已闭合，先读顶部真实交付；完整数据/原图/原调用/失败/账本须一起迁移。历史V3原包缺失时原失败重验保持未完成，不依旧“下一步”启动调用。
 
 ## 已完成与剩余范围
 
@@ -92,7 +101,7 @@ E6-B1 完成时点历史：三档 2/3/4 完整年报、2,739/4,289/5,636 导航�
 | E6-V2 | **9次实验完成；完整效果8/9、无恢复0/9，稳定性未达** | [真实交付](../experiments/agent_design/2026-10-10-e6-repeatability-v2/PUBLIC_DELIVERY.zh-CN.md) |
 | E6-R3 | **正文/预览/审核恢复已修，原标准回归通过** | [原例恢复＋S1/S3真实结果](../experiments/agent_design/2026-10-10-e6-delivery-boundary-v1/PUBLIC_DELIVERY.zh-CN.md) |
 | E6-V3 | **九次实验完成；终稿8/9、无恢复3/9，稳定性未达** | [逐题缺多、出处与费用](../experiments/agent_design/2026-10-10-e6-repeatability-v3/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-R4 | **诊断层完成；恢复策略与历史回归未完成** | V3 R3-S1真实反例与原输入 |
+| E6-R4 | **机制、新批次压力3/3及正常控制1/1通过；历史原例/自然8192→16384未验** | [本轮交付](../experiments/agent_design/2026-10-12-e6-r4-capacity-v1/DELIVERY.zh-CN.md) |
 | E6-R5 | 后续；要求归属反馈未修 | V3多例操作误用及合法对照 |
 | E6-UI2 | 后置，未实施 | 中文评估概览与折叠细节 |
 | E7 | 后置；需关系类型及原文依据 | 公司relations |
@@ -173,7 +182,7 @@ PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 
 
 提交前离线核心检查通过：Python569项、JavaScript36项；E5/E6受影响回归158项通过、1项跳过，页面/路由/E6 loader另23项通过。首次核心检查暴露历史运行evaluation=null导致附件列表读取报错，统一按空评估处理后原路由回归通过。没有新增模型调用，未执行本次完整历史集成或浏览器视觉验收。这些工程检查不改变E6-V3终稿8/9、无恢复3/9的业务结论。
 
-当前开发位置仍为E6-V3实验闭合；下一项E6-R4输出截断根因修复与原输入/标准回归，E6-R5、E6-UI2和E7保留未完成状态。下方“本次交接验证”为2026-10-09历史交接检查。
+当前位置以顶部E6-R4新批次有限验收为准；下一E6-R5b记录ID引用/分组与动作归属。E6-R4历史原例及自然8192→16384、E6-R5其余路径、E6-UI2和E7仍未完成。下方“本次交接验证”为2026-10-09历史交接检查。
 
 ## 本次交接验证
 
