@@ -858,6 +858,8 @@ def make_handler(data_path: Path, archive_path: Path | None = None, *, observati
                         raise ValueError('Invalid request size')
                     payload = json.loads(self.rfile.read(length))
                     detail = results.load_result(ROOT, parts[2], **observation_options)
+                    if detail['result_view']['kind'] == 'unavailable':
+                        raise ValueError('Restore and verify result evidence before scoring')
                     value = run_scores.save_score(score_store, detail['binding'], payload)
                     self.archive_json(value, 201)
                     return

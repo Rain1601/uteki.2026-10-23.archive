@@ -57,6 +57,9 @@ class AgentResultsPageTests(unittest.TestCase):
         self.assertIn('Orchard cash flow', doc.text_content())
         self.assertIn('Operating cash flow', doc.text_content())
         self.assertIn('-42', doc.text_content())
+        cells = doc.xpath('//table[contains(@class,"rr-facts")]/tbody/tr/td')
+        self.assertIn('2033-12-30', cells[1].text_content())
+        self.assertIn('million · USD', cells[2].text_content())
         self.assertIn('example-model', doc.text_content())
         self.assertIn('example-provider', doc.text_content())
         self.assertIn('high', doc.text_content())
@@ -65,6 +68,26 @@ class AgentResultsPageTests(unittest.TestCase):
         self.assertEqual(doc.xpath('//dl[@class="rr-metrics"]/div[1]/dd')[0].text_content(), '0')
         self.assertIn('Not recorded', doc.xpath('//dl[@class="rr-metrics"]/div[3]/dd')[0].text_content())
         self.assertEqual(doc.xpath('//button[@data-artifact]')[0].get('data-artifact-owner'), 'orchard-2033-worker')
+
+    def test_fact_units_and_periods_support_both_explicit_shapes_without_inference(self):
+        fact = self.left['result_view']['facts'][0]
+        for period in ({'start': '2033-01-01', 'end': '2033-12-30'}, '2033-01-01 → 2033-12-30'):
+            fact.update(period=period, unit='EUR', currency='EUR', value='0')
+            _, doc = self.render(run=self.left['id'])
+            cells = doc.xpath('//table[contains(@class,"rr-facts")]/tbody/tr/td')
+            self.assertEqual(cells[1].text_content().count('2033-12-30'), 1)
+            self.assertEqual(cells[2].text_content(), '0EUR')
+        fact.update(unit=None, currency='JPY', period='2033', period_end='2033-09-30')
+        _, doc = self.render(run=self.left['id'])
+        cells = doc.xpath('//table[contains(@class,"rr-facts")]/tbody/tr/td')
+        self.assertIn('JPY', cells[2].text_content())
+        self.assertIn('2033-09-30', cells[1].text_content())
+        fact.update(unit=None, currency=None)
+        _, doc = self.render(run=self.left['id'])
+        self.assertIn('Not recorded', doc.xpath('//table[contains(@class,"rr-facts")]/tbody/tr/td')[2].text_content())
+        fact.update(unit='<script>x</script>', currency='<img src=x>', period_end='<svg>x</svg>')
+        _, doc = self.render(run=self.left['id'])
+        self.assertFalse(doc.xpath('//table[contains(@class,"rr-facts")]//script|//img|//svg'))
 
     def test_comparison_retains_independent_bindings_and_never_declares_mismatch_fair(self):
         _, doc = self.render(run=self.left['id'], compare=self.right['id'])

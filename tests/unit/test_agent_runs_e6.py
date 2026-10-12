@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from lxml import html
 
 from apps.review_workbench.data import agent_runs, agent_run_results, agent_runs_e6 as e6
 
@@ -112,6 +113,56 @@ class SealedEvaluationTests(unittest.TestCase):
     def test_unknown_identity_and_steps_are_rejected(self):
         with self.assertRaises(KeyError): agent_runs.load_run(self.root, 'unregistered')
         with self.assertRaisesRegex(ValueError, 'Unknown step'): e6.load_step(self.root, 'cedar-a', 'other-step')
+
+    def assert_isolated(self, reason):
+        rows = {r['id']: r for r in agent_run_results.list_results(self.root)['results']}
+        self.assertEqual(set(rows), {'cedar-a', 'maple-b'})
+        self.assertEqual(rows['cedar-a']['integrity']['reason'], reason)
+        self.assertEqual(rows['cedar-a']['state']['execution'], 'unknown')
+        self.assertEqual(rows['cedar-a']['usage'], {})
+        self.assertEqual(rows['maple-b']['integrity']['status'], 'verified')
+        unavailable = agent_run_results.load_result(self.root, 'cedar-a')
+        self.assertEqual(unavailable['result_view']['kind'], 'unavailable')
+        self.assertEqual(unavailable['result_view']['facts'], [])
+        self.assertFalse(unavailable['comparison']['eligible'])
+        from apps.review_workbench.pages.agent_results import render_agent_results
+        from apps.review_workbench.pages.agent_runs import render_agent_runs
+        for render in (render_agent_results, render_agent_runs):
+            for selected in ({}, {'run': ['cedar-a']}, {'run': ['maple-b']}):
+                self.assertIn('maple-b', render(self.root, selected))
+        doc = html.fromstring(render_agent_results(self.root, {'run': ['cedar-a']}))
+        self.assertFalse(doc.xpath('//form[@data-score-form]'))
+
+    def test_missing_history_is_visible_and_restoration_is_revalidated(self):
+        path = self.root / self.a['path'] / 'manifest.json'
+        raw = path.read_bytes()
+        previous = e6.load_run(self.root, 'cedar-a')  # Populate the valid cache first.
+        path.unlink()
+        self.assert_isolated('missing_files')
+        with self.assertRaises(FileNotFoundError):
+            agent_runs.read_artifact(self.root, 'cedar-a', previous['artifacts'][0]['id'])
+        path.write_bytes(raw)
+        restored = agent_runs.load_run(self.root, 'cedar-a')
+        self.assertEqual(restored['integrity']['status'], 'verified')
+        self.assertEqual(restored['revision'], previous['revision'])
+
+    def test_corrupt_history_is_not_reported_as_missing_or_readable(self):
+        previous = e6.load_run(self.root, 'cedar-a')
+        path = self.root / self.a['path'] / 'input.json'
+        path.write_text('{}')
+        self.assert_isolated('invalid_evidence')
+        with self.assertRaisesRegex(ValueError, 'integrity mismatch'):
+            agent_runs.read_artifact(self.root, 'cedar-a', previous['artifacts'][0]['id'])
+        with self.assertRaisesRegex(ValueError, 'revision'):
+            agent_runs.load_run(self.root, 'cedar-a', revision=previous['revision'])
+
+    def test_hash_bound_invalid_json_shape_is_isolated(self):
+        bound = self.fixture.write(self.a['path'] + '/manifest.json', [])
+        self.a['manifest_sha256'] = bound['sha256']
+        self.fixture.register()
+        self.assert_isolated('invalid_evidence')
+        with self.assertRaisesRegex(ValueError, 'manifest must be an object'):
+            e6.load_run(self.root, 'cedar-a')
 
 
 class E6ActualHistoryTests(unittest.TestCase):

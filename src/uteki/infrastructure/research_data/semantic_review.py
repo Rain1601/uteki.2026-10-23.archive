@@ -10,6 +10,7 @@ from uteki.agents.data_query.artifacts import write_new
 from uteki.agents.data_query.coordinator import _verify_manifest
 from uteki.domain.research_data.execution_scope import ExecutionScope
 from uteki.domain.research_data.semantic_review import SemanticAssessment, SemanticAssessmentV2, SemanticTask
+from uteki.infrastructure.document_sources.sec_index import _LINE_BREAK_PARSERS
 from .financial_records import digest, dom_path_query
 from .query_dataset import contained
 from .query_service import QueryDataPort
@@ -202,7 +203,7 @@ def validate_dataset_binding(packet, dataset, *, artifact_root=None):
         raise ValueError('semantic source differs from frozen dataset')
     index = json.loads(contained(dataset, source['index_folder']+'/index.json').read_text())
     if ('parser_version' in packet and packet['parser_version'] != index['parser_version']) or (
-            index['parser_version'] == 'sec-source-blocks-v0.1.12' and 'parser_version' not in packet):
+            index['parser_version'] in _LINE_BREAK_PARSERS and 'parser_version' not in packet):
         raise ValueError('semantic parser version differs from frozen dataset')
     raw = contained(dataset, source['raw_file']).read_bytes()
     if digest(raw) != source['source_sha256']:

@@ -12,7 +12,7 @@ from pydantic import ValidationError
 
 from uteki.agents.data_query.autonomous import AutonomousDataAgent, AutonomousDecision, AUTONOMOUS_PROMPT, Requirement
 from uteki.agents.data_query.autonomous_model import _decision_validation_hints
-from uteki.agents.data_query.decision_protocol import ACTION_RULES
+from uteki.agents.data_query.decision_protocol import ACTION_RULES, SOURCE_SELECTION_RULE
 from uteki.domain.research_data.execution_scope import ExecutionScope
 from uteki.infrastructure.research_data.query_service import QueryDataPort, ScopedQueryDataPort
 from tests.unit.test_autonomous_data_agent import ScriptedPlanner, plan
@@ -20,6 +20,20 @@ from tests.unit.test_scoped_query_service import make_scoped_dataset
 
 
 class DecisionProtocolTests(unittest.TestCase):
+    def test_selection_broadcast_is_explained_in_prompt_and_wire_schema(self):
+        self.assertIn(SOURCE_SELECTION_RULE, AUTONOMOUS_PROMPT)
+        from uteki.agents.data_query.autonomous import runtime_prompt
+        for role in ('planner', 'worker'):
+            self.assertIn(SOURCE_SELECTION_RULE, runtime_prompt(role, 'analysis_evidence'))
+        description = AutonomousDecision.model_json_schema()['$defs']['EvidenceDelivery']['properties']['blocks']['description']
+        self.assertIn('EVERY requirement_id', description)
+        self.assertIn('separate actions', description)
+        # Same-source shared requirements remain expressible: no maxItems=1 shortcut.
+        choice = AutonomousDecision.model_validate({'action': 'select_evidence',
+            'requirement_ids': ['r-one', 'r-two'], 'reason': 'Shared source context.',
+            'delivery': {'blocks': [{'context_id': 'context', 'block_id': 'block'}]}})
+        self.assertEqual(choice.requirement_ids, ('r-one', 'r-two'))
+
     def test_registered_actions_and_schema_requirements_are_exposed_to_model(self):
         self.assertEqual(set(ACTION_RULES), set(get_args(AutonomousDecision.model_fields['action'].annotation)))
         schema = AutonomousDecision.model_json_schema()

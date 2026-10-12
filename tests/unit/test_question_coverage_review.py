@@ -2,9 +2,11 @@
 from copy import deepcopy
 import unittest
 
+from agents import AgentOutputSchema
+
 from uteki.agents.data_query.question_coverage_review import (
     QUESTION_REVIEW_PROMPT, project_question_review, validate_question_review, question_review_repair_input,
-    QuestionReviewProtocolError,
+    QuestionCoverageAssessment, QuestionReviewProtocolError,
 )
 from uteki.infrastructure.research_data.financial_records import digest
 
@@ -119,6 +121,19 @@ class QuestionCoverageReviewTests(unittest.TestCase):
         self.assertIn('explicitly asks WHETHER',QUESTION_REVIEW_PROMPT)
         self.assertIn('not proof of completeness',QUESTION_REVIEW_PROMPT)
 
+    def test_sdk_output_schema_and_prompt_share_the_quote_contract(self):
+        # Exercise the same SDK export used by the real reviewer. A correct
+        # Pydantic schema alone does not establish what reaches the model.
+        schema=AgentOutputSchema(QuestionCoverageAssessment,strict_json_schema=False).json_schema()
+        check_ref=schema['properties']['checks']['items']['$ref']
+        self.assertTrue(check_ref.startswith('#/$defs/'))
+        properties=schema['$defs'][check_ref.removeprefix('#/$defs/')]['properties']
+        for field in ('question_quote','requested_subject','requested_scope_quotes'):
+            with self.subTest(field=field):
+                description=properties[field]['description']
+                self.assertTrue(description.strip())
+                self.assertIn(field+': '+description,QUESTION_REVIEW_PROMPT)
+
     def test_distinct_period_clauses_can_check_same_subject_and_dimension(self):
         p=deepcopy(self.packet)
         p['question']='Provide Beacon revenue in FY2031 and Beacon revenue in FY2030.'
@@ -222,6 +237,51 @@ class QuestionCoverageReviewTests(unittest.TestCase):
             validate_question_review(projected,collapsed)
         self.assertEqual(error.exception.diagnostic['code'],'duplicate_check_requires_distinct_scope')
         self.assertEqual(draft,before)
+
+    def test_subject_in_full_question_but_outside_local_quote_is_still_rejected(self):
+        projected,value=self.scoped_grid()
+        for check in value['checks']:
+            check['question_quote']='provide revenue and cash flow in FY2031 and FY2030'
+        original=deepcopy(value)
+        # This is a real entity from the question, not an invented or joined
+        # phrase. Its presence elsewhere must not weaken the local quote rule.
+        value['checks'][0]['requested_subject']='Beacon'
+        self.assertIn('Beacon',projected['question'])
+        self.assertNotIn('Beacon',value['checks'][0]['question_quote'])
+        with self.assertRaises(QuestionReviewProtocolError) as error:
+            validate_question_review(projected,value)
+        self.assertEqual(error.exception.diagnostic['code'],'requested_subject_requires_verbatim')
+        diagnostics=question_review_repair_input(projected,value)['host_protocol_diagnostics']
+        self.assertEqual(len(diagnostics),1)
+        self.assertEqual(diagnostics[0]['constraint_pointer'],
+                         '/previous_assessment/checks/0/question_quote')
+        # A quote-local metric plus explicit full-question qualifiers preserves
+        # all eight requested identities without altering any source evidence.
+        value['checks'][0]['requested_subject']='revenue'
+        normalized,eligible=validate_question_review(projected,value)
+        self.assertTrue(eligible)
+        self.assertEqual(value,original)
+        identities={(check['requested_subject'],tuple(check['requested_scope_quotes']))
+                    for check in normalized['checks']}
+        self.assertEqual(len(identities),8)
+
+    def test_v1_also_rejects_a_real_subject_outside_the_local_question_quote(self):
+        projected=project_question_review(self.packet,version='question-coverage-input-v1')
+        value=self.response();value['projection_id']=projected['projection_id']
+        check=value['checks'][0]
+        check.pop('support_basis')
+        for citation in check['citations']:citation.pop('kind')
+        check['question_quote']='give its FY2031 disclosed revenue'
+        self.assertIn(check['requested_subject'],projected['question'])
+        with self.assertRaisesRegex(ValueError,'question quote/subject is not an original substring'):
+            validate_question_review(projected,value)
+        # Restoring the historical quote restores the same incomplete review,
+        # without migrating its schema or adding new fields.
+        check['question_quote']='Define Beacon'
+        normalized,eligible=validate_question_review(projected,value)
+        self.assertFalse(eligible)
+        self.assertNotIn('requested_scope_quotes',normalized['checks'][0])
+        self.assertNotIn('support_basis',normalized['checks'][0])
 
     def test_scopes_never_relax_source_quotes_or_record_fields(self):
         projected,value=self.scoped_grid()

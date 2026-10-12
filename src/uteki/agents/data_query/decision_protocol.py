@@ -2,7 +2,16 @@
 from dataclasses import dataclass
 
 
-DECISION_PROTOCOL_VERSION = 'data-agent-decision-v5-source-pinned-query'
+DECISION_PROTOCOL_VERSION = 'data-agent-decision-v6-selection-ownership'
+
+SOURCE_SELECTION_RULE = (
+    'select_evidence applies one identical delivery.blocks list to EVERY requirement_id; '
+    'it does not distribute a union of blocks among requirements. Prefer one requirement per action. '
+    'Batch only requirements with the same source_id and pinned scope that need the identical blocks. '
+    'For different sources, report versions or intended block sets, issue separate actions. '
+    'Each selected context/block must be fully read by this role and match every selected requirement. '
+    'The host rejects the whole invalid selection without changing prior selections; '
+    'it never assigns blocks to requirements for you.')
 
 # Native transports replace this host-object example with wire-envelope examples.
 # Keep a named literal so the adapter removes only our own text, not user input.
@@ -77,6 +86,10 @@ def action_protocol_prompt():
             ['reason (nonblank)'] if rule.reason else [])
         rows.append(f'{action} | {rule.payload or "none"} | {", ".join(required) or "none"}')
     rows.extend([
+        SOURCE_SELECTION_RULE,
+        'select_records likewise applies the entire record_ids list to every requirement_id; '
+        'each must have returned every selected record in its own pinned query. Use separate actions '
+        'when the intended record sets differ. Source ownership does not establish semantic relevance.',
         'Requirement field rules apply before the first plan, not only after a rejection:',
         'kind=query: include query (a QueryPlan); omit node_id. Optional source_id pins this requirement to one '
         'source from the active catalog; omit source_id to query the entire active scope. '

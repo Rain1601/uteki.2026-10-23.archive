@@ -9,6 +9,7 @@ import json
 
 from agents import OpenAIChatCompletionsModel
 from agents.exceptions import ModelBehaviorError
+from .output_limit import ModelOutputLimitExceeded
 
 
 BASE_URL = 'https://api.deepseek.com'
@@ -88,6 +89,9 @@ class DeepSeekChatCompletionsModel(OpenAIChatCompletionsModel):
             'raw_usage': usage,
         }
         allowed = {'stop', 'tool_calls'} if tools or handoffs else {'stop'}
+        if choice is not None and choice.finish_reason == 'length':
+            raise ModelOutputLimitExceeded(max_tokens=settings.max_tokens,
+                finish_reason=choice.finish_reason, raw_usage=usage)
         if choice is None or choice.finish_reason not in allowed:
             raise ModelBehaviorError('DeepSeek response incomplete; inspect recorded finish_reason')
         if not choice.message.content and not choice.message.tool_calls:

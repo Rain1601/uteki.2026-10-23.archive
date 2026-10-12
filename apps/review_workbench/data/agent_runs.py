@@ -60,7 +60,8 @@ def list_page(root, *, agent='data', cursor=None, limit=50, observation_root=Non
 def load_run(root, identity, *, observation_root=None, output_roots=(), revision=None):
     source = _source(root, identity, observation_root)
     if source in {'history', 'experiment', 'e6'}:
-        result = (history if source == 'history' else e6 if source == 'e6' else experiments).load_run(root, identity)
+        result = (e6.load_view(root, identity) if source == 'e6' else
+                  (history if source == 'history' else experiments).load_run(root, identity))
         if revision is not None and str(revision) != str(result['revision']):
             raise ValueError('Historical run revision does not match')
         return result

@@ -26,6 +26,12 @@ The initial R1 network failure retains two unknown calls and USD 0.1004304 reser
 These are local historical artifacts; a checkout without the private E6 outputs
 cannot substitute another result or reconstruct them from the public assessment.
 
+2026-10-12: missing, unreadable or invalid E6 evidence is isolated per registered
+run. Lists and details show an unavailable record with unverified outcome and
+cost; other runs stay readable. Restoring the pinned files triggers validation
+on the next read. Artifact access remains strict, and unavailable results cannot
+be scored. A malformed or ambiguous registry itself still fails validation.
+
 Start the server with the command above, then inspect:
 
 - [Original failed V1 R3-S3](http://127.0.0.1:8765/agent-results?run=e6-v1-r3-s3).

@@ -132,6 +132,8 @@
         if (!setWorkspaceTab(card,name)) return;
         try { const address=new URL(environment.location.href);address.searchParams.set('tab',name);environment.history.replaceState(null,'',address); } catch(_) {}
       });
+      // Unavailable evidence has neither scoreable results nor readable artifacts.
+      if (detail.result_view?.kind === 'unavailable') continue;
       const form = within('[data-score-form]'), status = within('[data-score-status]');
       const formValues = () => {
         const value = name=>form.elements.namedItem(name).value;

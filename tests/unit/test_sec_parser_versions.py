@@ -15,7 +15,7 @@ RAW = b'<html><body><p>Source <span id="amount">17</span></p><p>Following</p></b
 
 class SecParserVersionTests(unittest.TestCase):
     def test_direct_parser_rejects_unknown_blank_and_nonstring_versions(self):
-        for version in ('sec-source-blocks-v0.1.13', 'future', '', ' ', None, []):
+        for version in ('sec-source-blocks-v0.1.14', 'future', '', ' ', None, []):
             with self.subTest(version=version), self.assertRaisesRegex(ValueError, '^unsupported SEC parser version$'):
                 parse_sec_source('independent', 'https://example.invalid/report', RAW, parser_version=version)
 
@@ -25,7 +25,7 @@ class SecParserVersionTests(unittest.TestCase):
             'sec-source-blocks-v0.1.3', 'sec-source-blocks-v0.1.3-quarterly',
             'sec-source-blocks-v0.1.4-quarterly', 'sec-source-blocks-v0.1.5',
             'sec-source-blocks-v0.1.6', 'sec-source-blocks-v0.1.7', 'sec-source-blocks-v0.1.8',
-            'sec-source-blocks-v0.1.9', 'sec-source-blocks-v0.1.10', 'sec-source-blocks-v0.1.11', 'sec-source-blocks-v0.1.12')
+            'sec-source-blocks-v0.1.9', 'sec-source-blocks-v0.1.10', 'sec-source-blocks-v0.1.11', 'sec-source-blocks-v0.1.12', 'sec-source-blocks-v0.1.13')
         for version in versions:
             with self.subTest(version=version):
                 parsed = parse_sec_source('independent', 'https://example.invalid/report', RAW, parser_version=version)
@@ -43,7 +43,7 @@ class SecParserVersionTests(unittest.TestCase):
                 'source_url':'https://example.invalid/report', 'source_snapshot_id':'independent-snapshot',
                 'form':'10-K', 'content_sha256':hashlib.sha256(RAW).hexdigest()}))
             (source/'source.html.gz').write_bytes(gzip.compress(RAW))
-            for number,version in enumerate(('sec-source-blocks-v0.1.13','future','',' ')):
+            for number,version in enumerate(('sec-source-blocks-v0.1.14','future','',' ')):
                 output = root/f'rejected-{number}'
                 with self.subTest(version=version), self.assertRaisesRegex(ValueError, '^unsupported SEC parser version$'):
                     build_index_artifacts(source, output, parser_version=version)

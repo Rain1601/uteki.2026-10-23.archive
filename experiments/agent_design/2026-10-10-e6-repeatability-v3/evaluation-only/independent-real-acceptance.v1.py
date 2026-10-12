@@ -36,32 +36,15 @@ def blocks(packet):
     return rows
 
 
+PROJECTION_HELPER = ROOT / 'experiments/agent_design/2026-10-10-e6-repeatability-v3/evaluation-only/projection_visibility.py'
+projection_spec = importlib.util.spec_from_file_location('projection_visibility', PROJECTION_HELPER)
+projection_helper = importlib.util.module_from_spec(projection_spec)
+projection_spec.loader.exec_module(projection_helper)
+
+
 def visible_projection(packet, query):
-    expected = {d['source_snapshot_id']: [b['block_id'] for b in d['blocks']] for d in packet['source_documents']}
     inputs, binding = a.sdk_bound_inputs(query.parent)
-    matches, candidates = [], []
-    for p, v in inputs:
-        nav = v.get('record_selection_effect', {})
-        values = []
-        if nav.get('complete') and isinstance(nav.get('value'), dict): values.append(nav['value'])
-        for r in nav.get('reads', []):
-            if isinstance(r.get('value'), dict): values.append(r['value'])
-        if nav.get('artifact'):
-            artifact = query / nav['artifact']['path']
-            if artifact.exists() and digest(artifact.read_bytes()) == nav['artifact']['sha256']:
-                raw = read(artifact)
-                if isinstance(raw.get('value'), dict): values.append(raw['value'])
-                elif 'delivery_block_ids' in raw: values.append(raw)
-        for value in values:
-            if value.get('delivery_schema_version') != 'selected-originals-v4': continue
-            projection = {r['source_snapshot_id']: r['block_ids'] for r in value['delivery_block_ids']}
-            row = {'input': a.relative(p), 'projection': projection, 'matches_final': projection == expected,
-                   'complete_direct_sdk_value': bool(nav.get('complete') and nav.get('value') == value)}
-            candidates.append(row)
-            if row['matches_final']: matches.append(row)
-    return {'verdict': 'pass' if matches and binding['verdict'] == 'pass' else 'fail',
-        'expected_full_final_block_ids': expected, 'matching_pre_finish_sdk_inputs': matches,
-        'candidate_count': len(candidates), 'boundary': 'Identity/order projection only; exact body original and SDK exposure checked separately.'}
+    return projection_helper.visible_projection(packet, query, inputs, binding, a.relative)
 
 
 def audit(slot):
@@ -85,7 +68,10 @@ def audit(slot):
     final_ref = read(run/'result.json').get('final_review_ref')
     final = next((r for r in all_rows if final_ref and str(ROOT / r['review']) == final_ref['path']), None)
     first = all_rows[0] if all_rows else None
-    result.update(schema_version='e6-v3-independent-real-acceptance-v1',
+    result.update(schema_version='e6-v3-independent-real-acceptance-v2',
+        supersedes_evaluator_schema_version='e6-v3-independent-real-acceptance-v1',
+        historical_projection_claims='unverified-until-reassessed-with-sdk-projection-visibility-v2',
+        projection_helper={'path': a.relative(PROJECTION_HELPER), 'sha256': digest(PROJECTION_HELPER.read_bytes())},
         operation='fresh-autonomous',
         controlled_first_draft_is_not_fresh_baseline=False,
         first_projection_matches=bool(first and first['visible_final_body_projection']['verdict']=='pass'),

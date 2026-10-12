@@ -1,10 +1,17 @@
 const {test} = require('node:test');
 const assert = require('node:assert/strict');
-const {artifactURL,scorePayload,createScoreController,createArtifactReader,scoreHistoryHTML,draftKey,setWorkspaceTab} = require('../apps/review_workbench/static/js/agent_results.js');
+const {artifactURL,scorePayload,createScoreController,createArtifactReader,scoreHistoryHTML,draftKey,setWorkspaceTab,bootstrap} = require('../apps/review_workbench/static/js/agent_results.js');
 const binding={trace_id:'orchard-2033',revision:'rev3',result_sha256:'a'.repeat(64)};
 const values={reviewer:'Rain',scores:{accuracy:0,coverage:'5',analysis:'',evidence:null},notes:'Check source'};
 const record={id:'review1',binding,rubric_version:'agent-result-v1',reviewer:'Rain',scores:{accuracy:0,coverage:5,analysis:null,evidence:null},notes:'Check source'};
 const page={binding,rubric_version:'agent-result-v1',current:[record],stale:[]};
+
+test('unavailable evidence initializes without score forms or artifact requests',()=>{
+  const card={dataset:{result:'missing'},addEventListener(){},querySelector(){throw Error('No evidence controls should be accessed');}};
+  const document={querySelector(){return null;},querySelectorAll(selector){return selector==='[data-result]' ? [card] : [];}};
+  const result=bootstrap(document,{details:[{id:'missing',result_view:{kind:'unavailable'}}]});
+  assert.deepEqual(result.controllers,[]);
+});
 
 test('workspace tabs preserve the selected trace and review draft without requests',()=>{
   const tabs=['result','process','config'].map(name=>({dataset:{workspaceTab:name},setAttribute(key,value){this[key]=value;}}));

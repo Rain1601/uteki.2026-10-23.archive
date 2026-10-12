@@ -28,9 +28,9 @@ from uteki.infrastructure.document_sources.sec import normalize_text
 from uteki.infrastructure.document_sources.sec_index import CONTAINMENT_PARSERS, build_legal_outline, parse_sec_source
 from uteki.infrastructure.document_sources.company_acquisition import _mime
 
-PARSER = "sec-source-blocks-v0.1.11"
+PARSER = "sec-source-blocks-v0.1.13"
 ParserVersion = Literal["sec-source-blocks-v0.1.7", "sec-source-blocks-v0.1.8",
-                        "sec-source-blocks-v0.1.9", "sec-source-blocks-v0.1.10", "sec-source-blocks-v0.1.11", "sec-source-blocks-v0.1.12"]
+                        "sec-source-blocks-v0.1.9", "sec-source-blocks-v0.1.10", "sec-source-blocks-v0.1.11", "sec-source-blocks-v0.1.12", "sec-source-blocks-v0.1.13"]
 EXPORT = "uteki-parsed-document-v1"
 SHA = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 TEXT = Annotated[str, Field(min_length=1, pattern=r"\S")]

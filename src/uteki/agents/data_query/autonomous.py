@@ -1,5 +1,6 @@
 """Bounded acquisition/query orchestration; host evidence, model decisions, no adoption."""
 from uteki.agents.runtime.observation import observed_run
+from uteki.agents.runtime.output_limit import ModelOutputLimitExceeded
 import time
 import asyncio
 from copy import deepcopy
@@ -27,6 +28,7 @@ from uteki.domain.research_data.run_artifacts import ARTIFACT_READ_MAX_BYTES, Ar
 from uteki.infrastructure.research_data.run_artifacts import ArtifactStore, ArtifactReadProgress, at_pointer, json_size, load_evidence_bundle
 from .record_selection_navigation import candidate_index, selection_effect, navigation_page
 from .artifacts import write_new
+from .selection_contract import SelectionContractError, validate_source_selection
 from .decision_protocol import (ACTION_RULES, ARRAY_PAYLOADS, DECISION_PROTOCOL_VERSION,
                                 action_protocol_prompt, action_schema_rules)
 
@@ -115,7 +117,7 @@ Successful extraction is candidate generation, not semantic approval or adoption
 receipts rather than repeating an extraction. The full catalog is available through its artifact.
 """
 
-AUTONOMOUS_PROMPT_VERSION = 'autonomous-data-agent-v14-incremental-plan-append'
+AUTONOMOUS_PROMPT_VERSION = 'autonomous-data-agent-v15-selection-ownership'
 
 WORKER_PROMPT = AUTONOMOUS_PROMPT + """
 You are the bounded evidence Worker. Your packet has role=worker and fixed requirements from the
@@ -152,7 +154,7 @@ or that the final business graph is correct. Preserve that distinction in covera
 """
 
 
-ANALYSIS_EVIDENCE_PROMPT_VERSION = 'analysis-evidence-v24-explicit-body-delivery'
+ANALYSIS_EVIDENCE_PROMPT_VERSION = 'analysis-evidence-v25-selection-ownership'
 ANALYSIS_EVIDENCE_DELIVERY_VERSION = 'selected-originals-v4'
 _ANALYSIS_REQUIREMENT_POLICY = (
     'This run gathers evidence for a separate Analysis Agent, which owns the narrative answer. '
@@ -369,7 +371,10 @@ class EvidenceBlockSelection(Contract):
 
 
 class EvidenceDelivery(Contract):
-    blocks: tuple[EvidenceBlockSelection, ...] = Field(min_length=1, max_length=64)
+    blocks: tuple[EvidenceBlockSelection, ...] = Field(min_length=1, max_length=64,
+        description='Identical block list applied to EVERY requirement_id, not partitioned among them. '
+        'Prefer one requirement; batch only the same source/scope and intended blocks. '
+        'Use separate actions for different sources, versions or intended block sets.')
 
 
 class RecordDelivery(Contract):
@@ -1339,17 +1344,7 @@ class AutonomousDataAgent:
                     if self.purpose != 'analysis_evidence' or any(coverage[r]['kind'] != 'source_evidence' for r in refs):
                         raise ValueError('delivery selection is for analysis_evidence source_evidence requirements')
                     selected = [block.model_dump() for block in action.delivery.blocks]
-                    if len({(b['context_id'], b['block_id']) for b in selected}) != len(selected):
-                        raise ValueError('duplicate delivery selection')
-                    for rid in refs:
-                        row = coverage[rid]
-                        for block in selected:
-                            eid, bid = block['context_id'], block['block_id']
-                            item = evidence.get(eid)
-                            if (not item or item['kind'] != 'context' or item['scope'] != row['source_scope']
-                                    or item['value']['source_snapshot_id'] != row['source_id']
-                                    or bid not in delivered_blocks.get(eid, set())):
-                                raise ValueError('delivery selection must name fully read same-scope original blocks')
+                    validate_source_selection(refs, selected, coverage, evidence, delivered_blocks)
                     for rid in refs:
                         delivery_selection[rid] = deepcopy(selected)
                         for block in selected: attach(block['context_id'], (rid,))
@@ -1597,9 +1592,14 @@ class AutonomousDataAgent:
             except (ValueError, KeyError, PermissionError) as error:
                 observation = {'status': 'rejected', 'error_type': type(error).__name__,
                     'reason': str(error)[:1500] if type(error) is ValueError else 'invalid action or scope'}
+                if isinstance(error, SelectionContractError):
+                    observation['reason'] = error.diagnostic['guidance']
+                    observation['selection_diagnostic'] = deepcopy(error.diagnostic)
             except Exception as error:
                 status, stop_reason = 'failed', type(error).__name__
                 observation = {'status': 'failed', 'error_type': type(error).__name__}
+                if isinstance(error, ModelOutputLimitExceeded):
+                    observation['output_limit'] = deepcopy(error.diagnostic)
             full_observation = observation
             full_artifact = artifacts.put('tool_output', full_observation, scope=scope, step=step)
             truncated = bool(observation.get('preview_truncated', False))

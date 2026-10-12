@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
 
 from tests.unit.test_company_materialization import filing
 from uteki.infrastructure.research_data.company_materialization import materialize_sources
@@ -28,8 +27,8 @@ class VersionedAnchorPipelineTests(unittest.TestCase):
                         'content_sha256': digest(raw), 'path': 'source.html',
                         'mime_type': 'text/html', 'status': 'frozen'}]}
                 dataset = root/'dataset'
-                with patch('uteki.infrastructure.research_data.company_materialization.HTML_PARSER', 'sec-source-blocks-v0.1.12'):
-                    manifest = materialize_sources(run, root, dataset)
+                # Exercise the production default, not a test-only parser override.
+                manifest = materialize_sources(run, root, dataset)
                 rows = json.loads((dataset/'records.json').read_text())['rows']
                 ids = [r['record_id'] for r in rows]
                 self.assertEqual(len(ids), 2)
@@ -42,7 +41,7 @@ class VersionedAnchorPipelineTests(unittest.TestCase):
                 output = root/'semantic'
                 spec = prepare_semantic_inputs(root/'review', [task], output)
                 packet = json.loads((output/spec['packets'][0]['path']).read_text())
-                self.assertEqual(packet['parser_version'], 'sec-source-blocks-v0.1.12')
+                self.assertEqual(packet['parser_version'], 'sec-source-blocks-v0.1.13')
                 self.assertTrue(all(a['status'] == 'located' for a in packet['record_anchors'].values()))
                 self.assertIn('Operating income30', [a['text'] for a in packet['record_anchors'].values()])
                 validate_dataset_binding(packet, dataset, artifact_root=output)

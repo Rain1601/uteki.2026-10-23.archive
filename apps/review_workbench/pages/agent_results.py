@@ -40,6 +40,8 @@ def number(value):
 
 
 def delivery_label(detail):
+    if (detail.get('result_view') or {}).get('kind') == 'unavailable':
+        return bi('本机记录不可用', 'Local record unavailable')
     if (detail.get('result_view') or {}).get('kind') == 'no_visible_output':
         return bi('未交付 · 无可见结果', 'Not delivered · No visible output')
     return known((detail.get('state') or {}).get('delivery'))
@@ -147,6 +149,15 @@ def _result_body(detail):
         for fact in view['facts']:
             period = fact.get('period')
             period = ' — '.join(str(v) for v in (period.get('start'), period.get('end')) if v) if isinstance(period, dict) else period
+            period_end = fact.get('period_end')
+            period_display = known(period)
+            if period_end and str(period_end) not in str(period or ''):
+                period_display += '<small>' + e(period_end) + '</small>'
+            # Legacy results split scale and denomination; newer records may
+            # already use the currency as their unit. Preserve explicit fields.
+            units = list(dict.fromkeys(str(v) for v in (fact.get('unit'), fact.get('currency'))
+                                       if v is not None and v != ''))
+            unit_display = e(' · '.join(units)) if units else known(None)
             company = fact.get('company') or fact.get('company_id')
             value = fact.get('value')
             display_value = number(int(value)) if isinstance(value, str) and value.lstrip('-').isdigit() and len(value) < 30 else number(value)
@@ -155,7 +166,7 @@ def _result_body(detail):
             for citation in citations:
                 cell = citation.get('cell') or {}
                 evidence += '<details><summary>' + e(citation.get('block_id')) + '</summary><p>' + e(citation.get('source_snapshot_id') or fact.get('source_id')) + '</p><p>' + bi('行 / 列（记录索引）', 'Row / column (recorded index)') + ': ' + known(cell.get('row', fact.get('row'))) + ' / ' + known(cell.get('column', fact.get('column'))) + '</p><blockquote>' + e(citation.get('quote')) + '</blockquote></details>'
-            body += '<tr><td>' + e(fact.get('metric')) + ('<small>' + e(company) + '</small>' if company else '') + '</td><td>' + known(period) + '</td><td class="rr-number">' + display_value + '<small>' + known(fact.get('unit')) + '</small></td><td>' + evidence + '</td></tr>'
+            body += '<tr><td>' + e(fact.get('metric')) + ('<small>' + e(company) + '</small>' if company else '') + '</td><td>' + period_display + '</td><td class="rr-number">' + display_value + '<small>' + unit_display + '</small></td><td>' + evidence + '</td></tr>'
         body += '</tbody></table></div>'
     if view.get('documents'):
         body += '<h4>' + bi('实际交付原文', 'Delivered original text') + '</h4>'
@@ -190,6 +201,8 @@ RUBRIC = [('accuracy', '事实准确性', 'Factual accuracy'), ('coverage', '任
 
 
 def _scores(detail):
+    if (detail.get('result_view') or {}).get('kind') == 'unavailable':
+        return '<p class="rr-note">' + bi('材料恢复并通过校验后才能评价此结果。', 'Restore and verify the evidence before evaluating this result.') + '</p>'
     body = '<section class="rr-scores"><h3>' + bi('独立评分', 'Independent scoring') + '</h3><p class="rr-note">' + bi('每项 0–5 分；0 为零分，留空为未评分。1–4 表示从较弱到较好，5 表示完全满足任务。评分记录单独保存，不改变原产物或采纳状态。', 'Score each dimension from 0 to 5. Zero is a score; blank means unscored. Scores 1–4 range from weak to good; 5 fully meets the task. Reviews are stored separately and do not change the output or adoption state.') + '</p>'
     body += '<details><summary>' + bi('评分口径 · agent-result-v1', 'Rubric · agent-result-v1') + '</summary><ul class="rr-note">'
     for zh, en in [('事实准确性：数值、符号、期间和分析陈述是否正确。', 'Accuracy: correct values, signs, periods and analytical statements.'), ('任务覆盖：是否完成明确要求的内容；缺失与无输出应被计入。', 'Coverage: completion of the requested work, including omissions or no output.'), ('分析价值：解释是否有依据，是否区分事实、推断和限制。', 'Analysis: useful, supported explanations that distinguish facts, inferences and limits.'), ('证据可追溯：结论能否回到匹配范围的来源位置。', 'Evidence: claims can be traced to source locations within the selected scope.')]:

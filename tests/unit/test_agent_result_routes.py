@@ -133,3 +133,20 @@ class ResultRoutesTests(LiveRunFixture):
         with patch.object(agent_runs, 'read_artifact') as reader:
             self.assertEqual(self.request('/api/agent-runs/frozen/artifacts/output?revision=wrong-hash')['status'], 400)
             reader.assert_not_called()
+
+    def test_missing_registered_history_preserves_routes_and_cannot_be_scored(self):
+        from tests.unit.test_agent_runs_e6 import SealedFixture
+        entry = SealedFixture(self.root).add('missing-history')
+        (self.root / entry['path'] / 'manifest.json').unlink()
+        for path in ('/agent-results', '/agent-runs', '/api/agent-results', '/api/agent-runs',
+                     '/agent-results?run=missing-history', '/agent-runs?run=missing-history'):
+            response = self.request(path)
+            self.assertEqual(response['status'], 200, path)
+        listing = self.request('/api/agent-results')['json']['results']
+        self.assertEqual({r['id'] for r in listing}, {self.trace, 'missing-history'})
+        detail = self.request('/api/agent-results/missing-history')['json']
+        self.assertEqual(detail['integrity']['reason'], 'missing_files')
+        payload = {**self.payload(), 'binding': detail['binding']}
+        response = self.request('/api/agent-results/missing-history/scores', method='POST', payload=payload)
+        self.assertEqual(response['status'], 400)
+        self.assertFalse(self.score_path.exists())

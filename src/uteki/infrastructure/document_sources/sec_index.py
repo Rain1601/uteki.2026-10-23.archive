@@ -31,9 +31,10 @@ SUPPORTED_PARSER_VERSIONS = frozenset({
     'sec-source-blocks-v0.1.4-quarterly', 'sec-source-blocks-v0.1.5',
     'sec-source-blocks-v0.1.6', 'sec-source-blocks-v0.1.7', 'sec-source-blocks-v0.1.8',
     'sec-source-blocks-v0.1.9', 'sec-source-blocks-v0.1.10', 'sec-source-blocks-v0.1.11',
-    'sec-source-blocks-v0.1.12',
+    'sec-source-blocks-v0.1.12', 'sec-source-blocks-v0.1.13',
 })
-_LINE_BREAK_PARSERS = frozenset({'sec-source-blocks-v0.1.12'})
+_CONTENT_CELL_TOC_PARSERS = frozenset({'sec-source-blocks-v0.1.13'})
+_LINE_BREAK_PARSERS = frozenset({'sec-source-blocks-v0.1.12'}) | _CONTENT_CELL_TOC_PARSERS
 _INHERITED_PAGE_PARSERS = frozenset({'sec-source-blocks-v0.1.11'}) | _LINE_BREAK_PARSERS
 _TABLE_ITEM_PARSERS = frozenset({'sec-source-blocks-v0.1.10'}) | _INHERITED_PAGE_PARSERS
 NAVIGATION_PARSERS = frozenset({'sec-source-blocks-v0.1.9'}) | _TABLE_ITEM_PARSERS
@@ -158,17 +159,30 @@ def _toc_table(root: etree._Element, *, nearest_table=False) -> etree._Element |
     return max(scored, key=lambda item: item[0])[1] if scored else None
 
 
-def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_link_roles=False, nearest_table=False, linked_titles=False, preserve_line_breaks=False) -> tuple[tuple[TocEntry, ...], tuple[IndexDiagnostic, ...]]:
+def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_link_roles=False, nearest_table=False, linked_titles=False, preserve_line_breaks=False, content_cells=False) -> tuple[tuple[TocEntry, ...], tuple[IndexDiagnostic, ...]]:
     if table is None:
         return (), (
             IndexDiagnostic("toc_missing", "warning", "No Part/Item table of contents was detected; body headings will be used."),
         )
+    def row_hrefs(element):
+        return list(dict.fromkeys(link.get("href")
+            for link in element.xpath('.//a[starts-with(@href,"#")]')
+            if not content_cells or not _hidden(link)))
+
     entries: list[TocEntry] = []
     diagnostics: list[IndexDiagnostic] = []
     seen_items: set[tuple[str, str]] = set()
     current_part = ""
     for row_number, row in enumerate(_table_rows(table, nearest_table=nearest_table), start=1):
-        cell_text = [normalize_text(_visible_text(cell, preserve_line_breaks=True) if preserve_line_breaks else cell.text_content()) for cell in row.xpath("./th|./td")]
+        row_cells = row.xpath("./th|./td")
+        if content_cells:
+            # Physical positions include arbitrary leading/interleaved spacer
+            # cells. Interpret Item, title and page using visible content roles.
+            # Keep original DOM/cell geometry intact; legacy versions retain
+            # their frozen positional behavior.
+            row_cells = [cell for cell in row_cells
+                         if normalize_text(_visible_text(cell, preserve_line_breaks=preserve_line_breaks))]
+        cell_text = [normalize_text(_visible_text(cell, preserve_line_breaks=True) if preserve_line_breaks else cell.text_content()) for cell in row_cells]
         row_text = normalize_text(_visible_text(row, preserve_line_breaks=True) if preserve_line_breaks else row.text_content())
         part_match = _PART_RE.match(next((value for value in cell_text if value), row_text))
         if part_match:
@@ -180,13 +194,16 @@ def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_lin
             continue
         number = item_match.group(1).upper()
         title = cell_text[1] if len(cell_text) > 1 and cell_text[1] else item_match.group(2).strip()
+        if content_cells:
+            inline_title = item_match.group(2).strip()
+            title = inline_title or next((value for value in cell_text[1:] if not value.isdigit()), '')
         page_text = cell_text[-1] if cell_text else ""
         if linked_titles and (len(cell_text) < 2 or not cell_text[1]):
             # Spacer cells are layout, not the title or the reported page.
-            content_cells = [normalize_text(_visible_text(cell, preserve_line_breaks=preserve_line_breaks)) for cell in row.xpath('./th|./td')]
-            content_cells = [value for value in content_cells[1:] if value and not value.isdigit()]
-            if len(content_cells) == 1:
-                title = content_cells[0]
+            title_cells = [normalize_text(_visible_text(cell, preserve_line_breaks=preserve_line_breaks)) for cell in row_cells]
+            title_cells = [value for value in title_cells[1:] if value and not value.isdigit()]
+            if len(title_cells) == 1:
+                title = title_cells[0]
             title_links = {normalize_text(_visible_text(a, preserve_line_breaks=preserve_line_breaks)) for a in row.xpath('.//a[starts-with(@href,"#")]')
                            if normalize_text(_visible_text(a, preserve_line_breaks=preserve_line_breaks)) and not normalize_text(_visible_text(a, preserve_line_breaks=preserve_line_breaks)).isdigit()}
             title_links = {text for text in title_links if not _ITEM_RE.match(text)}
@@ -198,19 +215,16 @@ def _toc_entries(table: etree._Element | None, blocks=(), anchors=(), verify_lin
                     f'TOC row {row_number} for Item {number} contains conflicting titles.'))
             page_text = next((value for value in reversed(cell_text) if value), '')
         reported_page = int(page_text) if page_text.isdigit() else None
-        hrefs = list(
-            dict.fromkeys(
-                link.get("href")
-                for link in row.xpath(".//a[starts-with(@href, '#')]")
-                if link.get("href")
-            )
-        )
+        hrefs = row_hrefs(row)
         source_anchor = hrefs[0][1:] if hrefs else None
         equivalent_page_link = False
         if verify_link_roles and len(hrefs) == 2 and reported_page is not None:
-            cells = row.xpath('./th|./td')
-            title_links = list(dict.fromkeys(cells[1].xpath('.//a[starts-with(@href,"#")]/@href'))) if len(cells) > 2 else []
-            page_links = list(dict.fromkeys(cells[-1].xpath('.//a[starts-with(@href,"#")]/@href'))) if cells else []
+            cells = row_cells
+            title_links = row_hrefs(cells[1]) if len(cells) > 2 else []
+            if content_cells:
+                title_cell_index = 0 if item_match.group(2).strip() else 1
+                title_links = row_hrefs(cells[title_cell_index]) if len(cells) > title_cell_index + 1 else []
+            page_links = row_hrefs(cells[-1]) if cells else []
             if len(title_links) == len(page_links) == 1:
                 by_id = {b.block_id: b for b in blocks}
                 by_anchor = {a.anchor: by_id.get(a.target_block_id) for a in anchors}
@@ -612,7 +626,8 @@ def parse_sec_source(
 
     toc_entries, toc_diagnostics = _toc_entries(toc, blocks, anchors,
         verify_link_roles=visible_only or parser_version in {"sec-source-blocks-v0.1.3-quarterly", "sec-source-blocks-v0.1.4-quarterly", "sec-source-blocks-v0.1.5"},
-        nearest_table=nearest_table, linked_titles=parser_version in _TABLE_ITEM_PARSERS, preserve_line_breaks=preserve_line_breaks)
+        nearest_table=nearest_table, linked_titles=parser_version in _TABLE_ITEM_PARSERS, preserve_line_breaks=preserve_line_breaks,
+        content_cells=parser_version in _CONTENT_CELL_TOC_PARSERS)
     navigation_diagnostics = []
     if parser_version in NAVIGATION_PARSERS:
         blocks, navigation_diagnostics = _mark_repeated_navigation(blocks, candidates, toc, root,

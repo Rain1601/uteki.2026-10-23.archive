@@ -196,7 +196,7 @@ def prepare_initial_query(config, request, output):
             'query_path':root/'query', 'budget_changes': budget_changes}
 
 
-def _review_role_factory(config, role, prompt, output_schema):
+def _review_role_factory(config, role, prompt, output_schema, *, output_projection=None):
     model = config[role]
     def make(output):
         budget = RunBudget(model['budget_ledger'], model['budget_usd'],
@@ -207,7 +207,8 @@ def _review_role_factory(config, role, prompt, output_schema):
             credentials_root=config['credential_root'], prompt=prompt, output_schema=output_schema,
             max_tokens=model['max_tokens'], request_timeout=model['request_timeout'],
             max_retries=model['max_retries'], reasoning_effort=model['reasoning_effort'],
-            max_request_bytes=config.get('reviewer_max_request_bytes', 400000))
+            max_request_bytes=config.get('reviewer_max_request_bytes', 400000),
+            **({'output_projection': output_projection} if output_projection is not None else {}))
     return make
 
 
@@ -253,10 +254,11 @@ def reviewer_factory(config, packet=None, *, prior_failures=None):
 
 
 def question_reviewer_factory(config):
-    from .question_coverage_review import QUESTION_REVIEW_PROMPT, QuestionCoverageAssessment
+    from .question_review_generation import PROJECTION, QUESTION_GENERATION_PROMPT, QuestionCoverageGeneration
     if 'question_reviewer' not in review_roles(config):
         raise ValueError('independent question reviewer is not configured')
-    return _review_role_factory(config, 'question_reviewer', QUESTION_REVIEW_PROMPT, QuestionCoverageAssessment)
+    return _review_role_factory(config, 'question_reviewer', QUESTION_GENERATION_PROMPT,
+                                QuestionCoverageGeneration, output_projection=PROJECTION)
 
 
 def _reference(path):
@@ -290,6 +292,7 @@ async def run_retrieval_cycle(config, output):
         'uteki.agents.data_query.record_selection_navigation',
         'uteki.infrastructure.research_data.query_completion',
         'uteki.agents.data_query.question_coverage_review',
+        'uteki.agents.data_query.question_review_generation',
         'uteki.agents.data_query.decision_protocol', 'uteki.agents.runtime.claude_messages',
         'uteki.domain.research_data.period_scope', 'uteki.agents.runtime.qwen_model',
         'uteki.agents.runtime.deepseek_model', 'uteki.agents.runtime.model_factory',

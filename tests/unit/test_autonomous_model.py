@@ -16,6 +16,7 @@ from uteki.agents.data_query.autonomous import AUTONOMOUS_PROMPT, WORKER_PROMPT
 from uteki.agents.data_query.autonomous_model import SdkAutonomousPlanner, _RequestLimitedBudget, _decision_validation_hints
 from uteki.agents.runtime.run_budget import RunBudget, BudgetExceeded
 from uteki.agents.runtime.call_costs import pricing_snapshot, summarize
+from uteki.agents.runtime.output_limit import ModelOutputLimitExceeded
 from uteki.infrastructure.research_data.financial_records import digest
 
 
@@ -593,7 +594,10 @@ class AutonomousModelTests(unittest.TestCase):
                 attempt_path, = planner.output.glob('decision-*-attempt-*.json')
                 attempt = json.loads(attempt_path.read_text())
                 self.assertEqual(attempt['status'], 'failed_or_cancelled')
-                self.assertEqual(attempt['error_type'], 'ModelBehaviorError')
+                self.assertEqual(attempt['error_type'],
+                    'ModelOutputLimitExceeded' if finish_reason == 'length' else 'ModelBehaviorError')
+                if finish_reason != 'length':
+                    self.assertNotIn('output_limit', attempt)
                 usage = planner.snapshot_usage()['summary']
                 self.assertEqual(usage['calls']['requests'], 1)
                 self.assertEqual(usage['calls']['unknown_cost_requests'], 0)
@@ -606,6 +610,73 @@ class AutonomousModelTests(unittest.TestCase):
                     self.assertEqual(output['content'], content)
                     self.assertEqual(output['finish_reason'], finish_reason)
         self.assertEqual(len(self.requests), len(cases))
+
+    def test_output_limit_diagnostic_reaches_failed_query_without_executing_or_retrying(self):
+        from uteki.agents.data_query.autonomous import AutonomousDataAgent
+        from uteki.infrastructure.research_data.query_service import QueryDataPort
+        from uteki.domain.research_data.execution_scope import ExecutionScope
+        from tests.unit.test_scoped_query_service import make_scoped_dataset
+        dataset = self.root/'dataset'; dataset.mkdir()
+        make_scoped_dataset(dataset)
+        port = QueryDataPort(dataset); self.addCleanup(port.close)
+        scope = ExecutionScope(snapshot_id=port.snapshot_id, company_ids=('acme',),
+            source_snapshot_ids=('acme-annual',), source_policy_id='local-frozen-v1',
+            knowledge_cutoff='2032-05-01', include_candidates=True)
+        request = {'question': 'Read this company business evidence.', 'scope': scope.model_dump(mode='json')}
+        # Even syntactically complete JSON is untrusted when the provider says length.
+        for index, supplied_usage in enumerate((True, False)):
+            with self.subTest(supplied_usage=supplied_usage):
+                def respond(http_request):
+                    payload = self.raw_response(http_request, '{"action":"finish"}', finish_reason='length').json()
+                    if supplied_usage:
+                        payload['usage'] = {'prompt_tokens': 200, 'completion_tokens': 8192,
+                            'total_tokens': 8392, 'completion_tokens_details': {'reasoning_tokens': 8012}}
+                    else:
+                        payload.pop('usage')
+                    return httpx.Response(200, json=payload)
+                planner = self.planner(respond, name=f'limit-model-{index}', reasoning_effort='low',
+                    max_tokens=8192, max_retries=1)
+                output = self.root/f'limit-query-{index}'
+                async def run():
+                    try:
+                        return await AutonomousDataAgent(port, planner, limits={'max_steps': 3}).run(request, output=output)
+                    finally:
+                        await planner.aclose()
+                result = asyncio.run(run())
+                self.assertEqual(result['status'], 'failed')
+                self.assertEqual(result['stop_reason'], 'ModelOutputLimitExceeded')
+                self.assertEqual(len(list(output.glob('turn-*'))), 1)
+                self.assertFalse(list(output.glob('turn-*/decision.json')))
+                feedback = json.loads((output/'turn-001/feedback.json').read_text())
+                diagnostic = feedback['output_limit']
+                self.assertEqual(diagnostic['requested_max_tokens'], 8192)
+                self.assertEqual(diagnostic['finish_reason'], 'length')
+                self.assertFalse(diagnostic['action_accepted'])
+                self.assertFalse(diagnostic['automatic_recovery'])
+                self.assertEqual(diagnostic['usage_presence'], 'reported' if supplied_usage else 'absent')
+                self.assertEqual(diagnostic['usage']['reasoning_tokens'], 8012 if supplied_usage else None)
+                self.assertEqual(diagnostic['usage']['output_tokens'], 8192 if supplied_usage else None)
+                self.assertNotIn('diagnostic-hidden-reasoning', json.dumps(diagnostic))
+                artifact = Path(diagnostic['artifact_root'])/diagnostic['visible_output']['path']
+                self.assertEqual(digest(artifact.read_bytes()), diagnostic['visible_output']['sha256'])
+                self.assertEqual(json.loads(artifact.read_text())['content'], '{"action":"finish"}')
+                attempt, = (json.loads(p.read_text()) for p in planner.output.glob('decision-*-attempt-*.json'))
+                self.assertEqual(attempt['output_limit'], diagnostic)
+                calls = planner.snapshot_usage()['summary']['calls']
+                self.assertEqual(calls['requests'], 1)
+                self.assertEqual(calls['unknown_cost_requests'], 0 if supplied_usage else 1)
+                if supplied_usage:
+                    self.assertGreater(float(calls['known_estimated_usd']), 0)
+                    self.assertEqual(calls['records'][0]['raw_usage']['completion_tokens_details']['reasoning_tokens'], 8012)
+        self.assertEqual(len(self.requests), 2)
+
+    def test_output_limit_is_sdk_compatible_and_missing_counters_are_not_zero(self):
+        error = ModelOutputLimitExceeded(max_tokens=8192, finish_reason='length',
+            raw_usage={'prompt_tokens': 7, 'completion_tokens': -1,
+                       'completion_tokens_details': {'reasoning_tokens': True}})
+        self.assertIsInstance(error, ModelBehaviorError)
+        self.assertEqual(error.diagnostic['usage'], {'input_tokens': 7, 'output_tokens': None, 'reasoning_tokens': None})
+        self.assertEqual(error.diagnostic['usage_presence'], 'unknown')
 
     def test_visible_output_is_bounded_with_hash_of_the_complete_content(self):
         content = json.dumps({'action': 'finish', 'unexpected': 'x' * 140000})

@@ -49,7 +49,31 @@ unselected report content and image contents have not been reviewed. Do not infe
 Return the specified JSON schema. This is a semantic model opinion, not proof of completeness.
 """
 
+# These descriptions are shared by the V2 prompt and the emitted model schema.
+# V1 and the validators remain unchanged; this clarifies generation, not acceptance.
+_QUESTION_QUOTE_DESCRIPTION = (
+    'One exact continuous excerpt of the ORIGINAL QUESTION containing requested_subject. '
+    'Choose the subject anchor first, then copy a question excerpt that contains it. '
+    'An entity mentioned elsewhere in the question is not inside this excerpt.')
+_SUBJECT_ANCHOR_DESCRIPTION = (
+    'An exact continuous subject phrase INSIDE question_quote, used as a text anchor, '
+    'not a normalized name or a synthesized entity-period-metric label. '
+    'The full requested identity is this anchor plus requested_dimension and requested_scope_quotes. '
+    'Preserve every separately requested entity and period in that combination; '
+    'do not replace a requested metric with its period.')
+_REQUEST_SCOPE_DESCRIPTION = (
+    'Distinct exact continuous phrases from the FULL ORIGINAL QUESTION retaining this check\'s '
+    'entity, period and other applicable qualifiers beyond the subject anchor. '
+    'They may lie outside question_quote. For entity-by-period checks retain each applicable '
+    'entity and period, separately, unless already explicit in the anchor. '
+    'Never join separated words. Source subjects and evidence do not supply missing requested scope. '
+    'Use [] only when no separate qualifier is needed.')
+
 QUESTION_REVIEW_PROMPT = QUESTION_REVIEW_PROMPT_V1.replace(
+    'First identify the requested subjects and\ndimensions from the question itself. Keep each requested subject\'s identity unchanged when\nmatching source disclosures.',
+    'First identify each full requested identity (subject, dimension and applicable scope) from the question itself. '
+    'Keep that full identity unchanged when matching source disclosures; the requested_subject field is only its verbatim text anchor.'
+).replace(
     'Complete coverage\nrequires same-subject support; a merely related disclosure cannot substitute for the requested item.',
     'Apply the dimension-specific support rules below; never silently rename a broader group as the requested subject.'
 ).replace(
@@ -93,6 +117,19 @@ For an enumeration in the question, a shortened label joining its separated entr
 a verbatim subject or scope quote. Either review individual entries as separate checks with
 continuous question quotations, or retain a continuous longer quotation that includes the
 intervening words. Choose the representation from the question; do not abbreviate or join it.
+""" + '\nQUESTION ANCHOR CONTRACT v1 (shared with output field descriptions):\n' + '\n'.join((
+    'requested_subject: ' + _SUBJECT_ANCHOR_DESCRIPTION,
+    'question_quote: ' + _QUESTION_QUOTE_DESCRIPTION,
+    'requested_scope_quotes: ' + _REQUEST_SCOPE_DESCRIPTION,
+)) + """
+Construct each check in this order: identify the full requested identity; select its continuous
+subject anchor; select a question excerpt containing that anchor; retain the remaining scope
+phrases from the full question. Judge source_subject and relation against the FULL requested
+identity, not the anchor alone. A shared metric anchor is allowed across checks only when their
+requested scopes distinguish the requested entities/periods. Source_subject describes the evidence;
+changing it cannot distinguish two otherwise identical requested checks.
+Before returning, verify subject-in-quote and quote-in-question literally, and verify that no
+entity, period or other requested qualifier was lost. Do not rewrite quotations to force a match.
 """
 
 
@@ -142,22 +179,17 @@ class RecordFieldCitation(Contract):
 
 
 class QuestionCoverageCheckV2(QuestionCoverageCheck):
+    question_quote: str = Field(min_length=1, max_length=20000, pattern=r"\S",
+        description=_QUESTION_QUOTE_DESCRIPTION)
     requested_subject: str = Field(min_length=1, max_length=2000, pattern=r"\S",
-        description='What this check evaluates, copied as one exact continuous phrase within question_quote. '
-        'If an entity or period lies outside that phrase, preserve it in requested_scope_quotes from the full '
-        'original question. Do not concatenate the entity, period and metric or replace a separately requested '
-        'entity with a collective label that erases its identity.')
+        description=_SUBJECT_ANCHOR_DESCRIPTION)
     citations: tuple[BlockQuoteCitation | RecordFieldCitation, ...] = Field(default=(), max_length=16)
     support_basis: Literal['direct', 'qualified_disclosure', 'analysis_premises']
     qualification: str | None = Field(default=None, max_length=4000)
     qualification_question_quote: str | None = Field(default=None, max_length=20000)
     qualification_citations: tuple[BlockQuoteCitation, ...] = Field(default=(), max_length=16)
     requested_scope_quotes: tuple[str, ...] = Field(default=(), max_length=8,
-        description='Exact continuous quotations from the FULL original question identifying this check\'s '
-        'entity/company, period and other requested qualifiers. They may lie outside question_quote. '
-        'For separate entity-by-period results, retain both the applicable entity and period qualifiers. '
-        'Different source_subject strings or citations do not distinguish requested identities. '
-        'Use [] only when there is no separate requested qualifier; do not invent qualifiers from source text.')
+        description=_REQUEST_SCOPE_DESCRIPTION)
 
 
 class QuestionCoverageAssessment(QuestionCoverageAssessmentV1):

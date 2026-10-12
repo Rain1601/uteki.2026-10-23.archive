@@ -90,6 +90,8 @@ def _build(root, entry):
     folder = _path(root, base)
     manifest_path = _pinned(root, base + '/manifest.json', entry['manifest_sha256'])
     manifest = json.loads(manifest_path.read_text())
+    if not isinstance(manifest, dict):
+        raise ValueError('Sealed run manifest must be an object')
     files = manifest.get('files')
     if not isinstance(files, dict) or 'result.json' not in files:
         raise ValueError('Sealed run has no result binding')
@@ -340,9 +342,44 @@ def load_run(root, identity):
     return deepcopy(_loaded(root, identity)['view'])
 
 
+def load_view(root, identity):
+    """Isolate unavailable evidence for display; strict artifact reads stay closed."""
+    _identity(identity)
+    entries = [entry for entry in _registry(root) if entry['id'] == identity]
+    if len(entries) != 1:
+        raise ValueError('Select an explicitly registered sealed evaluation')
+    entry = entries[0]
+    try:
+        return load_run(root, identity)
+    except (OSError, ValueError, KeyError, TypeError, IndexError, AttributeError) as error:
+        # A registry identifies a run, but cannot establish its outcome or cost.
+        # Do not cache this projection: restored files must be checked next time.
+        reason = ('missing_files' if isinstance(error, FileNotFoundError) else
+                  'unreadable_files' if isinstance(error, OSError) else 'invalid_evidence')
+        message = {
+            'missing_files': '本机材料缺失，无法核验此记录。 / Local evidence files are missing; this run cannot be verified.',
+            'unreadable_files': '本机材料无法读取，无法核验此记录。 / Local evidence files cannot be read; this run cannot be verified.',
+            'invalid_evidence': '材料校验失败，已阻止读取此记录的产物。 / Evidence validation failed; artifact access is blocked.',
+        }[reason]
+        return _clean({'schema_version': 'agent-run-view-v1', 'id': identity,
+            'root_run_id': identity, 'agent': 'data', 'title': entry.get('title') or identity,
+            'origin': entry.get('kind'), 'live': False, 'root_terminal': None,
+            'revision': _digest({'registration': entry, 'availability': reason}),
+            'state': {'execution': 'unknown', 'connection': 'historical', 'delivery': 'unavailable',
+                      'quality': 'not_verified', 'adoption': 'unknown', 'stop_reason': None},
+            'scope': {}, 'usage': {}, 'run_tree': [], 'steps': [], 'calls': [],
+            'artifacts': [], 'inputs': [], 'configs': [], 'links': [], 'task': None,
+            'result_view': {'kind': 'unavailable', 'facts': [], 'analysis': [], 'documents': [],
+                            'gaps': [], 'artifacts': [], 'summary': message},
+            'evaluation': {'schema_version': 'unavailable-evaluation-v1', 'kind': 'unavailable',
+                           'summary': message},
+            'integrity': {'status': 'unavailable' if isinstance(error, OSError) else 'invalid',
+                          'adapter': ADAPTER, 'reason': reason}, 'diagnostics': [message]})
+
+
 def list_runs(root):
     keys = ('schema_version', 'id', 'root_run_id', 'agent', 'title', 'origin', 'live', 'root_terminal', 'revision', 'state', 'scope', 'usage', 'integrity', 'diagnostics')
-    return [{k: v[k] for k in keys} for e in _registry(root) for v in [load_run(root, e['id'])]]
+    return [{k: v[k] for k in keys} for e in _registry(root) for v in [load_view(root, e['id'])]]
 
 
 def load_step(root, identity, step_id):
@@ -362,7 +399,7 @@ def read_artifact(root, identity, artifact_id, *, cursor=None, browse=None):
 
 def result_summary(root, identity):
     """Small selection row; full result, trace and assessments are on demand."""
-    view = _loaded(root, identity)['view']
+    view = load_view(root, identity)
     keys = ('id', 'root_run_id', 'title', 'agent', 'origin', 'live', 'root_terminal', 'revision', 'state', 'scope', 'usage', 'integrity', 'diagnostics')
     value = {k: deepcopy(view[k]) for k in keys}
     starts = []

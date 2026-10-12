@@ -9,7 +9,7 @@ from uteki.infrastructure.document_sources.sec import normalize_text
 from uteki.infrastructure.document_sources.sec_index import _hidden, _visible_text
 
 VERSION = 'html-tenk-coverage-audit-v1'
-SUPPORTED_PARSERS = {'sec-source-blocks-v0.1.11', 'sec-source-blocks-v0.1.12'}
+SUPPORTED_PARSERS = {'sec-source-blocks-v0.1.11', 'sec-source-blocks-v0.1.12', 'sec-source-blocks-v0.1.13'}
 
 
 def audit_html_tenk(raw, source, index, blocks):
@@ -101,7 +101,7 @@ def audit_html_tenk(raw, source, index, blocks):
             ledger.append(entry)
             if status in ('uncovered_visible_text', 'represented_ancestor_but_text_missing'):
                 section['findings'].append({'code': status, 'dom_path': entry['dom_path'], 'text_kind': kind, 'text': text})
-    preserve_breaks = source['parser_version'] == 'sec-source-blocks-v0.1.12'
+    preserve_breaks = source['parser_version'] in {'sec-source-blocks-v0.1.12', 'sec-source-blocks-v0.1.13'}
     for b in blocks:
         element = by_path[b['dom_path']]
         section = section_at(element)

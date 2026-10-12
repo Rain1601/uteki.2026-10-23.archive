@@ -18,9 +18,12 @@ class TransferLocalStateTests(unittest.TestCase):
         self.dialogue=self.base/'dialogue';self.dialogue.mkdir()
         self.archive=self.base/'private.tar.gz'
 
-    def archive_of(self,files,*,wrong_hash=False,symlink=False,directories=None):
+    def archive_of(self,files,*,wrong_hash=False,symlink=False,directories=None,
+                   schema='uteki-private-transfer-v1',output_selections=None):
         manifest=dict(schema='uteki-private-transfer-v1',repository_root='/old/repo',dialogue_root='/old/dialogue',
             credentials_included=False,files={name:dict(sha256='0'*64 if wrong_hash else transfer.digest(raw),bytes=len(raw)) for name,raw in files.items()})
+        manifest['schema']=schema
+        if output_selections is not None:manifest['output_selections']=output_selections
         if directories is not None:manifest['directories']=directories
         with tarfile.open(self.archive,'w:gz') as archive:
             for name,raw in files.items():
@@ -151,6 +154,100 @@ class TransferLocalStateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'dialogue_directory_missing'):
             transfer.create(self.root,self.base/'missing-chat',self.archive)
         self.assertFalse(self.archive.exists())
+
+    def test_explicit_output_export_verify_restore_keeps_original_bytes_and_scope(self):
+        payloads={'output/run-a/history/manifest.json':b'{"absolute_path":"/old/repo/output/run-a"}\n',
+                  'output/run-a/turn/input.bin':b'\x00\xffexact bytes',
+                  'output/nested/run-b/record.json':b'{"second":true}'}
+        for name,raw in {**payloads,'output/not-selected/private.json':b'never include',
+                         'output/run-a/.env.production':b'fake key',
+                         'output/run-a/.env-dir/secret':b'fake key',
+                         'output/run-a/__pycache__/thing.pyc':b'cache'}.items():
+            path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(raw)
+        (self.root/'output/run-a/empty').mkdir()
+        with patch.object(transfer.subprocess,'check_output',side_effect=[b'',b'head\n']):
+            transfer.create(self.root,None,self.archive,include_output=['output/run-a','output/nested/run-b'])
+        with tarfile.open(self.archive,'r:gz') as archive:
+            manifest=json.load(archive.extractfile('transfer-manifest.json'))
+        self.assertEqual(manifest['schema'],'uteki-private-transfer-v2')
+        self.assertEqual(manifest['output_selections'],['output/run-a','output/nested/run-b'])
+        self.assertEqual(set(manifest['files']),{'repository/'+name for name in payloads})
+        self.assertTrue(transfer.inspect_or_restore(self.archive)['verified'])
+        destination=self.base/'empty-new-machine'
+        self.assertTrue(transfer.inspect_or_restore(self.archive,destination)['restored'])
+        for name,raw in payloads.items():self.assertEqual((destination/name).read_bytes(),raw)
+        self.assertTrue((destination/'output/run-a/empty').is_dir())
+        self.assertFalse((destination/'output/not-selected').exists())
+        self.assertFalse((destination/'output/run-a/.env.production').exists())
+        self.assertEqual(stat.S_IMODE((destination/'output/run-a').stat().st_mode),0o700)
+        self.assertEqual(stat.S_IMODE((destination/'output/run-a/turn/input.bin').stat().st_mode),0o600)
+        # Identical restore is idempotent; a changed local file prevents all writes.
+        transfer.inspect_or_restore(self.archive,destination)
+        first=destination/'output/run-a/history/manifest.json';first.unlink()
+        changed=destination/'output/nested/run-b/record.json';changed.write_bytes(b'keep local')
+        with self.assertRaisesRegex(ValueError,'overwrite'):
+            transfer.inspect_or_restore(self.archive,destination)
+        self.assertFalse(first.exists());self.assertEqual(changed.read_bytes(),b'keep local')
+
+    def test_default_create_does_not_collect_output_and_retains_v1(self):
+        path=self.root/'output/run-a/private';path.parent.mkdir(parents=True);path.write_bytes(b'private')
+        with patch.object(transfer.subprocess,'check_output',side_effect=[b'',b'head\n']):
+            transfer.create(self.root,None,self.archive)
+        with tarfile.open(self.archive,'r:gz') as archive:
+            manifest=json.load(archive.extractfile('transfer-manifest.json'))
+        self.assertEqual(manifest['schema'],'uteki-private-transfer-v1')
+        self.assertNotIn('output_selections',manifest);self.assertEqual(manifest['files'],{})
+
+    def test_explicit_output_selection_rejects_bad_scope_missing_files_and_symlinks(self):
+        path=self.root/'output/run-a/file';path.parent.mkdir(parents=True);path.write_bytes(b'file')
+        (self.root/'output/link').symlink_to(path.parent,target_is_directory=True)
+        for selected in [['output'],['data/run-a'],['output/missing'],['output/run-a/file'],
+                         [str(path.parent)],['output/../data'],['output//run-a'],['output/run-a/'],
+                         ['output/link'],['output/.env-private'],['output/run-a','output/run-a'],
+                         ['output/run-a','output/run-a/child']]:
+            with self.subTest(selected=selected):
+                with self.assertRaises(ValueError):transfer.create(self.root,None,self.archive,selected)
+                self.assertFalse(self.archive.exists())
+        (path.parent/'linked-file').symlink_to(path)
+        with patch.object(transfer.subprocess,'check_output',return_value=b''):
+            with self.assertRaisesRegex(ValueError,'symlink'):
+                transfer.create(self.root,None,self.archive,['output/run-a'])
+        self.assertFalse(self.archive.exists())
+        with self.assertRaisesRegex(ValueError,'archive_inside_selected_output'):
+            transfer.create(self.root,None,path.parent/'self.tar.gz',['output/run-a'])
+
+    def test_v2_archive_cannot_expand_scope_or_bypass_existing_validations(self):
+        valid_dirs=['repository','repository/output','repository/output/run-a']
+        for selected in [[],['output'],['output/../data'],['output//run-a'],['data/run-a'],
+                         ['output/run-a','output/run-a'],['output/run-a','output/run-a/nested']]:
+            with self.subTest(selected=selected):
+                self.archive_of({},schema='uteki-private-transfer-v2',output_selections=selected,directories=valid_dirs)
+                with self.assertRaises(ValueError):transfer.inspect_or_restore(self.archive,self.root)
+                self.assertEqual(list(self.root.iterdir()),[])
+        for name in ['repository/output/run-a','repository/output/run-b/file',
+                     'repository/output/run-a-other/file','repository/output/run-a/../file',
+                     'repository/output/run-a/.env.secret']:
+            with self.subTest(name=name):
+                self.archive_of({name:b'payload'},schema='uteki-private-transfer-v2',
+                                output_selections=['output/run-a'],directories=valid_dirs)
+                with self.assertRaises(ValueError):transfer.inspect_or_restore(self.archive,self.root)
+                self.assertEqual(list(self.root.iterdir()),[])
+        self.archive_of({'repository/output/run-a/file':b'payload'},schema='uteki-private-transfer-v2',
+                        output_selections=['output/run-a'],directories=valid_dirs,wrong_hash=True)
+        with self.assertRaisesRegex(ValueError,'hash_mismatch'):transfer.inspect_or_restore(self.archive,self.root)
+        self.assertEqual(list(self.root.iterdir()),[])
+        # A v1 manifest cannot opt itself into the additional scope.
+        self.archive_of({'repository/output/run-a/file':b'payload'},output_selections=['output/run-a'])
+        with self.assertRaisesRegex(ValueError,'require_v2'):transfer.inspect_or_restore(self.archive)
+        self.archive_of({'repository/output/run-a/file':b'payload'})
+        with self.assertRaisesRegex(ValueError,'outside_transfer_scope'):transfer.inspect_or_restore(self.archive)
+
+    def test_v2_output_destination_symlink_is_rejected(self):
+        self.archive_of({'repository/output/run-a/file':b'payload'},schema='uteki-private-transfer-v2',
+                        output_selections=['output/run-a'],directories=['repository/output/run-a'])
+        (self.root/'output').symlink_to(self.dialogue,target_is_directory=True)
+        with self.assertRaisesRegex(ValueError,'symlink'):transfer.inspect_or_restore(self.archive,self.root)
+        self.assertEqual(list(self.dialogue.iterdir()),[])
 
 
 if __name__=='__main__':unittest.main()

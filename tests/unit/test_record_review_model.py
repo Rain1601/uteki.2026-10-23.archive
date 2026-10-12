@@ -1,5 +1,6 @@
 """Record reviewer SDK/HTTP fixtures; never real provider calls or historical ledgers."""
 import asyncio
+from copy import deepcopy
 import json
 from pathlib import Path
 import tempfile
@@ -12,6 +13,12 @@ from openai import AsyncOpenAI, InternalServerError
 from pydantic import BaseModel
 
 from uteki.agents.data_query.record_review_model import SdkRecordReviewer
+from uteki.agents.data_query.question_review_generation import (
+    PROJECTION, QuestionCoverageGeneration, project_question_generation,
+)
+from uteki.agents.data_query.question_coverage_review import (
+    project_question_review, validate_question_review, question_review_repair_input, QuestionReviewProtocolError,
+)
 from uteki.agents.runtime.run_budget import RunBudget, BudgetExceeded, RequestEnvelopeTooLarge
 from uteki.infrastructure.research_data.financial_records import digest
 
@@ -386,6 +393,84 @@ class RecordReviewModelTests(unittest.TestCase):
         asyncio.run(run())
         self.assertEqual(json.loads((reviewer.output/'review-0001-attempt-01.json').read_text())['raw_text'], self.raw)
         self.close_and_snapshot(reviewer)
+
+    def test_question_generation_is_projected_and_raw_generated_and_repair_inputs_are_preserved(self):
+        text = 'Beacon revenue was 42. Cinder revenue was 18.'
+        initial = project_question_review({'schema_version': 'data-answer-review-input-v1',
+            'packet_id': 'packet', 'purpose': 'analysis_evidence', 'source_delivery': 'query_evidence_v1',
+            'question': 'For Beacon and Cinder, provide revenue for FY2031.',
+            'scope': {'execution_schema_version': 'research-execution-v1', 'snapshot_id': 'dataset',
+                'company_ids': ['example'], 'source_snapshot_ids': ['annual'],
+                'source_policy_id': 'local-frozen-v1', 'knowledge_cutoff': '2032-05-01', 'include_candidates': True},
+            'source_documents': [{'source_snapshot_id': 'annual', 'index_id': 'idx', 'source_sha256': 'a'*64,
+                'company_id': 'example', 'source_url': 'https://example.org/annual',
+                'source_period_end': '2031-12-31', 'available_at': '2032-02-01',
+                'blocks': [{'block_id': 'table', 'type': 'paragraph', 'text': text,
+                            'text_hash': digest(text.encode()), 'table': None}]}]})
+        generated = {'packet_id': 'packet', 'projection_id': initial['projection_id'], 'checks': [{
+            'request': {'question_quote': 'provide revenue for FY2031', 'requested_subject': 'revenue',
+                'requested_dimension': 'metric',
+                'scope': {'kind': 'self_contained', 'reason': 'The model incorrectly treats revenue as self contained.'}},
+            'judgment': {'source_subject': 'Beacon revenue', 'relation': 'same', 'coverage': 'complete',
+                'support_basis': 'direct', 'citations': [{'kind': 'block_quote', 'source_snapshot_id': 'annual',
+                    'block_id': 'table', 'quote': 'Beacon revenue was 42.'}], 'gap': None,
+                'rationale': 'Original disclosure supports this requested amount.'}}],
+            'output_constraints': [], 'uncovered_requests': [],
+            'question_coverage': 'complete', 'coverage_reason': 'Both disclosed amounts are present.'}
+        generated['checks'].append(deepcopy(generated['checks'][0]))
+        generated['checks'][1]['judgment']['source_subject'] = 'Cinder revenue'
+        generated['checks'][1]['judgment']['citations'][0]['quote'] = 'Cinder revenue was 18.'
+        repaired = deepcopy(generated)
+        for check, subject in zip(repaired['checks'], ('Beacon', 'Cinder')):
+            check['request']['scope'] = {'kind': 'qualified', 'quotes': [subject, 'FY2031']}
+        raw_outputs = [json.dumps(item, ensure_ascii=False, indent=2) for item in (generated, repaired)]
+        def handler(request):
+            return self.response(request, raw=raw_outputs[len(self.requests)])
+        reviewer = self.reviewer(handler, output_schema=QuestionCoverageGeneration, output_projection=PROJECTION)
+        expected_first = project_question_generation(generated)
+        repair = question_review_repair_input(initial, expected_first)
+        before = deepcopy(repair)
+        async def run():
+            try:
+                first = await reviewer.review(initial)
+                with self.assertRaises(QuestionReviewProtocolError) as caught:
+                    validate_question_review(initial, first)
+                self.assertEqual(caught.exception.diagnostic['code'], 'duplicate_check_requires_distinct_scope')
+                actual_repair = question_review_repair_input(initial, first)
+                self.assertEqual(actual_repair, repair)
+                second = await reviewer.review(actual_repair)
+                self.assertTrue(validate_question_review(initial, second)[1])
+                return first, second
+            finally:
+                await reviewer.aclose()
+        first, second = asyncio.run(run())
+        self.assertEqual(first, expected_first)
+        self.assertEqual(second, project_question_generation(repaired))
+        self.assertEqual(repair, before)
+        self.assertEqual(reviewer.frozen_config['output_projection'], PROJECTION)
+        for number, output in enumerate((generated, repaired), 1):
+            stem = f'review-{number:04d}'
+            stored = json.loads((reviewer.output/f'{stem}-generated.json').read_text())
+            canonical = json.loads((reviewer.output/f'{stem}-parsed.json').read_text())
+            provenance = json.loads((reviewer.output/f'{stem}-projection.json').read_text())
+            attempt = json.loads((reviewer.output/f'{stem}-attempt-01.json').read_text())
+            self.assertEqual(stored, QuestionCoverageGeneration.model_validate(output).model_dump(mode='json'))
+            self.assertEqual(canonical, project_question_generation(output))
+            self.assertEqual(provenance['generated_sha256'], digest(stored))
+            self.assertEqual(provenance['canonical_sha256'], digest(canonical))
+            self.assertEqual(provenance['protocol'], PROJECTION)
+            self.assertEqual(provenance['operation'], 'field_projection_only_no_semantic_repair')
+            self.assertEqual(attempt['raw_text'], raw_outputs[number-1])
+        sent = [m for m in self.requests[1]['messages'] if m['role'] == 'user']
+        self.assertEqual(json.loads(sent[0]['content']), repair)
+        saved = json.loads((reviewer.output/'review-0002-input.json').read_text())
+        self.assertEqual(saved['packet'], repair)
+        summary = self.close_and_snapshot(reviewer)
+        self.assertEqual(summary['calls']['requests'], 2)
+        paths = {item['path'] for item in summary['artifacts']}
+        for number in (1, 2):
+            for suffix in ('generated', 'projection', 'parsed'):
+                self.assertIn(f'review-{number:04d}-{suffix}.json', paths)
 
     def test_explicit_prompt_budget_and_supported_raw_capture_are_required(self):
         values = {'provider': 'deepseek', 'model': 'deepseek-flash', 'budget': RunBudget(self.root/'budget.sqlite', '1'),

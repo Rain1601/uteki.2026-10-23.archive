@@ -64,7 +64,8 @@ class SdkRecordReviewer:
     """Registered DeepSeek/Claude capture; callers own validation and authorization."""
     def __init__(self, provider, model, *, budget, max_requests_total, output, credentials_root, prompt,
                  max_tokens=8192, request_timeout=180, max_retries=0, client_factory=None, output_schema=None,
-                 input_format='packet_json_v1', reasoning_effort=None, max_request_bytes=400000):
+                 input_format='packet_json_v1', reasoning_effort=None, max_request_bytes=400000,
+                 output_projection=None):
         effort, thinking, native = reasoning_configuration(provider, model, reasoning_effort)
         if native and input_format != 'packet_json_v1':
             raise ValueError('Native Claude review requires packet_json_v1 input')
@@ -88,7 +89,12 @@ class SdkRecordReviewer:
         pricing = pricing_snapshot(provider, model)
         if (provider != 'deepseek' and not native) or not pricing:
             raise ValueError('Raw record-review capture requires a registered DeepSeek or native Claude model')
+        if output_projection is not None:
+            from .question_review_generation import PROJECTION, QuestionCoverageGeneration
+            if output_projection != PROJECTION or output_schema is not QuestionCoverageGeneration:
+                raise ValueError('Unsupported review output projection or schema')
         schema = AgentOutputSchema(output_schema or dict, strict_json_schema=False)
+        self._output_projection = output_projection
         self.output = Path(output).resolve()
         if self.output.exists():
             raise FileExistsError('Review artifact output already exists')
@@ -135,6 +141,8 @@ class SdkRecordReviewer:
             'budget_ledger': str(budget.path.resolve()), 'budget_policy': 'enforced' if budget.enforce else 'record_only',
             'allow_unknown_reservations': budget.allow_unknown_reservations,
             'credential_origin': credential_origin, 'budget_at_start': budget.summary()}
+        if output_projection is not None:
+            self._config['output_projection'] = output_projection
         write_new(self.output/'model-config.json', self._config)
         self._config_sha256 = digest((self.output/'model-config.json').read_bytes())
         self._lock = asyncio.Lock()
@@ -202,6 +210,18 @@ class SdkRecordReviewer:
                     value = result.final_output
                     if hasattr(value, 'model_dump'): value = value.model_dump(mode='json')
                     if not isinstance(value, dict): raise ValueError('Record-review output must be a JSON object')
+                    if self._output_projection is not None:
+                        from .question_review_generation import project_question_generation
+                        generated_path = self.output/f'review-{self._reviews:04d}-generated.json'
+                        write_new(generated_path, value)
+                        generated_sha = digest(value)
+                        value = project_question_generation(value)
+                        write_new(self.output/f'review-{self._reviews:04d}-projection.json', {
+                            'protocol': self._output_projection, 'generated_sha256': generated_sha,
+                            'canonical_sha256': digest(value),
+                            'operation': 'field_projection_only_no_semantic_repair'})
+                        if observation_context:
+                            observation_context.publish(generated_path, kind='model_output', owned_by_context=True)
                     record['status'] = 'json_returned'
                     write_new(self.output/f'review-{self._reviews:04d}-parsed.json', value)
                     return value

@@ -21,6 +21,7 @@ from uteki.agents.runtime.model_factory import model_adapter
 from uteki.agents.runtime.run_budget import RunBudget, BudgetExceeded
 from uteki.agents.runtime.claude_messages import ClaudeTransientTransportError
 from uteki.agents.runtime.strict_json import StrictJSONError, parse_json_object
+from uteki.agents.runtime.output_limit import ModelOutputLimitExceeded
 from uteki.infrastructure.research_data.financial_records import digest
 from .artifacts import write_new
 from .decision_protocol import DECISION_PROTOCOL_VERSION
@@ -332,6 +333,7 @@ class SdkAutonomousPlanner:
                     'plan_origin': self.plan_origin, 'role': self._config['role'], 'packet_sha256': digest(encoded),
                     'started_at': datetime.now(timezone.utc).isoformat(), 'status': 'started'}
                 retry = False
+                output_limit_error = None
                 try:
                     agent = self._agent
                     if observation_context:
@@ -352,6 +354,9 @@ class SdkAutonomousPlanner:
                                   error_type=type(error).__name__)
                     metadata = getattr(self._model.inner, 'response_metadata', None) or {}
                     content = getattr(self._model.inner, 'response_text', None)
+                    if isinstance(error, ModelOutputLimitExceeded):
+                        output_limit_error = error
+                        record['output_limit'] = error.diagnostic
                     if (not isinstance(error, ClaudeTransientTransportError)
                             and isinstance(error, (ModelBehaviorError, ValidationError, StrictJSONError))
                             and (self._strict_visible_json)
@@ -386,6 +391,10 @@ class SdkAutonomousPlanner:
                             'content': content[:VISIBLE_OUTPUT_CHAR_LIMIT], 'content_chars': len(content),
                             'content_sha256': digest(content), 'truncated': len(content) > VISIBLE_OUTPUT_CHAR_LIMIT})
                         record['visible_output'] = self._references([output_path])[0]
+                    if output_limit_error is not None:
+                        output_limit_error.diagnostic.update(
+                            artifact_root=str(self.output),
+                            visible_output=record.get('visible_output'))
                     record['elapsed_seconds'] = time.monotonic() - started
                     record['calls'] = self._references(set((self.output/'calls').glob('*.json')) - before)
                     write_new(self.output/f'decision-{self._decisions:04d}-attempt-{attempt + 1:02d}.json', record)
