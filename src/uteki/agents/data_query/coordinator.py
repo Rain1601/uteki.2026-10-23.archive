@@ -480,6 +480,25 @@ class CompanyDataCoordinator:
                 pass
             raise
 
+    async def acquire_official(self, config, task, *, output, model_config=None,
+                               credential_root=None, planner=None, should_stop=None):
+        """Acquire from official roots without requiring a pre-materialized dataset."""
+        from .official_acquisition import run_official_acquisition
+        output = Path(output)
+        managed = None
+        if planner is None:
+            if model_config is None:
+                raise ValueError('explicit acquisition planner required')
+            managed = self._planner(model_config, output.parent/(output.name+'-model'),
+                                    credential_root, purpose='official_acquisition')
+            planner = managed
+        try:
+            return await run_official_acquisition(config, task, self.workspace, output, planner,
+                                                 fetch=self.fetch, should_stop=should_stop)
+        finally:
+            if managed is not None:
+                await managed.aclose()
+
     def _acquire_stage(self, config, output, *, should_stop):
         report = prepare_sources(config, self.workspace, fetch=self.fetch, should_stop=should_stop)
         # This runs inside the drained worker, including on cancellation.
@@ -591,6 +610,7 @@ class CompanyDataCoordinator:
         if extractor_model_config is not None:
             write_new(output/'extractor-model-config.input.json', extractor_model_config)
         owners, acquired = [], {}
+        official_session = None
         source_history, dataset_cache = {}, {}
         result = {'schema_version': 'company-agent-result-v1', 'operation': 'query', 'status': 'unavailable',
                   'dataset': None, 'query_run': None, 'gaps': [], 'workspace': str(self.workspace)}
@@ -644,6 +664,17 @@ class CompanyDataCoordinator:
                 dataset_cache[self._materialization_key(source)] = owner
 
             async def acquire(arguments, *, scope, output):
+                nonlocal official_session
+                if set(arguments) == {'official'}:
+                    from uteki.infrastructure.document_sources.official_discovery import OfficialDiscovery
+                    if not config.get('official_discovery'):
+                        raise ValueError('caller official discovery task required')
+                    if official_session is None:
+                        official_session = OfficialDiscovery(config, config['official_discovery'],
+                                                             self.workspace, fetch=self.fetch)
+                    result = await self._worker(official_session.execute, arguments['official'])
+                    write_new(output/'official-observation.json', result)
+                    return result
                 if set(arguments) != {'filing_selection'}:
                     raise ValueError('acquire requires only explicit filing_selection')
                 next_config = {**config, 'filing_selection': arguments['filing_selection']}
@@ -711,6 +742,9 @@ class CompanyDataCoordinator:
                         'annual_form': '10-K or 20-F; copy the base form from the selected filing_catalog item',
                         'report_period_end': 'ISO date from filing_catalog'}},
                     'materialize': {'source_run_id': 'ID returned by acquire'}}}
+            if preparation is not None and config.get('official_discovery'):
+                preparation['official_discovery'] = config['official_discovery']
+                preparation['callbacks']['official'] = 'acquire.arguments={official:{operation:browse,url,offset,link_offset}} or {official:{operation:download,url,reason,company_quote,period_quote,material_quote}}; archived materials require independent review'
             feedback = request.review_feedback
             if feedback is not None:
                 _verify_review_feedback(feedback, request, scope, owner.dataset)
@@ -734,6 +768,9 @@ class CompanyDataCoordinator:
             result.update(status='failed', stop_reason=type(error).__name__)
             result['gaps'].append({'layer': 'coordination', 'reason': str(error)[:500]})
         finally:
+            if official_session is not None:
+                write_new(output/'official-source-run.json', official_session.finish(
+                    'acquisition_cancelled' if cancelled else 'query_ended'))
             for port in reversed(owners):
                 try: port.close()
                 except Exception as error:

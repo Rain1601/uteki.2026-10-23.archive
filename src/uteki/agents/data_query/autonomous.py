@@ -272,6 +272,9 @@ question requirements. Its question_protocol_failure is a host format diagnostic
 
 
 def runtime_prompt_version(purpose='question_answer'):
+    if purpose == 'official_acquisition':
+        from .official_acquisition import PROMPT_VERSION
+        return PROMPT_VERSION
     if purpose not in {'question_answer', 'business_materials', 'analysis_evidence'}:
         raise ValueError('unsupported autonomous purpose')
     return ANALYSIS_EVIDENCE_PROMPT_VERSION if purpose == 'analysis_evidence' else AUTONOMOUS_PROMPT_VERSION
@@ -279,6 +282,9 @@ def runtime_prompt_version(purpose='question_answer'):
 
 def runtime_prompt(role, purpose='question_answer'):
     runtime_prompt_version(purpose)
+    if purpose == 'official_acquisition':
+        from .official_acquisition import PROMPT
+        return PROMPT
     base = WORKER_PROMPT if role == 'worker' else AUTONOMOUS_PROMPT
     if purpose == 'analysis_evidence':
         base = base.replace('Answer the explicit request by obtaining traceable evidence.',
@@ -1538,6 +1544,8 @@ class AutonomousDataAgent:
                         result = await asyncio.wait_for(result, self.limits.turn_timeout) if inspect.isawaitable(result) else result
                         if result.get('status') == 'gap':
                             observation = {'status': 'gap', 'gap_id': gap(result['reason'], refs, result.get('details'))}
+                        elif action.action == 'acquire' and result.get('status') in {'observed', 'archived_pending_review'}:
+                            observation = {'status': result['status'], 'result': result}
                         elif action.action == 'acquire' and result.get('status') == 'acquired':
                             # Acquisition is observable progress, but it does not
                             # change the query snapshot until materialization.

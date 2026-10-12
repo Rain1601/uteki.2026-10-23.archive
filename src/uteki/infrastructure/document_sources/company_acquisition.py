@@ -361,7 +361,7 @@ def _annual_package(config):
 
 
 def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=None, clock=None,
-                    prior_repeat_verification=None, blocked_sources=None) -> dict:
+                    prior_repeat_verification=None, blocked_sources=None, _session_only=False) -> dict:
     """Fetch and freeze a bounded source run. Inject fetch(url, headers=..., timeout=...) -> bytes.
 
     Filing selection is required. latest_10k_and_subsequent_filings selects the
@@ -453,6 +453,17 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
         report['scope']['prior_repeat_verification_sha256'] = prior_repeat_verification['verification_sha256']
     cache, seen, previous, verified_previous, transport, frozen_paths = {}, set(), {}, {}, {}, {}
     prior_candidates = []
+    previous_rank = {}
+
+    def remember_version(doc, prior_cik):
+        if requested_cik and prior_cik != requested_cik:
+            return
+        url = doc['source_url']
+        rank = doc.get('verified_at') or ''
+        if url not in previous_rank or rank > previous_rank[url]:
+            previous[url] = doc['content_sha256']
+            previous_rank[url] = rank
+
     last_http_start = 0.0
 
     def remember(doc):
@@ -468,10 +479,10 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
         try:
             old = json.loads(prior.read_text())
             if old.get('scope', {}).get('symbol') == symbol:
-                previous.update({d['source_url']: d['content_sha256'] for d in old.get('documents', [])})
                 prior_cik = (old.get('company') or {}).get('cik')
                 for doc in old.get('documents', []):
                     prior_candidates.append((prior_cik, doc))
+                    remember_version(doc, prior_cik)
         except (OSError, ValueError, KeyError):
             continue
     # Each completed filing has its own atomic receipt, so a process crash before
@@ -484,7 +495,7 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
             if prior['company']['symbol'] == symbol:
                 doc = prior['document']
                 prior_candidates.append((prior['company']['cik'], doc))
-                previous[doc['source_url']] = doc['content_sha256']
+                remember_version(doc, prior['company']['cik'])
         except (OSError, ValueError, KeyError, TypeError):
             continue
 
@@ -634,6 +645,9 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                     throttle()
                     check_stop()
                     handlers = [_Redirect(request_allowed, redirect, resolve=not use_proxy)]
+                    if _session_only:
+                        from .official_discovery import PublicHTTPSHandler
+                        handlers.extend([urllib.request.ProxyHandler({}), PublicHTTPSHandler()])
                     if use_proxy:
                         handlers.insert(0, _ExplicitProxy({'https': proxy_transport['proxy_url']}))
                     opener = urllib.request.build_opener(*handlers)
@@ -890,6 +904,25 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                 if diagnostic not in report['filing_catalog']['gaps']:
                     report['filing_catalog']['gaps'].append(diagnostic)
         report['filing_catalog']['items'] = sorted(items.values(), key=lambda r: (r['filed_at'], r['accession']), reverse=True)
+
+    def finalize():
+        cancelled = any(g['reason'] == 'acquisition_cancelled' for g in report['gaps'])
+        if should_stop is not None and should_stop():
+            if not cancelled:
+                gap('acquisition_cancelled')
+            cancelled = True
+        report['status'] = ('cancelled' if cancelled else 'identity_unresolved' if report['company'] is None
+                            else 'completed_with_gaps' if report['gaps'] else 'completed')
+        manifest = workspace / 'source-runs' / run_id / 'manifest.json'
+        if not manifest.resolve().is_relative_to(workspace):
+            raise AcquisitionError('run path outside workspace')
+        report['manifest_path'] = manifest.relative_to(workspace).as_posix()
+        _write_new(manifest, (json.dumps(report, ensure_ascii=False, indent=2) + '\n').encode())
+        return report
+
+    if _session_only:
+        return dict(report=report, request=request, document=document, freeze=freeze,
+                    finish=finalize, gap=gap, check_stop=check_stop)
 
     try:
         if requested_cik:
@@ -1257,16 +1290,4 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
         gap(str(error) if isinstance(error, (AcquisitionError, LimitReached)) else 'identity_or_discovery_failed',
             error_type=type(error).__name__,
             **({'next_retry_at': error.next_retry_at} if isinstance(error, AcquisitionDeferred) else {}))
-    cancelled = any(g['reason'] == 'acquisition_cancelled' for g in report['gaps'])
-    if should_stop is not None and should_stop():
-        if not cancelled:
-            gap('acquisition_cancelled')
-        cancelled = True
-    report['status'] = ('cancelled' if cancelled else 'identity_unresolved' if report['company'] is None
-                        else 'completed_with_gaps' if report['gaps'] else 'completed')
-    manifest = workspace / 'source-runs' / run_id / 'manifest.json'
-    if not manifest.resolve().is_relative_to(workspace):
-        raise AcquisitionError('run path outside workspace')
-    report['manifest_path'] = manifest.relative_to(workspace).as_posix()
-    _write_new(manifest, (json.dumps(report, ensure_ascii=False, indent=2) + '\n').encode())
-    return report
+    return finalize()
