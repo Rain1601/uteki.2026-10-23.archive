@@ -23,9 +23,11 @@ VERSION = 'company-source-run-v1'
 TICKERS = 'https://www.sec.gov/files/company_tickers.json'
 SEC_HOSTS = {'www.sec.gov', 'data.sec.gov'}
 DEFAULT_LIMITS = dict(max_requests=60, max_documents=30, max_bytes_per_document=20000000,
-                      timeout_seconds=20, retries=1, backoff_seconds=.5, max_discovery_links=12)
+                      timeout_seconds=20, retries=1, backoff_seconds=.5, max_discovery_links=12,
+                      max_total_bytes=25000000000, min_request_interval_seconds=.15)
 MAX_LIMITS = dict(max_requests=500, max_documents=200, max_bytes_per_document=50000000,
-                  timeout_seconds=60, retries=3, backoff_seconds=5, max_discovery_links=100)
+                  timeout_seconds=60, retries=3, backoff_seconds=5, max_discovery_links=100,
+                  max_total_bytes=25000000000, min_request_interval_seconds=60)
 
 
 class AcquisitionError(ValueError):
@@ -140,13 +142,16 @@ class _Links(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.links, self.rows, self.dates = [], [], []
         self.active, self.row, self.text = None, None, []
+        self.section, self.heading = '', None
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag in ('h1', 'h2', 'h3'):
+            self.heading = []
         if tag == 'tr':
             self.row = {'text': [], 'links': []}
         if tag == 'a' and attrs.get('href'):
-            self.active = {'href': attrs['href'], 'text': ''}
+            self.active = {'href': attrs['href'], 'text': '', 'section': self.section}
         if tag == 'link' and attrs.get('href') and attrs.get('type') in ('application/rss+xml', 'application/atom+xml'):
             self.links.append({'href': attrs['href'], 'text': 'feed'})
         if tag == 'meta' and attrs.get('property', attrs.get('name', '')).lower() in ('article:published_time', 'date', 'datepublished'):
@@ -155,12 +160,17 @@ class _Links(HTMLParser):
             self.dates.append(attrs['datetime'][:10])
 
     def handle_data(self, data):
+        if self.heading is not None:
+            self.heading.append(data)
         if self.active is not None:
             self.active['text'] += data
         if self.row is not None:
             self.row['text'].append(data)
 
     def handle_endtag(self, tag):
+        if tag in ('h1', 'h2', 'h3') and self.heading is not None:
+            self.section = ' '.join(''.join(self.heading).split())
+            self.heading = None
         if tag == 'a' and self.active is not None:
             self.links.append(self.active)
             if self.row is not None:
@@ -256,6 +266,7 @@ def _configuration(config):
     if as_of > datetime.now(timezone.utc).date():
         raise ValueError('as_of cannot be in the future')
     _filing_selection(config, as_of)
+    _annual_package(config)
     ua = config.get('sec_user_agent')
     if not isinstance(ua, str) or not ua.strip() or '\n' in ua or '\r' in ua:
         raise ValueError('explicit sec_user_agent required')
@@ -302,16 +313,55 @@ def _configuration(config):
         raise ValueError('limits must be an explicit object with supported resource keys')
     limits = {**DEFAULT_LIMITS, **supplied}
     for key, value in limits.items():
-        integer = key not in ('timeout_seconds', 'backoff_seconds')
+        integer = key not in ('timeout_seconds', 'backoff_seconds', 'min_request_interval_seconds')
         if isinstance(value, bool) or not isinstance(value, (int, float)) or (integer and not isinstance(value, int)):
             raise ValueError(f'invalid resource limit: {key}')
-        minimum = 0 if key in ('retries', 'backoff_seconds') else 1
+        minimum = 0 if key in ('retries', 'backoff_seconds', 'min_request_interval_seconds') else 1
         if not minimum <= value <= MAX_LIMITS[key]:
             raise ValueError(f'invalid resource limit: {key}')
     return symbol.upper(), market, as_of, ua.strip(), entries, limits, updates_window
 
 
-def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=None, clock=None) -> dict:
+def _annual_package(config):
+    """Explicit directory adapters; no issuer-dependent URL or label defaults."""
+    package = config.get('annual_package')
+    if package is None:
+        return None
+    if (not isinstance(package, dict) or set(package) != {'version', 'report_year', 'directories', 'required_roles'}
+            or package['version'] != 'annual-financial-package-v1'
+            or type(package['report_year']) is not int or not 1900 <= package['report_year'] <= 9999
+            or not isinstance(package['directories'], list) or not package['directories']
+            or not isinstance(package['required_roles'], list) or not package['required_roles']
+            or any(not isinstance(r, str) or not r for r in package['required_roles'])):
+        raise ValueError('invalid explicit annual_package')
+    selection = config['filing_selection']
+    if selection.get('mode') != 'annual_filing_period':
+        raise ValueError('annual_package requires one explicit annual filing period')
+    for entry in package['directories']:
+        if (not isinstance(entry, dict) or set(entry) != {'url', 'allowed_hosts', 'selectors'}
+                or not isinstance(entry['allowed_hosts'], list) or not entry['allowed_hosts']
+                or any(not isinstance(h, str) or not h for h in entry['allowed_hosts'])
+                or not isinstance(entry['selectors'], list) or not entry['selectors']):
+            raise ValueError('invalid annual directory adapter')
+        _url(entry['url'], set(entry['allowed_hosts']))
+        for selector in entry['selectors']:
+            if (not isinstance(selector, dict) or set(selector) != {'role', 'section', 'text_pattern', 'url_pattern'}
+                    or not isinstance(selector['role'], str) or not selector['role']
+                    or selector['section'] is not None and not isinstance(selector['section'], str)):
+                raise ValueError('invalid annual directory selector')
+            for key in ('text_pattern', 'url_pattern'):
+                value = selector[key]
+                if not isinstance(value, str) or '{year}' not in value:
+                    raise ValueError('annual selectors require explicit year-bound patterns')
+                try:
+                    re.compile(value.replace('{year}', str(package['report_year'])))
+                except re.error as error:
+                    raise ValueError('invalid annual selector pattern') from error
+    return package
+
+
+def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=None, clock=None,
+                    prior_repeat_verification=None, blocked_sources=None) -> dict:
     """Fetch and freeze a bounded source run. Inject fetch(url, headers=..., timeout=...) -> bytes.
 
     Filing selection is required. latest_10k_and_subsequent_filings selects the
@@ -340,6 +390,18 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     proxy_transport = _transport(config)
     selection, mode, target_period, annual_form, period_range = _filing_selection(config, as_of)
     requested_cik = config.get('cik')
+    if blocked_sources is not None and (not isinstance(blocked_sources, dict)
+            or any(not isinstance(url, str) or code not in (401, 403, 404, 410)
+                   for url, code in blocked_sources.items())):
+        raise ValueError('blocked sources require explicit URL and permanent HTTP status')
+    if prior_repeat_verification is not None:
+        prior_scope = prior_repeat_verification
+        if (not isinstance(prior_scope, dict) or prior_scope.get('cik') != requested_cik
+                or prior_scope.get('report_period_end') != (target_period.isoformat() if target_period else None)
+                or prior_scope.get('as_of') != as_of.isoformat()
+                or not re.fullmatch(r'[a-f0-9]{64}', prior_scope.get('verification_sha256', ''))
+                or not isinstance(prior_scope.get('items'), dict)):
+            raise ValueError('prior repeat verification must match explicit company, period and cutoff')
     target_start = period_range[0] if period_range else target_period
     if should_stop is not None and not callable(should_stop):
         raise ValueError('should_stop must be callable')
@@ -371,7 +433,8 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                         'download_policy': config.get('download_policy', 'revalidate'),
                         'transport': proxy_transport or {'mode': 'public_dns_http'},
                         'annual_form': annual_form, 'automatic_adoption': False},
-              'documents': [], 'selected_filings': [], 'gaps': [], 'discovery': [], 'requests': 0, 'model_calls': 0,
+              'documents': [], 'selected_filings': [], 'selected_assets': [], 'gaps': [], 'discovery': [],
+              'requests': 0, 'bytes_received': 0, 'model_calls': 0,
               'storage_integrity': {'status': 'referenced_objects_only', 'findings': []},
               'filing_catalog': {'items': [], 'discovery_complete': False,
                                  'selection_discovery_complete': False, 'gaps': []},
@@ -384,6 +447,10 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     if period_range:
         report['scope'].update(report_period_end_from=period_range[0].isoformat(),
                                report_period_end_to=period_range[1].isoformat())
+    if config.get('annual_package'):
+        report['scope']['annual_package'] = config['annual_package']
+    if prior_repeat_verification:
+        report['scope']['prior_repeat_verification_sha256'] = prior_repeat_verification['verification_sha256']
     cache, seen, previous, verified_previous, transport, frozen_paths = {}, set(), {}, {}, {}, {}
     prior_candidates = []
     last_http_start = 0.0
@@ -524,7 +591,7 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     def throttle():
         nonlocal last_http_start
         # A per-run rate below the SEC published ten-requests/second ceiling.
-        remaining = .15 - (time.monotonic() - last_http_start)
+        remaining = limits['min_request_interval_seconds'] - (time.monotonic() - last_http_start)
         if remaining > 0:
             time.sleep(remaining)
         last_http_start = time.monotonic()
@@ -542,6 +609,10 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     def request(url, allowed):
         check_stop()
         url = _url(url, allowed)
+        if url in (blocked_sources or {}):
+            report['discovery'].append({'source_url': url, 'status': 'deferred',
+                'reason': 'permanent_failure_in_current_batch', 'http_status': blocked_sources[url]})
+            raise AcquisitionError('permanent_failure_in_current_batch')
         if url in cache:
             return cache[url]
         for attempt in range(limits['retries'] + 1):
@@ -549,8 +620,12 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
             enforce_cooldown(url)
             if report['requests'] >= limits['max_requests']:
                 raise LimitReached('request_limit')
+            if report['bytes_received'] >= limits['max_total_bytes']:
+                raise LimitReached('total_byte_limit')
             report['requests'] += 1
             info = {}
+            raw = None
+            requested_at = now().isoformat()
             try:
                 if fetch is None:
                     use_proxy = proxy_transport is not None and urllib.parse.urlsplit(url).hostname in proxy_transport['destination_hosts']
@@ -567,31 +642,69 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                         info = {'http_status': response.status, 'final_url': response.url,
                                 'content_type': response.headers.get('Content-Type'),
                                 'content_length': response.headers.get('Content-Length'), 'transport': 'http'}
+                        info['cache_headers'] = {k: response.headers.get(k) for k in
+                            ('Date', 'ETag', 'Last-Modified', 'Age', 'Cache-Control') if response.headers.get(k) is not None}
                         _url(response.url, request_allowed)
                         if use_proxy:
                             info.update(transport='trusted_local_http_proxy', proxy_url=proxy_transport['proxy_url'])
                         if response.status != 200:
                             raise AcquisitionError('unexpected_http_status')
-                        raw = response.read(limits['max_bytes_per_document'] + 1)
+                        cap = min(limits['max_bytes_per_document'], limits['max_total_bytes'] - report['bytes_received'])
+                        raw = response.read(cap + 1)
+                        report['bytes_received'] += len(raw)
                         if info['content_length'] is not None and int(info['content_length']) != len(raw):
                             raise AcquisitionError('content_length_mismatch')
                 else:
                     raw = fetch(url, headers={'User-Agent': ua, 'Accept-Encoding': 'identity'}, timeout=limits['timeout_seconds'])
                     info = {'transport': 'injected_fetch', 'final_url': url}
+                    if isinstance(raw, bytes):
+                        report['bytes_received'] += len(raw)
                 check_stop()
                 if not isinstance(raw, bytes) or not raw:
                     raise AcquisitionError('empty_or_nonbytes_response')
                 if len(raw) > limits['max_bytes_per_document']:
                     raise AcquisitionError('document_size_limit')
+                if report['bytes_received'] > limits['max_total_bytes']:
+                    raise LimitReached('total_byte_limit')
                 cache[url] = raw
                 transport[url] = {**info, 'bytes_received': len(raw), 'retrieved_at': now().isoformat()}
                 report['discovery'].append({'source_url': url, 'status': 'fetched',
-                    'content_sha256': _sha(raw), 'path': freeze(raw), 'attempt': attempt + 1, **transport[url]})
+                    'content_sha256': _sha(raw), 'path': freeze(raw), 'attempt': attempt + 1,
+                    'requested_at': requested_at, **transport[url]})
                 return raw
             except Exception as error:
+                # urllib raises before entering the response context for 4xx/5xx.
+                # Keep a bounded error response too; a status alone cannot locate
+                # whether the denial came from the origin, cache or transport.
+                if isinstance(error, urllib.error.HTTPError):
+                    info.update(http_status=error.code, final_url=error.url,
+                                transport='http_error', response_headers={k: v for k, v in
+                                    (error.headers or {}).items() if k.lower() in
+                                    ('date', 'server', 'via', 'content-type', 'content-length',
+                                     'retry-after', 'cf-ray', 'cf-cache-status', 'cache-control',
+                                     'etag', 'last-modified', 'x-cache', 'x-error')})
+                    try:
+                        cap = min(65536, limits['max_bytes_per_document'],
+                                  max(0, limits['max_total_bytes'] - report['bytes_received']))
+                        raw = error.read(cap) if cap and error.fp is not None else None
+                        if isinstance(raw, bytes):
+                            report['bytes_received'] += len(raw)
+                            info['error_body_limit'] = cap
+                            info['error_body_may_be_truncated'] = len(raw) == cap
+                    except Exception as read_error:
+                        info['error_body_read_error'] = type(read_error).__name__
+                    finally:
+                        error.close()
                 failed = {'source_url': url, 'status': 'failed', 'attempt': attempt + 1,
+                    **info,
                     'error_type': type(error).__name__, 'http_status': getattr(error, 'code', info.get('http_status')),
+                    'requested_at': requested_at, 'retrieved_at': now().isoformat(),
                     'reason': str(error) if isinstance(error, AcquisitionError) else type(error).__name__}
+                if isinstance(raw, bytes) and raw and not isinstance(error, AcquisitionCancelled):
+                    partial = workspace/'source-runs'/run_id/'partial-responses'/(_sha(url.encode())+'-'+str(attempt+1)+'.bin')
+                    _write_new(partial, raw)
+                    failed.update(bytes_received=len(raw), partial_path=partial.relative_to(workspace).as_posix(),
+                                  partial_sha256=_sha(raw), eligible_original=False)
                 report['discovery'].append(failed)
                 retry_after_delay = save_cooldown(url, error, failed)
                 # Access denial is not transient. Do not repeatedly retry 403 or
@@ -625,9 +738,27 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
         if len(report['documents']) >= limits['max_documents']:
             raise LimitReached('document_limit')
         raw, reused, validation = None, None, None
+        repeat_reused = False
         strict = role == 'filing' and config.get('document_validation') == 'sec_inline_identity_v1'
         prior = verified_previous.get(url)
-        if strict and config.get('download_policy') == 'reuse_verified' and prior:
+        repeated = (prior_repeat_verification or {}).get('items', {}).get(url)
+        if repeated and repeated['form'] == form and repeated['period_end'] == period_end:
+            old_path = workspace/repeated['path']
+            if old_path.is_symlink() or not old_path.resolve().is_relative_to(workspace/'sources/objects'):
+                raise AcquisitionError('invalid_prior_repeat_path')
+            old_raw = old_path.read_bytes()
+            if _sha(old_raw) != repeated['content_sha256']:
+                gap('prior_repeat_object_hash_mismatch', url)
+            elif len(old_raw) <= limits['max_bytes_per_document']:
+                if strict:
+                    validation = validate_sec_filing(old_raw, report['company']['cik'], form, period_end)
+                raw, reused, repeat_reused = old_raw, repeated, True
+                cache[url] = raw
+                transport[url] = {'transport': 'prior_remote_verification',
+                                  'verification_sha256': prior_repeat_verification['verification_sha256']}
+                report['discovery'].append({'source_url': url, 'status': 'reused_prior_repeat_verification',
+                    'content_sha256': repeated['content_sha256'], 'path': repeated['path'], **transport[url]})
+        if raw is None and strict and config.get('download_policy') == 'reuse_verified' and prior:
             try:
                 old_path = workspace / prior['path']
                 if old_path.is_symlink() or not old_path.resolve().is_relative_to(workspace / 'sources' / 'objects'):
@@ -654,6 +785,12 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                     expected_form=form, expected_period_end=period_end)
             except ValueError as error:
                 raise AcquisitionError('filing_content_invalid: ' + str(error)) from error
+        if config.get('annual_package') and role != 'filing':
+            suffix = Path(urllib.parse.urlsplit(url).path).suffix.lower()
+            expected = {'pdf': 'application/pdf', 'htm': 'text/html', 'html': 'text/html',
+                        'xml': 'application/xml', 'xsd': 'application/xml'}.get(suffix.lstrip('.'))
+            if expected and _mime(raw) != expected:
+                raise AcquisitionError('asset_content_type_mismatch')
         if published_at is None and role not in ('filing', 'filing_attachment') and _mime(raw) == 'text/html':
             page = _Links(); page.feed(raw.decode('utf-8', errors='replace'))
             dates = set()
@@ -695,9 +832,9 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                'previous_content_sha256': previous.get(url)}
         report['documents'].append(row)
         seen.add(url)
-        row['acquisition'] = 'reused_verified' if reused else 'downloaded'
+        row['acquisition'] = 'reused_remote_verified' if repeat_reused else 'reused_verified' if reused else 'downloaded'
         row['validation'] = validation or {'version': 'legacy_transport_only', 'identity_verified': False}
-        row['transport'] = reused.get('transport') if reused else transport.get(url)
+        row['transport'] = transport.get(url) if repeat_reused else reused.get('transport') if reused else transport.get(url)
         row['verified_at'] = now().isoformat()
         if recoveries:
             row['storage_recovery'] = recoveries
@@ -707,6 +844,24 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
         if not known_date:
             gap('publication_date_unverified', url)
         return row
+
+    def package_asset(url, allowed, *, role, form, filed_at=None, period_end=None):
+        task = {'source_url': url, 'role': role, 'status': 'not_attempted',
+                'period_end': period_end, 'filed_at': filed_at}
+        report['selected_assets'].append(task)
+        _write_new(workspace/'source-runs'/run_id/'planned-assets'/(_sha((role+':'+url).encode())+'.json'),
+                   (json.dumps(task, sort_keys=True)+'\n').encode())
+        try:
+            doc = document(url, allowed, role=role, form=form, filed_at=filed_at, period_end=period_end)
+            task.update(status=doc['acquisition'], source_id=doc['source_id'],
+                        content_sha256=doc['content_sha256'], path=doc['path'])
+        except AcquisitionCancelled:
+            raise
+        except Exception as error:
+            task.update(status='failed', error_type=type(error).__name__, http_status=getattr(error, 'code', None))
+            gap('annual_asset_acquisition_failed', url, role=role, error_type=type(error).__name__,
+                detail=str(error) if isinstance(error, AcquisitionError) else type(error).__name__)
+        return task
 
     def rows(value):
         if not isinstance(value, dict) or not value or any(not isinstance(v, list) for v in value.values()):
@@ -880,6 +1035,9 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
             {'accession': r['accessionNumber'], 'form': r['form'], 'filed_at': r['filingDate'],
              'period_end': r.get('reportDate'), 'primary_document': r['primaryDocument'], 'status': 'not_attempted'}
             for r in selected]
+        if config.get('annual_package'):
+            _write_new(workspace/'source-runs'/run_id/'selected-filings.json',
+                       (json.dumps(report['selected_filings'], indent=2)+'\n').encode())
         for filing in selected:
             acc = filing['accessionNumber']
             if acc in accessions:
@@ -899,6 +1057,40 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                                     period_end=filing.get('reportDate') or None, role='filing')
                 task.update(status=original['acquisition'], source_id=original['source_id'],
                             content_sha256=original['content_sha256'], path=original['path'])
+                if config.get('annual_package'):
+                    index_url = base + acc + '-index.html'
+                    index = package_asset(index_url, SEC_HOSTS, role='filing_index', form='FILING_INDEX',
+                        filed_at=filing['filingDate'], period_end=filing.get('reportDate') or None)
+                    if index['status'] == 'failed':
+                        gap('annual_filing_assets_discovery_incomplete', index_url)
+                    else:
+                        listing = _Links(); listing.feed(cache[index_url].decode('utf-8', errors='replace'))
+                        assets = {}
+                        for row in listing.rows:
+                            label = ' '.join(row['text'])
+                            for link in row['links']:
+                                candidate = urllib.parse.urljoin(index_url, link['href'])
+                                # EDGAR ixviewer links wrap the actual archive URL.
+                                if '/ixviewer/' in candidate or '/ix?doc=' in candidate:
+                                    inner = urllib.parse.parse_qs(urllib.parse.urlsplit(candidate).query).get('doc', [])
+                                    if inner:
+                                        candidate = urllib.parse.urljoin('https://www.sec.gov', inner[0])
+                                if candidate == url or not urllib.parse.urlsplit(candidate).path.startswith(urllib.parse.urlsplit(base).path):
+                                    continue
+                                suffix = Path(urllib.parse.urlsplit(candidate).path).suffix.lower()
+                                if suffix in ('.xml', '.xsd'):
+                                    assets[candidate] = ('filing_xbrl', 'XBRL')
+                                elif re.search(r'\bEX-\d', label, re.I) and suffix in ('.htm', '.html', '.pdf'):
+                                    assets[candidate] = ('filing_attachment', 'EXHIBIT')
+                        _write_new(workspace/'source-runs'/run_id/'filing-assets'/(acc+'.json'),
+                            (json.dumps([{'source_url': u, 'role': r, 'form': f} for u, (r, f) in assets.items()], indent=2)+'\n').encode())
+                        if not assets:
+                            gap('annual_filing_assets_not_discovered', index_url)
+                        for candidate, (role, form) in list(assets.items())[:limits['max_discovery_links']]:
+                            package_asset(candidate, SEC_HOSTS, role=role, form=form,
+                                filed_at=filing['filingDate'], period_end=filing.get('reportDate') or None)
+                        if len(assets) > limits['max_discovery_links']:
+                            gap('annual_filing_asset_discovery_limit', index_url, expected=len(assets))
                 if filing['form'] in ('8-K', '8-K/A'):
                     listing = _Links(); listing.feed(request(base + acc + '-index.html', SEC_HOSTS).decode('utf-8', errors='replace'))
                     attachments = [link for row in listing.rows if re.search(r'\bEX-\d', ' '.join(row['text']), re.I)
@@ -929,6 +1121,62 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                     error_type=type(error).__name__, http_status=getattr(error, 'code', None), detail=reason)
                 if isinstance(error, LimitReached):
                     break
+        package = config.get('annual_package')
+        if package:
+            for number, entry in enumerate(package['directories']):
+                allowed, directory = set(entry['allowed_hosts']), entry['url']
+                try:
+                    snapshot = (prior_repeat_verification or {}).get('directories', {}).get(directory)
+                    if snapshot:
+                        path = workspace/snapshot['path']
+                        if (path.is_symlink() or not path.resolve().is_relative_to(workspace/'sources/objects')
+                                or snapshot.get('source_url') != directory or snapshot.get('http_status') != 200):
+                            raise AcquisitionError('invalid_frozen_directory_snapshot')
+                        raw = path.read_bytes()
+                        if _sha(raw) != snapshot['content_sha256']:
+                            raise AcquisitionError('frozen_directory_hash_mismatch')
+                        report['discovery'].append({'source_url': directory, 'status': 'reused_directory_snapshot',
+                            'path': snapshot['path'], 'content_sha256': snapshot['content_sha256'],
+                            'original_request': snapshot, 'current_discovery_verified': False})
+                        gap('current_directory_discovery_unverified', directory)
+                    else:
+                        raw = request(directory, allowed)
+                    if _mime(raw) != 'text/html':
+                        raise AcquisitionError('annual_directory_not_html')
+                    page = _Links(); page.feed(raw.decode('utf-8', errors='replace'))
+                    candidates = []
+                    for selector in entry['selectors']:
+                        matches = []
+                        for link in page.links:
+                            label = ' '.join(link['text'].split())
+                            candidate = urllib.parse.urljoin(directory, link['href'])
+                            if (selector['section'] is not None and link['section'] != selector['section']
+                                    or not re.search(selector['text_pattern'].replace('{year}', str(package['report_year'])), label)
+                                    or not re.search(selector['url_pattern'].replace('{year}', str(package['report_year'])), candidate)):
+                                continue
+                            _url(candidate, allowed)
+                            matches.append({'source_url': candidate, 'role': selector['role'], 'directory_url': directory,
+                                            'link_text': label, 'section': link['section']})
+                        if not matches:
+                            gap('annual_directory_role_not_found', directory, role=selector['role'])
+                        candidates.extend(matches)
+                    _write_new(workspace/'source-runs'/run_id/'directory-selections'/(str(number)+'.json'),
+                               (json.dumps(candidates, indent=2)+'\n').encode())
+                    for item in candidates[:limits['max_discovery_links']]:
+                        package_asset(item['source_url'], allowed, role=item['role'], form='OFFICIAL_ANNUAL',
+                                      period_end=target_period.isoformat())
+                    if len(candidates) > limits['max_discovery_links']:
+                        gap('annual_directory_discovery_limit', directory, expected=len(candidates))
+                except AcquisitionCancelled:
+                    raise
+                except Exception as error:
+                    gap('annual_directory_discovery_failed', directory, error_type=type(error).__name__,
+                        detail=str(error) if isinstance(error, AcquisitionError) else type(error).__name__)
+            acquired_roles = {d['role'] for d in report['documents']}
+            acquired_roles.update(a['role'] for a in report['selected_assets'] if a['status'] == 'downloaded')
+            for role in package['required_roles']:
+                if role not in acquired_roles:
+                    gap('annual_required_role_missing', role=role)
         for entry in entries if mode == 'latest_10k_and_subsequent_filings' else []:
             allowed, url = set(entry['allowed_hosts']), entry['url']
             try:

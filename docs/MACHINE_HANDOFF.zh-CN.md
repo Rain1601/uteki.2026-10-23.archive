@@ -1,197 +1,23 @@
-# 换机接续开发 · 2026-10-10
+# 当前接续摘要 · 2026-10-12
 
-2026-10-12 **E6-R4 本轮有界容量恢复机制与新批次有限验收完成：压力三次3/3、正常控制1/1。** 先冻结显式一次升档契约，修复 Planner/Worker 状态与非支持角色配置静默忽略；183项工程回归通过。两份完整FY2025 10-K、原题/原业务标准/原件独立gold不传Agent；压力256→8192每次升档一次后四项收入/精确日期/USD/出处、全文实际输入、投影、聚焦、双审和严格加载均通过，无额外格式/业务纠错；正常8192未触发恢复也通过。三条B首决策仅诊断，不计完整成功率。R1检查器误禁公开Skill字段已修，旧报告保留、同原运行零API重审。新增59请求/$0.8081016，原M3同账本累计141/$1.6561587，$3/200不变、unknown/inflight=0。**当前位置：本轮机制/新批次验收闭合；历史V3原包回归、8192→16384真实触发及长期稳定仍未验。下一E6-R5b记录ID引用/分组与动作归属契约。** [本轮交付与边界](../experiments/agent_design/2026-10-12-e6-r4-capacity-v1/DELIVERY.zh-CN.md)。
+**当前重点：DS-03-T01，台积电 FY2025 年度合并财务包获取验收收尾。** 用户要求由公司参数化方法取得材料并重复校验，获取验收通过后再做文本解析。
 
-本轮换机需同时迁移 `output/e6-r4-capacity-20261012-r1` 和 `output/m3-rebuild-20261012-r2`：后者保存本轮继承并更新到141次的同一账本。旧 M3 迁移包仅保存82次历史快照，不能用于继续消费新额度。新版包路径使用 `output/machine-handoff-20261012-e6-r4/private-state-v2.tar.gz`，逐文件校验记录放同目录；M3找回原图和首次失败也继续显式收取。不得改写冻结文件内绝对路径、hash或重建空账本。
+输入：TSM／CIK 0001046179、FY2025／2025-12-31、截至2026-10-12、显式官方来源配置。范围：SEC 20-F及修订／目录附件／XBRL、官方年报、年度合并财报和20-F镜像。不扩展母公司报表、季度、PPT、OCR。
 
-```bash
-.venv/bin/python scripts/transfer_local_state.py create --root . --output output/machine-handoff-20261012-e6-r4/private-state-v2.tar.gz --include-output output/e6-r4-capacity-20261012-r1 --include-output output/m3-rebuild-20261012-r2 --include-output output/m3-recovery-20261012 --include-output output/m3-rebuild-20261012-r1
-.venv/bin/python scripts/transfer_local_state.py verify output/machine-handoff-20261012-e6-r4/private-state-v2.tar.gz
-```
+**已完成：** 冻结官方目录31/31件取得，每件三次真实HTTP200、hash一致；93条不同URL＋请求时刻的原件成功记录，独立hash复核通过。原件公司／期间及主表／附注范围已检查，财务事实逐项正确性未验收。参数化方法支持SHA绑定续取部分记录、错误响应隔离留证、单附件失败不阻断其它材料、显式目录快照；工程回归119项通过。
 
-2026-10-12 **03-M3 新重建批次真实验收完成：最终交付 3/3，首个取材 attempt 合格 2/3，全链无纠错 1/3。** 用户确认另一机器原图片转录/OCR包及 v5 数据集丢失；两张原图找回且 SHA 一致，Microsoft/Alphabet 全材料重新获取并独立核验，新 dataset/hash 不冒充旧包恢复。官方 DeepSeek 完成新图片转录，通用 host_ocr_v1 分离语义与坐标；集合事实缺少类型化引用导致旧 Query v1 R1 审核失败，新增严格 figure_collection_count 后原题同输入/原标准三次执行，必要信息全覆盖、实际完整阅读/双审/严格加载/独立原件验收通过，无无关业务正文。R1 JSON 自主纠正、R3 重复阅读停止及二次审核恢复均保留；旧失败和未跑槽位不替换。整任务 82 请求/$0.8480571，unknown/inflight=0，同一 $3 护栏；清理可再生缓存约207.85 MiB。**当前位置：本题有限验收完成；下一 E6-R4 显式容量恢复契约，历史原包缺失时旧失败重验仍未完成。** [逐题交付与全部费用](../experiments/agent_design/2026-10-12-m3-figure-query-v1/DELIVERY.zh-CN.md)。
+**403证据：** 原PDF地址同请求方式诊断返回200；旧403无正文，不能确定其服务端机制。r4金融报告／SEC镜像目录403保存Cloudflare managed browser challenge正文。未绕过挑战、改身份或代理；r5仅使用经SHA绑定的原官方目录快照选择和补取，快照不冒充实时发现。
 
-本次 M3 私密迁移入口：`output/machine-handoff-20261012-m3/private-state-v2.tar.gz`，逐文件校验和 SHA 记录在同目录 `verification.json` / `creation.json`。显式包含 `output/m3-rebuild-20261012-r2`（所有 dataset、转录、原调用、失败、两版源码快照、总账及独立验收）、`output/m3-recovery-20261012`（找回原图/清理清单）和首次 SEC 失败 `output/m3-rebuild-20261012-r1`；默认忽略材料按迁移脚本收取，原包不覆盖。API 密钥、`.env`、平台原生 OCR 安装前缀未加入；OCR 可从公开显式锁重装。模型写入停止后创建，验证成功后使用用户控制的私密渠道传输。
+**验收边界：** 冻结目录文件获取与重复已通过，T01整体验收未通过。实时目录穷尽性与IR首次发布日期仍有缺口；文件数、PDF打印日／修改日不能替代这些证据。合并财报前6页为图片型审计／封面页面，未来文本解析须保留格式缺口，未做OCR。T02未开始；获取通过后文本解析已授权，不能跳过前置。
 
-```bash
-.venv/bin/python scripts/transfer_local_state.py verify output/machine-handoff-20261012-m3/private-state-v2.tar.gz
-```
+证据：`output/ds03-tsmc-fy2025-method-20261012-r1/verification-r5/verification.json`，SHA `00540ba63df942529a9e543b5cb4651db69f61c3aec4142c05b14f5e53a5c8d7`；`independent-file-review.v2.json`。累计115次尝试／127,181,944响应字节，含DNS失败与诊断；零模型调用，旧失败／原字节／代码快照保留。
 
-旧绝对路径和冻结文件保持原字节，换机不能批量替换路径或清空账本。严格历史阅读与新运行配置分开；若重跑需用新明确版本绑定恢复后的材料和同一任务账本，并保留本次失败/分母。本次三轮后的收据兼容修复仅零 API 验证，真实运行的精确源码在私密快照中。
+**可迁移公开材料：** [台积电FY2025原件包](../data/material_packages/tsmc-fy2025-v1/README.zh-CN.md)，31件原件＋3份官方目录快照、93条原件成功HTTP记录、验收及失败历史；约42MB，原字节与hash不改。公开投影不含本机路径／私密配置，不能冒充原验证文件用于CLI续取。拉取后在包目录运行 `shasum -a 256 -c SHA256SUMS`；原私密运行保留本机。获取代码回归：`.venv/bin/python -m unittest -q tests.unit.test_annual_package tests.unit.test_company_acquisition tests.unit.test_acquisition_transport tests.unit.test_acquisition_recovery tests.unit.test_acquisition_cli tests.unit.test_acquisition_catalog_coverage tests.unit.test_acquisition_explicit_proxy tests.unit.test_quarterly_acquisition tests.unit.test_filing_integrity tests.unit.test_acquisition_replay`。
 
-以下为历史阶段记录；旧“当前/下一”按当时状态保留，不覆盖顶部和主队列。
+入口：[方法与验收](research/2026-10-12-tsmc-annual-package-method.v3.zh-CN.md) · [公司配置](../config/company_sources/tsmc-annual-package-v1.json) · [获取方法](../src/uteki/infrastructure/document_sources/annual_package.py) · [TODO](../TODO.md)。CLI显式传公司／财年／期末／截止日；续取传父验证文件与SHA。`--use-frozen-directories`须显式选择，当前目录仍标未验证，非默认兜底。
 
-2026-10-12 **当前位置：03-M3 工程接入已完成，真实原图/模型验收待执行。** R25–R29 已先回归、提交并上传 `0319a2ed`，远端同 SHA 已核验。随后完成调用方显式图片包绑定、scoped 导航/按需读取、角色实际完整阅读、显式选择、v5 原件重组、双审精确引用和恢复同包绑定。354 项定向整合检查、最终 84 项双审/公开调用链（有重叠）、576 Python + 37 JavaScript core 回归通过；fixture/SDK mock 是工程证据，不是模型实测。本轮 0 API / $0，未调用 AiHubMix。**紧接着：恢复 03-M2 原图片包及对应 v5 datasets，独立精读原图后冻结具体问题、重复次数、验收标准、官方模型配置及任务预算，再真实运行。** 原包缺失时不勾完 03-M3、不追认旧另一机器成绩、不重建费用历史。[工程交付与剩余验收](FIGURE_QUERY_DELIVERY_2026-10-12.zh-CN.md)。
+**唯一下一步：** 收尾实时目录及材料可用时刻核验，按原标准给出T01整体验收；通过后进入T02。不给无变化的403增加重试，也不重取已经三次一致的材料。
 
-2026-10-12 **R25–R29 五项 review 根因修复与整合回归完成**：依赖锁、SEC 私密身份入口、全角度 OCR 消费判据、行为组件指纹与非法费用单记录隔离。118 项定向检查、576 Python + 37 JavaScript core、实际 --locked 安装通过；0 API。**当前位置：修复收尾，下一 03-M3 图片按需消费**。本机缺原图片包/v5 dataset/原 E1 费用证据，真实原图未重验；图片生产入口仍使用被禁用的 AiHubMix，本轮不会调用。旧 03-M2 为另一机器的历史验收，保留原记录。[修复与回归边界](CODE_REVIEW_FIXES_2026-10-12-v2.zh-CN.md)。
+**保留：** 微软Q01／既有原包与协议暂停；台积电IFRS／20-F为独立范围，不追认原US GAAP DS-02完成。历史五年／二十季、FMP Free、E6/E7等在TODO，不自动恢复。Codex直接对接人工，PM为协作方式，轻量任务不委派。
 
-2026-10-12 **03-M2 图片材料缺口已补齐；微软/Alphabet FY2025 10-K 主文材料准备按本轮范围通过。** 系统独立扫描获取两张原图，Sonnet 两批4次真实转录；68项文字/8图例颜色/原文上下文正确。首批模型位置错位，改为通用本机 OCR 实测坐标、精确文本匹配和消费者重放校验，未放宽标准、未写公司特例。最终 v3 是同模型原稿的确定性坐标重建，原 v1/v2 留存；文字/表格沿03-M1原验收。含顾问合计估算 **$0.517494**。**下一03-M3：图片材料接入主 Query Agent 的按需消费验收**；这部分未运行。07仍有2,970个事实未映射，任意格式/全文财务语义不在本次通过范围。依赖 Pillow + Tesseract eng；运行包 `output/figure-materials-20261012` 和基础 v5 dataset须一起迁移。[验收与原图入口](../experiments/agent_design/2026-10-12-figure-materials-v1/ACCEPTANCE.zh-CN.md)。
-
-2026-10-12 **03-M1 FY2025完整材料准备验收：正文/表格通过，整份材料部分通过。** 用户将重点从 E6-R5b 前移到材料基础：系统从 SEC 独立获取微软/Alphabet FY2025 10-K各1份；Codex全DOM核验并修默认解析版本未接入换行修复、TOC物理空白列造成微软23项目录漏导出。最终 `.13`：2,739块/13,024原文文本节点、270张HTML表、46项目录及213数值引用通过，94项回归通过；相同原件二次重建规范文件逐字节一致。没有人工选材/公司特例；0模型调用/$0。**仍未全过：谷歌两张实质股价图仅引用；完整财务映射另有2,970条未映射（原表保留）。下一03-M2补图片材料链路**，E6-R5b/历史包/扩展后置。[本轮验收与原件](../experiments/agent_design/2026-10-12-preparation-acceptance-v1/ACCEPTANCE.zh-CN.md)。
-
-2026-10-12 **E6-QP1 请求身份结构修复，本题三次首审通过**：生成端先必填 request（锚点/维度/显式范围决策），再 judgment；程序只搬字段回历史 V2，保留 raw/projection/canonical，原校验不变。73 项相关检查及原失败无损重放通过，无公司特例。v4 问题审核首次通过3/3、最终独立内容通过3/3；全链无纠错2/3，R3取数ID抄错一字符后自主恢复，单独保留。三轮scope均显式公司和年份，R2合并两年审核但信息齐全；不外推新问题稳定性。新增45请求/$0.6404868，原任务累计175/$2.3855892，$3护栏剩$0.6144108，无新unknown；次数护栏500→600留痕，美元额度/历史费用不变。**下一 E6-R5b：记录ID引用接口**；E6-R4、历史包和扩展保持后置。[实测与证据](../experiments/agent_design/2026-10-12-revenue-stability-v1/DELIVERY-v4.zh-CN.md)。
-
-2026-10-12 **E6-QP1 字段契约已调整，稳定性未达**：只对齐 V2 原文锚点/完整请求身份/范围定义，实际模型 Schema 与提示共享说明；校验函数和约束不变，无公司特例。51 项相关检查通过，旧三份坏输出仍拒绝。v3 三次独立执行最终交付及原件核验 3/3，首次审核 2/3（原 v2 为 0/3）。R3 漏公司 scope，重复身份被严格拒绝后修订通过；原 subject-in-quote 错误未复现，不能称契约问题全解决。R2 每公司合并两年检查，身份保留但未逐年拆 check。新增 42 请求/$0.5727330；原任务累计 130/$1.7451024，无新增 unknown。**下一仍 E6-QP1：范围身份表达及审核粒度**，不再无变化重跑；E6-R5 其余分组/E6-R4/历史包等保持原状态。[三次实测及剩余问题](../experiments/agent_design/2026-10-12-revenue-stability-v1/DELIVERY-v3.zh-CN.md)。
-
-2026-10-12 **E6-R5a 来源选择归属已修并复验**：明确列表对每项 requirement 广播，不自动配对；同来源/冻结 scope 合法共用保留，错误分型且拒绝不改旧选择。原 R3 操作重放、归属专项 11 项与相关回归 57 项通过（有包含关系）。v2 三次独立交付均通过，归属拒绝 1→0；但三次均有审核引用修订，无恢复 1/3→0/3，总纠错和费用未下降。只有 v2 R1 直接执行两次 select_evidence，R2/R3 走数字记录路径，不冒称三次直接覆盖。新增 48 请求/$0.6466728；含 v1 共 88/$1.1723694，无新 unknown。**下一 E6-QP1 问题审核引用契约**；E6-R5 其余历史分组、E6-R4 与暂置历史包保持未完成。[修复、前后比较与独立验收](../experiments/agent_design/2026-10-12-revenue-stability-v1/DELIVERY-v2.zh-CN.md)。
-
-2026-10-12 **当前 E6-N1：微软与谷歌两年收入，同一冻结配置三次新鲜自主运行均交付通过（3/3），全程无恢复 1/3**。四项收入、准确财年、USD、出处与聚焦均独立核验；三份材料均七块/两表。R1 审核引用修订，R3 跨来源选择被拒后自主拆开，无人工补材料。40 次请求估算 **$0.5256966**，无新增 unknown；不是长期稳定证明。修复评测器首轮 `observation=null` 崩溃，17 项定向检查通过。历史包按用户要求暂放一边；下方为历史时点。**下一项 E6-R5**：依据本轮 R3 可重放反例改进动作归属契约与精确诊断；E6-R4 历史截断恢复仍未完成。[本题答案、根因、三次结果及证据](../experiments/agent_design/2026-10-12-revenue-stability-v1/DELIVERY.zh-CN.md)。
-
-2026-10-12 **R22-H 查找完成，历史重验待原包**：本机四个迁移包和两个旧项目 ZIP 均无目标记录；E6-V3 九次、E6-R3 三次原运行及三档冻结数据集均缺失，12 次重验均未执行。已新增 R24 显式 output 目录迁移，防止新包继续漏收运行记录；默认范围不扩大。E6-R4 输出额度耗尽诊断层已完成，87 项相关离线检查通过；恢复策略与历史原例回归未完成，下一项是显式有界恢复契约。[确切缺失项、恢复命令与检查记录](R22_HISTORY_RECOVERY_2026-10-12.zh-CN.md)。
-
-2026-10-12 **Review 修复更新：R21/P1、R22/P2、R23/P2 已完成代码修复与离线回归**。分别修复缺失 E6 记录拖垮列表、验收器将磁盘正文误作 SDK 可见输入、旧财务结果漏显币种/期末日期。本机 35 条记录中 19 条可用、16 条材料缺失；缺失记录明确标注且禁止评分。**下方 E6-R3/V3 为历史报告：可见性结论须恢复原运行包后用 v2 检查器重审（R22-H），本轮未重新核验历史业务成绩。** 下一具体动作是原包恢复后的零 API 重审；E6-R4 输出截断、E6-R5 归属反馈仍未修。[问题、技术选择与验证明细](CODE_REVIEW_FIXES_2026-10-12.zh-CN.md)。
-
-2026-10-10 **E6-V3九次实验已完成，稳定性未达**：原三档各3次从零真实执行，首稿效果7/9、最终内容/合格交付8/9、无恢复3/9。八份终稿均4/4、7块2表、无缺失/业务冗余；R3-S1输出length截断，0/4无交付，失败保留不替换。151请求/$2.0438718全部计入原账本，0新unknown；323文件/21历史引用保持。**当前位置：V3实验闭合；下一E6-R4先定位输出额度/length失败处置，E6-R5保留要求归属误用；E7后置。** [逐题结果与费用](../experiments/agent_design/2026-10-10-e6-repeatability-v3/PUBLIC_DELIVERY.zh-CN.md)。
-
-2026-10-10 E6-R3 已完成：`selected-originals-v4` 使正文选择、原子上下文预览和最终组装一致；`source-only-revision-v1` 恢复合法负面来源反馈，完整双审门禁保持。原失败受控恢复＋S1/S3各一次从零均按原标准通过，最终每例4/4、7块2表，无缺失或多余业务正文；从零无恢复1/2。新增37请求/$0.4988421，原账本和旧失败保留。**R3完成时点：当时下一E6-V3；该实验现已闭合，当前见顶部E6-R4。** 旧V2仍8/9、无恢复0/9，长期稳定性未证明。[本轮交付](../experiments/agent_design/2026-10-10-e6-delivery-boundary-v1/PUBLIC_DELIVERY.zh-CN.md)。
-
-**最新验收优先级：效果 > 成功率 >> 费用（用户于 2026-10-10 确认）。** 先独立判断结果能否正确、完整且聚焦地支持原问题，再看内容合格的完整交付成功率与恢复路径，最后比较全部费用。程序成功不等于内容成功；费用集中程度不单独决定内容是否通过。E6-V2 冻结与交付已沿用此顺序，不为便宜削减必要读取、不放宽质量、不改旧冻结标准/分母；原预算授权和硬上限保持。
-
-**E6-V2完成时点历史：当时下一项E6-R3；R3和V3现已闭合，按顶部E6-R4入口接续。** [E6-V2逐题交付](../experiments/agent_design/2026-10-10-e6-repeatability-v2/PUBLIC_DELIVERY.zh-CN.md)：首稿效果7/9，终稿四项收入/日期/单位/出处9/9，完整效果/合格交付8/9，无恢复0/9，稳定性未达。三档各3次，次数/原标准/代码/模型配置运行前冻结，失败不替换，参考答案不进入Agent。R1/R2原约定修复验收保留，不能追认为系统稳定；旧V1仍8/9、无恢复3/9。
-
-R3-S1新反例：纯numeric plan没有显式正文选择，已读产品context自动进入终稿；记录选择可见效果只显示两利润表。这是当时探索/最终交付与预览不一致的共同通道，本轮已通过v4修复。来源审核正确指出冗余，问题审核两稿漏公司scope并重复，组合assessment=null阻断来源建议送回Agent；Analysis门禁正确拒绝。E6-R3已修正文选择和受约束反馈机制并验收；原非法问题回复与Analysis拒绝记录保持。R1-S1首稿则是跨requirement合选被拒、仅2项结构化记录，第二轮自主恢复，原件本已充分。
-
-E6-V2历史时点新增 **187 settled / $2.6348004**；原共享总账 **712请求，已知$9.1243011＋旧预留$0.1004304＝占用$9.2247315**，仅原两笔unknown、无新unknown/在途，USD13/1000保持。342冻结文件在九次结束时核对通过，三档完整成员、旧V1九sealed引用、逐笔start/end/SDK/usage/账本保持。09:32界面规范在实跑结束后变化，旧规范按原hash精确归档；未进入Data输入、Data源码/Skill不变，详见V2交付，当前工作区不称全部342文件一致。完整费用（本机私密证据：`../experiments/agent_design/2026-10-10-e6-repeatability-v2/evaluation-only/cost-integrity-final.v1.json`）。费用为冻结价估算，未核验账单；下方E6-R1等费用是历史时点。UI2暂缓，本轮未接入页面、未提交上传。
-
-**2026-10-10 页面补充：E6-UI1 三栏查看已实现。** 复用 `/agent-results`，显式接入 16 条 E6-B1/V1/R1 真实记录。左选运行、中间结果/过程/配置、右侧各层评估与人工意见；文件/评估按当前运行与 hash 绑定，原失败和恢复不替换。启动命令和直接入口见[工作台说明](../apps/review_workbench/README.md#e6-three-pane-inspection-2026-10-10)。页面只读历史，不新增模型调用；私密 E6 输出未迁移时不能用公开 gold 代替结果。下一开发项为 E6-R4；右侧中文评估整理留在 E6-UI2 待办。
-
-**E6-R1 完成时点：机制修复与原标准复验完成。** [本轮交付](../experiments/agent_design/2026-10-10-e6-source-citation-v1/PUBLIC_DELIVERY.zh-CN.md)与[主 TODO](../TODO.md)为当前入口。原错误稿仍严格拒绝；两份原稿真实模型恢复、一次原题 S3 从零执行均必要 4/4、范围/真实性/出处、实际完整读取、聚焦、双审与严格加载通过。该复验不证明长期稳定或新公司模型泛化；E6-V1 九次历史仍 8/9、无恢复 3/9、S1 费用分散，不重写分母。
-
-已确认 E6-R1 工程根因是严格引用校验与有界修订之间丢失具体错误上下文，原包和 literal 规则本来存在。通用修复提供全部机械错误位置、原包和不可信拒绝稿，由模型完整重审；不供应替代 quote/邻块答案、不放宽原 `_quote`。来源审核最多两次逻辑调用，网络重试按原有配置单独记录；修订历史与结果标记、原包、首末稿严格绑定。八历史成功和独立合成错误边界通过。E6-R2 此后已完成修复与约定验收，详见顶部当前入口；E7 后置。
-
-新公开结果与评测在 `experiments/agent_design/2026-10-10-e6-source-citation-v1/`；运行/配置/原调用/恢复在 `output/e6-source-citation-20261010-r1/`。恢复实验引用旧封存错误稿与原包，不是新查询；新鲜S3完整材料沿用 `output/e6-material-scale-20261010-r1/`，无预选块或答案。新v2冻结32文件和原封存refs均一致，旧E6-V1资料/运行未修改。生产实现已经有意版本化改变，不能再声称旧freeze的当前源码hash全部不变；按新冻结复跑，旧结果按旧hash审阅。
-
-本轮新增21请求，19 settled估算$0.2324139＋2 unknown全预留$0.1004304＝占用**$0.3328443**。当前原E2→E6总账 **499请求，已知$6.1476372＋预留$0.1004304＝$6.2480676**，unknown2/inflight0。首次沙箱DNS故障无正文，配置内一次network retry也失败；获准联网环境恢复一次，v1/v2记录及失败封存保留。旧日志不足以证明未发出，不核销为零。只允许已核验的两笔旧unknown保留并继续原授权，新的unknown先停核对。USD硬上限仍13、请求护栏1000，原授权/历史不清零或分叉；费用非供应商账单。旧budget_usd=3配置不能用于新调用，旧冻结配置不改。原迁移包仍是E5/E6前快照，**不包含本轮新状态**，未生成新包。
-
-E6-V1 完成时点历史：[九次交付](../experiments/agent_design/2026-10-10-e6-repeatability-v1/PUBLIC_DELIVERY.zh-CN.md)三档各3次，原始材料均4/4，完整交付8/9、无恢复3/9；S1未达费用集中阈值，R3-S3材料正确但来源审核错引两次阻断加载。新增206/$2.6732376，共享当时478/$5.9152233、unknown/inflight0；外层首样本后v1→v3停止分类修正留痕，原业务标准与输入不变。
-
-E6-B1 完成时点历史：三档 2/3/4 完整年报、2,739/4,289/5,636 导航块，首次对照均 4/4、范围/原件/聚焦、双审及加载通过，共 52 请求/$0.6509178，当时共享累计 272/$3.2419857。该组三次不计入 E6-V1 的九次分母。[首次对照](../experiments/agent_design/2026-10-10-e6-material-scale-v1/PUBLIC_DELIVERY.zh-CN.md)与原冻结记录保留，不改写或追认为稳定证据。下方 E5 与 E2–E4 为历史时点。
-
-2026-10-10 另一台机器的准备阶段历史：当时已启动 E5，完成 Microsoft/Alphabet 双公司完整语料与独立标准，修复旧 builder 漏传 form 导致财历丢失的问题。四项收入的工具预检通过，但尚未运行模型；本机未收到下述 E2–E4 原共享账本与迁移包。[当前 E5 交付](../experiments/agent_design/2026-10-10-e5-multi-company-v1/PUBLIC_DELIVERY.zh-CN.md)含新相对路径准备入口、冻结标准与恢复缺口。下方是上一台机器的交接记录；“E5 尚未冻结”的历史描述已由本更新取代，费用账本不重建。
-
-**E5 完成时点历史：E5-A1 指定双公司收入题完成，当时下一项 E6-P1。R20 新 v3 修订与 Schema 字段职责说明后，r5 根据合法模型审核自主修订取材，必要 4/4、原件/公司/期间、聚焦、最终双审及下游加载通过；失败与 r4 反例保留，未验稳定性。** 本文件是当前操作入口；完整队列和修复历史见[TODO](../TODO.md)。不从历史“下一步”或旧不限额配置启动调用。下方 E2–E4 交接记录保留为历史，不覆盖当前 Data 阶段状态。
-
-2026-10-10 本机已核验原共享账本与迁移包；另一台机器的“缺件”记录不适用于本机。E5 新本机准备与执行绑定位于 `output/e5-multi-company-20261010-local-r1/`，新数据 manifest 为 `27a6a081608d5ca381f82a426d2f56a6e49d0d639b3927f5ba4d6a6895dd012f`；旧机冻结 hash 保留。R18/R19 已通过原例验证；R20 引用/范围提示按通用机制修正，71 项受影响检查通过，旧 v1/v2 审核不改写。Agent 自主把记录与正文出处对齐，9→7 块、3→2 表。E5 全链 44 请求/$0.5340771，原共享累计 220/$2.5910679，全部 settled、未知/在途 0；原限制不变。下一项 E6-P1 先零 API 固定规模梯度、问题与评价/费用分母。原件、标准、旧运行及最终加载门禁已核验，细节见[本机实跑交付](../experiments/agent_design/2026-10-10-e5-multi-company-v1/PUBLIC_DELIVERY.zh-CN.md)。
-
-## 接手后先做什么
-
-1. 阅读[工作约定](../AGENTS.md)、本文件、[统一验收标准](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)和[逐题交付](../experiments/agent_design/2026-10-09-e4-heldout-v1/DELIVERY.zh-CN.md)。
-2. 检查代码、公开交付和私密状态是否齐全。Git可恢复代码和公开解释；继续原实验还需要本机迁移包中的原件、冻结运行和真实账本。
-3. 从[主待办当前队列](../TODO.md#有序待办)的 **E6-R5b** 接续：先冻结记录ID引用/分组与动作归属共同契约，再做通用修复与原标准回归。E6-R4本轮机制和新批次压力/正常控制已闭合，原包回归保持未完成。03-M3新批次本题三次已闭合，先读顶部真实交付；完整数据/原图/原调用/失败/账本须一起迁移。历史V3原包缺失时原失败重验保持未完成，不依旧“下一步”启动调用。
-
-## 已完成与剩余范围
-
-| ID | 状态 / 依赖 | 可查看交付 |
-|---|---|---|
-| **03-M3** | **本题新重建批次最终3/3，首取材2/3、无纠错1/3；有限验收完成** | [真实交付](../experiments/agent_design/2026-10-12-m3-figure-query-v1/DELIVERY.zh-CN.md) |
-| R25–R29 | 已修、回归并上传 `0319a2ed` | [五项根因修复](CODE_REVIEW_FIXES_2026-10-12-v2.zh-CN.md) |
-| C1–C3 | 验收统一、清理备份、本地启动完成 | [统一标准](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)、[归档清单](REPOSITORY_RETENTION.zh-CN.md) |
-| E1 | 双年度七题受限基线；旧账本及私密包缺失 | [历史阶段报告](../experiments/agent_design/2026-10-09-e1-benchmark-v1/DELIVERY.zh-CN.md) |
-| E2 | 指定10-Q收入题r3必要4/4、原件/范围/聚焦及双审通过 | [季度逐题结果与失败](../experiments/agent_design/2026-10-09-e2-msft-10q-v1/DELIVERY.zh-CN.md) |
-| E3 | 混合收入4/4；原列报/后续重列指定题r2通过 | [混合/版本逐题结果](../experiments/agent_design/2026-10-09-e3-mixed-sources-v1/DELIVERY.zh-CN.md) |
-| E4 | H1现金流r2独立取材通过、r3仅恢复双审；H2新公司收入/地理归属r2必要5/5及完整规则通过 | [两题实际材料、遗漏/冗余、失败与费用](../experiments/agent_design/2026-10-09-e4-heldout-v1/DELIVERY.zh-CN.md) |
-| R15/R16 | 新修订v2、旧v1精确兼容；期间解析v5。7份旧修订及5份成功产物加载通过，2份失败仍拒绝 | [核验脚本及记录](../experiments/agent_design/2026-10-09-e4-heldout-v1/evaluation-only/R15-R16-verification-v1/) |
-| E5 | **指定双公司题完成**；依赖 E4 指定题 | [自主修订后 4/4、聚焦/双审/加载通过及失败历史](../experiments/agent_design/2026-10-10-e5-multi-company-v1/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-P1 | **已完成**；依赖 E5 | [运行前冻结方案与梯度](../experiments/agent_design/2026-10-10-e6-material-scale-v1/PLAN.zh-CN.md) |
-| E6-B1 | **指定题三档一次对照完成**；依赖 P1 | [真实执行、独立验收、全部费用与限制](../experiments/agent_design/2026-10-10-e6-material-scale-v1/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-V1 | **九次实验完成，稳定性观察未通过**；依赖 B1 | [原始材料均 4/4，完整交付 8/9，无恢复 3/9，全部失败费用保留](../experiments/agent_design/2026-10-10-e6-repeatability-v1/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-R1 | **已修并按原标准验收**；依赖 V1 原失败 | [两原稿真实修订＋一新鲜 S3、独立反例与加载](../experiments/agent_design/2026-10-10-e6-source-citation-v1/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-R2 | **已修并完成约定验收** | [冻结计划与因果证据](../experiments/agent_design/2026-10-10-e6-record-selection-v1/PLAN.zh-CN.md) |
-| E6 | 首次对照与九次重复实验完成；稳定性未达，更广范围未验收 | 材料增长下的质量/费用 |
-| E6-V2 | **9次实验完成；完整效果8/9、无恢复0/9，稳定性未达** | [真实交付](../experiments/agent_design/2026-10-10-e6-repeatability-v2/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-R3 | **正文/预览/审核恢复已修，原标准回归通过** | [原例恢复＋S1/S3真实结果](../experiments/agent_design/2026-10-10-e6-delivery-boundary-v1/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-V3 | **九次实验完成；终稿8/9、无恢复3/9，稳定性未达** | [逐题缺多、出处与费用](../experiments/agent_design/2026-10-10-e6-repeatability-v3/PUBLIC_DELIVERY.zh-CN.md) |
-| E6-R4 | **机制、新批次压力3/3及正常控制1/1通过；历史原例/自然8192→16384未验** | [本轮交付](../experiments/agent_design/2026-10-12-e6-r4-capacity-v1/DELIVERY.zh-CN.md) |
-| E6-R5 | 后续；要求归属反馈未修 | V3多例操作误用及合法对照 |
-| E6-UI2 | 后置，未实施 | 中文评估概览与折叠细节 |
-| E7 | 后置；需关系类型及原文依据 | 公司relations |
-
-整份数据仍为`prepared_with_gaps`。上述指定题通过不证明完整财务、全部修订、任意公司/格式或稳定泛化；本轮没有调用Analysis。历史失败和原冻结标准保留，恢复审核不追认为从零一次成功，参考对照不称严格A/B。
-
-当前账本完成时点为V3：900请求、已知$11.6670150＋旧unknown预留$0.1004304，累计上限$13/1000不变，新增未知0。下方费用段落若含749/712/525等均为历史阶段时点，不作为新额度或清零依据。
-
-## 工程状态
-
-已修 R1 及 R8–R20：共享预算恢复、大包/大表读取、逐块审核、期间与财历、计划追加、导航投影、历史协议兼容、来源格式保留及审核身份保持。各自证据和限制见[主待办明细](../TODO.md#完整任务与验收依据)。修复是通用机制，未把公司答案写入执行逻辑。
-
-R2–R7仍未修：探索来源先验、无期末来源审核、部分临时错误分类、简报审核token预算、business_map发布前hash复验、reading_groups旧版本回放。精确问题及状态见[标准中的review表](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md#本次代码-review-状态)。R15/R16发现时点的“未修”记录只作为历史，当前状态为已修。
-
-## 模型与费用：历史交接快照（176 次；本机最新749次见顶部R3交付）
-
-用户明确不使用AIHubMix/MiniMax。当前实验四角色显式使用官方DeepSeek `deepseek-flash`；planner/worker为low、8192输出token，审核为none、16384；32步、取材attempt上限1，网络重试及问题协议修订有界。worker配置通过离线检查，本轮指定题没有委派worker，不能称四角色均有真实调用。
-
-| 账本 | 已结请求 / 保守列表价估算USD | 限制 |
-|---|---:|---|
-| E2→E3→E4原共享`experiments/agent_design/2026-10-09-e2-msft-10q-v1/costs.sqlite` | 176 / 2.0569908；unknown及在途0 | USD硬上限3；请求护栏220，变更留痕，未清零/分叉 |
-| 官方迁移独立历史`experiments/agent_design/2026-10-09-deepseek-official-v1/costs.sqlite` | 13 / 0.1280133；unknown0 | 原任务上限3，保留首轮失败 |
-| E1旧机缺件历史 | 已知28.4473026834；unknown预留0.0358508674 | 总授权100、曾累计释放40；本机不能恢复调用 |
-
-176笔包含全部失败、审核恢复及有界修订。E3→E4指定目标新增113笔/$1.3504302，已经闭合。费用不是已核对的供应商账单；Codex账户额度与API费用分开。缺账本不能新建空账本冒充继承；E1用户确认无旧私密包，不重复索取或清空旧费用。这段为 2026-10-09 交接快照；当前执行与费用以文件顶部 E6-R1 更新为准，不把旧余额解释成自动新增预算。
-
-## Git与私密状态边界
-
-Git提交源码、测试、Skill、公开逐题解释、独立验收文字及审阅过的公开标准/核验脚本。当前八个E5/E6实验目录采用显式公开文件清单；其余完整运行、准备层、配置、机器路径、联系人和费用SQLite保留本地，按忽略规则纳入迁移包。公开文档中指向这些材料的链接标为本地证据入口；未恢复私密包时不能仅靠checkout打开或完整重放。原文件逐字节保留，不为去除机器路径改写冻结JSON/hash。
-
-凭据`.env`不随Git或迁移包传递；新机器单独配置`DEEPSEEK_API_KEY`与SEC联系身份，权限600。已提供的SEC身份在原机私密配置中保留。私密Claude完整对话保留本机；普通工程接续不依赖该会话，不随Git发布。
-
-本轮迁移包入口：`output/machine-handoff-20261009-current/private-state-v1.tar.gz`，校验记录为同目录`verification.json`。只通过用户控制的私密渠道传输。它用于当前机器的忽略状态，不补回缺失的E1账本；包不含API密钥或外部Claude会话。包权限600，共3,246文件/477目录，14,747,230字节；SHA-256为`c09b423808f87b209b14dd44ef5e03141c94ab4bf6a56b953a6af8704b2dd1d9`。逐文件verify和空目录恢复均通过，两份现有账本逐字节一致；没有.env或Claude对话。最终回归结果见下方“本次交接验证”。
-
-```bash
-# 新机器：安装后，用实际收到的包路径替换示例。
-.venv/bin/python scripts/transfer_local_state.py verify /actual/private/path/private-state-v1.tar.gz
-.venv/bin/python scripts/transfer_local_state.py restore /actual/private/path/private-state-v1.tar.gz --root "$PWD"
-```
-
-导出须停模型请求和写入，使用新文件名，不能覆盖已有包。恢复器逐文件hash校验、拒绝符号链接/路径穿越和不同内容覆盖。原运行引用旧绝对路径；新机器应从明确冻结输入生成**新的**本机配置，绑定恢复后的同一账本和来源，先`--check-only`。当前E2–E4尚无专用换机配置生成器，不能直接执行旧配置或批量替换冻结文件；E5配置开发须纳入显式重定位及scope/hash预检。
-
-## 安装、检查与启动
-
-运行环境：macOS/Linux，Python3.11+、Node.js20+。在包含本轮提交的检出目录执行：
-
-```bash
-git pull --ff-only
-uv sync --locked --extra analysis --extra data --extra mcp
-.venv/bin/python scripts/run_offline_checks.py
-PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --check
-```
-
-检查不调用模型。完整历史集成入口如下；缺私密历史材料时会保留非零结果，不生成占位资料使其通过：
-
-```bash
-.venv/bin/python scripts/run_offline_checks.py --integration
-```
-
-分别启动两个本地服务：
-
-```bash
-PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 --port 8765
-.venv/bin/python -m http.server 8769 --bind 127.0.0.1
-```
-
-工作台为<http://127.0.0.1:8765/agent-results>；Swiss C与已有六题/E1页面可从[README](../README.md)进入。当前E2–E4逐题结果使用上方公开文档入口，尚未接入专用结果页。启动/HTTP可用与用户视觉验收分别记录。
-
-## 清理与历史恢复
-
-本地备份`codex/backup-20261009-before-cleanup`绑定基线`a4595ba82164f6597db72ee01891f3c2abf7cbf0`。本轮删除3,729个已确认无活动依赖的旧跟踪文件，226.51MiB；逐文件Git blob/hash与备份一致。Git历史仍保留，备份分支未推送。精确清单、恢复方法及保留依赖见[归档说明](REPOSITORY_RETENTION.zh-CN.md)。无关`apps/attention-game/`不属于本轮提交。
-
-更早的E1、completion-v1及2026-10-08交接状态从各自PLAN/DELIVERY/README及备份提交追溯；旧AIHubMix、无限额配置和旧私密包指纹不作为本轮入口。整理前完整交接快照保留在本机`output/machine-handoff-20261009-current/`，未修改实验冻结记录。
-
-## 2026-10-12 · 本次代码交付检查
-
-本次交付包含Data Agent通用机制、受影响测试、E6三栏真实记录查看、TODO和交接，以及八个E5/E6实验的公开说明/冻结标准/核验脚本。原始运行、完整模型输入输出、账本和联系人配置保留本机；无关的注意力小游戏和独立Editorial设计改动不纳入。公开脚本需要对应私密状态，单独checkout不能复现全部历史实验。
-
-提交前离线核心检查通过：Python569项、JavaScript36项；E5/E6受影响回归158项通过、1项跳过，页面/路由/E6 loader另23项通过。首次核心检查暴露历史运行evaluation=null导致附件列表读取报错，统一按空评估处理后原路由回归通过。没有新增模型调用，未执行本次完整历史集成或浏览器视觉验收。这些工程检查不改变E6-V3终稿8/9、无恢复3/9的业务结论。
-
-当前位置以顶部E6-R4新批次有限验收为准；下一E6-R5b记录ID引用/分组与动作归属。E6-R4历史原例及自然8192→16384、E6-R5其余路径、E6-UI2和E7仍未完成。下方“本次交接验证”为2026-10-09历史交接检查。
-
-## 本次交接验证
-
-- 从实际暂存区导出独立目录后运行核心检查：567项Python、35项JavaScript全部通过。使用现有已安装依赖；不是另一台机器重新安装验证。
-- 本轮受影响Data检查此前为218项通过、1历史路径fixture跳过，含重叠，不与核心数相加为业务分数；最后源码与这些检查一致。
-- 完整历史集成实际运行2,360项：6失败、14错误、1跳过；JavaScript35通过。9错误来自沙箱禁止本地监听，开放本地端口后定向10项全部通过。其余6失败/5错误分别是旧审核/版本/错误文本断言、旧303路由、指标定义文本、旧event回放及未分发dataset；均对照a4595ba源码+Skill定向复现，未发现本轮新增失败。**完整集成仍未通过**，这些问题保留，不修改原件、跳过测试或放松运行校验。
-- 私密包逐文件verify及新空目录restore通过；两份账本逐字节一致。共享账本仍176笔settled、上限3、unknown/在途0；无新增模型API。
-- 实验公开白名单58文件约0.32MiB；完整运行/来源状态保留本机。暂存新增/修改文件逐项隐私扫描及清单审阅；费用SQLite、个人联系、凭据、机器路径和无关attention-game均排除。CLI可编辑示例已使用本机$PWD。
-- 删除集3,729文件与归档清单及备份完全一致；提交前`git diff --cached --check`通过。新交接整理未重新进行视觉审阅、完整新机器模型复跑或供应商账单核对。
-- 整理前main与远端main均为a4595ba；本轮只做本地提交，不推送。实际提交以Git记录为准。清理备份分支保留本机。
-
-完整集成的后续修复不自动覆盖当前E5顺序；若新证据表明它阻断E5，说明原因并重排队列。新机器先完成离线材料/配置检查，再开始有目的的一题。
+历史入口：[之前摘要](MACHINE_HANDOFF_HISTORY_2026-10-12.zh-CN.md) · [微软Q01](research/2026-10-12-profit-cashflow-query01-contract.v1.zh-CN.md)。

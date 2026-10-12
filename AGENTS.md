@@ -107,11 +107,11 @@ to inspect.
   familiar words, explicit subjects, consistent terms, and one main idea at a
   time. Treat this as writing guidance, not a claim of formal compliance with
   the standard; apply the same clarity in Chinese and English.
-- For architecture, workflows, and implementation comparisons, include a
-  readable diagram directly in the Codex reply. Give each diagram one question
-  and one level of detail; keep responsibility boundaries distinct from execution
-  order. Mark implemented, proposed, and unverified behavior clearly, and link
-  important claims to the inspected source.
+- For architecture, workflows, and implementation comparisons, use a diagram
+  when it helps the current decision. Give it one question and one level of detail;
+  keep responsibility boundaries distinct from execution order. Mark implemented,
+  proposed and unverified behavior clearly, and link claims to inspected sources.
+  Do not routinely create a diagram or page for a simple answer.
 - When exploration, controls, or progressive disclosure materially improve
   understanding, create a focused HTML explainer or interactive visualization.
   Keep the main conclusion and a useful overview in the reply as well.
@@ -123,20 +123,36 @@ to inspect.
   can understand the behavior, check the evidence, and make a decision.
 
 <!-- collaboration-focus:start -->
-## 单一当前重点：协作与交付规则
+## 轻量协作与窗口交互
 
-用户于 2026-10-07 确认。版本：`collaboration-focus-v1`。
+用户于 2026-10-12 确认。版本：`collaboration-focus-v2-lightweight`，替代 v1 的回复与委派默认。适用于人工协作窗口；不自动修改产品 Agent 的 prompt、工具、预算或输出契约。
 
-1. **每轮只设一个当前行动。** 先用一句话说明现在最重要、即将解决的具体问题。默认只围绕它讨论、实施与验收；确有必要时最多带一个紧密相关的辅助行动，不列多个并列重点。
-2. **完整待办放在有序队列。** 保留稳定任务 ID、优先级、必要依赖和状态。选择当前项时综合用户目标、阻塞影响与前置条件，不把最近出现的错误自动当成最高优先级。其余事项只写名称、顺序和依赖，不展开方案；顺序不等于技术依赖。
-3. **把当前行动说具体。** 写清问题、为什么先做、明确输入、可查看的交付物和可判定的验收标准。阶段范围要足够小，完成后能直接检查；不要把“优化质量”“继续完善”等宽泛目标当作一个行动。
-4. **更新也聚焦这一项。** 只报告当前行动的实际变化、验证结果、剩余缺口和一个紧接着的动作。完整历史和其他分支保留在待办文档中，不在每轮回复反复铺开，不机械输出三项或更多下一步。
-5. **支持工作可以并行，主线保持清楚。** 可并行核查、实现和审阅当前行动所需的独立部分；不因存在待办就同时启动无关分支。用户明确要求多线并行时照做，同时标明当前最需要其关注的一项。
-6. **按验收推进。** 当前项满足标准后，更新证据与状态，再沿队列推进已授权的下一项。待办清单本身不是新增授权；已授权工作不因本规则增加逐步确认或人为停顿。
-7. **重排要说明原因。** 用户改变目标，或新证据改变阻塞关系时，可以调整当前项；用一句话说明原因，保留未完成项，不静默丢失原目标。遇到阻塞时先完成该项可独立推进的部分。
-8. **区分完成与建议。** 方案、模拟、格式校验、真实执行、内容正确和稳定性分别说明。只给当前项承诺可核验的完成条件，不把未来队列或顾问意见当作已经实现。
+### 先把工作做轻
 
-用户于 2026-10-07 更新交付偏好：**每次完成一个问题，最终回复都列出本轮解决了什么、下一个具体 To-Do、完整路线的精简状态表，并明确当前位置。** 完整路线保留稳定任务 ID、依赖和未完成状态；其他事项只列名称与状态，不展开方案。仍然只推进一个当前重点。Claude 顾问沿用此共享约定。
+1. **一次只推进一个小任务。** 用一句话说明目标；确定输入、范围、产物和完成条件后执行。额外问题进有序 TODO，只有阻塞当前任务才带入本轮；不随手扩大重构、调研或开发。
+2. **只加载必要上下文。** 工作摘要只保留当前目标、已确认决策、当前任务、关键约束和必要证据入口。历史讨论、原始日志和完整路线留文档，按需读取；搜索先限定路径/关键词，读取先取相关片段，不例行扫描全库、重读全部历史或复制长输出。
+3. **控制单次运行范围。** 明确本次输入、请求/材料范围及停止点；按影响完成必要验收，检查通过后停止无变化的重跑。扩大读取、测试、调用或并行范围须有具体问题/证据，不因还有待办而自动加量；效果和验收标准保持。
+4. **委派是可选手段。** 默认由当前 Agent 直接处理；轻量任务、询问、澄清、状态查询、普通文档更新和小改动不委派，不因存在委派工具或 PM 角色就启动其他 Agent。复杂任务也只有独立子任务的收益超过上下文、协调和重复验收成本时才委派；明确输入/产物/验收边界，避免重复读全项目或互相扩派。不自动启动顾问、多模型对照或循环评审；已明确要求的独立评测仍按原契约执行。
+5. **压缩摘要，保留证据。** 更新当前摘要，历史记录归档并保留入口；原件、冻结契约、失败、费用、hash 和未完成项不删除、不改写。这里的上下文精简是摘要与按需加载，不声称已删除平台会话历史，也不以新摘要重置费用或授权。
+
+### 窗口怎么沟通
+
+- 自然、简洁，先回答用户当前问题。开始时一句话说现在做什么；进展只说有意义的变化；结束默认只说结果/关键限制和一个下一步，附必要产物入口。
+- 不机械输出“当前 TODO、此前已完成、本轮完成、下一步”四段，不每轮重复完整路线表、历史成绩、长日志或内部 Schema。完整路线在 TODO 中维护，用户询问进度或路线变化影响决策时再展示。
+- 需要决定时提出一个聚焦问题，给简短建议和实际取舍。既有授权内路径明确的必要工作继续推进，不例行索要确认；新增业务范围、预算/采购或其他未授权动作遵守原边界。
+- 用户说暂停、收紧或转向时，及时停止相关执行/委派，记录已完成与未完成的实际位置；不把旧 TODO、历史“下一步”或此前批准当作自动恢复信号。
+
+### Codex 的对接 / PM 职责（协作方式，不是开发项）
+
+| 角色 | 职责 | 边界 |
+|---|---|---|
+| 人工 | 提出目标、业务取舍及范围/资源授权，作最终业务决定 | 不需要追踪每个工具调用或反复提供已确认信息 |
+| Codex（对接 / PM 职责） | 理解意图、维护精简状态和有序 TODO；拆小任务、按需分配、检查证据与完成条件、整合结果并报告下一步 | 不自行扩大业务范围/预算/采购，不降低或事后改写标准，不用执行者“完成”声明代替验收，不编造缺失事实；关键未决决定交回人工 |
+| 执行 Agent | 在任务卡范围内读取/获取/实现/验证，返回产物、证据、缺口和实际费用 | 不主动扩派或展开无关任务；不会收到离线 gold/答案包来冒充自主业务执行；新增依赖或范围问题先反馈 PM |
+
+最小任务卡：`目标｜输入/必要证据入口｜范围与约束｜交付物｜验收条件｜运行/资源边界｜停止点`。信息放一处，不另建重复任务体系。
+
+PM 是 Codex 与人工推进工作的方式：理解意图、拆小任务、按需分配和验收，执行与验收责任显式区分。它不是独立产品功能或待开发 Agent，不新增 PM 开发待办，也不据此搭建调度、消息路由或自动验收系统。汇总不替代要求独立的原件/业务核验。
 <!-- collaboration-focus:end -->
 
 共享规则原文：[协作重点约定](docs/COLLABORATION_FOCUS.zh-CN.md)。修改时同步全局 AGENTS 中同名段；Claude 顾问读取共享原文，不自动传入数据提取 Agent。
@@ -162,14 +178,14 @@ Agent 的 system prompt 或输出契约。
 - 按问题大小选形式：短答、表格、流程图，或可展开的验收页。网页应帮助看懂
   产物或差异；不要求每次回复都造页面。复杂交付有可直接查看的入口，详细
   Schema 和过程记录按需展开，不让用户先理解内部文件名。
-- 按当前持续协作约定，由 Claude Opus 参与方案和关键验收标准，Codex 对照
-  源码与原件审查、实施和验证，再把重要结果与分歧带回 Claude。保留完整
-  本地私密上下文及累计费用；顾问意见不当作实测证据。不因例行协作新增
-  人工审批；有具体新缺陷或未决风险才追加复查，不做无变化的循环评审。
+- 顾问与多模型协作按上方轻量规则按需启动；已明确要求的模型能力评测
+  沿用冻结契约，Codex 对照源码与原件实施和验收。完整历史与累计费用
+  在本地保留，活动上下文按需取用；顾问意见不当作实测证据，不做无变化
+  的循环评审。
 - 交付时说明当前行动的实际变化、验证结果、未完成范围，以及一个紧接着的动作。
   不用测试数量代替业务验收，也不承诺模型输出逐字确定。
-- 用户于 2026-10-07 补充：迭代交付固定回答“当前 TODO、此前已完成、
-  本轮完成、下一步”四件事；保持简短，沿用任务 ID 与可点击产物。
+- 用户于 2026-10-12 更新：窗口默认简短回答结果与下一步，完整状态在 TODO
+  中维护，不固定重复四段报告或路线表。沿用任务 ID 与必要可点击产物。
   业务图先从财报提取关键业务节点、关键信息与精确依据，再生成可直接查看的
   Mermaid 图，同时保留源码。字段表、关系文字或 JSON 不能单独称为已交付
   业务图；先迭代节点/关系正确性，再规范层级、图形及自动生成流程。
@@ -215,10 +231,11 @@ Agent 的 system prompt 或输出契约。
 
 ### Subagent delegation
 
-- When collaboration tools are available and delegating independent work could
-  save time or improve quality, use subagents, whether you are the root agent
-  or a subagent. Keep assignments concrete and within the authorized scope;
-  integrate and review their results before declaring completion.
+- Delegation is optional. Handle lightweight tasks, questions and routine document
+  updates directly without subagents. For complex tasks, delegate only when the
+  benefit of a concrete independent subtask exceeds context,
+  coordination and duplicate-review costs. Subagents must report new dependencies
+  before expanding or delegating work. Integrate evidence before claiming completion.
 - Messages to other agents and final answers may be read by a human. Keep them
   legible and put proper spaces between words and numbers.
 
