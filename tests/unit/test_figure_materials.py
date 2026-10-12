@@ -43,13 +43,27 @@ class FigureMaterialsTests(unittest.TestCase):
     def tearDown(self):
         self.fixture.tearDown()
 
-    def run_materials(self, *, effect=None, answer=None, output=None, model='claude-sonnet-5-5'):
+    def run_materials(self, *, effect=None, answer=None, output=None, model='claude-sonnet-5-5',
+                      coordinate_policy='model_proposal'):
         runner = AsyncMock(side_effect=effect, return_value=SimpleNamespace(final_output=answer or chart()))
         fixture_ocr = mock_ocr_process({0: tsv([('Series', 1, 1, 3, 1, 99, 1), ('A', 5, 1, 2, 1, 99, 1), ('$100', 1, 5, 4, 1, 99, 2)])})
         with patch('uteki.agents.figure_materials.Runner.run', runner), patch('uteki.agents.figure_materials.load_provider_key'), patch('uteki.infrastructure.document_sources.figure_grounding.shutil.which', return_value='/offline/tesseract'), patch('uteki.infrastructure.document_sources.figure_grounding.subprocess.run', side_effect=fixture_ocr):
             result = asyncio.run(run_figure_preparation(self.dataset, self.acquisition, output or self.bundle,
-                model=model, budget=None, credentials_root=self.fixture.root))
+                model=model, budget=None, credentials_root=self.fixture.root,
+                coordinate_policy=coordinate_policy))
         return result, runner
+
+    def test_host_coordinate_policy_is_provider_independent_and_legacy_default_stays_strict(self):
+        from uteki.agents.figure_materials import FigureTranscription, HOST_OCR_PROMPT
+        answer=chart()
+        for entry in answer['texts']:
+            del entry['box']
+        report, runner=self.run_materials(answer=answer,coordinate_policy='host_ocr_v1')
+        self.assertEqual(report['status'],'prepared')
+        self.assertEqual(runner.call_args.args[0].instructions,HOST_OCR_PROMPT)
+        self.assertEqual(runner.call_args.args[0].output_type.output_type,FigureTranscription)
+        row=report['figures'][0]
+        Figure.model_validate(FigureMaterialReader(self.bundle,self.dataset).read(row['figure_id'])['transcription'])
 
     def rewrite_bundle_file(self, relative, value):
         path = self.bundle / relative

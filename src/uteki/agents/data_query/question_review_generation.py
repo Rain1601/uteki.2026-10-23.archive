@@ -12,6 +12,7 @@ from pydantic import Field, create_model
 from uteki.domain.research_data.query_contract import Contract
 from .question_coverage_review import (
     QUESTION_REVIEW_PROMPT, QuestionCoverageAssessment, QuestionCoverageCheckV2,
+    FIGURE_COLLECTION_COUNT_PROMPT,
 )
 
 PROJECTION = 'question-request-identity-v1'
@@ -132,4 +133,4 @@ printed point labels were transcribed, not that a disclosure elsewhere is absent
 series identity, dates, units and original prose assumptions distinct. Figure labels cannot supply
 missing context; use block_quote citations for selected original prose. Review the original question's
 scope and missing information independently; the program supplies no desired answer or verdict.
-'''
+''' + FIGURE_COLLECTION_COUNT_PROMPT

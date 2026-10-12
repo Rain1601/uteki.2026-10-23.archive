@@ -1,5 +1,17 @@
 # 换机接续开发 · 2026-10-10
 
+2026-10-12 **03-M3 新重建批次真实验收完成：最终交付 3/3，首个取材 attempt 合格 2/3，全链无纠错 1/3。** 用户确认另一机器原图片转录/OCR包及 v5 数据集丢失；两张原图找回且 SHA 一致，Microsoft/Alphabet 全材料重新获取并独立核验，新 dataset/hash 不冒充旧包恢复。官方 DeepSeek 完成新图片转录，通用 host_ocr_v1 分离语义与坐标；集合事实缺少类型化引用导致旧 Query v1 R1 审核失败，新增严格 figure_collection_count 后原题同输入/原标准三次执行，必要信息全覆盖、实际完整阅读/双审/严格加载/独立原件验收通过，无无关业务正文。R1 JSON 自主纠正、R3 重复阅读停止及二次审核恢复均保留；旧失败和未跑槽位不替换。整任务 82 请求/$0.8480571，unknown/inflight=0，同一 $3 护栏；清理可再生缓存约207.85 MiB。**当前位置：本题有限验收完成；下一 E6-R4 显式容量恢复契约，历史原包缺失时旧失败重验仍未完成。** [逐题交付与全部费用](../experiments/agent_design/2026-10-12-m3-figure-query-v1/DELIVERY.zh-CN.md)。
+
+本次 M3 私密迁移入口：`output/machine-handoff-20261012-m3/private-state-v2.tar.gz`，逐文件校验和 SHA 记录在同目录 `verification.json` / `creation.json`。显式包含 `output/m3-rebuild-20261012-r2`（所有 dataset、转录、原调用、失败、两版源码快照、总账及独立验收）、`output/m3-recovery-20261012`（找回原图/清理清单）和首次 SEC 失败 `output/m3-rebuild-20261012-r1`；默认忽略材料按迁移脚本收取，原包不覆盖。API 密钥、`.env`、平台原生 OCR 安装前缀未加入；OCR 可从公开显式锁重装。模型写入停止后创建，验证成功后使用用户控制的私密渠道传输。
+
+```bash
+.venv/bin/python scripts/transfer_local_state.py verify output/machine-handoff-20261012-m3/private-state-v2.tar.gz
+```
+
+旧绝对路径和冻结文件保持原字节，换机不能批量替换路径或清空账本。严格历史阅读与新运行配置分开；若重跑需用新明确版本绑定恢复后的材料和同一任务账本，并保留本次失败/分母。本次三轮后的收据兼容修复仅零 API 验证，真实运行的精确源码在私密快照中。
+
+以下为历史阶段记录；旧“当前/下一”按当时状态保留，不覆盖顶部和主队列。
+
 2026-10-12 **当前位置：03-M3 工程接入已完成，真实原图/模型验收待执行。** R25–R29 已先回归、提交并上传 `0319a2ed`，远端同 SHA 已核验。随后完成调用方显式图片包绑定、scoped 导航/按需读取、角色实际完整阅读、显式选择、v5 原件重组、双审精确引用和恢复同包绑定。354 项定向整合检查、最终 84 项双审/公开调用链（有重叠）、576 Python + 37 JavaScript core 回归通过；fixture/SDK mock 是工程证据，不是模型实测。本轮 0 API / $0，未调用 AiHubMix。**紧接着：恢复 03-M2 原图片包及对应 v5 datasets，独立精读原图后冻结具体问题、重复次数、验收标准、官方模型配置及任务预算，再真实运行。** 原包缺失时不勾完 03-M3、不追认旧另一机器成绩、不重建费用历史。[工程交付与剩余验收](FIGURE_QUERY_DELIVERY_2026-10-12.zh-CN.md)。
 
 2026-10-12 **R25–R29 五项 review 根因修复与整合回归完成**：依赖锁、SEC 私密身份入口、全角度 OCR 消费判据、行为组件指纹与非法费用单记录隔离。118 项定向检查、576 Python + 37 JavaScript core、实际 --locked 安装通过；0 API。**当前位置：修复收尾，下一 03-M3 图片按需消费**。本机缺原图片包/v5 dataset/原 E1 费用证据，真实原图未重验；图片生产入口仍使用被禁用的 AiHubMix，本轮不会调用。旧 03-M2 为另一机器的历史验收，保留原记录。[修复与回归边界](CODE_REVIEW_FIXES_2026-10-12-v2.zh-CN.md)。
@@ -56,13 +68,13 @@ E6-B1 完成时点历史：三档 2/3/4 完整年报、2,739/4,289/5,636 导航�
 
 1. 阅读[工作约定](../AGENTS.md)、本文件、[统一验收标准](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)和[逐题交付](../experiments/agent_design/2026-10-09-e4-heldout-v1/DELIVERY.zh-CN.md)。
 2. 检查代码、公开交付和私密状态是否齐全。Git可恢复代码和公开解释；继续原实验还需要本机迁移包中的原件、冻结运行和真实账本。
-3. 从[主待办当前队列](../TODO.md#有序待办)的 **03-M3** 接续，先读[工程交付](FIGURE_QUERY_DELIVERY_2026-10-12.zh-CN.md)与[冻结消费契约](FIGURE_QUERY_CONTRACT_V1.zh-CN.md)。恢复 03-M2 原图片包和对应 v5 datasets 后，Codex 独立核验原图、冻结具体问题/重复次数/必要与冗余标准、官方模型及预算，再运行 Agent；参考答案、必需图 ID 和评测批评不传入。历史 E6-R4/R5 保留在队列后方，旧失败与原分母不改写；不要根据下方历史“下一步”启动调用。
+3. 从[主待办当前队列](../TODO.md#有序待办)的 **E6-R4** 接续：先冻结显式容量恢复契约，再做通用实现与边界回归。03-M3新批次本题三次已闭合，先读顶部真实交付；完整数据/原图/原调用/失败/账本须一起迁移。历史V3原包缺失时原失败重验保持未完成，不依旧“下一步”启动调用。
 
 ## 已完成与剩余范围
 
 | ID | 状态 / 依赖 | 可查看交付 |
 |---|---|---|
-| **03-M3** | **当前：工程完成；真实原图/模型验收待原包** | [工程交付及下一验收](FIGURE_QUERY_DELIVERY_2026-10-12.zh-CN.md) |
+| **03-M3** | **本题新重建批次最终3/3，首取材2/3、无纠错1/3；有限验收完成** | [真实交付](../experiments/agent_design/2026-10-12-m3-figure-query-v1/DELIVERY.zh-CN.md) |
 | R25–R29 | 已修、回归并上传 `0319a2ed` | [五项根因修复](CODE_REVIEW_FIXES_2026-10-12-v2.zh-CN.md) |
 | C1–C3 | 验收统一、清理备份、本地启动完成 | [统一标准](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)、[归档清单](REPOSITORY_RETENTION.zh-CN.md) |
 | E1 | 双年度七题受限基线；旧账本及私密包缺失 | [历史阶段报告](../experiments/agent_design/2026-10-09-e1-benchmark-v1/DELIVERY.zh-CN.md) |

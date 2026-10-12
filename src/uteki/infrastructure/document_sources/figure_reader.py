@@ -21,9 +21,10 @@ def _sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
-def _validate_grounding(row, transcription, raw, info, verified, *, require_image_hash):
+def _validate_grounding(row, transcription, raw, info, verified, *, require_image_hash,
+                        coordinate_policy='model_proposal'):
     from PIL import Image
-    from uteki.agents.figure_materials import Figure
+    from uteki.agents.figure_materials import Figure, FigureTranscription
     from .figure_grounding import ANGLES, norm, original_box, replay_text_grounding
 
     grounding_path = row.get('grounding')
@@ -96,7 +97,8 @@ def _validate_grounding(row, transcription, raw, info, verified, *, require_imag
         if replayed != matches:
             raise ValueError('Figure grounding differs from the complete pinned OCR replay')
     model_path = (Path(row['transcription']).parent / 'model-transcription.json').as_posix()
-    model = Figure.model_validate_json(verified(model_path)).model_dump()
+    model_schema = FigureTranscription if coordinate_policy == 'host_ocr_v1' else Figure
+    model = model_schema.model_validate_json(verified(model_path)).model_dump()
     if {text['id'] for text in model['texts']} != set(matches):
         raise ValueError('Figure model text identities changed during grounding')
     for text in model['texts']:
@@ -136,6 +138,9 @@ class FigureMaterialReader:
         for relative in files:
             verified(relative)
         config = json.loads(verified('config.json'))
+        coordinate_policy = config.get('coordinate_policy', 'model_proposal')
+        if coordinate_policy not in ('model_proposal', 'host_ocr_v1'):
+            raise ValueError('Unsupported figure coordinate policy')
         if config.get('dataset_manifest_sha256') != discovered['dataset_manifest_sha256']:
             raise ValueError('Figure configuration dataset binding mismatch')
         expected = {figure['figure_id']: figure for figure in discovered['figures']}
@@ -178,7 +183,9 @@ class FigureMaterialReader:
                 raise ValueError('Figure image decoding metadata mismatch')
             transcription = Figure.model_validate_json(verified(row['transcription'])).model_dump()
             if manifest['version'] != 'figure-materials-v1':
-                _validate_grounding(row, transcription, original_raw, info, verified, require_image_hash=manifest['version'] == 'figure-materials-v3')
+                _validate_grounding(row, transcription, original_raw, info, verified,
+                    require_image_hash=manifest['version'] == 'figure-materials-v3',
+                    coordinate_policy=coordinate_policy)
             source = sources[frozen['source_snapshot_id']]
             blocks = [json.loads(line) for line in _contained(self.dataset, source['index_folder'] + '/blocks.jsonl').read_text().splitlines()]
             selected = {location['block_id'] for location in wanted['locations']}

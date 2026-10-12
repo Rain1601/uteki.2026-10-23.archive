@@ -79,7 +79,9 @@ class RecordReviewModelTests(unittest.TestCase):
             'judgment': {'source_subject': 'Legend A', 'relation': 'same', 'coverage': 'complete',
                 'support_basis': 'direct', 'citations': [{'kind': 'figure_text',
                     'source_snapshot_id': 'synthetic-source', 'figure_id': 'synthetic-figure',
-                    'text_id': 'legend-a', 'quote': 'Legend A'}], 'gap': None,
+                    'text_id': 'legend-a', 'quote': 'Legend A'},
+                    {'kind':'figure_collection_count','source_snapshot_id':'synthetic-source',
+                     'figure_id':'synthetic-figure','field_path':'transcription.printed_values','count':0}], 'gap': None,
                 'rationale': 'The supplied synthetic transcription contains this label.'}}],
             'output_constraints': [], 'uncovered_requests': [], 'question_coverage': 'complete',
             'coverage_reason': 'This transport fixture preserves one literal figure citation.'}
@@ -97,10 +99,14 @@ class RecordReviewModelTests(unittest.TestCase):
                 await reviewer.aclose()
         asyncio.run(run())
         self.assertEqual(reviewer.frozen_config['output_projection'], PROJECTION_FIGURES)
+        self.assertIn('FigureCollectionCountCitation',self.requests[0]['messages'][0]['content'])
         for number in (1, 2):
             stored = json.loads((reviewer.output/f'review-{number:04d}-parsed.json').read_text())
             self.assertEqual(stored['checks'][0]['citations'][0]['kind'], 'figure_text')
             self.assertEqual(stored['checks'][0]['citations'][0]['quote'], 'Legend A')
+            self.assertEqual(stored['checks'][0]['citations'][1]['kind'], 'figure_collection_count')
+            self.assertIs(type(stored['checks'][0]['citations'][1]['count']), int)
+            self.assertEqual(stored['checks'][0]['citations'][1]['count'], 0)
         self.close_and_snapshot(reviewer)
         with self.assertRaisesRegex(ValueError, 'projection or schema'):
             self.reviewer(name='wrong-projection', output_schema=schema, output_projection=PROJECTION)

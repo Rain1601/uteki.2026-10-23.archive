@@ -212,9 +212,29 @@ class FigureFieldCitation(Contract):
     value: str = Field(min_length=1, max_length=20000, pattern=r"\S")
 
 
+class FigureCollectionCountCitation(Contract):
+    kind: Literal['figure_collection_count']
+    source_snapshot_id: str = Field(min_length=1, pattern=r"\S")
+    figure_id: str = Field(min_length=1, pattern=r"\S")
+    field_path: Literal['transcription.printed_values']
+    count: int = Field(strict=True, ge=0)
+
+
+FIGURE_COLLECTION_COUNT_PROMPT = '''
+Figure collection citation contract v2: to cite the number of printed observation labels
+in a selected figure's delivered transcription, use kind=figure_collection_count with
+source_snapshot_id, figure_id, field_path=transcription.printed_values and count as a
+nonnegative JSON integer equal to that list's length. This includes an empty list (count=0).
+It proves only the selected transcription's printed-label count, not global nondisclosure,
+curve point values, OCR coverage or absence elsewhere in the report. Do not use figure_field
+with value="[]" or a serialized array: figure_field continues to allow exact string scalars only.
+No geometry, OCR metadata, other collections or unseen figures are eligible count sources.
+'''
+
+
 class FigureQuestionCoverageCheck(QuestionCoverageCheckV2):
-    citations: tuple[BlockQuoteCitation | RecordFieldCitation | FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
-    qualification_citations: tuple[BlockQuoteCitation | FigureTextCitation | FigureFieldCitation, ...] = Field(default=(), max_length=16)
+    citations: tuple[BlockQuoteCitation | RecordFieldCitation | FigureTextCitation | FigureFieldCitation | FigureCollectionCountCitation, ...] = Field(default=(), max_length=16)
+    qualification_citations: tuple[BlockQuoteCitation | FigureTextCitation | FigureFieldCitation | FigureCollectionCountCitation, ...] = Field(default=(), max_length=16)
 
 
 class FigureQuestionCoverageAssessment(QuestionCoverageAssessment):
@@ -234,9 +254,10 @@ def question_assessment_schema(projected):
 
 
 def validate_figure_citation(figures, citation):
-    """Only literal transcribed labels and explicit scalar fields, never geometry-derived values."""
+    """Exact selected labels/scalars or an explicitly permitted collection length."""
     kind = citation.get('kind')
-    model = FigureTextCitation if kind == 'figure_text' else FigureFieldCitation if kind == 'figure_field' else None
+    model = {'figure_text': FigureTextCitation, 'figure_field': FigureFieldCitation,
+             'figure_collection_count': FigureCollectionCountCitation}.get(kind)
     if model is None:
         raise ValueError('unsupported figure citation kind')
     ref = model.model_validate(citation).model_dump(mode='json')
@@ -249,6 +270,10 @@ def validate_figure_citation(figures, citation):
         labels = [text for text in transcription['texts'] if text['id'] == ref['text_id']]
         if len(labels) != 1 or ref['quote'] not in labels[0]['text']:
             raise ValueError('figure quotation differs from its exact transcribed text identity')
+    elif kind == 'figure_collection_count':
+        values = transcription.get('printed_values')
+        if type(values) is not list or len(values) != ref['count']:
+            raise ValueError('figure collection count differs from selected transcription')
     else:
         path = ref['field_path']
         if path == 'transcription.kind':
@@ -523,7 +548,7 @@ def validate_question_review(projected, response):
               for d in projected['source_documents'] for b in d['blocks']}
     records = {(r['source_snapshot_id'], r['record_id']):r for r in projected.get('selected_records', [])}
     def citation_valid(ref):
-        if ref.get('kind') in {'figure_text', 'figure_field'}:
+        if ref.get('kind') in {'figure_text', 'figure_field', 'figure_collection_count'}:
             if not v3:
                 raise ValueError('figure citations require question coverage v3')
             validate_figure_citation(projected['source_figures'], ref)
