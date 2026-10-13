@@ -1196,7 +1196,7 @@ build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（�
 |---|---|---|
 | `pdf_region` | `block_id`、`page_index`（物理页，1 起）、`page_label`（印刷页码，可空）、`bbox`、`coord_system`、`char_range`（可空） | `coord_system` 固定为 `pdf_pt_top_left`（PDF 点、左上原点）；印刷页码与物理页分开 |
 | `html_node` | `block_id`、`dom_path`、`char_range`（可空） | `dom_path` 针对冻结快照，在线 DOM 不作出处 |
-| `table_cell` | `table_id`、`row`、`col`（0 起）、`span`、底层 `pdf_region` 或 `html_node` | 合并单元格保留跨度 |
+| `table_cell` | `table_id`、`row`、`col`（0 起）、`row_span`、`col_span`、底层 `pdf_region` 或 `html_node` | 合并单元格保留跨度 |
 | `image_region` | `image_id`、`bbox`、`coord_system=image_px_top_left` | 原图与区域都可读回 |
 | `record_field` | `record_id`、`field`、`shard_id`（API 响应分片）、`json_pointer` | iXBRL 记录另附对应 `html_node` |
 
