@@ -1,6 +1,6 @@
 # Data Agent 与分析 Agent：数据能力框架设计
 
-日期：2026-10-14 · 版本：设计稿 v1.4 · **状态：第 3.1 节系统架构 review 与优化提案待用户确认，确认后进入技术选型与技术方案；第 3 节四类一级功能及关系图、首期输入范围、材料资产与查询主流程、第 7.2.1 节找资产流程、第 7.2.2 节获取资产的输出边界、说明信息含义与内部职责、第 7.2.3 节定位与读取的衔接原则，以及第 8–11 节的执行边界（含第 9.2 节自主判断与状态更新机制）已确认；当前进入具体技术实现的设计讨论，其余字段、工具与验收细化仍待 review，功能开发暂停**。
+日期：2026-10-14 · 版本：设计稿 v1.5 · **状态：第 3.1 节系统架构与 A1–A9 已确认；第 14 节技术方案 v1 与接口契约 v0.3 待用户 review；第 3 节四类一级功能及关系图、首期输入范围、材料资产与查询主流程、第 7.2.1 节找资产流程、第 7.2.2 节获取资产的输出边界、说明信息含义与内部职责、第 7.2.3 节定位与读取的衔接原则，以及第 8–11 节的执行边界（含第 9.2 节自主判断与状态更新机制）已确认；当前进入具体技术实现的设计讨论，其余字段、工具与验收细化仍待 review，功能开发暂停**。
 
 本文整理已讨论的职责与建议设计，不新增业务范围授权，不宣称目标框架全部实现。公司、年份和单次实验属于验收案例，不成为通用规则。DA-01 获取与储存、DA-02 解析与索引、DA-03 查询与材料交付作为模块 ID 保留。当前唯一任务是核对本文的方案与设计，其他文档暂不读取。
 
@@ -100,9 +100,9 @@ flowchart LR
 - **功能与执行机制：**四类功能均属于 Data Agent；模型负责选择、理解与判断，工具程序负责具体执行。更新、质量、追溯等要求贯穿各功能，不另增一级功能节点。
 - **与模块 ID 的关系：**既有 DA-01 获取与储存、DA-02 解析与索引、DA-03 查询与材料交付继续保留为模块 ID。四类功能是本节的业务职责划分，不要求对应四个 Agent 或部署服务，也不新增并行开发任务；存储、版本、身份和出处仍贯穿三个模块。
 
-### 3.1 系统架构与 review 优化（提案，2026-10-14）
+### 3.1 系统架构与 review 优化（已确认，2026-10-14）
 
-**状态：**用户要求对当前架构做 review 优化，完成后进入技术选型与技术方案。本节把第 2–11 节已确认的职责落到组件与调用边界，并列出 review 发现的结构问题和优化提案；**全部为待确认提案**，不改写已确认职责，不代表实现。现有实现于 2026-10-14 只读核对源码与依赖，未运行。
+**状态：**本节把第 2–11 节已确认的职责落到组件与调用边界，并列出 review 发现的结构问题和优化方案。**用户已采纳架构图与 A1–A9（2026-10-14），无异议**；不改写已确认职责，不代表实现。技术方案见第 14 节。
 
 ```mermaid
 flowchart TB
@@ -178,7 +178,7 @@ flowchart TB
 
 **图例：**实线为正常请求或数据流，虚线为配置引用、模型调用或外部宿主的只读访问。第 3 节的四类功能对应关系：①收集与②处理落在资产建设管线；③存储与管理落在存储层及其发布协议；④查询与交付由运行时加目录、检索与结构化查询完成。外部 MCP 宿主使用自带模型，只能读已发布内容，不经过 Data Agent 的充分性判断，其结果不能视为 Data Agent 交付。
 
-#### 3.1.1 Review 发现与优化提案
+#### 3.1.1 Review 发现与优化（已确认）
 
 | # | 发现的问题 | 优化提案 | 影响章节 |
 |---|---|---|---|
@@ -188,32 +188,28 @@ flowchart TB
 | A4 | “检索索引”同时承担资产发现与资产内定位；第 12.1 节外部候选（PageIndex、OpenAI 文件检索）替换的到底是哪一层不清 | 检索分两级：**资产级发现**基于 SQLite 元数据过滤和资产标题、摘要的文本匹配，由 `find_assets` 进程内调用，首期不需要 HTTP 后端；**资产内检索**定义统一接口（outline / concept / text，返回绑定 build 的块引用与定位），A/B 只替换这一接口的后端。外部后端返回的片段必须能映射回雨滴的块与原文定位，否则不能作证据 | 6、7.2.1、12.1 |
 | A5 | 传输与部署方式留待以后决定；仓库已有只读 `uteki-data` MCP（`discover_data / get_data_schema / query_facts / read_source`），与第 7.2 节六个工具的关系未说明 | 首期按单机单用户做成**单进程 Python 库**，分析 Agent 与用户页面进程内调用，不新建 HTTP 服务；外部宿主沿用 MCP，作为能力层只读工具的一种暴露方式。现有四个 MCP 工具与新工具的对应和替换在接口文档中对齐，不并行维护两套语义 | 7.2、接口文档 |
 | A6 | 来源策略、材料 profile、概念表、模型配置都要求“显式选择、版本化”，但架构中没有它们的归属 | 新增**规则与配置**作为版本化输入（随代码版本管理），由 build manifest 与运行记录引用其版本；运行时只能显式选择，不能由公司名触发。现有 `adapters/alphabet_*` 是实验运行时显式选择的公司映射，只作历史基线，新管线中的适配器按材料类型和来源注册 | 4、5.2、5.5 |
-| A7 | 查询记录、工具结果、交付包和费用要保留，但第 6 节只说“按上述职责保存” | 运行记录与冻结交付包作为内容写入本地文件（按请求组织），SQLite 只登记引用与状态；优先复用现有运行产物与预算账本机制，账本不因新目录而拆分 | 6、8.4 |
+| A7 | 查询记录、工具结果、交付包和费用要保留，但第 6 节只说“按上述职责保存” | 运行记录与冻结交付包作为内容写入本地文件（按请求组织），SQLite 只登记引用与状态；同一任务的费用记在同一账本，不因新目录而拆分 | 6、8.4 |
 | A8 | DA-01 “获取与储存”同时包含①收集和③存储，模块 ID 与四类功能对不齐 | 对应关系：DA-01 = 发现、获取与原件快照写入；DA-02 = 解析、标注、校验与派生层构建；DA-03 = 目录、检索、结构化查询与交付。SQLite 元数据目录与发布协议是三个模块共用的基础，不单列模块 | 3、13 |
 | A9 | 第 2 节职责表把“程序执行层”与 Agent 并列，与“执行属于 Data Agent 职责”的正文容易误读 | 架构图中把运行框架与能力层画在 Data Agent 边界内，职责不变；第 2 节表格措辞等确认后再调整 | 2 |
 
 **不纳入本次优化：**风险 Agent 的形态、持仓数据来源、持续监控与调度、语义缓存，以及第 4 节第三方研报的接入表述（用户已说明有发现报告 MCP 入口，表述待整理第 4 节时一并更新）。
 
-#### 3.1.2 组件现状与选型状态（衔接技术选型）
+#### 3.1.2 现有实现的参考现状
 
-“现有实现”按 2026-10-14 源码与依赖只读核对，未运行；“选型状态”是进入技术选型时的初始判断，待逐项讨论。
+**用户补充（2026-10-14）：忽略已有实现，以“做对和做好”为最终目的。** 技术方案按正确性与质量选型，下表现有实现只作参考或对照基线，不构成选型约束；该指令优先于“优先复用现有机制”的默认做法。选型结论见第 14 节。下表按 2026-10-14 只读核对源码与依赖，未运行。
 
-| 组件 | 现有实现 | 选型状态 |
+| 组件 | 现有实现（仅参考） | 第 14 节方案 |
 |---|---|---|
-| HTML 解析 | lxml，解析产物见 `document_sources/parsed_package.py` | 倾向沿用；核对与新块/定位契约的差距 |
-| PDF 文字与坐标 | poppler `pdftotext -bbox-layout`（`research_data/company_materialization.py`） | 文字与坐标倾向沿用；表格结构待选（Docling 为历史候选） |
-| OCR 与图片 | tesseract CLI（`document_sources/figure_grounding.py`）；Claude、DeepSeek、Qwen 视觉适配 | 待评估扫描页质量与费用 |
-| 原件存储 | 按内容 hash 保存本地对象（`document_sources/company_acquisition.py`） | 沿用，补资产、快照目录布局 |
-| 元数据目录 | 未实现；SQLite 目前仅用于预算账本与发现报告 | 已确认 SQLite；表字段 review 中 |
-| 结构化查询 | DuckDB 1.5.5 快照与 hash 清单（`research_data/query_dataset.py`、`query_service.py`） | 沿用；改为从已发布 build 派生 |
-| 资产内检索 | 现有原文目录、搜索、读取请求（`domain/research_data/execution_scope.py`），无统一索引 | A/B：现有基线 / PageIndex / OpenAI 文件检索 |
-| 全文检索引擎 | 无统一实现 | 待选（与资产内检索 A/B 一起定） |
-| 语义标注 | 无统一实现；LangExtract 为历史候选 | 待选：规则 + 模型的组合方式 |
-| Agent 运行时 | openai-agents 0.22.2 与 OpenAI、DeepSeek、AIHubMix、Claude、Qwen 适配；运行预算与观测记录 | 倾向沿用；核对 ReAct 状态与工具回写是否满足 9.2 |
-| 对外接口 | `uteki-data` MCP（mcp 2.2.0），只读四工具 | 沿用并与新工具对齐 |
-| 来源接入 | SEC 获取与索引、有限官网发现、发现报告接口（`infrastructure/investment_reports/fxbaogao.py`） | 沿用；首个 API 数据资源待选 |
-
-**后续顺序（提案）：**用户确认本节架构后，按依赖讨论技术方案：①存储与发布协议（目录布局、SQLite 事务、派生层重建）→ ②资产建设管线（PDF/HTML 处理链、标注、校验）→ ③资产内检索接口与 A/B 方案 → ④运行时与工具接口对齐。A/B 需要调用模型或外部服务时，事先确认范围与费用额度。
+| HTML 解析 | lxml，`document_sources/parsed_package.py` | 新建块模型，保留 DOM 定位与 iXBRL 标签（14.6） |
+| PDF 文字与坐标 | poppler `pdftotext -bbox-layout`，`research_data/company_materialization.py` | Docling 与 PyMuPDF 做 A/B 后定（14.6、14.8） |
+| OCR 与图片 | tesseract CLI；Claude、DeepSeek、Qwen 视觉适配 | OCR 引擎随 PDF A/B 决定；视觉读取按需补处理（14.6） |
+| 原件存储 | 按内容 hash 保存本地对象，`document_sources/company_acquisition.py` | 新内容存储布局（14.3） |
+| 元数据目录 | 未实现；SQLite 仅用于预算账本与发现报告 | 新建 SQLite 目录（14.4） |
+| 结构化查询 | DuckDB 1.5.5 快照，`research_data/query_dataset.py` | DuckDB 派生视图，记录来自 iXBRL 与 SEC XBRL（14.6、14.7） |
+| 资产内检索 | 原文目录、搜索、读取请求，`domain/research_data/execution_scope.py` | `ContentIndex` 接口，FTS5 基线，外部后端经 A/B（14.7） |
+| Agent 运行时 | `agents/data_query/autonomous.py` 24 种 action 的决策 schema；openai-agents 0.22.2 | 新建运行时，原生工具调用（14.9）；旧实现作对照基线 |
+| 对外接口 | `uteki-data` MCP v1，只读四工具 | MCP v2 同名工具；v1 冻结（14.10） |
+| 来源接入 | SEC 获取与索引、有限官网发现、发现报告接口 | 新 connector 协议（14.6） |
 
 ## 4. 第二层：获取哪些类别的数据
 
@@ -223,7 +219,7 @@ flowchart TB
 | 专业接口数据 | 财务、估值、股价、K 线、成交量 | 适配任务的专业供应商；保留供应商、口径与版本，必要时对照披露 | FMP/行情没有已验收的统一接入 |
 | 公司官方网页 | 产品、定价、技术文档、博客、发布动态 | 确认官方归属，保存时间和网页版本 | 有限 HTML 发现已有；全面覆盖未验 |
 | 产品与经营观测 | 价格、库存、销量、交付时间、性能评测 | 可验证来源；保留型号、地区、渠道、采样方法等条件 | 通用接入与持续监控待设计 |
-| 第三方观点材料 | 研究报告、行业评论、独立测试 | 保留作者、范围与方法；观点和事实分开 | 本轮仅定义边界，不承诺接入 |
+| 第三方观点材料 | 研究报告、行业评论、独立测试 | 保留作者、范围与方法；观点和事实分开 | 研报经已有的发现报告 MCP 入口接入，发布券商与收录平台分别记录；其他第三方材料仅定义边界 |
 
 来源不是一条绝对可信的排名。官方适合证明自身披露，专业接口适合标准化查询，其他一手观测可能适合价格等问题。分别记录来源适用性、处理质量与当前问题适配性，不用一个“可信”标签替代全部判断。
 
@@ -538,7 +534,7 @@ flowchart LR
 
 **现有实现核对（2026-10-13，仅源码）：**[获取流程](../src/uteki/infrastructure/document_sources/company_acquisition.py)将原始字节按内容 hash 保存为本地对象；[查询数据集构建](../src/uteki/infrastructure/research_data/query_dataset.py)保存 JSON 产物、DuckDB 快照及文件 hash 清单；[查询服务](../src/uteki/infrastructure/research_data/query_service.py)核对清单后只读打开该快照。[现有目录接口](../src/uteki/infrastructure/research_data/query_catalog.py)提供限定数据集与范围内的来源、对象、指标和期间视图，不能据此认定目标中的统一公司/资产元数据管理已经完成。本轮未运行这些路径。
 
-优先复用上述机制。首期按第 6.1 节已确认的本地文件、SQLite 元数据管理与 DuckDB 查询分工细化；统一元数据结构、跨格式映射、缓存生命周期和发布一致性仍待 review。
+上述机制此前作为优先复用对象；2026-10-14 起按第 3.1.2 节用户补充，现有实现仅作参考，选型以第 14 节为准。首期按第 6.1 节已确认的本地文件、SQLite 元数据管理与 DuckDB 查询分工细化；统一元数据结构、跨格式映射、缓存生命周期和发布一致性仍待 review。
 
 ### 重复、冲突与时效
 
@@ -681,7 +677,7 @@ schema 是资产的使用说明，不只是数据库字段表。PDF/HTML 提供�
 
 ### 7.2 最小工具契约（提案）
 
-具体方法、request 与 response 独立维护于[Data Agent 接口契约](DATA_AGENT_API.zh-CN.md)，当前有 `find_assets` 字段草案。第 7.2.1 节记录已确认的找资产流程与职责，第 7.2.2 节记录已确认的获取资产输出边界，第 7.2.3 节记录定位与读取的衔接原则；接口文档仍需据此分别对齐 Function 参数、执行请求、内部结构和模型可见输出，现有字段草案不因流程确认而一并通过 review。
+具体方法、request 与 response 独立维护于[Data Agent 接口契约](DATA_AGENT_API.zh-CN.md)，v0.3 已覆盖全部工具（待 review）。第 7.2.1 节记录已确认的找资产流程与职责，第 7.2.2 节记录已确认的获取资产输出边界，第 7.2.3 节记录定位与读取的衔接原则；接口文档仍需据此分别对齐 Function 参数、执行请求、内部结构和模型可见输出，现有字段草案不因流程确认而一并通过 review。
 
 保留五个读取工具和一个内部补建设入口；不为每种材料创建一套 Agent 工作流。函数名是提案，正式实现需对照已有工具避免重复。
 
@@ -1127,6 +1123,376 @@ OpenAI 候选包含两种接入方式，先作为同一检索后端的选项记�
 
 设计验收示例：文档问题能定位原段落；数值问题能核对单位和字段；混合问题能组合两类证据；缺数据能补取或说明限制；修改原件/处理器后旧证据仍可复现；同数据复用不重复计数。以上是拟议验收，未在本轮执行。
 
-**架构 review（2026-10-14）：**按用户要求完成当前架构 review，第 3.1 节给出分层架构图、九项优化提案（A1–A9）及组件现状与选型状态，均待确认；确认后按“存储与发布协议 → 资产建设管线 → 资产内检索接口与 A/B → 运行时与工具接口对齐”进入技术方案。下段 6.2 字段 review 归入第一项继续。
+**架构与技术方案（2026-10-14）：**用户采纳第 3.1 节架构图与 A1–A9；随后要求制定完整技术方案并补充“忽略已有实现，以做对和做好为最终目的”。第 14 节给出技术方案 v1（含 SQLite 逐表字段，承接下段 6.2 字段 review），[接口契约 v0.3](DATA_AGENT_API.zh-CN.md) 覆盖全部工具；两者待 review，开发需单独授权。
 
-**当前设计进度：**既有业务功能、业务字段、版本与依据、维护职责及存储分工保持；第 6.2 节已记录 SQLite 核心表的职责与关联，第 6.2.1 节补充美股优先范围、多证券映射的影响及首期建议。按用户要求先保存并提交当前讨论，后续待用户恢复 review。恢复时从 `companies` 与 `company_securities` 的最小字段、主键、身份匹配与证券映射约束继续，再衔接行业和竞争关系表；其余表字段、发布一致性、表现形式/API 细则、接口及停止阈值仍待 review。当前仍为设计讨论，本轮未开发代码、接入服务或运行模型及评测，第 12.1 节本期技术选型与 A/B 待办保持。
+**当前设计进度：**第 3.1 节架构已确认；第 14 节技术方案 v1 与接口契约 v0.3 已写成，待用户 review。review 通过后按第 14.12 节分期申请 M1 实施授权。当前仍为设计阶段：未开发代码、未建库、未接入服务、未调用模型或运行评测；第 14.8 节的 A/B 在对应分期执行，涉及模型或外部付费服务前单独确认额度。
+
+## 14. 技术方案 v1（待 review，2026-10-14）
+
+**依据与原则：**用户已采纳第 3.1 节架构，要求制定完整技术方案，并补充“忽略已有实现，以做对和做好为最终目的”。因此本节按正确性与质量选型，现有代码只作参考或对照基线（见 3.1.2），不受其约束。本节是待 review 的方案，不代表实现；接口字段见[接口契约 v0.3](DATA_AGENT_API.zh-CN.md)。
+
+选型按以下优先顺序判断：
+
+1. **做对：**证据能回到冻结原件的具体位置；版本不漂移；未知不补造；失败与缺口可见。
+2. **做好：**召回、读取保真、表格与定位精度。
+3. **成本与维护：**在满足前两项的方案中取更简单、依赖更少者。
+
+每项关键选型写明理由与替代方案；凭经验无法判定、需要实测的，列入第 14.8 节 A/B，不预先定论。
+
+### 14.1 运行形态与代码组织
+
+- 单机单用户，Python ≥3.11，单进程库。分析 Agent 与用户页面进程内调用，外部宿主经 MCP（stdio）访问；不建 HTTP 服务。以后需要多进程或远程访问时，只在接口层增加传输，能力层契约不变。
+- 新建包 `src/uteki/data_platform/`，与旧 `research_data`、`data_query` 互不依赖；旧代码保留为对照基线，不再扩展。
+- 契约统一用 pydantic v2 定义（`extra=forbid`），工具 JSON Schema、MCP schema 与文档示例都由契约导出，避免三处漂移。
+
+| 子包 | 职责 |
+|---|---|
+| `contracts/` | 引用、时间、定位、共同信封、工具请求与响应、交付包 |
+| `catalog/` | SQLite 元数据目录：迁移、仓储、身份与证券解析、发布事务 |
+| `content/` | 内容存储：对象写入、目录布局、staging、manifest 与 hash 校验 |
+| `connectors/` | 来源接入：SEC EDGAR 文件、SEC XBRL 数据、公司官网、发现报告、本地文件；统一抓取策略检查 |
+| `build/` | 资产建设管线：阶段协议、解析器、目录、标注、校验、说明生成、发布编排 |
+| `retrieval/` | 资产级发现与资产内 `ContentIndex` 后端 |
+| `structured/` | DuckDB 结构化记录视图与类型化查询编译 |
+| `agent/` | Data Agent 运行时：循环、任务状态、工具分发、输出格式化、预算与停止 |
+| `interfaces/` | `DataService` Python 入口、MCP v2 服务、CLI |
+
+依赖在实施时锁定精确版本：pydantic v2、lxml、duckdb、mcp、ULID 实现；PDF 解析库待第 14.8 节 A/B 决定；模型 SDK 见第 14.9 节。
+
+### 14.2 标识、时间与证据地址
+
+**系统 ID：**类型前缀 + ULID，由程序生成，时间可排序，不含业务含义；名称、证券代码和 URL 都不作 ID。
+
+| 前缀 | 对象 | 前缀 | 对象 |
+|---|---|---|---|
+| `co_` | 公司 | `as_` | 资产 |
+| `sec_` | 证券 | `sn_` | 原件快照 |
+| `src_` | 来源 | `rp_` | 原件表现形式 |
+| `sr_` | 来源获取记录 | `bd_` | 处理版本（build） |
+| `rev_` | 元数据修订 | `ev_` | 修订依据 |
+| `req_` | 请求上下文 | `run_` | 运行（查询或建设） |
+| `job_` | 建设任务 | `dl_` | 交付包 |
+
+build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（如 `blk-000123`），全局引用总是“`asset_ref` + 内部 ID”，不承诺不同 build 间内部 ID 一致。原始字节和产物文件以 sha256 寻址，用于完整性与去重，不代替来源或资产身份。
+
+**时间值 `TemporalValue`：**
+
+```json
+{"value": "2026-02-04T16:05:12-05:00", "precision": "datetime"}
+{"value": "2026-02-04", "precision": "date"}
+{"value": "2026-02", "precision": "month"}
+```
+
+- `datetime` 必须带时区偏移；来源只有本地时刻、时区未知时，降为 `date` 并记 `TIMEZONE_UNKNOWN`，不补造时区。
+- 未知值为 `null`，同一对象的 `unknown_reasons` 说明原因：`not_disclosed_by_source / not_processed / not_applicable / conflict`。
+- **保守比较：**date 或 month 精度的值表示一个区间，下界按 UTC+14 起点、上界按 UTC−12 终点换算。判断 `available_at <= as_of` 时，区间上界 ≤ `as_of` 才算满足；区间跨越 `as_of` 时为 unresolved。发布时间范围筛选同理：完全落在范围内为 matched，部分重叠为 unresolved。
+- SQLite 每个业务时间存四列：`<name>_value`、`<name>_precision`，以及用于索引比较的 `<name>_lower_utc`、`<name>_upper_utc`。系统事件时间（获取、处理、登记）一律为带时区的 UTC 时刻。
+
+**报告期间 `FiscalPeriod`：**`{label, fiscal_year, fiscal_quarter, start, end, basis}`。`label` 如 `FY2025`、`FY2025Q3`；`start`、`end` 为日期，取自来源（10-K 封面、XBRL `dei:DocumentPeriodEndDate` 等）；`basis` 取 `source / derived_from_fiscal_year_end / unknown`。不把 FY 默认换算成自然年。
+
+**证据地址 `Locator`：**类型化联合，不拼接字符串；每个 locator 都必须能由 `read_evidence` 读回。
+
+| 类型 | 字段 | 规则 |
+|---|---|---|
+| `pdf_region` | `block_id`、`page_index`（物理页，1 起）、`page_label`（印刷页码，可空）、`bbox`、`coord_system`、`char_range`（可空） | `coord_system` 固定为 `pdf_pt_top_left`（PDF 点、左上原点）；印刷页码与物理页分开 |
+| `html_node` | `block_id`、`dom_path`、`char_range`（可空） | `dom_path` 针对冻结快照，在线 DOM 不作出处 |
+| `table_cell` | `table_id`、`row`、`col`（0 起）、`span`、底层 `pdf_region` 或 `html_node` | 合并单元格保留跨度 |
+| `image_region` | `image_id`、`bbox`、`coord_system=image_px_top_left` | 原图与区域都可读回 |
+| `record_field` | `record_id`、`field`、`shard_id`（API 响应分片）、`json_pointer` | iXBRL 记录另附对应 `html_node` |
+
+所有 locator 都绑定外层的 `asset_ref`（`asset_id / snapshot_id / representation_id / build_id`）。
+
+### 14.3 内容存储布局
+
+`data_root` 由配置显式给出，代码中不设默认路径。
+
+```text
+<data_root>/
+  catalog.sqlite                       元数据目录（14.4）
+  objects/sha256/<前两位>/<sha256>      原始字节，不可变，按内容去重
+  assets/<asset_id>/
+    snapshots/<snapshot_id>/
+      snapshot-manifest.json           来源记录引用、表现形式清单、对象 hash、冻结时间
+      representations/<representation_id>.json   格式、主对象 hash、附属资源清单
+    builds/<build_id>/
+      manifest.json                    输入引用；处理器、配置、profile、taxonomy 版本；产物清单及 hash
+      sections.jsonl  section-mappings.jsonl  blocks.jsonl
+      tables.jsonl  images.jsonl  records.jsonl  annotations.jsonl
+      quality.json                     检查结果、覆盖与缺口
+      asset-schema.json                由本 build 生成的资产说明
+  derived/<build_id>/
+    fts.sqlite                         资产内全文与标注索引（可重建）
+    records.duckdb                     结构化记录视图（可重建，仅限有记录的 build）
+  staging/<job_id>/                    未发布工作区
+  runs/<run_id>/
+    request.json  turns.jsonl  tool-calls.jsonl  delivery.json  usage.json
+```
+
+- 原始对象只写一次：写临时文件 → fsync → 原子 rename；同 hash 已存在时校验字节后复用。
+- build 在 `staging/` 生成，发布时整体 rename 到 `builds/`（同一文件系统内原子），发布后只读。
+- `derived/` 可删除重建；`builds/`、`snapshots/`、`objects/` 和 `runs/` 中被交付引用的内容不随缓存清理。保留期限与删除策略属于第 10 节待设计项，本期不做自动删除。
+
+### 14.4 SQLite 元数据目录
+
+**通用约定：**WAL 模式，`foreign_keys=ON`，所有表含系统时间 `created_at`、`updated_at`（UTC）。表结构用版本化 SQL 迁移文件管理，`schema_migrations` 记录已应用版本及文件 hash，启动时发现不一致即拒绝打开。业务字段的当前值存主表，历史与依据存 `metadata_revisions` 和 `metadata_evidence`，主表引用当前修订。下表“必填”指数据库层非空；业务时间按 14.2 展开为四列，表中只写逻辑名。
+
+在 6.2 的 12 张核心表之外新增 6 张支撑表：`company_aliases`、`asset_relations`、`snapshot_representations`、`derived_indexes`、`runs`、`run_cost_entries`，分别承接别名检索、资产间关系、`representation_id`、派生层状态、运行记录引用与费用账本。
+
+#### 公司与证券
+
+**`companies`**
+
+| 字段 | 类型 | 必填 | 约束与说明 |
+|---|---|---|---|
+| `company_id` | TEXT | 是 | 主键，`co_` |
+| `canonical_name` | TEXT | 是 | 规范名称；不单独作身份依据 |
+| `identity_basis_kind` | TEXT | 否 | `sec_cik / lei / manual_verified`；美股首期以 SEC CIK 为主 |
+| `identity_basis_value` | TEXT | 否 | 与 kind 组成唯一键（非空时） |
+| `status` | TEXT | 是 | `confirmed / pending_identity`；`confirmed` 要求身份依据非空 |
+| `incorporation_country` | TEXT | 否 | ISO 3166-1；不由上市地推断 |
+| `website_url` | TEXT | 否 | 官网 |
+| `fiscal_year_end` | TEXT | 否 | `MM-DD`，取自来源（如 SEC submissions）；变更时以修订保留历史 |
+| `description_revision_id` | TEXT | 否 | 业务简介的当前修订 |
+
+**`company_aliases`**：`alias_id` 主键；`company_id` 外键；`alias`（必填）；`alias_kind`：`former_name / short_name / brand / translation`；`valid_from`、`valid_to`（可空）；`revision_id`。别名只用于检索候选，命中多家公司时返回歧义，不自动选择。
+
+**`company_securities`**
+
+| 字段 | 类型 | 必填 | 约束与说明 |
+|---|---|---|---|
+| `security_id` | TEXT | 是 | 主键，`sec_` |
+| `company_id` | TEXT | 是 | 外键 |
+| `ticker` | TEXT | 是 | 大写交易代码 |
+| `exchange_mic` | TEXT | 是 | ISO 10383，如 `XNAS`、`XNYS` |
+| `share_class` | TEXT | 否 | 如 `Class A`；来源未写明时为空 |
+| `security_type` | TEXT | 是 | `common / preferred / adr / unit / warrant / other` |
+| `figi` | TEXT | 否 | 唯一（非空时） |
+| `valid_from`、`valid_to` | 日期 | 否 | 代码适用期间；未知保留为空 |
+| `status` | TEXT | 是 | `confirmed / pending` |
+| `basis_revision_id` | TEXT | 否 | 映射依据所在修订 |
+
+唯一键为 (`exchange_mic`, `ticker`, `valid_from`)；程序另外校验同一 (`exchange_mic`, `ticker`) 的有效期不重叠，且起点未知的记录最多一条。代码解析按请求时点进行，多条命中报歧义；GOOG / GOOGL 这类多股类是同一 `company_id` 下的两条记录。
+
+**`company_industries`**：`industry_id` 主键；`company_id`；`taxonomy`（`sec_sic / naics / gics / custom`）与 `taxonomy_version`；`code`、`label`；`business_scope`（可空）；`valid_from`、`valid_to`（可空）；`status`：`confirmed / candidate / conflict`；`revision_id`。SEC SIC 代码可由来源直接读取，其余分类需有依据。
+
+**`company_competitors`**：`relation_id` 主键；`company_id`、`competitor_company_id`（检查二者不同）；说话者 `asserted_by_company_id` 或 `asserted_by_source_id`（二选一必填）；`business_scope`、`region`（可空）；`valid_from`、`valid_to`（可空）；`status`；`revision_id`。关系是有向陈述（“A 在某材料中称 B 为竞争对手”），不自动生成反向关系。
+
+#### 资产、来源与版本
+
+**`assets`**
+
+| 字段 | 类型 | 必填 | 约束与说明 |
+|---|---|---|---|
+| `asset_id` | TEXT | 是 | 主键，`as_` |
+| `asset_kind` | TEXT | 是 | `document / dataset` |
+| `material_type` | TEXT | 是 | 已注册类型，如 `sec_10k / sec_10q / sec_20f / sec_8k / earnings_release / investor_presentation / broker_report / xbrl_company_facts`；未知类型拒绝登记 |
+| `title` | TEXT | 是 | 原始标题 |
+| `language` | TEXT | 否 | BCP 47 |
+| `reporting_period` | FiscalPeriod | 否 | 展开为 `period_label / fiscal_year / fiscal_quarter / period_start / period_end / period_basis` |
+| `natural_key` | TEXT | 否 | 来源给出的材料身份，如 SEC accession number + 主文件名；唯一（非空时），用于去重 |
+| `declared_scope_json` | TEXT | 否 | dataset 必填：资源、主体、期间规则、数据口径 |
+| `status` | TEXT | 是 | `registered / has_snapshot / retired` |
+| `summary_revision_id` | TEXT | 否 | 派生摘要的当前修订 |
+
+**`asset_company_relations`**：主键 (`asset_id`, `company_id`, `role`)；`role`：`issuer / subject / mentioned`；`basis`：`source_metadata / rule / model`；`status`：`confirmed / candidate`；`revision_id`。发布方只记在 `sources`。
+
+**`asset_relations`**：`from_asset_id`、`to_asset_id`、`kind`（`amends / same_material_other_form / supplements`）、`basis`、`revision_id`。SEC 修订申报（如 10-K/A）作为独立资产，用 `amends` 指向原资产：修订申报可能只含部分内容，不能当作原报告的完整新版本；同一来源替换同一份文件（如官网 PDF 更新）才在原资产下新增快照。
+
+**`sources`**：`source_id` 主键；`source_kind`：`sec_edgar / sec_xbrl_api / official_site / fxbaogao / data_vendor / user_file`；`publisher_name`（必填）；`publisher_company_id`（可空）；`platform_name`（可空，如收录平台）；`canonical_url`（可空）；`policy_ref`（适用的来源策略版本）。
+
+**`source_records`**
+
+| 字段 | 类型 | 必填 | 约束与说明 |
+|---|---|---|---|
+| `record_id` | TEXT | 是 | 主键，`sr_` |
+| `source_id` | TEXT | 是 | 外键 |
+| `asset_id` | TEXT | 否 | 身份确定后填写 |
+| `snapshot_id` | TEXT | 否 | 原件保存并冻结后填写 |
+| `run_id` | TEXT | 是 | 发起的运行 |
+| `request_url`、`final_url` | TEXT | 否 | 重定向后地址单列；不含凭据 |
+| `http_status` | INTEGER | 否 | |
+| `outcome` | TEXT | 是 | `discovered / acquired / failed / denied_by_policy` |
+| `failure_code` | TEXT | 否 | 失败时必填 |
+| `acquired_at` | 系统时间 | 否 | 实际取得时刻 |
+| `published_at`、`source_revised_at`、`available_at` | TemporalValue | 否 | 各附 `*_basis`；`available_at` 不得由获取时间填充 |
+
+**`asset_snapshots`**：`snapshot_id` 主键；`asset_id`；`status`：`collecting / frozen / failed`；`frozen_at`；`manifest_sha256`（冻结后必填）；`revision_of_snapshot_id` 与 `revision_basis`（可空）；`completeness`：`complete / partial / unknown`；`version_consistency`：`consistent / inconsistent / unknown`（API 分片使用）。冻结后表现形式清单不可追加。
+
+**`snapshot_representations`**：`representation_id` 主键；`snapshot_id`；`format`：`pdf / html / xbrl_instance / api_json`；`object_sha256`；`byte_size`；`resource_manifest_sha256`（HTML 附属图片等，可空）。
+
+**`asset_builds`**
+
+| 字段 | 类型 | 必填 | 约束与说明 |
+|---|---|---|---|
+| `build_id` | TEXT | 是 | 主键，`bd_` |
+| `snapshot_id`、`representation_id` | TEXT | 是 | 输入原件 |
+| `build_key` | TEXT | 是 | 唯一；sha256(输入对象 hash + 处理器版本 + 配置 hash + profile + taxonomy) |
+| `processor_version`、`config_sha256`、`profile_ref`、`taxonomy_ref` | TEXT | 是 | 处理依据 |
+| `status` | TEXT | 是 | `staging / published / failed` |
+| `readiness_json` | TEXT | 是 | 各能力 `ready / partial / not_ready / failed / not_applicable` |
+| `manifest_sha256` | TEXT | 否 | `published` 时必填 |
+| `job_id` | TEXT | 是 | 生成它的建设任务 |
+| `published_at` | 系统时间 | 否 | |
+| `failure_code` | TEXT | 否 | `failed` 时必填 |
+
+**`derived_indexes`**：主键 (`build_id`, `kind`, `backend_version`)；`kind`：`fts / records_duckdb / external:<backend>`；`status`：`ready / failed / stale`；`file_sha256`；`built_at`。
+
+#### 修订、依据与运行
+
+**`metadata_revisions`**：`revision_id` 主键；`object_type`（`company / alias / security / industry / competitor / asset / asset_company_relation / asset_relation`）；`object_id`；`field`；`value_json`；`status`：`current / superseded / candidate / conflict / rejected`；`reason`；`supersedes_revision_id`（可空）；`created_by_run_id`。同一字段可同时存在多条 `conflict` 候选，不按时间先后静默覆盖。
+
+**`metadata_evidence`**：`evidence_id` 主键；`revision_id`；`source_id`、`snapshot_id`、`build_id`（可空）；`locator_json`（14.2 的 Locator）；`method`：`source_direct / rule / model`；`method_ref`（规则 ID，或模型名与提示词 hash）；`ref_check`：`valid / invalid / unchecked`；`content_check`：`confirmed / unverified / rejected`；`applicable_scope_json`（业务、地区、期间，可空）。
+
+**`runs`**：`run_id` 主键；`kind`：`query / build`；`parent_run_id`（补数时指向原查询）；`context_ref`；`status`：`running / completed / partial / failed / cancelled / needs_clarification`；`record_dir`；`budget_limit_usd`；`started_at`、`ended_at`。
+
+**`run_cost_entries`**：`entry_id` 主键；`run_id`（记到根运行，补数与重试不另开账本）；`provider`、`model`；`reserved_usd`、`actual_usd`；`state`：`reserved / settled / unknown`。存在 `unknown` 时，新的付费调用须先对账。
+
+### 14.5 发布与一致性协议
+
+SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
+
+1. **登记任务：**插入 `asset_builds(status=staging)`；`build_key` 唯一约束同时充当并发锁，同一输入与配置已有 `published` build 时直接复用、不重跑。
+2. **生成产物：**全部写入 `staging/<job_id>/`，每个产物登记到 manifest 并计算 sha256。
+3. **校验：**manifest 中的文件存在且 hash 一致；块、章节、表格、标注、locator 之间的引用闭包完整；`asset-schema.json` 声明的能力与 `readiness` 一致。失败则置 `failed` 并保留 staging 内容供诊断。
+4. **构建派生层：**生成 `derived/<build_id>/` 并登记 `derived_indexes`；单项失败只把对应能力降为 `partial` 或 `not_ready`，不阻止发布原件与其他能力。
+5. **移动目录：**staging 整体 rename 到 `builds/<build_id>/`。
+6. **发布事务：**单个 `BEGIN IMMEDIATE` 事务中写入 `manifest_sha256`、`readiness_json`、`published_at`，并将状态置为 `published`。
+7. **崩溃恢复：**启动时扫描 `staging` 状态超时的 build：目录已移动但事务未提交的，重新校验后补完事务或置为 `failed`；孤儿 staging 目录标记为待清理。未发布的 build 对查询始终不可见。
+
+快照冻结采用同样模式：全部表现形式的对象写入并校验后，单个事务把 `collecting` 置为 `frozen`。查询只读 `frozen` 快照与 `published` build，并在整个运行中固定 `asset_ref`；新 build 发布不影响进行中的查询。
+
+**版本呈现规则：**系统中不存在隐式的“默认版本”。`find_assets` 对每个（资产、快照、表现形式）返回最新的 published build，同时给出 `other_builds` 计数与修订关系；更早的 build 需显式引用。是否选用修订快照由 Data Agent 依据请求判断，结果包记录实际选择。
+
+### 14.6 资产建设管线
+
+**阶段协议：**每个阶段实现 `run(inputs, ctx) -> StageResult{status, outputs, issues, usage}`，并声明阶段版本；阶段结果逐条写入任务记录，失败阶段保留输入与错误。任务 `BuildJob{job_id, run_id, trigger, target, policy_ref, budget}` 的 `trigger` 为 `prepare`（CLI 数据准备任务）或 `request_asset_update`（查询中补缺口），两者走同一条管线（A1）。
+
+| 阶段 | 执行方 | 输出 | 失败或不足时 |
+|---|---|---|---|
+| discover | connector 规则；官网发现可受限调用模型 | 候选来源记录 | 无候选记为缺口 |
+| acquire | 程序 | 原始对象、`source_records` | 记 `failed` 或 `denied_by_policy` |
+| freeze | 程序 | 确定资产身份，冻结快照 | 身份无法确定则资产保持待确认，不合并 |
+| parse | 程序 | 块、表格、图片、记录 | 局部失败记入 quality，能力降级 |
+| outline | 程序；推断结构需标注 | 原始目录树 | 推断章节标 `inferred` |
+| annotate | 规则与 XBRL 标签优先，模型受限补充 | 规范章节映射、概念标注 | 未匹配保留 `unclassified` |
+| validate | 程序 | 第 9.1 节格式检查结果 | 不合格产物不进入可用能力 |
+| describe | 程序生成；摘要可由模型生成并标为派生 | `asset-schema.json` | 缺项写入 gaps |
+| derive | 程序 | 派生索引 | 只降级对应能力 |
+| publish | 程序 | 已发布 build | 见 14.5 |
+
+**抓取策略：**`SourcePolicy{allow, deny, redirect: recheck, max_downloads, max_bytes, max_seconds}` 以版本化配置文件管理；每次请求（包括重定向目标和页面中的附件链接）在发出前重新检查，deny 优先。SEC 请求遵守其公平访问要求：声明含联系方式的 User-Agent，并限速。联系方式和账号等凭据只放本机配置，不进仓库。
+
+**Connector：**
+
+| Connector | 范围 | 说明 |
+|---|---|---|
+| SEC EDGAR 文件 | 按 CIK 取 submissions 列表与申报文件（10-K、10-Q、20-F、8-K 及附件） | 以 accession number + 主文件名作 `natural_key`；`published_at` 取 SEC 受理时间并保留精度 |
+| SEC XBRL 数据 | companyfacts 等结构化接口 | 作为 dataset 资产（见下） |
+| 公司官网 | 显式授权的域名或路径 | 发现可由模型参与，抓取前做策略检查 |
+| 发现报告 | 经已有 MCP 入口检索与下载研报 PDF | 发布券商记为 publisher，发现报告记为 platform |
+| 本地文件 | 用户显式提供的文件 | 保留文件来源说明；没有网页地址时不补造 URL |
+
+**SEC 结构化财务数据作为首个 dataset（新建议）：**美股以 SEC 为权威来源，XBRL 数据本身带概念、期间、单位、维度和申报编号，能直接支撑 `query_records`，比从表格反解析数值更可靠。分两层：
+
+- **申报内记录（主）：**10-K、10-Q 等 iXBRL 文档在 parse 阶段提取 `ix:nonFraction` 等事实，生成记录；每条记录同时带 `record_field` 与对应 `html_node` locator，数字能回到原文位置。
+- **companyfacts 数据集（辅）：**每家公司一个 dataset 资产，声明范围为“该公司在 SEC 已申报的 XBRL 事实”，每次获取为一个快照；每条事实保留 accession number、form、filed 日期，用于跨期查询和核对。两层出现差异时并列返回，不静默选择其一。
+
+**各格式处理：**
+
+- **HTML（SEC 与官网）：**lxml 解析冻结快照，自建块模型：段落、列表、表格（单元格、跨度、表头关系）、图片引用、iXBRL 标签；章节树来自目录锚点与标题结构，推断部分标注。
+- **PDF（年报、业绩材料、研报）：**Docling（版面分析、阅读顺序、表格结构、OCR 集成；MIT 许可）与 PyMuPDF（文字层、精确坐标、图片提取；AGPL 许可，需确认可接受）在相同输出契约下做 A/B（14.8），按表格保真与定位精度选定，也可组合使用（例如 PyMuPDF 取文字与坐标，Docling 取表格结构）。没有文字层或文字覆盖不足的页面走 OCR，引擎随同一 A/B 决定；OCR 文字标注来源，不与文字层混同。
+- **图片：**登记区域、图题与可提取文字；需要理解图表时经 `request_asset_update(action=process, capabilities=[vision])` 按需处理，结果作为派生产物标注模型与提示词版本。
+
+**标注：**profile 按材料类型版本化（`sec_10k`、`sec_10q`、`sec_20f`、`sec_8k`、`earnings_release`、`broker_report`），定义规范章节类别与原始标题的匹配规则。概念表 v1 以 US-GAAP 概念为锚，先覆盖收入、利润、现金流、资本开支、分部等小规模集合；iXBRL 事实可按标签直接关联概念，正文叙述的关联由规则优先、模型受限补充，并记录方法与验证状态。不随意新增概念；不匹配的内容保留 `unclassified`。
+
+### 14.7 检索
+
+**资产级发现（`find_assets`）：**在 SQLite 中先按硬边界与过滤条件筛选，再用 FTS5 对标题、公司名、别名、证券代码和派生摘要做文本匹配。FTS5 同时建两种分词：`trigram`（支持中文与子串）和 `unicode61` + porter（英文词形）；已核实本机 SQLite 3.47.1 支持两者。主体过滤是硬条件，文本相关性只影响排序；同分按完整 `asset_ref` 固定排序。
+
+**资产内检索（`ContentIndex` 接口）：**
+
+| 模式 | 输入 | 返回 |
+|---|---|---|
+| `outline` | 父章节（可空）、深度 | 子章节、规范映射状态、块数与页码范围 |
+| `text` | 短语、全部词、任一词或受限正则；文字来源（正文、表格、图题、OCR）；章节范围 | 命中块、匹配区间、片段、文字来源 |
+| `concept` | 概念 ID、角色、维度、期间 | 已标注目标、标注依据、未标注覆盖 |
+
+基线后端：每个 build 一个 `fts.sqlite`，包含两种分词的块全文表与标注表。所有后端返回 build 内的块 ID 和 locator；外部后端（PageIndex、OpenAI 文件检索）接入时，雨滴导出带字符偏移的块文本，后端命中按偏移映射回块，映射不上的命中计入 issues，不作为证据。正则使用线性时间引擎并限制长度与执行时间。
+
+**结构化查询（`query_records`）：**`records.duckdb` 由 build 的 `records.jsonl` 派生；查询由类型化请求编译为参数化 SQL，不开放任意 SQL。数值以十进制字符串传递，保留 `decimals` 与 scale；`null` 与 0 严格区分。
+
+### 14.8 A/B 验证方案
+
+| 实验 | 对照 | 所在分期 | 费用 |
+|---|---|---|---|
+| E-PDF：PDF 解析 | Docling / PyMuPDF / 二者组合；OCR 引擎对照 | M2 | 本地运行，不调用模型 |
+| E-RET：资产内检索 | FTS5 基线 / PageIndex / OpenAI `vector_stores.search` | M5 | PageIndex 与 OpenAI 产生模型或检索费用，运行前单独申请额度（预计超过 $3 须事先批准） |
+
+**案例：**3–5 家美股公司的 10-K、10-Q、业绩材料 PDF 与研报 PDF，覆盖第 7.4 节三类问题，以及表格、跨页表格和扫描页。公司与材料由用户确认。运行前人工冻结每个问题的必要块及原文位置；参考答案和必要块不进入任何运行上下文。
+
+**指标：**
+
+- E-PDF：表格单元格保真（行列、跨度、表头）、文字与坐标定位误差、阅读顺序错误数、OCR 字符准确率、处理耗时。
+- E-RET：必要块召回@k、locator 映射成功率、读回正确率、费用、延迟；中英文查询分别统计。
+
+通过阈值与选择规则在看到结果前与用户确认并冻结。实验只比较检索与解析环节，不代表 Data Agent 端到端效果。
+
+### 14.9 Data Agent 运行时（新建）
+
+**循环：**宿主驱动，每轮一次模型调用。
+
+1. 组装上下文：系统提示词（版本化）、请求上下文、需求计划、当前四项任务状态、最近的工具输出；较早的工具输出压缩为引用，完整结果留在程序侧，模型可通过工具重新读取。
+2. 调用模型：使用**供应商原生工具调用**，`tool_choice` 要求每轮恰好一个工具调用。可用工具：6 个数据工具，加 `clarify`（向调用方澄清关键歧义）与 `deliver`（交付）。
+3. 宿主校验参数（pydantic）、补入上下文、检查策略与预算，执行工具，按第 8 节模板格式化输出后写回对话。
+4. 记录本轮：工具调用、结果引用、费用写入 `runs/<run_id>/`。
+
+**任务状态：**每个工具调用都带公共参数 `state`，包含第 9.2 节四项状态：已满足的需求、剩余缺口、下一步动作、简短理由。宿主校验状态中引用的需求 ID 与证据 ID 均存在，并保存为可检查记录；不要求也不保存模型私有推理。
+
+**停止规则：**最大轮数、预算上限、连续 N 轮没有新增证据、墙钟时间上限、调用方取消。阈值由请求的运行策略显式给出，共享代码不设隐藏默认值；达到条件时，运行框架强制进入交付，交付已确认部分、缺口和停止原因。
+
+**交付：**`deliver` 只提交每项需求的状态（supported / partial / unresolved）、引用的证据 ID 和说明。交付包由程序按引用闭包组装：数值和原文从工具结果中复制，模型文字只进入标注为模型说明的字段；引用了本次运行未返回过的证据时拒绝交付并要求修正。
+
+**模型接入：**定义 `ModelClient` 接口（消息与工具 schema 输入，单个工具调用与用量输出），按所选供应商分别实现。供应商与模型由配置显式选择（不使用 MiniMax）；费用估算先预留后结算，未知费用计入同一账本。首期每轮只允许一个工具调用，以便状态、预算和失败定位保持简单；独立需求的并行执行留待验证后再加。
+
+### 14.10 接口层
+
+- **`DataService`（Python）：**`create_context`、6 个数据工具，以及 `run_query(context_ref) -> DeliveryPackage`（运行 Data Agent 并交付）。分析 Agent 补数时传入原交付包引用。
+- **MCP v2（stdio）：**同名暴露 `create_context`、`find_assets`、`get_asset_schema`、`search_asset`、`read_evidence`、`query_records`、`run_query`；`request_asset_update` 首期不对外部宿主开放。外部宿主直接调用读取工具时，结果不经 Data Agent 充分性判断，不称为 Data Agent 交付。
+- **MCP v1：**冻结，不扩展；迁移完成后另行决定下线时间。
+- **CLI：**数据准备任务（显式公司与材料范围）、发布状态查看、派生层重建、运行记录查看。
+
+### 14.11 测试与验收
+
+| 层 | 测试 | 通过标准 |
+|---|---|---|
+| 契约 | schema 往返、未知字段拒绝、时间保守比较、locator 校验 | 违反契约的输入一律报错，不静默修正 |
+| 目录 | 迁移 hash、唯一性、证券有效期不重叠、身份规则 | 名称或代码不能单独确认公司 |
+| 发布 | 在 14.5 每一步注入中断 | 不出现半发布的可见 build；恢复后状态一致 |
+| 版本 | 新 build 或修订快照发布后重放旧查询 | 旧引用与旧交付不漂移 |
+| 解析 | 程序生成的合成 HTML/PDF 夹具；E-PDF 冻结真实材料 | 定位可读回；不以样本公司作默认值 |
+| 检索 | 排序确定性、游标绑定、外部命中映射闭包 | 同输入同输出；不可映射的命中不进证据 |
+| 运行时 | 脚本化假模型驱动工具序列 | 预算、停止、引用闭包、状态校验均按契约执行 |
+| 端到端 | 第 7.5 节案例冻结小样，真实模型 | 单独授权运行；与独立原件验收分开报告 |
+
+脚本检查、真实模型评测和用户验收分别记录；测试通过不等于业务内容正确。
+
+### 14.12 实施分期
+
+| 分期 | 范围 | 完成条件 |
+|---|---|---|
+| M1 | `contracts`、`catalog`、`content`；发布协议与崩溃恢复 | 14.11 契约、目录、发布、版本测试通过 |
+| M2 | SEC connector、HTML 与 iXBRL 解析、companyfacts dataset、PDF 适配器；执行 E-PDF | 选定 PDF 方案；用户确认的样本公司 10-K 与业绩材料可完成发布，locator 可读回 |
+| M3 | 目录、标注、资产说明生成；FTS5 基线与 DuckDB 视图 | 6 个工具在脚本调用下按接口契约返回 |
+| M4 | 运行时、`DataService`、MCP v2；发现报告与官网 connector | 假模型测试通过；真实模型小样经授权运行 |
+| M5 | E-RET 与选型定稿 | 按冻结阈值作出检索后端决定 |
+
+每一期开工前单独取得用户授权；后一期依赖前一期的完成条件。
+
+### 14.13 待决项
+
+1. M2 与 A/B 的样本公司和材料。
+2. 概念表 v1 的具体概念清单。
+3. 运行策略中各停止阈值的数值。
+4. E-RET 的额度，以及 E-PDF、E-RET 的通过阈值。
+5. PyMuPDF 的 AGPL 许可是否可接受。
+6. 首个非 SEC API 数据资源（是否需要、选哪家）。
