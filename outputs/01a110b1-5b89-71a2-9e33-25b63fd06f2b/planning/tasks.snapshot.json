@@ -1,0 +1,1075 @@
+{
+  "asOf": "2026-10-13",
+  "commit": "ce3f2af720a761a5e37f8f6772307db008289806",
+  "mode": "development_paused",
+  "sources": {
+    "todo": "TODO.md",
+    "map": "docs/DATA_AGENT_EXTRACTION_TODO.zh-CN.md",
+    "scope": "docs/research/2026-10-12-ds02-financial-coverage-contract.v1.zh-CN.md",
+    "plan": "docs/research/2026-10-12-ds03-source-acquisition-validation-plan.zh-CN.md",
+    "a01": "docs/research/2026-10-12-ds03-a01-delivery.zh-CN.md",
+    "t01": "data/material_packages/tsmc-fy2025-v1/README.zh-CN.md",
+    "accept": "data/material_packages/tsmc-fy2025-v1/acceptance.json",
+    "m3": "experiments/agent_design/2026-10-12-m3-figure-query-v1/DELIVERY.zh-CN.md",
+    "r4": "experiments/agent_design/2026-10-12-e6-r4-capacity-v1/DELIVERY.zh-CN.md",
+    "qp": "experiments/agent_design/2026-10-12-revenue-stability-v1/DELIVERY-v4.zh-CN.md",
+    "review": "docs/CODE_REVIEW_FIXES_2026-10-12-v2.zh-CN.md",
+    "history": "docs/R22_HISTORY_RECOVERY_2026-10-12.zh-CN.md",
+    "source": "docs/research/2026-10-12-data-sources-selection.zh-CN.md",
+    "q01": "docs/research/2026-10-12-profit-cashflow-query01-contract.v1.zh-CN.md"
+  },
+  "tasks": [
+    {
+      "id": "PL-01",
+      "priority": "P0",
+      "module": "业务决策",
+      "task": "确定第一阶段的用户交付与停止边界",
+      "status": "待讨论",
+      "arrangement": "当前讨论",
+      "acceptance": "用一个真实投资经理问题，写明交付什么、排除什么、如何验收；确认后才排开发顺序",
+      "deps": [],
+      "gap": "建议先收敛可信财务查数；是排序建议，不改 DS-02 已冻结范围",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-T01-C",
+      "priority": "P1",
+      "module": "材料获取",
+      "task": "核对台积电实时官方目录是否齐全",
+      "status": "未通过",
+      "arrangement": "暂停",
+      "acceptance": "保存实际目录及应收清单，逐项对账；不能用冻结目录替代实时发现",
+      "deps": [],
+      "gap": "实时目录受 Cloudflare 挑战阻断；T01 总验收未通过",
+      "source": "accept",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-T01-D",
+      "priority": "P1",
+      "module": "材料获取",
+      "task": "查明台积电 IR 材料首次公开时刻",
+      "status": "未通过",
+      "arrangement": "暂停",
+      "acceptance": "有可核验首次公开依据；区分下载、修改、打印和发布日期",
+      "deps": [],
+      "gap": "publication_date_acceptance=incomplete；不得参与截止日可得性推断",
+      "source": "accept",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-T02",
+      "priority": "P1",
+      "module": "材料解析",
+      "task": "验收台积电年度包的文本解析",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "逐项核对主表/附注、表头/单位/限定条件与原文定位；图片页显式留缺口",
+      "deps": [
+        "DS-03-T01-C",
+        "DS-03-T01-D"
+      ],
+      "gap": "不含新增 OCR；不能因文件取齐标记解析通过",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-P0-INV",
+      "priority": "P1",
+      "module": "材料获取",
+      "task": "冻结三家公司首轮完整材料清单",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "MSFT/Alphabet/Costco 的 FY2025、Q3、FY2024 及引用/补充披露逐项应收可查",
+      "deps": [
+        "DS-02"
+      ],
+      "gap": "已取得 19 个 filing 的目录/索引/主文首轮；完整附件与版本包未齐",
+      "source": "plan",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-P0-GET",
+      "priority": "P1",
+      "module": "材料获取",
+      "task": "补齐首轮缺件并核验重复获取",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "按冻结清单取齐原件、附件、补充披露与版本；三轮远程核对留原始失败",
+      "deps": [
+        "DS-03-P0-INV"
+      ],
+      "gap": "微软部分小包通过；全公司完整包尚未通过",
+      "source": "plan",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-DEDUP",
+      "priority": "P1",
+      "module": "材料获取",
+      "task": "区分重复文件、重复披露和真实版本",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "同内容不重复计数；修订保留版本；重复事实保留各出处与列报时间",
+      "deps": [
+        "DS-03-P0-INV"
+      ],
+      "gap": "已有 hash/版本与重列小样；跨完整材料包验收不足",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-DATE",
+      "priority": "P1",
+      "module": "材料获取",
+      "task": "保证历史查询只用当时可得的材料",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "首次公开时刻、截止日与财务期间分开；未知可得时刻显式拒绝或留缺口",
+      "deps": [
+        "DS-03-P0-INV"
+      ],
+      "gap": "已有 scope/cutoff 机制；IR 未知日期缺口保留",
+      "source": "a01",
+      "decision": ""
+    },
+    {
+      "id": "03-PARSE",
+      "priority": "P1",
+      "module": "材料解析",
+      "task": "核验首轮全文、表格与目录无漏无重复",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "系统独立构建；对原文节点、表格、目录、单位及重复定位逐项核验",
+      "deps": [
+        "DS-03-P0-GET"
+      ],
+      "gap": "双公司 FY2025 10-K 有受限基线；首轮全部类型未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "04-SCHEMA",
+      "priority": "P1",
+      "module": "索引与说明",
+      "task": "给每种数据对象提供可消费说明",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "公司/期间/类型目录、表 schema、字段/单位与读取方法齐全且互相一致",
+      "deps": [
+        "03-PARSE"
+      ],
+      "gap": "已有目录/指标/分页说明；新增数据类型仍需补齐",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "04-ANCHOR",
+      "priority": "P1",
+      "module": "索引与说明",
+      "task": "从块、表格、图片定位并高亮原文",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "每个索引回指冻结原字节与具体片段；表头、单位、图中文字可核验",
+      "deps": [
+        "03-PARSE"
+      ],
+      "gap": "HTML 与指定图片通过；新格式及全包定位未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F01",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "覆盖利润表全部披露行",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "保留原列报、期间、单位、币种、来源与层级，逐行对账",
+      "deps": [
+        "03-PARSE",
+        "04-SCHEMA"
+      ],
+      "gap": "现有少数指标映射不能代表整表覆盖",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F02",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "覆盖资产负债表全部披露行",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "存量时点、单位、币种、原行及原文定位正确，逐行对账",
+      "deps": [
+        "03-PARSE",
+        "04-SCHEMA"
+      ],
+      "gap": "完整覆盖未独立验收",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F03",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "覆盖现金流量表全部披露行",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "期间与累计口径正确；现金/非现金、补充披露分开，逐行对账",
+      "deps": [
+        "03-PARSE",
+        "04-SCHEMA"
+      ],
+      "gap": "微软现金流小包审阅完成；完整接口与多公司未完成",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F04",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "提取综合收益与权益变动表",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "原行、期初/变动/期末、归属及计量口径均可追溯",
+      "deps": [
+        "03-PARSE",
+        "04-SCHEMA"
+      ],
+      "gap": "冻结范围已包含；无完整覆盖验收",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F05",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "提取股数、EPS、股权激励和股东回报",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "区分基本/稀释、时点/加权平均、拆股及实际回购/授权额度",
+      "deps": [
+        "03-PARSE",
+        "04-SCHEMA"
+      ],
+      "gap": "不能把同名字段当成同口径",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F06",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "提取分部、产品与地区财务披露",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "忠于报告维度，保留分部对账与口径；不补造未披露交叉矩阵",
+      "deps": [
+        "03-PARSE",
+        "04-SCHEMA"
+      ],
+      "gap": "历史收入图不是完整财务事实库验收",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F07-INV",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "建立全部财务附注定量事实清单",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "独立精读列出表格与正文数量/区间/条件；每条有原文位置与覆盖状态",
+      "deps": [
+        "03-PARSE"
+      ],
+      "gap": "先形成覆盖分母；不能只挑关键附注",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F07",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "提取全部财务附注定量事实",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "按独立清单逐项覆盖，保留币种/单位/期间/条件；未支持项显式列出",
+      "deps": [
+        "DS-04-F07-INV",
+        "04-SCHEMA"
+      ],
+      "gap": "已知旧基线另有 2,970 条未映射；原文保留不等同可结构化查询",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F08",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "提取财务补充披露、Non-GAAP 与指引",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "原文对账、调整项和公司定义齐全；实际/预测严格区分",
+      "deps": [
+        "DS-03-P0-GET",
+        "04-SCHEMA"
+      ],
+      "gap": "仅限冻结财务范围，非财务运营 KPI 后置",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F09",
+      "priority": "P1",
+      "module": "结构化财务",
+      "task": "保留财务定义、会计政策与重要限定",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "数据可回查相关定义、重列说明、审计与解释，不能截断必要条件",
+      "deps": [
+        "03-PARSE",
+        "04-SCHEMA"
+      ],
+      "gap": "结构化数字和文本说明必须可关联",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-F10",
+      "priority": "P1",
+      "module": "财务查询",
+      "task": "实现可审计的季度、TTM、增速与比率计算",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "显式公式/定义、输入出处及期间一致；不支持的口径拒绝推算",
+      "deps": [
+        "DS-04-F01",
+        "DS-04-F02",
+        "DS-04-F03"
+      ],
+      "gap": "已有有限期间机制；全指标派生未验；FCF/净债务需定义",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-04-Q01",
+      "priority": "P1",
+      "module": "财务查询",
+      "task": "落地微软利润与现金流问题的查询交付",
+      "status": "方案完成",
+      "arrangement": "暂停",
+      "acceptance": "系统从显式范围自主取材，返回足够且聚焦的原始证据与缺口",
+      "deps": [
+        "04-SCHEMA",
+        "04-ANCHOR"
+      ],
+      "gap": "原包/文本审阅和协议候选保留；新接口未开发或模型实跑",
+      "source": "q01",
+      "decision": ""
+    },
+    {
+      "id": "10-DISCOVER",
+      "priority": "P1",
+      "module": "自主查询",
+      "task": "从问题找到公司、期间和合适数据源",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "读取小型目录/schema 后选择源；缺失/歧义/越界拒绝，不默选公司",
+      "deps": [
+        "04-SCHEMA"
+      ],
+      "gap": "指定多公司与多期间案例通过；完整材料库泛化未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "10-REVIEW",
+      "priority": "P1",
+      "module": "自主查询",
+      "task": "检查取材结果并有界补查",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "判断问题是否被材料覆盖；补充/收窄查询，每轮依据和状态留存",
+      "deps": [
+        "10-DISCOVER",
+        "04-ANCHOR"
+      ],
+      "gap": "已有真实循环与双审；更多问题首次交付能力未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "05-HANDOFF",
+      "priority": "P1",
+      "module": "数据交付",
+      "task": "交付最少充分证据包与明确缺口",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "必要信息全、无大量无关材料、真实且精确出处；失败不能冒充就绪",
+      "deps": [
+        "10-REVIEW"
+      ],
+      "gap": "特定问题可严格加载；真实 Analysis 消费未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "11-GOLD",
+      "priority": "P1",
+      "module": "独立验收",
+      "task": "建立多公司多问题独立评测集",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "Codex 对原件冻结必需/可选/冗余与等价出处，答案不进入运行 Agent",
+      "deps": [
+        "03-PARSE"
+      ],
+      "gap": "已有有限题库；完整财务、更多新题覆盖不足",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "11-GENERAL",
+      "priority": "P1",
+      "module": "独立验收",
+      "task": "验收新公司、新年份和混合材料查询",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "单公司/多公司、相同/不同问题各有独立保留题；覆盖与聚焦分别判定",
+      "deps": [
+        "11-GOLD",
+        "05-HANDOFF"
+      ],
+      "gap": "指定 E2–E5 收入等案例通过；不等同任意公司通过",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "11-STABLE",
+      "priority": "P1",
+      "module": "独立验收",
+      "task": "验收完整交付稳定性与纠错成本",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "冻结问题与配置重复运行；首审/最终/无纠错分别统计，失败不替换",
+      "deps": [
+        "11-GENERAL"
+      ],
+      "gap": "若干小样成功；全链长期稳定仍无保证",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "DS-05",
+      "priority": "P1",
+      "module": "整体关口",
+      "task": "验收完整财务可查询、可追溯",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "按 DS-02 清单逐项验原件、事实、历史版本、计算、证据与自主交付",
+      "deps": [
+        "DS-03-P1",
+        "DS-04-F01",
+        "DS-04-F02",
+        "DS-04-F03",
+        "DS-04-F04",
+        "DS-04-F05",
+        "DS-04-F06",
+        "DS-04-F07",
+        "DS-04-F08",
+        "DS-04-F09",
+        "DS-04-F10",
+        "11-STABLE"
+      ],
+      "gap": "总验收关口；前置项各自通过才可关闭，不计为额外功能",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-API",
+      "priority": "P2",
+      "module": "数据来源",
+      "task": "验证专业结构化接口是否适合作加速层",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "以 SEC/IR 原件对照覆盖、口径、出处、版本、权限与费用；先有限样本",
+      "deps": [
+        "DS-02"
+      ],
+      "gap": "FMP Free 契约暂置；未注册/调用/采购；不能替代全部附注",
+      "source": "plan",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-P1",
+      "priority": "P2",
+      "module": "材料获取",
+      "task": "扩展五个财年与二十个财季",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "逐公司逐期间应收/实收/缺件清楚，版本与可得时刻可复核",
+      "deps": [
+        "DS-03-P0-GET",
+        "DS-03-DATE"
+      ],
+      "gap": "不以一份年报内比较列代替完整历史材料",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-S10",
+      "priority": "P2",
+      "module": "稳定运行",
+      "task": "验收连续十交易日获取与恢复",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "按既有方案每日两次观察，记录新披露、延迟、故障与恢复；24小时目标另验",
+      "deps": [
+        "DS-03-P0-GET"
+      ],
+      "gap": "三次下载一致不等同连续稳定",
+      "source": "plan",
+      "decision": ""
+    },
+    {
+      "id": "E6-R5b",
+      "priority": "P2",
+      "module": "保留缺陷",
+      "task": "修复记录 ID 引用与分组动作契约",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "原误用与独立边界复现；合法共用保留，越来源/要求严格拒绝",
+      "deps": [],
+      "gap": "R5a 来源选择修复不代表记录分组已解决",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "R2",
+      "priority": "P2",
+      "module": "保留缺陷",
+      "task": "核查弃用探索来源阻断交付",
+      "status": "待复核",
+      "arrangement": "暂停",
+      "acceptance": "对当前代码复现最早偏差，再按责任层修复并验原例",
+      "deps": [],
+      "gap": "历史列未修；当前机制已变化，不能预判仍存在",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "R3",
+      "priority": "P2",
+      "module": "保留缺陷",
+      "task": "允许无期末但合法的来源接受正确审核",
+      "status": "未解决",
+      "arrangement": "暂停",
+      "acceptance": "财报期间与发布日期分开；8-K/官方更新可合法审核，未知范围不猜测",
+      "deps": [],
+      "gap": "8-K/官方更新扩展前解决",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "R4",
+      "priority": "P2",
+      "module": "保留缺陷",
+      "task": "补齐临时错误的有限重试分类",
+      "status": "未解决",
+      "arrangement": "暂停",
+      "acceptance": "只恢复已定义临时故障；未知费用保留且同预算计入",
+      "deps": [],
+      "gap": "历史缺陷保留；新获取入口有局部机制，不自动关闭旧路径",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "R5",
+      "priority": "P2",
+      "module": "保留缺陷",
+      "task": "使精编复核使用显式输出额度",
+      "status": "未解决",
+      "arrangement": "暂停",
+      "acceptance": "配置真实传到复核请求，边界与失败留证，不靠默认值",
+      "deps": [],
+      "gap": "filing_brief 历史缺陷",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "R6",
+      "priority": "P2",
+      "module": "保留缺陷",
+      "task": "业务图发布前复核原件 hash",
+      "status": "未解决",
+      "arrangement": "暂停",
+      "acceptance": "原件被改/错绑则拒绝发布，合法原件与历史版本可验证",
+      "deps": [],
+      "gap": "business_map 历史缺陷",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "R7",
+      "priority": "P2",
+      "module": "保留缺陷",
+      "task": "修复历史阅读分组回放兼容",
+      "status": "未解决",
+      "arrangement": "暂停",
+      "acceptance": "按绑定版本重放 reading_groups；旧原件/状态不改写",
+      "deps": [],
+      "gap": "需要相应原例/版本证据",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "12-TRACE",
+      "priority": "P2",
+      "module": "过程与结果",
+      "task": "统一每步快照、模型配置与费用展示",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "Request/Trace ID 串起输入、索引、查询、补查、审核和结果；unknown 保留",
+      "deps": [],
+      "gap": "已有后台和快照/账本；全链统一覆盖未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "E6-UI2",
+      "priority": "P2",
+      "module": "过程与结果",
+      "task": "以问题、缺漏、冗余和费用展示验收",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "优先显示用户可读结论，过程记录可展开，失败与同次运行绑定",
+      "deps": [
+        "11-GOLD",
+        "12-TRACE"
+      ],
+      "gap": "已有独立评估页面；统一中文简明视图后置",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "12-TRANSFER",
+      "priority": "P2",
+      "module": "工程交接",
+      "task": "让验收运行包跨机器可核验",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "按显式清单迁移配置说明、原件、运行及 hash；密钥/私密对话不自动提交",
+      "deps": [],
+      "gap": "原件包可迁移；本机 A01/M3 私密原运行包缺失",
+      "source": "history",
+      "decision": ""
+    },
+    {
+      "id": "16-CONSUME",
+      "priority": "P2",
+      "module": "分析 Agent",
+      "task": "真实消费数据包并反馈缺数",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "Analysis 独立读取 Data 交付，缺信息可要求补查，再产出带证据结论",
+      "deps": [
+        "05-HANDOFF"
+      ],
+      "gap": "角色边界已明确；真实分析消费未完成",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "08-BRIEF",
+      "priority": "P2",
+      "module": "分析产物",
+      "task": "生成完整财报精编",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "保留关键事实/必要限定/精确引用，以原件独立核验；不只做小节",
+      "deps": [
+        "16-CONSUME",
+        "R5"
+      ],
+      "gap": "已有历史小节候选；整份精编未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "09-MAP",
+      "priority": "P2",
+      "module": "分析产物",
+      "task": "生成清晰完整的业务关系图",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "Agent 自主取材；业务层级/产品/支撑关系分开，节点与边有出处",
+      "deps": [
+        "16-CONSUME",
+        "R6"
+      ],
+      "gap": "有已认可视觉参考和历史候选；通用独立生成验收未闭合",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "09-REVENUE",
+      "priority": "P2",
+      "module": "分析产物",
+      "task": "单独展示收入结构与比例",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "与业务关系图分开；金额、分母、分类、期间和出处可对账",
+      "deps": [
+        "DS-04-F06",
+        "16-CONSUME"
+      ],
+      "gap": "历史收入图存在；不能凭图证明完整财务提取",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "09-SKILL",
+      "priority": "P2",
+      "module": "技能复用",
+      "task": "沉淀并验收通用业务制图 Skill",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "冻结规则/输入/配置，用系统 Agent 在保留公司复跑；不写公司答案",
+      "deps": [
+        "09-MAP",
+        "09-REVENUE"
+      ],
+      "gap": "已有 Skill；好看参考不等同生产泛化通过",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "13-LINKS",
+      "priority": "P2",
+      "module": "官方补证",
+      "task": "给产品和服务附可核验官网链接",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "官方归属与页面内容有依据；可选 Skill 执行，链接不硬编码流程",
+      "deps": [
+        "09-MAP"
+      ],
+      "gap": "历史可选补充保留；系统化发现/更新未验",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "E7",
+      "priority": "P2",
+      "module": "公司关系",
+      "task": "定义并提取公司竞争等关系",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "明确说话者、业务范围、日期、精确片段；披露/推断分开，不自动反向",
+      "deps": [
+        "05-HANDOFF"
+      ],
+      "gap": "company relations 类型与验收标准未冻结",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "DS-01",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "数据源选型调研",
+      "status": "已完成",
+      "arrangement": "封存",
+      "acceptance": "保留官方资料、覆盖与稳定性边界；调研不等同供应商实测",
+      "deps": [],
+      "gap": "已有调研；未采购、未测试专业源",
+      "source": "source",
+      "decision": ""
+    },
+    {
+      "id": "DS-02",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "首批财务范围冻结",
+      "status": "已完成",
+      "arrangement": "封存",
+      "acceptance": "保留 US GAAP 非金融、三家公司、五年二十季及财务披露范围 v1",
+      "deps": [],
+      "gap": "契约完成；数据覆盖未完成；TSMC 为独立 IFRS/20-F 范围",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-A01",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "模型自主发现并归档官网 HTML",
+      "status": "有限通过",
+      "arrangement": "暂停",
+      "acceptance": "显式官方根起点；两家公司各一件，模型发现、下载、公司/期间/hash/证据正确",
+      "deps": [],
+      "gap": "TSMC、Microsoft 各一次实跑通过；修后全链未新跑，非长期稳定",
+      "source": "a01",
+      "decision": ""
+    },
+    {
+      "id": "03-M3",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "图片证据接入自主取材与交付",
+      "status": "有限通过",
+      "arrangement": "暂停",
+      "acceptance": "冻结双公司材料与原题，完整阅读、精确引用、独立内容核验及严格加载",
+      "deps": [],
+      "gap": "新批次最终 3/3；无纠错 1/3；新图与任意扫描件未验",
+      "source": "m3",
+      "decision": ""
+    },
+    {
+      "id": "E6-QP1",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "审核请求身份与范围契约",
+      "status": "有限通过",
+      "arrangement": "暂停",
+      "acceptance": "原标准不变，完整公司/期间/原文身份，同题独立三次审核",
+      "deps": [],
+      "gap": "首审及终稿 3/3；无纠错 2/3；跨问题未验",
+      "source": "qp",
+      "decision": ""
+    },
+    {
+      "id": "E6-R4",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "输出容量不足的有界恢复",
+      "status": "有限通过",
+      "arrangement": "暂停",
+      "acceptance": "原完整输入、共享预算、一次显式升档；压力与正常控制分开",
+      "deps": [],
+      "gap": "压力 3/3、正常 1/1；历史原例、自然 8192→16384 未验",
+      "source": "r4",
+      "decision": ""
+    },
+    {
+      "id": "R25-R29",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "锁文件、配置、图片校验、指纹与费用隔离修复",
+      "status": "已完成",
+      "arrangement": "封存",
+      "acceptance": "保留五项各自根因、原例及离线回归；不等同业务全链验收",
+      "deps": [],
+      "gap": "代码与离线回归已交付，细项沿用 R25–R29 原记录",
+      "source": "review",
+      "decision": ""
+    },
+    {
+      "id": "DS-03-T01-F",
+      "priority": "P3",
+      "module": "已有基线",
+      "task": "冻结目录中的台积电原件取齐",
+      "status": "有限通过",
+      "arrangement": "暂停",
+      "acceptance": "冻结清单 31 件均取得，三次请求与 hash 一致，公开包可迁移",
+      "deps": [],
+      "gap": "31/31、93 条成功记录；不代表实时目录全集",
+      "source": "t01",
+      "decision": ""
+    },
+    {
+      "id": "R22-H",
+      "priority": "P3",
+      "module": "历史验证",
+      "task": "恢复历史运行包并重审可见性",
+      "status": "缺材料",
+      "arrangement": "暂停",
+      "acceptance": "找回 12 次原运行与绑定 dataset，零 API 重审；不能用新运行替代",
+      "deps": [],
+      "gap": "E6-V3 九次、E6-R3 三次原包缺失；不阻断无关工作",
+      "source": "history",
+      "decision": ""
+    },
+    {
+      "id": "14-WATCH",
+      "priority": "P3",
+      "module": "观察与监控",
+      "task": "从业务结论形成 To Watch 清单",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "每个观察项有目的、官方来源、触发条件和证据关联",
+      "deps": [
+        "16-CONSUME",
+        "13-LINKS"
+      ],
+      "gap": "不等同已经启动自动监控",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "14-RUN",
+      "priority": "P3",
+      "module": "观察与监控",
+      "task": "持续跟踪官方更新与变化",
+      "status": "未开始",
+      "arrangement": "暂停",
+      "acceptance": "来源先核验，再按频率采集、去重、识别变化并保存历史",
+      "deps": [
+        "14-WATCH",
+        "DS-03-S10"
+      ],
+      "gap": "官方 blog/新闻优先；非官方高质量数据另定范围",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "15-INDUSTRY",
+      "priority": "P3",
+      "module": "行业扩展",
+      "task": "增加有明确适用边界的行业规则",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "行业规则显式选择，有证据要求/版本/不支持情况；不按公司名触发",
+      "deps": [],
+      "gap": "金融行业/特殊财历等不得静默套用当前范围",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "06",
+      "priority": "P3",
+      "module": "技术选项",
+      "task": "对照 PageIndex 的适用性与成本",
+      "status": "暂停",
+      "arrangement": "暂停",
+      "acceptance": "同冻结材料与问题比较覆盖、出处、聚焦和费用，再决定复用范围",
+      "deps": [],
+      "gap": "已有调研；同输入实测未完成，用户原先要求暂缓",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "03-FORMATS",
+      "priority": "P3",
+      "module": "材料扩展",
+      "task": "支持更多 PDF 扫描页与图片类型",
+      "status": "未验收",
+      "arrangement": "暂停",
+      "acceptance": "新样本逐图/页对照原件，OCR 坐标与语义独立校验、缺口可见",
+      "deps": [],
+      "gap": "已有两图基线；当前 T02 不自动扩大到 OCR",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "02-CALLS",
+      "priority": "P3",
+      "module": "材料扩展",
+      "task": "获取并处理官方电话会文字稿",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "确认官方来源、时间、发言者与段落出处；Prepared/Q&A 边界明确",
+      "deps": [],
+      "gap": "历史需求保留；完整音频/Q&A 不在 DS-02 当前范围",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "02-BLOG",
+      "priority": "P3",
+      "module": "材料扩展",
+      "task": "获取官方产品、新闻与博客材料",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "公司官方归属先校验，按日期/类型入库、去重且可定位片段",
+      "deps": [],
+      "gap": "当前 A01 英文 HTML 年报不代表任意网页均支持",
+      "source": "a01",
+      "decision": ""
+    },
+    {
+      "id": "DS-X01",
+      "priority": "P3",
+      "module": "数据扩展",
+      "task": "加入行情、估值与指数数据",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "先定数据频率、权利、时点与复权/币种口径，再验来源",
+      "deps": [],
+      "gap": "明确放下一阶段，未选定生产数据源",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-X02",
+      "priority": "P3",
+      "module": "数据扩展",
+      "task": "加入非财务运营与产业一手数据",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "每个指标定义、来源、更新时间与可信度可核验",
+      "deps": [],
+      "gap": "销量/订单/产品价格等属后续业务讨论，非既有覆盖承诺",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "DS-X03",
+      "priority": "P3",
+      "module": "数据扩展",
+      "task": "加入一致预期和其他报告制度",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "为不同制度/行业建立显式范围和验收，保留未支持项",
+      "deps": [],
+      "gap": "TSMC 独立分支不追认为 US GAAP 完成",
+      "source": "scope",
+      "decision": ""
+    },
+    {
+      "id": "11-MODELS",
+      "priority": "P3",
+      "module": "模型比较",
+      "task": "小步比较模型质量、稳定性与费用",
+      "status": "部分完成",
+      "arrangement": "暂停",
+      "acceptance": "同输入/配置/标准独立运行；质量先行，计入失败/unknown，避免无变化重跑",
+      "deps": [
+        "11-GOLD"
+      ],
+      "gap": "已有对照；Qwen/DeepSeek 等后续先核对适配，不用 MiniMax",
+      "source": "todo",
+      "decision": ""
+    },
+    {
+      "id": "16-RISK",
+      "priority": "P3",
+      "module": "后续 Agent",
+      "task": "定义风险分析 Agent 的最小任务",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "明确用户问题、输入、输出与验收，再决定技术方案",
+      "deps": [],
+      "gap": "来自用户历史需求；当前未形成已验收实现",
+      "source": "map",
+      "decision": ""
+    },
+    {
+      "id": "16-PORTFOLIO",
+      "priority": "P3",
+      "module": "后续 Agent",
+      "task": "定义组合 Agent 与账户数据边界",
+      "status": "待定义",
+      "arrangement": "暂停",
+      "acceptance": "明确分析/模拟/交易边界及数据权限；未授权不操作账户",
+      "deps": [],
+      "gap": "来自用户历史需求；雪盈账户接口调研不等于接入完成",
+      "source": "source",
+      "decision": ""
+    }
+  ]
+}
