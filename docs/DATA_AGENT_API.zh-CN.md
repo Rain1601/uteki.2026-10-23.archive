@@ -1,10 +1,12 @@
 # Data Agent 接口契约
 
-日期：2026-10-14 · 版本：v0.3 · 状态：设计稿，待 review，尚未实现或联调。
+日期：2026-10-14 · 版本：v0.4 · 状态：设计稿，五项契约修订待 review，尚未实现或联调。
 
 本文件定义 Data 能力的全部对外与内部接口：请求上下文、6 个数据工具、模型可见输出、交付包、内部组件接口及 MCP 映射。职责与流程见[核心设计](DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md)第 7 节，技术方案见第 14 节；本文件只维护接口细节。
 
 **相对 v0.2 的变化：**按已确认的 A5（单进程库，不建 HTTP 服务），删除 HTTP 路由与状态码映射，改为 Python 进程内调用与 MCP 两种传输；`find_assets` 保留 v0.2 的字段与边界规则，增加证券代码解析与版本呈现规则；补齐其余 5 个工具、`create_context` 与交付包。
+
+**相对 v0.3 的变化：**补齐需求计划登记、统一结果引用、build 身份与完整输入、发布能力与实时能力、澄清返回与继续上下文五项契约；对应核心设计第 14.15 节的两条文档走查。此次仅修订设计，不表示通过实跑验收。
 
 所有示例中的公司、期间、ID、URL 与数值均为虚构，不是公司事实或实跑结果。
 
@@ -29,7 +31,7 @@
 
 ### 0.3 共同响应信封
 
-除 `create_context` 与 `run_query` 外，每个工具的响应都使用：
+六个数据工具的响应使用下列信封；`create_context` 使用第 1 节响应，`run_query` 及其 clarify / deliver 控制分支使用第 9 节返回类型：
 
 | 字段 | 类型 | 规则 |
 |---|---|---|
@@ -54,6 +56,13 @@
 - 四个字段共同固定“哪份材料、哪次原件、哪种表现形式、哪个处理版本”。读取工具只接受完整引用，不隐式跳到最新版本。
 - 只有原件、尚无 published build 时 `build_id=null`；此时读取正文的工具返回 `BUILD_NOT_READY`，不代为启动处理。
 - 块、章节、表格、图片、记录的 ID 只在所属 build 内唯一，必须与 `AssetRef` 一起使用。
+
+**可交付引用 `ResultRef`：**`{run_id, operation_id, kind: evidence / record / calculation, item_id}`。它定位一次工具调用实际交给模型的结果，不代替 `AssetRef` 或原文地址。`item_id` 分别取 `evidence_id`、`record_id`、`calc_id`；操作 ID 消除不同查询中的同名计算歧义，资产引用仍保存在被引用条目中。
+
+- `search_asset` 返回的原文、`read_evidence` 证据、`query_records` 记录与计算共用该引用。仅有命中位置、目录摘要、模型生成摘要时，不登记为原文证据。
+- 宿主在格式化后登记实际展示的内容与范围，保存 `result_ref`、完整 `asset_ref`、locator、截断状态及依赖引用。保存在程序侧但未展示的内容不可用于交付；模板再次缩短片段时，登记的证据也必须缩短到实际展示范围。
+- 模型使用 `result_refs` 引用登记结果；宿主校验运行归属、类型、条目存在及范围。Data Agent 交付只接受当前运行登记的引用。外部直接读取使用宿主分配的读取运行 ID，不能将这些引用直接带入另一次 `run_query` 交付。
+- 计算引用所需的原始记录、证据所需的上下文均作为依赖登记，交付时递归纳入。引用存在只证明读过该范围，不证明足以支持需求。
 
 ### 0.5 时间与期间
 
@@ -89,7 +98,7 @@
 
 ### 0.8 分页与游标
 
-- 游标是不透明字符串，绑定：上下文、工具名、全部请求参数（游标本身除外）、目录或 build 版本、`limit`。翻页时只替换 `cursor`，其余参数必须原样不变，否则报 `CURSOR_MISMATCH`。
+- 游标是不透明字符串，绑定：上下文、工具名、全部业务请求参数（游标本身除外）、目录或 build 版本、`limit`。翻页时只替换 `cursor`，其余业务参数必须原样不变，否则报 `CURSOR_MISMATCH`；运行时公共参数 `state` 不参与绑定，可以随轮次更新。
 - 目录或版本已无法重现旧视图时报 `CURSOR_EXPIRED`，不改用最新内容。
 - 同分结果按完整引用固定排序，保证翻页不重不漏。
 
@@ -98,6 +107,9 @@
 | code | 含义 |
 |---|---|
 | `INVALID_REQUEST` | 参数缺失、类型错误、取值越界、未知字段、时间格式错误 |
+| `PLAN_VERSION_MISMATCH` | `plan_update.base_version` 不等于当前已登记计划版本 |
+| `RESULT_REF_INVALID` | 引用未登记、类型不符、属于其他运行或未实际展示 |
+| `CLARIFICATION_MISMATCH` | 澄清 ID 与前序上下文不对应，或同一澄清已有不同的后继上下文 |
 | `CONTEXT_NOT_FOUND` | `context_ref` 不存在或调用方无权使用 |
 | `SCOPE_DENIED` | 请求超出上下文的主体、来源、截止日或权限边界 |
 | `ENTITY_NOT_FOUND` | 名称或代码在已登记目录中找不到 |
@@ -116,7 +128,7 @@
 
 ## 1 `create_context`：建立请求上下文
 
-上下文一经建立不可修改；需要改变范围时新建上下文，并用 `revises_context_ref` 关联。
+上下文一经建立不可修改；需要澄清或改变范围时新建上下文，并用 `revises_context_ref` 关联。原始问题与回答分别保存，不能用回答覆盖原问题。
 
 ### Request
 
@@ -124,6 +136,8 @@
 |---|---|---|---|
 | `question` | string | 是 | 原始问题，原样保存 |
 | `caller` | object | 是 | `{kind: user / analysis_agent, prior_delivery_refs: []}`；补数时引用原交付包 |
+| `revises_context_ref` | string | 否 | 被补充或修订的上下文；继续同一任务时必填，宿主据此继承根运行与账本 |
+| `clarification_response` | object | 否 | `{clarification_id, answer}`；回答第 9.1 节澄清时必填，且必须同时给出匹配的 `revises_context_ref` |
 | `entities` | object | 否 | `company_ids`、`company_names`、`securities: [{ticker, exchange_mic?}]` 任选；全部在已登记目录中解析 |
 | `periods` | FiscalPeriod[] 或日期区间 | 否 | 显式期间；相对时间（如“去年”）不在此解析，由 Data Agent 结合 `clock` 澄清后填写 |
 | `as_of` | datetime | 否 | 历史可得截止时间；省略表示不做历史截止日限制 |
@@ -136,12 +150,21 @@
 | 字段 | 说明 |
 |---|---|
 | `context_ref` | `req_` 标识 |
-| `clock` | 建立上下文的时刻（带时区），相对时间以此为准 |
+| `clock` | 原任务建立上下文的时刻（带时区），相对时间以此为准；继续时继承 |
+| `created_at` | 本上下文实际登记时刻（带时区） |
 | `resolved_entities` | 每项含输入值、`company_id`、规范名称及匹配的证券（`security_id`、ticker、MIC、share_class、有效期） |
 | `unresolved` | 未能解析的输入及原因；存在歧义时直接报 `ENTITY_AMBIGUOUS`，不建立上下文 |
 | `effective_policy` | 实际生效的来源、扩展和运行策略 |
+| `continuation` | 首次为 null；继续时为 `{revises_context_ref, prior_run_id, root_run_id, clarification_id}`；非澄清修订的 `clarification_id` 为 null，归属由宿主解析 |
 
 证券代码按 `clock` 或 `as_of` 时点解析；一个公司有多个证券时全部列出，并保留用户原始输入的证券，供后续股价、每股指标类问题使用。
+
+**澄清后继续：**调用方重传完整上下文字段，`question` 保留原始问题，回答写入 `clarification_response`，已澄清的主体、期间等写入对应字段。宿主校验字段类型、身份/期间依据及原边界；回答原文留存，不声称程序已验证任意自然语言与字段的语义一致性。缺少可验证字段时不猜测填充，后续运行仍可返回澄清或缺口。`clock` 沿用原任务的解释时点，新的登记时间另记 `created_at`，避免跨日回答使“去年”漂移。
+
+- 澄清只补明未决值或收紧范围，不自行扩大主体、来源或截止日边界；扩大范围须有调用方的明确授权，不能仅由模型的澄清请求授权。
+- 同一任务的修订/补数继续使用原 `root_run_id`。`run_policy` 各上限只能相同或更紧；已用费用、未知预留、轮数、连续无进展计数与已用执行时间继续累计，等待人工回答的时间不计入执行时间。剩余额度由根账本计算，不把新上下文的上限当作新增额度；未知费用先对账。
+- 同一个 `clarification_id` 最多关联一个后继上下文；完全相同的重复提交返回原后继引用，改变答案的重复提交报 `CLARIFICATION_MISMATCH`，避免响应丢失造成重复继续。
+- 前序需求计划及历史传入后继运行；旧结果只作追溯入口。新运行使用旧证据前，须按固定资产引用重新读取或查询并通过新上下文范围检查，生成本运行的 `ResultRef`，不复制旧的“已满足”状态。
 
 ## 2 `find_assets`：找资产
 
@@ -160,7 +183,13 @@
   "as_of": null,
   "limit": 10,
   "cursor": null,
-  "state": {"...": "第 8.1 节公共参数"}
+  "state": {
+    "plan_update": {"base_version": 0, "needs": [{"need_id": "need-1", "description": "取得 FY2025 收入及原文依据", "required": true}]},
+    "satisfied": [],
+    "gaps": [{"need_id": "need-1", "missing": "尚未查找资产", "result_refs": []}],
+    "next_action": "find_assets",
+    "reason": "先定位所需年报"
+  }
 }
 ```
 
@@ -235,14 +264,14 @@
 
 ## 3 `get_asset_schema`：获取资产说明与读取入口
 
-返回选中资产指定版本的说明，对应核心设计第 7.2.2 节的九类信息；正文由后续工具读取。说明来自该 build 发布时生成的 `asset-schema.json`，查询时不重新生成。
+返回选中资产指定版本的说明，对应核心设计第 7.2.2 节的九类信息；正文由后续工具读取。内容说明来自该 build 发布时生成的 `asset-schema.json`，查询时不重新生成。宿主另查询派生索引的当前状态，合成实时 `readiness` 与 `capabilities`；不改写冻结文件。
 
 ### Request
 
 | 字段 | 类型 | 必填 | 规则 |
 |---|---|---|---|
 | `asset_ref` | AssetRef | 是 | 完整引用 |
-| `facets` | string[] | 否 | `overview / outline / fields / concepts / coverage / readiness / capabilities`；省略时返回 `overview`、`readiness`、`capabilities` 与一级 `outline` 或 `fields` 摘要 |
+| `facets` | string[] | 否 | `overview / outline / fields / concepts / coverage / readiness / capabilities`；readiness 同时返回内容/发布/当前状态及 availability。省略时返回 overview、readiness、capabilities 与一级 outline 或 fields 摘要 |
 | `outline` | object | 否 | `{parent_section_id: null 或 ID, depth: 1–3}`，用于展开目录 |
 | `field_group` | string | 否 | dataset 的字段组展开 |
 | `limit`、`cursor` | | 否 | 目录节点或字段的分页 |
@@ -252,12 +281,16 @@
 | 字段组 | 内容 |
 |---|---|
 | `overview` | 标题、语言、`asset_ref`、来源（发布方、平台、原始链接）、类型（资产类别 / 材料类型 / 表现形式）、关联公司及角色、时间（报告期间、内容期间、发布、获取、可得及依据）、派生内容概述（标注生成方式与版本） |
-| `readiness` | 0.7 中各能力的状态，及未完成位置 |
+| `content_readiness`、`published_readiness` | 冻结内容的能力上限、发布时内容与派生层合成的状态；均取自冻结说明 |
+| `readiness` | 当前有效状态及未完成位置；内容可用且所需派生层可用时才可宣告 ready，规则见核心设计 14.5 |
+| `availability` | `{observed_at, derived_indexes: [{kind, backend_version, status, file_sha256}]}`；记录此次状态依据，缺失或校验失败附 issue |
 | `capabilities` | 可用的工具与模式，如 `search_asset.outline`、`search_asset.text`、`search_asset.concept`、`read_evidence`、`query_records` |
 | `outline`（document） | 节点 `{section_id, title_raw, canonical_section, mapping_status: explicit / inferred / unmatched, origin: source / inferred, child_count, block_count, page_range}`；含显式的“未归属块”节点 |
 | `fields`（dataset） | `{name, type, concept_id, unit, period_semantics: instant / duration, nullable_meaning, dimensions}`、允许的过滤与计算、分片与版本一致性状态 |
 | `concepts` | 已标注概念、角色、目标数；附概念标注的覆盖范围 |
 | `coverage` | 已处理与未处理范围：未读图片、失败表格、OCR 未处理页、未分类块等 |
+
+以下为内容字段节选，完整响应还含上述发布状态与实时状态依据：
 
 ```json
 {
@@ -273,7 +306,9 @@
 }
 ```
 
-`concepts` 只统计已建立的标注；未命中不表示材料未披露。没有 `query_records` 能力意味着表格未经结构化，不能当作标准化指标表查询。
+`concepts` 只统计已建立的标注；未命中不表示材料未披露。是否有结构化记录由 content_readiness 判定，当前没有 `query_records` 入口也可能只是派生视图失效，须结合缺口原因判断。
+
+`find_assets` 与读取工具使用同一有效能力规则。索引在两次调用间失效时，读取工具重新检查并报 `BUILD_NOT_READY` 及具体 issue；不得沿用旧说明宣告可用，也不静默切换到新 build。`content_readiness.records=not_applicable` 表示没有记录能力，报 `CAPABILITY_UNSUPPORTED`；已有记录但派生视图不可用属于暂不可读，两者区分。
 
 ## 4 `search_asset`：在资产内定位
 
@@ -305,8 +340,11 @@
 | `snippet` | `{text, truncated}`；只在请求时返回 |
 | `attached` | 请求的附带内容 `[{role: section_title / table_header / units, block_id, text}]` |
 | `text_origin` | `text_layer / ocr / table / caption` |
+| `evidence` | 实际返回原文时为第 5 节证据项数组（含 `result_ref`）；仅位置提示时为空。片段与附带上下文各自保留精确 locator、角色和截断状态 |
 
 `coverage`：`{status, blocks_searched, not_searched: [{reason, count, section_ids}]}`；concept 模式另含 `{annotated_blocks, unannotated_blocks}`。命中只是候选，不是答案；附带内容按 `attached` 的角色标出，不伪装成直接命中。片段与附带内容足以判断时，Data Agent 可以不再调用 `read_evidence`（核心设计 7.2.3）。
+
+`hit_id` 只作导航；可交付的是 `evidence[].result_ref`。截断片段只证明实际展示的范围，省略号不映射为原文；多个不连续片段分别登记。必要上下文作为独立证据项返回并写入目标证据的 `dependency_refs`，不把附带内容算成直接命中。
 
 ## 5 `read_evidence`：读取原文与上下文
 
@@ -327,7 +365,10 @@
 
 | 字段 | 说明 |
 |---|---|
-| `evidence_id` | 本次运行内唯一（如 `e-0007`，不同于元数据依据的 `ev_` ID）；交付时只能引用这里返回过的 ID |
+| `evidence_id` | 本次运行内唯一（如 `e-0007`，不同于元数据依据的 `ev_` ID）；`search_asset` 与 `read_evidence` 共用宿主登记机制 |
+| `result_ref` | 第 0.4 节的 `ResultRef`，kind=evidence；由宿主分配，不由模型填写内容 |
+| `asset_ref` | 证据所属的完整资产版本引用 |
+| `dependency_refs` | 此证据所需上下文的证据引用；无依赖时为空，引用闭包不得有环 |
 | `role` | `target` 或 `context`；context 附 `context_of`（对应目标）与 `context_kind` |
 | `kind` | `text / table / image / record` |
 | `content` | text：`{text}`；table：`{cell_fields, rows, spans, header_rows}`；image：`{media_type, width, height, image}`（MCP 中以图像内容块传递）；record：见第 6 节 |
@@ -339,7 +380,7 @@
 
 ## 6 `query_records`：查询结构化记录
 
-只适用于 `readiness.records` 为 `ready` 或 `partial` 的资产，例如带 iXBRL 记录的申报文件或 companyfacts 数据集；其他资产报 `CAPABILITY_UNSUPPORTED`。
+只适用于有效 `readiness.records` 为 `ready` 或 `partial` 的资产，例如带 iXBRL 记录的申报文件或 companyfacts 数据集。原本无记录能力时报 `CAPABILITY_UNSUPPORTED`；有内容但派生视图暂不可用时报 `BUILD_NOT_READY`。
 
 ### Request
 
@@ -353,6 +394,8 @@
 | `limit`、`cursor` | | 否 | limit 1–200，默认 50 |
 
 ### Response item（记录）
+
+每条记录还必须带 `asset_ref` 与 kind=record 的 `result_ref`；以下为业务字段节选：
 
 ```json
 {
@@ -371,7 +414,11 @@
 }
 ```
 
-计算结果单列：`{calc_id, formula, operand_record_ids, value, unit, limitations}`。零基数、单位或口径不一致时不硬算，返回 `limitations` 与 issue。`null` 与 `"0"` 严格区分；同一事实在多份材料重复出现时保留各自记录，不重复累计。查询由类型化请求编译为参数化查询，不接受任意 SQL。
+响应在共同信封之外增加 `calculations` 和 `supporting_records` 数组。计算结果为 `{calc_id, result_ref, formula, operand_refs, value, unit, limitations}`，其中 kind=calculation，`operand_refs` 是本次操作中实际返回的记录引用；不使用跨 build 含义不明的裸记录 ID。
+
+计算所需的记录即使不在当前结果页，也必须在 `supporting_records` 中带完整记录、资产引用与 locator 返回并展示。`items` 与 `supporting_records` 合计仍受请求 `limit` 与展示预算限制；依赖超限时不返回该计算，给出 `partial` 与 `CALC_DEPENDENCIES_TOO_LARGE` issue，提示缩小计算范围。不能返回数值却隐藏其依赖。零基数、单位或口径不一致时不硬算，返回 `value=null`、`limitations` 与 issue，该结果不能支持“已取得有效计算值”的声明。
+
+`null` 与 `"0"` 严格区分；同一事实在多份材料重复出现时保留各自记录，不重复累计。查询由类型化请求编译为参数化查询，不接受任意 SQL。`deliver` 可直接引用记录和计算的 `result_ref`，无需再调 `read_evidence` 换取另一种 ID。
 
 ## 7 `request_asset_update`：补获取或补处理
 
@@ -408,27 +455,43 @@ Data Agent 内部的补数入口（核心设计第 8.2 节），把请求交给�
 
 ### 8.1 公共参数 `state`
 
-Data Agent 每次工具调用都携带 `state`，对应核心设计第 9.2 节的四项任务状态：
+Data Agent 每次工具调用都携带 `state`，包含核心设计第 9.2 节的四项任务状态，以及可选的需求计划更新 `plan_update`。新任务的计划版本为 0、无需求；第一次调用必须提交非空计划，可以和第一次 `find_assets` 或 `clarify` 在同一次调用中完成：
 
 ```json
 {
-  "satisfied": [{"need_id": "need-1", "evidence_ids": ["e-0007"]}],
-  "gaps": [{"need_id": "need-2", "missing": "管理层对 FY2025 收入变化的解释"}],
-  "next_action": "search_asset",
-  "reason": "需求 2 尚无证据；同一份 10-K 的 MD&A 章节可能包含相关说明"
+  "plan_update": {
+    "base_version": 0,
+    "needs": [
+      {"need_id": "need-1", "description": "FY2024 与 FY2025 同口径收入及增长率", "required": true},
+      {"need_id": "need-2", "description": "管理层对 FY2025 收入变化的解释", "required": true}
+    ]
+  },
+  "satisfied": [],
+  "gaps": [
+    {"need_id": "need-1", "missing": "尚未取得两年收入及计算", "result_refs": []},
+    {"need_id": "need-2", "missing": "尚未取得管理层解释", "result_refs": []}
+  ],
+  "next_action": "find_assets",
+  "reason": "先查找相关期间的年报"
 }
 ```
 
-运行框架校验 `need_id` 与 `evidence_id` 都存在，并把 `state` 保存到运行记录；`state` 不进入工具的业务参数。
+后续 `satisfied` 的条目为 `{need_id, result_refs}`，引用至少一项已登记结果；`gaps` 的条目为 `{need_id, missing, result_refs}`，可附已取得的部分结果。当前计划的每项需求恰好出现在二者之一；部分满足仍放在 gaps 中。`next_action` 必须等于本次调用工具名。
+
+**接收顺序：**先校验请求形状与计划 `base_version` → 以候选计划校验所有需求引用与当前运行的结果引用 → 校验本工具参数、范围与预算 → 将计划更新和 state 一起接受并写入记录 → 执行工具。校验失败时不接受任何计划或 state 变化、不执行工具；工具执行失败仍保留已接受计划和错误。状态引用的是本次调用之前已返回的结果，不能预先引用尚未产生的结果。
+
+- `plan_update` 提交完整需求清单；接受后版本加 1，保存旧版与 `reason`。同一上下文内已有 need_id 的 description 与 required 固定，不能删除；程序按字段相等校验，避免依赖对“是否缩小原需求”的语义猜测。可添加细化需求并保留原需求；确需更改问题范围，经第 1 节上下文修订并保留历史。
+- 澄清后从前序已登记版本继续，更新时 `base_version` 不是 0；期间等澄清绑定保存在新上下文，需求 ID 不因继续而重置。旧结果未在新运行读取前，相关需求进入 gaps。
+- 不更新计划时省略 `plan_update`。`state` 由运行框架消费，不进入工具业务参数或分页游标。未知 need_id 报 `INVALID_REQUEST`，无效结果引用报 `RESULT_REF_INVALID`；不能从一句 `reason` 隐式新建需求。
 
 ### 8.2 控制工具
 
 | 工具 | 参数 | 效果 |
 |---|---|---|
-| `clarify` | `question`、`blocking_need_ids`、`state` | 运行状态变为 `needs_clarification`，问题返回调用方；调用方回答后新建上下文继续 |
-| `deliver` | `needs: [{need_id, status, evidence_ids, note}]`、`stop_reason`、`state` | 程序按第 9 节组装交付包；引用了未返回过的证据时拒绝并要求修正 |
+| `clarify` | `question`、`blocking_need_ids`、`state` | 运行状态变为 `needs_clarification`，返回第 9.1 节的澄清分支；调用方按第 1 节新建继续上下文 |
+| `deliver` | `needs: [{need_id, status, result_refs, gaps, note}]`、`conflicts: [{need_id, result_refs, description}]`、`stop_reason`、`state` | 程序按第 9 节组装交付包；引用未登记结果时拒绝，预算尚允许时可修正 |
 
-需求计划由 Data Agent 在首轮通过 `state` 提出，后续修订需在 `reason` 中说明；删除未满足的需求不能让覆盖变为完整。
+`deliver.needs` 必须逐项覆盖已登记计划，且与 state 一致；supported 必须有结果引用且无该项缺口，partial / unresolved 必须说明缺口。冲突涉及的结果也必须已登记；未解决且影响需求的冲突不能同时声明该需求 supported。结构检查不代替模型的业务充分性判断。模型主动交付时 `stop_reason=delivered`；其余停止原因由宿主设置，模型不能冒填。
 
 ### 8.3 输出模板与长度预算
 
@@ -440,7 +503,7 @@ Data Agent 每次工具调用都携带 `state`，对应核心设计第 9.2 节�
 | `get_asset_schema` | 概览加不超过 40 个目录节点或字段 |
 | `search_asset` | 8 个命中，每个片段不超过 300 字符 |
 | `read_evidence` | 遵循请求的 `max_bytes`，默认 24,000 字节 |
-| `query_records` | 50 条记录；计算结果全部展示 |
+| `query_records` | 共 50 条记录（含计算依赖）；只展示依赖已完整展示的计算 |
 
 `find_assets` 输出示例：
 
@@ -457,32 +520,45 @@ issues: 无
 
 截断、分页和执行不完整分别写明；未展示的候选不能当作已读，首屏不能冒充全部结果。
 
+凡可用于交付的展示条目都附 `result_ref`，上下文与计算依赖一并展示并登记；保存在完整响应但未展示的条目不能引用。更大的显式请求在展示预算不足时必须返回可继续读取的范围/游标，不能用下一页游标跳过本页被隐藏的条目。
+
 ## 9 `run_query` 与交付包
 
 ### 9.1 `run_query`
 
-`DataService.run_query(context_ref) -> DeliveryPackage`：在给定上下文中运行 Data Agent，直至交付、需要澄清、取消或达到停止条件。调用方可以中途取消；取消后返回已确认部分与 `stop_reason=cancelled`。
+`DataService.run_query(context_ref) -> RunQueryResult`：在给定上下文中运行 Data Agent，直至交付、需要澄清、取消或达到停止条件。Python 与 MCP 使用相同的带 `kind` 联合返回类型：
+
+| kind | 字段 | 含义 |
+|---|---|---|
+| `delivery` | `delivery: DeliveryPackage` | 正常交付或宿主因停止条件强制组装的部分交付 |
+| `needs_clarification` | `clarification: ClarificationRequest` | 返回问题并结束当前执行，不伪装成完成交付 |
+
+`ClarificationRequest` 包含 `{clarification_id, context_ref, run_id, root_run_id, question, blocking_need_ids, needs_plan, state, usage, remaining_budget, created_at}`。`clarification_id` 使用 `cl_` 系统 ID；usage 为根任务累计用量，remaining_budget 为扣除已结算、预留及未知费用后的余额。宿主冻结该记录；调用方得到问题后，按第 1 节提交回答和原上下文引用，再调用 `run_query(new_context_ref)`。不另增模型工具或自动后台等待。
+
+`context_ref` 与查询运行一一对应：重复调用正在执行的上下文时，同步等待同一执行并返回同一结果；已结束的返回已保存的 `RunQueryResult`，不重复发起模型调用。澄清后通过新上下文创建新的运行。
+
+取消、预算、轮数或时间耗尽时返回 kind=delivery，停止原因由宿主填写。强制交付不额外调用模型：复制最近一次已校验状态及引用；尚未经过下一轮判断的新工具结果不自动算作 supported，未确认部分列为缺口。若首轮计划尚未登记，宿主只以原始问题创建一项 unresolved 需求，标明“停止前尚未完成需求拆解”，不生成事实或满足声明。
 
 ### 9.2 `DeliveryPackage`
 
 | 字段 | 说明 |
 |---|---|
 | `delivery_id` | `dl_` 标识 |
-| `context_ref`、`run_id` | 对应的上下文与运行 |
+| `context_ref`、`run_id`、`root_run_id` | 对应的上下文、本次运行与累计预算所属根运行 |
 | `prior_delivery_refs` | 补数时引用的原交付包 |
 | `needs_plan` | `{version, needs: [{need_id, description, required}]}`，含修订历史引用 |
-| `needs` | `[{need_id, status, evidence_ids, gaps, note}]`；`note` 标为模型说明 |
+| `needs` | `[{need_id, status, result_refs, gaps, note}]`；`note` 标为模型说明；宿主强制停止的说明标为程序生成 |
 | `evidence` | 被引用的证据项（第 5 节结构），每项含 `asset_ref` 与 `locator` |
 | `records`、`calculations` | 被引用的记录与计算（第 6 节结构） |
 | `assets_used` | 实际使用的 `asset_ref` 列表，均已冻结 |
-| `conflicts` | `[{need_id, evidence_ids, description}]`；未解决的冲突并列呈现 |
+| `conflicts` | `[{need_id, result_refs, description}]`；未解决的冲突并列呈现 |
 | `gaps` | 未满足的缺口与原因 |
 | `search_log_ref` | 本次运行的工具调用记录位置 |
-| `usage` | `{model_calls, cost_usd, unknown_cost_reserved_usd, wall_seconds}` |
+| `usage` | `{model_calls, cost_usd, unknown_cost_reserved_usd, wall_seconds}`；均为根任务累计值，单次明细见运行记录；wall_seconds 为执行时间，不含等待澄清回答 |
 | `stop_reason` | `delivered / budget_exhausted / max_turns / no_progress / wall_time / cancelled` |
 | `created_at` | 系统时间 |
 
-**闭包规则：**`needs` 引用的每个证据、记录和计算都必须在 `evidence`、`records`、`calculations` 中出现，并来自本次运行的工具结果；它们引用的每个 `asset_ref` 都在 `assets_used` 中。交付包写入后不可修改，新的补充生成新的交付包。
+**闭包规则：**以 `needs` 与 `conflicts` 的 `result_refs` 为起点，递归纳入证据的 `dependency_refs` 与计算的 `operand_refs`；每个条目按 kind 放入 `evidence`、`records` 或 `calculations`，保留原 `result_ref`。所有引用必须来自本运行实际展示的工具结果，不得悬空、循环或引用旧运行；每个原始证据/记录的 `asset_ref` 都须出现在 `assets_used`。原文、数值、公式和依赖由程序从登记结果复制，模型不提交替代数值。交付包写入后不可修改，新的补充生成新的交付包。
 
 ## 10 内部组件接口
 
@@ -493,7 +569,8 @@ class CatalogRepository(Protocol):
     def resolve_entities(self, names: list[str], securities: list[SecurityQuery], at: datetime) -> EntityResolution: ...
     def search_assets(self, ctx: RequestContext, req: FindAssetsRequest) -> FindAssetsResponse: ...
     def get_build(self, ref: AssetRef) -> BuildRecord: ...
-    def begin_build(self, key: BuildKey, job_id: str) -> BuildRecord: ...        # 唯一约束即并发锁
+    def begin_build(self, spec: BuildSpec, job_id: str, retry_of_build_id: str | None = None) -> BuildRecord: ...
+    # BuildSpec 含资产/快照/表现形式、完整输入清单 hash 与处理配方；仓储计算 build_key，按有效行部分唯一约束复用或登记
     def publish_build(self, build_id: str, manifest_sha256: str, readiness: Readiness) -> None: ...  # 单事务
     def fail_build(self, build_id: str, failure_code: str) -> None: ...
     def freeze_snapshot(self, snapshot_id: str, manifest_sha256: str) -> None: ...
@@ -531,6 +608,8 @@ class ModelClient(Protocol):
 - `ContentIndex` 的所有实现（FTS5 基线、PageIndex、OpenAI 文件检索）返回同一种 `SearchPage`，命中必须映射到 build 内的块 ID 与 locator；映射失败的命中进入 issues。
 - `SourceConnector.fetch` 对重定向目标与附件逐个重新检查策略；被拒绝时返回 `denied_by_policy`，不抛出静默异常。
 - `BuildStage` 不直接写 SQLite；状态变更由管线编排器经 `CatalogRepository` 完成，保证发布协议只有一个入口。
+- `begin_build` 必须校验版本归属、完整输入清单与 build_key；不同快照即使主对象字节相同也分别登记。已有 staging 返回同一任务，published 返回同一 build，failed 仅在显式重试授权内新建并保留旧记录；具体约束见核心设计 14.4。
+- `publish_build` 在最终说明/manifest 复验后调用，readiness 必须等于冻结说明的 published_readiness。查询端将 content_readiness 与派生层当前状态合成有效能力，不回写冻结文件；见核心设计 14.5。
 
 ## 11 MCP v2 映射
 

@@ -1,6 +1,6 @@
 # Data Agent 与分析 Agent：数据能力框架设计
 
-日期：2026-10-14 · 版本：设计稿 v1.5 · **状态：第 3.1 节系统架构与 A1–A9 已确认；第 14 节技术方案 v1 与接口契约 v0.3 待用户 review；第 3 节四类一级功能及关系图、首期输入范围、材料资产与查询主流程、第 7.2.1 节找资产流程、第 7.2.2 节获取资产的输出边界、说明信息含义与内部职责、第 7.2.3 节定位与读取的衔接原则，以及第 8–11 节的执行边界（含第 9.2 节自主判断与状态更新机制）已确认；当前进入具体技术实现的设计讨论，其余字段、工具与验收细化仍待 review，功能开发暂停**。
+日期：2026-10-14 · 版本：设计稿 v1.6 · **状态：第 3.1 节系统架构与 A1–A9 已确认；第 14 节技术方案 v1.1 与接口契约 v0.4 待用户 review；第 3 节四类一级功能及关系图、首期输入范围、材料资产与查询主流程、第 7.2.1 节找资产流程、第 7.2.2 节获取资产的输出边界、说明信息含义与内部职责、第 7.2.3 节定位与读取的衔接原则，以及第 8–11 节的执行边界（含第 9.2 节自主判断与状态更新机制）已确认；当前进入具体技术实现的设计讨论，其余字段、工具与验收细化仍待 review，功能开发暂停**。
 
 本文整理已讨论的职责与建议设计，不新增业务范围授权，不宣称目标框架全部实现。公司、年份和单次实验属于验收案例，不成为通用规则。DA-01 获取与储存、DA-02 解析与索引、DA-03 查询与材料交付作为模块 ID 保留。当前唯一任务是核对本文的方案与设计，其他文档暂不读取。
 
@@ -677,7 +677,7 @@ schema 是资产的使用说明，不只是数据库字段表。PDF/HTML 提供�
 
 ### 7.2 最小工具契约（提案）
 
-具体方法、request 与 response 独立维护于[Data Agent 接口契约](DATA_AGENT_API.zh-CN.md)，v0.3 已覆盖全部工具（待 review）。第 7.2.1 节记录已确认的找资产流程与职责，第 7.2.2 节记录已确认的获取资产输出边界，第 7.2.3 节记录定位与读取的衔接原则；接口文档仍需据此分别对齐 Function 参数、执行请求、内部结构和模型可见输出，现有字段草案不因流程确认而一并通过 review。
+具体方法、request 与 response 独立维护于[Data Agent 接口契约](DATA_AGENT_API.zh-CN.md)，v0.4 已覆盖全部工具（待 review）。第 7.2.1 节记录已确认的找资产流程与职责，第 7.2.2 节记录已确认的获取资产输出边界，第 7.2.3 节记录定位与读取的衔接原则；接口文档仍需据此分别对齐 Function 参数、执行请求、内部结构和模型可见输出，现有字段草案不因流程确认而一并通过 review。
 
 保留五个读取工具和一个内部补建设入口；不为每种材料创建一套 Agent 工作流。函数名是提案，正式实现需对照已有工具避免重复。
 
@@ -1123,13 +1123,13 @@ OpenAI 候选包含两种接入方式，先作为同一检索后端的选项记�
 
 设计验收示例：文档问题能定位原段落；数值问题能核对单位和字段；混合问题能组合两类证据；缺数据能补取或说明限制；修改原件/处理器后旧证据仍可复现；同数据复用不重复计数。以上是拟议验收，未在本轮执行。
 
-**架构与技术方案（2026-10-14）：**用户采纳第 3.1 节架构图与 A1–A9；随后要求制定完整技术方案并补充“忽略已有实现，以做对和做好为最终目的”。第 14 节给出技术方案 v1（含 SQLite 逐表字段，承接下段 6.2 字段 review），[接口契约 v0.3](DATA_AGENT_API.zh-CN.md) 覆盖全部工具；两者待 review，开发需单独授权。
+**架构与技术方案（2026-10-14）：**用户采纳第 3.1 节架构图与 A1–A9；随后要求制定完整技术方案并补充“忽略已有实现，以做对和做好为最终目的”。第 14 节给出技术方案 v1.1（含 SQLite 逐表字段，承接下段 6.2 字段 review），[接口契约 v0.4](DATA_AGENT_API.zh-CN.md) 覆盖全部工具；两者待 review，开发需单独授权。
 
-**当前设计进度：**第 3.1 节架构已确认；第 14 节技术方案 v1 与接口契约 v0.3 已写成，待用户 review。review 通过后按第 14.12 节分期申请 M1 实施授权。当前仍为设计阶段：未开发代码、未建库、未接入服务、未调用模型或运行评测；第 14.8 节的 A/B 在对应分期执行，涉及模型或外部付费服务前单独确认额度。
+**当前设计进度：**第 3.1 节架构已确认；第 14 节技术方案 v1.1 与接口契约 v0.4 已完成五项契约修订，并按 14.15 做过两条文档流程走查，待用户 review。review 通过后按第 14.12 节分期申请 M1 实施授权。当前仍为设计阶段：未开发代码、未建库、未接入服务、未调用模型或运行评测；第 14.8 节的 A/B 在对应分期执行，涉及模型或外部付费服务前单独确认额度。
 
-## 14. 技术方案 v1（待 review，2026-10-14）
+## 14. 技术方案 v1.1（五项契约修订待 review，2026-10-14）
 
-**依据与原则：**用户已采纳第 3.1 节架构，要求制定完整技术方案，并补充“忽略已有实现，以做对和做好为最终目的”。因此本节按正确性与质量选型，现有代码只作参考或对照基线（见 3.1.2），不受其约束。本节是待 review 的方案，不代表实现；接口字段见[接口契约 v0.3](DATA_AGENT_API.zh-CN.md)。
+**依据与原则：**用户已采纳第 3.1 节架构，要求制定完整技术方案，并补充“忽略已有实现，以做对和做好为最终目的”。因此本节按正确性与质量选型，现有代码只作参考或对照基线（见 3.1.2），不受其约束。本节是待 review 的方案，不代表实现；接口字段见[接口契约 v0.4](DATA_AGENT_API.zh-CN.md)。2026-10-14 按用户授权修订五项契约缺口，文档走查见 14.15；未开发代码或运行模型评测。
 
 选型按以下优先顺序判断：
 
@@ -1170,14 +1170,17 @@ OpenAI 候选包含两种接入方式，先作为同一检索后端的选项记�
 | `src_` | 来源 | `rp_` | 原件表现形式 |
 | `sr_` | 来源获取记录 | `bd_` | 处理版本（build） |
 | `rev_` | 元数据修订 | `ev_` | 修订依据 |
-| `req_` | 请求上下文 | `run_` | 运行（查询或建设） |
+| `req_` | 请求上下文 | `run_` | 运行（查询、建设或直接读取） |
 | `job_` | 建设任务 | `dl_` | 交付包 |
+| `cl_` | 澄清请求 | | |
 
 build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（如 `blk-000123`），全局引用总是“`asset_ref` + 内部 ID”，不承诺不同 build 间内部 ID 一致。原始字节和产物文件以 sha256 寻址，用于完整性与去重，不代替来源或资产身份。
 
-**时间值 `TemporalValue`：**
+**交付引用 `ResultRef`：**`{run_id, operation_id, kind: evidence / record / calculation, item_id}`，由宿主登记实际展示给模型的工具结果。原文证据与结构化记录保存完整 `asset_ref` 和 locator；计算保存 `operand_refs`，证据保存上下文 `dependency_refs`。搜索片段只有实际返回原文并可定位时才登记为证据；位置、摘要和程序侧未展示结果不算已读。交付递归复制这些引用及其依赖，不要求为了换一种 ID 重复读取同一内容。细节见接口 0.4、4–6、9.2。
 
-```json
+**时间值 `TemporalValue`（以下每行是一个独立示例）：**
+
+```jsonl
 {"value": "2026-02-04T16:05:12-05:00", "precision": "datetime"}
 {"value": "2026-02-04", "precision": "date"}
 {"value": "2026-02", "precision": "month"}
@@ -1215,22 +1218,24 @@ build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（�
       snapshot-manifest.json           来源记录引用、表现形式清单、对象 hash、冻结时间
       representations/<representation_id>.json   格式、主对象 hash、附属资源清单
     builds/<build_id>/
-      manifest.json                    输入引用；处理器、配置、profile、taxonomy 版本；产物清单及 hash
+      manifest.json                    输入引用与完整输入清单 hash；处理器、配置、profile、taxonomy；产物清单及 hash
       sections.jsonl  section-mappings.jsonl  blocks.jsonl
       tables.jsonl  images.jsonl  records.jsonl  annotations.jsonl
       quality.json                     检查结果、覆盖与缺口
-      asset-schema.json                由本 build 生成的资产说明
+      asset-schema.json                冻结内容说明、content_readiness 与 published_readiness
   derived/<build_id>/
     fts.sqlite                         资产内全文与标注索引（可重建）
     records.duckdb                     结构化记录视图（可重建，仅限有记录的 build）
   staging/<job_id>/                    未发布工作区
   runs/<run_id>/
-    request.json  turns.jsonl  tool-calls.jsonl  delivery.json  usage.json
+    request.json  turns.jsonl  tool-calls.jsonl  needs-plan.jsonl  results.jsonl
+    clarification.json  delivery.json  usage.json  result.json
 ```
 
 - 原始对象只写一次：写临时文件 → fsync → 原子 rename；同 hash 已存在时校验字节后复用。
 - build 在 `staging/` 生成，发布时整体 rename 到 `builds/`（同一文件系统内原子），发布后只读。
 - `derived/` 可删除重建；`builds/`、`snapshots/`、`objects/` 和 `runs/` 中被交付引用的内容不随缓存清理。保留期限与删除策略属于第 10 节待设计项，本期不做自动删除。
+- `needs-plan.jsonl` 保留接受的计划修订；`results.jsonl` 保留实际展示的可交付结果及依赖；`clarification.json` 与 `delivery.json` 按实际返回分支生成，`result.json` 保存带 kind 的终态响应。澄清后新运行链接原运行，不覆盖原件或拆分账本。
 
 ### 14.4 SQLite 元数据目录
 
@@ -1326,16 +1331,22 @@ build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（�
 |---|---|---|---|
 | `build_id` | TEXT | 是 | 主键，`bd_` |
 | `snapshot_id`、`representation_id` | TEXT | 是 | 输入原件 |
-| `build_key` | TEXT | 是 | 唯一；sha256(输入对象 hash + 处理器版本 + 配置 hash + profile + taxonomy) |
+| `input_manifest_sha256` | TEXT | 是 | 完整、规范化输入清单的 hash，含主对象、附属资源及缺失记录；定义见下 |
+| `build_key` | TEXT | 是 | sha256(规范化的版本身份、完整输入 hash 与处理配方)；仅 staging / published 行上唯一 |
+| `retry_of_build_id` | TEXT | 否 | 显式重试关联的失败 build；失败记录及产物不覆盖 |
 | `processor_version`、`config_sha256`、`profile_ref`、`taxonomy_ref` | TEXT | 是 | 处理依据 |
 | `status` | TEXT | 是 | `staging / published / failed` |
-| `readiness_json` | TEXT | 是 | 各能力 `ready / partial / not_ready / failed / not_applicable` |
+| `readiness_json` | TEXT | 是 | 发布时状态（published_readiness），发布后不变；状态枚举不变 |
 | `manifest_sha256` | TEXT | 否 | `published` 时必填 |
 | `job_id` | TEXT | 是 | 生成它的建设任务 |
 | `published_at` | 系统时间 | 否 | |
 | `failure_code` | TEXT | 否 | `failed` 时必填 |
 
-**`derived_indexes`**：主键 (`build_id`, `kind`, `backend_version`)；`kind`：`fts / records_duckdb / external:<backend>`；`status`：`ready / failed / stale`；`file_sha256`；`built_at`。
+**build 身份与内容去重：**`build_key` 对命名字段对象作规范化序列化后计算 hash，字段为 `asset_id / snapshot_id / representation_id / input_manifest_sha256 / processor_version / config_sha256 / profile_ref / taxonomy_ref`。配置必须覆盖处理范围（capabilities、targets）、规则及受限模型步骤的模型/提示词版本。输入清单包含主对象 hash，以及按稳定路径或资源键排序的附属资源 hash、冻结 URL 映射和缺失资源原因；HTML 主文件不变但图片变化时，完整输入 hash 必须变化。清单规范化规则自身带版本，禁止用不带字段边界的字符串拼接。
+
+同字节属于不同快照或表现形式时，分别登记 build，原始对象仍按 hash 去重；不跨版本复用带旧资产引用的说明或 locator。数据库用 `UNIQUE(build_key) WHERE status IN ('staging', 'published')` 约束同一身份与配方的有效建设。已有 published 返回该 build，已有 staging 返回任务状态；已有 failed 时不自动重跑，只有显式且符合重试/预算规则的请求才新建 build_id 与 job_id，记录 retry_of_build_id 并校验其指向同一 build_key 的 failed 行。失败历史不占用后续尝试的唯一键，不靠改配置伪装新输入。
+
+**`derived_indexes`**：主键 (`build_id`, `kind`, `backend_version`)；`kind`：`fts / records_duckdb / external:<backend>`；`status`：`ready / failed / stale`；`file_sha256`；`built_at`。不存在的行或文件视为缺失，不能视为 ready；重建状态变化记入发起运行。操作记录保存实际使用的后端版本、hash 与观察时刻。
 
 #### 修订、依据与运行
 
@@ -1343,7 +1354,7 @@ build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（�
 
 **`metadata_evidence`**：`evidence_id` 主键；`revision_id`；`source_id`、`snapshot_id`、`build_id`（可空）；`locator_json`（14.2 的 Locator）；`method`：`source_direct / rule / model`；`method_ref`（规则 ID，或模型名与提示词 hash）；`ref_check`：`valid / invalid / unchecked`；`content_check`：`confirmed / unverified / rejected`；`applicable_scope_json`（业务、地区、期间，可空）。
 
-**`runs`**：`run_id` 主键；`kind`：`query / build`；`parent_run_id`（补数时指向原查询）；`context_ref`；`status`：`running / completed / partial / failed / cancelled / needs_clarification`；`record_dir`；`budget_limit_usd`；`started_at`、`ended_at`。
+**`runs`**：`run_id` 主键；`kind`：`query / build / read`（read 用于外部直接读取的记录归属）；`parent_run_id`（补数或澄清继续时指向前序运行）；`root_run_id`（首次运行指向自身，后续继承）；`context_ref`（query 运行非空，在 kind=query 的行上唯一；read 可复用上下文，重复 run_query 不新开运行）；`status`：`running / completed / partial / failed / cancelled / needs_clarification`；`record_dir`；`budget_limit_usd`；`started_at`、`ended_at`。上下文修订、新 run_id 和等待人工回答均不重置根任务累计费用与运行计数。
 
 **`run_cost_entries`**：`entry_id` 主键；`run_id`（记到根运行，补数与重试不另开账本）；`provider`、`model`；`reserved_usd`、`actual_usd`；`state`：`reserved / settled / unknown`。存在 `unknown` 时，新的付费调用须先对账。
 
@@ -1351,15 +1362,19 @@ build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（�
 
 SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 
-1. **登记任务：**插入 `asset_builds(status=staging)`；`build_key` 唯一约束同时充当并发锁，同一输入与配置已有 `published` build 时直接复用、不重跑。
-2. **生成产物：**全部写入 `staging/<job_id>/`，每个产物登记到 manifest 并计算 sha256。
-3. **校验：**manifest 中的文件存在且 hash 一致；块、章节、表格、标注、locator 之间的引用闭包完整；`asset-schema.json` 声明的能力与 `readiness` 一致。失败则置 `failed` 并保留 staging 内容供诊断。
-4. **构建派生层：**生成 `derived/<build_id>/` 并登记 `derived_indexes`；单项失败只把对应能力降为 `partial` 或 `not_ready`，不阻止发布原件与其他能力。
-5. **移动目录：**staging 整体 rename 到 `builds/<build_id>/`。
-6. **发布事务：**单个 `BEGIN IMMEDIATE` 事务中写入 `manifest_sha256`、`readiness_json`、`published_at`，并将状态置为 `published`。
-7. **崩溃恢复：**启动时扫描 `staging` 状态超时的 build：目录已移动但事务未提交的，重新校验后补完事务或置为 `failed`；孤儿 staging 目录标记为待清理。未发布的 build 对查询始终不可见。
+1. **登记任务：**按 14.4 的完整 build_key 登记 staging；通过部分唯一约束区分 published 复用、staging 已在执行、failed 的显式新尝试，不能将另一快照的 build 当成本次结果。
+2. **生成与初验：**产物写入 `staging/<job_id>/`，校验文件 hash、块/章节/表格/标注/locator 引用闭包，确定不可变内容的 `content_readiness`。失败则置 failed，保留 staging。
+3. **构建派生层：**基于已初验内容生成 `derived/<build_id>/`，校验并登记派生索引；失败或缺失只影响依赖该索引的能力，不阻止其余可用内容发布。
+4. **生成最终说明：**根据内容与派生层结果生成 `asset-schema.json`，同时写入 `content_readiness`、`published_readiness` 和具体缺口；此时才确定最终 manifest 及各产物 hash。
+5. **最终校验与移动：**再检查完整 manifest、引用闭包、说明中的发布能力与拟写入 SQLite 的状态一致；通过后整体 rename 到 `builds/<build_id>/`。若校验失败，保留失败记录，不移动或发布。
+6. **发布事务：**单个 `BEGIN IMMEDIATE` 事务中写入 `manifest_sha256`、与说明一致的 `readiness_json`、`published_at`，并将状态置为 published。
+7. **崩溃恢复：**启动时扫描 staging 状态超时的 build：目录已移动但事务未提交的，按最终 manifest 与冻结说明重新校验后补完事务或置为 failed；恢复时不重写已移动内容，派生索引的新状态按下述实时规则处理。孤儿 staging 目录标记为待清理。未发布 build 对查询不可见。
 
 快照冻结采用同样模式：全部表现形式的对象写入并校验后，单个事务把 `collecting` 置为 `frozen`。查询只读 `frozen` 快照与 `published` build，并在整个运行中固定 `asset_ref`；新 build 发布不影响进行中的查询。
+
+**冻结说明与实时能力：**`content_readiness` 描述该 build 内容能支持什么，`published_readiness` 记录发布时可用状态，二者随说明冻结；SQLite `readiness_json` 保存后者。API 的 `readiness` 与 `capabilities` 则按内容上限和此次检查的派生层状态合成：全文/概念检索依赖显式选择的 ContentIndex 后端（基线为 FTS），结构化查询依赖 records_duckdb，原文读取与原始目录不依赖这些索引。所需索引缺失、failed、stale 或 hash 校验不通过时，对应能力为 not_ready，并返回原因；只有确有可查询的部分覆盖时才用 partial，完全不可用不能写 partial。成功重建可恢复到内容上限，不能提高内容覆盖。
+
+`find_assets`、`get_asset_schema`、实际读取工具共用此规则；每次操作记录 `availability`（观察时刻、后端版本、hash 与状态）。重建不修改冻结说明、原文或旧交付。说明读取后索引再失效，实际读取须返回明确错误，不沿用旧状态、不静默改版本；索引全部失效也不阻断不依赖索引的原文读取。
 
 **版本呈现规则：**系统中不存在隐式的“默认版本”。`find_assets` 对每个（资产、快照、表现形式）返回最新的 published build，同时给出 `other_builds` 计数与修订关系；更早的 build 需显式引用。是否选用修订快照由 Data Agent 依据请求判断，结果包记录实际选择。
 
@@ -1376,9 +1391,9 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 | outline | 程序；推断结构需标注 | 原始目录树 | 推断章节标 `inferred` |
 | annotate | 规则与 XBRL 标签优先，模型受限补充 | 规范章节映射、概念标注 | 未匹配保留 `unclassified` |
 | validate | 程序 | 第 9.1 节格式检查结果 | 不合格产物不进入可用能力 |
-| describe | 程序生成；摘要可由模型生成并标为派生 | `asset-schema.json` | 缺项写入 gaps |
-| derive | 程序 | 派生索引 | 只降级对应能力 |
-| publish | 程序 | 已发布 build | 见 14.5 |
+| derive | 程序 | 派生索引及校验状态 | 只影响依赖该索引的能力 |
+| describe | 程序生成；摘要可由模型生成并标为派生 | 含内容能力与发布能力的最终 `asset-schema.json` | 缺项与派生层失败写入 gaps |
+| publish | 程序 | 最终 manifest 复验通过后的已发布 build | 见 14.5 |
 
 **抓取策略：**`SourcePolicy{allow, deny, redirect: recheck, max_downloads, max_bytes, max_seconds}` 以版本化配置文件管理；每次请求（包括重定向目标和页面中的附件链接）在发出前重新检查，deny 优先。SEC 请求遵守其公平访问要求：声明含联系方式的 User-Agent，并限速。联系方式和账号等凭据只放本机配置，不进仓库。
 
@@ -1443,20 +1458,24 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 
 1. 组装上下文：系统提示词（版本化）、请求上下文、需求计划、当前四项任务状态、最近的工具输出；较早的工具输出压缩为引用，完整结果留在程序侧，模型可通过工具重新读取。
 2. 调用模型：使用**供应商原生工具调用**，`tool_choice` 要求每轮恰好一个工具调用。可用工具：6 个数据工具，加 `clarify`（向调用方澄清关键歧义）与 `deliver`（交付）。
-3. 宿主校验参数（pydantic）、补入上下文、检查策略与预算，执行工具，按第 8 节模板格式化输出后写回对话。
+3. 宿主校验参数（pydantic）、补入上下文；按接口第 8.1 节先校验候选需求计划，再校验 state 与工具参数中的引用及范围/预算。全部校验通过才接受计划与 state，然后执行工具；按接口第 8.3 节模板展示结果，并登记实际展示的可交付 ResultRef。
 4. 记录本轮：工具调用、结果引用、费用写入 `runs/<run_id>/`。
 
-**任务状态：**每个工具调用都带公共参数 `state`，包含第 9.2 节四项状态：已满足的需求、剩余缺口、下一步动作、简短理由。宿主校验状态中引用的需求 ID 与证据 ID 均存在，并保存为可检查记录；不要求也不保存模型私有推理。
+**任务状态与计划入口：**state 保留第 9.2 节四项状态，并增加可选 `plan_update={base_version, needs:[{need_id, description, required}]}`。新任务首次调用必须由版本 0 提交非空计划，可与 find_assets 或 clarify 同轮完成；宿主先以候选计划校验需求引用，不能要求新 ID 预先存在。更新后版本加 1 并保留历史；后续可省略更新。同一上下文内不删除原需求，已有 ID 的 description 与 required 固定并按字段相等校验；细化可添加需求并保留原项，范围改变须修订上下文。校验失败不接受计划/state 或执行工具，执行失败则保留已接受计划和错误。
 
-**停止规则：**最大轮数、预算上限、连续 N 轮没有新增证据、墙钟时间上限、调用方取消。阈值由请求的运行策略显式给出，共享代码不设隐藏默认值；达到条件时，运行框架强制进入交付，交付已确认部分、缺口和停止原因。
+状态用 `result_refs` 关联先前已展示的证据、记录与计算；每项需求在 satisfied 或 gaps 中恰好出现一次，部分满足仍列 gaps，不能提前引用当前尚未执行的工具结果。计划与 state 由运行框架消费，不参与业务查询或游标绑定；不要求也不保存模型私有推理。
 
-**交付：**`deliver` 只提交每项需求的状态（supported / partial / unresolved）、引用的证据 ID 和说明。交付包由程序按引用闭包组装：数值和原文从工具结果中复制，模型文字只进入标注为模型说明的字段；引用了本次运行未返回过的证据时拒绝交付并要求修正。
+**停止规则：**最大轮数、预算上限、连续 N 轮没有新增有效信息、墙钟时间上限、调用方取消。阈值由请求的运行策略显式给出，共享代码不设隐藏默认值；达到条件时，运行框架从最近已校验状态与引用强制组装部分交付，不再调用模型，未判断的新结果不自动变为 supported。首轮计划尚未登记时，仅将原始问题列为 unresolved 并说明未完成拆解。计数在澄清继续后沿用；重复读取并分配新 ResultRef 本身不算新增信息，按完整资产引用、实际范围/内容及计算依赖判断。
+
+**交付：**`deliver` 提交全部已登记需求的状态（supported / partial / unresolved）、result_refs、缺口、冲突与说明。原文搜索、读取、记录查询与计算结果均可直接引用；位置提示和模型摘要不登记为原文证据。程序递归收集证据的上下文依赖与计算的原始记录，将原文、数值和公式从工具登记结果复制到交付包；模型文字只进入标注为模型说明的字段。引用未展示、旧运行、类型不符或悬空依赖时拒绝，预算允许时才能修正；格式有效不等于业务充分。
+
+**澄清与继续：**`run_query` 返回 kind=delivery 或 kind=needs_clarification；后者携带 clarification_id、原问题关联、待澄清问题与需求、计划/state、根任务用量与余额。调用方用 `create_context(revises_context_ref, clarification_response, 完整上下文字段)` 提交回答，再运行新上下文。旧上下文/澄清记录不变，相对时间沿用原 clock；计划与版本历史继承，旧引用须经新运行重新读取和范围检查后才能交付。root_run_id、已用费用、未知预留、轮数、无进展计数与执行时间沿用，人工等待时间不计入执行时间，澄清不增加额度或授权范围。上下文与 query 运行一一对应，重复调用返回同一执行/已存结果；同一澄清的重复相同回答返回原后继上下文，避免重复执行。
 
 **模型接入：**定义 `ModelClient` 接口（消息与工具 schema 输入，单个工具调用与用量输出），按所选供应商分别实现。供应商与模型由配置显式选择（不使用 MiniMax）；费用估算先预留后结算，未知费用计入同一账本。首期每轮只允许一个工具调用，以便状态、预算和失败定位保持简单；独立需求的并行执行留待验证后再加。
 
 ### 14.10 接口层
 
-- **`DataService`（Python）：**`create_context`、6 个数据工具，以及 `run_query(context_ref) -> DeliveryPackage`（运行 Data Agent 并交付）。分析 Agent 补数时传入原交付包引用。
+- **`DataService`（Python）：**`create_context`、6 个数据工具，以及 `run_query(context_ref) -> RunQueryResult`（delivery / needs_clarification 两种返回，字段见接口第 9 节）。分析 Agent 补数时传入原交付包引用，并以 revises_context_ref 链接原任务账本。
 - **MCP v2（stdio）：**同名暴露 `create_context`、`find_assets`、`get_asset_schema`、`search_asset`、`read_evidence`、`query_records`、`run_query`；`request_asset_update` 首期不对外部宿主开放。外部宿主直接调用读取工具时，结果不经 Data Agent 充分性判断，不称为 Data Agent 交付。
 - **MCP v1：**冻结，不扩展；迁移完成后另行决定下线时间。
 - **CLI：**数据准备任务（显式公司与材料范围）、发布状态查看、派生层重建、运行记录查看。
@@ -1467,11 +1486,11 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 |---|---|---|
 | 契约 | schema 往返、未知字段拒绝、时间保守比较、locator 校验 | 违反契约的输入一律报错，不静默修正 |
 | 目录 | 迁移 hash、唯一性、证券有效期不重叠、身份规则 | 名称或代码不能单独确认公司 |
-| 发布 | 在 14.5 每一步注入中断 | 不出现半发布的可见 build；恢复后状态一致 |
-| 版本 | 新 build 或修订快照发布后重放旧查询 | 旧引用与旧交付不漂移 |
+| 发布 | 在 14.5 每一步注入中断；派生构建失败、删除及重建 | 不出现半发布；最终说明与发布状态一致；实时能力随索引变化，冻结文件 hash 不变 |
+| 版本 | 同字节不同快照、HTML 附属资源变化、失败后显式重试；新版本后重放旧查询 | 版本归属不混淆、完整输入变化可识别、失败原件保留；旧引用与旧交付不漂移 |
 | 解析 | 程序生成的合成 HTML/PDF 夹具；E-PDF 冻结真实材料 | 定位可读回；不以样本公司作默认值 |
-| 检索 | 排序确定性、游标绑定、外部命中映射闭包 | 同输入同输出；不可映射的命中不进证据 |
-| 运行时 | 脚本化假模型驱动工具序列 | 预算、停止、引用闭包、状态校验均按契约执行 |
+| 检索 | 排序确定性、游标绑定、外部命中映射闭包 | 同输入、同目录/build 与同索引版本下结果一致；不可映射命中不进证据 |
+| 运行时 | 脚本化假模型驱动首次计划、搜索/记录/计算交付、澄清继续、强制停止 | 计划先登记再引用；交付依赖闭合且已展示；澄清问题可返回、旧引用拒绝、预算与计数不重置 |
 | 端到端 | 第 7.5 节案例冻结小样，真实模型 | 单独授权运行；与独立原件验收分开报告 |
 
 脚本检查、真实模型评测和用户验收分别记录；测试通过不等于业务内容正确。
@@ -1492,7 +1511,7 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 
 **用户要求（2026-10-14）：**按功能维度说明 Data Agent 的运行流程与接口：Agent 做了什么、为什么这么做、为什么可以取得效果。
 
-下文按第 3 节四类一级功能，加上连接建设与使用的“按缺口补充”，共五个维度展开。每个维度给出触发与输入、运行流程、使用的接口（字段见[接口契约 v0.3](DATA_AGENT_API.zh-CN.md)）、模型判断与程序执行的分工、设计理由，以及效果来自什么机制。**“为什么可以取得效果”是基于机制的预期，不是实测结论**；每项列出由哪个测试或 A/B 来证实。
+下文按第 3 节四类一级功能，加上连接建设与使用的“按缺口补充”，共五个维度展开。每个维度给出触发与输入、运行流程、使用的接口（字段见[接口契约 v0.4](DATA_AGENT_API.zh-CN.md)）、模型判断与程序执行的分工、设计理由，以及效果来自什么机制。**“为什么可以取得效果”是基于机制的预期，不是实测结论**；每项列出由哪个测试或 A/B 来证实。
 
 | 维度 | 触发 | 主要接口 | 模型判断 | 程序执行 |
 |---|---|---|---|---|
@@ -1530,14 +1549,14 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 
 **触发与输入：**快照冻结后自动开始；查询中需要 OCR、视觉读取或表格结构时，通过 `request_asset_update(action=process)` 补做。输入是快照中某个表现形式的原始字节。
 
-**运行流程：**`parse` → `outline` → `annotate` → `validate` → `describe` → `derive` → 交给 D3 发布。
+**运行流程：**`parse` → `outline` → `annotate` → `validate` → `derive` → `describe` → 交给 D3 最终复验并发布。
 
 1. `parse`：按格式选适配器。HTML 生成段落、列表、表格（单元格、跨度、表头）和图片引用，并提取 iXBRL 事实为记录；PDF 按 E-PDF 选定的方案生成带页码与坐标的块和表格，无文字层的页走 OCR。
 2. `outline`：从目录锚点、书签与标题结构建立原始章节树；推断出的章节标为 `inferred`，找不到归属的块放入“未归属”节点。
 3. `annotate`：profile 把原始章节映射到规范类别（如 Item 7 → `mdna`）；iXBRL 事实按标签直接关联概念；叙述段落先用规则，规则不能判定时由模型在概念表 v1 范围内标注，并记录方法与版本。
 4. `validate`：第 9.1 节格式检查与引用闭包；不合格的产物不进入可用能力。
-5. `describe`：根据本 build 的产物生成 `asset-schema.json`（第 7.2.2 节九类信息）；摘要由模型生成时标为派生。
-6. `derive`：构建 `fts.sqlite` 与 `records.duckdb`。
+5. `derive`：构建并校验 `fts.sqlite` 与 `records.duckdb`，记录各项成功/失败与覆盖。
+6. `describe`：基于内容与派生层结果生成最终 `asset-schema.json`（第 7.2.2 节九类信息），区分 content_readiness 与 published_readiness；摘要由模型生成时标为派生，随后确定最终 manifest 并复验。
 
 **为什么这么做：**查询效果的上限由处理质量决定：表格丢了表头、页码错位、章节归属错误，后面再好的模型也拿不到正确证据。理解性工作在建设时做一次并保存，查询时直接读取，同一材料不必每次重新理解。
 
@@ -1594,19 +1613,19 @@ sequenceDiagram
         T-->>F: 结构化结果
         F-->>M: 模板化输出（状态、条目、缺口、继续入口）
     end
-    M->>F: deliver（需求状态 + 证据 ID）
+    M->>F: deliver（需求状态 + result_refs + 缺口/冲突）
     F->>F: 按引用闭包组装交付包
-    F-->>C: DeliveryPackage
+    F-->>C: RunQueryResult（kind=delivery）
 ```
 
 **运行流程：**
 
-1. **理解问题：**首轮在 `state` 中提出需求计划，明确对象、期间与口径；“去年”“增长”等歧义影响取数时调用 `clarify`。
+1. **理解问题：**首轮通过 `state.plan_update(base_version=0)` 登记需求计划，再校验 state 引用，明确对象、期间与口径；歧义影响取数时调用 clarify，返回 needs_clarification 分支，回答后按 14.9 继续。
 2. **找资产：**`find_assets` 按主体、材料类型、期间筛选，返回候选与匹配状态。
 3. **读说明：**`get_asset_schema` 查看目录、能力与缺口，判断这份材料能否回答、用哪种方式读。
 4. **定位与读取：**按问题选择方式：业务描述走 `outline` 进入对应章节；产品名等专有名词走 `text`；跨章节的同义表达（如英文 Net sales 对应“收入”）走 `concept`；精确数值走 `query_records`。命中内容不足时用 `read_evidence` 补读表头、单位、脚注和邻近段落。
 5. **判断：**每轮更新四项状态；检查期间、单位、口径是否一致，冲突是否需要并列呈现；不足时继续定位、换资产，或进入 D5。
-6. **交付：**`deliver` 提交各需求的状态与证据 ID，程序复制工具结果中的原文与数值，组装交付包。
+6. **交付：**`deliver` 提交全部需求的状态与 result_refs，程序递归复制实际展示的原文、记录、计算及上下文/操作数依赖，组装交付包。
 
 **Agent 做了什么：**模型负责拆解需求、判断资产是否适用、选择定位方式、判断内容是否足够与是否冲突，并决定下一步。程序负责范围硬边界（主体、来源、截止日）、参数校验、执行、输出格式化、预算与停止，以及交付闭包。
 
@@ -1617,7 +1636,7 @@ sequenceDiagram
 - **只装相关内容：**按“摘要 → 说明 → 目录 → 正文”渐进加载，上下文里是与问题相关的内容，减少漏读和编造。
 - **定位方式互补：**目录回答“在哪里”，全文找专有名词，概念标注找跨章节的同义表达，记录给出精确数值；一种方式的盲区由另一种补上，而不是押在单一检索上。
 - **不会越界：**主体、来源与截止日由程序检查，模型的参数越界会直接报错，不会被静默放宽。
-- **不会空转：**每轮的状态针对一个具体缺口，停止规则在没有新增证据时强制交付。
+- **限制空转：**每轮状态针对一个具体缺口，连续没有新增有效信息达到阈值时强制交付；分配新引用 ID 本身不算新增信息。
 - **结果可核对：**数值与原文从工具结果复制，引用必须是本次运行读过的证据，每条结论都能回到原文位置；不足之处以缺口形式明确交付。
 
 **证实方式：**第 7.5 节验收案例的冻结小样；E-RET 的必要块召回；同一问题重复运行，检验真实模型选择的稳定性。脚本检查、模型评测与用户验收分开报告。
@@ -1664,3 +1683,67 @@ flowchart LR
 4. E-RET 的额度，以及 E-PDF、E-RET 的通过阈值。
 5. PyMuPDF 的 AGPL 许可是否可接受。
 6. 首个非 SEC API 数据资源（是否需要、选哪家）。
+
+### 14.15 五项契约修订与两条流程走查（2026-10-14，仅文档）
+
+**范围与判断：**用户授权将 review 的五项问题修入本核心设计及接口文档，再检查“首次查询 → 取数 → 交付”和“澄清 → 继续”。以下对照修订后的字段、状态转换、引用来源与失败分支逐步走查；采用虚构输入与预期响应，不是工具调用记录、程序测试或真实模型评测。不改变 A1–A9 或实施授权边界。
+
+| # | 原问题与可触发场景 | 机制修订 | 对应位置 |
+|---|---|---|---|
+| R1 | 首轮提出 need_id，但宿主要求它已存在 | 同一调用先以 plan_update 建立候选计划，再校验引用，全部校验通过后原子接受计划/state | 14.9；接口 8.1 |
+| R2 | 搜索已有充分原文、记录查询已有数值/增长率，deliver 却只接受 read_evidence 的 ID | 三类 ResultRef 统一登记实际展示范围，交付递归复制上下文与计算操作数 | 14.2、14.9；接口 0.4、4–6、9.2 |
+| R3 | 两个快照主文件相同，或 HTML 图片变化但主文件相同 | build_key 包含版本身份与完整输入清单，原始字节去重与 build 归属分离 | 14.4；接口 10 |
+| R4 | 说明已生成后索引失败；发布后索引被删除 | 派生层完成后生成最终说明并复验；冻结内容/发布状态与当前有效能力分开 | 14.5–14.6；接口 3、10 |
+| R5 | clarify 返回问题，调用方无类型承接或无字段提交回答 | RunQueryResult 明确澄清分支；回答关联旧上下文；继续继承根账本与计划历史 | 14.9–14.10；接口 1、9.1 |
+
+#### 流程一：首次查询 → 取数 → 交付
+
+**虚构输入：**已登记的公司甲；请求 FY2024、FY2025 同口径收入、增长率及管理层解释；期间、来源策略与运行预算显式给出。假定已有通过发布校验的年报 build。仅为引用说明，用 R、O、E、V、C 作运行、操作、证据、记录、计算的短名，不作为生产默认值。
+
+| 步骤 | 调用/状态 | 检查结果（按文档） |
+|---|---|---|
+| 1 | create_context → req；run_query(req) → 新运行 R，根运行也是 R | 输入范围固定，计划版本从 0 开始；无须已有 need_id |
+| 2 | 首次 find_assets 携带 plan_update(base_version=0)，登记收入/增长率与解释两个需求；satisfied 为空，二者均在 gaps | 先用候选计划检查需求 ID，再接受为 v1；错误引用不能使计划部分生效。工具结果不能被同次 state 预先引用 |
+| 3 | get_asset_schema(完整 asset_ref) | 返回冻结的内容/发布能力与本次有效能力；records 和检索实际可用才进入下一步，不由旧发布状态保证可用 |
+| 4 | search_asset 返回管理层解释原文 E 及所需上下文，登记 kind=evidence 的 ResultRef(R,O1,E) | 模型实际看到的原文范围与登记范围一致，可直接引用；只有命中位置或摘要则必须补读，不生成可交付原文引用 |
+| 5 | query_records 返回两年记录 V1/V2 与增长计算 C，C.operand_refs 指向本操作实际展示的 V1/V2 | 记录与计算均有 ResultRef；若操作数因上限未展示，就不返回该计算，列明缺口。无需为换证据 ID 重读记录 |
+| 6 | deliver 的 state 将两项需求移至 satisfied；needs 引用 E 和 C，status=supported；无未解冲突 | 宿主纳入 E 的上下文和 C 的 V1/V2，收齐 assets_used；原文、数字、公式来自登记结果，返回 kind=delivery 与冻结交付包 |
+
+**反例检查：**仅提供 hit_id、裸 calc_id、程序侧未展示记录、其他运行的结果或悬空依赖，均不能通过引用校验。若第 5 步后预算耗尽、尚未完成第 6 步判断，宿主按最近已校验状态交付部分结果，不把刚取得的记录自动宣告满足全部需求。
+
+#### 流程二：澄清 → 继续
+
+**虚构输入：**已登记公司甲，请求“去年收入”；财年与自然年含义仍未确定，其他输入与预算已明确。假定根任务仍有继续空间，无未知费用待对账。
+
+```mermaid
+sequenceDiagram
+    participant C as 调用方
+    participant F as 运行框架
+    participant M as Data Agent 模型
+    C->>F: run_query(req1)
+    M->>F: clarify + state.plan_update（首次计划）
+    F-->>C: kind=needs_clarification，cl1、问题、根任务用量
+    C->>F: create_context（revises=req1，回答 cl1，明确期间）
+    F-->>C: req2，继承 root_run_id 与原 clock
+    C->>F: run_query(req2)
+    F->>M: 原问题、回答、继承计划、剩余预算
+    M->>F: 读取/查询 → deliver（本运行 result_refs）
+    F-->>C: kind=delivery，累计用量与新交付包
+```
+
+| 步骤 | 调用/状态 | 检查结果（按文档） |
+|---|---|---|
+| 1 | req1 对应 R1；首轮 clarify 与 plan_update(base_version=0) 一起提交“取得去年收入”需求，标为 gaps | 接受计划 v1 后可校验 blocking_need_ids；澄清问题不是伪造数据结果 |
+| 2 | 返回 kind=needs_clarification，包含 cl1、req1、R1/root_run_id、问题、计划/state、累计 usage 与余额 | 调用方有明确字段显示问题；R1 停在 needs_clarification，宿主不继续调用模型 |
+| 3 | 调用方回答“指 FY2025”，重传完整字段，question 保留原问题，periods 指定 FY2025，带 revises_context_ref=req1 与 clarification_response | 宿主验证 cl1 与 req1 对应、结构字段有效且符合原边界；回答原文保留供模型核对，新 req2 沿用原解释 clock。错误 ID、无授权扩大范围或重置预算不能通过 |
+| 4 | run_query(req2) 创建 R2，parent=R1，root=R1；传入原计划 v1，相关需求仍在 gaps | 需要更新计划时使用 base_version=1；费用、未知预留、轮数、无进展计数与执行时间继续累计，人工等待不计入执行时间 |
+| 5 | R2 按澄清后的范围获取说明并读取/查询；如复用 R1 的材料，也必须以固定资产版本重新取回 | R1 的 ResultRef 不能直接交付；R2 新登记结果通过当前范围校验后，才可支持需求 |
+| 6 | R2 deliver → kind=delivery | 新交付引用 R2 的结果，用量来自根 R1；原澄清记录、计划历史、费用记录不被覆盖 |
+
+**反例检查：**重复提交完全相同的 cl1 回答返回原 req2；重复 run_query(req2) 等待同一执行或返回保存结果，不新开付费运行。根预算已耗尽时不得因新上下文再次调用模型；出现未知费用须先对账。跨日回答仍按原 clock 解释相对时间。
+
+**支撑边界检查：**不同快照同字节时，版本身份使 build_key 不同；主 HTML 相同但附图不同，完整输入清单 hash 不同。failed build 的显式后续尝试可新建 ID，原记录保留；published/staging 同 key 不重复启动。索引构建失败发生在最终说明之前；发布后删索引只改变有效能力，重建成功恢复到内容上限，冻结说明与旧引用不变。
+
+**文档检查：**两份文档的 9 个 JSON/JSONL 示例块可解析，代码围栏成对，本地链接目标存在；已检查旧交付字段/返回签名残留和改动空白格式。上述检查不执行接口，也不代替契约实现后的测试。
+
+**结论与停止点：**这两条流程在修订后的文档契约上都有明确输入、返回分支、状态归属及引用闭包，原五项缺口已逐项对应修订。尚未证明程序实现、真实解析/检索质量或模型充分性判断正确；第 14.11 节运行时、发布与版本测试仍待获准实施。本轮停在文档修订与走查，继续由用户 review，不启动 M1。
