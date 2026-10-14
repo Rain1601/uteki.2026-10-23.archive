@@ -65,3 +65,24 @@ git archive e6366df56c7c005499b2ef222fafe3bf406a3794 -- docs/EVOLUTION.md | tar 
 ```
 
 本轮无生产功能修改、模型调用或新业务验收；归档不意味着历史问题已解决。下一步继续 review 核心设计。
+
+## 2026-10-14：旧过程数据本机归档
+
+用户授权为重建整理旧过程数据：先归档至本机 `archive/`，禁止提交归档，再从远程当前版本移除旧数据。此次仅处理以下 6 个目录，不扩大为全部 `data/` 的删除或迁移：
+
+| 原路径 | 归档依据 |
+| --- | --- |
+| `data/company_workspace/official-filing-preparations/amd-v1/` | 旧解析基线；当前工作台及 MCP 登记使用 v2，原失败和缺口仍保留 |
+| `data/company_workspace/official-filing-preparations/tsmc-v1/` | 旧解析基线；当前登记使用 v2，原件及解析结果整包保留 |
+| `data/company_workspace/record_review/semantic-quality-v1/` | 已结束的历史语义评测过程；原始响应、失败及账本归档 |
+| `data/company_workspace/record_review/semantic-integrity-v2/` | 历史语义协议评测过程；输入、版本、评分与账本归档 |
+| `data/company_workspace/record_review/semantic-loop-v3/` | 历史语义循环评测过程；修订、独立评测及累计账本归档 |
+| `data/agent_observation/` | 已结束的 7 次旧提取运行事件；保留与原实验 run ID 的对应关系 |
+
+**本机归档：**`archive/data-process-20261014/`，共 **1,281 个文件、84,560,945 B（约 80.6 MiB）**。复制后逐文件校验 SHA256、大小、类型与权限，再移除原目录；归档含 **3 份完整费用账本**，未清零费用或改写失败。归档内 `manifest.json` 保存逐文件清单、原相对路径、清理前 Git 基线及保留数据的哈希，仅留本机，不公开提交。
+
+**Git 范围：**移除 1,269 个已跟踪的旧过程文件；另 12 个原本未跟踪/被忽略的文件一并完整归档。`/archive/` 和上述 6 个原路径加入 `.gitignore`，避免本机归档或后续恢复的过程数据再次进入提交。空的 `data/company_update_sources/` 及其子目录同时移除。远程当前树随清理提交删除旧文件，Git 旧提交与历史不重写；本机归档不等于跨机器备份，也不代表整机磁盘空间已释放。
+
+**保留与恢复：**复数的 `data/agent_observations/` 仍被历史核验脚本直接读取，因此保留；当前工作台/MCP 注册数据、公司名单、原件库、材料包、阅读库和研究状态不变。历史说明中的原路径与原运行记录不改写；需要重放归档案例时，先确认目标不存在，再从本机归档按原相对路径复制回仓库，并按归档清单核对哈希后执行。不要覆盖新工作，归档不将旧失败变成通过。
+
+**核验：**1,281 份归档原件逐文件校验通过，其他保留数据的字节未变，归档文件全部被 Git 忽略；语义基准/评分、数据集页面与 Data Agent 基准的 47 项离线检查通过。本轮不调用模型、不重新获取数据、不修改当前 SDK 接入文件，也不提交其他开发改动。
