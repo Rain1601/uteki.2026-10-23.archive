@@ -1,0 +1,15 @@
+import {esc,Button,Badge} from './components.mjs';
+import {number} from './tokens.mjs?v=1';
+const validId=id=>{if(typeof id!=='string'||!/^[-a-zA-Z0-9_]+$/.test(id))throw Error('Invalid identity');return id};
+export function ViewTabs({entries,selected,label,panelId}){
+ const ids=entries.map(e=>validId(e.id));if(new Set(ids).size!==ids.length||!ids.includes(selected))throw Error('Invalid tab identity');validId(panelId);
+ return `<div class="edition-tabs" role="tablist" aria-label="${esc(label)}">${entries.map(e=>`<button id="view-${e.id}" role="tab" aria-controls="${panelId}" aria-selected="${selected===e.id}" tabindex="${selected===e.id?0:-1}" data-view="${e.id}">${esc(e.label)}</button>`).join('')}</div>`;
+}
+export function RecordDetail({record,labels,locale,first,last}){
+ validId(record.id);return `<div class="edition-detail-top"><span class="eyebrow">${esc(labels.record)} / ${esc(record.id.toUpperCase())}</span><button class="button text" data-close aria-label="${esc(labels.close)}">×</button></div><h2>${esc(record.title)}</h2>${Badge({text:record.category})}<p class="edition-reading">${esc(record.summary)}</p><dl class="edition-facts"><div><dt>${esc(labels.value)}</dt><dd>${esc(number(record.value,{locale}))}</dd></div><div><dt>${esc(labels.change)}</dt><dd>${esc(number(record.change,{locale,digits:1,unit:'%'}))}</dd></div><div><dt>${esc(labels.date)}</dt><dd>${esc(record.date)}</dd></div></dl><div class="edition-step"><button class="button secondary" data-step="-1" ${first?'disabled':''} aria-label="${esc(labels.previous)}">↑</button><button class="button secondary" data-step="1" ${last?'disabled':''} aria-label="${esc(labels.next)}">↓</button><button class="button text" data-read="${esc(record.id)}">${esc(labels.read)} →</button></div>`;
+}
+export function SignedBars({rows,label,unit,locale,selected=null,missingLabel}){
+ const ids=rows.map(r=>validId(r.id));if(new Set(ids).size!==ids.length)throw Error('Duplicate chart identity');if(rows.some(r=>r.value!==null&&!Number.isFinite(r.value)))throw Error('Invalid chart value');
+ const min=Math.min(0,...rows.filter(r=>r.value!==null).map(r=>r.value)),max=Math.max(0,...rows.filter(r=>r.value!==null).map(r=>r.value));const span=max-min||1,zero=-min/span*100;
+ return `<figure class="edition-chart" aria-label="${esc(label)}"><div class="edition-chart-head"><h3>${esc(label)}</h3><span class="muted">${esc(unit)}</span></div><div class="edition-bars">${rows.map(r=>{const end=r.value===null?zero:(r.value-min)/span*100;return `<button class="edition-bar-row ${selected===r.id?'current':''}" data-record="${r.id}" aria-pressed="${selected===r.id}" aria-label="${esc(r.title)}: ${esc(r.value===null?missingLabel:number(r.value,{locale}))} ${esc(unit)}"><span>${esc(r.title)}</span><span class="edition-bar-track"><i class="edition-zero" style="left:${zero}%"></i>${r.value===null?'':`<i class="edition-bar ${r.value<0?'negative':''}" style="left:${Math.min(zero,end)}%;width:${Math.abs(end-zero)}%"></i>`}</span><b class="numeric">${esc(r.value===null?missingLabel:number(r.value,{locale}))}</b></button>`}).join('')}</div></figure>`;
+}

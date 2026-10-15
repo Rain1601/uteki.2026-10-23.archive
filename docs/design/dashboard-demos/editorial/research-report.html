@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Uteki Editions · Research Report</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="citation-components.css">
+  <link rel="stylesheet" href="source-panel.css">
+  <link rel="stylesheet" href="report-reader.css">
+  <style>
+    html{scrollbar-gutter:stable}body{--report-sticky-top:140px;--report-anchor-offset:140px}#report-header{position:sticky;top:0;z-index:10}#report-header .site-head{position:static}
+    .report-tools{position:sticky;top:68px;z-index:9;background:var(--canvas);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:24px;min-height:48px;padding:8px max(24px,calc((100vw - 1120px)/2));font-size:12px}
+    .report-tools label{display:flex;align-items:center;gap:8px}.report-tools select{padding:4px 8px;font-size:12px}.report-tools .report-tools-end{margin-left:auto;display:flex;gap:20px;align-items:center}
+    .report-end{max-width:1120px;margin:56px auto 0;padding:24px 0 40px;border-top:1px solid var(--line);display:flex;gap:24px;justify-content:space-between;color:var(--muted);font-size:12px}
+    @media(max-width:760px){.report-tools{gap:12px;flex-wrap:wrap}.report-tools .report-tools-end{margin-left:0}.site-head{padding:0 24px}.site-head nav{gap:16px}.site-head nav a{font-size:12px}.report-end{margin:32px 24px 0;flex-wrap:wrap}}
+  </style>
+</head>
+<body>
+  <a class="sr" href="#report-host">跳到正文 / Skip to report</a>
+  <div id="report-header"></div>
+  <div class="report-tools" aria-label="报告外观 / Report appearance">
+    <span id="report-edition">RESEARCH EDITION / 01</span>
+    <button class="button text" id="report-read-status" type="button"></button>
+    <div class="report-tools-end">
+      <label><span id="palette-label">配色</span><select id="report-palette"><option value="paper">Paper</option><option value="paper-night">Paper Night</option><option value="mineral">Mineral</option><option value="plum">Plum</option></select></label>
+      <label><span class="sr">Language</span><select id="report-language"><option value="zh">中文</option><option value="en">English</option></select></label>
+    </div>
+  </div>
+  <main id="report-host" tabindex="-1"></main>
+  <footer class="report-end"><span id="report-scope" role="status"></span><a id="principles-link" href="EDITORIAL_DESIGN_PRINCIPLES.md">设计原则 ↗</a></footer>
+  <script type="module" src="research-report.mjs?v=0.22"></script>
+</body>
+</html>

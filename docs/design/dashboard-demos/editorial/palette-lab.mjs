@@ -1,0 +1,12 @@
+import {palettePresets,applyPalette} from './palette-presets.mjs';
+import {Card,ItemList} from './compound-components.mjs';
+import {DataTable} from './editorial-primitives.mjs';
+const $=s=>document.querySelector(s);const records=[{id:'known',title:'已记录',value:12},{id:'zero',title:'明确为零',value:0},{id:'gap',title:'未记录',value:null},{id:'negative',title:'负值',value:-8}];let selected='known';
+function render(){const r=records.find(x=>x.id===selected);$('#card').innerHTML=Card({id:'selected-record',title:r.title,description:r.value===null?'保持缺失，不补零。':`样稿值：${r.value}`,meta:'原创接口样例 · 非财务数据'});$('#list').innerHTML=ItemList({id:'records',label:'选择记录',selected,items:records.map(x=>({id:x.id,title:x.title,description:x.value===null?'缺失':String(x.value)}))});$('#table').innerHTML=DataTable({rows:records,rowKey:'id',selected,caption:'同一组输入：0 / null / 负值',columns:[{key:'title',label:'记录',interactive:true},{key:'value',label:'样稿值',numeric:true}],locale:'zh-CN'});}
+function apply(input){const p=applyPalette(document.body,input);$('#swatches').replaceChildren(...Object.entries(p).map(([role,value])=>{const span=document.createElement('span'),chip=document.createElement('i');chip.style.setProperty('--swatch',value);span.append(chip,document.createTextNode(role+' '+value));return span;}));$('#palette-json').value=JSON.stringify(p,null,2);$('#color-check').textContent='9/9 小字角色组合 ≥ 4.5';}
+$('#palette').replaceChildren(...Object.keys(palettePresets).map(id=>{const option=document.createElement('option');option.value=id;option.textContent=id;return option;}));
+$('#palette').addEventListener('change',()=>{apply($('#palette').value);$('#palette-result').textContent='已应用命名色卡；记录与布局保持。';});
+$('#layout').addEventListener('change',()=>{$('#preview').dataset.layout=$('#layout').value;});
+$('#preview').addEventListener('click',event=>{const button=event.target.closest('[data-item-id],[data-record]');if(!button)return;const id=button.dataset.itemId??button.dataset.record;if(!records.some(r=>r.id===id))return;const list=Boolean(button.dataset.itemId);selected=id;render();$('#preview').querySelector(list?`[data-item-id="${id}"]`:`[data-record="${id}"]`)?.focus({preventScroll:true});});
+$('#apply-palette').addEventListener('click',()=>{try{apply(JSON.parse($('#palette-json').value));$('#palette').value='';$('#palette-result').textContent='已应用自定义色卡；记录与布局保持。';}catch(error){$('#palette-result').textContent='未应用：'+error.message;$('#palette-json').focus({preventScroll:true});}});
+apply('paper');render();

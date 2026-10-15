@@ -1,5 +1,17 @@
 # Logo motion studio · 2026-09-24
 
+## 2026-10-14：Data Agent 业务评审交互原型
+
+**用户后续反馈：**单独看问题的案例表达与交互方向 OK；工作台整体仍需优化/设计，后续作为独立任务调整。本轮停止扩展界面，原型保留为业务案例讨论载体，不记为工作台整体视觉定稿或生产采纳。
+
+用户希望以可操作产品原型 review 完整 Data Agent 的业务行为，并明确不同模型的 system prompt 必须分别维护、调优，避免单模型优化直接迁移后退化。新增独立[产品评审原型](design/data-agent-product-review/index.html)，对应核心设计 7.7.6/14.17.6，不改生产公司名单、主导航或采纳记录。
+
+四个视图围绕同一组虚构材料：问答结果/出处/缺口、空库准备资料、核对原文后纠错并保留版本、双 SDK 方案与独立模型 prompt。用编辑式标题、细分隔和表格组织内容；左侧案例导航、中间结果与过程/配置、右侧出处与评审分别原生滚动。窄屏详情通过点击打开，关闭与 Escape 返回原位置；中英与日夜主题可切换。复用 editorial 的语义 token、引用组件和现有丝绸蓝雨滴，新增样式只作用于独立页面。
+
+评审意见仅存当前浏览器，可导出，不自动发送或记为验收通过。所有数字、材料、版本、步骤和两侧显示结果为人工编写的设计样例；对照页能独立选择完整/漏答样例，不能归因于对应模型。每个 prompt 单独展示内容与版本，精确模型、原生提示、hash、成绩和费用未取得时保留未知。实际 prompt 调优及双 SDK 接入尚未执行。视觉效果由用户 review，不以程序检查代替视觉认可。
+
+本轮验证：21 项示例状态/数值/引用/配置断言，72 个中英页面状态的无浏览器生成与 HTML 结构检查；8 个 HTTP 资源与本地文件字节一致、模块 MIME 正确，预览入口及只读路径边界检查通过。未安装新依赖、打开浏览器或做截图检查，未测试真实模型或生产业务。预览启动方式见核心设计 7.7.6。
+
 ## 2026-10-07：业务结构和收入结构分别展示
 
 用户指出谷歌图将“收入构成”与“包含”并列，仅靠颜色无法避免维度混淆。新增[第二轮图页](design/data-agent-acceptance/business-revenue-v2/index.html)，保留四公司列表和节点取证方式，主切换为“业务结构 / 收入结构”。业务图不含收入分类；独立收入页用金额与占比回答收入来源，两个视图可直接链接。
@@ -1833,6 +1845,32 @@ attachment hashes. No browser, model call or visual acceptance was performed.
 
 对照页4个本地链接检查通过；HTTP 200；未做浏览器视觉验收。七题v3此前86个本地链接/锚点与HTTP检查通过。
 
+
+## 2026-10-09 · Dashboard 交互实验
+
+独立入口 `docs/design/dashboard-demos/index.html`，六种布局与六类交互使用统一虚构数据，支持布局切换和用户比较。没有修改既有公司界面。采用克制的绿色与中性背景、稳定字级和可见操作；未调用 frontend-design。原生桌面拖拽松手后重排，详情是视图切换，连续原位变形未实现。按 D01→D02→D03 保存路线及限制于同目录 README。
+
+检查：内联 JavaScript 提取后 `node --check` 通过；无外部资源依赖。未进行浏览器行为或视觉验收，没有新增外部模型调用。
+
+
+## 2026-10-09 · Anthropic 编辑设计组件样册 v0.1
+
+用户确认喜欢 Anthropic 整体编辑设计，配色可独立，要求覆盖 Header、Sidebar、PDF、Table 与其他常用组件。多页参考浏览器观察和官方 PDF 两页渲染核查后，新增独立 `docs/design/dashboard-demos/editorial/`。以四字体角色、语义颜色、栏目层级与细线建立风格；实现 26 类样例、9 个复用渲染器和组合页，三主题、中英、两密度可切换，另保留 EC27–EC36 未完成队列。生产旧页未替换。
+
+检查：Node 语法与数值/排序/转义/主题 schema 边界；浏览器三主题表格和选中项不变，中英及紧凑切换、空搜索、缺失、零值、排序、弹层焦点恢复；HTTP 200；两页英文 PDF 嵌入 Liberation 字体后渲染检查。首轮 PDF Poppler 缓存失败已用临时 fontconfig 修复。浏览器打印、中文 PDF、完整组件行为、跨机器字体及生产迁移未验收。没有调用外部模型或 frontend-design。总体方向已认可，样册样式待用户查看。
+
+## 2026-10-10 · Anthropic 四组件原件对照 v0.2
+
+当前ES04.1已交付：在独立 editorial 样册逐项核查 Header/Sidebar/Table/PDF，保持生产 Swiss C 和实体列表。保留history/v0.1、旧PDF与来源截图。Header按文章页68px/15px/64px，Sidebar按172px/12px/sticky92px/阅读640px，Table按14px层级及ruled/grid，PDF按Letter及36/24/11/8pt角色。字体字形使用本地Liberation，中文仍回退；色彩仍独立。
+
+共同机制修复：Sidebar variant class workspace曾误继承外层布局padding，改为sidebar-workspace；密度rowInset曾被inline default覆盖，apply明确输出密度值，回归14→10→14px。四个stateless renderer和共享排版JSON已有API说明；校验调用范围/身份/参数，保留零、负与缺失。
+
+检查：定价表和文章目录实看；8项独立组件契约检查通过；三主题保留当前记录、数据与详情；英文字体加载，双语切换及两密度验证；最终英文PDF两页实际渲染、文字页内边界、零与缺失核查，中文缺字和溢出明确失败。未验收浏览器打印/跨浏览器矩阵，未接生产导出。本轮无外部付费模型调用。
+
+可查看入口：`docs/design/dashboard-demos/editorial/comparison.html`；组件API为同目录`COMPONENT_API.md`。下一项ES04.2固定中文字体并回到同四组件检查；ES05生产迁移未开始。
+
+同轮字体收尾：网页中文已固定完整 Noto Sans SC/Serif SC 本地文件并保留OFL及hash清单，英文仍Liberation。变量字体解析和关键中文字形覆盖检查通过；同一阅读组件复核640px正文、172px目录、84px列距。当前TTF原件较大，WOFF2生成因缺fontTools未执行；生产前压缩/拆包未完成。下一项调整为ES04.2中文两页PDF适配；先前同轮“中文网页仍回退”的过程状态已被此收尾取代。
+
 ## 2026-10-10 · E6 三栏真实运行查看
 
 用户授权将 E6 历史真实结果、过程与评估接入现有 `/agent-results` 并启动查看。单次运行左侧固定运行列表，中间结果/调用过程/配置，右侧评估与人工意见，三栏独立原生滚动。复用界面规范、记录 loader、文件读取与评分接口，不另造演示任务或执行控制。
@@ -1843,7 +1881,103 @@ attachment hashes. No browser, model call or visual acceptance was performed.
 
 用户复查后将左侧结果列表按实际执行开始时间倒序：已有运行开始时间优先，历史缺失时取首个带时区的有效调用时间；未知时间放末尾，不使用名称或文件修改时间。E6 轻量列表带真实时间，最新 fresh S3 位于首项；不改变当前选中运行及评估绑定。
 
+## 2026-10-10 · ES04.2 中文两页 PDF
+
+当前ES04.2已交付。中英v0.3共用版面JSON与renderer，中文400/600静态字重锁定、实际角色字形验证、按字宽与标点禁则断行、长标签增高、数值列和页脚边界检查。原因证据：源Noto可变字体默认100/200；默认CJK断行在独立混排案例将右引号置行首，通用边界回退后原例通过。四页最终PDF逐页渲染实看，文字提取/字体嵌入/页内边界及独立失败保留检查通过。入口`docs/design/dashboard-demos/editorial/pdf-bilingual.html`，规则`PDF_LAYOUT_RULES.md`；v0.2与生产页面保留，无外部模型调用。ES04.3长文/跨页表格未开始，生产迁移未验收。
+
+## 2026-10-10 · ES04.4 Editorial 整体页面
+
+用户确认PDF OK，要求继续组件与整体页面。新增独立`editorial/workspace.html`：主区+窄栏概览、列表详情、目录阅读三视图，顶部唯一范围/搜索，中英/主题/密度保留记录；既有生产页面与名单不修改。新增可复用页签、详情、正负轴图表及纯状态模块。发现输入重渲染会影响composition与焦点，增加composition保护和键盘恢复；标题显示语言与排序字段统一。目标浏览器功能链检查通过，未做审美截图/视口矩阵，实际IME未实测。下一ES04.5表单菜单反馈组合；PDF长文暂缓。
+
+## 2026-10-10 · ES04.5 MUI行为参考
+
+用户认可Editorial整体风格并授权参考Material UI推进。保留现有字体/留白/主题，以MUI官方TextField/Menu/Dialog/Snackbar职责为行为参考，新增复用TextField/ActionMenu/Notice/InlineAlert、显式笔记schema与独立overlay控制器。保存到本机后提示成功，撤销同样须写入成功；损坏存储不覆盖，源记录不修改。目标浏览器测试空提交/保存/对应记录/撤销/Menu键盘焦点，独立schema检查通过。没有安装MUI或迁移React，没有外部模型调用。当前v0.5，下一ES04.6日期区间/多选/检索；全部覆盖与边界见editorial/INTERACTION_COMPONENTS.md。
+
+
+## 2026-10-10 · ES01.2 多场景来源与媒体
+
+用户要求广泛探索Anthropic/Claude且避免同质化。新增14来源设计图谱：出版、产品、目录、应用文档、动态素材、教学、开发者七类；7张公开截图。加入原创MotionFigure静态/播放/暂停/重播样例；页面任务决定容器，字体按角色配置。内部应用访问受账户状态阻碍，Projects/编辑器仅官方文档推导。未下载原站品牌资源，保留原工作台和PDF。核查详见 [设计图谱](design/dashboard-demos/editorial/ANTHROPIC_DESIGN_ATLAS.md)。
+
+
+## 2026-10-10 · ES04.7a 案例叙事和动效落实到阅读页
+
+客户案例提炼导语/事实栏/署名引用；机制文章区分PNG和视频，不以静态图冒称动态图。本轮原创4步SVG图解嵌入现有工作台，单一进度驱动图形、说明和控制；绑定原记录，null/零/负值保持。控件与英文主题切换实际核查，组件契约测试通过。更广泛视觉/屏幕阅读器/视频播放未验收。详见[组件记录](design/dashboard-demos/editorial/STORY_COMPONENTS.md)。
+
+
+## 2026-10-10 · ES04.7b 正文可展开媒体与不同动效
+
+用户认可调研交互，并要求视频入页及非方块动效。沿用字体/图注/分隔线，新增原生视频、曲线绘制、轨道运动与统一dialog组件。素材为原创本地，关闭暂停且复用同一节点；进度输入先取值再暂停修复共同重绘问题。视频播放、暂停返回、单实例、Esc、进度边界及英文主题组合实际检查。来源和边界见[组件记录](design/dashboard-demos/editorial/READING_MEDIA.md)。
+
+
+## 2026-10-10 · ES04.7c 图片局部与图表联动
+
+保持Editorial阅读节奏，图片整幅加局部镜，双图共享参考线与固定读数，区别于既有视频/曲线/轨道。新增显式配置组件、按id连接数据及卸载清理；实际IAB验证鼠标进入、键盘锁定、null/zero/negative、双语主题和文档切换。42项检查通过；移动端及全读屏矩阵未验收。原创图片和模拟记录，无外部模型调用或生产迁移。详见docs/design/dashboard-demos/editorial/INSPECTION_COMPONENTS.md。
+
+
+## 2026-10-10 · Editorial v0.14 任务页面与金融 App 演示
+
+沿用户已认可编辑风格新增范围弹层、快速检索、树/分栏/PDF预览、财务应收、工作项看板、投资瀑布/散点联动和证据复核页。领域页各用独立模拟范围，不把研究记录筛选强加给所有视图。重点来源来自用户提供官方视频的30–55秒实际画面；文字教程、营销预览、视频界面与本地原创适配严格区分。
+
+证据复核保留缺项、来源浮窗与手动显示补齐示例，缺项不能通过总额反推成业务事实。线稿插图为原创SVG，暂停与减少动态设置可控，已入档案。组件都用getState/destroy或显式onChange保持跨视图/语言/主题状态。实际目标操作检查与原型限制见docs/design/dashboard-demos/editorial/PAGE_PATTERNS.md。没有模型调用或生产迁移；浏览器检查是用户要求的来源观察和实页交互检查，非全站/多视口审美验收。
+
+
+## 2026-10-10 · Editorial v0.15 完整 Agent 任务原型
+
+沿既有编辑风格，卡片采用细分隔线与内容层级，过程采用横向阶段与可展开记录，产物在正文区域就地预览；不把所有区域做成同种盒子。提取独立 Card/ItemList，Agent页面由显式状态机组合，状态标识与本地化文字分开。状态恢复重放事件记录以阻止跳过确认。官方Cowork/Artifacts文档作交互参考，实际Claude App访问受限，未标成新App实测。91项检查与目标浏览器回放通过；附件仅元信息、阶段手动推进、产物预写/既有PDF，0模型调用，无生产接入。接口与证据详见 docs/design/dashboard-demos/editorial/PAGE_PATTERNS.md。
+
+
+## 2026-10-10 · Editorial v0.16 原文引用
+
+研究列表和Agent产物使用同一点击引用组件，字体角色、语义主题与细下划线沿既有编辑风格；固定浮窗限制在视口内，避免表格滚动容器裁切。按稳定记录id插入安全单元格槽，引用Esc不影响原详情。来源原文、出处类型、定位与链接独立传入；原创研究样稿不支持模拟财务数值，备忘文字对齐真实项目规则摘录。九条摘录与原文件逐字一致，98项检查及目标浏览器交互通过。没有真实检索/模型调用/附件分析，PDF网页入口不改原PDF。详见 docs/design/dashboard-demos/editorial/PAGE_PATTERNS.md。
+
+
+## 2026-10-10 · Editorial v0.17 来源与阅读往返
+
+研究列表和Agent产物共用mountSourcePanel；右侧集中目录与原文摘录各自滚动，引用精确定位并高亮，关闭恢复最初双轴滚动和触发焦点。纸面、细分隔线、衬线原文保持既有语义主题；Native dialog处理焦点限制。来源真实性仍由显式调用方负责，不宣称全文检索。102项程序检查，列表210→210、Agent1282.5→1282.5及焦点返回实页验证通过。详情见 docs/design/dashboard-demos/editorial/PAGE_PATTERNS.md。
+
+## 2026-10-10 · iDA 设置页具体修复
+
+用户截图指出通用设置居底、details展开位置变化及动画生硬。实际修改独立ida-extension设置源码：DOM导航general置首，general-panel顶部网格取代继承的横向flex，advanced下一整行；原生details实际高度动画、快速反向、减少动态与焦点处理。系统深浅色来自prefers-color-scheme，未改主题逻辑。原件哈希核对后应用，179项既有检查+3项生命周期检查通过。原样式回放标题上移18.453125px，新样式展开前后坐标相同；回放不读写存储，已安装扩展重载未核验。详见 docs/design/dashboard-demos/editorial/IDA_SETTINGS_REVIEW.md。
+# 2026-10-10 · ES08.1 报告阅读交互
+
+本轮交付公开原站调研，未修改现有页面。实测Anthropic完整论文章节跳转/正文常驻章节选择、Distill正文脚注点击展开、OWID图表与数据表切换及数据口径定位。观察事实、截图与待实现建议分开记录于[报告交互调研](design/dashboard-demos/editorial/REPORT_INTERACTIONS.md)。采用建议：摘要先行、连续正文、紧凑目录、按需证据层与图表/数据互查；字体与主题复用既有角色。下一具体项ES08.2报告壳；来源分组ES07.4保留后续。未运行模型、未部署、未新增报告业务结果；纯调研文档无需程序测试。
+
+
+
+## 2026-10-10 · Editorial v0.18 完整研究报告与原则
+
+当前ES08.2完成摘要→章节→图表/数据→来源→返回的固定原创样稿，ES08.3沉淀ED01–08与任务页适配模板v0.1。报告用连续正文与细线分层，局部700px版心、160px目录、68px Header与48px外观栏；复用语义主题、中英字体及来源组件。目录与锚点偏移共同读取同一变量，修正重复跳转章节目录误亮上一章的机制。移除pagehide清空正文以保留缓存返回。
+
+105项组件检查通过。实际浏览器：定位顶139.914px；图表/数据280→280px且滚动1406.5→1406.5；来源切换后Esc关闭1889.5→1889.5、恢复引用2焦点；英文与主题切换保留图表数据状态。原生历史按既有阅读坐标返回，目录跟随实际章节。截图和最新完整队列在[PAGE_PATTERNS](design/dashboard-demos/editorial/PAGE_PATTERNS.md)。原创样稿不等于真实研究结果，任意报告Schema/生产接入未实施；无需外部模型调用或部署。下一ES08.4报告列表预览与阅读往返，原则继续按实际反馈修订。
+
+
+## 2026-10-10 · Editorial Design System v1 最终收口
+
+当前 DS04 完成；此前已认可的编辑设计感延续到统一入口、两份显式报告内容、阅读列表往返、来源检索和通用设置。18 组模块标注参数化 API 与固定任务模板。五类辅助组件提取 Tooltip/Accordion/Breadcrumb/Pagination/Loading；通用设置置顶，高级项网格渐进展开，草稿、有效预览与保存分开。字体按 display/reading/ui/numeric 分工，三主题 muted 角色加深以通过 9 组小字角色颜色检查；不宣称整页可访问性达标。
+
+144 项模块检查与六个入口语法通过，中英两页 PDF 字体/边界/换行/数字检查通过。针对具体交互核对：报告2215→2215、列表353→353且筛选排序保持；来源0/3→1/3、Escape1898.5→1898.5；高级设置展开标题/通用位置保持；错误字号、保存与撤销通过；Tooltip Escape、空分页、主题/语言后 gap 身份与缺失值保持。状态按页/报告显式持有，设置只影响预览本页。未进行常规多视口审美检查，也未调用付费模型或部署。
+
+[统一样册](design/dashboard-demos/editorial/system.html) / [接入指南](design/dashboard-demos/editorial/QUICKSTART.md) / [原则 v1](design/dashboard-demos/editorial/EDITORIAL_DESIGN_PRINCIPLES.md) / [验收与完整路线](design/dashboard-demos/editorial/DESIGN_SYSTEM_DELIVERY.md)。下一项 ES04.3 长文 PDF 属后续，ES05 生产接入未实施；两者不作为当前 v1 已实现能力。
+
 2026-10-12 提交前兼容回归：历史运行的可选评估为 null 时，统一按空评估读取附件；真实路由、页面和 E6 loader 的23项检查通过。未做浏览器视觉验收。
+
+## 2026-10-12 · SK01 可调用编辑设计 skill
+
+沉淀 skills/editorial-design：字体/层级/间距、内容与操作顺序、上下文回程与状态契约为稳定骨架，布局和色卡分别配置。六色卡与完整12角色JSON包括深色，validatePalette检查9组小字角色，applyPalette保留宿主内联尺寸并拒绝无效草稿。便携模块闭包使用系统字体，不复制77MB字体或宣称原型字形一致。原仓库组件与安装包之间保留明确来源。
+
+独立模拟React接入发现局部主题/来源portal职责不一致；在source-panel共同层添加portalContainer，同文档可指定主题根，body默认兼容。文档明确箭头选行与高级筛选控件需宿主实现。148项模块检查与官方skill结构校验通过，纯模块闭包实际加载；没有新增常规截图或浏览器审美矩阵。项目按要求本地启动并返回HTTP200。下一应用是在实际页面任务中使用新skill；生产后端与长文PDF未因封装skill而实现。
+
+## 2026-10-12 · SK02 编辑设计 skill 的页面应用
+
+研究任务工作台使用 Forest 而非固定米色，任务列表+原位详情，语义配色独立于对象与任务阶段。复用共用Header、Table、Field、Citation、SourcePanel，专有筛选/排序/选择/草稿/保存/人工确认由页面状态模块承担。高级项位于通用项后，网格展开不移动上方参照；正文计划采用细线序列，明确不是实时执行进度。
+
+151项模块检查通过。按用户“尝试效果”请求在默认视口实看新页面，核对Night/英文保留选择与草稿、键盘切换保留笔记、局部主题来源继承、224.5→224.5引用回程、人工确认与空结果恢复；标题/通用筛选展开位置保持。已保存 output/research-desk-v1.png。未宣称用户审美认可或真实后端接入；下一建议SK03优化已有报告列表。
+
+## 2026-10-12 · SK02.1 Paper / Paper Night
+
+用户反馈Paper最自然；研究任务页默认从Forest改为Paper，新增paper-night暖灰黑、米白和低饱和暖棕的配对主题，保留原night草木金供独立选择。七套完整语义色卡仍不绑定布局。Header添加原位日夜切换，依照Header实际data-action接口绑定；URL palette配置可直接打开对应版本，切换不重建任务或笔记。color-scheme同时指定原生控件明暗。
+
+色卡原有全部输入/对比度/原子写入检查通过，Paper Night的9组文字角色满足阈值。浏览器复放Paper→Paper Night→Paper保持scope记录和笔记草稿；该原例通过不代表所有页面完成深色适配。Paper/Night配对已同步skill资产与配色说明。下一仍为SK03报告列表优化建议，长文PDF与生产接入未实施。
 
 2026-10-12 review 修复：单条 E6 记录缺少本机文件或校验失败时，在原列表和详情明确显示不可用，不再中断整个页面；执行结果、费用和内容质量显示未知，不能评分或读取未经验证的产物。恢复后重新校验原引用。根因是展示目录与可用证据错误耦合，修复位于展示读取边界，严格产物读取不放宽。财务事实同时兼容旧版独立 `currency` / `period_end` 与新版期间对象及单位，保留币种和准确日期，相同单位不重复。未改布局、公司列表或模型输入。
 
@@ -1851,3 +1985,70 @@ attachment hashes. No browser, model call or visual acceptance was performed.
 
 
 2026-10-12：03-M2 本地图片验收页沿 Uteki 简洁阅读基线，仅显示冻结原图、可点击文字高亮、可展开上下文和精确出处。高亮坐标取 OCR 校正结果，图像原字节不改；模型初稿自述明确为历史。检查 DOM/链接/字段绑定，未做浏览器截图或用户视觉验收。页面不触发模型调用。
+
+### SK03 · 报告 Paper / Paper Night（2026-10-12）
+- 共用夜间色卡提亮至 canvas #302e2a、surface #38352f；原位 applyPalette，body 覆盖正文和来源 portal，不重建 reader。
+- Modal 背景无法点击，新增可选 headerAction；报告以 sourcePanelAction 透传“切换明暗”。默认调用无新入口。阅读会话及报告列表白名单同时支持新主题，兼容旧记录。
+- 浏览器验收：正文 top=1292.5、data=true 换色不变；来源 query=PDF、rule-footer、panelTop=159.5、open=true、正文 top=928.5 前后相同；关闭恢复 top=928.5 和 rule-hierarchy 引用焦点。26项相关契约检查通过，不代表全页无障碍审计。
+- 当前 SK03 完成；下一项 SK04 独立报告迁移验收（待推进）。仅本地原创样稿，无真实报告接入。
+
+### SK04 · 不同报告内容复用（2026-10-12）
+- 新增 evidence-to-judgment 原创研究方法样稿：四章、长摘要、两图，六条正负/零/null 数据与三条独立记录。复用现有 reader、来源与样式，没有专属 CSS。正文建议与合成数字显式区分，引用只支撑现有排版契约。
+- 页首编号原先写死 01，现按明确报告目录派生为 03。原两报告身份不变。
+- 浏览器：Paper / Night 同版心与自然换行；展开说明=true、两图 data=[true,false]、top=1282 原位换色保持。来源 query=表格、rule-table、open=true、panelTop=0、top=2170 换色不变；关闭恢复引用焦点及 top=2170。
+- 从列表打开旧报告：独立 top=0、data=false；重新进入新报告保留 details=true、data=[true,false]。用实际顶部点击往返列表验收 top=1727→1727；自动定位顶部链接会先滚动443px，因此自动点击前坐标不能作为离开时的保存坐标。
+- 新增显式内容契约检查；22项内容/阅读/会话检查通过。保存 output/evidence-report-paper.png 与 evidence-report-night.png；已将迁移规则及新样稿同步技能。仅当前样稿与视口，不声称任意报告/长文PDF验收。
+- 当前 SK04 完成；下一项 SK05 真实内容接入（待用户选择内容，不新增业务范围）。
+
+### PK01 · 独立 Editorial Design Kit（2026-10-12）
+当前：本地独立待发布包 output/editorial-design-kit 与 ZIP；Skill/README/安装器/示例/验证齐备，未上传。复制至独立临时根启动8880验证，无原仓库运行依赖。相对链接适配Header安全校验、来源文档位于示例sources目录；没有放宽共享组件校验。44文件隔离安装与覆盖拒绝、34项契约测试、实际来源/列表/配色运行通过。独立审阅发现的运行路径问题已修复。官方quick_validate因本机缺PyYAML未运行成功，明示于VALIDATION.md。下项PK02：确定发布名与许可证后远程发布（未授权上传）。
+
+### PK02 · MIT 与双语发布说明（2026-10-12）
+用户确定项目名 Editorial Design Kit 与 MIT。独立包补全 MIT LICENSE（含技能内副本）、English README.md/中文 README.zh-CN.md，并校验两版命令一致。扩展便携检查发现原型说明存在未分发历史链接，改为明确历史文字保留原摘录。98本地引用、33安装引用、45文件字节一致与覆盖拒绝通过；34契约测试通过，更新ZIP后再次解压与隔离安装通过。独立示例代码未变，沿用上轮实测。未上传；下一项PK03是用户授权后的GitHub发布。
+
+### PK03 · GitHub 发布与真实安装使用（2026-10-12）
+公开仓库 https://github.com/Rain1601/editorial-design-kit ，MIT 与双语README，搜索主题已设置。官方Skill Installer从真实仓库main下载安装45文件，与发布内容逐字节一致，现有安装未覆盖。独立Codex CLI实际读取下载的Skill，生成三条虚构阅读项目的双语队列，复用ItemList/applyPalette并保留许可；浏览器确认选中第二项后换色/中文保持身份。验证记录已提交60f52e9；发布源码未包含原项目无关改动、会话日志或截图里的扩展品牌。当前PK01–03完成。下一项是按用户需求做后续版本维护，不自动部署示例站。
+
+## 2026-10-12 · PK04 Pages 与平铺切换
+
+独立 Editorial Design Kit 已部署到 https://rain1601.github.io/editorial-design-kit/ 。采用 GitHub Pages Actions，只上传显式静态目录，MIT 与中英文 README 均保留；两份 README 加入在线预览与安装入口。报告、报告列表与独立阅读清单使用 choice-switch 可复用受控按钮，语义色卡独立于业务状态。用户偏好少量常用外观选项平铺；筛选与长列表仍按任务选择控件。局部检查确认阅读坐标、来源搜索与回程焦点保留，线上检查确认三页加载及 Paper / Paper Night 切换。PK01–03 已完成，PK04 已完成；下一项为按用户新页面任务维护组件与示例，无待部署阻塞。
+
+## 2026-10-12 · PK05 语言平铺与复制安装
+
+三份双语示例统一采用中文 / English 受控按钮。报告语言重绘按章节 ID + 章内偏移还原位置，并保留独立图表模式与展开状态；列表保存展开对象 ID，防止翻译重绘收起摘要。局部浏览器验证章节偏移差小于0.01px、列表筛选/排序/展开均保持，阅读清单选中文章与 Paper Night 保持。便携 skill 同步规则，中英文 README 增加直接复制给 Codex 的安装+使用指令。PK01–04 已完成，PK05 本轮实现并验证，发布记录见独立仓库。
+
+PK05 发布确认：cc8938bcc471dd6630c5f7d689991b05cb6faadc 已与远端 main 一致，Pages run 38202843686 成功；在线阅读清单和报告可见中文 / English 按钮，已实点阅读清单并核对选中文章、语言与 Paper Night。PK05 完成。
+
+## 2026-10-12 · PK06 全新项目 Agent 页面复用验证
+
+在全新空目录通过官方 Skill Installer 从 GitHub 安装47文件，逐字节匹配 cc8938b。独立 Codex CLI 读取该安装的 skill 与组成/组件/色卡参考后生成 Agent Studio；主会话补充固定顶部切换栏及阅读锚点边界，再做浏览器核验。完整路径输入/附件元信息→暂停范围确认→明确批准→两份样稿；拒绝后编辑、取消不产出、错误恢复、语言/主题保留状态、产物数据模式与 Markdown 下载均已核验。执行区换语言保持top=119.984375px。页面是本地计时器/原创模板演示，不提供真实 Agent 后端，不读取附件正文。新项目12检查与已有34检查全部通过，便携闭包132引用；发布目录仅包含源码/运行资源/许可/文档/Node检查，排除原始会话和浏览器探针。已推送 b8f7717，Pages 状态待最终在线确认。PK01–05已完成，PK06当前发布验收。
+
+PK06 最终在线确认：Pages run 38206431651 成功；已从公开域名打开 Agent Studio，切到 English / Paper Night、选择展开范围并确认，再批准产出两份样稿。待确认阶段无产物，完成阶段有预览及下载入口。线上入口 https://rain1601.github.io/editorial-design-kit/examples/agent-task/agent-task.html 。PK06 完成；下一项按实际使用反馈维护，不主动接入真实后端。
+
+### Editorial Design Kit Agent components · 2026-10-12
+
+PK07: controlled input, execution, approval and artifacts now reside in the portable skill. Caller-defined choices, request IDs, output identity and bilingual labels replace two-artifact UI coupling. An independent three-option/three-artifact task uses the same mounted components. Paper / Paper Night and language updates preserve state, original text and anchor offset; local template execution remains explicitly a demo. See output/editorial-design-kit/VALIDATION.md for bounded checks.
+
+### Motion Lab foundation · 2026-10-12
+
+M01 adds purpose-specific measured height, selection-marker and non-modal presence transitions to Editorial Design Kit. Caller state is independent of motion; interrupted transitions cannot apply stale visibility. Reduced-motion updates are immediate. The bilingual Paper / Paper Night specimen retains selection, disclosure and detail identity. Targeted browser checks and pure lifecycle tests are recorded in the independent kit VALIDATION.md.
+
+## Editorial Design Kit M02 · 2026-10-12
+
+Independent kit report and Agent examples now share measured disclosure, selection marker and short presence motion. Native details retains a separate logical state during animated closing; restoration skips replay, and closing moves focus out of disappearing content. Agent opts in with motion:true, preserving controlled requests and artifacts. Targeted bilingual/Paper checks retained report figure modes, source-panel search and citation focus, Agent scope/acknowledgement, original artifact text and reading coordinates. Kit lifecycle/portability checks passed; local templates remain separate from live Agent execution. Changes belong to output/editorial-design-kit; no Uteki production integration is claimed.
+
+## Editorial Design Kit M03 · 2026-10-12
+
+Portable research Dashboard uses heterogeneous content-led modules, pointer/keyboard reorder with committed state separate from preview, and full-width expansion of original DOM nodes. Non-dense grid retains reading order. Expanded modules share a bottom navigation rail; closure restores stable module anchor and focus, not an absolute scroll offset that drifts after translation. Fixed header reveal offset is explicit configuration. Bilingual/Paper updates preserve note, independent chart mode and layout. Focused lifecycle and desktop browser checks passed; this is an independent kit specimen with synthetic data, not Uteki integration or live research.
+
+### 2026-10-12 · Editorial Design Kit continuous reading
+
+User explicitly prefers enough content on a single page. Reports and reading specimens default to continuously mounted chapters with an outline; avoid next/previous reading screens, viewport-height chapter floors and forced scroll snapping. App work-view transitions remain a separate task. The independent kit adds a chapter navigator, curved scroll-driven illustration and a continuous bilingual Paper/Paper Night specimen. Targeted desktop checks preserved chapter-middle position, annotation and note through translation; native scrolling retained focus. No full mobile or accessibility audit is claimed.
+
+### 2026-10-12 · Original micro illustrations
+
+The independent Editorial Design Kit now uses original toolkit opening, paper turning and pencil sketching SVGs. Fixed small footprints and ink/surface/accent roles preserve the single-page composition across Paper and Paper Night. Report decorations sit outside the re-rendered reader; Agent title ornament stays outside input/state renderers. Language updates only the illustration labels. One-time entry, explicit replay, offscreen static settling and system reduced motion prevent decorative loops from implying execution progress. Targeted local checks retained Agent input and confirmed semantic night colors.
+
+### 2026-10-12 · Toolkit static approval before motion
+
+User rejected the initial sparse toolbox and approved a second generated static direction. The implementation redraws that broad case/handle/clasps/three-tool composition as semantic-color SVG layers; it does not claim pixel identity with the raster. Lid rotation includes the attached handle, tools rise behind the foreground case and settle in the static pose. Targeted browser checks confirmed replay motion and retained task input through English/Paper Night. Paper and pencil materials were not expanded.

@@ -1,0 +1,34 @@
+.linked-charts{margin:32px 0 40px;color:var(--ink);font:12px/1.5 var(--font-ui);border-top:1px solid var(--ink)}
+.linked-charts .linked-chart-instructions{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:15px 0;color:var(--muted)}
+.linked-charts .linked-chart-clear{font:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);padding:4px 0;white-space:nowrap}
+.linked-charts .linked-chart-clear:disabled{opacity:.35;cursor:default}
+.linked-charts .linked-chart-stage{position:relative;isolation:isolate}
+.linked-charts svg{display:block;width:100%;height:auto;overflow:visible}
+.linked-charts .linked-chart-title{fill:var(--ink);font:19px var(--font-reading)}
+.linked-charts .linked-chart-unit,.linked-charts .linked-chart-tick,.linked-charts .linked-chart-label{fill:var(--muted);font:12px var(--font-ui)}
+.linked-charts .linked-chart-baseline{stroke:var(--line);stroke-width:1}
+.linked-charts .linked-chart-path{fill:none;stroke:var(--ink);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;transition:opacity 180ms}
+.linked-charts .linked-chart-mark{fill:var(--accent);transition:opacity 180ms}
+.linked-charts .linked-chart-mark.negative{fill:var(--ink)}
+.linked-charts .linked-chart-series.line circle{stroke:var(--canvas);stroke-width:2}
+.linked-charts .linked-chart-zero-value{stroke:var(--accent);stroke-width:2}
+.linked-charts .linked-chart-gap{stroke:var(--muted);stroke-width:1.5;fill:none}
+.linked-charts.has-active .linked-chart-mark{opacity:.22}
+.linked-charts.has-active .linked-chart-mark.is-active{opacity:1}
+.linked-charts.has-active .linked-chart-path{opacity:.3}
+.linked-charts .linked-chart-reference{stroke:var(--accent);stroke-width:1;stroke-dasharray:3 5;pointer-events:none}
+.linked-charts.is-pinned .linked-chart-reference{stroke-dasharray:none}
+.linked-charts .linked-chart-hit-area{position:absolute;inset:9.7% 0 9.7%}
+.linked-charts .linked-chart-point{position:absolute;top:0;height:100%;margin:0;padding:0;border:0;background:transparent;border-radius:0;cursor:crosshair;color:inherit}
+.linked-charts .linked-chart-point:hover{background:transparent}
+.linked-charts .linked-chart-point:focus-visible{outline:1px solid var(--accent);outline-offset:-2px;background:color-mix(in srgb,var(--surface) 25%,transparent)}
+.linked-charts .linked-chart-caption{display:grid;grid-template-columns:72px 1fr auto;align-items:start;gap:16px;min-height:80px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0}
+.linked-charts .linked-chart-selected{font:18px/1.5 var(--font-reading)}
+.linked-charts .linked-chart-detail{grid-column:1/-1;font:14px/1.5 var(--font-reading);min-height:21px}
+.linked-charts .linked-chart-readout{display:flex;gap:30px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.linked-charts .linked-chart-readout>span{display:flex;flex-direction:column;gap:4px}
+.linked-charts .linked-chart-readout b{color:var(--muted);font-weight:400}
+.linked-charts .linked-chart-pin-status{color:var(--accent);font-size:11px}
+.linked-charts .linked-chart-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(max-width:600px){.linked-charts .linked-chart-caption{grid-template-columns:56px 1fr;gap:12px}.linked-charts .linked-chart-pin-status{grid-column:2}.linked-charts .linked-chart-readout{gap:18px}.linked-charts .linked-chart-instructions{font-size:11px}.linked-charts .linked-chart-title{font-size:21px}}
+@media(prefers-reduced-motion:reduce){.linked-charts .linked-chart-path,.linked-charts .linked-chart-mark{transition:none}}

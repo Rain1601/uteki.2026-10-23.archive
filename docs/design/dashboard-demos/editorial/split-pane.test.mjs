@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {clampPane} from './split-pane.mjs';
+test('pane widths remain within both sides and reject invalid bounds',()=>{assert.equal(clampPane(999,900),420);assert.equal(clampPane(100,900),210);assert.equal(clampPane(400,600),340);assert.equal(clampPane(260,350),175);assert.throws(()=>clampPane(NaN,900));assert.throws(()=>clampPane(200,0));});

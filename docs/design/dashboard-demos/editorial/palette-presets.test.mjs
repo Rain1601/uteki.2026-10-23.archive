@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {palettePresets,resolvePalette,validatePalette} from './palette-presets.mjs';
+import {themeCSS} from './tokens.mjs';
+test('named palettes validate independent complete roles, including dark surfaces',()=>{for(const [id,p] of Object.entries(palettePresets)){const copy=validatePalette(id);assert.deepEqual(copy,p);assert.notEqual(copy,p);assert.ok(themeCSS(copy).includes('--accent-soft:'));}assert.notEqual(palettePresets.night.positive,palettePresets.paper.positive);});
+test('custom palette preserves caller input and rejects incomplete unsafe or unreadable roles',()=>{const custom={...palettePresets.forest,series3:'#123456'};assert.deepEqual(validatePalette(custom),custom);assert.equal(custom.series3,'#123456');for(const input of ['unknown',{}, {...custom,ink:'#fff'},{...custom,foo:'#123456'}])assert.throws(()=>resolvePalette(input));assert.throws(()=>validatePalette({...custom,muted:custom.surface}),/contrast/);});
+
+test('theme writes preserve inline layout and invalid drafts make no partial writes',async()=>{const {applyPalette}=await import('./palette-presets.mjs');const values=new Map([['width','640px']]),host={style:{setProperty:(k,v)=>values.set(k,v)}};applyPalette(host,'night');assert.equal(values.get('width'),'640px');assert.equal(values.get('--accent-soft'),palettePresets.night.accentSoft);const before=[...values];assert.throws(()=>applyPalette(host,{...palettePresets.night,muted:palettePresets.night.surface}));assert.deepEqual([...values],before);});

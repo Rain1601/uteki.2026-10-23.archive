@@ -1,0 +1,146 @@
+{
+  "version": "0.1",
+  "checked": "2026-10-10",
+  "sources": [
+    {
+      "id": "AS01",
+      "name": "研究出版 / Research",
+      "family": "editorial",
+      "url": "https://www.anthropic.com/research",
+      "evidence": "结构核查；此前对照",
+      "observation": "栏目、日期、分类和文章列表共同建立出版秩序。",
+      "components": "PublicationList · SectionIndex",
+      "image": null
+    },
+    {
+      "id": "AS02",
+      "name": "工程文章 / Engineering",
+      "family": "editorial",
+      "url": "https://www.anthropic.com/engineering",
+      "evidence": "结构核查",
+      "observation": "技术内容按主题和文章组织；适合内容入口而非数据卡片堆叠。",
+      "components": "ArticleIndex · FeaturedStory",
+      "image": null
+    },
+    {
+      "id": "AS03",
+      "name": "新闻 / News",
+      "family": "editorial",
+      "url": "https://www.anthropic.com/news",
+      "evidence": "结构核查",
+      "observation": "重点报道与后续列表分层；日期作为扫描锚点。",
+      "components": "NewsLead · DateRow",
+      "image": null
+    },
+    {
+      "id": "AS04",
+      "name": "产品总览 / Overview",
+      "family": "product",
+      "url": "https://claude.com/product/overview",
+      "evidence": "截图与DOM",
+      "observation": "大衬线标题居中，周围是任务缩略素材；主次按钮区分行动。",
+      "components": "ProductHero · TaskThumbnail",
+      "image": "study/overview.png"
+    },
+    {
+      "id": "AS05",
+      "name": "作品 / Artifacts",
+      "family": "product",
+      "url": "https://claude.com/features/artifacts",
+      "evidence": "截图与DOM",
+      "observation": "小标签与大衬线标题分工；示例切换和作品信息可独立组合。",
+      "components": "ExampleSwitcher · ArtifactMeta",
+      "image": "study/artifacts.png"
+    },
+    {
+      "id": "AS06",
+      "name": "连接器目录 / Directory",
+      "family": "directory",
+      "url": "https://claude.com/marketplace/connectors-plugins",
+      "evidence": "截图、DOM与筛选操作",
+      "observation": "左侧分类筛选，右侧检索、排序和目录；勾选分类后范围与数量同步变化。",
+      "components": "FilterRail · DirectoryGrid",
+      "image": "study/connectors.png"
+    },
+    {
+      "id": "AS07",
+      "name": "下载 / Download",
+      "family": "product",
+      "url": "https://claude.com/download",
+      "evidence": "截图与DOM",
+      "observation": "首屏明确主平台行动；下面再展开各端入口。",
+      "components": "PlatformPicker · DownloadCard",
+      "image": "study/download.png"
+    },
+    {
+      "id": "AS08",
+      "name": "任务委托 / Cowork",
+      "family": "product",
+      "url": "https://claude.com/product/cowork",
+      "evidence": "截图与DOM；内部未实测",
+      "observation": "围绕任务和工作成果组织说明；应用内执行过程仍需独立检查。",
+      "components": "TaskBrief · ProgressRail",
+      "image": null
+    },
+    {
+      "id": "AS09",
+      "name": "作品编辑工作区 / Editor",
+      "family": "application",
+      "url": "https://support.claude.com/en/articles/17153992-what-are-artifacts-and-how-do-i-use-them",
+      "evidence": "官方文档；非应用实测",
+      "observation": "官方说明作品窗口、工具栏、缩略图和属性区域。分区布局由此推导，不声称像素复刻。",
+      "components": "ArtifactCanvas · Inspector · ThumbnailRail",
+      "image": null
+    },
+    {
+      "id": "AS10",
+      "name": "项目知识 / Projects",
+      "family": "application",
+      "url": "https://support.claude.com/en/articles/9519177-how-can-i-create-and-manage-projects",
+      "evidence": "官方文档；非应用实测",
+      "observation": "项目、知识文件、指令和成员有不同职责，适合分别建立导航和编辑区域。",
+      "components": "KnowledgePanel · MemberList · ProjectMenu",
+      "image": null
+    },
+    {
+      "id": "AS11",
+      "name": "文章动态素材 / Inline media",
+      "family": "motion",
+      "url": "https://claude.com/blog/claude-builds-visuals",
+      "evidence": "截图与媒体DOM",
+      "observation": "同文组合YouTube视频、GIF操作演示和静态PNG；局部演示留在正文流内。",
+      "components": "ArticleVideo · LoopFigure · MediaCaption",
+      "image": "study/article-motion.png"
+    },
+    {
+      "id": "AS12",
+      "name": "动态图解文章 / Motion article",
+      "family": "motion",
+      "url": "https://claude.com/resources/articles/dashboards-and-motion",
+      "evidence": "媒体及结构核查",
+      "observation": "段落先说明用途，再配视频与操作截图；动效承载具体解释任务。",
+      "components": "ExplainerFigure · Walkthrough",
+      "image": null
+    },
+    {
+      "id": "AS13",
+      "name": "教学任务 / Academy",
+      "family": "learning",
+      "url": "https://academy.claude.com/use-cases/visualize-the-mechanism-behind-an-explanation-mid-chat",
+      "evidence": "截图与DOM",
+      "observation": "色块导语、时间与主题标签、分步教程、可复制提示和右侧目录，形成教学节奏。",
+      "components": "LessonIntro · PromptBlock · StepIndex",
+      "image": "study/academy.png"
+    },
+    {
+      "id": "AS14",
+      "name": "开发者文档 / Docs",
+      "family": "developer",
+      "url": "https://code.claude.com/docs/en/overview",
+      "evidence": "截图与DOM",
+      "observation": "左侧分组导航、中间正文、右侧页内目录；安装方式用嵌套标签页，代码有局部工具。",
+      "components": "DocsShell · CodeBlock · PlatformTabs",
+      "image": "study/docs.png"
+    }
+  ]
+}

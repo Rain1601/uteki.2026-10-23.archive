@@ -1,0 +1,13 @@
+.citation-anchor{display:inline-block;position:relative;vertical-align:baseline}
+.citation-trigger{display:inline;border:0;border-bottom:1px solid currentColor;border-radius:0;background:none;padding:0 1px;color:var(--accent,var(--ink));font:inherit;font-size:.8em;line-height:1.3;cursor:pointer;text-align:inherit}
+.citation-trigger:hover,.citation-trigger[aria-expanded="true"]{color:var(--ink);background:var(--surface,var(--canvas))}
+.citation-trigger:focus-visible{outline:2px solid var(--accent,var(--ink));outline-offset:4px}
+.citation-excerpt{position:fixed;left:0;right:auto;width:min(350px,calc(100vw - 56px));max-height:min(440px,70vh);overflow:auto;box-sizing:border-box;color:var(--ink);font:14px/1.7 var(--font-ui);z-index:40}
+.citation-excerpt b{font:18px/1.3 var(--font-reading)}
+.citation-excerpt p{white-space:pre-wrap}
+.citation-excerpt small{display:block}
+.citation-source-link{display:inline-block;margin-top:14px;padding-bottom:2px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;font:11px/1.5 var(--font-ui)}
+@media(prefers-reduced-motion:reduce){.citation-trigger{transition:none}}
+/* Inline citations keep the same treatment inside task controls and prose. */
+.agent-task-page .citation-trigger{padding:0 1px;border:0;border-bottom:1px solid currentColor;border-radius:0;background:none;color:var(--accent,var(--ink));font-size:.8em;line-height:1.3}
+.agent-task-page .citation-trigger[aria-expanded="true"]{color:var(--ink)}
