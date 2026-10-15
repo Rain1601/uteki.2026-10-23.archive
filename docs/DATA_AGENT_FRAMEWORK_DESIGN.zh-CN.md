@@ -1,6 +1,6 @@
 # Data Agent 与分析 Agent：数据能力框架设计
 
-日期：2026-10-15 · 版本：设计稿 v1.29 · **状态：第四批原限定验收记录保留（14.12.12）；后续 review 的 R1–R4 已完成修正及限定验收（14.12.14）：187 项测试、49 个安装文件核验及旧格式兼容通过。具备第五批离线适配开工条件，第四批已停止，未自动进入下一批。未接生产、未新增真实取数、模型调用为 0，不代表 Agent 自主业务通过。前三批和环境证据见 14.12.8–14.12.11；M0 仅离线接入及本地 CLI 探针通过，真实模型/网关未验收。保留 OpenRouter、两套官方 SDK 与各模型独立 prompt，DeepSeek 为低成本功能验证候选，工作台后置**。
+日期：2026-10-15 · 版本：设计稿 v1.30 · **状态：第四批原限定验收记录保留（14.12.12）；后续 review 的 R1–R4 已完成修正及限定验收（14.12.14）：187 项测试、49 个安装文件核验及旧格式兼容通过。第五批第一步双 SDK 离线绑定已完成限定验收及 review（14.12.15）；按用户连续推进授权，下一步为 T5/T6 运行控制。未接生产、未新增真实取数、模型调用为 0，不代表 Agent 自主业务通过。前三批和环境证据见 14.12.8–14.12.11；M0 仅离线接入及本地 CLI 探针通过，真实模型/网关未验收。保留 OpenRouter、两套官方 SDK 与各模型独立 prompt，DeepSeek 为低成本功能验证候选，工作台后置**。
 
 本文整理已确认职责、设计及分批限定验收，不新增业务范围授权，不宣称目标框架全部实现。公司、年份和单次实验属于验收案例，不成为通用规则。DA-01 获取与储存、DA-02 解析与索引、DA-03 查询与材料交付保留为模块 ID。第四批原交付后停止；review 原发现见 14.12.13，收尾证据和后续离线适配准入见 14.12.14。模型功能验证与业务效果验收分开，工作台继续后置。
 
@@ -2574,6 +2574,28 @@ A24 两个显式原记录为 391035000000 与 383285000000 USD，各自保留原
 **边界与未运行：**只使用临时目录、合成 HTML/记录和受控传输，真实网络/模型调用均为 0；没有加载生产数据或重新获取两份真实财报。其他平台/文件系统、真实断电、M0 重跑、真实 SDK/网关、完整业务效果未运行。依赖声明和锁文件不变；未提交、推送或部署，其他未提交改动保留。
 
 **后续准入与停止：**第五批可以在新指令后开始双 SDK 的原生工具绑定、离线同案例回放与独立 prompt/profile 装配；共享业务契约，不复制 Runner。完整第五批和真实调用仍需 T5/T6、强制停止/澄清继续/费用等契约及对应离线证据，具体模型、路由、物理请求限制和额度另行冻结。本批不自动进入 SDK、付费调用或工作台。
+
+#### 14.12.15 第五批第一步：双 SDK 离线绑定与 review（2026-10-15）
+
+**结论：本步七项条件完成限定验收；下一步进入 T5/T6，完整第五批及完整 Data Agent 尚未完成。** 用户已授权按剩余任务逐步实施，每步 review 后核对/调整下一步；各步“停止”作为验收检查点，付费、业务标准和生产切换仍遵守其明确授权条件，不因连续 Goal 自动放行。
+
+实现增加 agent/profiles、agent/binding、agent/openai_runtime、agent/claude_runtime 与 providers/openrouter；业务六工具仍调用原 DataService，原 contracts/content/catalog/build/retrieval/service 源码不变。profile 绑定 kernel/model/role、SDK 版本、独立 prompt 正文/hash 和显式路由配置；只有 fixture profile 可运行，live/未验证能力和未经验证的 reasoning 配置拒绝。OpenRouter 配置边界已经保留，但没有发出真实网关请求。
+
+| 条件 | 当前证据 |
+|---|---|
+| 官方循环与共享工具 | OpenAI 实际 Runner/FunctionTool；Claude 实际 SDK/MCP 与随包 CLI。两侧合成案例均执行六工具、明确处理索引、读回原文、代码计算并由 DataService 校验交付；模型回答由脚本提供，不是自主业务效果。 |
+| 独立 profile | 两侧 fixture 的 query prompt 不同；模型/内核/角色错误、正文 hash 变化、配置逃逸、SDK 版本不符、能力未配置及不同模型复用正文都有拒绝检查。未提供真实模型 profile，不声称已调优。 |
+| 非法终态 | 非法参数、未建索引的业务错误、伪造引用、纯自由文本在两侧均不成为交付。Claude 负例另核验原生正常终态与无 fixture API 错误，避免把其他失败当作预期拒绝。 |
+| 消息与证据 | handler 返回、SDK 消息与交付分别记录。OpenAI on_llm_start 捕获输入；Claude UserMessage 工具结果与下一次实际本地 Messages 请求逐项对照。仅 handler 返回或截断文本不能使原完整 ResultRef 通过适配层检查；不声称“模型已理解”或任意压缩策略已验收。 |
+| 可复现环境 | 主 pyproject 新增 agent extra，主锁只增加 Claude SDK 0.2.166，其余版本不变；M0 声明/锁不变。新的 data+agent 环境 43 包，另建 data-only 环境；两边普通重装后 48 个 Data 包 Python/SQL 文件全部 hash 一致。 |
+
+**测试与证据：**`output/data-agent-sdk-20261015/` 的 [verification-final.json](../output/data-agent-sdk-20261015/verification-final.json)、[review-final.json](../output/data-agent-sdk-20261015/review-final.json)、[OpenAI 原生输入/输出](../output/data-agent-sdk-20261015/openai-final.json)、[Claude 正常案例](../output/data-agent-sdk-20261015/native-final/success.json)。7 项 SDK 单测、2 项 Claude 原生集成测试（5 个场景）、140 项核心单测、18 项 data-only 进程测试通过，共 167 个不同测试。当前安装包及源码清单见 installed-final.json 与 installed-core-final.json；不同场景和阶段重跑不重复计入测试数。没有运行新真实取数、付费模型、M0 历史探针或完整业务评测。
+
+**本步 review 的实际修正：**合成计算请求漏传必填 select 先在 fixture 修正，没有放宽产品 schema。OpenAI 原生最终输出在未声明 output_type 时转为字符串，改为以官方终止回调确认加已校验交付判定，最终输出仍保留。macOS 配置目录采用规范化路径比较并允许系统自动补入的编码变量。Claude 权限模式不能依赖默认值：初次 native init 显示 auto，并产生额外分类请求/拒绝，现显式 default，由 can_use_tool 与 PreToolUse 限定业务工具；原失败及合成请求保留。
+
+原进程套件含“SDK 不在环境中”的依赖隔离检查，在 agent 环境中失败符合该检查的前提；随后在新建 data-only 环境按原标准通过，没有修改/跳过测试。新测试与主锁在 macOS arm64 / Python 3.13.15 验证，其他平台、真实网络/模型协议、持久 SDK 恢复和业务准确性未验证。
+
+**下一步调整与边界：**OpenAI 正常案例为 8 次脚本模型响应，Claude 正常案例为 9 次本地合成请求；后者在 accepted deliver 后仍有原生终态交互。此差异不作性能优劣结论，下一步需实现不追加模型调用的强制停止、T5/T6 的取消/未知结果/根账本、澄清继续和持久恢复。原生 init 仍报告内置 Skills/plugins，空 settings/skills 配置不能当作全部原生配套已禁用；具体隔离/增益在后续配套步骤验收。当前仅暴露离线入口，以上缺口不能通过“SDK 运行成功”提前豁免。
 
 ### 14.13 各功能维度的运行流程与接口
 

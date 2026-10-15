@@ -41,6 +41,16 @@
 
 **交付说明：**参数只接受登记引用和标明来源的调用者说明，不接受调用者补填原文或数值。`context_evidence` 与计算操作数递归纳入交付；引用、闭包和格式有效不证明自然语言需求已被充分满足。本批的程序化案例不能当作 Agent 自主选材或业务充分性通过。
 
+### 0.0.1 第五批 SDK 离线绑定（2026-10-15）
+
+在 0.0 的确定性 API 外增加两侧原生 SDK 装配，入口为 agent.openai_runtime.run_offline 与 agent.claude_runtime.run_offline。六工具及 deliver 的模型参数是 `{request, state}`；context_ref、请求幂等键与根上下文由宿主绑定，模型不能替换。工具 schema 来自现有 Pydantic 契约。OpenAI strict_json_schema=False 是为保留维度/QName 映射等动态键，应用完整参数校验保持；真实模型是否支持该 schema 仍须对应网关验证。
+
+适配层分别记录 handler 返回、可观察 SDK 消息与最终交付。OpenAI 在 on_llm_start 观察实际输入；Claude 从 UserMessage 的工具结果观察，并在原生 CLI 合成网关案例中对照下一次 Messages 请求确认内容。截断或替换后的结果不按原完整返回登记为本适配运行可用引用；这里证明消息包含，不证明模型理解，也不把已测小样扩展为任意压缩/大结果配置已验证。
+
+只有 DataService 接受的 deliver 才能产生成功交付；自由文本、非法引用、工具错误与 SDK 终态成功本身均不够。OpenAI 通过原生 tool_use_behavior 终止；当前 Claude 正常案例在 accepted deliver 后还有一次原生终态模型交互（合成响应），零追加调用的停止控制属于下一步运行协议。本步不实现 T5/T6、澄清继续、强制部分交付或持久 SDK 恢复。
+
+当前 profile 与入口限定离线；OpenRouter 配置描述保留精确协议、模型、上游与禁止 fallback 的边界，不表示真实网关已接通。Claude 明确使用 default 权限模式、业务工具白名单及 PreToolUse 检查；空 setting_sources/skills/plugins 不被表述为原生内置 Skills 已全部禁用，后续原生配套单独核验。证据和停止/继续准入见核心设计 14.12.15。
+
 ### 0.1 调用方与传输
 
 | 调用方 | 传输 | 说明 |

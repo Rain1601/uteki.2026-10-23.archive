@@ -18,7 +18,7 @@
 
 | 环境 | 依赖声明 | 安装依据与边界 |
 |---|---|---|
-| 主开发环境 | 根 `pyproject.toml`，按需选择 analysis/data/mcp extras | 根 `uv.lock`；Data Agent 开发基线选这三个 extras，不包含 Claude M0 验证依赖 |
+| 主开发环境 | 根 `pyproject.toml`，按需选择 analysis/data/mcp/agent extras | 根 `uv.lock`；确定性核心选 data，双 SDK 选 data + agent；agent 显式包含 Claude SDK |
 | M0 SDK 验证环境 | 根 `pyproject.toml` 的基础依赖 + `requirements/m0.in` | `requirements/m0.txt` 的 40 个固定版本，Python 3.13；独立环境保留已验证 SDK 组合，不与主锁混用 |
 
 不提供 `m0` extra：该声明已迁到 `requirements/m0.in`，避免主项目元数据声明了一套未进入主锁的独立环境。两个锁允许共同包版本不同；升级须针对对应环境重新验证，不靠合并锁或整体升级消除差异。以下命令均从仓库根运行；首次安装依赖/构建工具可能联网，不请求模型、不需要 API 密钥。
@@ -88,6 +88,29 @@ uv pip compile pyproject.toml requirements/m0.in --python-version 3.13 --constra
 ```
 
 有意升级 M0 时才重新生成 `requirements/m0.txt` 并复验；主锁仍由主项目维护。安装依赖的下载缓存可复用，旧虚拟环境的已安装包不能充当新环境验收结果。当前机制遵循 [uv 锁定与同步](https://docs.astral.sh/uv/concepts/projects/sync/) 及 [requirements 锁定流程](https://docs.astral.sh/uv/pip/compile/)。
+
+## 第五批双 SDK 离线接入（2026-10-15）
+
+正式 runtime 使用主锁的 `agent` extra，包含 OpenAI Agents SDK 0.22.2、Claude Agent SDK 0.2.166 和 MCP 2.2.0；与 `data` 一起安装。主锁仅新增 Claude SDK，原包版本未升级。M0 独立声明与锁保持原样，继续用于历史探针复现，不作为正式 runtime 的隐式依赖来源。
+
+```bash
+uteki_sdk_repo="$PWD"
+uteki_sdk_env="$(mktemp -d "${TMPDIR:-/tmp}/uteki-sdk.XXXXXX")"
+UV_PROJECT_ENVIRONMENT="$uteki_sdk_env/venv" uv sync --locked --python 3.13 --extra data --extra agent --no-editable
+uv pip install --reinstall-package uteki-eval --no-deps . --python "$uteki_sdk_env/venv/bin/python"
+uv pip check --python "$uteki_sdk_env/venv/bin/python"
+(
+  cd "$uteki_sdk_env"
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_sdk_repo/tests/unit/data_platform_agent" -p 'test_*.py' -v
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_sdk_repo/tests/integration/data_platform_agent" -p 'test_*.py' -v
+)
+```
+
+第二组会启动本机回环服务和随包 Claude CLI，需允许监听 127.0.0.1。worker 使用独立临时配置、虚拟令牌及拒绝外部连接的代理；没有真实模型推理或 OpenRouter 请求。OpenAI 使用实际 Runner 和脚本 Model；Claude 使用实际 SDK/CLI 与脚本 Messages 服务。缺少本机端口/子进程权限时明确记未运行，不能以 scripted CLI Transport 的结果替代此组。
+
+当前 `agent.openai_runtime.run_offline` / `agent.claude_runtime.run_offline` 接受调用者提供的 DataService、context_ref 和精确 profile；不提供默认模型或付费入口。`config/data_platform` 中只有明确标为 offline_fixture_only 的 query profile，不能用于真实模型。推理配置未经对应能力验证会拒绝；不是已完成真实路由或 prompt 业务调优。
+
+确定性核心的进程测试包含“SDK 未安装”的安装边界断言，必须在仅安装 `data` 的另一干净环境运行，不能在 agent 环境中删除或放宽该断言。第五批第一步限定验收及已知差异见核心设计 14.12.15。
 
 ## 原件存储与输入清单的独立验收（2026-10-14）
 

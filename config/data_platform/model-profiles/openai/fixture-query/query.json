@@ -1,0 +1,28 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "fixture/openai-query-v1",
+  "role": "query",
+  "sdk_version": "0.22.2",
+  "status": "offline_fixture_only",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/fixture-query/query.md",
+    "version": "offline-v1",
+    "sha256": "f94093e11f96d7a8656090ecc3f3e522c75bfedec66480e650b2ce8d3b6391bb"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "fixture-only"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "reasoning_effort": null
+}

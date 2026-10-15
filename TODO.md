@@ -1,4 +1,4 @@
-# 当前动作：第四批 review 收尾修正已完成限定验收，已停止
+# 当前动作：第五批第二步——运行控制与 T5/T6
 
 核心文档：[DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md](docs/DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md)；接口：[DATA_AGENT_API.zh-CN.md](docs/DATA_AGENT_API.zh-CN.md)。
 
@@ -12,7 +12,11 @@
 | 第四批：六工具与可追溯交付 | 原限定验收及 review 记录保留；R1–R4 已关闭，187 项测试与旧格式兼容核验通过，14.12.14 |
 | 第五至七批 | 两套真实 Agent、配套与业务验收、迁移试用尚未完成；路线见 14.1.5 |
 
-**当前唯一动作：**本批完成并停止。R1–R4 已按核心设计 14.12.14 关闭，满足第五批“两套官方 SDK 离线适配”的代码开工条件；等待新任务指令，不自动启动下一批。
+**当前唯一动作：**第五批第一步已完成限定验收与 review（14.12.15）；按用户连续推进授权，进入第二步 T5/T6：根运行/账本、明确终态、停止、澄清继续与恢复。先固定协议及反例，再实现并验收；不调用真实模型、不接生产。后续步骤按核心设计路线与用户剩余任务逐步 review，不一次启动。
+
+**第五批第一步证据：**[verification-final.json](output/data-agent-sdk-20261015/verification-final.json)、[review-final.json](output/data-agent-sdk-20261015/review-final.json)。两侧实际 SDK；Claude 另运行原生 CLI 与本机合成 Messages 服务。7 项 SDK 单测、2 项 native 集成测试（5 场景）、140 项核心单测和 18 项 data-only 进程测试通过，48 个包文件与安装内容一致。主锁只新增 Claude SDK，原版本及 M0 锁未改。原失败全部保留；真实模型/OpenRouter 调用为 0。当前 fixture profile、原生消息边界及差异见 14.12.15，不当作真实业务或配套能力完成。
+
+**本步 review 对下一步的约束：**Claude accepted deliver 后仍有一次原生终态交互，下一步需落实不追加模型调用的停止；SDK 原生配置、未知费用与业务运行状态不能相互替代。原生内置 Skills 仍可出现在 init 信息中，后续配套隔离须实际验证。
 
 | 收尾项 | 已验证结果 |
 |---|---|
