@@ -1,5 +1,7 @@
 # 当前动作：第五批第四步——真实网关路径的非付费工程实现
 
+**本轮停止点（2026-10-15 用户确认）：**完成 Prompt 4 的非付费工程与验收后暂停 goal，供用户 review 实现，不进入 Prompt 5。收尾须覆盖实际传输与持久 RuntimeJournal 的批次/scope 绑定、两套真实 SDK 在本机合成网关上的规定场景、受影响回归与差异核验；只完成单个传输检查点不等于达到停止点。未授权的真实模型调用仍保留为未执行，不将非付费验收写成完整 Prompt 4 通过。执行中问题特别是 SDK 问题，按 AGENTS.md 新增规则优先查官方依据后修复。
+
 核心文档：[DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md](docs/DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md)；接口：[DATA_AGENT_API.zh-CN.md](docs/DATA_AGENT_API.zh-CN.md)。
 
 | 工作 | 完成情况 |
@@ -15,6 +17,8 @@
 | 第五至七批 | 两套真实 Agent、配套与业务验收、迁移试用尚未完成；路线见 14.1.5 |
 
 **当前唯一动作：**按目标附件 Prompt 4，先补齐真实 transport、原始响应/收费捕获和两侧多场景共用的批次预算控制，以离线事件完成验收。入口仍拒绝未经授权的真实运行。具体候选及准入见 [gateway-contract.draft.v1.json](config/data_platform/gateway-contract.draft.v1.json)；缺凭据或额度不阻塞这些工程工作，但不发送推理请求、不充值、不接生产。完整目标及后续步骤保持，不因单批完成缩小。
+
+**Prompt 4 检查点 3：**实际 HTTP 边界与两套 SDK 本机接线已完成限定验收：74 项不同检查通过，66 个普通安装包文件一致。修复关闭连接后隐式重连、HTTP/1.0 响应取消和 EOF 误判；按官方 SDK 实现允许精确的 Claude beta Messages 路径。两侧各一请求、独立 prompt/八个工具 schema/原始字节和同一合成账本核对通过，原失败保留。证据见 14.12.18 与 [verification.json](output/data-agent-gateway-runtime-20261015/checkpoint-3/verification.json)。未执行业务工具、未调用真实模型；持久 RuntimeJournal/scope 绑定和 G01–G05 尚未完成，L2/L3 不记整体通过。**下一动作：持久绑定批次 scope 与业务根身份，完成两侧规定场景，再按顶部用户约定暂停供 review。**
 
 **Prompt 4 检查点 2：**已补齐检查点 1 缺失的验证报告，并完成原始响应/收费记录模块。HTTP 完整、协议终态和收费分别判断；部分响应在核费后仍保持未知，补回同次完整响应保留原事件；generation 身份冲突与同一账单重复归属明确拒绝。HTTP 长度/编码反例也已修正；本检查点累计 71 项不同检查通过（新增 27 项，最终改动影响的 27 项已重放），65 个包文件匹配，原失败保留，详见核心设计 14.12.18 与 [verification.json](output/data-agent-gateway-runtime-20261015/checkpoint-2/verification.json)。只使用合成账单和本机 HTTP，未调用真实模型；实际 transport/SDK/RuntimeJournal 接线未完成，L2/L3 不记通过。**下一动作：接入实际 HTTP 请求边界与宿主批次/scope 绑定，再验证两侧 SDK。**
 

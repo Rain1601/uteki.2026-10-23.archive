@@ -2834,6 +2834,16 @@ OpenAI 使用 Chat Completions，实际发送 `provider.only/order=['deepseek']`
 
 本检查点不包含实际 SDK/HTTP transport/RuntimeJournal 接线、真实收费查询或完整 SDK 恢复联调；模块本身不加载凭据、不联网、不授予运行权限，调用方必须提供可信传输与冻结身份。全部金额均为合成账单，真实模型请求与实际推理费用为 0；主锁/M0 锁及网关草案未变，原四项历史偶发故障未关闭。**下一动作：将实际 HTTP 请求边界和宿主的批次/scope 绑定接入持久 RuntimeJournal，再以两套实际 SDK 验证原始响应、费用、取消与恢复；L2/L3 仍未整体通过。**
 
+**检查点 3：实际 SDK 的 HTTP 边界（2026-10-15，限定验收）。** 新增 `agent/providers/gateway_http.py`，由宿主显式提供已绑定 scope、冻结 profile、截止时间、凭据及准入回调。私密 loopback 代理保留两侧原生协议，逐物理请求预留、派发、接收和记录；合成模式只允许明确的本机地址及合成凭据，未准入的外部契约拒绝构造。不发现凭据、不选择模型、不执行模型循环、不授予真实运行权限。原始响应先落盘再返回 SDK；当前 SSE 收齐后转交，不提供实时逐事件转发。
+
+原关闭连接反例确认 `http.client` 会自动重新连接；现在显式建立一次连接、禁止自动重连，持有 HTTP/1.0 分离响应的 socket 以便取消。依据为 [Python 官方说明](https://docs.python.org/3.13/library/http.client.html#http.client.HTTPConnection.connect) 和锁定本机实现。回归另发现 EOF 后设置已关闭 socket 会误报响应不完整，已按响应关闭状态修正。慢速请求正文受总接收期限限制；响应超时、超限和短 Content-Length 保留有限原字节及预留。响应落盘失败不在异常分支重写，原 dispatched/reserved 继续阻止新派发，等待原恢复机制确认，不记零费用。
+
+OpenAI Chat 适配器顶层 `ModelResponse.response_id` 为 `None`，见[官方 SDK 参考实现](https://openai.github.io/openai-agents-python/ref/models/openai_chatcompletions/)及当前安装源码，网关 generation 从原始响应保存。原测试对该字段、项目账本 `control_scope_id` 和 `RequestInFlight` 有错误假设，已修正测试，未修改 SDK 或放宽生产契约。Claude CLI 实际使用 `/v1/messages?beta=true`；核对 [Anthropic 官方 SDK 源码](https://github.com/anthropics/anthropic-sdk-typescript/blob/main/src/resources/beta/messages/messages.ts) 后仅允许该精确路径并原样转发，其他查询仍拒绝。原失败日志及中间源码快照保留；最初关闭连接失败未单独冻结源码，不声称每份早期日志都有独立版本快照。
+
+当前普通安装包 **74 项不同检查通过**：HTTP 行为 15、两套实际 SDK 同账本联调 1、响应/收费 22、响应进程/短传输 5、预算单测 27、scope 进程 4。OpenAI 实际客户端和 Claude 原生 CLI 各发一次本机请求；独立 prompt、八个工具 schema、模型/输出限制和原始收发字节核对通过。两请求使用同一账本，合成账单共 $0.08；Claude 先保留未知费用，再用合成 generation 核对。Claude 进程组确认退出。66 个普通安装 Python/SQL 文件与当前源码一致，43 个发行包依赖检查通过；主锁、M0 锁、profile 和旧 runtime 未改。证据及差异见 [checkpoint-3/verification.json](../output/data-agent-gateway-runtime-20261015/checkpoint-3/verification.json)。
+
+**未完成及停止点。** 本检查点没有业务工具执行和持久 RuntimeJournal 接线，不能替代 G01–G05；实际网关/路由/收费及原生配套隔离未验证。宿主仍须覆盖 DNS/响应头阻塞、整体执行截止及取消，socket 超时不当作完整运行上限。四项历史偶发问题保留，L2/L3 不记整体通过。用户于 2026-10-15 确认：**完成 Prompt 4 的非付费工程与验收后暂停 goal 供 review，不进入 Prompt 5**；真实模型验证保持未授权、未执行，不将非付费收尾写成完整 Prompt 4 通过。下一动作是持久绑定批次 scope 与业务根身份，完成两套 SDK 规定场景及受影响恢复回归。
+
 ### 14.13 各功能维度的运行流程与接口
 
 **用户要求（2026-10-14）：**按功能维度说明 Data Agent 的运行流程与接口：Agent 做了什么、为什么这么做、为什么可以取得效果。
