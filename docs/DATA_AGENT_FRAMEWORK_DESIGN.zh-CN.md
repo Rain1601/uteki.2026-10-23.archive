@@ -2824,6 +2824,16 @@ OpenAI 使用 Chat Completions，实际发送 `provider.only/order=['deepseek']`
 
 本检查点只修改预算共同机制及必要测试/文档，主锁/M0 锁、profile/网关草案、两套 runtime 和其他工作树改动未变。scope 测试使用内核标签和合成收费，不是两套 SDK 的真实联调；未重跑完整 325 项旧测试、未测其他平台/真实网关，原四项历史偶发故障仍保留。**下一动作：实现原始 HTTP 响应/费用证据捕获，再接入实际 SDK 与持久 RuntimeJournal；scope 初始化/归属必须通过宿主绑定，不能只传标签便声称 L3 完成。**
 
+**检查点 2 实现前约束：响应与收费分别确认。** 原始响应先在现有账本的不可变 response event 中保存字节、hash、HTTP 状态和必要响应头；不另建费用权威。HTTP 完整、协议终态、可用业务结果与收费确认是不同结论。截断、超限、连接中断或缺少流终态保存有限原字节并保持 outcome_unknown；后续收费核对不能把缺失响应补成成功。若后来取得同一次请求的完整原响应，可显式补充，必须保留此前不完整事件；不得用新请求覆盖。JSON 重复字段、非有限/负费用、generation 身份冲突不采用为账单。金额从原始 JSON 按 Decimal 读取；Chat 的 `usage.cost` 和 generation 查询的 `data.total_cost` 才是对应账户收费依据，token 估算、上游成本和 Claude session 估算不能替代。Claude Messages 未获得可核验 generation 身份/收费字段时保留未知，不把原生 msg ID 猜改成网关 ID。模型/上游核对与收费分开：错误路由已发生的费用仍保留，不能因业务不采纳而抹账。本切片先验证解析、原字节保存及同账本原子记录，实际网络 transport 和 SDK/宿主绑定继续后续接线。
+
+**检查点 2 限定结果（2026-10-15）。** 新增 `agent/providers/openrouter_evidence.py`，消费传输方提供的有界响应块，保存 HTTP entity 原字节与 SHA-256、状态及长度/编码/内容类型/请求身份响应头；不保存认证、Cookie 或任意头，也不声称保存 TLS/HTTP 分块帧。字节在 Content-Encoding 解压前保存；本切片只解析 identity 编码，其他编码保留原件并显式不支持，不能误作已解压 JSON。Chat JSON、Messages JSON/SSE 的终态与 usage 分别观察；SDK 继续负责模型内容和工具协议。费用使用原 JSON 的 Decimal；Messages 计数或会话估价不作结算，没有可核验网关 generation 身份时明确留缺口。依据为 [OpenRouter usage accounting](https://openrouter.ai/docs/guides/guides/usage-accounting) 与 [generation metadata](https://openrouter.ai/docs/api/api-reference/generations/get-request-&-usage-metadata-for-a-generation)；Messages 搜索结果对应参考页本轮返回 404，未据其未经核验的额外 metadata 字段实现收费。响应头中的 generation 身份仍须实际网关确认可获得，不能由合成头推断已支持。
+
+`RunBudget.record_response` 新增显式 `outcome_known=False`：不完整原响应与未知结果同事务保存，后续账单可以确认费用但不能解开未知响应；取得同一次完整响应时，保留原不完整事件，适配器核对协议、状态、必要头和原字节前缀，原已结算金额不再累加或换收据。新账单可声明 generation 身份命名空间；同一身份不能结算两次物理请求，检查在既有 SQLite 事务中执行。旧调用省略新参数时保持原字段及行为，不新增费用账本。
+
+原反例保留：首版在响应头/body generation 冲突时仍保留一个可用于核账的 ID；独立复核又证实 generation 查询 body 的非法 ID 可借响应头通过，以及同一 generation 可被两个物理请求重复结算。均已在适配/账本责任层修正并重放；另保留合成 JSON 小数写法错误和沙箱拒绝本机监听的失败，前者修正 fixture，后者以同一输入在允许 loopback 的环境复验。收尾另用反例复现合法 JSON 在 Content-Length 声明结束前 EOF 及忽略 Content-Encoding 可误判完整的问题；现保存并检查长度/编码，原字节保留，原失败与本机分块读取短响应重放均通过。本检查点全新主锁 data-only 普通安装累计 **71 项不同检查通过**：响应/收费 22、本批进程/本机 HTTP 5、旧预算 27、旧预算进程 5、初始化恢复 9、收尾 3。新增 27 项，其中四项真实退出覆盖接收后未记录、响应事务中、完整响应落盘后和部分响应已核费；本机短响应保留实际收到的字节并保持未知。最后 HTTP 边界修正仅重跑受影响的 27 项；其余 44 项沿用本检查点日志，相关源码与测试 hash 未变，不重复计数。65 个源码/SQL 文件与安装内容一致，9 个包依赖检查通过。源码、失败、最终日志和差异见 [checkpoint-2/verification.json](../output/data-agent-gateway-runtime-20261015/checkpoint-2/verification.json)。
+
+本检查点不包含实际 SDK/HTTP transport/RuntimeJournal 接线、真实收费查询或完整 SDK 恢复联调；模块本身不加载凭据、不联网、不授予运行权限，调用方必须提供可信传输与冻结身份。全部金额均为合成账单，真实模型请求与实际推理费用为 0；主锁/M0 锁及网关草案未变，原四项历史偶发故障未关闭。**下一动作：将实际 HTTP 请求边界和宿主的批次/scope 绑定接入持久 RuntimeJournal，再以两套实际 SDK 验证原始响应、费用、取消与恢复；L2/L3 仍未整体通过。**
+
 ### 14.13 各功能维度的运行流程与接口
 
 **用户要求（2026-10-14）：**按功能维度说明 Data Agent 的运行流程与接口：Agent 做了什么、为什么这么做、为什么可以取得效果。

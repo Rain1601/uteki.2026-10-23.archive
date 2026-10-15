@@ -476,25 +476,56 @@ class RunBudget:
             raise ValueError('Verified provider billing evidence required; SDK estimates are insufficient')
         bill = dict(billed_usd=str(amount), receipt=receipt,
                     basis='synthetic_zero' if root['mode'] == 'offline' else 'provider_bill')
+        if receipt is not None and 'identity_namespace' in receipt:
+            self._text(receipt['identity_namespace'], 'billing identity namespace')
         return str(amount), self._json(bill)
 
-    def record_response(self, request_key, response, *, billed_usd, receipt=None):
+    @staticmethod
+    def _check_bill_identity(db, request_key, receipt):
+        # Adapters may declare a provider-wide identity namespace. Its receipt
+        # must not settle two physical requests, including concurrent lookups.
+        if receipt is None or 'identity_namespace' not in receipt:
+            return
+        rows = db.execute('SELECT bill_json FROM metered_requests WHERE bill_json IS NOT NULL '
+                          'AND request_key!=?', (request_key,))
+        for (encoded,) in rows:
+            previous = json.loads(encoded)['receipt']
+            if (previous is not None and previous.get('identity_namespace') == receipt['identity_namespace']
+                    and previous['request_id'] == receipt['request_id']):
+                raise RequestIdentityConflict('A provider billing identity is already bound to another request')
+
+    def record_response(self, request_key, response, *, billed_usd, receipt=None, outcome_known=True):
         """Persist complete transport response and cost state in ONE transaction.
 
         `response` is a durable transport result, not a business-success claim.
+        A partial transport observation keeps the dispatch outcome unknown,
+        even after billing is reconciled. An explicit complete observation may
+        follow it, preserving the original partial event in the same record.
         The adapter verifies provider billing evidence before passing a receipt.
         """
         if not isinstance(response, dict):
             raise ValueError('Structured transport response required')
+        if type(outcome_known) is not bool:
+            raise ValueError('Outcome knowledge must be explicit boolean')
         with self._transaction() as db:
             root = self._root(db)
             amount, bill = self._bill(root, billed_usd, receipt)
-            encoded = self._json(dict(response=response, billed_usd=amount, receipt=receipt))
+            self._check_bill_identity(db, request_key, receipt)
+            event = dict(response=response, billed_usd=amount, receipt=receipt)
+            if not outcome_known:
+                event['outcome_known'] = False
             current = self._request(db, request_key)
             if current['response_event'] is not None:
-                if self._json(current['response_event']) != encoded:
-                    raise RequestIdentityConflict('A different response cannot overwrite the original')
-                return current
+                previous = current['response_event']
+                if previous.get('outcome_known') is False and outcome_known:
+                    event['prior_response_events'] = [previous]
+                else:
+                    if 'prior_response_events' in previous:
+                        event['prior_response_events'] = previous['prior_response_events']
+                    if self._json(previous) != self._json(event):
+                        raise RequestIdentityConflict('A different response cannot overwrite the original')
+                    return current
+            encoded = self._json(event)
             if current['stage'] not in {'dispatched','outcome_unknown'}:
                 raise RequestRecoveryRequired('Response has no possibly-dispatched request')
             if current['cost_state'] == 'settled':
@@ -506,8 +537,9 @@ class RunBudget:
                 db.execute('UPDATE reservations SET actual=?,state=? WHERE id=?',
                     (amount, 'settled' if amount is not None else 'unknown', current['reservation_id']))
                 db.execute('UPDATE metered_requests SET bill_json=? WHERE request_key=?', (bill, request_key))
-            db.execute("UPDATE metered_requests SET stage='responded',response_event=?,updated_at=? WHERE request_key=?",
-                       (encoded, datetime.now(timezone.utc).isoformat(), request_key))
+            db.execute('UPDATE metered_requests SET stage=?,response_event=?,updated_at=? WHERE request_key=?',
+                       ('responded' if outcome_known else 'outcome_unknown', encoded,
+                        datetime.now(timezone.utc).isoformat(), request_key))
             return self._request(db, request_key)
 
     def abandon_prepared(self, request_key, *, reason):
@@ -556,6 +588,7 @@ class RunBudget:
         with self._transaction() as db:
             root = self._root(db)
             amount, bill = self._bill(root, billed_usd, receipt)
+            self._check_bill_identity(db, request_key, receipt)
             if amount is None:
                 raise ValueError('Known billed cost required for reconciliation')
             current = self._request(db, request_key)

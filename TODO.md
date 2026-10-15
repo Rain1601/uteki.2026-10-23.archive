@@ -16,6 +16,8 @@
 
 **当前唯一动作：**按目标附件 Prompt 4，先补齐真实 transport、原始响应/收费捕获和两侧多场景共用的批次预算控制，以离线事件完成验收。入口仍拒绝未经授权的真实运行。具体候选及准入见 [gateway-contract.draft.v1.json](config/data_platform/gateway-contract.draft.v1.json)；缺凭据或额度不阻塞这些工程工作，但不发送推理请求、不充值、不接生产。完整目标及后续步骤保持，不因单批完成缩小。
 
+**Prompt 4 检查点 2：**已补齐检查点 1 缺失的验证报告，并完成原始响应/收费记录模块。HTTP 完整、协议终态和收费分别判断；部分响应在核费后仍保持未知，补回同次完整响应保留原事件；generation 身份冲突与同一账单重复归属明确拒绝。HTTP 长度/编码反例也已修正；本检查点累计 71 项不同检查通过（新增 27 项，最终改动影响的 27 项已重放），65 个包文件匹配，原失败保留，详见核心设计 14.12.18 与 [verification.json](output/data-agent-gateway-runtime-20261015/checkpoint-2/verification.json)。只使用合成账单和本机 HTTP，未调用真实模型；实际 transport/SDK/RuntimeJournal 接线未完成，L2/L3 不记通过。**下一动作：接入实际 HTTP 请求边界与宿主批次/scope 绑定，再验证两侧 SDK。**
+
 **Prompt 4 检查点 1：**同一 RunBudget 已增加冻结场景清单、场景独立停止、串行派发和按场景恢复；费用/请求总额仍只有原账本。修正首版场景归属缺失可能绕过停止的边界，原反例保留。当前普通安装包 44 项不同检查通过，64 个包文件一致，详见核心设计 14.12.18 与 [verification.json](output/data-agent-gateway-runtime-20261015/checkpoint-1/verification.json)。真实 transport、收费证据及 SDK/RuntimeJournal 接线尚未完成，L2/L3 不记通过；下一动作先实现原始响应与费用证据捕获。未调用模型，原四项历史偶发故障仍未关闭。
 
 **Prompt 3 准备结果：**两侧候选均为 DeepSeek V4.1 Flash，经 OpenRouter；Claude 非 Anthropic 模型路径仍为兼容性实验。全新普通安装的实际 OpenAI SDK 与 Claude SDK/CLI 请求捕获各 1 次，模型名、独立 prompt、八个工具 schema 与 4,096 输出限制核对通过；仅合成响应，未验证网关或真实选工具。冻结五场景/侧、最多 52 个物理请求、十份上下文模板及完整合成原件/附件/处理配置。$3 仅是未授权的停止上限提案；字节估算约 $2.56 不作为硬预留，保守端点上限预留与无法跑完整组时的停止规则已另列。当前进程无 OpenRouter 凭据，余额及是否需要充值未知，认证账户查询与真实推理均为 0。证据：[verification.json](output/data-agent-gateway-20261015/verification.json)，具体限制与原失败见 14.12.17。
