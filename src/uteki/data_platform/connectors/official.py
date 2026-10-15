@@ -10,7 +10,7 @@ from uteki.infrastructure.document_sources.company_acquisition import Acquisitio
 from uteki.infrastructure.document_sources.filing_integrity import validate_sec_filing
 from uteki.infrastructure.document_sources.sec_settings import resolve_sec_contact
 
-from ..content.store import ContentStore
+from ..content.store import ContentStore, ContentStoreError
 from ..contracts.common import CatalogError, digest
 from ..contracts.content import InputManifest, MissingResource, PresentResource
 from ..build.dom import SourceDOM, excluded, srcset_key
@@ -21,7 +21,8 @@ def image_key(url):
 
 
 def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url: str,
-                 allowed_urls: tuple[str, ...], max_seconds: float, fetch=None, should_cancel=None):
+                 allowed_urls: tuple[str, ...], max_seconds: float, fetch=None, should_cancel=None,
+                 on_progress=None):
     """Return verified acquisition bytes/receipts, never a published asset.
 
     `fetch` is solely the transport injection point for deterministic tests.
@@ -67,10 +68,35 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
     report["company"] = {"symbol": copied["symbol"], "cik": copied.get("cik"), "market": copied["market"]}
     report["scope"]["exact_allowed_urls"] = list(allowed_urls)
     report["scope"]["max_seconds"] = max_seconds
+    report['transport_journal_version'] = 'uteki-acquisition-transport-v1'
+    report['transport_state'] = None
     hosts = {urlsplit(url).hostname for url in allowed_urls}
     result = {"main": None, "resources": {}, "missing": {}, "unsupported": {}, "excluded": [], "report": report}
+    def record_progress():
+        if on_progress is not None:
+            try:
+                on_progress(deepcopy(report))
+            except (OSError,ContentStoreError) as error:
+                raise CatalogError('RECOVERY_REQUIRED','acquisition receipt persistence failed') from error
+
+    def request(url):
+        report['transport_state'] = dict(status='dispatched',url=url,ordinal=report['requests']+1)
+        record_progress()
+        try:
+            raw = session['request'](url,hosts)
+        except Exception:
+            report['transport_state']['status'] = 'returned_error'
+            record_progress()
+            raise
+        report['transport_state']['status'] = 'returned'
+        record_progress()
+        return raw
+
+    # Persist the source-run identity before transport, and completed receipts
+    # before another request. An in-flight request can still be unconfirmed.
+    record_progress()
     try:
-        raw = session["request"](main_url, hosts)
+        raw = request(main_url)
         result["main"] = raw
         receipt = next(r for r in reversed(report["discovery"]) if r.get("source_url") == main_url and r["status"] == "fetched")
         result["final_url"] = receipt["final_url"]
@@ -106,7 +132,10 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
                 session["gap"]("document_limit", url)
                 continue
             try:
-                result["resources"][url] = session["request"](url, hosts)
+                result["resources"][url] = request(url)
+            except CatalogError:
+                # Journal failures are not missing remote resources.
+                raise
             except AcquisitionCancelled:
                 raise
             except Exception as error:
@@ -117,6 +146,8 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
     except Exception as error:
         session["gap"]("main_acquisition_failed", main_url, error_type=type(error).__name__)
         session["finish"]()
+        if isinstance(error,CatalogError) and error.code in {'RECOVERY_REQUIRED','CATALOG_INCONSISTENT'}:
+            raise
         raise CatalogError("ACQUISITION_FAILED", "official main acquisition failed; source-run receipt retained") from error
     session["finish"]()
     if report["status"] == "cancelled":

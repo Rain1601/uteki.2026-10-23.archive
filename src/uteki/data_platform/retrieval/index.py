@@ -128,7 +128,23 @@ class DerivedIndex:
                 raise
             return dict(status='not_ready', generation=None, token=None, issue=str(error))
 
-    def build(self, *, checkpoint=lambda phase: None, on_effect=lambda **value: None):
+    def confirm_head(self, intent):
+        """Confirm only this already-visible generation; never activate another."""
+        expected = dict(generation=intent['generation'],manifest=intent['manifest'])
+        if intent['asset_ref'] != self.reference.model_dump(mode='json'):
+            raise CatalogError('RECOVERY_REQUIRED','index intent belongs to a different asset')
+        try:
+            _,manifest,token = self.current()
+            if token != digest(canonical(expected)):
+                raise CatalogError('RECOVERY_REQUIRED','current index head differs from the interrupted publication')
+            # A visible rename may have preceded its directory fsync. Reconfirm
+            # identical bytes only after full source/manifest/file validation.
+            write_control(self.base/'head.json',canonical(expected),replace=True)
+            return manifest
+        except (OSError,ValueError) as error:
+            raise CatalogError('RECOVERY_REQUIRED','cannot confirm interrupted index publication: '+str(error)) from error
+
+    def build(self, *, checkpoint=lambda phase: None, on_effect=lambda **value: None, on_prepare=lambda intent: None):
         """Build a new generation. Failure leaves old generations and head intact."""
         source_hash = self._source_hash()
         inventory = self.reader.inventory()
@@ -182,6 +198,8 @@ class DerivedIndex:
             generation=generation, source_manifest_sha256=source_hash, files=files,
             blocks=len(values), records=len(rows), created_at=utc_now())
         reference = self.catalog.content.put_object(canonical(manifest))
+        on_prepare(dict(asset_ref=self.reference.model_dump(mode='json'),generation=generation,manifest=reference.model_dump(mode='json')))
+        checkpoint('index_intent_prepared')
         checkpoint('index_before_head')
         self.check()
         try:

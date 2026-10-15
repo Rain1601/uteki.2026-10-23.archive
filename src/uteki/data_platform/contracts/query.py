@@ -7,7 +7,7 @@ from typing import Annotated, Literal
 from pydantic import Field, model_validator
 
 from .assets import AssetRef, CompanyId, SourceId
-from .common import Contract, FiscalPeriod, Text, canonical
+from .common import Contract, FiscalPeriod, Text, canonical, id_type
 from .evidence import HtmlLocator
 
 
@@ -107,6 +107,11 @@ class Caller(Contract):
     prior_delivery_refs: tuple[Text, ...] = ()
 
 
+class ClarificationAnswer(Contract):
+    clarification_id: id_type('cl')
+    answer: Text
+
+
 class ContextRequest(Contract):
     question: Text
     caller: Caller
@@ -116,12 +121,23 @@ class ContextRequest(Contract):
     source_policy_ref: Text
     expansion: Expansion
     run_policy: RunPolicy
+    revises_context_ref: id_type('req') | None = None
+    clarification_response: ClarificationAnswer | None = None
 
     @model_validator(mode='after')
     def timezone(self):
         if self.as_of is not None and self.as_of.tzinfo is None:
             raise ValueError('as_of requires a timezone')
+        if self.clarification_response is not None and self.revises_context_ref is None:
+            raise ValueError('clarification answer requires revises_context_ref')
         return self
+
+    def context_payload(self):
+        # Preserve canonical requests created before continuation fields existed.
+        value = self.model_dump(mode='json')
+        for key in ('revises_context_ref','clarification_response'):
+            if value[key] is None:value.pop(key)
+        return value
 
 
 class DateRange(Contract):

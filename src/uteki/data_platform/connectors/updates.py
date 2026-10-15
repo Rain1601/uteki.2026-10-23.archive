@@ -105,12 +105,23 @@ class OfficialAcquisitionAdapter:
         catalog=execution.catalog
         workspace=ensure_directory(catalog.root,'acquisitions/'+execution.operation)
         frozen_plan=catalog.content.put_object(plan.canonical_bytes())
+        recipe=html_recipe(catalog,encoding='utf-8',form_type=plan.form_type,profile_ref=plan.profile_ref,taxonomy_ref=plan.taxonomy_ref)
+        execution.prepare_acquisition(plan_ref=frozen_plan.model_dump(mode='json'),recipe=recipe.model_dump(mode='json'),
+            transport_journal_version='uteki-acquisition-transport-v1')
+
+        def progress(report):
+            receipt=catalog.content.put_object(canonical(report))
+            execution.resource_usage.update(transport_requests=report['requests'],bytes_received=report['bytes_received'],
+                external_calls=report['requests'] if self.fetch is None else 0)
+            execution.prepare_acquisition(source_run_id=report['run_id'],receipt_ref=receipt.model_dump(mode='json'))
+            execution.check('acquisition_receipt_recorded')
+
         try:
             execution.check('before_acquisition')
             acquired=acquire_html(config=deepcopy(plan.config),workspace=workspace,settings_root=self.settings_root,
                 main_url=plan.main_url,allowed_urls=plan.allowed_urls,
                 max_seconds=min(plan.max_seconds,execution.limit.remaining()) if execution.limit else plan.max_seconds,fetch=self.fetch,
-                should_cancel=execution.limit.stopped if execution.limit else execution.should_cancel)
+                should_cancel=execution.limit.stopped if execution.limit else execution.should_cancel,on_progress=progress)
         except CatalogError:
             if execution.limit is not None:
                 execution.limit.check('acquisition_stopped')
@@ -123,13 +134,17 @@ class OfficialAcquisitionAdapter:
             if reports:
                 execution.effect(kind='acquisition_receipt',status='recorded',operation_id=execution.operation,
                     source_run_ids=[r['run_id'] for r in reports],transport_requests=requests)
-        execution.check('acquisition_received')
         input_ref=store_acquisition(catalog.content,acquired,main_url=plan.main_url)
         inputs=catalog.content.read_manifest(input_ref)
+        receipt=catalog.content.put_object(canonical(acquired['report']))
+        execution.prepare_acquisition(input_ref=input_ref.model_dump(mode='json'),receipt_ref=receipt.model_dump(mode='json'),
+            acquisition_complete=True)
+        execution.check('acquisition_received')
         execution.check('before_snapshot_registration')
         main=next(r for r in acquired['report']['discovery'] if r['status']=='fetched' and r['source_url']==plan.main_url)
         run=catalog.start_run('acquisition:'+execution.operation,purpose='explicit approved source update',kind='build',
             parent_run_id=execution.context['run_id'])['run_id']
+        execution.prepare_acquisition(run_id=run)
         try:
             acquisition=Acquisition(source_id=plan.source_id,request_url=plan.main_url,final_url=acquired['final_url'],
                 acquired_at=main['retrieved_at'],published_at=plan.published_at,available_at=plan.available_at,source_revised_at=plan.source_revised_at)
@@ -139,10 +154,10 @@ class OfficialAcquisitionAdapter:
                 revision_basis=plan.revision_basis,run_id=run)
             representation=catalog.add_representation(execution.operation+':html',snapshot_id=snapshot,format='html',input_manifest=input_ref)
             catalog.relate_snapshot(snapshot,plan.relation)
+            execution.prepare_acquisition(snapshot_id=snapshot,representation_id=representation)
             execution.check('before_snapshot_freeze')
             Publication(catalog,checkpoint=execution.check).freeze_snapshot(snapshot)
             execution.check('acquisition_snapshot_frozen')
-            recipe=html_recipe(catalog,encoding='utf-8',form_type=plan.form_type,profile_ref=plan.profile_ref,taxonomy_ref=plan.taxonomy_ref)
             reference=build_html(catalog,snapshot_id=snapshot,representation_id=representation,recipe=recipe,run_id=run,checkpoint=execution.check)
             catalog.finish_run(run,status='completed')
             execution.check('acquisition_build_published')
@@ -162,9 +177,14 @@ class OfficialAcquisitionAdapter:
                 execution.effect(kind='build',asset_ref=catalog.asset_ref(dict(row)).model_dump(mode='json'),status=row['status'],
                     failure_code=row['failure_code'],recovery_required=row['status']=='staging' or catalog.database.head_uncertain,
                     publication_outcome='uncertain' if catalog.database.head_uncertain else row['status'])
-        gaps=[r.reason for r in inputs.resources if isinstance(r,MissingResource)]
-        return dict(update_id=catalog.get_build(reference.build_id)['job_id'],status='partial' if gaps else 'completed',
+        return acquisition_result(catalog,reference,inputs,execution.resource_usage,frozen_plan,execution.operation,acquired['report']['run_id'])
+
+
+def acquisition_result(catalog, reference, inputs, resource_usage, frozen_plan, operation_id, source_run_id):
+    """Same result shape for normal execution and verified existing publication."""
+    gaps=[r.reason for r in inputs.resources if isinstance(r,MissingResource)]
+    return dict(update_id=catalog.get_build(reference.build_id)['job_id'],status='partial' if gaps else 'completed',
             policy_decision=dict(allowed=True,denied_reason=None,matched_rules=['host_approved_exact_request','exact_url_allowlist']),
-            new_asset_refs=[reference.model_dump(mode='json')],gaps=gaps,resource_usage=deepcopy(execution.resource_usage),
+            new_asset_refs=[reference.model_dump(mode='json')],gaps=gaps,resource_usage=deepcopy(resource_usage),
             acquisition_plan_ref=frozen_plan.model_dump(mode='json'),
-            acquisition_report_ref=dict(operation_id=execution.operation,source_run_id=acquired['report']['run_id']))
+            acquisition_report_ref=dict(operation_id=operation_id,source_run_id=source_run_id))

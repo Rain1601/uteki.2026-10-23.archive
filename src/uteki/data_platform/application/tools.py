@@ -28,6 +28,37 @@ class ToolExecution:
 
     def effect(self, **value):
         self.effects.append(value)
+        operation = self.session.data['operations'][self.operation]
+        operation['effects'] = deepcopy(self.effects)
+        operation['resource_usage'] = deepcopy(self.resource_usage)
+        operation['elapsed_lower_bound'] = self.limit.elapsed() if self.limit else 0
+        self.session.save()
+
+    def prepare_index(self, intent):
+        operation = self.session.data['operations'][self.operation]
+        operation['effect_intent'] = dict(kind='index_head',target=intent,
+            response=self.process_response(intent['generation']))
+        operation['elapsed_lower_bound'] = self.limit.elapsed() if self.limit else 0
+        self.session.save()
+
+    def prepare_acquisition(self, **target):
+        operation = self.session.data['operations'][self.operation]
+        intent = operation.setdefault('effect_intent',dict(kind='official_acquisition',target={}))
+        if intent['kind'] != 'official_acquisition':
+            raise CatalogError('RECOVERY_REQUIRED','operation already owns a different effect intent')
+        intent['target'].update(deepcopy(target))
+        operation.setdefault('acquisition_progress',[]).append(deepcopy(target))
+        operation['resource_usage'] = deepcopy(self.resource_usage)
+        operation['elapsed_lower_bound'] = self.limit.elapsed() if self.limit else 0
+        try:
+            self.session.save()
+        except (OSError,ValueError) as error:
+            raise CatalogError('RECOVERY_REQUIRED','acquisition intent could not be durably acknowledged') from error
+
+    def process_response(self, generation):
+        return self.response([dict(update_id=self.operation,status='completed',policy_decision=dict(allowed=True,denied_reason=None),
+            new_asset_refs=[self.request.process.asset_ref.model_dump(mode='json')],derived_generation=generation,gaps=[],
+            resource_usage=dict(model_calls=0,external_calls=0,cost_usd='0'))])
 
     def check(self,phase):
         if self.limit is not None:
@@ -284,7 +315,5 @@ class ToolExecution:
         reader = self.reader(request.process.asset_ref)
         if any(c in {'records','concepts'} for c in capabilities) and not reader.inventory()['records']:
             raise CatalogError('CAPABILITY_UNSUPPORTED','source has no inline records to derive')
-        manifest = self.index(request.process.asset_ref).build(checkpoint=self.check,on_effect=self.effect)
-        return self.response([dict(update_id=self.operation,status='completed',policy_decision=dict(allowed=True,denied_reason=None),
-            new_asset_refs=[request.process.asset_ref.model_dump(mode='json')],derived_generation=manifest['generation'],gaps=[],
-            resource_usage=dict(model_calls=0,external_calls=0,cost_usd='0'))])
+        manifest = self.index(request.process.asset_ref).build(checkpoint=self.check,on_effect=self.effect,on_prepare=self.prepare_index)
+        return self.process_response(manifest['generation'])

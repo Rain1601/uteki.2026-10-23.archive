@@ -1,6 +1,6 @@
 # Data Agent 接口契约
 
-日期：2026-10-14 · 版本：v0.5 · 状态：用户已确认实施路线，最新指定模型 API 统一经 OpenRouter，对比 OpenAI Agents SDK 与 Claude Agent SDK 及配套能力两套实现；共享业务工具契约延续 v0.4。剩余缺口见核心设计 14.16，SDK/网关边界与交叉比较见 14.17，第四批 review 收尾项已关闭，SDK/MCP 尚未联调，当前确定性实现范围见 0.0。
+日期：2026-10-14 · 版本：v0.5 · 状态：用户已确认实施路线，模型 API 统一经 OpenRouter，对比 OpenAI Agents SDK 与 Claude Agent SDK 及配套能力两套实现；共享业务工具契约延续 v0.4。第四批 review 收尾、双 SDK 绑定及 T5/T6 限定离线验收已完成（2026-10-15），真实网关与正式 MCP 尚未联调。当前实现范围见 0.0–0.0.1；剩余业务契约与双实现边界见核心设计 14.16–14.17。
 
 本文件定义 Data 能力的全部对外与内部接口：请求上下文、6 个数据工具、模型可见输出、交付包、内部组件接口及 MCP 映射。职责与流程见[核心设计](DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md)第 7 节，技术方案见第 14 节；本文件只维护接口细节。
 
@@ -43,13 +43,62 @@
 
 ### 0.0.1 第五批 SDK 离线绑定（2026-10-15）
 
-在 0.0 的确定性 API 外增加两侧原生 SDK 装配，入口为 agent.openai_runtime.run_offline 与 agent.claude_runtime.run_offline。六工具及 deliver 的模型参数是 `{request, state}`；context_ref、请求幂等键与根上下文由宿主绑定，模型不能替换。工具 schema 来自现有 Pydantic 契约。OpenAI strict_json_schema=False 是为保留维度/QName 映射等动态键，应用完整参数校验保持；真实模型是否支持该 schema 仍须对应网关验证。
+**当前验收范围：**核心设计 14.12.16 检查点 16 已按目标附件 Prompt 2 七项要求完成离线收尾，证据见 [checkpoint-16.json](../output/data-agent-runtime-20261015/checkpoint-16.json)。下文按检查点保留协议演进，当时未完成项以该节末尾审计为当前结论。四项历史偶发故障仍未解释；真实网关、实际收费、完整配套与业务效果未验证。当前只准入不付费的执行契约准备，正式 CLI/MCP 信号映射留对应入口批次。
 
-适配层分别记录 handler 返回、可观察 SDK 消息与最终交付。OpenAI 在 on_llm_start 观察实际输入；Claude 从 UserMessage 的工具结果观察，并在原生 CLI 合成网关案例中对照下一次 Messages 请求确认内容。截断或替换后的结果不按原完整返回登记为本适配运行可用引用；这里证明消息包含，不证明模型理解，也不把已测小样扩展为任意压缩/大结果配置已验证。
+在 0.0 的确定性 API 外增加两侧原生 SDK 装配，入口为 agent.openai_runtime.run_offline 与 agent.claude_runtime.run_offline。六工具及 deliver/clarify 的模型参数是 `{request, state}`；context_ref、请求幂等键与根上下文由宿主绑定，模型不能替换。工具 schema 来自现有 Pydantic 契约。OpenAI strict_json_schema=False 是为保留维度/QName 映射等动态键，应用完整参数校验保持；真实模型是否支持该 schema 仍须对应网关验证。
 
-只有 DataService 接受的 deliver 才能产生成功交付；自由文本、非法引用、工具错误与 SDK 终态成功本身均不够。OpenAI 通过原生 tool_use_behavior 终止；当前 Claude 正常案例在 accepted deliver 后还有一次原生终态模型交互（合成响应），零追加调用的停止控制属于下一步运行协议。本步不实现 T5/T6、澄清继续、强制部分交付或持久 SDK 恢复。
+适配层分别记录 handler 返回、可观察 SDK 消息与最终交付。OpenAI 在 on_llm_start 观察实际输入；Claude 现在从已经转发并取得响应的原生 Messages 请求中提取工具结果；原先 UserMessage 观察仅保留为第一步历史证据。截断或替换后的结果不按原完整返回登记为本适配运行可用引用；这里证明消息包含，不证明模型理解，也不把已测小样扩展为任意压缩/大结果配置已验证。
+
+只有 DataService 接受的 deliver 才能产生成功交付；自由文本、非法引用、工具错误与 SDK 终态成功本身均不够。接受的 clarify 产生 needs_clarification，不代表业务完成。OpenAI 通过原生 tool_use_behavior 终止。第一步验收时 Claude 在 accepted deliver 后还有一次原生终态交互；第二步实施检查点已用原生 PostToolUse 的 continue_=False 修正，同一真实 CLI/合成服务正常案例由 9 次变为 8 次请求（核心设计 14.12.16）。最终控制输出保留在原生事件中，不再宣称进入下一次模型请求。澄清后继、两侧受限非终态继续、终态与持久停止的当前离线验收见检查点 16；不能扩为任意中断或真实网关均可恢复。
+
+当前两侧 `run_offline` 必须显式提供 `limits={native_max_turns,max_model_requests,max_request_bytes,max_response_bytes}`，业务工具轮数/墙钟/无进展/费用仍使用上下文 run_policy。`recover=False` 默认不重开未确认原生执行；显式 `recover=True` 先协调已保存的交付/澄清意图及下述普通工具响应/索引效果。已经结束的交付恢复不新增模型请求；OpenAI 满足下文持久状态和时间核对条件时可继续未结束的原运行，后续新请求仍扣原根额度。原生终态未确认时，业务结果与 native_success=false、native_error、execution_time_uncertain 分别保留；普通工具或模型请求中断仍可返回 RECOVERY_REQUIRED。精确运行绑定与根账本不允许通过重试改变。
+
+当前新增同步 `clarify(context_ref, {question,blocking_need_ids}, state=..., request_key=..., recover=False)`，返回 `{kind:needs_clarification, clarification, clarification_object}`。它保存完整原问题与不可变澄清；同键显式恢复保留同一 ID/字节。回答通过 `create_context` 的 revises_context_ref/clarification_response 提交完整字段，相同完整回答及策略复用唯一后继，改变回答报 CLARIFICATION_MISMATCH；创建中断用 recover=True 补齐。后继 continuation 额外保存 root_context_ref；原 clock、计划/历史、业务计数/时间及根账本继承，旧引用须重新读取。业务 Session 为 needs_clarification，该次 Catalog 执行为 completed；正常后继开启新原生 session。根物理请求累计不清零，根请求/响应字节限制不扩大，业务范围和策略只可收紧。未确认执行时间仍阻止后继创建；受观察的原运行可以按下文核对后继续。非澄清修订和 analysis_agent 的 prior_delivery_refs 继续明确拒绝，不据此提前声明补数衔接已实现。
+
+检查点 14 固定离线异步入口的取消语义：取消任一正在等待同一 `run_offline` 执行的调用者，表示请求取消该共享运行。宿主先停止原根账本，再向 SDK 发送一次取消；重复取消等待同一收尾，两位调用者取得同一持久结果。适配器吞掉取消异常也不能继续新请求或业务工具，已完成/结果未知的响应仍按原账本保存。当前不建 HTTP 服务；后续传输入口按下述检查点 15 规则将运行调用者断连映射为取消，不把观察连接或普通读取等同于运行调用者。合作退出失败仍需所属 worker 的监督与实际退出核对，不声称能够抢占任意同步代码。Claude 自动压缩请求已纳入当前 Messages 边界；当前 OpenAI 装配未启用 Session 压缩器/Sandbox/Memory，新配套不能凭本批结果直接放行。
+
+检查点 15 增加统一 Python 入口 `DataService(catalog, acquisition_adapter=None, query_runtime=None)` 与 `await service.run_query(context_ref, recover=False)`。query_runtime 是显式绑定的异步调用对象，接收 service、context_ref、recover 和由 DataService 捕获的单调起点 started；两侧直接绑定既有 SDK run_offline，仍只有一个 native 执行登记与根账本。未配置 runtime 返回 CAPABILITY_UNSUPPORTED；非法 recover 或已关闭 Catalog 在调用 runtime 前拒绝。入口不发现凭据、不选择默认模型、不隐式启动真实请求，当前只验收离线绑定。有效调用从 DataService 入口计时，恢复/重放沿原绑定规则；只读取结果继续使用 read_run_result。
+
+调用者显式取消，或宿主因运行调用者断连而取消 run_query 的等待任务，都请求停止同一共享运行并等待收尾；不自动创建脱离调用者的后台任务。其他只读观察者断开不改变运行。正式 MCP/CLI 尚未接入，本步只证明进程内 asyncio 取消与受观察进程退出后的业务结果。进程被监督终止后须记录所属进程的实际退出，再显式 recover=True；未知请求继续保留，不以进程退出证明未收费。
+
+装配示意（变量均由调用方显式提供，scripted_model 仅为合成测试模型）：
+
+```python
+from functools import partial
+from uteki.data_platform.agent.openai_runtime import run_offline
+from uteki.data_platform.service import DataService
+
+service = DataService(catalog, query_runtime=partial(
+    run_offline, profile=loaded_profile, model=scripted_model, limits=limits,
+))
+result = await service.run_query(context_ref, recover=False)
+```
+
+Claude 使用其独立 run_offline 绑定 profile、limits、隔离 cwd 和安装的 cli_path，不传 OpenAI Model 对象；本机离线环境限制保持。配置文件载入发生在调用方，started 是宿主内部计时参数，不作为模型工具参数或用户可扩大额度的入口。
+
+检查点 4 增加 `service.call(..., recover=True)`（六工具便捷方法同样支持）：必须匹配已接受操作的原请求/state/request_key；已保存完整 response_intent 时确认同一响应、引用和用量，不重新读取或执行工具。仅派生索引副作用已提交时，可核对冻结 generation/manifest、来源、文件 hash 和当前 head，再确认原索引；不会激活尚未发布的 generation 或覆盖不同 head。此分支响应包含 recovery、elapsed_lower_bound_ms，elapsed_ms=null、execution_time_uncertain=true，inspect_context 同时展示未确认时间，后续动作暂不能继续。目录同步结果不确定时抛 RECOVERY_REQUIRED 并保留 accepted 操作，不再作为普通工具 error 返回。两侧 run_offline(recover=True) 可协调这些原响应并保存到原生工具调用记录；没有终态时仍返回 recovery_required，不调用模型、不宣称原生会话已经恢复。官方 acquire 的同一原请求现可核对持久计划、receipt、输入清单及 snapshot/representation/recipe/run：仅确认已经移入最终目录的同一发布，不重新获取或解析，不执行全目录恢复；保留原 job/AssetRef、附件缺口与实际记录的传输用量。仅取得原件或尚无最终发布仍抛 RECOVERY_REQUIRED，并保留原操作，不假装成功。receipt 保存失败、发布待确认或目录同步不确定均不能作为普通可重试工具错误；取消时若发布已确定则仍返回取消及实际副作用，若发布待确认则先要求恢复核对。恢复后的 elapsed_ms 仍为 null，execution_time_uncertain=true；确认资产发布不代表原生会话或业务任务已经完成。检查点 5 的两侧 SDK 恢复未增加模型请求或下载；受观察运行的时间核对见下文；一般非终态续跑尚未完成。
+
+内部宿主可用 `application.execution_clock.ObservedWorker` 持有实际子进程，`wait(timeout=...)` 确认所属进程组退出后，在重新取得 Catalog 所有权时 `record(catalog, context_ref)` 保存不可变观察；该能力不向业务工具/MCP 暴露，也不接收模型提供的 elapsed 数值。后续 `run_offline(recover=True)` 核对原 PID、单调时钟域、起点、native session 和上下文，在原副作用协调后按耗时上界扣减累计 wall_seconds；`runtime.time_reconciliation` / `inspect_context.time_reconciliations` 明确 `supervised_upper_bound`、已知下界和观察引用，不能把它当精确耗时。观察结束后的等待不计入，重复核对不重复扣减；历史未知记录和旧交付保持。澄清后继继承累计预算及时间依据，并重新读取证据。没有有效观察、跨时钟域或旧格式缺少 clock 时仍保留未核对；普通执行不因无权读取系统启动元数据而失败。已核对时间不代表未知模型响应/费用已解决，也不代表一般原生会话已经续跑。
+
+新写入的 execution_clock 使用 `domain_version=2`，macOS 启动标识不包含时区格式化文本；原生执行和恢复宿主均按保存的版本核对。缺少版本字段视为旧 v1，仍使用原字节算法，不改写旧记录。宿主可绑定同域旧 worker；旧记录因时区不同而无法验证、未知版本或真正跨启动周期时仍返回 RECOVERY_REQUIRED，不能改用新 hash 或清零耗时。
+
+根账本持久停止对恢复和正在执行的两套 SDK 同样生效：动作/请求准入核对根停止，后来的超时或额度信号不能替换首次停止原因。允许保存迟到响应及确认已发生效果，不再执行保存响应里的新工具动作或重新进入原生会话。此前执行时间未核验时仍返回 recovery_required，持久取消不能代替退出观察；已接受交付或澄清及其原结果保持，不因更晚的根停止被撤销。
+
+检查点 7 增加 OpenAI 非终态继续：原生工具 approval interruption 保存官方 RunState，宿主依据既有工具授权自动批准；业务权限检查仍在共享工具内执行，不新增用户确认。恢复校验 context/native session/profile/SDK 版本及请求前缀，通过官方 `RunState.from_json` 继续原 Runner 状态；账本已保存的完整响应只在重建请求完全相同时读回，prepared 请求沿原键发出，未知响应不重发。状态缺失、损坏、版本或请求不符明确 recovery_required；旧运行不补造 SDK 状态。原执行必须有可核对退出观察；新执行段保留旧段、累计时间和根预算，不能沿用旧段观察。checkpoint 中已观察引用恢复同一原生运行的可见前缀，其后工具结果仍需进入 SDK 模型输入；澄清新上下文依旧重读。此检查点不覆盖 Claude 续跑；其后新增范围见下段。未发布获取和全部辅助请求仍未完成，一次索引中断的时间核对失败尚未解释，最新正例通过不等于所有中断均可恢复，见核心设计 14.12.16。
+
+检查点 8 增加 Claude 已保存完整工具结果后的继续：`run_offline(..., recover=True)` 先协调原副作用、预算与退出时间，再核对隔离目录、SDK/CLI 绑定、原始输入、SDK 实际输出的 assistant 消息及原工具 ID/参数/结果，通过公共 `get_session_messages` 和 `resume=<原 session ID>` 继续，不 fork 或改写 transcript。实际转发的首个恢复请求还须携带相同工具历史，之后才登记可见证据。锁定 CLI 插入的精确 `No response requested.` 分隔文字单独记为原生控制标记，不作为模型事实；任意追加 assistant 内容不能因此放行。历史丢失/改动、待执行工具、原生取消替代结果、未观察到的模型响应及未知费用仍返回 recovery_required，不创建新会话掩盖缺口。已通过四个工具后退出位置的续跑与根请求上限验证；尚未证明任意中断均可继续。
+
+检查点 9 增加宿主同步入口 `resolve_update(context_ref, request_key=原工具请求键, action="continue_local"|"close")`，不向模型或外部 MCP 开放。`call(..., recover=True)` 的确认既有结果语义保持。继续只使用原完整输入、收据、计划及已冻结 recipe，核对原 adapter 绑定、归属、根账本和实际退出观察；沿同一 snapshot/build/job 在本地完成，不发获取或模型请求。原运行及本地处理的每次中断分别核对时间，不能复用上一段退出观察。未封存产物按原输入/recipe 重做时已有字节必须相同；封存文件缺失或损坏不重建，保持明确错误。原已提交响应原样读回。
+
+`close` 返回 `status=error / error.code=ACQUISITION_CLOSED`，`error.details.retained_ref` 指向保留记录，`transport_outcome_unknown` 区分在途或旧记录缺证据的传输。它核对已登记原件并只关闭原操作所属的未发布候选，保留原文件/收据和已冻结快照；最终 build 已存在时必须先确认，不能用关闭撤销发布。继续失败后可显式转为关闭并保留原处理历史；关闭后不能再用同键重开。缺少本机原生退出观察时不转移执行权；旧纯同步获取可关闭，但未知执行时间仍保留。关闭不清除根停止、未知费用或费用预留。宿主完成业务操作不补造 SDK 原生 transcript，也不自动启用原生续跑。
+
+时间观察核对失败保留具体原因；`runtime.time_reconciliation_failures` 返回不可变诊断对象引用，宿主可通过内容存储核对原观察、时钟域、已知耗时与上界。这是执行诊断，不是业务证据，也不解除时间/费用未知限制。新增诊断没有解释早期未重现的时钟失败，不能记作该问题已修复。
+
+同步 `deliver(..., recover=True)` 按原请求及 request_key 恢复持久 terminal_intent 中的同一包；缺少原意图的旧中断不重新生成。新增内部宿主收尾 `force_delivery` 不向模型或外部 MCP 开放，使用最近接受的 state 和原生可见引用，不增加业务工具轮数。交付新增 business_status（completed/partial/cancelled），停止原因及根账本 usage；对 SDK 离线运行明确 real_model_calls=0、synthetic_cost_usd=0、cost_usd=null，未知请求数量仍保留，不能将无真实账单写成已核验收费 0。旧交付不回填这些新字段。
 
 当前 profile 与入口限定离线；OpenRouter 配置描述保留精确协议、模型、上游与禁止 fallback 的边界，不表示真实网关已接通。Claude 明确使用 default 权限模式、业务工具白名单及 PreToolUse 检查；空 setting_sources/skills/plugins 不被表述为原生内置 Skills 已全部禁用，后续原生配套单独核验。证据和停止/继续准入见核心设计 14.12.15。
+
+初始化中断的离线恢复沿用 `recover=True`。新格式 native `phase=initializing` 保存原身份和根策略；原宿主已被实际观察退出后，可以确认原初始账本发布并以同一 native ID 首次进入 SDK，原执行与恢复耗时继续累计。根账本描述确认 ready 后，缺失、损坏或不一致不会从初始字节对象重建；初始对象只是未启用阶段的发布输入，不是第二份费用权威。缺少退出观察、已有该上下文的模型/原生工作或旧格式缺少创建意图时不按“尚未开始”重开。恢复原生执行仍走既有 SDK checkpoint/session 协议，不能用初始化路径绕过请求未知、旧会话或根停止状态。限定证据及未覆盖的启动/收尾边界见核心设计 14.12.16。
 
 ### 0.1 调用方与传输
 
@@ -569,14 +618,28 @@ issues: 无
 
 ### 9.1 `run_query`
 
-`DataService.run_query(context_ref) -> RunQueryResult`：在给定上下文中运行 Data Agent，直至交付、需要澄清、取消或达到停止条件。Python 与 MCP 使用相同的带 `kind` 联合返回类型：
+**检查点 11 的时间核对补充：**恢复宿主与被恢复的原生进程分别保存时钟。`inspect_context.recovery_attempts` 展示当前执行段的恢复尝试、owner、已计耗时以及 completed/reconciled/active 状态；active 仅表示尚无持久完成确认，不证明进程存活。恢复尝试再次中断时，宿主 `ObservedWorker.record` 绑定该尝试自己的退出观察，原进程观察不可替代。已确认恢复耗时加到累计 `wall_seconds`，原进程上界只与属于原进程的部分比较；人工等待不加入。原生续跑将这些记录归档到原段，并把累计时间带入新段。恢复宿主的监督超时停止同一根账本，不能因恢复而得到新预算。新结果快照的 `runtime.wall_seconds` 是准备结果时的累计执行时间，`host_recovery_seconds` 是当前执行段内已计的恢复时间；冻结结果不随后续核对改写。已有终态或提交意图仍可通过显式恢复核对后来取得的原进程退出观察，仅更新当前审计状态。没有可验证观察或旧格式缺少记录时不补造耗时依据。
 
-内部由所选 SDK 执行完整循环。OpenAI 侧拟用 `tool_use_behavior` 处理已校验的 deliver/clarify；Claude 侧须验证原生结束事件及结构化结果到同一业务终态的映射，不要求复制该 OpenAI 扩展点。错误工具结果不能触发成功终止；SDK 的自由文本不能直接变为 DeliveryPackage。保存内核/版本/原生 session 与业务 run/root/context ID 的显式映射，恢复不绕过范围、引用与账本检查；跨内核不承诺无损恢复。致命错误分支仍是核心设计 T6 待完成的契约，不能据 SDK 返回对象宣称已经闭合。
+**检查点 13 的入口与结果提交计时：**有效离线 SDK 调用从公开入口捕获起点，预检与装配耗时计入本次执行；配置文件装载发生在调用方，非法配置仍在启动 SDK 前拒绝。SDK 装配失败也保存明确运行结果。新结果的 `runtime.timing_scope="through_result_preparation"` 表示准备该不可变结果时的历史用量快照，不包含此后提交与核对的全部耗时；当前累计时间从 `inspect_context.wall_seconds` 查看。
+
+`inspect_context.completion_clock` 与业务结果的提交状态分开：`pending` 表示结果收尾计时尚未确认，`recorded` 表示已在业务结果提交后采样并保存，`observed` 表示中断后由所属原宿主的真实退出观察核对。收据自身写入后的尾部不由一次采样证明，实际退出观察可补充核对。计时确认中断时，`read_run_result` 仍能读回已提交的原结果；运行入口须显式恢复，澄清后继不能跳过未确认时间。没有原退出观察的恢复保留不确定性，不重开 SDK、不改写旧结果；在结果意图保存前退出也不能恢复出从未持久化的原错误。旧格式不补造新字段或计时证据。当前 Python 宿主准入、取消及已装配辅助请求的离线证据见核心设计 14.12.16 检查点 16；新增配套和真实网关须重新核对对应调用入口。
+
+`await DataService.run_query(context_ref, recover=False) -> RunQueryResult`：在给定上下文中运行已显式配置的 Data Agent，直至交付、需要澄清、取消或达到停止条件。当前 Python 离线绑定见 0.0.1；MCP 尚未接入，其目标响应仍与 Python 使用相同的带 `kind` 联合返回类型：
+
+内部由所选 SDK 执行完整循环。两套离线运行已使用各自原生停止机制，错误工具结果不能触发成功交付；SDK 的自由文本不能直接变为 DeliveryPackage。保存内核/版本/原生 session 与业务 run/root/context ID 的显式映射，恢复不绕过范围、引用与账本检查；跨内核不承诺无损恢复。`contracts/run.py` 的 `RunQueryResult` 已用于当前 Python `DataService.run_query` 离线接入，七项收尾审计见核心设计 14.12.16。正式 MCP、真实网关及业务效果尚未验收，不据该类型或离线通过宣称整条真实运行路径完成。
 
 | kind | 字段 | 含义 |
 |---|---|---|
 | `delivery` | `delivery: DeliveryPackage` | 正常交付或宿主因停止条件强制组装的部分交付 |
 | `needs_clarification` | `clarification: ClarificationRequest` | 返回问题并结束当前执行，不伪装成完成交付 |
+| `failed` | `error`、`runtime` | 本上下文明确失败并结束；未知费用/响应仍须核对，不因此变成零 |
+| `recovery_required` | `error`、`runtime` | 本上下文尚未确认终态；只能按原意图恢复或显式关闭 |
+
+当前离线信封保留 `delivery`/`clarification` 的已提交工具响应及不可变对象引用，内部业务包仍按下文约定。新结果带 `schema_version=uteki-run-query-result-v1`、`terminal` 和 `reconciliation_required`；兼容已有 `status`：delivery 为 completed/partial/cancelled，澄清为 needs_clarification，失败及恢复要求为 failed，调用者须以 kind/terminal 判断是否结束。`native_success` 单独报告 SDK 是否正常结束：SDK 正常结束却未交付仍是业务失败；已接受业务包而 SDK 收尾失败，业务包保留且 `native_error` 说明原生失败。结果中的耗时与账本是冻结时快照，后续费用核对不能改写原结果。
+
+终态先保存不可变结果和 `outcome_intent`，再确认 Session、Catalog 和结果头；显式恢复确认同一对象，不重跑模型。`read_run_result(context_ref)` 只读已有结果并校验终态一致性；未完成提交返回 RECOVERY_REQUIRED。`inspect_context.lifecycle` 同时给出 Catalog 状态、原生阶段及待提交/关闭标记；Catalog running 是业务未终结，不是进程存活证据。旧格式结果原样读回，不补造新字段。
+
+宿主 `close_run(context_ref, request_key=..., reason=...)` 用于原生历史不完整或未知响应的显式放弃。要求实际观察原进程组退出、无待确认交付/澄清，副作用及已有响应意图先经原恢复入口确认/关闭。无响应意图的只读 accepted 操作可标记 closed 并保留原记录，不生成假的成功/错误工具响应。关闭停止原根账本，仅释放尚未 dispatch 的 prepared 请求，保留 dispatched/outcome_unknown 的预留；返回 kind=failed、error=RUN_CLOSED。关闭键/原因固定，关闭中断沿原意图继续；普通 SDK recover 不能取消关闭，也不能创建第二个运行掩盖它。该宿主操作不是新增模型工具或对外 MCP 能力。
 
 `ClarificationRequest` 包含 `{clarification_id, context_ref, run_id, root_run_id, question, blocking_need_ids, needs_plan, state, usage, remaining_budget, created_at}`。`clarification_id` 使用 `cl_` 系统 ID；usage 为根任务累计用量，remaining_budget 为扣除已结算、预留及未知费用后的余额。宿主冻结该记录；调用方得到问题后，按第 1 节提交回答和原上下文引用，再调用 `run_query(new_context_ref)`。不另增模型工具或自动后台等待。
 

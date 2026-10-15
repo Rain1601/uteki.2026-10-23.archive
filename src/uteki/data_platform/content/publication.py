@@ -166,6 +166,23 @@ class Publication:
             raise
         return self.catalog.get_snapshot(snapshot_id)
 
+    @operation
+    def continue_snapshot(self, snapshot_id):
+        """Explicitly publish an intact candidate; never repair sealed files."""
+        row = self.catalog.get_snapshot(snapshot_id)
+        if row['status'] == 'frozen' or self.snapshot_path(row,final=True).exists():
+            self.commit_snapshot(snapshot_id)
+        elif row['status'] != 'collecting':
+            raise CatalogError('INVALID_STATE','terminal snapshot cannot be continued')
+        elif row['manifest_ref'] is None:
+            self.freeze_snapshot(snapshot_id)
+        else:
+            self.verify_snapshot(snapshot_id,final=False)
+            parent = ensure_directory(self.root,f"assets/{row['asset_id']}/snapshots")
+            self.move(self.snapshot_path(row,final=False),parent/snapshot_id)
+            self.commit_snapshot(snapshot_id)
+        return self.catalog.get_snapshot(snapshot_id)
+
     def commit_snapshot(self, snapshot_id):
         row = self.catalog.get_snapshot(snapshot_id)
         self.verify_snapshot(snapshot_id)

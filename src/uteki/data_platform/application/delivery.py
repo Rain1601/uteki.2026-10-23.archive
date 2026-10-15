@@ -1,8 +1,82 @@
 """Copy registered, actually returned results into an immutable dependency closure."""
 from __future__ import annotations
 
+from copy import deepcopy
+
+from uteki.infrastructure.run_budget import RunBudget
 from ..contracts.common import CatalogError, canonical, new_id, utc_now
+from ..contracts.run import DeliveryRequest, TaskState
 from .session import ref_key
+
+
+def delivery_usage(session):
+    root_session = session.root_session()
+    native = session.data.get('native_execution') or root_session.data.get('root_budget') or root_session.data.get('native_execution')
+    if native is None:
+        return dict(model_calls=0,cost_usd='0',unknown_cost_reserved_usd='0',wall_seconds=session.data['wall_seconds'])
+    context = session.data['context']
+    expected = 'runs/'+context['root_run_id']+'/budget.sqlite'
+    if native['ledger_path'] != expected:
+        raise CatalogError('RECOVERY_REQUIRED','delivery ledger differs from its root identity')
+    root_policy = root_session.data['context']['request']['run_policy']
+    budget = RunBudget.open_existing(session.catalog.root/expected,root_policy['max_usd'],
+                                     root_run_id=context['root_run_id'])
+    root, summary = budget.inspect_root(), budget.summary()
+    calls = sum(v for k,v in root['request_stages'].items() if k in {'dispatched','responded','outcome_unknown'})
+    usage = dict(model_calls=calls,real_model_calls=0 if root['mode']=='offline' else calls,
+        cost_usd=root['cost']['known_billed_usd'],synthetic_cost_usd=root['cost']['synthetic_cost_usd'],
+        unknown_cost_reserved_usd=root['cost']['unknown_reserved_usd'],
+        in_flight_reserved_usd=root['cost']['in_flight_reserved_usd'],unknown_requests=summary['unknown_requests'],
+        wall_seconds=session.data['wall_seconds'],root_run_id=context['root_run_id'],mode=root['mode'])
+    if session.data.get('time_reconciliations'):
+        usage['time_reconciliations']=deepcopy(session.data['time_reconciliations'])
+    return usage
+
+
+def stopped_request(session, reason, visible_results):
+    """Only the last accepted state may support a host-generated partial result."""
+    visible = {canonical(r) for r in visible_results}
+    plan = session.data['plan']
+    update = None
+    if not plan['needs']:
+        update = dict(base_version=0,needs=[dict(need_id='original-question',
+            description=session.data['context']['request']['question'],required=True)])
+        planned = update['needs']
+    else:
+        planned = plan['needs']
+    prior = session.data['state'] or dict(satisfied=[],gaps=[])
+    supported = {n['need_id']:n for n in prior['satisfied']}
+    gaps = {n['need_id']:n for n in prior['gaps']}
+    needs, accepted, missing = [], [], []
+
+    def is_visible(reference, active=None):
+        key = canonical(reference)
+        active = set() if active is None else active
+        if key in active:
+            raise CatalogError('RESULT_REF_INVALID','cyclic dependencies in stopped execution')
+        item = session.lookup(reference)
+        if key not in visible:
+            return False
+        return all(is_visible(r,active | {key}) for r in item.get('dependency_refs',[])+item.get('operand_refs',[]))
+
+    for need in planned:
+        identity = need['need_id']
+        previous = supported.get(identity) or gaps.get(identity) or {}
+        refs = previous.get('result_refs',[])
+        usable = [r for r in refs if is_visible(r)]
+        if identity in supported and usable and len(usable)==len(refs):
+            accepted.append(dict(need_id=identity,result_refs=usable))
+            needs.append(dict(need_id=identity,status='supported',result_refs=usable,gaps=[]))
+        else:
+            gap = previous.get('missing') or 'No confirmed completion before execution stopped: '+reason
+            if len(usable)!=len(refs):
+                gap += '; some evidence was not visible in this native execution'
+            missing.append(dict(need_id=identity,missing=gap,result_refs=usable))
+            needs.append(dict(need_id=identity,status='partial' if usable else 'unresolved',result_refs=usable,gaps=[gap]))
+    request = DeliveryRequest.model_validate_json(canonical(dict(needs=needs)))
+    state = TaskState.model_validate_json(canonical(dict(plan_update=update,satisfied=accepted,gaps=missing,
+        next_action='deliver',reason='Host stopped execution: '+reason)))
+    return request, state
 
 
 def assemble(session, request, state, plan):
@@ -70,5 +144,6 @@ def assemble(session, request, state, plan):
         assets_used=[assets[k] for k in sorted(assets)], conflicts=[c.model_dump(mode='json') for c in request.conflicts],
         gaps=[dict(need_id=n.need_id,reason=g) for n in request.needs for g in n.gaps],
         search_log_ref=dict(run_id=context['run_id'],session_revision=session.data['revision']),
-        usage=dict(model_calls=0,cost_usd='0',unknown_cost_reserved_usd='0',wall_seconds=session.data['wall_seconds']),
-        stop_reason='delivered',created_at=utc_now(),business_sufficiency_evaluated=False)
+        usage=delivery_usage(session),
+        stop_reason='delivered',business_status='completed' if all(n.status=='supported' for n in request.needs) else 'partial',
+        created_at=utc_now(),business_sufficiency_evaluated=False)

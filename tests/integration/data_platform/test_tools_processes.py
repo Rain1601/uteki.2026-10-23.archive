@@ -9,7 +9,7 @@ import unittest
 
 from uteki.data_platform.catalog import Catalog
 from uteki.data_platform.build.pipeline import build_html, html_recipe
-from uteki.data_platform.contracts.common import canonical
+from uteki.data_platform.contracts.common import CatalogError, canonical
 from uteki.data_platform.retrieval.content import HtmlReader
 from uteki.data_platform.retrieval.index import DerivedIndex
 from uteki.data_platform.service import DataService
@@ -76,8 +76,21 @@ class ToolProcessTests(unittest.TestCase):
                     self.assertEqual(catalog._get('runs','run_id',self.context['run_id'])['status'],'completed')
             else:
                 self.assertEqual(operation['status'],'accepted')
-                replay=service.call(**args)
-                self.assertEqual(replay['error']['code'],'OPERATION_INTERRUPTED')
+                if delivery:
+                    with self.assertRaises(CatalogError) as caught:
+                        service.deliver(**args)
+                    self.assertEqual(caught.exception.code,'OPERATION_INTERRUPTED')
+                    intended=canonical(operation['terminal_intent']['package'])
+                    turns=inspected['turns']
+                    replay=service.deliver(**args,recover=True)
+                    self.assertEqual(canonical(replay['delivery']),intended)
+                    self.assertEqual(service.deliver(**args,recover=True),replay)
+                    self.assertEqual(service.inspect_context(self.context['context_ref'])['turns'],turns)
+                    self.assertEqual(service.read_delivery(self.context['context_ref']),replay['delivery'])
+                    self.assertEqual(catalog._get('runs','run_id',self.context['run_id'])['status'],'completed')
+                else:
+                    replay=service.call(**args)
+                    self.assertEqual(replay['error']['code'],'OPERATION_INTERRUPTED')
                 self.assertEqual(operation['response'],None)
             if not delivery:
                 self.assertEqual(current['generation']==self.old['generation'],phase in {'tool_started','index_before_head'})
@@ -98,6 +111,12 @@ class ToolProcessTests(unittest.TestCase):
 
     def test_delivery_commit_before_catalog_finish_reconciles_on_exact_replay(self):
         self.interrupted('delivery_response_committed',delivery=True)
+
+    def test_delivery_exit_after_intent_recovers_same_package(self):
+        self.interrupted('delivery_accepted',delivery=True)
+
+    def test_delivery_exit_after_object_recovers_same_package(self):
+        self.interrupted('delivery_object_written',delivery=True)
 
     def test_context_creation_process_exits_recover_original_identity(self):
         from uteki.data_platform.contracts.content import ObjectRef

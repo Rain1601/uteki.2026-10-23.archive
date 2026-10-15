@@ -15,6 +15,13 @@ def main():
     parser.add_argument('phase')
     args=parser.parse_args()
     invocation=json.loads(args.invocation.read_bytes())
+    if args.phase=='index_head_visible':
+        from uteki.data_platform.retrieval import index
+        write_index=index.write_control
+        def stop_index(path,*values,**options):
+            write_index(path,*values,**options)
+            os._exit(73)
+        index.write_control=stop_index
     if args.phase=='context_control_pending':
         # Interrupt the real atomic writer after it creates its temporary file,
         # before linking the first control file. The durable intent is already
@@ -38,7 +45,7 @@ def main():
             os._exit(73)
     with Catalog.open(args.root) as catalog:
         service=DataService(catalog)
-        method={'deliver':service.deliver,'call':service.call,'create_context':service.create_context}[invocation.pop('method')]
+        method={'deliver':service.deliver,'clarify':service.clarify,'call':service.call,'create_context':service.create_context}[invocation.pop('method')]
         result=method(**invocation,checkpoint=checkpoint)
     print(json.dumps(result))
 

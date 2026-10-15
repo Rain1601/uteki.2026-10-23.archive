@@ -106,9 +106,15 @@ class ReviewFixTests(unittest.TestCase):
             write(path,*args,**kwargs)
             raise OSError('synthetic sync acknowledgement lost')
         with patch.object(indexes,'write_control',failure):
-            result=f.call('request_asset_update',dict(need_id='need-1',action='process',process=dict(asset_ref=f.reference.model_dump(mode='json'),capabilities=['text_search']),reason='Explicit rebuild'))
-        self.assertEqual(result['status'],'error')
-        self.assertEqual(result['error']['details']['effects'][0]['status'],'uncertain')
+            with self.assertRaises(CatalogError) as caught:
+                f.call('request_asset_update',dict(need_id='need-1',action='process',process=dict(asset_ref=f.reference.model_dump(mode='json'),capabilities=['text_search']),reason='Explicit rebuild'))
+        self.assertEqual(caught.exception.code,'RECOVERY_REQUIRED')
+        self.assertEqual(caught.exception.details['effects'][0]['status'],'uncertain')
+        operation=next(o for o in f.service.inspect_context(f.context)['operations'].values() if o['status']=='accepted')
+        recovered=f.service.call(f.context,operation['tool'],operation['request'],state=operation['state'],
+            request_key=operation['request_key'],recover=True)
+        self.assertEqual(recovered['items'][0]['derived_generation'],f.index.current()[1]['generation'])
+        self.assertTrue(recovered['resource_usage']['execution_time_uncertain'])
 
     def test_acquisition_cancel_at_publication_boundaries_reports_actual_state(self):
         for phase,published in [('before_build_commit',0),('after_build_commit',1)]:
@@ -117,11 +123,22 @@ class ReviewFixTests(unittest.TestCase):
                 def stop(value):
                     if value==phase:cancelled[0]=True
                 service,context=f.service(lambda url,**kw:A['F']['source']() if url==A['F']['MAIN_URL'] else b'synthetic image')
-                result=service.request_asset_update(context,f.request,state=f.state,request_key='cancel-publication',checkpoint=stop,should_cancel=lambda:cancelled[0])
-                self.assertEqual(result['error']['code'],'CANCELLED',result)
+                if not published:
+                    with self.assertRaises(CatalogError) as caught:
+                        service.request_asset_update(context,f.request,state=f.state,request_key='cancel-publication',checkpoint=stop,should_cancel=lambda:cancelled[0])
+                    self.assertEqual(caught.exception.code,'RECOVERY_REQUIRED')
+                    effects=caught.exception.details['effects']
+                else:
+                    result=service.request_asset_update(context,f.request,state=f.state,request_key='cancel-publication',checkpoint=stop,should_cancel=lambda:cancelled[0])
+                    self.assertEqual(result['error']['code'],'CANCELLED',result)
+                    effects=result['error']['details']['effects']
                 self.assertEqual(f.catalog._db.execute("SELECT count(*) FROM asset_builds WHERE status='published'").fetchone()[0],published)
-                builds=[e for e in result['error']['details']['effects'] if e['kind']=='build']
+                builds=[e for e in effects if e['kind']=='build']
                 self.assertEqual(builds[0]['status'],'published' if published else 'staging')
+                if not published:
+                    result=service.request_asset_update(context,f.request,state=f.state,request_key='cancel-publication',recover=True)
+                    self.assertEqual(result['items'][0]['status'],'completed')
+                    self.assertTrue(result['resource_usage']['execution_time_uncertain'])
                 self.assertEqual(service.request_asset_update(context,f.request,state=f.state,request_key='cancel-publication'),result)
 
     def test_native_query_obeys_deadline_and_cancellation(self):
