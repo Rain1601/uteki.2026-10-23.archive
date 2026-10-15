@@ -1,6 +1,7 @@
 """Business plans and delivery requests, independent of any agent SDK."""
 from __future__ import annotations
 
+from decimal import Decimal, InvalidOperation
 from typing import Annotated, Awaitable, Literal, Protocol
 from pydantic import Field, model_validator
 from .common import Contract, Text, id_type
@@ -112,12 +113,18 @@ class RunQueryResult(Contract):
     native_events: list[dict]
     tool_events: list[dict]
     runtime: dict
-    mode: Literal['offline']
-    real_model_calls: Literal[0]
-    gateway_cost_usd: None
+    mode: Literal['offline','gateway_synthetic','remote']
+    real_model_calls: Annotated[int, Field(ge=0)]
+    gateway_cost_usd: str | None
 
     @model_validator(mode='after')
     def consistent(self):
+        if self.mode!='remote' and (self.real_model_calls!=0 or self.gateway_cost_usd is not None):
+            raise ValueError('nonremote execution cannot claim real requests or costs')
+        if self.gateway_cost_usd is not None:
+            try:amount=Decimal(self.gateway_cost_usd)
+            except InvalidOperation:raise ValueError('invalid gateway charge') from None
+            if not amount.is_finite() or amount<0:raise ValueError('invalid gateway charge')
         if self.terminal != (self.kind!='recovery_required'):
             raise ValueError('recovery is nonterminal; other results end this context')
         if self.kind=='delivery':

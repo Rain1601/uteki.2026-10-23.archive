@@ -15,12 +15,19 @@ def delivery_usage(session):
     if native is None:
         return dict(model_calls=0,cost_usd='0',unknown_cost_reserved_usd='0',wall_seconds=session.data['wall_seconds'])
     context = session.data['context']
-    expected = 'runs/'+context['root_run_id']+'/budget.sqlite'
-    if native['ledger_path'] != expected:
-        raise CatalogError('RECOVERY_REQUIRED','delivery ledger differs from its root identity')
-    root_policy = root_session.data['context']['request']['run_policy']
-    budget = RunBudget.open_existing(session.catalog.root/expected,root_policy['max_usd'],
-                                     root_run_id=context['root_run_id'])
+    gateway = None
+    if native.get('binding',{}).get('gateway') is not None:
+        from .gateway_batch import load_gateway_binding, open_runtime_budget
+        budget = open_runtime_budget(session)
+        gateway = load_gateway_binding(session,native['binding']['gateway'],native['binding']['profile'],
+            native['binding']['limits'],open_ledger=False)
+    else:
+        expected = 'runs/'+context['root_run_id']+'/budget.sqlite'
+        if native['ledger_path'] != expected:
+            raise CatalogError('RECOVERY_REQUIRED','delivery ledger differs from its root identity')
+        root_policy = root_session.data['context']['request']['run_policy']
+        budget = RunBudget.open_existing(session.catalog.root/expected,root_policy['max_usd'],
+                                         root_run_id=context['root_run_id'])
     root, summary = budget.inspect_root(), budget.summary()
     calls = sum(v for k,v in root['request_stages'].items() if k in {'dispatched','responded','outcome_unknown'})
     usage = dict(model_calls=calls,real_model_calls=0 if root['mode']=='offline' else calls,
@@ -28,6 +35,13 @@ def delivery_usage(session):
         unknown_cost_reserved_usd=root['cost']['unknown_reserved_usd'],
         in_flight_reserved_usd=root['cost']['in_flight_reserved_usd'],unknown_requests=summary['unknown_requests'],
         wall_seconds=session.data['wall_seconds'],root_run_id=context['root_run_id'],mode=root['mode'])
+    if gateway is not None:
+        scope_id=gateway['binding']['scope_id']
+        usage.update(mode=gateway['mode'],budget_root_run_id=root['root_run_id'],control_scope_id=scope_id,
+            scope_model_calls=sum(r['stage'] in {'dispatched','responded','outcome_unknown'}
+                for r in budget.inspect_requests() if r.get('control_scope_id')==scope_id))
+        if gateway['mode']=='gateway_synthetic':
+            usage.update(real_model_calls=0,cost_usd=None,synthetic_cost_usd=root['cost']['known_billed_usd'])
     if session.data.get('time_reconciliations'):
         usage['time_reconciliations']=deepcopy(session.data['time_reconciliations'])
     return usage

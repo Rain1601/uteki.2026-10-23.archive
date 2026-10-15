@@ -14,6 +14,11 @@ from ..contracts.content import ObjectRef
 SCHEMA='uteki-runtime-initialization-v1'
 
 def new_root_descriptor(journal, root_session, native_id, ledger_path):
+    if journal.gateway_binding is not None:
+        root=journal.gateway['budget'].inspect_root()
+        return dict(ledger_path=ledger_path,mode=root['mode'],max_requests=root['max_requests'],policy=root['policy'],
+            gateway=deepcopy(journal.gateway_binding),
+            initialization=dict(context_ref=journal.context_ref,native_session_id=native_id,status='pending'))
     return dict(ledger_path=ledger_path,mode='offline',max_requests=journal.limits.max_model_requests,
         policy=dict(context_ref=root_session.data['context']['context_ref'],run_policy=journal.root_policy,
             request_bytes=journal.limits.max_request_bytes,response_bytes=journal.limits.max_response_bytes,
@@ -61,6 +66,7 @@ def _publish(path, raw, checkpoint):
 
 def complete_initialization(journal):
     """Only a frozen initialization intent may create a new root's empty ledger."""
+    if journal.gateway_binding is not None:return _complete_gateway_initialization(journal)
     session=journal.session();native=session.data['native_execution']
     intent=native.get('initialization')
     if not intent or intent.get('schema_version')!=SCHEMA or native['phase']!='initializing':
@@ -132,4 +138,38 @@ def complete_initialization(journal):
     native=journal.state()
     if native['tool_calls'] or native.get('openai_checkpoint') or native.get('claude_session'):
         raise CatalogError('RECOVERY_REQUIRED','initialization already contains native SDK work')
+    return budget
+
+
+def _complete_gateway_initialization(journal):
+    """Attach one business root to a prepublished batch; never create a ledger here."""
+    from .gateway_batch import load_gateway_binding
+    session=journal.session();native=session.data['native_execution'];intent=native.get('initialization')
+    if not intent or intent.get('schema_version')!=SCHEMA or native['phase']!='initializing':
+        raise CatalogError('RECOVERY_REQUIRED','no original gateway initialization intent')
+    expected=journal.gateway['ledger_path']
+    if native['ledger_path']!=expected:raise CatalogError('RECOVERY_REQUIRED','gateway ledger path differs')
+    budget=load_gateway_binding(session,journal.gateway_binding,journal.profile,journal.limits.model_dump(mode='json'))['budget']
+    root=session.root_session();current=root.data.get('root_budget')
+    if intent['owns_new_root']:
+        descriptor=intent['root_descriptor']
+        wanted=new_root_descriptor(journal,root,native['native_session_id'],expected)
+        if descriptor!=wanted:raise CatalogError('RECOVERY_REQUIRED','gateway initialization binding differs')
+        if current is None:
+            root.data['root_budget']=deepcopy(descriptor);root.save()
+            journal.checkpoint('root_initialization_saved');current=descriptor
+        pending=deepcopy(current)
+        if pending.get('initialization',{}).get('status') not in {'pending','ready'}:
+            raise CatalogError('RECOVERY_REQUIRED','invalid gateway initialization state')
+        pending['initialization']['status']='pending'
+        if pending!=descriptor:raise CatalogError('RECOVERY_REQUIRED','business root belongs to a different gateway binding')
+        if current['initialization']['status']=='pending':
+            root.data['root_budget']['initialization']['status']='ready';root.save()
+            journal.checkpoint('root_initialization_ready')
+    elif current is None or current.get('gateway')!=journal.gateway_binding:
+        raise CatalogError('RECOVERY_REQUIRED','original business root gateway binding missing')
+    if any(r.get('control_scope_id')==journal.gateway_binding['scope_id'] for r in budget.inspect_requests()):
+        raise CatalogError('RECOVERY_REQUIRED','initializing scope already contains requests; no SDK restart')
+    if native['tool_calls'] or native.get('openai_checkpoint') or native.get('claude_session'):
+        raise CatalogError('RECOVERY_REQUIRED','initialization already contains SDK work')
     return budget

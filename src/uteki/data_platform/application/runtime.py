@@ -22,6 +22,7 @@ from .execution_clock import start_clock, reconcile_time, begin_segment, TimeObs
 from .run_completion import commit_result, read_result, save_result
 from .recovery_clock import RecoveryClock, pending_recoveries
 from .runtime_initialization import SCHEMA as INITIALIZATION_SCHEMA, new_root_descriptor, check_root_ready, complete_initialization
+from .gateway_batch import load_gateway_binding, open_runtime_budget
 
 FORCED_STOPS = {'cancelled','wall_time','max_turns','no_progress','model_budget','native_max_turns'}
 
@@ -73,7 +74,7 @@ class RuntimeJournal:
     Model transport threads may use only `budget`, `guard_transport` and the
     immutable binding. Session mutations stay on the Catalog owner's thread.
     """
-    def __init__(self, service, context_ref, profile, limits, *, recover=False, checkpoint=None, started=None):
+    def __init__(self, service, context_ref, profile, limits, *, recover=False, checkpoint=None, started=None, gateway_binding=None):
         now=time.monotonic()
         if started is not None and (type(started) not in (int,float) or not math.isfinite(started) or not 0<=started<=now):
             raise CatalogError('INVALID_REQUEST','host invocation start must be a finite prior monotonic time')
@@ -97,7 +98,12 @@ class RuntimeJournal:
         self.prior_elapsed = 0.0
         self.initial_seconds = session.data['wall_seconds']
         self.deadline = self.started + self.context['request']['run_policy']['max_wall_seconds'] - self.initial_seconds
-        binding = dict(profile=self.profile, limits=self.limits.model_dump(mode='json'), mode='offline')
+        self.gateway_binding=deepcopy(gateway_binding)
+        self.gateway=(load_gateway_binding(session,self.gateway_binding,self.profile,self.limits.model_dump(mode='json'))
+            if self.gateway_binding is not None else None)
+        self.mode=self.gateway['mode'] if self.gateway else 'offline'
+        binding = dict(profile=self.profile, limits=self.limits.model_dump(mode='json'), mode=self.mode)
+        if self.gateway_binding is not None:binding['gateway']=self.gateway_binding
         current = session.data.get('native_execution')
         recovery_pending = bool(current and pending_recoveries(current))
         completion_pending = bool(current and current.get('completion_clock',{}).get('status')=='pending')
@@ -118,11 +124,7 @@ class RuntimeJournal:
         if self.cached is not None and not (recover and (recovery_pending or completion_pending or self.cached.get('kind')=='recovery_required'
                 or current.get('exit_observation') and (current.get('execution_time_uncertain')
                     or session.data.get('execution_time_uncertain') or not current.get('time_reconciliation')))):
-            expected = 'runs/'+self.context['root_run_id']+'/budget.sqlite'
-            if current['ledger_path'] != expected:
-                raise CatalogError('RECOVERY_REQUIRED', 'stored root ledger path differs')
-            self.budget = RunBudget.open_existing(self.catalog.root/expected,
-                self.root_policy['max_usd'], root_run_id=self.context['root_run_id'])
+            self.budget = open_runtime_budget(session)
             return
         if current is not None:
             if recover:
@@ -132,12 +134,8 @@ class RuntimeJournal:
                         raise CatalogError('RECOVERY_REQUIRED','legacy initialization lacks a frozen creation intent; never recreate its ledger')
                     self._resume_initialization()
                     return
-                expected = 'runs/'+self.context['root_run_id']+'/budget.sqlite'
-                if current['ledger_path'] != expected:
-                    raise CatalogError('RECOVERY_REQUIRED','stored root ledger path differs')
-                self.budget = RunBudget.open_existing(self.catalog.root/expected,
-                    self.root_policy['max_usd'],root_run_id=self.context['root_run_id'])
-                root_stop=self.budget.inspect_root()['stop_reason']
+                self.budget = open_runtime_budget(session)
+                root_stop=self._persistent_stop()
                 if root_stop:self.stop(root_stop)
                 self.recovery_clock = RecoveryClock(self.session(),started=self.started)
                 try:
@@ -154,17 +152,22 @@ class RuntimeJournal:
             raise CatalogError('INVALID_STATE', 'cannot start an SDK on a terminal deterministic context')
         if any(o['status'] != 'completed' for o in session.data['operations'].values()):
             raise CatalogError('RECOVERY_REQUIRED', 'previous business operation has an uncertain outcome')
-        path = ensure_directory(self.catalog.root, 'runs/'+self.context['root_run_id'])/'budget.sqlite'
+        path = (self.catalog.root/self.gateway['ledger_path'] if self.gateway else
+            ensure_directory(self.catalog.root, 'runs/'+self.context['root_run_id'])/'budget.sqlite')
         existing_root = root_session.data.get('root_budget') or root_session.data.get('native_execution')
-        if existing_root is None and (path.exists() or path.is_symlink()):
+        if self.gateway is None and existing_root is None and (path.exists() or path.is_symlink()):
             raise CatalogError('RECOVERY_REQUIRED','unexpected existing root ledger; never adopt it')
         if existing_root is not None:
             check_root_ready(self,existing_root)
             if existing_root['ledger_path']!=path.relative_to(self.catalog.root).as_posix():
                 raise CatalogError('RECOVERY_REQUIRED','root ledger binding differs')
-            self.budget = RunBudget.open_existing(path,self.root_policy['max_usd'],root_run_id=self.context['root_run_id'])
+            self.budget = (self.gateway['budget'] if self.gateway else
+                RunBudget.open_existing(path,self.root_policy['max_usd'],root_run_id=self.context['root_run_id']))
             root = self.budget.inspect_root()
-            if (root['mode']!='offline' or self.limits.max_model_requests>root['max_requests']
+            if self.gateway is not None:
+                if existing_root.get('gateway')!=self.gateway_binding:
+                    raise CatalogError('RECOVERY_REQUIRED','business root gateway binding differs')
+            elif (root['mode']!='offline' or self.limits.max_model_requests>root['max_requests']
                     or self.limits.max_request_bytes>root['policy']['request_bytes']
                     or self.limits.max_response_bytes>root['policy']['response_bytes']):
                 raise CatalogError('SCOPE_VIOLATION','child runtime cannot expand frozen root transport limits')
@@ -197,7 +200,7 @@ class RuntimeJournal:
             self.prior_elapsed=max(self.prior_elapsed,
                 self.state().get('prior_elapsed_seconds',0.0)+accounted['native_elapsed_upper'])
             self.budget=complete_initialization(self)
-            root_stop=self.budget.inspect_root()['stop_reason']
+            root_stop=self._persistent_stop()
             if root_stop:self.stop(root_stop)
             if accounted['timed_out'] or self.recovery_clock.timed_out:self.stop('wall_time')
             self.finish_recovery()
@@ -224,7 +227,7 @@ class RuntimeJournal:
                 native['execution_time_uncertain']=True
                 saved.save()
             return commit_result(saved,checkpoint=self.checkpoint)
-        self.budget.recover_requests()
+        self._recover_requests()
         session = self.session()
         native = session.data['native_execution']
         native['events'].append(dict(type='explicit_recovery',at=utc_now(),previous_owner_pid=native['owner_pid']))
@@ -327,7 +330,7 @@ class RuntimeJournal:
         if self.stopped.is_set():
             raise CatalogError('RUN_STOPPED', self.stop_reason or 'runtime stopped')
         if self.budget is not None:
-            root_stop=self.budget.inspect_root()['stop_reason']
+            root_stop=self._persistent_stop()
             if root_stop:
                 self.stop(root_stop)
                 raise CatalogError('RUN_STOPPED',self.stop_reason)
@@ -340,7 +343,16 @@ class RuntimeJournal:
             self.stop_reason = reason
             self.stopped.set()
         if reason in FORCED_STOPS and self.budget is not None:
-            self.stop_reason=self.budget.stop_root(reason)['stop_reason']
+            self.stop_reason=(self.budget.stop_scope(self.gateway_binding['scope_id'],reason)['stop_reason']
+                if self.gateway_binding else self.budget.stop_root(reason)['stop_reason'])
+
+    def _persistent_stop(self):
+        root_stop=self.budget.inspect_root()['stop_reason']
+        return root_stop or (self.budget.inspect_scope(self.gateway_binding['scope_id'])['stop_reason']
+            if self.gateway_binding else None)
+
+    def _recover_requests(self):
+        return self.budget.recover_requests(**({'scope_id':self.gateway_binding['scope_id']} if self.gateway_binding else {}))
 
     def tick(self, *, completion=False):
         if self.recovery_clock is not None and not self.recovery_clock.closed:
@@ -383,6 +395,8 @@ class RuntimeJournal:
             raise CatalogError('BUDGET_EXCEEDED', 'no-progress limit exhausted')
 
     def prepare_model(self, request, *, request_bytes=None, request_key=None):
+        if self.gateway_binding is not None:
+            raise CatalogError('INVALID_STATE','gateway requests must use the physical HTTP boundary, not zero-cost offline metering')
         self.guard_transport()
         existing = next((r for r in self.budget.inspect_requests() if r['request_key']==request_key),None) if request_key else None
         if existing is None and self.budget.summary()['requests']>=self.limits.max_model_requests:
@@ -409,6 +423,8 @@ class RuntimeJournal:
         return key
 
     def record_model(self, key, response, *, complete):
+        if self.gateway_binding is not None:
+            raise CatalogError('INVALID_STATE','gateway responses require raw transport and billing evidence')
         self.checkpoint('model_response_received')
         self.budget.record_response(key, response, billed_usd='0' if complete else None)
         self.checkpoint('model_response_committed')
@@ -458,10 +474,12 @@ class RuntimeJournal:
         value = deepcopy(outcome)
         if self.failure_code is not None:
             value.update(kind='recovery_required',status='failed',error=self.failure_code)
-        if self.budget.inspect_root()['request_stages'].get('dispatched'):
+        own_requests=[r for r in self.budget.inspect_requests() if not self.gateway_binding
+            or r.get('control_scope_id')==self.gateway_binding['scope_id']]
+        if any(r['stage']=='dispatched' for r in own_requests):
             # Native error/cancellation may leave a request without a response.
             # Preserve the outcome uncertainty, never release that reservation.
-            self.budget.recover_requests()
+            self._recover_requests()
         terminal = any(value.get(k) for k in ('delivery','committed_delivery','clarification','committed_clarification'))
         if self.stop_reason in FORCED_STOPS and not terminal:
             try:
@@ -491,7 +509,7 @@ class RuntimeJournal:
         result=save_result(session,self.budget,value,checkpoint=self.checkpoint)
         if owns_clock:
             self.tick(completion=True)
-            if time.monotonic()>=self.deadline:self.budget.stop_root('wall_time')
+            if time.monotonic()>=self.deadline:self.stop('wall_time')
             self.checkpoint('runtime_completion_clock_recorded')
         self.finish_recovery()
         return result

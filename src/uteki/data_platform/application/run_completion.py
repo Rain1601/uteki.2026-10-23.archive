@@ -1,5 +1,6 @@
 """Durable business completion and explicit host closure; no SDK loop/history edits."""
 from copy import deepcopy
+from decimal import Decimal
 import json
 import os
 import time
@@ -11,6 +12,7 @@ from ..contracts.content import ObjectRef
 from ..contracts.run import RunQueryResult
 from .execution_clock import begin_segment, reconcile_time
 from .session import Session
+from .gateway_batch import load_gateway_binding, open_runtime_budget
 
 
 def result_value(session, budget, outcome):
@@ -35,6 +37,16 @@ def result_value(session, budget, outcome):
     value['runtime']=dict(context_ref=context['context_ref'],run_id=context['run_id'],root_run_id=context['root_run_id'],
         native_session_id=native['native_session_id'],budget=root,elapsed_seconds=native['elapsed_seconds'],
         execution_time_uncertain=uncertain,unknown_transports=unknown_transports)
+    if native['binding'].get('gateway') is not None:
+        gateway=load_gateway_binding(session,native['binding']['gateway'],native['binding']['profile'],
+            native['binding']['limits'],open_ledger=False)
+        scope_id=gateway['binding']['scope_id']
+        records=[r for r in budget.inspect_requests() if r.get('control_scope_id')==scope_id]
+        value['runtime'].update(gateway_binding=gateway['binding'],control_scope=budget.inspect_scope(scope_id))
+        remote=gateway['plan']['origin']=='openrouter'
+        known=all(r['cost_state']=='settled' for r in records)
+        value.update(mode=gateway['mode'],real_model_calls=sum(r['stage'] in {'dispatched','responded','outcome_unknown'} for r in records) if remote else 0,
+            gateway_cost_usd=str(sum((Decimal(r['settled_usd']) for r in records),Decimal(0))) if remote and known else None)
     from .recovery_clock import recovery_seconds
     value['runtime'].update(wall_seconds=session.data['wall_seconds'],host_recovery_seconds=recovery_seconds(native),
         timing_scope='through_result_preparation')
@@ -50,10 +62,21 @@ def validate_result(session, value):
     """Validate immutable result bindings, including any already accepted package."""
     RunQueryResult.model_validate(value)
     native=session.data['native_execution'];context=session.data['context']
+    expected_root=context['root_run_id']
+    if native['binding'].get('gateway') is not None:
+        gateway=load_gateway_binding(session,native['binding']['gateway'],native['binding']['profile'],
+            native['binding']['limits'],open_ledger=False)
+        expected_root=gateway['plan']['batch_id']
+        recorded_scope=value['runtime'].get('control_scope') or {}
+        if (value['mode']!=gateway['mode'] or value['runtime'].get('gateway_binding')!=gateway['binding']
+                or any(recorded_scope.get(key)!=gateway['scope'][key] for key in ('scope_id','max_requests','policy'))
+                or recorded_scope.get('root_run_id')!=expected_root):
+            raise CatalogError('RECOVERY_REQUIRED','runtime gateway scope binding differs')
+    elif value['mode']!='offline':raise CatalogError('RECOVERY_REQUIRED','offline runtime result mode differs')
     if (any(value['runtime'].get(k)!=context[k] for k in ('context_ref','run_id','root_run_id'))
             or value['runtime'].get('native_session_id')!=native['native_session_id']
             or value['profile']!=native['binding']['profile']
-            or value['runtime']['budget']['root_run_id']!=context['root_run_id']):
+            or value['runtime']['budget']['root_run_id']!=expected_root):
         raise CatalogError('RECOVERY_REQUIRED','runtime result binding differs')
     for kind in ('delivery','clarification'):
         response=value.get(kind)
@@ -146,10 +169,7 @@ def close_run(service, context_ref, *, request_key, reason, checkpoint=None):
     session=Session(service.catalog,context_ref);native=session.data.get('native_execution')
     if native is None:raise CatalogError('INVALID_STATE','no native execution to close')
     context=session.data['context'];root=session.root_session()
-    expected='runs/'+context['root_run_id']+'/budget.sqlite'
-    if native['ledger_path']!=expected:raise CatalogError('RECOVERY_REQUIRED','root ledger path differs')
-    budget=RunBudget.open_existing(service.catalog.root/expected,root.data['context']['request']['run_policy']['max_usd'],
-        root_run_id=context['root_run_id'])
+    budget=open_runtime_budget(session)
     saved=native.get('close_intent')
     if saved and (saved['request_key'],saved['reason'])!=(request_key,reason):
         raise CatalogError('IDEMPOTENCY_CONFLICT','closure identity or reason differs')
@@ -184,8 +204,12 @@ def close_run(service, context_ref, *, request_key, reason, checkpoint=None):
         if accounted is None:raise CatalogError('RECOVERY_REQUIRED','interrupted closure worker exit is not confirmed')
         begin_segment(session,started=started,prior_elapsed=max(native['elapsed_seconds'],
             native.get('prior_elapsed_seconds',0.0)+accounted['native_elapsed_upper']))
-    budget.stop_root('run_closed');budget.recover_requests()
+    gateway=native['binding'].get('gateway')
+    if gateway:
+        budget.stop_scope(gateway['scope_id'],'run_closed');budget.recover_requests(scope_id=gateway['scope_id'])
+    else:budget.stop_root('run_closed');budget.recover_requests()
     for request in budget.inspect_requests():
+        if gateway and request.get('control_scope_id')!=gateway['scope_id']:continue
         if request['stage']=='prepared':budget.abandon_prepared(request['request_key'],reason='run_closed_before_dispatch')
     checkpoint('run_close_root_stopped')
     for identity in saved['abandoned_operation_ids']:

@@ -16,7 +16,9 @@
 | 第五批：OpenRouter 验证准备 | Prompt 3 的具体契约、独立 profile、请求捕获及合成输入准备已完成；仍不可实跑，见 14.12.17 |
 | 第五至七批 | 两套真实 Agent、配套与业务验收、迁移试用尚未完成；路线见 14.1.5 |
 
-**当前唯一动作：**按目标附件 Prompt 4，先补齐真实 transport、原始响应/收费捕获和两侧多场景共用的批次预算控制，以离线事件完成验收。入口仍拒绝未经授权的真实运行。具体候选及准入见 [gateway-contract.draft.v1.json](config/data_platform/gateway-contract.draft.v1.json)；缺凭据或额度不阻塞这些工程工作，但不发送推理请求、不充值、不接生产。完整目标及后续步骤保持，不因单批完成缩小。
+**当前唯一动作：**按目标附件 Prompt 4，将两套官方 SDK 的既有循环接入已实现的 HTTP 边界和持久批次绑定，补齐原生请求关联、宿主监督及 G01–G05 本机合成网关场景。入口仍拒绝未经授权的真实运行。具体候选及准入见 [gateway-contract.draft.v1.json](config/data_platform/gateway-contract.draft.v1.json)；缺凭据或额度不阻塞这些工程工作，但不发送推理请求、不充值、不接生产。完整目标及后续步骤保持，不因单批完成缩小。
+
+**Prompt 4 检查点 4：**持久批次与业务根绑定已完成限定验收：独立业务根/原生 session 共用同一账本；启用后缺失或损坏不重建；初始化和派发后真实退出沿原身份恢复，自己的收尾不改写其他 scope 在途请求。交付层旧路径假设导致的失败已复现修正；合成收费、整批累计与本场景请求数明确区分。累计 323 项不同检查通过，最后交付修正后重放受影响的 310 项；两套复用环境各 67 个安装文件一致，新增 17 项行为/进程测试，原失败保留。见 14.12.18 与 [verification.json](output/data-agent-gateway-runtime-20261015/checkpoint-4/verification.json)。当前验证的是持久绑定和旧 SDK 回归，尚未完成网关上的 SDK 业务循环及 G01–G05；L2/L3 不记整体通过，未到约定暂停点。真实模型调用与费用为 0，原四项历史偶发问题未关闭。
 
 **Prompt 4 检查点 3：**实际 HTTP 边界与两套 SDK 本机接线已完成限定验收：74 项不同检查通过，66 个普通安装包文件一致。修复关闭连接后隐式重连、HTTP/1.0 响应取消和 EOF 误判；按官方 SDK 实现允许精确的 Claude beta Messages 路径。两侧各一请求、独立 prompt/八个工具 schema/原始字节和同一合成账本核对通过，原失败保留。证据见 14.12.18 与 [verification.json](output/data-agent-gateway-runtime-20261015/checkpoint-3/verification.json)。未执行业务工具、未调用真实模型；持久 RuntimeJournal/scope 绑定和 G01–G05 尚未完成，L2/L3 不记整体通过。**下一动作：持久绑定批次 scope 与业务根身份，完成两侧规定场景，再按顶部用户约定暂停供 review。**
 
