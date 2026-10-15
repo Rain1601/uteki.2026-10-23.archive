@@ -21,7 +21,7 @@ def image_key(url):
 
 
 def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url: str,
-                 allowed_urls: tuple[str, ...], max_seconds: float, fetch=None):
+                 allowed_urls: tuple[str, ...], max_seconds: float, fetch=None, should_cancel=None):
     """Return verified acquisition bytes/receipts, never a published asset.
 
     `fetch` is solely the transport injection point for deterministic tests.
@@ -61,7 +61,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
             raise AcquisitionError("URL outside frozen exact allowlist")
 
     session = prepare_sources(copied, workspace, fetch=fetch, _session_only=True,
-                              request_guard=guard, should_stop=lambda: time.monotonic() >= deadline)
+                              request_guard=guard, should_stop=lambda: time.monotonic() >= deadline or bool(should_cancel and should_cancel()))
     report = session["report"]
     report["company"] = {"symbol": copied["symbol"], "cik": copied.get("cik"), "market": copied["market"]}
     report["scope"]["exact_allowed_urls"] = list(allowed_urls)

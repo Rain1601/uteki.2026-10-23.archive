@@ -4,6 +4,8 @@
 
 ## 当前交付状态
 
+2026-10-15：Data 共享核心前四批已完成各自限定验收；当前六工具、程序化计算/交付及本地复现方式见本页第四批章节和核心设计 14.12.12。M0 仍限离线，真实模型/网关、Agent 自主业务与工作台不在该完成结论内。
+
 2026-09-22 更新：仓库已包含公司名单、部分完整公开材料与索引、研究数据发布，以及 Data Agent 查询快照和历史样例。后续开发顺序、已知边界和换机器交接见 [开发待办](../TODO.md)。凭据、费用账本和含本机路径的运行元数据不随 Git 同步。
 
 2026-09-18 接手时部分资料尚未取得；下文保留恢复方法供实际缺失时使用，不表示列出的文件现在都缺失。新环境先运行工作区检查确认本次检出的状态。离线检查通过不代表 M0 验收、完整年报核验、模型质量达标或历史人工审核已恢复。
@@ -223,6 +225,44 @@ uteki_html_data="$(mktemp -d "${TMPDIR:-/tmp}/uteki-html-data.XXXXXX")"
 `output/` 原件、收据与 gold 是本地证据，不随 Git 安装；新检出须先恢复完整证据目录，不能将缺文件记为通过。另行获准获取时，可将 `--receipt` 换为 `--acquire --settings-root <已有私密设置目录>`，并提供新的显式 acquisition-root、核对 request 中精确 URL 清单及请求/字节/时间限制。SEC 联系信息继续由 `resolve_sec_contact` 读取，不能写进公开 request。当前批次网络验收已完成，不因复现说明自动追加请求；下载版本变化须重新独立核验，不能覆盖冻结预期。
 
 当前支持 UTF-8 静态 HTML 和声明的 iXBRL 数字转换子集。HTML 恢复、推断章节、nil、未支持转换/维度和未取得图片均可观察；不支持 PDF/OCR、外部 CSS/脚本渲染、图片理解、结构化查询或搜索。`HtmlReader` 是构造时验证的字节视图，重新构造才重新检查磁盘完整性。Catalog 单根排他；不得并行打开同一 data_root。旧四文件 build、HTML v1/v2 各按其版本复验。
+
+## 六工具与可追溯交付的独立验收（第四批）
+
+本批使用同一主锁的 `data` extra，通过普通安装运行，不需要任何 Agent SDK、模型凭据或新增网络取数。上节的格式限制属于第三批；第四批新增 HTML 搜索、结构化查询、确定性计算及交付，仍不包含 PDF/OCR、图片理解或 Agent 自主执行。具体参数与不支持的模式见 [API 0.0](DATA_AGENT_API.zh-CN.md)。
+
+从仓库根创建一个新环境，重装当前项目，再切到仓库外执行测试：
+
+```bash
+uteki_tools_repo="$PWD"
+uteki_tools_env="$(mktemp -d "${TMPDIR:-/tmp}/uteki-tools-env.XXXXXX")"
+UV_PROJECT_ENVIRONMENT="$uteki_tools_env/venv" uv sync --locked --python 3.13 --extra data --no-editable
+uv pip install --reinstall-package uteki-eval --no-deps . --python "$uteki_tools_env/venv/bin/python"
+uv pip check --python "$uteki_tools_env/venv/bin/python"
+( cd "$uteki_tools_env"
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_tools_repo/tests/unit/data_platform" -p 'test_*.py' -v
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_tools_repo/tests/integration/data_platform" -p 'test_*.py' -v
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_tools_repo/tests/unit" -p test_company_acquisition.py -v
+)
+```
+
+仍须按上节方式核对实际包来源与源码/安装文件 hash；不能仅凭安装成功认定没有复用旧 wheel。此次核验包含全部 Data Python/SQL 以及复用的获取模块。行为测试只写临时目录和合成数据，acquire 通过既有 `prepare_sources` 链路注入合成传输，未启用真实网络。进程测试在子进程用明确退出点验证不完整响应、索引 head 切换与持久化后重放。
+
+程序调用示例为 [data_tools.py](../examples/data_platform/data_tools.py)。它接收显式主体、来源策略、需求计划、工具参数及交付选择器，没有默认公司、期间、路径或预期答案。只操作已有独立 Data 根；重建派生索引也须在请求中显式提交 process。需要在其他目录复现已有真实材料时，先恢复第三批完整冻结证据并复制到独立测试根，再运行：
+
+```bash
+"$uteki_tools_env/venv/bin/python" -I "$uteki_tools_repo/examples/data_platform/data_tools.py" \
+  --data-root /absolute/path/isolated-data-copy \
+  --request /absolute/path/reviewed-tool-request.json \
+  --output /absolute/path/new-tool-result.json
+"$uteki_tools_env/venv/bin/python" -I "$uteki_tools_repo/scripts/data_agent/verify_tool_delivery.py" \
+  --data-root /absolute/path/isolated-data-copy \
+  --gold /absolute/path/frozen-tools-gold.json \
+  --source-id A24-K --example-result /absolute/path/new-tool-result.json
+```
+
+示例拒绝覆盖已有输出；相同 request_key 和请求在同一根内重放已完成响应，不重新取数/处理。要验证修改后的代码路径，须采用新的 request_key，而不是用旧响应冒充新执行。gold 仅进入独立核验器，不传入产品入口；M25-K 的记录不适用，不能补造 inline facts。原始请求、失败、不同版本的 gold 与安装证据保留于 `output/data-agent-tools-20261014/`；这些本地材料不随 Git 发布，缺少时不能把真实材料核验记为通过。
+
+宿主可单独装配 `OfficialAcquisitionAdapter`，其网络默认关闭；只有明确批准的精确请求、已登记主体/资产/来源、时间依据与 URL 清单能执行。不要在 JSON 放 SEC 联系人，继续使用私密设置与现有解析入口。中断且未保存响应的操作需先检查，工具不会自动重放副作用；已落盘交付通过 `read_delivery` 读回，重复 deliver 不改写交付。当前平台验收为本地 POSIX/macOS arm64/Python 3.13，其他平台、真实断电与网络文件系统不在已验收结论内。
 
 ## Agent 执行监控（2026-10-06）
 
