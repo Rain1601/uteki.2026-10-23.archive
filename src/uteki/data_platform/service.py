@@ -14,6 +14,7 @@ from pydantic import ValidationError
 from .application.delivery import assemble
 from .application.evidence import register_returned
 from .application.session import Session
+from .application.limits import ExecutionLimit
 from .contracts.common import CatalogError, canonical, digest, new_id, nonblank, utc_now
 from .contracts.content import ObjectRef
 from .contracts.query import ContextRequest, ReadPolicy, TOOLS, parse
@@ -33,7 +34,7 @@ class DataService:
         self.catalog = catalog
         self.acquisition_adapter = acquisition_adapter
 
-    def create_context(self, request, *, request_key):
+    def create_context(self, request, *, request_key, recover=False, checkpoint=None):
         request = parse(ContextRequest,request)
         nonblank(request_key)
         stamp = utc_now()
@@ -46,7 +47,7 @@ class DataService:
         context = dict(context_ref=new_id('req'),clock=stamp,created_at=stamp,request=request.model_dump(mode='json'),
             company_ids=companies,resolved_entities=[dict(company_id=c,name=self.catalog.get_company(c)['canonical_name']) for c in companies],
             matched_securities=securities,read_policy=policy.model_dump(mode='json'),unresolved=[],continuation=None)
-        return deepcopy(Session.create(self.catalog,context,request_key).data['context'])
+        return deepcopy(Session.create(self.catalog,context,request_key,recover=recover,checkpoint=checkpoint).data['context'])
 
     def inspect_context(self, context_ref):
         session = Session(self.catalog,context_ref)
@@ -55,6 +56,9 @@ class DataService:
 
     def call(self, context_ref, tool, request, *, state, request_key, should_cancel=None, checkpoint=None):
         from .application.tools import ToolExecution
+        start = time.monotonic()
+        session = None
+        limit = None
         operation_id = new_id('op')
         try:
             nonblank(request_key)
@@ -77,32 +81,34 @@ class DataService:
             if tool=='request_asset_update' and request.need_id not in {n['need_id'] for n in plan['needs']}:
                 raise CatalogError('INVALID_REQUEST','update refers to unknown need')
             policy = session.data['context']['request']['run_policy']
+            limit = ExecutionLimit(policy['max_wall_seconds']-session.data['wall_seconds'],
+                started=start,should_cancel=should_cancel)
             if (session.data['turns'] >= policy['max_turns'] or session.data['wall_seconds'] >= policy['max_wall_seconds']
                     or session.data['no_progress_turns'] >= policy['max_no_progress_turns']):
                 raise CatalogError('BUDGET_EXCEEDED','synchronous run limit exhausted')
-            if should_cancel is not None and should_cancel():
-                raise CatalogError('CANCELLED','cancelled before accepting operation')
+            limit.check('before_preflight')
             executor = ToolExecution(self.catalog,session,tool,request,should_cancel=should_cancel,checkpoint=checkpoint,
-                acquisition_adapter=self.acquisition_adapter)
+                acquisition_adapter=self.acquisition_adapter,limit=limit)
             executor.preflight()
+            executor.check('preflight_complete')
             operation_id = session.accept(key=request_key,fingerprint=signature,tool=tool,request=request,state=state,plan=plan)
         except ValidationError as error:
             return error_response(operation_id,CatalogError('INVALID_REQUEST',str(error)))
         except CatalogError as error:
             if error.code in {'RECOVERY_REQUIRED','CATALOG_INCONSISTENT'}:
                 raise
-            return error_response(operation_id,error)
-        start = time.monotonic()
+            if limit is not None:
+                session.data['wall_seconds'] += limit.elapsed()
+                session.save()
+            return error_response(operation_id,error,time.monotonic()-start)
         try:
             response = executor.execute(operation_id)
-            elapsed = time.monotonic()-start
-            if elapsed+session.data['wall_seconds'] > policy['max_wall_seconds']:
-                raise CatalogError('BUDGET_EXCEEDED','operation exceeded remaining run wall time')
-            if should_cancel is not None and should_cancel():
-                raise CatalogError('CANCELLED','cancelled before returning results; inspect update generation if applicable')
+            executor.check('before_return')
+            elapsed = limit.elapsed()
             response['resource_usage'] = dict(elapsed_ms=round(elapsed*1000,3),**executor.resource_usage)
             if len(canonical(response)) > getattr(request,'max_bytes',200000):
                 raise CatalogError('OUTPUT_LIMIT','complete response exceeds byte budget; narrow targets or increase max_bytes')
+            limit.check('before_result_registration')
             added = register_returned(session,operation_id,response)
             update_progress = False
             if tool=='request_asset_update':
@@ -117,12 +123,17 @@ class DataService:
             session.data['no_progress_turns'] = 0 if added or update_progress else session.data['no_progress_turns']+1
         except (CatalogError,OSError,ValueError,sqlite3.DatabaseError,duckdb.Error) as error:
             if isinstance(error,CatalogError) and error.code in {'RECOVERY_REQUIRED','CATALOG_INCONSISTENT'}:
+                error.details = dict(operation_id=operation_id,effects=deepcopy(executor.effects))
                 raise
-            elapsed = time.monotonic()-start
+            elapsed = limit.elapsed()
             error = error if isinstance(error,CatalogError) else CatalogError('INTERNAL_ERROR',type(error).__name__+': '+str(error))
             response = error_response(operation_id,error,elapsed)
             response['resource_usage'].update(executor.resource_usage)
+            if executor.effects:
+                response['error']['details'] = dict(effects=deepcopy(executor.effects))
             session.data['no_progress_turns'] += 1
+        elapsed = limit.elapsed()
+        response['resource_usage']['elapsed_ms'] = round(elapsed*1000,3)
         result = session.complete(operation_id,response,elapsed)
         if checkpoint is not None:
             checkpoint('response_committed')

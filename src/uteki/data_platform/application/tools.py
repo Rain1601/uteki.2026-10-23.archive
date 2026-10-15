@@ -14,7 +14,7 @@ from .evidence import result_item, source_evidence, fit_page
 
 
 class ToolExecution:
-    def __init__(self,catalog,session,tool,request,*,should_cancel=None,checkpoint=None,acquisition_adapter=None):
+    def __init__(self,catalog,session,tool,request,*,should_cancel=None,checkpoint=None,acquisition_adapter=None,limit=None):
         self.catalog,self.session,self.tool,self.request = catalog,session,tool,request
         self.should_cancel = should_cancel or (lambda:False)
         self.checkpoint = checkpoint or (lambda phase:None)
@@ -23,27 +23,39 @@ class ToolExecution:
         self.context = session.data['context']
         self.acquisition_adapter = acquisition_adapter
         self.resource_usage = dict(external_calls=0,model_calls=0,cost_usd='0')
+        self.limit = limit
+        self.effects = []
+
+    def effect(self, **value):
+        self.effects.append(value)
 
     def check(self,phase):
+        if self.limit is not None:
+            self.limit.check(phase)
         if self.should_cancel():
             raise CatalogError('CANCELLED','cancelled at '+phase)
         self.checkpoint(phase)
+        # The checkpoint itself may block or signal cancellation.
+        if self.limit is not None:
+            self.limit.check(phase)
 
     def reader(self,reference):
+        self.check('before_read')
         reference = parse(AssetRef,reference)
         key = canonical(reference.model_dump(mode='json'))
         if key not in self.readers:
             self.metas[key] = check_scope(self.catalog,self.context,reference)
             self.readers[key] = HtmlReader(self.catalog,reference)
+        self.check('after_read')
         return self.readers[key]
 
     def index(self,reference):
-        return DerivedIndex(self.catalog,self.reader(reference))
+        return DerivedIndex(self.catalog,self.reader(reference),limit=self.limit)
 
     def preflight(self):
         request = self.request
         if self.tool == 'find_assets':
-            self.found = candidates(self.catalog,self.context,request)
+            self.found = candidates(self.catalog,self.context,request,limit=self.limit)
         elif self.tool == 'request_asset_update':
             if request.action == 'process':
                 self.reader(request.process.asset_ref)
@@ -65,10 +77,12 @@ class ToolExecution:
                     'context_source','unit_source','asset_ref','result_ref'}:
                     raise CatalogError('INVALID_REQUEST','unknown record field')
             if self.tool == 'search_asset' and request.mode == 'text' and request.text.match == 'regex':
-                with sql_connection(':memory:',readonly=False) as db:
+                with sql_connection(':memory:',readonly=False,limit=self.limit) as db:
                     try:
                         db.execute('SELECT regexp_matches(?,?)',['',request.text.value]).fetchone()
                     except Exception as error:
+                        if self.limit is not None:
+                            self.limit.check('regex_preflight')
                         raise CatalogError('INVALID_REQUEST','invalid or unsupported RE2 expression') from error
 
     def _validate_filters(self,filters):
@@ -99,7 +113,7 @@ class ToolExecution:
     def schema(self,reference):
         reader = self.reader(reference)
         inventory = reader.inventory()
-        index = DerivedIndex(self.catalog,reader)
+        index = DerivedIndex(self.catalog,reader,limit=self.limit)
         available = index.availability()
         frozen = inventory['schema']
         effective = deepcopy(frozen['content_readiness'])
@@ -270,7 +284,7 @@ class ToolExecution:
         reader = self.reader(request.process.asset_ref)
         if any(c in {'records','concepts'} for c in capabilities) and not reader.inventory()['records']:
             raise CatalogError('CAPABILITY_UNSUPPORTED','source has no inline records to derive')
-        manifest = self.index(request.process.asset_ref).build(checkpoint=self.check)
+        manifest = self.index(request.process.asset_ref).build(checkpoint=self.check,on_effect=self.effect)
         return self.response([dict(update_id=self.operation,status='completed',policy_decision=dict(allowed=True,denied_reason=None),
             new_asset_refs=[request.process.asset_ref.model_dump(mode='json')],derived_generation=manifest['generation'],gaps=[],
             resource_usage=dict(model_calls=0,external_calls=0,cost_usd='0'))])

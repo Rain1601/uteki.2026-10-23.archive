@@ -1,6 +1,6 @@
 # Data Agent 接口契约
 
-日期：2026-10-14 · 版本：v0.5 · 状态：用户已确认实施路线，最新指定模型 API 统一经 OpenRouter，对比 OpenAI Agents SDK 与 Claude Agent SDK 及配套能力两套实现；共享业务工具契约延续 v0.4。剩余缺口见核心设计 14.16，SDK/网关边界与交叉比较见 14.17，第四批原限定验收后发现待修正项，SDK/MCP 尚未联调，当前范围与 review 缺口见 0.0。
+日期：2026-10-14 · 版本：v0.5 · 状态：用户已确认实施路线，最新指定模型 API 统一经 OpenRouter，对比 OpenAI Agents SDK 与 Claude Agent SDK 及配套能力两套实现；共享业务工具契约延续 v0.4。剩余缺口见核心设计 14.16，SDK/网关边界与交叉比较见 14.17，第四批 review 收尾项已关闭，SDK/MCP 尚未联调，当前确定性实现范围见 0.0。
 
 本文件定义 Data 能力的全部对外与内部接口：请求上下文、6 个数据工具、模型可见输出、交付包、内部组件接口及 MCP 映射。职责与流程见[核心设计](DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md)第 7 节，技术方案见第 14 节；本文件只维护接口细节。
 
@@ -16,15 +16,15 @@
 
 ### 0.0 第四批确定性 Python 实现范围（2026-10-15，限定验收）
 
-以下是第四批当前实现的具体调用形状；后文仍保留完整目标接口，不能将 SDK/MCP、`run_query`、澄清继续或模型输出格式化当成本批已实现。核心契约见 14.7.1，原限定验收及未运行检查见核心设计 14.12.12。**2026-10-15 review 补充：同步时限、有效标题修订、上下文创建恢复及相关性排序尚有 R1–R4 缺口，第五批准入暂缓，详见核心设计 14.12.13；本节列出现状不等于批准偏离目标契约。**
+以下是第四批当前实现的具体调用形状；后文仍保留完整目标接口，不能将 SDK/MCP、`run_query`、澄清继续或模型输出格式化当成本批已实现。核心契约见 14.7.1，原限定验收及未运行检查见核心设计 14.12.12。**2026-10-15 收尾：R1–R4 已修正并通过限定验收（核心设计 14.12.14），原反例保留于 14.12.13。具备第五批离线适配开工条件，不代表真实 SDK/模型业务验收通过。**
 
-- 装配为 `DataService(catalog, acquisition_adapter=None)`，Catalog 与绝对数据根由宿主显式提供。`create_context(request, request_key=...)` 创建不可变上下文；六工具调用为 `service.<tool>(context_ref, request, state=..., request_key=...)`。`deliver(...)` 是控制入口；`inspect_context` 查看接受/完成的操作，`read_delivery` 读回已冻结交付。同步工具不执行模型循环。
+- 装配为 `DataService(catalog, acquisition_adapter=None)`，Catalog 与绝对数据根由宿主显式提供。`create_context(request, request_key=..., recover=False)` 创建不可变上下文；六工具调用为 `service.<tool>(context_ref, request, state=..., request_key=...)`。`deliver(...)` 是控制入口；`inspect_context` 查看接受/完成的操作，`read_delivery` 读回已冻结交付。同步工具不执行模型循环。
 - 请求的可执行类型定义在 `contracts/query.py`、`contracts/run.py`。`FiscalPeriod` 沿用存储契约，六个字段均显式提供，未知字段值用 null 并注明 basis；本实现不把财年标签转成自然年。主体、来源与截止日为硬边界，期间匹配未知保留 unresolved；记录查询用精确的 `{start,end}` 或 `{instant}`，时间戳需有时区。
 - 完整 AssetRef 四项非空并属于同一已发布版本。未发布版本不可读，旧引用不自动改指向新 build。`ResultRef.item_id` 为宿主生成的 `res_` 标识；业务 `record_id`、`calc_id`、原件 `reader_ref` 保存在结果中，不把业务 ID 当全局唯一结果身份。
 
 | 工具 | 本批实际能力与返回差异 |
 |---|---|
-| `find_assets` | SQLite 目录硬过滤与 FTS5 文本匹配；返回 matched/unresolved、未确认最新及实际派生能力。未登记内容期间不补造；无法证明历史可得时间的资产不返回为合格候选。 |
+| `find_assets` | SQLite 目录硬过滤与 FTS5 文本匹配；当前有效标题用于展示和检索，candidate/conflict 修订不采用。两路 BM25 各自按同分共享的 dense rank 做 RRF 合并（k=60），精确分数内部用分数运算，同分按完整 AssetRef；match.ranking 给出方法和分数字符串。返回 matched/unresolved、未确认最新及实际派生能力。未登记内容期间不补造；无法证明历史可得时间的资产不返回为合格候选。 |
 | `get_asset_schema` | `overview`、三层以内目录、记录字段、原件 QName 概念及实时 readiness；默认带一级目录，分页条目位于单个说明的 `facets` 中。 |
 | `search_asset` | outline/text/concept；text 支持 phrase/all_terms/any_terms/RE2 regex，返回原文字符命中区间及最长 300 字符片段。词干命中区间来自 FTS 高亮，Unicode casefold 命中映射回原字符。concept 仅指原件 inline QName，角色语义标注、OCR/caption 分类显式拒绝；block/origin scope 仅用于 text。 |
 | `read_evidence` | 正文、表格单元格、inline fact 和这些结果的精确 Locator；合并单元格按覆盖的行列选择。仅支持 full 表格表示；compact、图片和跨页 continuation 显式 unsupported。请求的上下文作为 `context_evidence` 返回，目标通过 `dependency_refs` 关联；该组不能被字节预算拆散。无明确表头标记时保留候选上下文和关联未确认 issue。 |
@@ -32,6 +32,10 @@
 | `request_asset_update` | process 显式构建整份 HTML 的派生索引；无 inline facts 时不制造 records/concepts。acquire 只执行宿主配置的 `OfficialAcquisitionAdapter` 精确计划，校验公司、材料、期间、来源、截止日、URL 与扩展策略后复用既有官方获取/发布链。无适配器或未允许网络时不发网络请求；受控传输单列 transport_requests，不冒充真实外部调用。 |
 
 **索引与预算：**派生索引 manifest 为 `uteki-derived-html-v2`，trigram 以 casefold 文本检索并保留原文；旧代不修改，需显式重建后才能使用新代。计算按精度 50、ROUND_HALF_EVEN、除法 18 位小数执行，零基数/歧义/不可比返回 null 和原因。`read_evidence/query_records.max_bytes` 为 2,000–200,000；工具最终信封也受限制，其他工具上限 200,000 字节。计算的原始记录、原文的上下文均计入实际输出；输出不足则保留缺口，未展示结果不登记。
+
+**同步时限与失败：**单次调用从进入 DataService.call 开始计时，扣除该运行已累计时间，覆盖必要预检与执行；未接受计划的超时预检仍计时。获取逐请求 timeout 不超过剩余时间；DuckDB 可中断、SQLite 有进度检查；处理/索引激活/发布移动与提交前检查取消及 deadline。已经开始的不可抢占系统调用可能稍后才返回，返回后不得启动下一业务步骤；失败记录与持久化收尾仍须完成，不以强杀破坏存储。停止后的已提交/不确定结果通过 error.details.effects（致命恢复异常为异常的 details）报告，包含 receipt、generation、snapshot/build 状态及恢复要求；错误不是“没有副作用”的保证。模型强制部分交付仍由后续 runtime 实现。
+
+**上下文创建恢复：**使用原请求和 request_key，显式设置 recover=True；未完成创建返回 RECOVERY_REQUIRED，已完成状态损坏拒绝重置为初始状态。创建意图通过现有 Catalog registrations 和 ContentStore 固定，控制文件再写入；恢复校验原 request/policy/run/context，重确认必要目录同步。此入口只完成上下文创建，不重执行已接受的工具或模型，也不扩展成澄清继续。旧格式上下文与交付可读，无需迁移。
 
 **补数与重放：**获取发布返回现有 build 的 job_；仅重建派生索引及拒绝动作返回 op_，与对应 operation_id 关联，并另列 generation。成功构建索引不代表原始记录全部可解析。acquire 的宿主计划指纹参与幂等键校验；重复原请求读取已保存响应，变更计划不能沿用同一键。接受后中断且无已保存响应时返回 OPERATION_INTERRUPTED，允许检查原件、候选与索引 head，但不自动重复有副作用的动作。交付响应已落盘但目录 run 未收尾时，精确重放补齐目录终态，交付字节不变。
 
@@ -126,6 +130,7 @@
 - 游标是不透明字符串，绑定：上下文、工具名、全部业务请求参数（游标本身除外）、目录或 build 版本、`limit`。翻页时只替换 `cursor`，其余业务参数必须原样不变，否则报 `CURSOR_MISMATCH`；运行时公共参数 `state` 不参与绑定，可以随轮次更新。
 - 目录或版本已无法重现旧视图时报 `CURSOR_EXPIRED`，不改用最新内容。
 - 同分结果按完整引用固定排序，保证翻页不重不漏。
+- find_assets 冻结候选身份、匹配和排序的目录视图；readiness 为每次读取时的实时能力，不参与本实现的过滤/排序，也不是冻结值。派生索引故障可使后页 readiness 变化而目录游标继续有效；若未来按 readiness 过滤/排序，必须将该状态纳入视图。本次排序协议版本参与目录游标，升级前旧排序游标明确 CURSOR_EXPIRED，不能带原 offset 混用新排序。query_records/search_asset 的派生内容查询仍绑定其 index generation。
 
 ### 0.9 错误码
 
@@ -135,7 +140,10 @@
 | `PLAN_VERSION_MISMATCH` | `plan_update.base_version` 不等于当前已登记计划版本 |
 | `RESULT_REF_INVALID` | 引用未登记、类型不符、属于其他运行或未实际展示 |
 | `CLARIFICATION_MISMATCH` | 澄清 ID 与前序上下文不对应，或同一澄清已有不同的后继上下文 |
-| `CONTEXT_NOT_FOUND` | `context_ref` 不存在或调用方无权使用 |
+| `CONTEXT_NOT_FOUND` | `context_ref` 不存在或其状态无法读回 |
+| `CONTEXT_INVALID` | 创建/恢复数据损坏或不一致，拒绝重置已完成状态 |
+| `RECOVERY_REQUIRED` | 持久化结果未确认，需按对应显式恢复协议处理，不盲重执行 |
+| `CANCELLED` | 同步执行已观察到取消；结合 effects 判断已经发生的动作 |
 | `SCOPE_DENIED` | 请求超出上下文的主体、来源、截止日或权限边界 |
 | `ENTITY_NOT_FOUND` | 名称或代码在已登记目录中找不到 |
 | `ENTITY_AMBIGUOUS` | 名称或代码对应多个主体或证券；`details.candidates` 列出候选 |

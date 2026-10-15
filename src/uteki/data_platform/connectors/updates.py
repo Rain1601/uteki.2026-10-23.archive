@@ -11,6 +11,7 @@ from typing import Annotated, Literal
 
 from ..build.pipeline import build_html, html_recipe
 from ..catalog.database import ensure_directory
+from ..content.publication import Publication
 from ..contracts.assets import Acquisition, AssetId, SnapshotId, SnapshotRelation, SourceId
 from ..contracts.common import Contract, SourceTime, Text, CatalogError, canonical, digest
 from ..contracts.content import MissingResource
@@ -105,34 +106,62 @@ class OfficialAcquisitionAdapter:
         workspace=ensure_directory(catalog.root,'acquisitions/'+execution.operation)
         frozen_plan=catalog.content.put_object(plan.canonical_bytes())
         try:
+            execution.check('before_acquisition')
             acquired=acquire_html(config=deepcopy(plan.config),workspace=workspace,settings_root=self.settings_root,
-                main_url=plan.main_url,allowed_urls=plan.allowed_urls,max_seconds=plan.max_seconds,fetch=self.fetch,
-                should_cancel=execution.should_cancel)
+                main_url=plan.main_url,allowed_urls=plan.allowed_urls,
+                max_seconds=min(plan.max_seconds,execution.limit.remaining()) if execution.limit else plan.max_seconds,fetch=self.fetch,
+                should_cancel=execution.limit.stopped if execution.limit else execution.should_cancel)
+        except CatalogError:
+            if execution.limit is not None:
+                execution.limit.check('acquisition_stopped')
+            raise
         finally:
             reports=[json.loads(p.read_bytes()) for p in (workspace/'source-runs').glob('*/manifest.json')]
             requests=sum(r['requests'] for r in reports)
             execution.resource_usage.update(transport_requests=requests,bytes_received=sum(r['bytes_received'] for r in reports),
                 external_calls=requests if self.fetch is None else 0)
+            if reports:
+                execution.effect(kind='acquisition_receipt',status='recorded',operation_id=execution.operation,
+                    source_run_ids=[r['run_id'] for r in reports],transport_requests=requests)
         execution.check('acquisition_received')
         input_ref=store_acquisition(catalog.content,acquired,main_url=plan.main_url)
         inputs=catalog.content.read_manifest(input_ref)
+        execution.check('before_snapshot_registration')
         main=next(r for r in acquired['report']['discovery'] if r['status']=='fetched' and r['source_url']==plan.main_url)
         run=catalog.start_run('acquisition:'+execution.operation,purpose='explicit approved source update',kind='build',
             parent_run_id=execution.context['run_id'])['run_id']
-        acquisition=Acquisition(source_id=plan.source_id,request_url=plan.main_url,final_url=acquired['final_url'],
-            acquired_at=main['retrieved_at'],published_at=plan.published_at,available_at=plan.available_at,source_revised_at=plan.source_revised_at)
-        snapshot=catalog.begin_snapshot(execution.operation+':snapshot',asset_id=plan.asset_id,acquisition=acquisition,
-            completeness='partial' if any(isinstance(r,MissingResource) for r in inputs.resources) else 'complete',
-            version_consistency=plan.version_consistency,revision_of_snapshot_id=plan.revision_of_snapshot_id,
-            revision_basis=plan.revision_basis,run_id=run)
-        representation=catalog.add_representation(execution.operation+':html',snapshot_id=snapshot,format='html',input_manifest=input_ref)
-        catalog.relate_snapshot(snapshot,plan.relation)
-        catalog.freeze_snapshot(snapshot)
-        execution.check('acquisition_snapshot_frozen')
-        recipe=html_recipe(catalog,encoding='utf-8',form_type=plan.form_type,profile_ref=plan.profile_ref,taxonomy_ref=plan.taxonomy_ref)
-        reference=build_html(catalog,snapshot_id=snapshot,representation_id=representation,recipe=recipe,run_id=run)
-        catalog.finish_run(run,status='completed')
-        execution.check('acquisition_build_published')
+        try:
+            acquisition=Acquisition(source_id=plan.source_id,request_url=plan.main_url,final_url=acquired['final_url'],
+                acquired_at=main['retrieved_at'],published_at=plan.published_at,available_at=plan.available_at,source_revised_at=plan.source_revised_at)
+            snapshot=catalog.begin_snapshot(execution.operation+':snapshot',asset_id=plan.asset_id,acquisition=acquisition,
+                completeness='partial' if any(isinstance(r,MissingResource) for r in inputs.resources) else 'complete',
+                version_consistency=plan.version_consistency,revision_of_snapshot_id=plan.revision_of_snapshot_id,
+                revision_basis=plan.revision_basis,run_id=run)
+            representation=catalog.add_representation(execution.operation+':html',snapshot_id=snapshot,format='html',input_manifest=input_ref)
+            catalog.relate_snapshot(snapshot,plan.relation)
+            execution.check('before_snapshot_freeze')
+            Publication(catalog,checkpoint=execution.check).freeze_snapshot(snapshot)
+            execution.check('acquisition_snapshot_frozen')
+            recipe=html_recipe(catalog,encoding='utf-8',form_type=plan.form_type,profile_ref=plan.profile_ref,taxonomy_ref=plan.taxonomy_ref)
+            reference=build_html(catalog,snapshot_id=snapshot,representation_id=representation,recipe=recipe,run_id=run,checkpoint=execution.check)
+            catalog.finish_run(run,status='completed')
+            execution.check('acquisition_build_published')
+        except (CatalogError,OSError) as error:
+            pending = (catalog._db.execute("SELECT 1 FROM asset_builds WHERE run_id=? AND status='staging'",(run,)).fetchone()
+                or catalog._db.execute("SELECT 1 FROM asset_snapshots WHERE run_id=? AND status='collecting'",(run,)).fetchone())
+            if not pending and not catalog.database.head_uncertain and catalog._get('runs','run_id',run)['status']=='running':
+                code=getattr(error,'code','STORAGE_IO_ERROR')
+                catalog.finish_run(run,status='cancelled' if code=='CANCELLED' else 'failed',
+                    failure_code=None if code=='CANCELLED' else code)
+            raise
+        finally:
+            for row in catalog._db.execute('SELECT * FROM asset_snapshots WHERE run_id=?',(run,)):
+                execution.effect(kind='snapshot',snapshot_id=row['snapshot_id'],status=row['status'],failure_code=row['failure_code'],
+                    recovery_required=row['status']=='collecting' or catalog.database.head_uncertain)
+            for row in catalog._db.execute('SELECT * FROM asset_builds WHERE run_id=?',(run,)):
+                execution.effect(kind='build',asset_ref=catalog.asset_ref(dict(row)).model_dump(mode='json'),status=row['status'],
+                    failure_code=row['failure_code'],recovery_required=row['status']=='staging' or catalog.database.head_uncertain,
+                    publication_outcome='uncertain' if catalog.database.head_uncertain else row['status'])
         gaps=[r.reason for r in inputs.resources if isinstance(r,MissingResource)]
         return dict(update_id=catalog.get_build(reference.build_id)['job_id'],status='partial' if gaps else 'completed',
             policy_decision=dict(allowed=True,denied_reason=None,matched_rules=['host_approved_exact_request','exact_url_allowlist']),

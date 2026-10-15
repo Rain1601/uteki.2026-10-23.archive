@@ -362,7 +362,7 @@ def _annual_package(config):
 
 def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=None, clock=None,
                     prior_repeat_verification=None, blocked_sources=None, _session_only=False,
-                    request_guard=None) -> dict:
+                    request_guard=None, remaining_seconds=None) -> dict:
     """Fetch and freeze a bounded source run. Inject fetch(url, headers=..., timeout=...) -> bytes.
 
     Filing selection is required. latest_10k_and_subsequent_filings selects the
@@ -508,6 +508,15 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     def check_stop():
         if should_stop is not None and should_stop():
             raise AcquisitionCancelled('acquisition_cancelled')
+
+    def request_timeout():
+        check_stop()
+        if remaining_seconds is None:
+            return limits['timeout_seconds']
+        remaining = remaining_seconds()
+        if remaining <= 0:
+            raise AcquisitionCancelled('acquisition_deadline_exhausted')
+        return min(limits['timeout_seconds'],remaining)
 
     def damaged(path, expected_sha, observed_sha, recovery_path=None):
         relative = path.relative_to(workspace).as_posix()
@@ -659,7 +668,7 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                         handlers.insert(0, _ExplicitProxy({'https': proxy_transport['proxy_url']}))
                     opener = urllib.request.build_opener(*handlers)
                     with opener.open(urllib.request.Request(url, headers={'User-Agent': ua, 'Accept-Encoding': 'identity'}),
-                                     timeout=limits['timeout_seconds']) as response:
+                                     timeout=request_timeout()) as response:
                         info = {'http_status': response.status, 'final_url': response.url,
                                 'content_type': response.headers.get('Content-Type'),
                                 'content_length': response.headers.get('Content-Length'), 'transport': 'http'}
@@ -678,7 +687,7 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                         if info['content_length'] is not None and int(info['content_length']) != len(raw):
                             raise AcquisitionError('content_length_mismatch')
                 else:
-                    raw = fetch(url, headers={'User-Agent': ua, 'Accept-Encoding': 'identity'}, timeout=limits['timeout_seconds'])
+                    raw = fetch(url, headers={'User-Agent': ua, 'Accept-Encoding': 'identity'}, timeout=request_timeout())
                     info = {'transport': 'injected_fetch', 'final_url': url}
                     if isinstance(raw, bytes):
                         report['bytes_received'] += len(raw)

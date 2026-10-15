@@ -61,7 +61,8 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
             raise AcquisitionError("URL outside frozen exact allowlist")
 
     session = prepare_sources(copied, workspace, fetch=fetch, _session_only=True,
-                              request_guard=guard, should_stop=lambda: time.monotonic() >= deadline or bool(should_cancel and should_cancel()))
+                              request_guard=guard, should_stop=lambda: time.monotonic() >= deadline or bool(should_cancel and should_cancel()),
+                              remaining_seconds=lambda: deadline-time.monotonic())
     report = session["report"]
     report["company"] = {"symbol": copied["symbol"], "cik": copied.get("cik"), "market": copied["market"]}
     report["scope"]["exact_allowed_urls"] = list(allowed_urls)

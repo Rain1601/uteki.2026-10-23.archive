@@ -99,6 +99,43 @@ class ToolProcessTests(unittest.TestCase):
     def test_delivery_commit_before_catalog_finish_reconciles_on_exact_replay(self):
         self.interrupted('delivery_response_committed',delivery=True)
 
+    def test_context_creation_process_exits_recover_original_identity(self):
+        from uteki.data_platform.contracts.content import ObjectRef
+        from uteki.data_platform.contracts.common import CatalogError
+        for phase in ('context_control_pending','context_prepared','context_head_written','context_mapping_written'):
+            with self.subTest(phase=phase):
+                request=self.context['request']
+                key='creation-exit-'+phase
+                path=self.root/(key+'.json')
+                path.write_text(json.dumps(dict(method='create_context',request=request,request_key=key)))
+                child=subprocess.run([sys.executable,'-I',str(FIXTURES/'tools_worker.py'),str(self.root),str(path),phase],
+                    cwd=self.root,capture_output=True,text=True,timeout=30)
+                self.assertEqual(child.returncode,73,child.stderr)
+                self.assertEqual(child.stdout,'')
+                with Catalog.open(self.root) as catalog:
+                    run=catalog._db.execute('SELECT * FROM runs WHERE request_key=?',('data-context:'+key,)).fetchone()
+                    run_path=self.root/'runs'/run['run_id']
+                    if phase=='context_control_pending':
+                        row=catalog._db.execute('SELECT result_id FROM registrations WHERE namespace=? AND request_key=?',('data-context-creation',key)).fetchone()
+                        saved=ObjectRef.model_validate_json(row['result_id'])
+                        remnants=list(run_path.glob('.pending-*'))
+                        self.assertEqual(len(remnants),1)
+                    else:
+                        saved=ObjectRef.model_validate_json((run_path/'creation.json').read_bytes())
+                    original=json.loads(catalog.content.read_object(saved))['context']
+                    service=DataService(catalog)
+                    with self.assertRaises(CatalogError) as failure:
+                        service.create_context(request,request_key=key)
+                    self.assertEqual(failure.exception.code,'RECOVERY_REQUIRED')
+                    recovered=service.create_context(request,request_key=key,recover=True)
+                    self.assertEqual(recovered,original)
+                    if phase=='context_control_pending':
+                        self.assertTrue(remnants[0].exists())
+                    self.assertEqual(service.create_context(request,request_key=key),original)
+                    self.assertEqual(service.inspect_context(recovered['context_ref'])['plan']['version'],0)
+                    self.assertEqual(service.inspect_context(self.context['context_ref'])['context'],self.context)
+                    self.assertEqual(DerivedIndex(catalog,HtmlReader(catalog,self.reference)).current()[1]['generation'],self.old['generation'])
+
 
 if __name__=='__main__':
     unittest.main()

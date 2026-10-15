@@ -47,7 +47,7 @@ def file_names(directory: Path) -> set[str]:
     return result
 
 
-def move_complete(source: Path, destination: Path):
+def move_complete(source: Path, destination: Path, *, checkpoint=None):
     if destination.exists() or destination.is_symlink():
         raise CatalogError("CATALOG_INCONSISTENT", "immutable version directory already exists")
     # The Catalog's exclusive root lock protects this no-overwrite precondition.
@@ -59,6 +59,8 @@ def move_complete(source: Path, destination: Path):
     for path in sorted((p for p in source.rglob("*") if p.is_dir()), reverse=True):
         _fsync_directory(path)
     _fsync_directory(source)
+    if checkpoint is not None:
+        checkpoint('before_publication_move')
     os.rename(source, destination)
     _fsync_directory(source.parent)
     _fsync_directory(destination.parent)
@@ -83,9 +85,20 @@ def check_graph(edges: dict[str, tuple[str, ...]]):
 
 
 class Publication:
-    def __init__(self, catalog):
+    def __init__(self, catalog, *, checkpoint=None):
         self.catalog = catalog
         self.root = catalog.root
+        self.checkpoint = checkpoint
+
+    def check(self, phase):
+        if self.checkpoint is not None:
+            self.checkpoint(phase)
+
+    def move(self, source, destination):
+        if self.checkpoint is None:
+            move_complete(source,destination)
+        else:
+            move_complete(source,destination,checkpoint=self.checkpoint)
 
     def snapshot_path(self, row, *, final):
         if final:
@@ -117,6 +130,7 @@ class Publication:
 
     @operation
     def freeze_snapshot(self, snapshot_id):
+        self.check('snapshot_freeze_started')
         row = self.catalog.get_snapshot(snapshot_id)
         if row["status"] == "frozen":
             self.verify_snapshot(snapshot_id)
@@ -127,6 +141,7 @@ class Publication:
             value = self._snapshot_value(row,utc_now())
             raw = canonical(value)
             reference = self.catalog.content.put_object(raw)
+            self.check('before_snapshot_seal')
             with self.catalog.database.transaction():
                 self.catalog._db.execute("UPDATE asset_snapshots SET manifest_ref=?,updated_at=? WHERE snapshot_id=?",
                                          (reference.model_dump_json(),utc_now(),snapshot_id))
@@ -135,10 +150,11 @@ class Publication:
             write_control(stage/"snapshot-manifest.json",raw)
             representations = ensure_directory(stage,"representations")
             for item in value["representations"]:
+                self.check('snapshot_representation_write')
                 write_control(representations/(item["representation_id"]+".json"),canonical(item))
             self.verify_snapshot(snapshot_id,final=False)
             target_parent = ensure_directory(self.root,f"assets/{row['asset_id']}/snapshots")
-            move_complete(stage,target_parent/snapshot_id)
+            self.move(stage,target_parent/snapshot_id)
             self.commit_snapshot(snapshot_id)
         except (CatalogError, ContentStoreError, OSError, ValidationError) as error:
             if not self.catalog.database.head_uncertain:
@@ -158,6 +174,7 @@ class Publication:
         if row["status"] != "collecting":
             raise CatalogError("INVALID_STATE", "cannot commit failed snapshot")
         self._sync_moved(self.snapshot_path(row,final=True))
+        self.check('before_snapshot_commit')
         with self.catalog.database.transaction():
             self.catalog._db.execute("UPDATE asset_snapshots SET status='frozen',updated_at=? WHERE snapshot_id=?", (utc_now(),snapshot_id))
             self.catalog._db.execute("UPDATE assets SET status='has_snapshot',updated_at=? WHERE asset_id=? AND status='registered'", (utc_now(),row["asset_id"]))
@@ -195,6 +212,7 @@ class Publication:
 
     @operation
     def stage(self, build_id, *, files: dict[str, bytes], manifest: BuildManifest):
+        self.check('build_stage_started')
         build = self.catalog.get_build(build_id)
         if build["status"] != "staging" or build["manifest_ref"] is not None:
             raise CatalogError("INVALID_STATE", "build is terminal or already sealed")
@@ -205,6 +223,7 @@ class Publication:
                 raise CatalogError("PUBLICATION_INVALID", "supplied files do not match manifest")
             stage = ensure_directory(self.root,"staging/"+build["job_id"])
             for item in manifest.files:
+                self.check('build_artifact_write')
                 raw = files[item.path]
                 if not isinstance(raw,bytes) or len(raw) != item.object_ref.byte_length or digest(raw) != item.object_ref.sha256:
                     raise CatalogError("PUBLICATION_INVALID", "supplied artifact bytes differ from manifest")
@@ -218,6 +237,7 @@ class Publication:
                 schema = HtmlSchema.model_validate_json(files["asset-schema.json"])
             else:
                 schema = BuildSchema.model_validate_json(files["asset-schema.json"])
+            self.check('before_build_seal')
             with self.catalog.database.transaction():
                 self.catalog._db.execute("UPDATE asset_builds SET manifest_ref=?,readiness_json=?,updated_at=? WHERE build_id=?",
                     (reference.model_dump_json(),schema.published_readiness.canonical_bytes().decode(),utc_now(),build_id))
@@ -322,7 +342,7 @@ class Publication:
                 raise CatalogError("PUBLICATION_INVALID", "build has no sealed candidate")
             self.verify_build(build,final=False)
             ensure_directory(self.root,f"assets/{build['asset_id']}/builds")
-            move_complete(self.build_path(build,final=False),destination)
+            self.move(self.build_path(build,final=False),destination)
             self.commit_build(build_id)
         except (CatalogError,ContentStoreError,OSError,ValidationError) as error:
             if not self.catalog.database.head_uncertain and not destination.exists():
@@ -338,9 +358,11 @@ class Publication:
         if build["status"] != "staging":
             raise CatalogError("INVALID_STATE", "cannot publish a failed build")
         self._sync_moved(self.build_path(build,final=True))
+        self.check('before_build_commit')
         with self.catalog.database.transaction():
             self.catalog._db.execute("UPDATE asset_builds SET status='published',published_at=?,updated_at=? WHERE build_id=?",
                                      (utc_now(),utc_now(),build_id))
+        self.check('after_build_commit')
 
     def _sync_moved(self, directory):
         # Recovery repeats syncs which may have failed after rename. A visible

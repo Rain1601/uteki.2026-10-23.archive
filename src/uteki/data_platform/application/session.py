@@ -41,30 +41,110 @@ class Session:
             context_raw = catalog.content.read_object(ObjectRef.model_validate(mapping['context']))
             if canonical(self.data['context']) != context_raw:
                 raise ValueError('immutable context differs')
+            if (self.path/'creation.json').exists() and not (self.path/'creation-complete.json').exists():
+                raise CatalogError('RECOVERY_REQUIRED','context creation acknowledgement incomplete; repeat original create_context with recover=True')
+        except CatalogError:
+            raise
         except (OSError, ValueError, KeyError, TypeError) as error:
             raise CatalogError('CONTEXT_NOT_FOUND', 'context or run state is missing, corrupt or incompatible') from error
 
     @classmethod
-    def create(cls, catalog, context, request_key):
+    def create(cls, catalog, context, request_key, *, recover=False, checkpoint=None):
+        """Explicit recovery completes creation only; it never rewinds a running session."""
+        if type(recover) is not bool:
+            raise CatalogError('INVALID_REQUEST','recover must be a boolean')
+        checkpoint = checkpoint or (lambda phase: None)
         run = catalog.start_run('data-context:'+request_key,purpose='deterministic data tools: '+context['request']['question'],kind='read')
         path = ensure_directory(catalog.root,'runs/'+run['run_id'])
-        if (path/'head.json').exists():
-            head = ObjectRef.model_validate_json(read_regular(path/'head.json'))
-            saved = json.loads(catalog.content.read_object(head))
-            if saved['context']['request'] != context['request'] or saved['context']['read_policy'] != context['read_policy']:
-                raise CatalogError('IDEMPOTENCY_CONFLICT','context request differs')
-            return cls(catalog,saved['context']['context_ref'])
-        context = context | dict(run_id=run['run_id'],root_run_id=run['root_run_id'])
         instance = cls.__new__(cls)
         instance.catalog, instance.path, instance.uncertain, instance.head_ref = catalog, path, False, None
-        instance.data = dict(schema_version='uteki-tool-session-v1',context=context,revision=0,previous=None,
-            status='open',plan=dict(version=0,needs=[]),plan_history=[],state=None,operations={},results={},cursors={},
-            turns=0,wall_seconds=0.0,no_progress_turns=0,seen_results=[],delivery=None)
-        context_obj = catalog.content.put_object(canonical(context))
-        instance.save()
-        mapping_root = ensure_directory(catalog.root,'contexts')
-        write_control(mapping_root/context['context_ref'],canonical(dict(run_id=run['run_id'],context=context_obj.model_dump(mode='json'))))
-        return instance
+        try:
+            prepared = None
+            if (path/'creation.json').exists():
+                reference = ObjectRef.model_validate_json(read_regular(path/'creation.json'))
+                prepared = json.loads(catalog.content.read_object(reference))
+            if (path/'head.json').exists():
+                instance.head_ref = ObjectRef.model_validate_json(read_regular(path/'head.json'))
+                instance.data = json.loads(catalog.content.read_object(instance.head_ref))
+                if prepared is not None and prepared['context'] != instance.data['context']:
+                    raise CatalogError('CONTEXT_INVALID','creation and current context differ')
+            elif prepared is not None:
+                if (path/'creation-complete.json').exists() or (catalog.root/'contexts'/prepared['context']['context_ref']).exists():
+                    raise CatalogError('CONTEXT_INVALID','completed context lost its head; cannot reset to its initial state')
+                if not recover:
+                    raise CatalogError('RECOVERY_REQUIRED','context creation incomplete; repeat original request with recover=True')
+                instance.data = prepared
+            else:
+                remnants = list(path.iterdir())
+                if any(not p.name.startswith('.pending-') or p.is_symlink() or not p.is_file() for p in remnants):
+                    raise CatalogError('CONTEXT_INVALID','run files exist without a verifiable creation/head')
+                binding = dict(request=context['request'],read_policy=context['read_policy'],run_id=run['run_id'])
+                intent = catalog._existing('data-context-creation',request_key,binding)
+                if intent is not None:
+                    if not recover:
+                        raise CatalogError('RECOVERY_REQUIRED','context control files incomplete; repeat original request with recover=True')
+                    initial = ObjectRef.model_validate_json(intent)
+                    instance.data = json.loads(catalog.content.read_object(initial))
+                    # Losing completed controls is corruption, never permission to
+                    # restart from the creation intent and forget prior operations.
+                    mappings = catalog.root/'contexts'
+                    if mappings.exists() and any(json.loads(read_regular(p)).get('run_id')==run['run_id'] for p in mappings.iterdir() if p.name.startswith('req_')):
+                        raise CatalogError('CONTEXT_INVALID','existing mapping has lost its state; cannot reset')
+                else:
+                    if remnants:
+                        raise CatalogError('CONTEXT_INVALID','pending files have no durable creation intent')
+                    context = context | dict(run_id=run['run_id'],root_run_id=run['root_run_id'])
+                    instance.data = dict(schema_version='uteki-tool-session-v1',context=context,revision=0,previous=None,
+                        status='open',plan=dict(version=0,needs=[]),plan_history=[],state=None,operations={},results={},cursors={},
+                        turns=0,wall_seconds=0.0,no_progress_turns=0,seen_results=[],delivery=None)
+                    initial = catalog.content.put_object(canonical(instance.data))
+                    # Reuse the existing durable registration/ContentStore
+                    # mechanism, so even the first control-file write can fail.
+                    with catalog.database.transaction():
+                        catalog._register_key('data-context-creation',request_key,binding,initial.model_dump_json())
+                write_control(path/'creation.json',canonical(initial.model_dump(mode='json')))
+                checkpoint('context_prepared')
+            saved = instance.data['context']
+            identity = saved['context_ref']
+            if not isinstance(identity,str) or len(identity)!=30 or not identity.startswith('req_') or not identity[4:].isalnum():
+                raise CatalogError('CONTEXT_INVALID','saved context identity is invalid')
+            if (instance.data['schema_version'] != 'uteki-tool-session-v1' or saved['run_id'] != run['run_id']
+                    or saved['root_run_id'] != run['root_run_id']):
+                raise CatalogError('CONTEXT_INVALID','saved context is not bound to the registered run')
+            if saved['request'] != context['request'] or saved['read_policy'] != context['read_policy']:
+                raise CatalogError('IDEMPOTENCY_CONFLICT','context request differs')
+            mapping_root = ensure_directory(catalog.root,'contexts')
+            mapping_path = mapping_root/saved['context_ref']
+            # A current head may include prior operations. Recover only its mapping,
+            # never substitute the initial creation record for that head.
+            if instance.head_ref is not None and mapping_path.exists():
+                if prepared is not None and not (path/'creation-complete.json').exists():
+                    if not recover:
+                        raise CatalogError('RECOVERY_REQUIRED','context creation acknowledgement is incomplete; use recover=True')
+                    mapping = json.loads(read_regular(mapping_path))
+                    if mapping['run_id'] != run['run_id'] or catalog.content.read_object(ObjectRef.model_validate(mapping['context'])) != canonical(saved):
+                        raise CatalogError('CONTEXT_INVALID','existing mapping differs; no recovery was performed')
+                    # A visible mapping may have failed its directory fsync.
+                    # Re-acknowledge the identical bytes before marking complete.
+                    write_control(mapping_path,canonical(mapping))
+                    write_control(path/'creation-complete.json',canonical({'context_ref':saved['context_ref']}))
+                return cls(catalog,saved['context_ref'])
+            if instance.head_ref is not None and not recover:
+                raise CatalogError('RECOVERY_REQUIRED','context mapping missing; repeat original request with recover=True')
+            if instance.head_ref is None:
+                instance.save()
+            checkpoint('context_head_written')
+            context_obj = catalog.content.put_object(canonical(saved))
+            write_control(mapping_path,canonical(dict(run_id=run['run_id'],context=context_obj.model_dump(mode='json'))))
+            checkpoint('context_mapping_written')
+            write_control(path/'creation-complete.json',canonical({'context_ref':saved['context_ref']}))
+            return cls(catalog,saved['context_ref'])
+        except OSError as error:
+            raise CatalogError('RECOVERY_REQUIRED','context creation write outcome uncertain; reopen and repeat original request with recover=True') from error
+        except CatalogError:
+            raise
+        except (ValueError,KeyError,TypeError) as error:
+            raise CatalogError('CONTEXT_INVALID','saved context creation data is invalid; no recovery was performed') from error
 
     def save(self):
         self.catalog.database.assert_open()

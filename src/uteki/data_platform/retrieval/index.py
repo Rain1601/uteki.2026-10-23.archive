@@ -29,16 +29,36 @@ def dimensions(record):
 
 
 @contextmanager
-def sql_connection(path, *, readonly=True, timeout=20):
+def sql_connection(path, *, readonly=True, timeout=20, limit=None):
+    if limit is not None:
+        timeout = min(timeout,limit.remaining())
     connection = duckdb.connect(str(path), read_only=readonly, config={
         'enable_external_access': False, 'autoinstall_known_extensions': False,
         'autoload_known_extensions': False, 'threads': 1, 'memory_limit': '128MB'})
     timer = threading.Timer(timeout, connection.interrupt)
     timer.daemon = True
     timer.start()
+    done = threading.Event()
+    def watch():
+        while not done.wait(0.02):
+            if limit.stopped():
+                connection.interrupt()
+                return
+    watcher = threading.Thread(target=watch,daemon=True) if limit is not None else None
+    if watcher is not None:
+        watcher.start()
     try:
         yield connection
+        if limit is not None:
+            limit.check('sql_complete')
+    except duckdb.Error:
+        if limit is not None:
+            limit.check('sql_interrupted')
+        raise
     finally:
+        done.set()
+        if watcher is not None:
+            watcher.join()
         timer.cancel()
         timer.join()
         connection.close()
@@ -46,17 +66,23 @@ def sql_connection(path, *, readonly=True, timeout=20):
 
 class DerivedIndex:
     """Catalog's exclusive lock owns writes. Reads never repair an index."""
-    def __init__(self, catalog, reader):
+    def __init__(self, catalog, reader, *, limit=None):
         self.catalog = catalog
         self.reader = reader
         self.reference = reader.reference
         self.base = catalog.root/'derived'/self.reference.build_id
+        self.limit = limit
+
+    def check(self):
+        if self.limit is not None:
+            self.limit.check('derived_index')
 
     def _source_hash(self):
         manifest = self.catalog.read_published(self.reference)
         return digest(manifest.canonical_bytes())
 
     def current(self):
+        self.check()
         source = self._source_hash()
         try:
             parent = self.catalog.root/'derived'
@@ -102,14 +128,17 @@ class DerivedIndex:
                 raise
             return dict(status='not_ready', generation=None, token=None, issue=str(error))
 
-    def build(self, *, checkpoint=lambda phase: None):
+    def build(self, *, checkpoint=lambda phase: None, on_effect=lambda **value: None):
         """Build a new generation. Failure leaves old generations and head intact."""
         source_hash = self._source_hash()
         inventory = self.reader.inventory()
+        self.check()
         generation = new_id('idx')
         directory = ensure_directory(self.catalog.root, 'derived/'+self.reference.build_id+'/'+generation)
         checkpoint('index_started')
         connection = sqlite3.connect(directory/'fts.sqlite')
+        if self.limit is not None:
+            connection.set_progress_handler(lambda:int(self.limit.stopped()),1000)
         try:
             connection.execute("CREATE VIRTUAL TABLE terms USING fts5(id UNINDEXED, body, tokenize='porter unicode61')")
             connection.execute("CREATE VIRTUAL TABLE grams USING fts5(id UNINDEXED, body, source UNINDEXED, tokenize='trigram')")
@@ -118,10 +147,13 @@ class DerivedIndex:
             connection.executemany('INSERT INTO grams VALUES (?,?,?)',[(identity,body.casefold(),body) for identity,body in values])
             connection.commit()
             assert connection.execute('PRAGMA integrity_check').fetchone()[0] == 'ok'
+        except sqlite3.Error:
+            self.check()
+            raise
         finally:
             connection.close()
         checkpoint('index_fts_written')
-        with sql_connection(directory/'records.duckdb', readonly=False) as db:
+        with sql_connection(directory/'records.duckdb', readonly=False,limit=self.limit) as db:
             db.execute('CREATE TABLE blocks (id VARCHAR PRIMARY KEY, body VARCHAR)')
             if values:
                 db.executemany('INSERT INTO blocks VALUES (?,?)', values)
@@ -129,6 +161,7 @@ class DerivedIndex:
                 period VARCHAR, period_end VARCHAR, dimensions VARCHAR, unit VARCHAR, payload VARCHAR)''')
             rows = []
             for record in inventory['records']:
+                self.check()
                 period = record['period']
                 rows.append((record['id'], concept_id(record), record['status'], canonical(period).decode(),
                     period.get('end', period.get('instant', '')), canonical(dimensions(record)).decode(),
@@ -150,7 +183,13 @@ class DerivedIndex:
             blocks=len(values), records=len(rows), created_at=utc_now())
         reference = self.catalog.content.put_object(canonical(manifest))
         checkpoint('index_before_head')
-        write_control(self.base/'head.json', canonical(dict(generation=generation, manifest=reference.model_dump(mode='json'))), replace=True)
+        self.check()
+        try:
+            write_control(self.base/'head.json', canonical(dict(generation=generation, manifest=reference.model_dump(mode='json'))), replace=True)
+        except OSError:
+            on_effect(kind='index_head',status='uncertain',asset_ref=self.reference.model_dump(mode='json'),generation=generation)
+            raise
+        on_effect(kind='index_head',status='committed',asset_ref=self.reference.model_dump(mode='json'),generation=generation)
         checkpoint('index_after_head')
         return manifest
 
@@ -159,7 +198,7 @@ class DerivedIndex:
         text = request.value
         if request.match == 'regex':
             try:
-                with sql_connection(directory/'records.duckdb') as db:
+                with sql_connection(directory/'records.duckdb',limit=self.limit) as db:
                     marker = '__'+new_id('match')+'__'
                     flag = 'c' if request.case_sensitive else 'i'
                     rows = db.execute('SELECT id, body, regexp_replace(body, ?, ?, ?) FROM blocks WHERE regexp_matches(body, ?, ?) ORDER BY id',
@@ -187,6 +226,8 @@ class DerivedIndex:
             query = (' AND ' if request.match == 'all_terms' else ' OR ').join(map(quote, terms))
             table = 'terms'
         db = sqlite3.connect((directory/'fts.sqlite').as_uri()+'?mode=ro&immutable=1', uri=True)
+        if self.limit is not None:
+            db.set_progress_handler(lambda:int(self.limit.stopped()),1000)
         ranges = {}
         try:
             if request.match == 'phrase' and len(text) < 3:
@@ -203,8 +244,12 @@ class DerivedIndex:
                     start = marked.index(before)
                     end = marked.index(after,start+len(before))-len(before)
                     ranges[identity] = (start,end)
+        except sqlite3.Error:
+            self.check()
+            raise
         finally:
             db.close()
+        self.check()
         # Phrase means a literal substring. FTS term matching uses the declared
         # unicode61/porter semantics; case-sensitive matching also checks source.
         if request.match == 'phrase':
@@ -250,7 +295,7 @@ class DerivedIndex:
         field = {'record_id':'id', 'concept_id':'concept', 'period_end':'period_end'}[order.field] if order else 'id'
         direction = ' DESC' if order and order.direction=='desc' else ' ASC'
         query = 'SELECT payload FROM records'+(' WHERE '+' AND '.join(clauses) if clauses else '')+' ORDER BY '+field+direction+', id ASC'
-        with sql_connection(directory/'records.duckdb') as db:
+        with sql_connection(directory/'records.duckdb',limit=self.limit) as db:
             rows = db.execute(query, params).fetchall()
         records = [json.loads(r[0]) for r in rows]
         if (filters is not None and filters.dimensions is not None) or (selector is not None and selector.dimensions is not None):

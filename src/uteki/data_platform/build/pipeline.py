@@ -81,8 +81,10 @@ def build_bundle(catalog, build):
     return files,manifest
 
 
-def build_html(catalog, *, snapshot_id, representation_id, recipe, run_id, retry_of_build_id=None):
+def build_html(catalog, *, snapshot_id, representation_id, recipe, run_id, retry_of_build_id=None, checkpoint=None):
     from ..content.publication import Publication
+    check = checkpoint or (lambda phase: None)
+    check('before_build_registration')
     recipe_config(catalog.content,recipe)
     build=catalog.begin_build(snapshot_id=snapshot_id,representation_id=representation_id,recipe=recipe,
                              run_id=run_id,retry_of_build_id=retry_of_build_id)
@@ -94,7 +96,8 @@ def build_html(catalog, *, snapshot_id, representation_id, recipe, run_id, retry
         raise CatalogError('RECOVERY_REQUIRED','sealed build requires explicit publication/recovery')
     try:
         files,manifest=build_bundle(catalog,build)
-        publisher=Publication(catalog)
+        check('build_parsed')
+        publisher=Publication(catalog,checkpoint=checkpoint)
         publisher.stage(build['build_id'],files=files,manifest=manifest)
         return publisher.publish(build['build_id'])
     except Exception as error:
