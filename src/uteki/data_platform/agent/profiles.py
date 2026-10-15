@@ -64,8 +64,16 @@ class LoadedProfile:
         package = 'openai-agents' if kernel == 'openai' else 'claude-agent-sdk'
         if importlib.metadata.version(package) != p.sdk_version:
             raise ValueError('installed SDK differs from the frozen profile')
-        if mode != 'offline' or p.status != 'offline_fixture_only' or not p.model_id.startswith('fixture/'):
-            raise ValueError('live execution requires the later metered runtime and approved contract')
+        if mode == 'offline':
+            if p.status != 'offline_fixture_only' or not p.model_id.startswith('fixture/'):
+                raise ValueError('offline execution requires a fixture profile')
+        elif mode == 'gateway':
+            if p.status not in {'unverified','live_verified'} or p.model_id.startswith('fixture/'):
+                raise ValueError('gateway execution requires an explicit candidate model profile')
+            # This validates configuration, not authorization. The bound HTTP
+            # transport separately admits the exact endpoint and contract.
+        else:
+            raise ValueError('unsupported execution mode')
 
     def metadata(self):
         return self.profile.model_dump(mode='json')

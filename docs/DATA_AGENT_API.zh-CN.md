@@ -43,7 +43,7 @@
 
 ### 0.0.1 第五批 SDK 离线绑定（2026-10-15）
 
-**当前验收范围：**核心设计 14.12.16 检查点 16 已按目标附件 Prompt 2 七项要求完成离线收尾，证据见 [checkpoint-16.json](../output/data-agent-runtime-20261015/checkpoint-16.json)。下文按检查点保留协议演进，当时未完成项以该节末尾审计为当前结论。四项历史偶发故障仍未解释；真实网关、实际收费、完整配套与业务效果未验证。当前只准入不付费的执行契约准备，正式 CLI/MCP 信号映射留对应入口批次。
+**当前验收范围：**核心设计 14.12.16 检查点 16 已按目标附件 Prompt 2 七项要求完成离线收尾，证据见 [checkpoint-16.json](../output/data-agent-runtime-20261015/checkpoint-16.json)。下文按检查点保留协议演进，当时未完成项以该节末尾审计为当前结论。四项历史偶发故障仍未解释；真实网关、实际收费、完整配套与业务效果未验证。当前准入非付费工程与本机合成验收，付费准入未通过；正式 CLI/MCP 信号映射留对应入口批次。
 
 在 0.0 的确定性 API 外增加两侧原生 SDK 装配，入口为 agent.openai_runtime.run_offline 与 agent.claude_runtime.run_offline。六工具及 deliver/clarify 的模型参数是 `{request, state}`；context_ref、请求幂等键与根上下文由宿主绑定，模型不能替换。工具 schema 来自现有 Pydantic 契约。OpenAI strict_json_schema=False 是为保留维度/QName 映射等动态键，应用完整参数校验保持；真实模型是否支持该 schema 仍须对应网关验证。
 
@@ -53,9 +53,13 @@
 
 当前两侧 `run_offline` 必须显式提供 `limits={native_max_turns,max_model_requests,max_request_bytes,max_response_bytes}`，业务工具轮数/墙钟/无进展/费用仍使用上下文 run_policy。`recover=False` 默认不重开未确认原生执行；显式 `recover=True` 先协调已保存的交付/澄清意图及下述普通工具响应/索引效果。已经结束的交付恢复不新增模型请求；OpenAI 满足下文持久状态和时间核对条件时可继续未结束的原运行，后续新请求仍扣原根额度。原生终态未确认时，业务结果与 native_success=false、native_error、execution_time_uncertain 分别保留；普通工具或模型请求中断仍可返回 RECOVERY_REQUIRED。精确运行绑定与根账本不允许通过重试改变。
 
-Prompt 4 检查点 4 新增内部宿主 `application.gateway_batch.create_gateway_batch`：显式冻结批次 UUID、各独立业务根的 context/profile/limits/transport、总费用与请求上限及执行契约 hash，返回各 scope 的 `gateway_binding={batch_ref,scope_id}`。`RuntimeJournal(..., gateway_binding=...)` 只挂接该批次已有账本；不创建第二份额度，不加载凭据，不构成真实调用授权。批次启用后账本或 ready 标记缺失/损坏明确失败；只有未启用的原初始化意图可显式恢复。业务根、原生 session 和批次预算根分别保留；场景取消仅停止自己的 scope，整批停止和未知费用仍约束全部 scope。当前仅支持独立业务根，尚未绑定网关澄清后继；两侧公开 SDK 入口仍为上述离线入口，实际 SDK 网关运行接线待完成。
+Prompt 4 检查点 4 新增内部宿主 `application.gateway_batch.create_gateway_batch`：显式冻结批次 UUID、各独立业务根的 context/profile/limits/transport、总费用与请求上限及执行契约 hash，返回各 scope 的 `gateway_binding={batch_ref,scope_id}`。`RuntimeJournal(..., gateway_binding=...)` 只挂接该批次已有账本；不创建第二份额度，不加载凭据，不构成真实调用授权。批次启用后账本或 ready 标记缺失/损坏明确失败；只有未启用的原初始化意图可显式恢复。业务根、原生 session 和批次预算根分别保留；场景取消仅停止自己的 scope，整批停止和未知费用仍约束全部 scope。当前仅支持独立业务根，尚未绑定网关澄清后继；OpenAI 本机网关接线新增于下述检查点 5，Claude 业务接线仍待完成。
 
 `RunQueryResult.mode` 保留 `offline`，另允许明确标识的 `gateway_synthetic` 与 `remote`。合成本机网关的 `real_model_calls=0`、`gateway_cost_usd=null`；真实模式的请求数仅表示该 scope 已登记派发的物理尝试，不证明上游已执行或收费，未知仍单列。真实费用仅在该 scope 全部请求核费完成后给出，否则为 null。`runtime.root_run_id` 仍是业务根，`runtime.budget.root_run_id` 是批次预算根；另保存 `gateway_binding` 和 `control_scope`。交付 `usage` 的请求/费用/预留是整批累计，另有 `budget_root_run_id`、`control_scope_id`、`scope_model_calls`；墙钟仍属于本业务运行。合成网关交付将合成账单放在 `synthetic_cost_usd`，`cost_usd=null`，不把同账本的合成收费当真实收费。旧结果和交付不回填这些字段。
+
+Prompt 4 检查点 5 新增 `agent.openai_runtime.run_gateway(service, context_ref, profile, *, gateway_binding, endpoint, credential, limits, execution_contract=None, checkpoint=None, recover=False, started=None)`，复用原 Runner/approval/RunState 与六工具/终态控制。profile 的 `mode='gateway'` 校验只确认配置和 SDK 版本，不授予调用权限；网关来源由冻结批次决定，合成来源只能访问明确 loopback，真实来源仍需原 HTTP 准入的精确授权契约。当前草案拒绝真实运行，凭据不从环境自动发现，也不保存到运行绑定。
+
+OpenAI 逻辑请求意图的 hash 与原物理请求键共同进入现有账本。原始 HTTP 响应先保存，随后保存 SDK 实际解析结果；恢复继续官方 RunState，只在重建字节、身份、已存响应与核费状态一致时交给官方客户端重新解析原字节，不发 HTTP。已准备请求沿原键派发，未知请求不重发，缺失/冲突不转换成普通成功或自动重试。锁定 OpenAI 3.13.0 会把自定义 transport 的 CatalogError 包装成 APIConnectionError，适配器通过公开 cause 链保留原错误码，其余 SDK 网络异常保持原类型。调用取消会关闭自己持有的传输并等候该请求收尾，未知响应/费用仍保留；完整宿主进程监督及 Claude 接线尚未验收。当前限定证据见核心设计 14.12.18 检查点 5。
 
 当前新增同步 `clarify(context_ref, {question,blocking_need_ids}, state=..., request_key=..., recover=False)`，返回 `{kind:needs_clarification, clarification, clarification_object}`。它保存完整原问题与不可变澄清；同键显式恢复保留同一 ID/字节。回答通过 `create_context` 的 revises_context_ref/clarification_response 提交完整字段，相同完整回答及策略复用唯一后继，改变回答报 CLARIFICATION_MISMATCH；创建中断用 recover=True 补齐。后继 continuation 额外保存 root_context_ref；原 clock、计划/历史、业务计数/时间及根账本继承，旧引用须重新读取。业务 Session 为 needs_clarification，该次 Catalog 执行为 completed；正常后继开启新原生 session。根物理请求累计不清零，根请求/响应字节限制不扩大，业务范围和策略只可收紧。未确认执行时间仍阻止后继创建；受观察的原运行可以按下文核对后继续。非澄清修订和 analysis_agent 的 prior_delivery_refs 继续明确拒绝，不据此提前声明补数衔接已实现。
 

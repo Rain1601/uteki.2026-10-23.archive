@@ -136,7 +136,7 @@ class GatewayHTTP:
             raise ValueError('gateway_reasoning_controls_differ')
         return request
 
-    def exchange(self, path, raw, headers, *, request_key=None):
+    def exchange(self, path, raw, headers, *, request_key=None, native_request_sha256=None):
         """Called once per physical SDK HTTP request; never retries or redirects."""
         headers={k.lower():v for k,v in headers.items()}
         request=self.validate_request(path,raw,headers)
@@ -147,6 +147,11 @@ class GatewayHTTP:
             business_root_run_id=self.policy['business_root_run_id'],profile=self.profile,
             method='POST',path=path,origin=self.origin,body_sha256=digest(raw),
             body_base64=base64.b64encode(raw).decode('ascii'))
+        if native_request_sha256 is not None:
+            if (not isinstance(native_request_sha256,str) or len(native_request_sha256)!=64
+                    or any(c not in '0123456789abcdef' for c in native_request_sha256)):
+                raise ValueError('invalid_native_request_identity')
+            metadata['native_request_sha256']=native_request_sha256
         self.budget.prepare_request(key,metadata,reserve_usd=self.transport['reserve_usd'],scope_id=self.scope_id)
         self.checkpoint('gateway_request_prepared')
         self.guard()

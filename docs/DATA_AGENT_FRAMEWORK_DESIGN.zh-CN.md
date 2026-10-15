@@ -2852,6 +2852,18 @@ OpenAI Chat 适配器顶层 `ModelResponse.response_id` 为 `None`，见[官方 
 
 **下一动作仍是 Prompt 4 非付费部分。** 当前新证据覆盖账本/RuntimeJournal/交付绑定，旧原生 SDK 回归使用既有离线 transport；二者不能合并宣称真实 SDK 网关业务闭环已通过。还须将现有官方循环接到该 HTTP 边界，核对原生逻辑请求与物理请求、完成宿主截止/取消监督及 G01–G05。真实 OpenRouter、路由、generation 核费、付费授权、其他平台和四项历史偶发问题均未验证/关闭；真实模型调用及费用为 0。L2/L3 保持未整体通过，达到前述非付费停止点后才暂停供用户 review，不进入 Prompt 5。
 
+**检查点 5：OpenAI 官方循环的实际网关接线（2026-10-15，单侧限定验收）。** `openai_runtime.run_gateway` 复用既有 Runner、approval interruption、RunState、工具绑定与收尾；新增 `providers/gateway_openai.py`，通过官方 `AsyncOpenAI` 客户端扩展接入上一检查点的 `GatewayHTTP`，不另写模型/工具循环或协议转换。依据为[官方自定义模型客户端示例](https://github.com/openai/openai-agents-python/blob/main/examples/model_providers/custom_example_agent.py)与 [RunState 参考](https://openai.github.io/openai-agents-python/ref/run_state/)，并核对锁定本机 SDK 签名。profile 新增 gateway 配置校验，真实授权仍只由冻结 HTTP 契约准入；未授权的真实来源及合成来源试图使用外部端点均在连接前拒绝。
+
+原生逻辑请求先保存意图，其 hash 和同一个物理请求键进入账本；原始 HTTP 响应落盘后才交给官方 SDK 解析，再保存原生解析对象。恢复沿原 RunState，核对请求顺序、业务/profile/scope 与原字节；已回答请求通过官方客户端重新解析保存的原响应，prepared 沿原键继续，未知请求或对象缺失明确要求恢复核对，不重发。取消会关闭所属连接并等待传输记录完成后收尾。正常结果和原生成功分别保留，合成收费不作为实际收费。
+
+本轮反例确认：恢复时实际序列化字节变化虽然被传输拦截，但 OpenAI 3.13.0 的 `APIConnectionError` 包装使应用错误码丢失，结果误记普通 failed。先核对[官方错误说明](https://github.com/openai/openai-python#handling-errors)、[官方 v3.13.0 源码](https://github.com/openai/openai-python/blob/v3.13.0/src/openai/_base_client.py)及本机实现，再在适配器通过公开 `__cause__` 只还原项目 CatalogError，保留原链且不升级依赖。主分支说明称自定义传输应用异常原样传播，本机锁定版与该版本源码实测为包装，不能直接套用主分支结论。原失败与修正前包源码快照保留，修正后同一反例返回 recovery_required，物理请求仍为原 1 次。
+
+共 **71 项不同检查通过，新增 10 项**：OpenAI 网关集成 10、原 SDK 单测 40、HTTP 边界 15、原 OpenAI 恢复 6。最后修正只涉及新增适配器的错误保留，重放其全部 10 项；另 61 项代码路径未变，保留同检查点回归证据。正常场景 8 次合成 HTTP 完成查找、说明、处理、检索、原文读取、确定性计算与交付；准备后、原响应落盘后、首个工具结果保存后三处真实退出都恢复原身份，最终仍为 8 次请求。另验证派发未知、SDK 响应对象丢失、重建字节变化、schema 合法的工具错误进入下一原生请求、取消保留未知预留，以及未授权来源。G05 扣留收费观察时完整原响应仍保留并阻止另一个已登记 scope 派发；合成 generation 核对只结算原请求，模型请求数保持 1，不改写冻结结果中的历史未知状态。
+
+两套现有环境各 68 个普通安装 Python/SQL 文件匹配源码，data-only/SDK 分别 9/43 个发行包通过依赖检查；没有新建环境，主锁、M0 锁、profile/prompt 和网关草案未改。测试使用 `-I` 和合成材料，最终集成组从仓库外运行。原失败、原始响应、原生记录、安装内容及范围差异见 [checkpoint-5/verification.json](../output/data-agent-gateway-runtime-20261015/checkpoint-5/verification.json)。
+
+**未完成项不能合并旧证据计作通过。** 本检查点按独立合成场景创建 fixture 批次，每批登记两侧 scope，但只实际执行 OpenAI；尚未执行双侧十场景共享同一冻结批次。G04 当前验证响应尚未收到时取消的未知结果分支，整批后续场景不能绕过该未知状态另开账本。下一步是 Claude 原生业务接线、必要收费观察及完整宿主截止/取消监督，再核验整组执行/停止顺序。真实模型、OpenRouter 路由/收费、认证 generation 查询、完整原生能力隔离、网关澄清后继及其他平台均未验证；四项历史偶发问题保留，真实调用/费用为 0。L2/L3 不记整体通过，尚未达到用户约定的 Prompt 4 非付费暂停点。
+
 ### 14.13 各功能维度的运行流程与接口
 
 **用户要求（2026-10-14）：**按功能维度说明 Data Agent 的运行流程与接口：Agent 做了什么、为什么这么做、为什么可以取得效果。

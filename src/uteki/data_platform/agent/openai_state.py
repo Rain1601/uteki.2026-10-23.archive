@@ -7,7 +7,7 @@ import uuid
 from agents import ModelResponse, RunContextWrapper, RunState
 from pydantic import TypeAdapter
 
-from ..contracts.common import CatalogError, canonical
+from ..contracts.common import CatalogError, canonical, digest
 from ..contracts.content import ObjectRef
 
 
@@ -53,10 +53,13 @@ class OpenAIState:
                 raise ValueError('a physical request is absent from the SDK request order')
             for item in requests[:self.cursor]:
                 record = self.journal.budget.inspect_request(item['request_key'])
-                if (record['stage']!='responded' or record['request']['profile']!=self.journal.profile
-                        or record['request']['request']!=self.read(item['request_ref'])
+                if (record['stage']!='responded' or not self.record_matches(record,self.read(item['request_ref']))
                         or record['response_event']['response'].get('complete') is not True):
                     raise ValueError('checkpoint consumes a request without a complete bound response')
+                if self.journal.gateway_binding is not None:
+                    if record['cost_state']!='settled' or item.get('response_ref') is None:
+                        raise ValueError('gateway checkpoint lacks a confirmed SDK response or bill')
+                    TypeAdapter(ModelResponse).validate_python(self.read(item['response_ref']))
             visible = {canonical(r) for r in saved['visible_results']}
             if not visible <= {canonical(r) for r in native['observed_results']}:
                 raise ValueError('checkpoint claims results not observed in this native run')
@@ -98,13 +101,16 @@ class OpenAIState:
                 raise CatalogError('RECOVERY_REQUIRED','resumed SDK request differs from the original; no replay or resend')
         record = next((r for r in self.journal.budget.inspect_requests() if r['request_key']==item['request_key']),None)
         if record is not None:
-            if record['request']!=dict(run_id=self.journal.context['run_id'],context_ref=self.journal.context_ref,
-                                       profile=self.journal.profile,request=request):
+            if not self.record_matches(record,request):
                 raise CatalogError('RECOVERY_REQUIRED','physical request and SDK intent bindings differ')
             if record['stage']=='responded':
                 response = record['response_event']['response']
                 if response.get('complete') is not True or record['cost_state']!='settled':
                     raise CatalogError('RECOVERY_REQUIRED','saved response or fee is incomplete')
+                if self.journal.gateway_binding is not None:
+                    # The official client parses the exact saved wire bytes
+                    # again. Never trust a separate cache as a model response.
+                    return item['request_key'],None
                 try:
                     value = TypeAdapter(ModelResponse).validate_python(response['response'])
                 except (ValueError,KeyError) as error:
@@ -116,5 +122,26 @@ class OpenAIState:
                 raise CatalogError('RECOVERY_REQUIRED','physical request outcome is unknown; never resend')
         return item['request_key'],None
 
-    def responded(self):
+    def record_matches(self, record, request):
+        if self.journal.gateway_binding is None:
+            return record['request']==dict(run_id=self.journal.context['run_id'],context_ref=self.journal.context_ref,
+                profile=self.journal.profile,request=request)
+        metadata=record['request']
+        expected=dict(boundary='gateway_http',context_ref=self.journal.context_ref,
+            business_root_run_id=self.journal.context['root_run_id'],profile=self.journal.profile,
+            origin=self.journal.gateway['plan']['origin'],native_request_sha256=digest(canonical(request)))
+        return (record.get('control_scope_id')==self.journal.gateway_binding['scope_id']
+            and all(metadata.get(key)==value for key,value in expected.items()))
+
+    def responded(self, response=None):
+        if self.journal.gateway_binding is not None:
+            if response is None:raise ValueError('gateway SDK response required')
+            session=self.journal.session()
+            item=session.data['native_execution']['openai_requests'][self.cursor]
+            reference=self.journal.catalog.content.put_object(canonical(response)).model_dump(mode='json')
+            if item.get('response_ref') is not None and item['response_ref']!=reference:
+                raise CatalogError('RECOVERY_REQUIRED','SDK response changed for the same physical request')
+            item['response_ref']=reference
+            session.save()
+            self.journal.checkpoint('openai_gateway_response_committed')
         self.cursor += 1
