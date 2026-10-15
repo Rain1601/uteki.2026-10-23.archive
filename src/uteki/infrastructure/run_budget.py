@@ -27,6 +27,10 @@ class RequestIdentityConflict(ValueError):
     """A durable request key was reused for different input or a response."""
 
 
+class RequestInFlight(RuntimeError):
+    """A known active request occupies the frozen dispatch concurrency slot."""
+
+
 class RunBudget:
     def __init__(self, path, limit, *, enforce=True, allow_unknown_reservations=False,
                  allow_zero_limit=False):
@@ -202,7 +206,8 @@ class RunBudget:
             raise ValueError(label+' must be nonempty text')
         return value
 
-    def bind_root(self, root_run_id, *, mode, max_requests, policy):
+    def bind_root(self, root_run_id, *, mode, max_requests, policy, max_in_flight_requests=None,
+                  scope_ids=None):
         """Freeze a root's dispatch policy in its one existing cost ledger.
 
         This records local limits, not user authorization to call a provider.
@@ -213,14 +218,31 @@ class RunBudget:
             raise ValueError('Explicit mode and positive physical request limit required')
         if not isinstance(policy, dict) or not policy:
             raise ValueError('Explicit frozen root policy required')
+        if max_in_flight_requests is not None and (type(max_in_flight_requests) is not int
+                or not 1 <= max_in_flight_requests <= max_requests):
+            raise ValueError('Dispatch concurrency must be positive and no greater than the request limit')
+        if scope_ids is not None:
+            if not isinstance(scope_ids, (list, tuple)) or not scope_ids:
+                raise ValueError('An explicit nonempty list of allowed control scopes is required')
+            for scope_id in scope_ids:
+                self._text(scope_id, 'scope_id')
+            if len(set(scope_ids)) != len(scope_ids):
+                raise ValueError('Duplicate control scopes are not permitted')
+            scope_ids = sorted(scope_ids)
         if not self.enforce or self.allow_unknown_reservations:
             raise ValueError('Durable roots require enforcement and unresolved-cost blocking')
         with self._transaction() as db:
             limit = db.execute('SELECT usd FROM config WHERE id=1').fetchone()[0]
             if limit is None or (mode == 'remote' and Decimal(limit) <= 0):
                 raise ValueError('Remote roots require a positive finite reservation limit')
-            contract = self._json(dict(schema_version='uteki-metered-root-v1', root_run_id=root_run_id,
-                mode=mode, max_requests=max_requests, policy=policy, limit_usd=limit))
+            binding = dict(schema_version='uteki-metered-root-v1', root_run_id=root_run_id,
+                mode=mode, max_requests=max_requests, policy=policy, limit_usd=limit)
+            # Omit the optional extension to preserve existing root bytes.
+            if max_in_flight_requests is not None:
+                binding['max_in_flight_requests'] = max_in_flight_requests
+            if scope_ids is not None:
+                binding['scope_ids'] = scope_ids
+            contract = self._json(binding)
             db.execute('CREATE TABLE IF NOT EXISTS metered_root '
                        '(id INTEGER PRIMARY KEY CHECK(id=1), contract TEXT NOT NULL, stop_reason TEXT)')
             current = db.execute('SELECT contract FROM metered_root WHERE id=1').fetchone()
@@ -236,6 +258,81 @@ class RunBudget:
                 'request_json TEXT NOT NULL, stage TEXT NOT NULL, response_event TEXT, bill_json TEXT, '
                 'reason TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)')
             return json.loads(contract)
+
+    @staticmethod
+    def _has_scopes(db):
+        return db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='metered_scopes'").fetchone() is not None
+
+    @staticmethod
+    def _scope(db, scope_id):
+        if not RunBudget._has_scopes(db):
+            raise ValueError('No control scopes have been bound')
+        row = db.execute('SELECT contract,stop_reason FROM metered_scopes WHERE scope_id=?', (scope_id,)).fetchone()
+        if row is None:
+            raise ValueError('Unknown control scope')
+        return json.loads(row[0]) | {'stop_reason': row[1]}
+
+    @staticmethod
+    def _request_scope(db, request_key):
+        if not RunBudget._has_scopes(db):
+            return None
+        row = db.execute('SELECT scope_id FROM metered_request_scopes WHERE request_key=?', (request_key,)).fetchone()
+        return row[0] if row else None
+
+    def bind_scope(self, scope_id, *, max_requests, policy):
+        """Freeze one execution scope inside the SAME root cost ledger.
+
+        This is a request/stop boundary, not a new balance, native session or
+        authorization. Existing unscoped requests cannot be adopted into it.
+        """
+        self._text(scope_id, 'scope_id')
+        if type(max_requests) is not int or max_requests < 1 or not isinstance(policy, dict) or not policy:
+            raise ValueError('Explicit scope request limit and policy required')
+        with self._transaction() as db:
+            root = self._root(db)
+            if root.get('scope_ids') is not None and scope_id not in root['scope_ids']:
+                raise RequestIdentityConflict('Control scope is outside the frozen root scope list')
+            if max_requests > root['max_requests']:
+                raise ValueError('Control scope cannot expand the root request limit')
+            encoded = self._json(dict(schema_version='uteki-metered-scope-v1',
+                root_run_id=root['root_run_id'], scope_id=scope_id, max_requests=max_requests, policy=policy))
+            db.execute('CREATE TABLE IF NOT EXISTS metered_scopes '
+                       '(scope_id TEXT PRIMARY KEY, contract TEXT NOT NULL, stop_reason TEXT)')
+            db.execute('CREATE TABLE IF NOT EXISTS metered_request_scopes '
+                       '(request_key TEXT PRIMARY KEY, scope_id TEXT NOT NULL)')
+            current = db.execute('SELECT contract FROM metered_scopes WHERE scope_id=?', (scope_id,)).fetchone()
+            if current:
+                if current[0] != encoded:
+                    raise RequestIdentityConflict('Control scope identity, limits or policy differ')
+            else:
+                self._check_dispatch_allowed(db, root)
+                db.execute('INSERT INTO metered_scopes VALUES (?,?,NULL)', (scope_id, encoded))
+            return self._scope(db, scope_id)
+
+    @staticmethod
+    def _check_scope_allowed(scope):
+        if scope['stop_reason'] is not None:
+            raise BudgetExceeded('Control scope stopped: '+scope['stop_reason'])
+
+    def stop_scope(self, scope_id, reason):
+        """Stop only this execution; late response/billing remains recordable."""
+        self._text(scope_id, 'scope_id'); self._text(reason, 'stop_reason')
+        with self._transaction() as db:
+            self._root(db)
+            current = self._scope(db, scope_id)
+            if current['stop_reason'] is None:
+                db.execute('UPDATE metered_scopes SET stop_reason=? WHERE scope_id=?', (reason, scope_id))
+            return self._scope(db, scope_id)
+
+    def inspect_scope(self, scope_id):
+        self._text(scope_id, 'scope_id')
+        with self._transaction() as db:
+            root = self._root(db)
+            scope = self._scope(db, scope_id)
+            rows = db.execute('SELECT m.stage,COUNT(*) FROM metered_requests m '
+                'JOIN metered_request_scopes s ON s.request_key=m.request_key '
+                'WHERE s.scope_id=? GROUP BY m.stage', (scope_id,)).fetchall()
+            return scope | dict(root_stop_reason=root['stop_reason'], request_stages=dict(rows))
 
     def _root(self, db):
         if not self.enforce or self.allow_unknown_reservations:
@@ -261,13 +358,18 @@ class RunBudget:
         for name in ('request','response_event','bill'):
             if result[name] is not None:
                 result[name] = json.loads(result[name])
+        scope_id = RunBudget._request_scope(db, key)
+        if scope_id is not None:
+            result['control_scope_id'] = scope_id
         return result
 
-    def prepare_request(self, request_key, request, *, reserve_usd):
+    def prepare_request(self, request_key, request, *, reserve_usd, scope_id=None):
         """Atomically bind an immutable request identity to its cost reservation."""
         self._text(request_key, 'request_key')
         if not isinstance(request, dict) or not request:
             raise ValueError('Nonempty request identity and transport metadata required')
+        if scope_id is not None:
+            self._text(scope_id, 'scope_id')
         encoded = self._json(request)
         amount = Decimal(str(reserve_usd))
         if not amount.is_finite() or amount < 0:
@@ -275,14 +377,25 @@ class RunBudget:
         fingerprint = hashlib.sha256(encoded.encode()).hexdigest()
         with self._transaction() as db:
             root = self._root(db)
+            if root.get('scope_ids') is not None and scope_id not in root['scope_ids']:
+                raise RequestIdentityConflict('Request requires one of the frozen root control scopes')
             if (root['mode'] == 'offline' and amount != 0) or (root['mode'] == 'remote' and amount <= 0):
                 raise ValueError('Only offline synthetic requests may reserve zero')
             if db.execute('SELECT 1 FROM metered_requests WHERE request_key=?', (request_key,)).fetchone():
                 current = self._request(db, request_key)
-                if current['fingerprint'] != fingerprint or Decimal(current['reserved_usd']) != amount:
+                if (current['fingerprint'] != fingerprint or Decimal(current['reserved_usd']) != amount
+                        or current.get('control_scope_id') != scope_id):
                     raise RequestIdentityConflict('Request key reused with different input or reservation')
                 return current
             self._check_dispatch_allowed(db, root)
+            if scope_id is not None:
+                scope = self._scope(db, scope_id)
+                self._check_scope_allowed(scope)
+                scope_count = db.execute('SELECT COUNT(*) FROM metered_requests m '
+                    'JOIN metered_request_scopes s ON s.request_key=m.request_key '
+                    "WHERE s.scope_id=? AND m.stage!='abandoned'", (scope_id,)).fetchone()[0]
+                if scope_count >= scope['max_requests']:
+                    raise BudgetExceeded('Control scope physical request slots exhausted')
             occupied = db.execute("SELECT COUNT(*) FROM metered_requests WHERE stage!='abandoned'").fetchone()[0]
             if occupied >= root['max_requests']:
                 raise BudgetExceeded('Physical request slots exhausted, including prepared requests')
@@ -290,12 +403,30 @@ class RunBudget:
             stamp = datetime.now(timezone.utc).isoformat()
             db.execute('INSERT INTO metered_requests VALUES (?,?,?,?,?,NULL,NULL,NULL,?,?)',
                        (request_key, fingerprint, token, encoded, 'prepared', stamp, stamp))
+            if scope_id is not None:
+                db.execute('INSERT INTO metered_request_scopes VALUES (?,?)', (request_key, scope_id))
             return self._request(db, request_key)
 
     @staticmethod
     def _check_dispatch_allowed(db, root):
         if root['stop_reason'] is not None:
             raise BudgetExceeded('Root stopped: '+root['stop_reason'])
+        if root.get('scope_ids') is not None:
+            # A missing association must not silently turn a scoped request
+            # into a legacy unscoped request and bypass its persisted stop.
+            if not RunBudget._has_scopes(db):
+                if db.execute('SELECT 1 FROM metered_requests LIMIT 1').fetchone():
+                    raise RequestRecoveryRequired('Control scope records are missing; never adopt as unscoped')
+            else:
+                rows = db.execute('SELECT s.scope_id,c.contract FROM metered_requests m '
+                    'LEFT JOIN metered_request_scopes s ON s.request_key=m.request_key '
+                    'LEFT JOIN metered_scopes c ON c.scope_id=s.scope_id').fetchall()
+                for scope_id, encoded in rows:
+                    if scope_id not in root['scope_ids'] or encoded is None:
+                        raise RequestRecoveryRequired('Request control scope association is missing or outside the root')
+                    scope = json.loads(encoded)
+                    if scope.get('scope_id') != scope_id or scope.get('root_run_id') != root['root_run_id']:
+                        raise RequestRecoveryRequired('Request control scope identity differs from its root')
         if db.execute("SELECT 1 FROM reservations WHERE state='unknown' LIMIT 1").fetchone():
             raise RequestRecoveryRequired('Unknown request cost must be reconciled before dispatch')
         if db.execute("SELECT 1 FROM metered_requests WHERE stage='outcome_unknown' LIMIT 1").fetchone():
@@ -309,6 +440,14 @@ class RunBudget:
             if current['stage'] != 'prepared':
                 raise RequestRecoveryRequired('Request is not prepared; inspect/replay, never resend')
             self._check_dispatch_allowed(db, root)
+            scope_id = current.get('control_scope_id')
+            if scope_id is not None:
+                self._check_scope_allowed(self._scope(db, scope_id))
+            concurrency = root.get('max_in_flight_requests')
+            if concurrency is not None:
+                occupied = db.execute("SELECT COUNT(*) FROM metered_requests WHERE stage='dispatched'").fetchone()[0]
+                if occupied >= concurrency:
+                    raise RequestInFlight('Another known active request occupies the root dispatch slot')
             # Another completed request can cost more than its estimate. Recheck
             # the total before dispatching even an already-prepared request.
             committed = sum((Decimal(a if s == 'settled' else r) for r,a,s in
@@ -388,7 +527,7 @@ class RunBudget:
                        (reason, datetime.now(timezone.utc).isoformat(), request_key))
             return self._request(db, request_key)
 
-    def recover_requests(self):
+    def recover_requests(self, *, scope_id=None):
         """Caller must hold exclusive runtime ownership; never automatically resend.
 
         Conservative even if the process died between begin_request and sending.
@@ -396,7 +535,14 @@ class RunBudget:
         """
         with self._transaction() as db:
             self._root(db)
-            keys = [r[0] for r in db.execute("SELECT request_key FROM metered_requests WHERE stage='dispatched'")]
+            if scope_id is None:
+                keys = [r[0] for r in db.execute("SELECT request_key FROM metered_requests WHERE stage='dispatched'")]
+            else:
+                self._text(scope_id, 'scope_id')
+                self._scope(db, scope_id)
+                keys = [r[0] for r in db.execute('SELECT m.request_key FROM metered_requests m '
+                    'JOIN metered_request_scopes s ON s.request_key=m.request_key '
+                    "WHERE m.stage='dispatched' AND s.scope_id=?", (scope_id,))]
             for key in keys:
                 current = self._request(db, key)
                 db.execute("UPDATE reservations SET actual=NULL,state='unknown' WHERE id=? AND state='reserved'",
