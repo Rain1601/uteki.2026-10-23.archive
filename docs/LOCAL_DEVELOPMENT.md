@@ -117,6 +117,48 @@ uteki_content_root="$(mktemp -d "${TMPDIR:-/tmp}/uteki-content-data.XXXXXX")"
 
 示例写入合成 HTML、附图及一个明确缺失的附件，保存清单后重新打开存储并读回。完整契约、错误码、25 项测试的覆盖及未验证边界见核心设计 14.3.1、14.12.9；对象/清单可读不等于来源身份已核验或快照已发布。该切片要求支持硬链接和目录 fsync 的本地 POSIX 文件系统。
 
+## 目录、快照与发布的独立验收（2026-10-14）
+
+第二批继续使用主锁的 `data` extra，不需要 Agent SDK 或模型凭据。仅在临时根运行合成数据；不要指向已有生产目录。以下从仓库根开始，普通安装后核对全部 Data 包文件及 SQL，测试切换到仓库外目录。首次初始化要求调用者提供已有绝对目录；已有目录使用 `Catalog.open`，恢复需显式 `recover=True`。一个 Catalog 上下文持有整根排他锁，须先关闭才能再次打开。
+
+```bash
+uteki_catalog_repo="$PWD"
+uteki_catalog_env="$(mktemp -d "${TMPDIR:-/tmp}/uteki-catalog-env.XXXXXX")"
+UV_PROJECT_ENVIRONMENT="$uteki_catalog_env/venv" uv sync --locked --python 3.13 --extra data --no-editable
+uv pip install --reinstall-package uteki-eval --no-deps . --python "$uteki_catalog_env/venv/bin/python"
+uv pip check --python "$uteki_catalog_env/venv/bin/python"
+"$uteki_catalog_env/venv/bin/python" -I - <<'PY'
+import hashlib
+import sys
+from pathlib import Path
+import uteki.data_platform
+
+source = Path("src/uteki/data_platform")
+installed = Path(uteki.data_platform.__file__).resolve().parent
+assert installed.is_relative_to(Path(sys.prefix).resolve()), installed
+for path in sorted(source.rglob("*")):
+    if path.suffix not in {".py", ".sql"}:
+        continue
+    target = installed / path.relative_to(source)
+    assert hashlib.sha256(path.read_bytes()).digest() == hashlib.sha256(target.read_bytes()).digest(), path
+    print(path.relative_to(source), target)
+assert (installed / "catalog/migrations/0001_catalog.sql").is_file()
+PY
+(
+  cd "$uteki_catalog_env"
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_catalog_repo/tests/unit/data_platform" -p test_catalog.py -v
+  ./venv/bin/python -I -m unittest discover -s "$uteki_catalog_repo/tests/integration/data_platform" -p test_catalog_processes.py -v
+  ./venv/bin/python -I -m unittest discover -s "$uteki_catalog_repo/tests/unit/data_platform" -p test_content.py -v
+  ./venv/bin/python -I -m unittest discover -s "$uteki_catalog_repo/tests/integration/data_platform" -p test_content_processes.py -v
+)
+uteki_catalog_root="$(mktemp -d "${TMPDIR:-/tmp}/uteki-catalog-data.XXXXXX")"
+"$uteki_catalog_env/venv/bin/python" -I tests/fixtures/data_platform/catalog_worker.py example "$uteki_catalog_root"
+```
+
+示例执行登记→冻结→两版发布→关闭重开→旧引用读回；输出包含旧/新 AssetRef、冻结快照和 `business_verified=false`。四文件产物及字节 locator 只验证存储发布，不能当作真实 HTML/PDF 解析。参考核心设计 14.5.1、14.12.10：第二批 32+4 项测试、第一批 21+4 项回归；无模型调用。离线复现可为 uv 指定包含锁定依赖与构建依赖的缓存并加 `--offline`；缺缓存时应明确报告未运行，不更换依赖版本。
+
+本地备份只支持：关闭所有 Catalog 句柄、完成 checkpoint 且停止其他写入后，复制完整 data_root 到另一显式根，再用 `Catalog.open` 完整核验。不要单独恢复 SQLite；其 head/文件不一致会被拒绝。失败 staging/未知残留保留，不通过删除或覆盖它们伪装恢复成功。本批只验证 macOS arm64 本地 POSIX，其他平台、网络文件系统和真实断电尚未验证。
+
 ## Agent 执行监控（2026-10-06）
 
 启动工作台后打开 [Agent 运行](http://127.0.0.1:8765/agent-runs)。默认可回看两次已登记真实历史运行：`amd-fy2023-main-agent-v2-parent`（6 个父步骤、1 个提取任务、7 次调用）和 `amd-fy2023-cash-flow-main-agent-v2-parent`（7 个父步骤、1 个提取任务、8 次调用，以 `no_progress_limit` 停止）。从步骤展开子任务、输入、候选与用量；查看不会调用模型或改变采纳状态。历史记录没有心跳，也不会补造未保存的工具耗时。

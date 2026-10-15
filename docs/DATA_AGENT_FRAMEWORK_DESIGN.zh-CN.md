@@ -1,8 +1,8 @@
 # Data Agent 与分析 Agent：数据能力框架设计
 
-日期：2026-10-14 · 版本：设计稿 v1.24 · **状态：原件存储与输入清单切片已通过 21 项单测、4 项进程集成测试及安装包核验（14.12.9），未接生产，不代表完整 M1 或业务验收通过。主环境与 M0 已按原锁完成干净安装及限定离线回归（14.12.8）。M0 限定离线接入已实现，15 项测试及 9 个 SDK 场景通过（14.12.5）；Claude 原生 CLI 的本地参数探针见 14.17.7。完整目录、逐文件职责与开发批次见 14.1.1–14.1.5，仓库组织 review 见 14.1.6，官方项目对照与源码布局见 14.1.7。保留 OpenRouter、两套官方 SDK 与独立模型 prompt；DeepSeek 为低成本功能验证候选，原 Sonnet 草案保留。付费入口关闭，真实模型调用为 0，M0 整体未通过；真实材料与缺口见 7.8，工作台后置**。
+日期：2026-10-14 · 版本：设计稿 v1.25 · **状态：第二批最小目录、快照冻结与发布恢复通过 32 项单测、4 项进程集成测试及安装包核验，第一批 25 项回归通过（14.12.10）。仅本地合成数据，未接生产，不代表完整 M1 或业务验收通过。第一批证据保留于 14.12.9。主环境与 M0 已按原锁完成干净安装及限定离线回归（14.12.8）。M0 限定离线接入已实现，15 项测试及 9 个 SDK 场景通过（14.12.5）；Claude 原生 CLI 的本地参数探针见 14.17.7。完整目录、逐文件职责与开发批次见 14.1.1–14.1.5，仓库组织 review 见 14.1.6，官方项目对照与源码布局见 14.1.7。保留 OpenRouter、两套官方 SDK 与独立模型 prompt；DeepSeek 为低成本功能验证候选，原 Sonnet 草案保留。付费入口关闭，真实模型调用为 0，M0 整体未通过；真实材料与缺口见 7.8，工作台后置**。
 
-本文整理已讨论的职责与建议设计，不新增业务范围授权，不宣称目标框架全部实现。公司、年份和单次实验属于验收案例，不成为通用规则。DA-01 获取与储存、DA-02 解析与索引、DA-03 查询与材料交付作为模块 ID 保留。本批完成 14.1.5 批次 1 的契约、实现和限定行为验收后停止；下一批目录/快照/发布的具体目标与准入见 14.12.9，尚未启动。SDK 真实接入在联调前补齐，模型功能验证与业务效果验收分开，工作台继续后置。
+本文整理已讨论的职责与建议设计，不新增业务范围授权，不宣称目标框架全部实现。公司、年份和单次实验属于验收案例，不成为通用规则。DA-01 获取与储存、DA-02 解析与索引、DA-03 查询与材料交付作为模块 ID 保留。本批完成 14.1.5 批次 2 的契约、实现和限定行为验收后停止；下一批首条真实材料链的提案与准入见 14.12.10，尚未启动。SDK 真实接入在联调前补齐，模型功能验证与业务效果验收分开，工作台继续后置。
 
 ## 1. 这份设计要回答什么
 
@@ -1466,7 +1466,7 @@ OpenAI 候选包含两种接入方式，先作为同一检索后端的选项记�
 
 **开工判断：可以进入正式开发，先实现共享 Data 核心，再接完整 Agent。** 两套 SDK 的实跑、模型选择和业务阈值分别在用到它们前落实，不统一阻塞原件、目录、解析和确定性工具开发。下面给出完整范围的文件职责和开发顺序；它是实现地图，不是已完成清单，也不要求一次创建所有空文件。
 
-**本次实际状态：**`data_platform/__init__.py`、`contracts/__init__.py`、`contracts/content.py`、`content/__init__.py`、`content/store.py` 已完成本批契约和限定行为验收，证据见 14.12.9，未接入生产入口。此前目录 review 时的未验收草稿已按 14.3.1 修正，不能据此扩大为整个文件地图已实现。除明确标为已有者，下列路径均为预计新增；函数名是实现入口建议，公开字段仍以本设计与 API 契约为准。包的 `__init__.py` 只做必要导出，不承担业务流程。
+**本次实际状态：**第一批五个文件已完成原件与清单验收（14.12.9）；第二批新增 common/assets 契约、catalog database/repository/迁移、publication/recovery 及必要导出，限定验收见 14.12.10。两批均未接生产入口，不能扩大为整个文件地图已实现。除明确标为已有者，下列路径均为预计新增；函数名是实现入口建议，本批实际接口与字段以 14.5.1 为准。包的 `__init__.py` 只做必要导出，不承担业务流程。
 
 **先看项目根目录：**仓库根是 `uteki/`，`src/` 只存放可安装的 Python 源码。以下是主要目录的目标职责图，已有与预计新增分别标注；不是完整文件清单或本轮搬迁结果。官方对照及选择理由见 14.1.7。
 
@@ -1477,7 +1477,7 @@ uteki/                              项目/仓库根目录（已有）
 ├── README.md / AGENTS.md / TODO.md  项目入口、协作规则、当前动作（已有）
 ├── src/                            Python 源码根（已有）
 │   ├── uteki/                      产品代码的导入包（已有）
-│   │   └── data_platform/          新 Data 核心与 SDK 接入（五个草稿，其余计划）
+│   │   └── data_platform/          原件/目录/发布已限定验收；其他 Data 能力与 SDK 接入按批次建设
 │   └── uteki_eval/                 现有评测入口（已有，保留兼容）
 ├── apps/                           应用/工作台代码（已有；活动页面归位后置）
 ├── tests/                          自动化验证；新模块按 unit/integration/fixtures 分组
@@ -1528,6 +1528,8 @@ scripts/data_agent/migrate.py
 #### 14.1.2 共享核心：逐文件职责
 
 下表路径相对于 `src/uteki/data_platform/`。阶段是该文件首次投入工作的时间；后续可以扩充其已定职责，不用另开同功能文件。
+
+第二批实际落地与下表规划的差异：`contracts/common.py`、`contracts/assets.py`、`catalog/database.py`、`catalog/migrations/0001_catalog.sql`、`content/publication.py`、`content/recovery.py` 的本批部分已实现；登记/关系/修订/本地 run 身份集中在 `catalog/repository.py`。没有预建 entities/assets/revisions/runs 空壳，也没有创建 `0002_runs.sql`；本地 run 最小字段已随 0001 冻结，后续生产运行扩充再增加迁移。共同响应信封、业务 Locator、完整查询/运行协议和派生索引仍未实现。
 
 | 文件 | 文件内的主要功能与入口 | 阶段与处理 |
 |---|---|---|
@@ -1638,7 +1640,7 @@ Skills/Memory 首期放在两个 runtime 的官方装配配置中，业务数据
 | 批次 | 主要文件 | 完成后能 review 什么 | 开始条件/尚需落实 |
 |---|---|---|---|
 | 1 原件与输入清单 | contracts/content、content/store、test_content | 两份主文件相同但附图不同的材料生成不同清单；旧原件仍读回；损坏不能伪装成功 | 已按 14.3.1 实现，限定验收通过，证据与停止点见 14.12.9。无需模型 |
-| 2 目录、快照与发布 | contracts/common/assets、catalog、content/publication/recovery | 显式登记材料、冻结快照、构建/发布/中断恢复；新版本不改变旧引用 | T1/T2/T3/T8 及持久化部分由 Codex 在对应模块前落定，业务取舍才交用户 |
+| 2 目录、快照与发布 | contracts/common/assets、catalog、content/publication/recovery | 显式登记材料、冻结快照、构建/发布/中断恢复；新版本不改变旧引用 | 14.5.1 已固定本批契约；36 项第二批测试和 25 项第一批回归通过，限定验收与停止点见 14.12.10 |
 | 3 首条真实材料链 | connectors、build、最小检索/记录读回、CLI | 官方材料从获取到可发布、可定位、可读回；缺图/未知日期/解析失败可见 | 官方来源/范围明确；PDF/OCR 额外选型和验收阈值在使用前落实 |
 | 4 六个工具与交付 | contracts/query/evidence、retrieval、structured、application/tools/evidence/delivery、service | 用程序走完找材料→读数/原文→计算→出处交付，缺数与冲突分支可核验 | T4 计算/记录选择及分页边界冻结；不依赖业务模型得分 |
 | 5 两套真实 Agent | profiles、OpenRouter、两个 runtime、state/budget、run 持久化 | DeepSeek 等低成本候选完成自主工具循环；错误/取消/恢复/用量可核对 | 对应 M0 路径通过、T5/T6 完整、独立 prompt 和精确模型/路由已配置；付费前明确额度 |
@@ -1951,7 +1953,7 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 4. **生成最终说明：**根据内容与派生层结果生成 `asset-schema.json`，同时写入 `content_readiness`、`published_readiness` 和具体缺口；此时才确定最终 manifest 及各产物 hash。
 5. **最终校验与移动：**再检查完整 manifest、引用闭包、说明中的发布能力与拟写入 SQLite 的状态一致；通过后整体 rename 到 `builds/<build_id>/`。若校验失败，保留失败记录，不移动或发布。
 6. **发布事务：**单个 `BEGIN IMMEDIATE` 事务中写入 `manifest_sha256`、与说明一致的 `readiness_json`、`published_at`，并将状态置为 published。
-7. **崩溃恢复：**启动时扫描 staging 状态超时的 build：目录已移动但事务未提交的，按最终 manifest 与冻结说明重新校验后补完事务或置为 failed；恢复时不重写已移动内容，派生索引的新状态按下述实时规则处理。孤儿 staging 目录标记为待清理。未发布 build 对查询不可见。
+7. **崩溃恢复：**显式恢复入口先取得全目录排他锁，不能根据 staging 超时抢占活跃持有者。目录已移动但事务未提交的，按最终 manifest 与冻结说明重新校验、同步后补完事务或置为 failed；未完成 staging 明确失败，原记录和文件保留，不自动重跑。恢复不重写已移动内容；孤儿 staging 只报告并保留。提交后 head 未同步的结果须显式核验提交链，不当作已确认成功。具体实现见 14.5.1；未发布 build 对查询不可见。
 
 快照冻结采用同样模式：全部表现形式的对象写入并校验后，单个事务把 `collecting` 置为 `frozen`。查询只读 `frozen` 快照与 `published` build，并在整个运行中固定 `asset_ref`；新 build 发布不影响进行中的查询。
 
@@ -1960,6 +1962,57 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 `find_assets`、`get_asset_schema`、实际读取工具共用此规则；每次操作记录 `availability`（观察时刻、后端版本、hash 与状态）。重建不修改冻结说明、原文或旧交付。说明读取后索引再失效，实际读取须返回明确错误，不沿用旧状态、不静默改版本；索引全部失效也不阻断不依赖索引的原文读取。
 
 **版本呈现规则：**系统中不存在隐式的“默认版本”。`find_assets` 对每个（资产、快照、表现形式）返回最新的 published build，同时给出 `other_builds` 计数与修订关系；更早的 build 需显式引用。是否选用修订快照由 Data Agent 依据请求判断，结果包记录实际选择。
+
+#### 14.5.1 第二批实施契约（2026-10-14，实现前固定）
+
+本节细化第二批指令授权的最小目录、冻结、发布和恢复，不改变第一批 ObjectRef/InputManifest。验收目标为用户任务中的十项条件及 A–I 反例；契约在实现前固定，现已完成本地合成数据的限定验收（14.12.10）。真实处理器、检索工具、业务内容充分性及 Agent 联调不在本批。
+
+**复用与文件范围：**复用第一批 ContentStore 的原件校验与确定性清单；旧 `research_data/query_catalog.py` 绑定旧 scoped port 和快照字段，不能直接替代统一目录。旧 `agents/archive/research_archive.py` 的 flock、`agents/runtime/run_budget.py` 的显式事务提供机制参考，但不导入其业务层或费用账本；使用标准库 sqlite3/fcntl 完成局部实现。新增 contracts/common.py、contracts/assets.py、catalog/database.py、catalog/repository.py、catalog/migrations/0001_catalog.sql、content/publication.py、content/recovery.py 及必要 tests/fixture。repository 先承接本批窄接口，后续职责增长才按 14.1 分开 entities/assets/revisions，避免现在建立空壳。SQL 必须随普通 wheel 打包，pyproject 只增 package-data，无依赖升级。
+
+**身份、时间与显式登记（T2/T4/T5 的本批部分）：**
+
+- 程序生成类型前缀 + ULID（48 位毫秒时间、80 位随机数；同毫秒内不承诺排序），业务输入不能指定任意内部 ID。引用验证类型与格式。主对象引用继续用完整 ObjectRef，不只存 hash 丢失长度。
+- `Catalog.initialize(data_root)` 使用显式已有绝对根，允许其已有第一批 objects；已有目录用 `Catalog.open(data_root)`，不隐式初始化或覆盖。根校验沿用 ContentStore；所有目录控制文件禁止内部符号链接。
+- `start_run(request_key, purpose, kind, parent_run_id=None)` 显式登记本地 build/read 任务，记录 run_id/parent_run_id/root_run_id、系统 UTC、状态；同 key 同请求复用，内容不一致报 IDEMPOTENCY_CONFLICT。继续任务显式指定 parent 并继承根身份；build 重试必须属于同一根任务，每次尝试有独立 job_id，保留 retry_of_build_id。恢复把有中断失败工作的运行标为 failed 并保留原因，成功恢复文件不自动证明整个 run 已完成；完成由调用者显式 finish，仍有 collecting/staging 时拒绝终结。不给模型调用创建账本或恢复协议。
+- `register_policy`、`register_material_type`、`register_source`、`register_company`、`register_alias`、`register_security`、`register_asset` 为显式接口；不自带样本公司、年份、网址或默认策略。策略只存调用者提供的版本化引用/说明，不在本批实施网络允许规则。材料类型未登记即拒绝。调用者提供身份依据（种类/值/说明）才可确认；无依据只可 pending。仅登记依据，不宣称本地调用验证了真实权威来源。
+- natural_key 按既有设计唯一；同 key、不同身份请求报冲突而非合并，调用者需明确版本更新或独立 amends 关系。别名检索返回候选；多个候选报 AMBIGUOUS_ENTITY，pending 不用于 confirmed 硬匹配。证券按交易所、代码及显式有效日期解析，重叠/未知区间冲突拒绝；未知边界不能在历史查询中充当无限有效，返回 UNRESOLVED_TIME。别名可返回未知时效或未核验的候选，但通过别名作确定身份解析时，须有明确有效区间和已确认依据，不能自动把候选升级为确定匹配。
+- `TemporalValue` 保留值、精度、保守 UTC 区间；发布时间/可得时间未知时保存明确原因，获取时间单列。快照保存本次来源记录及日期依据；不把下载时刻填成历史可得时间。FiscalPeriod 保存显式边界和依据；未提供即未知，不根据公司名或 FY 标签补算。
+
+**历史修订与目录视图（T1/T3）：**
+
+- 元数据修订采用追加行（value/status/reason/evidence/run/适用范围/被替代修订）。初版只开放本批使用的公司名称、资产标题/状态等明确字段；不提供可写任意 SQL 列的通用更新器。candidate/conflict 不改变当前值；current 必须显式指出被替代版本，防止并发旧值覆盖。旧证据不删除。
+- 公司—资产关系绑定到 collecting 快照，保存 role、basis、status、evidence；冻结时成为该快照不可变清单的一部分。S2 的新增关系不改变 S1；冻结后纠错需新快照，旧快照及修订关系保留。资产之间 amends/supplements 关系单独登记，不把修订申报当完整替换。
+- `CatalogView{catalog_id, revision, token}` 绑定目录视图，每次成功改变持久目录状态的事务推进 revision；完全幂等读取不推进。指定旧 view 的读取在 revision/token 不符时返回 CURSOR_EXPIRED，首期不提供跨调用历史视图重放或完整分页接口。显式 AssetRef 不依赖最新 view，仍读冻结旧版本。
+
+**一致性与持久化（T8）：**
+
+- 单机本地 POSIX，与第一批文件系统要求一致。一个 Catalog 上下文持有 `.catalog.lock` 的排他非阻塞 flock，直到关闭；其他进程或第二实例打开返回 CATALOG_BUSY，不用时间阈值夺锁。不支持跨进程共享连接或并发目录读句柄；这是首期明确边界，原件只读仍可单独使用 ContentStore。OS 释放锁后才能执行恢复，活跃任务不会仅因等待超时被判断死亡。
+- SQLite 使用 WAL、foreign_keys=ON、synchronous=FULL、显式 BEGIN IMMEDIATE。迁移文件按包内固定版本列表应用，schema_migrations 保存每份 hash；未知版本、历史 hash 改写或外键/完整性异常拒绝打开。初始化在独立临时数据库完成并同步后无覆盖落为 catalog.sqlite；失败残留不可当作初始化成功。
+- `catalog-head.json` 保存 catalog_id/revision/随机 commit token，SQLite 保存追加提交记录。事务先提交数据库，再原子更新并同步 head；返回成功以前两者须一致。正常打开要求一致；head 落后且能在数据库提交链证明时，显式 recover 才可向前补写。head 比数据库新、同 revision token 不同或 catalog_id 不同均报 CATALOG_INCONSISTENT，不以旧库覆盖新文件。
+- 打开/恢复核对已冻结快照和已发布 build 的文件清单、hash 与引用；多出不属于目录记录的权威 snapshot/build 目录也报不一致。未登记 staging 只报告 orphan，不自动删除。目录与文件同步失败保留原错误和未确认结果，不盲重做事务。
+- 一致备份边界：关闭所有 Catalog 句柄、完成 WAL checkpoint 后，在停写状态复制完整 data_root（数据库、head、objects、assets、失败 staging 和必要记录）；恢复到新的显式根，再全量复验后使用。数据库单独回退不受支持且须检测；本批不新增自动备份服务。锁文件不代表活跃状态，始终以真实 flock 为准。
+
+**冻结与 build 状态：**
+
+- collecting 快照登记 asset/source/source-record、来源时间及原因、表现形式（format + InputManifest ObjectRef）、关联、前序快照及修订依据。冻结前重新读回每份输入，至少一个表现形式；有 missing 资源不得声明 complete，未知保持 unknown。快照清单包含冻结的材料/来源/关系及时间，不从当前元数据动态重组旧版本。
+- freeze_snapshot 先持久化确定的候选清单身份，再写独立快照暂存目录；校验后无覆盖移动至 assets/<asset>/snapshots/<snapshot>，最后事务置 frozen。任何中断都保持 collecting/frozen/failed 的可辨状态；明确失败保留失败码与文件，不能追加冻结内容。
+- begin_build 按 14.4 的八项身份字段计算有版本的规范 build_key；published 返回既有结果，staging 返回已有任务，failed 只允许显式 retry_of 指向同 key 的失败尝试。数据库部分唯一约束保护 staging/published。配方的 config_sha256 指向显式规范配置内容，其覆盖范围/模型提示版本由调用者声明，本批不执行处理器。
+- 发布协议使用 staging/<job_id> → assets/<asset>/builds/<build> → SQLite published；发布前把候选最终 manifest 和 readiness 固定到 staging 目录记录，再最终复验、移动、事务提交。发布后的数据与输入引用不可修改。跨快照永不复用带旧 AssetRef 的 build。
+
+**本批发布产物契约与真实校验：**
+
+本批实现能被独立校验的最小文档发布格式 `uteki-build-v1`，不把 fixture 通过扩大成真实解析器通过。BuildManifest 必须绑定完整 AssetRef、InputManifest ObjectRef、BuildRecipe 和有序文件表（安全相对路径、ObjectRef），文件集合精确匹配，不接受多余/缺失或符号链接。manifest.json 自身不进入自引用 hash。
+
+- 必需 `sections.jsonl`、`blocks.jsonl`、`quality.json`、`asset-schema.json`。sections 行显式 id/title/parent_id；blocks 行显式 id/section_id/text/原件字节区间 locator/dependency_ids。JSON/JSONL 产物拒绝重复对象 key 与非有限常量。唯一 ID、目录无环、块章节归属、块依赖存在且无环、locator 绑定当前表现形式的 main 或 present 资源且区间有效，都必须检查实际文件内容，不能仅相信调用者的“校验通过”。无章节可为空；有块时归属可明确为 null，不能伪造目录。
+- byte-range locator 只服务本批产物存储/引用闭包，不替代 14.2 的 HTML DOM/PDF/表格/记录业务 Locator；后续解析批次须扩充相应类型并验收。可发布只有原件及明确未处理缺口的 build，但不能声称已有文本/目录内容。表格、图片理解、结构化查询和检索未实现，相关能力不得为 ready。
+- quality 显式保留 issues/coverage；schema 绑定 AssetRef，声明 content_readiness/published_readiness/gaps，发布前核对所声明文本/目录能力与实际块/章节，原件能力与输入闭包对应，其他能力为 not_ready。完整来源/时间/材料身份来自冻结快照，不能使用未来目录修订覆盖它。readiness 不证明语义正确或整份材料充分；派生索引本批不构建。
+- `read_published(AssetRef)` 与 `read_artifact(AssetRef,path)` 只接受 frozen + published 的精确组合，并复验冻结文件和输入，不回退最新。`list_published(view=...)` 提供不带搜索/分页的最小目录视图：仅 frozen+published、排除 retired 材料，按每个资产/快照/表现形式返回最新 published build 与 other_builds 数量；旧 AssetRef 仍可读。管理接口 `get_asset`/`get_build`/`get_snapshot` 可返回未发布状态，类型和用途与可用内容读取分开。
+
+**恢复与错误：**显式恢复只在成功取得全目录锁后执行。已移动候选有完整、与数据库候选一致的 manifest/输入/说明时补完冻结/发布事务；已移动但校验失败置 failed 并保留原件；未完成 staging 置 INTERRUPTED 失败，不执行处理器或自动新建尝试。已成功 frozen/published 的损坏是 CATALOG_INCONSISTENT，不能伪装成待恢复或修改旧状态。恢复提交前重新同步最终目录、父目录和 staging 父目录；此前同步失败不能因为文件已经移动而跳过。重复恢复不重复发布/增建。操作错误使用 CatalogError.code：INVALID_ARGUMENT、NOT_FOUND、INVALID_STATE、IDENTITY_CONFLICT、AMBIGUOUS_ENTITY、IDEMPOTENCY_CONFLICT、CATALOG_BUSY、MIGRATION_MISMATCH、CATALOG_INCONSISTENT、RECOVERY_REQUIRED、CURSOR_EXPIRED、UNRESOLVED_TIME、PUBLICATION_INVALID、STORAGE_IO_ERROR；原件错误仍保留第一批 code/cause。数据库约束与系统 I/O 失败归类并保留 cause，不用吞异常返回空集合。
+
+**实现前固定验收：**用户 A–I 正常/失败案例逐项映射测试；额外覆盖 pending/别名歧义、证券重叠、未知时间、候选修订不覆盖当前值、视图过期、迁移事务失败、快照冻结中断、提交后 head 未同步、旧数据库单独回退、包内 SQL 安装。真实子进程验证 flock 和进程退出，普通异常测试验证 fsync/移动/事务失败；第一批原例按影响回归，包安装与源码/hash 一致。明确未验证网络文件系统/断电/恶意并发路径替换，不扩张为完整 M1 或业务验收通过。
+
+机制依据：[ULID 规范](https://github.com/ulid/spec)、[Python sqlite3 事务控制](https://docs.python.org/3.13/library/sqlite3.html#transaction-control-via-the-isolation-level-attribute)、[SQLite 原子提交](https://www.sqlite.org/atomiccommit.html)。它们说明底层机制，不替代本项目故障与业务验收。
 
 ### 14.6 资产建设管线
 
@@ -2088,14 +2141,14 @@ SQLite 中 build 的 `published` 状态是唯一的可见性开关（A3）。
 
 #### 14.12.1 现在能否开始代码
 
-**判断：M0 离线部分已实现；M1 原件存储切片已完成限定验收，不依赖充值或全部 SDK 实跑。** 完整目录/发布、付费调用及旧入口切换仍各有准入条件。业务目标、首期来源、核心重建边界、两套 SDK/统一网关与共同交付要求已确认，无须重新 review 整套架构。剩余问题按实际依赖收敛，不能以局部实现代替生产能力完成。
+**判断：M0 离线部分已实现；M1 原件存储及第二批最小目录/发布切片已完成限定验收，不依赖充值或全部 SDK 实跑。** 首条真实材料链、付费调用及旧入口切换仍各有准入条件。业务目标、首期来源、核心重建边界、两套 SDK/统一网关与共同交付要求已确认，无须重新 review 整套架构。剩余问题按实际依赖收敛，不能以局部实现代替生产能力完成。
 
 | 要开始的工作 | 当前证据与判断 | 仍需满足的开工/执行条件 |
 |---|---|---|
 | M0 离线验证代码 | **限定范围已通过**：原生装配及本地探针证据见 14.12.5、14.17.7 | 新模型仍须独立 profile 与参数检查；离线结果不代替真实协议/工具循环 |
 | M0 经 OpenRouter 实跑 | **未就绪**：只有文档路径和静态分析，没有本项目实跑证据 | 固定两侧 SDK/CLI、共同模型及实际路由、超时/重试/调用与费用上限；离线边界通过且本次模型额度明确后才调用 |
 | M1 原件存储切片 | **限定范围已通过**：字节存储、清单、损坏/中断及安装隔离证据见 14.12.9 | 只覆盖 14.3.1 的本地 POSIX 契约；不把该切片称为完整快照发布或 M1 通过 |
-| M1 完整目录/发布 | **仍有前置缺口**：T1/T2/T3/T8 及 T4/T5 的持久化部分 | 在各相关模块实现前固定主体/历史版本、登记、分页视图、写入恢复与运行身份；不再把与模块无关的 M0 付费状态作为统一阻塞 |
+| M1 最小目录/发布切片 | **限定范围已通过**：T1/T2/T3/T8 及本批运行身份已落实，证据见 14.12.10 | 全局排他打开、本地 POSIX、固定四文件合成发布格式；完整查询/运行协议和真实解析产物另行验收，不等于完整 M1 |
 | M2–M5 的业务验收、比较与迁移 | **尚未到准入阶段**：缺少前期实现与真实材料结果 | 按下表前置条件逐步进入；不因设计完整、fixture 通过或某一模型答对就提前放行 |
 
 M0 结论若显示某 SDK 的必需能力无法满足共同业务契约，应修订对应接入方案并报告证据，不继续大规模建设后才处理；也不能静默删除用户要求的某套实现。后期 PDF/检索最优选型、完整记忆策略、所有公司覆盖，不阻塞最小 M0 代码。
@@ -2280,7 +2333,50 @@ with TemporaryDirectory() as directory:
 
 **差异与限制：**相对任务开始前五个草稿，仅两个实现文件有机制修改；新增三个测试/夹具文件。关联文档修改用于保持安装方式、唯一入口和验收状态一致；未改旧存储、生产入口、依赖或既有记录。[最终检查记录](../output/data-agent-content-20261014/review-final.json) 核对了测试后源码未变、草稿差异、锁版本、文档链接和上述示例；限定文件的 `git diff --check` 通过。当前验证为 macOS arm64、CPython 3.13.15、uv 0.12.15、Pydantic 2.13.5。其他平台/Python 版本、真实断电、网络文件系统、恶意并发目录替换、完整历史回归均未运行；本地进程中断测试不证明这些性质。目录/快照发布、真实模型和业务效果未实施或验收，不计作通过。
 
-**下一批提案与准入（尚未启动）：**目标为“完成最小元数据目录、快照冻结与 build 发布/恢复：显式登记主体及材料，发布前不可查询，失败或中断不产生半发布，新版本不改变旧引用，重开后状态可核验”。范围按批次 2 限于 contracts/common/assets、catalog 及 content/publication/recovery 的必要部分。开始实现相应模块前，先在本设计固定 T1 关联适用版本、T2 首次登记与歧义、T3 目录视图/游标、T8 写入归属与一致备份恢复，以及影响持久化的 T4/T5 字段；用合成 fixture 明确成功、回滚、中断、恢复和旧版本读回反例，确认本批 ObjectRef/InputManifest 被引用而非重新定义。业务含义发生变化才交用户决定，普通事务/迁移实现由 Codex 选择。进入该批需新的批次指令，不自动开始；M0 真实实跑在 Agent 联调前补齐，不阻塞这批确定性存储工作。
+**第一批交付时的下一批提案与准入（后续已按第二批指令完成，见 14.12.10）：**目标为“完成最小元数据目录、快照冻结与 build 发布/恢复：显式登记主体及材料，发布前不可查询，失败或中断不产生半发布，新版本不改变旧引用，重开后状态可核验”。范围按批次 2 限于 contracts/common/assets、catalog 及 content/publication/recovery 的必要部分。开始实现相应模块前，先在本设计固定 T1 关联适用版本、T2 首次登记与歧义、T3 目录视图/游标、T8 写入归属与一致备份恢复，以及影响持久化的 T4/T5 字段；用合成 fixture 明确成功、回滚、中断、恢复和旧版本读回反例，确认本批 ObjectRef/InputManifest 被引用而非重新定义。业务含义发生变化才交用户决定，普通事务/迁移实现由 Codex 选择。进入该批需新的批次指令，不自动开始；M0 真实实跑在 Agent 联调前补齐，不阻塞这批确定性存储工作。
+
+#### 14.12.10 最小目录、快照冻结与发布恢复：第二批验收（2026-10-14）
+
+**结论：第二批十项条件在声明环境内通过，本批停止。** 先固定 14.5.1，再实现和修正；32 项单测、4 项独立进程集成测试通过，第一批 21 项单测与 4 项进程测试回归通过，共 61 项（进程测试内部另含多个中断位置）。没有真实材料获取、模型调用、生产读写、提交或部署。测试通过只证明本批存储/发布行为，不是完整 M1、真实解析或业务效果验收。
+
+**实现与复用：**新增 `contracts/common.py`、`contracts/assets.py`、`catalog/{__init__,database,repository}.py`、`catalog/migrations/0001_catalog.sql`、`content/{publication,recovery}.py`，以及三份测试/fixture；第一批五个包文件与三份测试/fixture hash 保持不变。复用 ContentStore 的对象、清单、错误和目录同步机制；旧 query_catalog 依赖旧 scoped port/快照字段，不直接搬入新目录。SQLite/flock 采用标准库，未引入 Agent 框架或第二套账本。`pyproject.toml` 相对本批基线只增加 SQL package-data；`uv.lock`、`requirements/m0.in`、`requirements/m0.txt` 均未改。
+
+**验收对照：**单测指 [test_catalog.py](../tests/unit/data_platform/test_catalog.py)，进程测试指 [test_catalog_processes.py](../tests/integration/data_platform/test_catalog_processes.py)。下表测试均实际执行；证据汇总含命令、安装内容、源码/测试/log hash 和案例映射：[verification-final.json](../output/data-agent-catalog-20261014/verification-final.json)。
+
+| 条件 | 结论与可观察行为 | 关键证据（测试名片段） |
+|---|---|---|
+| 1 显式根与可靠初始化 | 通过；沿用第一批显式已有绝对根校验，initialize/open 分开，缺库不隐式初始化；初始化 head 未确认须显式恢复，坏提交链拒绝 | `explicit_initialization`、`initialization_head_failure`、第一批根路径回归 |
+| 2 迁移与约束 | 通过；包内 SQL hash/版本检查，真实 FK/状态/有效 build 唯一约束；坏迁移不生成权威库，原残留保留 | `migration_failure`、`changed_migration_history`、`schema_foreign_key_status_and_build_uniqueness`；安装 13 个源码/SQL 文件逐一核对 |
+| 3 登记与业务身份 | 通过；pending/歧义/未知证券时效不硬匹配；请求冲突报错；两公司同字节分别发布，修订与 amends 保留 | `idempotency_pending_identity`、`unregistered_material`、`unknown_security_dates`、`metadata_candidates_history`、`amendment` |
+| 4 输入冻结 | 通过；重新检查实际对象和完整清单；已登记对象缺失/损坏明确 failed，不能混作声明 missing；冻结不可追加；新附图生成新版本 | `freeze_rechecks_registered_resource_bytes`、`complete_claim_with_missing_resource`、`snapshot_relations`、`old_reference_and_artifacts` |
+| 5 build 身份/重试 | 通过；八字段规范 key；有效尝试唯一，published/staging 幂等，failed 显式同 key 且同根任务重试，不覆盖失败记录 | `build_staging_published_and_failed_reuse_rules`、`retry_run_inherits_root`、双身份/新附图案例 |
+| 6 发布复验 | 通过；实际四文件/manifest/hash、引用图与 locator/readiness 校验；坏引用、越界、环、重复 JSON key 和虚假能力拒绝 | `missing_or_corrupt_staged_file`、`actual_content_references_and_readiness`、`ambiguous_json_keys` |
+| 7 唯一可见性 | 通过；公共 list/read 只提供 frozen+published；已移动且数据库回滚的 build 不可见；退休隐藏但显式旧引用仍读回 | `directory_visibility_latest_build`、`publication_transaction_rollback`、进程 `build_move_and_commit_interruptions` |
+| 8 中断/恢复/并发 | 通过；快照移动前后、build 移动前后/提交后退出；head 未确认报 RECOVERY_REQUIRED；重新同步、有效候选恢复/坏候选失败；锁保护活跃持有者 | 两组进程中断测试、`live_owner_cannot_be_stolen`、`recovery_must_retry_failed_destination_directory_sync`、`moved_but_corrupt_candidate`、`commit_head_failure` |
+| 9 历史与视图 | 通过；重开后旧 build/原附图读回；S2 关系不倒灌 S1；旧视图明确 CURSOR_EXPIRED；停写整根复制可恢复，数据库单独回退拒绝 | `old_reference_and_artifacts`、`snapshot_relations`、`view_expires`、`complete_quiescent_copy`、`published_corruption_and_database_only_restore` |
+| 10 安装与回归 | 通过；全新 data-only 环境普通安装，再强制重装当前项目；仓库外 `-I` 运行，导入来自该环境 site-packages；SQL 已打包，锁检查/依赖检查通过 | `install-1.log`、`reinstall-3.log`、`installed-3.json`、下述四份最终测试日志；9 个安装包，无 Agent SDK |
+
+**A–I 案例映射：**A 对应进程 `normal_example_reopens_two_distinct_versions` 和合成示例；B 对应 `unregistered_material_and_identity_conflicts_do_not_merge`（含两份已发布引用）；C 对应 `old_reference_and_artifacts_survive_new_attachment_version`（沿旧/新引用分别读回原附图）；D 对应 `snapshot_relations_do_not_flow_back_into_old_versions`；E 对应 build reuse/retry 两项；F 对应缺文件/损坏/真实引用/readiness 校验；G 对应真实子进程 `build_after_move` 及事务回滚测试；H 对应活跃进程持锁测试；I 对应迁移 hash、坏提交链、旧库回退、未知权威目录及已发布损坏测试。
+
+**原失败与机制修正：**
+
+- 未知证券/别名有效期曾被 SQL 的 NULL 宽条件当作历史确定匹配。保留候选检索，但确定解析增加已知有效区间和已确认依据检查；[原失败](../output/data-agent-catalog-20261014/unknown-time-before.log)在最终单测回归通过。
+- 目录已移动后首次 fsync 失败，原恢复路径只复验文件便提交，遗漏重做持久化同步。恢复和正常提交统一重新同步最终目录及父目录；持续注入同一故障时恢复仍失败，移除故障后才成功。[原失败](../output/data-agent-catalog-20261014/recovery-sync-before.log)保留。
+- 默认 JSON 解码会接受重复 key 并覆盖先值，导致非法内容可进入已发布产物。产物解码先拒绝重复 key/非有限常量，再做严格 schema 与引用校验。[原失败](../output/data-agent-catalog-20261014/ambiguous-json-before.log)保留。
+- 最后补验 SQLite 真正回滚、初始化 head 不确定、整根复制和已移动候选损坏；SQL sidecar 在连接前拒绝符号链接。测试中 SQLite context manager 不负责 close 引起的 ResourceWarning 已通过显式 closing 修正，旧日志保留；最终单测启用 `-W error::ResourceWarning`，无该告警。
+
+**本次验证证据与运行入口：**
+
+- 当前源码与普通安装包共 13 个 Python/SQL 文件 hash 一致，路径/解释器/依赖版本见 [installed-3.json](../output/data-agent-catalog-20261014/installed-3.json)；Git HEAD 仅作基线，实际工作区内容以 verification 中逐文件 SHA-256 为准，未提交。
+- [unit-final.log](../output/data-agent-catalog-20261014/unit-final.log)：32 项；[integration-3.log](../output/data-agent-catalog-20261014/integration-3.log)：4 项。集成运行后仅补改单测及文档，受测包/进程 fixture hash 未变，没有为凑“final”重跑无变化检查。
+- 第一批 [content-unit-final.log](../output/data-agent-catalog-20261014/content-unit-final.log)：21 项；[content-integration-final.log](../output/data-agent-catalog-20261014/content-integration-final.log)：4 项。最终日志均无失败、跳过；历史失败日志仍保留，不能与最终通过混为一轮。
+- 可复制安装/hash/测试/示例命令见 [LOCAL_DEVELOPMENT.md](LOCAL_DEVELOPMENT.md) 的“目录、快照与发布的独立验收”。本次测试工作目录为仓库外临时目录，解释器均带 `-I`；未改 sys.path/PYTHONPATH。包重装命令使用 `--reinstall-package uteki-eval --no-deps .`，不重新解析依赖。
+- 可运行示例：[catalog_worker.py](../tests/fixtures/data_platform/catalog_worker.py)，`example <显式已有绝对临时根>`。它登记一份合成材料，发布附图更新前后两版，关闭重开后读取两版；输出 [example-final.json](../output/data-agent-catalog-20261014/example-final.json)，明确 `business_verified=false`。测试中的公司、日期和内容只在 fixture 内，不是产品默认值。
+- 相对任务前逐文件副本的差异检查、锁/第一批文件不变、SQL 安装和测试后源码不变见 [review-final.json](../output/data-agent-catalog-20261014/review-final.json)。未清理、还原或提交其他工作区改动。
+
+**已验证边界与未运行检查：**macOS arm64、CPython 3.13.15、uv 0.12.15、Pydantic 2.13.5，本地 POSIX。未验证其他 OS/Python 版本、真实断电、网络文件系统、恶意并发目录替换或完整历史业务回归；本批没有重新运行 M0 SDK 场景，不记作通过。Catalog 首期全生命周期独占，同根另一读/写 Catalog 句柄返回 BUSY；不支持分布式或并行目录读。确认依据由调用者提供，不证明真实权威身份；ready 只核验本批结构与声明一致性，不证明语义正确/完整。字节 locator、四文件 `uteki-build-v1` 和原件读取不能替代 HTML/PDF/表格/记录业务证据能力。失败/staging 残留保留，不自动清理；整根备份须关闭句柄并停写，不支持仅恢复数据库。0001 已随本批交付冻结；此前未验收的本地实验库如 hash 不同会被拒绝，不静默迁移或销毁。
+
+**下一批提案（未启动）：**完成一条已明确来源与范围的官方 HTML/iXBRL 材料链：复用既有受限获取入口→保存原件与附属资源→冻结→从冻结字节解析章节/文本和本批明确的表格或数字→生成真实 locator/说明→通过发布校验→沿显式引用读回。开始前固定来源/材料范围、处理能力、业务 locator 与格式版本兼容方式、独立验收点及阈值；若使用 SEC，继续既有 acquire/prepare_sources/resolve_sec_contact 入口。完成条件是原文/数值、期间/单位、出处与缺失分支可独立核验，新旧引用稳定；PDF/OCR、模型调用、六工具全集及 Agent 联调不自动带入。需要新的批次指令；T4 跨材料计算/记录选择、T5 模型恢复/费用、T6 致命错误/取消与完整分页仍保留后续准入。
 
 ### 14.13 各功能维度的运行流程与接口
 
@@ -2552,6 +2648,8 @@ sequenceDiagram
 #### 14.16.2 需要补齐的技术契约
 
 这些是当前文档未明确的执行规则，不直接证明旧代码存在对应故障。除涉及上表业务取舍外，由实施方写出一致规则与最小反例，不逐项索要技术实现偏好。
+
+**2026-10-14 落实说明：**下表保留最初缺口及解决时点；第二批已按 14.5.1 落实 T1 快照关系、T2 最小显式登记、T3 revision/token 变化后明确过期、T8 单机独占与一致恢复，以及 T5 本地 run/root/job 身份，验收见 14.12.10。T4 仅固定当前 AssetRef/输入版本边界，未实现记录选择或跨资产计算；T5 模型调用恢复/未知费用、T3 完整分页等仍未实现，不能据局部验收关闭整项后续契约。
 
 | 编号 | 现有定义与缺口 | 可区分问题的反例 / 需补内容 | 解决时点 |
 |---|---|---|---|
