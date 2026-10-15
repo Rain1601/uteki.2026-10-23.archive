@@ -1,6 +1,6 @@
 # 本地开发与资料恢复 / Local development and data recovery
 
-2026-10-08换机请先按 [当前交接说明](MACHINE_HANDOFF.zh-CN.md) 执行。它补充最新依赖、私密状态迁移和任务断点；下文保留历史恢复边界。
+当前 Python 环境安装以本页“从新检出仓库开始”和“M0 独立验证环境”为准。2026-10-08 的 [交接说明](MACHINE_HANDOFF.zh-CN.md) 保留历史私密状态迁移与资料恢复边界，不作为当前依赖安装入口。
 
 ## 当前交付状态
 
@@ -10,16 +10,43 @@
 
 ## 从新检出仓库开始
 
-要求 Python 3.11+、Node.js 20+，运行环境为 macOS 或 Linux。归档存储使用 POSIX 文件锁。
+项目声明 Python 3.11+；本轮环境复现使用 Python 3.13。Node.js 20+ 仅在使用对应前端/开发规范工具时需要，Python 安装与 M0 探针不需要 Node。归档存储使用 POSIX 文件锁。
+
+两套环境安装同一个 Uteki Python 包，但依赖锁分别管理：
+
+| 环境 | 依赖声明 | 安装依据与边界 |
+|---|---|---|
+| 主开发环境 | 根 `pyproject.toml`，按需选择 analysis/data/mcp extras | 根 `uv.lock`；Data Agent 开发基线选这三个 extras，不包含 Claude M0 验证依赖 |
+| M0 SDK 验证环境 | 根 `pyproject.toml` 的基础依赖 + `requirements/m0.in` | `requirements/m0.txt` 的 40 个固定版本，Python 3.13；独立环境保留已验证 SDK 组合，不与主锁混用 |
+
+不提供 `m0` extra：该声明已迁到 `requirements/m0.in`，避免主项目元数据声明了一套未进入主锁的独立环境。两个锁允许共同包版本不同；升级须针对对应环境重新验证，不靠合并锁或整体升级消除差异。以下命令均从仓库根运行；首次安装依赖/构建工具可能联网，不请求模型、不需要 API 密钥。
 
 ```bash
-uv sync --locked --extra analysis --extra data
+uv sync --locked --python 3.13 --extra analysis --extra data --extra mcp
+uv pip check --python .venv/bin/python
+.venv/bin/python -I -c "import uteki, uteki_eval, agents, duckdb, pydantic, lxml.etree, mcp"
+```
+
+`uv sync` 默认把项目安装为 editable，适合日常改代码；依赖仍按锁安装，锁与声明不一致时 `--locked` 会报错。环境验收应使用全新目录和普通安装，不能只依赖已有 `.venv`：
+
+```bash
+uteki_env_root="$(mktemp -d "${TMPDIR:-/tmp}/uteki-env.XXXXXX")"
+UV_PROJECT_ENVIRONMENT="$uteki_env_root/main" uv sync --locked --python 3.13 --extra analysis --extra data --extra mcp --no-editable
+uv pip check --python "$uteki_env_root/main/bin/python"
+"$uteki_env_root/main/bin/python" -I -c "import uteki, uteki_eval, agents, duckdb, pydantic, lxml.etree, mcp; print(uteki.__file__)"
+```
+
+导入位置应在该新环境的 `site-packages`，不能指向仓库 `src/` 或旧虚拟环境；`-I` 排除环境变量、用户 site 和当前目录对 Python 导入的影响。保留实际 Python/平台、安装日志、包版本和未运行检查，不能把一台机器通过表述为所有平台已验证。安装数据依赖不等于存储草稿或业务功能通过验收。
+
+现有离线检查可按需要运行，覆盖范围见 [OFFLINE_TESTS.md](OFFLINE_TESTS.md)：
+
+```bash
 .venv/bin/python scripts/run_offline_checks.py
 .venv/bin/python scripts/smoke_research_workflow.py
 .venv/bin/python scripts/check_workspace.py
 ```
 
-依赖安装可能联网；后三个命令不请求模型、不下载资料、不需要 API 密钥。测试和流程演练只向临时目录写审核状态。`analysis` 扩展用于离线假模型及报告契约测试；`data` 扩展提供 DuckDB/Pydantic，供新查询和数据库明细页面使用。
+上述检查不请求模型、不下载资料、不需要 API 密钥。测试和流程演练只向临时目录写审核状态。`analysis` 扩展用于离线假模型及报告契约测试；`data` 扩展提供 DuckDB/Pydantic，`mcp` 提供 MCP 入口依赖。
 
 `check_workspace.py` 在资料缺失时返回 **2**，同时列出必需文件和可选功能缺口；以实际输出为准，不预设新检出一定失败。可用 `--json` 获取结构化清单，或 `--root /path/to/recovered-checkout` 只读检查另一份候选工作区。检查会核对研究发布清单里的文件指纹、材料索引指纹和原文整体指纹；它不替代真实页面验收。
 
@@ -33,6 +60,62 @@ PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 
 打开 `http://127.0.0.1:8765/agent-results`。后台主导航只有“运行结果”和“运行过程”。根地址 `/`、`/companies` 和未选择材料的 `/data-workspace` 均以 HTTP 303 转到结果页。显式数据产物、原文、公司报告审核继续作为明细工具保留。启动会先检查必需输入；缺失或损坏时在绑定端口、迁移或初始化审核库之前退出。`--check` 即使检查通过也不启动服务、不写审核状态。完整来源、索引和分析扩展的缺口会单独报告。
 
 完整本地回归的命令和覆盖边界见 [OFFLINE_TESTS.md](OFFLINE_TESTS.md)。`scripts/run_offline_checks.py --integration` 保留原测试失败与跳过结果，不会用占位资料补齐历史实验。
+
+## M0 独立验证环境（2026-10-14）
+
+选择尚不存在的环境路径，保留以前的运行结果。以下以 `output/m0-sdk/.venv` 为例；如已存在，显式更换路径，不覆盖旧环境或证据：
+
+```bash
+uv venv output/m0-sdk/.venv --python 3.13
+uv pip sync requirements/m0.txt --python output/m0-sdk/.venv/bin/python
+uv pip install --reinstall-package uteki-eval --no-deps . --python output/m0-sdk/.venv/bin/python
+uv pip check --python output/m0-sdk/.venv/bin/python
+output/m0-sdk/.venv/bin/python -I -c "import uteki, agents, openai, claude_agent_sdk, mcp; print(uteki.__file__)"
+output/m0-sdk/.venv/bin/python -I scripts/run_sdk_probe.py --python output/m0-sdk/.venv/bin/python --fixture config/sdk_probe/fixture.json --profiles config/sdk_probe --output output/m0-sdk/probe.json
+output/m0-sdk/.venv/bin/python -I -m unittest discover -s tests/unit -p test_sdk_probe.py -v
+```
+
+先同步锁定依赖，再以 `--no-deps` 普通安装当前项目，避免项目安装重新解析/升级已冻结依赖。源码修改后须用 `--reinstall-package uteki-eval` 强制重新构建并安装项目：本批曾观察到普通 sync 复用旧 wheel，安装成功本身不能证明测试的是当前源码。主环境使用普通安装验收时同样适用，替换 `--python` 为该环境解释器，并核对模块来源和文件 hash。`uv pip sync` 会移除未列在 requirements 中的包，因此每次重新同步后仍须重新安装 Uteki。不再用 `PYTHONPATH=src` 或入口脚本修改 `sys.path` 代替安装；独立 worker 使用 `-I` 从所选环境加载已安装包，父进程凭据/设置仍按原规则隔离。
+
+M0 入口只接受合成 fixture/profile，并在场景内禁止网络与子进程；此命令不运行真实模型或原生 Claude CLI 循环。安装验证、15 项已有离线测试、9 个 SDK 合成场景与业务验收分别报告。输出路径已存在时会失败，须选新路径保留旧结果。
+
+仅检查声明能否解析为现有 M0 锁、不升级版本时，可生成临时结果并比较包名/版本集合（不能覆盖原锁来消除差异）：
+
+```bash
+uv pip compile pyproject.toml requirements/m0.in --python-version 3.13 --constraint requirements/m0.txt --no-header --no-annotate --output-file output/m0-sdk/resolved-check.txt
+```
+
+有意升级 M0 时才重新生成 `requirements/m0.txt` 并复验；主锁仍由主项目维护。安装依赖的下载缓存可复用，旧虚拟环境的已安装包不能充当新环境验收结果。当前机制遵循 [uv 锁定与同步](https://docs.astral.sh/uv/concepts/projects/sync/) 及 [requirements 锁定流程](https://docs.astral.sh/uv/pip/compile/)。
+
+## 原件存储与输入清单的独立验收（2026-10-14）
+
+此切片只需要主锁的 `data` extra；不另设依赖锁，也不改变主开发环境与 M0 的关系。使用普通安装、独立进程和合成数据验证；这组检查使用以下专用入口，未加入依赖源码路径注入的旧离线 runner。以下命令从仓库根运行，临时环境与数据根均显式指定：
+
+```bash
+uteki_content_env="$(mktemp -d "${TMPDIR:-/tmp}/uteki-content-env.XXXXXX")"
+UV_PROJECT_ENVIRONMENT="$uteki_content_env/venv" uv sync --locked --python 3.13 --extra data --no-editable
+uv pip install --reinstall-package uteki-eval --no-deps . --python "$uteki_content_env/venv/bin/python"
+uv pip check --python "$uteki_content_env/venv/bin/python"
+"$uteki_content_env/venv/bin/python" -I - <<'PY'
+import hashlib
+import importlib
+from pathlib import Path
+import sys
+
+for name in ("uteki.data_platform.contracts.content", "uteki.data_platform.content.store"):
+    origin = Path(importlib.import_module(name).__file__).resolve()
+    source = Path("src").joinpath(*name.split(".")).with_suffix(".py")
+    assert origin.is_relative_to(Path(sys.prefix).resolve()), origin
+    assert hashlib.sha256(source.read_bytes()).digest() == hashlib.sha256(origin.read_bytes()).digest(), name
+    print(name, origin)
+PY
+"$uteki_content_env/venv/bin/python" -I -m unittest discover -s tests/unit/data_platform -p test_content.py -v
+"$uteki_content_env/venv/bin/python" -I -m unittest discover -s tests/integration/data_platform -p test_content_processes.py -v
+uteki_content_root="$(mktemp -d "${TMPDIR:-/tmp}/uteki-content-data.XXXXXX")"
+"$uteki_content_env/venv/bin/python" -I tests/fixtures/data_platform/store_worker.py example "$uteki_content_root"
+```
+
+示例写入合成 HTML、附图及一个明确缺失的附件，保存清单后重新打开存储并读回。完整契约、错误码、25 项测试的覆盖及未验证边界见核心设计 14.3.1、14.12.9；对象/清单可读不等于来源身份已核验或快照已发布。该切片要求支持硬链接和目录 fsync 的本地 POSIX 文件系统。
 
 ## Agent 执行监控（2026-10-06）
 
