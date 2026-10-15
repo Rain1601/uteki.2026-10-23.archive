@@ -1,0 +1,334 @@
+{
+  "schema_version": "uteki-gateway-function-contract-draft-v1",
+  "contract_id": "deepseek-openrouter-function-20261015-v1",
+  "status": "prepared_not_executable",
+  "execution_enabled": false,
+  "authorization": {
+    "inference_authorized": false,
+    "approved_limit_usd": null,
+    "proposed_root_limit_usd": "3.00",
+    "historical_sonnet_authorization_reused": false
+  },
+  "scope": "two real SDKs with shared DataService and synthetic materials; functional correctness, not financial/business quality",
+  "dependencies": {
+    "openai-agents": "0.22.2",
+    "openai": "3.13.0",
+    "claude-agent-sdk": "0.2.166",
+    "claude-code": "2.1.299"
+  },
+  "model": {
+    "gateway_id": "deepseek/deepseek-v4.1-flash",
+    "upstream_tag": "deepseek",
+    "upstream_name": "DeepSeek | deepseek/deepseek-v4.1-flash-20260910",
+    "allow_fallbacks": false,
+    "require_parameters": true,
+    "automatic_model_selection": false,
+    "reasoning_requested": false,
+    "claude_compatibility": "experimental_not_officially_guaranteed",
+    "alternate": "Existing Sonnet 4.6 / Anthropic draft retained separately; never an automatic fallback"
+  },
+  "profiles": [
+    {
+      "path": "config/data_platform/model-profiles/openai/deepseek-v4.1-flash/query.json",
+      "sha256": "65e54a97045414ea92e9fd36186030bd610cbc09d0bc548359061610049c6cb8",
+      "kernel": "openai",
+      "prompt": {
+        "path": "prompts/openai/deepseek-v4.1-flash/query.md",
+        "version": "gateway-function-draft-v1",
+        "sha256": "68a4144b8bbc904fc11659274e4cffa7d0cd728dd6fe7574e1030ef16199e25d"
+      },
+      "tuning_performed": false,
+      "live_verified": false
+    },
+    {
+      "path": "config/data_platform/model-profiles/claude/deepseek-v4.1-flash/query.json",
+      "sha256": "54a79a23e311de9e80f01fd639d7270f3c27d4cdbb834d4bba36109789afb96e",
+      "kernel": "claude",
+      "prompt": {
+        "path": "prompts/claude/deepseek-v4.1-flash/query.md",
+        "version": "gateway-function-draft-v1",
+        "sha256": "516f23017b0b43c74cad0b8a3fbe381a65fe59081594f7e909f9c67153c482e9"
+      },
+      "tuning_performed": false,
+      "live_verified": false
+    }
+  ],
+  "tools": {
+    "schema_source": "src/uteki/data_platform/agent/binding.py",
+    "source_sha256": "bd5d31aa24b599721636b7e1dc700306e1c17b5ef7e217f8fde5ec972e997713",
+    "business_tools": [
+      "find_assets",
+      "get_asset_schema",
+      "search_asset",
+      "read_evidence",
+      "query_records",
+      "request_asset_update"
+    ],
+    "controls": [
+      "deliver",
+      "clarify"
+    ],
+    "external_acquisition": false,
+    "native_tools": false
+  },
+  "fixture": {
+    "kind": "synthetic-only",
+    "preparation_source": "output/data-agent-gateway-20261015/prepare_fixture.py",
+    "preparation_sha256": "9ce1d6009f7cb91457c6f43fc2220034b5d5f3bd239726cb90379133d4f809d2",
+    "source_generator": "tests/fixtures/data_platform/html_fixture.py",
+    "source_generator_sha256": "014a66293b8f81dd5eefd9c051f8f442a238df8c278dcda2209664cb648cbaf1",
+    "scripted_responder_must_not_be_used_live": true,
+    "runtime_input": "normal question and immutable context; no expected values, scripted actions or gold in model-visible files",
+    "contract_file": "output/data-agent-gateway-20261015/fixture-preflight-2/fixture-contract.json",
+    "context_identity_rule": "new identity for each SDK/scenario; freeze actual IDs after creation and before dispatch; common batch budget is a separate host responsibility",
+    "freeze_before_inference": [
+      "input manifests",
+      "context fields",
+      "source policy",
+      "material recipe",
+      "tool schemas",
+      "actual prompts"
+    ],
+    "contract_sha256": "9d730b678ada04fa8affef05a197880de787efaf88d12b60b32922cbbafb1470"
+  },
+  "openai": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "model_class": "OpenAIChatCompletionsModel",
+    "protocol": "chat_completions",
+    "stream": false,
+    "client_max_retries": 0,
+    "runner_max_retries": 0,
+    "tracing_disabled": true,
+    "model_settings": {
+      "max_tokens": 4096,
+      "parallel_tool_calls": false,
+      "store": false,
+      "preserve_raw_usage": true,
+      "extra_body": {
+        "provider": {
+          "only": [
+            "deepseek"
+          ],
+          "order": [
+            "deepseek"
+          ],
+          "allow_fallbacks": false,
+          "require_parameters": true
+        },
+        "reasoning": {
+          "enabled": false
+        }
+      }
+    }
+  },
+  "claude": {
+    "base_url": "https://openrouter.ai/api",
+    "protocol": "anthropic_messages",
+    "native_model_id": "deepseek/deepseek-v4.1-flash",
+    "model_overrides": null,
+    "system_prompt_assembly": "explicit application string, not Claude Code preset append",
+    "thinking": {
+      "type": "disabled"
+    },
+    "effort": null,
+    "fallback_model": null,
+    "setting_sources": [],
+    "skills": [],
+    "plugins": [],
+    "tools": [],
+    "allowed_tools": [],
+    "strict_mcp_config": true,
+    "process_env": {
+      "ANTHROPIC_API_KEY": "",
+      "ANTHROPIC_AUTH_TOKEN": "reference:OPENROUTER_API_KEY",
+      "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+      "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "4096"
+    },
+    "upstream_enforcement": {
+      "method": "official task-key model/provider allowlist; no shared account preference changes",
+      "required_model": "deepseek/deepseek-v4.1-flash",
+      "required_provider": "deepseek",
+      "verified": false
+    },
+    "transport": "native HTTP/SSE, every physical request gated; no home-made Messages-to-Chat translation",
+    "native_cost_report": "estimate only, not OpenRouter settlement"
+  },
+  "execution": {
+    "order": [
+      "openai",
+      "claude"
+    ],
+    "concurrency": 1,
+    "cases_per_sdk": [
+      {
+        "id": "G01-normal",
+        "max_requests": 10,
+        "input": "For the registered synthetic company, compare the disclosed Cash movement for the fiscal years 2023-07-02 through 2024-06-29 and 2022-07-03 through 2023-07-01. Read the source and its unit/footnote context; use query_records to calculate the current-to-prior change rate. Deliver the two values, periods, units, calculation and evidence. Do not relabel Cash movement as operating cash flow.",
+        "expected": "validated delivery with original records, deterministic calculation and readable evidence; no financial quality claim"
+      },
+      {
+        "id": "G02-resume",
+        "max_requests": 10,
+        "input": "For the registered synthetic company, compare the disclosed Cash movement for the fiscal years 2023-07-02 through 2024-06-29 and 2022-07-03 through 2023-07-01. Read the source and its unit/footnote context; use query_records to calculate the current-to-prior change rate. Deliver the two values, periods, units, calculation and evidence. Do not relabel Cash movement as operating cash flow.",
+        "fault": "observed worker exit after the first complete native tool result; resume the same run",
+        "expected": "one original root and native identity; prior physical requests/effects not repeated; same evidence requirements"
+      },
+      {
+        "id": "G03-tool-error",
+        "max_requests": 4,
+        "input": "For the registered synthetic company and fiscal years specified in the context, read the metric named NonexistentMetric; report the source evidence or the exact gap. Do not substitute another metric.",
+        "fault": "one controlled, schema-valid tool error at the first find_assets invocation; preserve original error",
+        "expected": "no invented value or unsupported successful delivery; a valid gap, partial result or explicit failure is permitted"
+      },
+      {
+        "id": "G04-cancel",
+        "max_requests": 1,
+        "input": "For the registered synthetic company, compare the disclosed Cash movement for the fiscal years 2023-07-02 through 2024-06-29 and 2022-07-03 through 2023-07-01. Read the source and its unit/footnote context; use query_records to calculate the current-to-prior change rate. Deliver the two values, periods, units, calculation and evidence. Do not relabel Cash movement as operating cash flow.",
+        "fault": "cancel after the first recorded dispatch while transport response is held locally",
+        "expected": "no further model/business action; already incurred/unknown cost retained; partial result uses only validated visible state"
+      },
+      {
+        "id": "G05-missing-usage",
+        "max_requests": 1,
+        "input": "For the registered synthetic company, compare the disclosed Cash movement for the fiscal years 2023-07-02 through 2024-06-29 and 2022-07-03 through 2023-07-01. Read the source and its unit/footnote context; use query_records to calculate the current-to-prior change rate. Deliver the two values, periods, units, calculation and evidence. Do not relabel Cash movement as operating cash flow.",
+        "fault": "retain the complete raw gateway response in the audit record, but withhold its billing observation from the application",
+        "expected": "unknown reservation blocks both SDKs in this batch; read-only generation reconciliation does not resend a model request"
+      }
+    ],
+    "native_max_turns_per_run": 12,
+    "business_max_turns_per_run": 12,
+    "max_no_progress_turns": 3,
+    "max_physical_requests_total": 52,
+    "max_serialized_request_bytes": 131072,
+    "max_response_bytes": 2097152,
+    "request_timeout_seconds": 45,
+    "run_timeout_seconds": 180,
+    "batch_execution_seconds": 1800,
+    "retries": 0,
+    "fault_acceptance": "a fault case passes only if the intended fault boundary was actually reached and observed; otherwise not exercised",
+    "unexpected_failure": "stop the affected scenario and inspect; no automatic alternative model or repeated run",
+    "uncertain_cost": "stop all new model requests across both SDKs until reconciled"
+  },
+  "pricing_snapshot": {
+    "source": "https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints",
+    "local_file": "output/data-agent-gateway-20261015/deepseek-endpoints.json",
+    "sha256": "0165aa538b588ae0d86b6bc0fb77a4e0f2e669ceb9ba39de0b57519a9f991f0b",
+    "time_overrides_present": true,
+    "input_usd_per_token": "3E-7",
+    "output_usd_per_token": "0.0000012",
+    "token_bound": "request bytes plus allowance are an estimate only; never use this alone as the request reservation",
+    "max_protocol_token_allowance": 16384,
+    "estimated_request_cost_usd": "0.0491520",
+    "estimated_batch_cost_usd": "2.5559040",
+    "provider_enforced_cap": false,
+    "conservative_provider_envelope": {
+      "input_tokens": 1048576,
+      "output_tokens": 393216,
+      "per_request_usd": "0.7864320",
+      "all_52_requests_usd": "40.8944640",
+      "assumptions": "selected upstream retains advertised context/completion limits and maximum snapshot prices; no unlisted fee; verify before dispatch",
+      "policy": "reserve the conservative envelope unless a tighter enforceable billed-token bound has been verified; settle actual cost before the next request"
+    },
+    "budget_completion": "USD 3 is a proposed stopping limit, not a guarantee that all scenarios fit; stop before a reservation cannot fit, never exceed it to finish the matrix",
+    "refresh": "before inference, compare model/provider/rates and required parameters; changed assumptions require review"
+  },
+  "accounting": {
+    "authority": "uteki.infrastructure.run_budget.RunBudget",
+    "batch_requirement": "one persistent root budget shared by both kernels and all scenarios; distinct SDK sessions and business contexts",
+    "production_task_budget": "do not widen production clarification rules to assemble an evaluation batch",
+    "required_remote_evidence": [
+      "generation/request identity",
+      "model",
+      "provider",
+      "native usage including cache/reasoning",
+      "actual cost receipt"
+    ],
+    "read_only_reconciliation": "GET /api/v1/generation?id=<generation_id>; maximum 2 read-only observations per unresolved generation, no inference retry",
+    "unknown_policy": "retain original reservation; billing confirmation does not fabricate a missing business response"
+  },
+  "account": {
+    "credential_reference": "OPENROUTER_API_KEY",
+    "credential_available_in_current_process": false,
+    "account_balance": null,
+    "key_limit_remaining": null,
+    "authentication_requests": 0,
+    "top_up_conclusion": "unknown; no credential available, not evidence of insufficient balance",
+    "key_check": "GET /api/v1/key; keep only limit/remaining/expiry and boolean capability results",
+    "credits_check": "GET /api/v1/credits needs a management key; do not request or infer privileged access",
+    "proposed_task_key": {
+      "limit_usd": "3.00",
+      "limit_reset": null,
+      "include_byok_in_limit": true,
+      "configured": false
+    }
+  },
+  "launch_gates": [
+    {
+      "id": "L1",
+      "requirement": "capture both actual SDK request shapes and verify model, tools, prompt and output bound locally",
+      "status": "passed_limited_local_request_shape"
+    },
+    {
+      "id": "L2",
+      "requirement": "implement live transport and raw billing capture with the existing root ledger; current offline APIs remain rejecting live profiles",
+      "status": "pending_prompt_4_implementation"
+    },
+    {
+      "id": "L3",
+      "requirement": "prove evaluation batch root sharing across kernels/scenarios without resetting requests, holds or cancellation",
+      "status": "pending_prompt_4_implementation"
+    },
+    {
+      "id": "L4",
+      "requirement": "verify actual task-key model/provider enforcement, usable credential and available credits/limit",
+      "status": "not_verified"
+    },
+    {
+      "id": "L5",
+      "requirement": "approve this exact matrix and proposed USD 3 total; old budget is not reused",
+      "status": "not_authorized"
+    },
+    {
+      "id": "L6",
+      "requirement": "fresh price/endpoint check and actual billed-token bounding assumptions before first dispatch",
+      "status": "pending_execution_preflight"
+    }
+  ],
+  "limitations": [
+    "local request capture is not gateway compatibility",
+    "no real routing, fees or model-selected tool loop measured",
+    "four retained historical runtime incidents remain open",
+    "formal CLI/MCP and business evaluation are later tasks"
+  ],
+  "real_model_calls": 0,
+  "openrouter_inference_requests": 0,
+  "runtime_note": "Review contract only. Editing execution_enabled or profile status grants no authorization and creates no live entrypoint.",
+  "request_preflight": {
+    "result_file": "output/data-agent-gateway-20261015/request-probe-4/result.json",
+    "sha256": "1c1d9f7fae7195fd6c4e4b58218eba4987d7e38472be4a8109f97d4012c51189",
+    "openai_request_bytes": 43094,
+    "claude_request_bytes": 44239,
+    "native_cli_warning": "unrecognized_model; exact model ID was still forwarded to the synthetic peer",
+    "native_isolation": "wire tools are exactly the eight registered MCP tools, but init still lists built-in Skills/plugins despite empty option lists; full native capability isolation is not established here",
+    "not_verified": [
+      "real gateway compatibility",
+      "provider routing enforcement",
+      "real usage/billing",
+      "model-selected tool loop"
+    ]
+  },
+  "review_revision": 2,
+  "review_changes": [
+    "Cash movement matches the frozen source; not operating cash flow",
+    "request-byte cost projection is not an enforceable token reservation",
+    "all case prompts are complete normal business inputs; faults are host actions, not model instructions"
+  ],
+  "official_sources": [
+    "https://openrouter.ai/docs/cookbook/coding-agents/claude-code-integration",
+    "https://openrouter.ai/docs/guides/routing/provider-selection",
+    "https://openrouter.ai/docs/guides/features/guardrails/overview",
+    "https://openrouter.ai/docs/api/api-reference/api-keys/get-current-api-key",
+    "https://openrouter.ai/docs/api/api-reference/credits/get-remaining-credits",
+    "https://openrouter.ai/docs/cookbook/administration/usage-accounting"
+  ]
+}

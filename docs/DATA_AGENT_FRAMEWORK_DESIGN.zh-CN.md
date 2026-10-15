@@ -1649,7 +1649,7 @@ Skills/Memory 首期放在两个 runtime 的官方装配配置中，业务数据
 
 **贯穿案例：**用户问“比较显式指定的两年收入，计算增速并解释原因”。`service.py` 建立主体/期间/来源/截止日上下文 → 所选 runtime 让模型提交需求计划 → tools 调用 retrieval/assets 查目录 → evidence 读取管理层原文、structured 查询同口径数字并计算 → application/evidence 登记实际展示的出处 → delivery 组装带数值、计算和原文依赖的结果包。缺材料时经受限更新工具走 connectors/build/content/catalog，再回到读取；换 SDK 仍使用同一组业务函数。模型选材料和判断充分性，代码执行计算及引用校验。
 
-**当前停止点：**批次 1–4、第五批双 SDK 离线绑定及运行控制已完成各自限定验收（14.12.14–14.12.16），未接生产或调用真实模型。下一步为目标附件 Prompt 3 的 OpenRouter 执行契约、配置与费用准备；尚未取得真实网关、账单或业务验收证据，不因离线通过自动放行付费运行。
+**当前停止点：**批次 1–4、第五批双 SDK 离线绑定及运行控制已完成各自限定验收（14.12.14–14.12.16）。Prompt 3 的网关契约和非付费准备见 14.12.17，仍不可实跑；下一步为 Prompt 4 的真实传输与批次预算工程，先离线验收。尚未取得真实网关、账单或业务验收证据，不因配置/离线通过自动放行付费运行。
 
 #### 14.1.6 当前仓库目录组织 review（2026-10-14）
 
@@ -2780,6 +2780,33 @@ Claude 使用锁定 SDK 的 `PostToolUse` → `continue_=False`，仅在 DataSer
 **保留问题及准入判定：**四项历史偶发事件——`core-process-18` 收尾恢复错误、一次初始化观察归属错误、一次澄清 worker 30 秒监督超时、早期 `openai-resume-3/index_after_head` 时钟失败——仍缺原现场因果证明；本轮 49 项集成通过且未产生新的观察诊断，不足以关闭它们。它们限制稳定性结论，不能被记为修复完成；当前没有证据证明本次持久根停止修正解释了这些事件。后续遇到同类情况仍须保留现场、按原恢复/未知费用规则停止，不能追加盲重试。
 
 据原限定输入、两套 SDK 及七项条件，**Prompt 2 离线范围通过；Prompt 3 的只读网关准备可开始**。这不放行 Prompt 4 的真实调用：精确模型/上游、费用捕获与调用前控制、凭据/余额、独立 prompt、物理请求/输出限制、实际额度及未解释失败的处置均须进入具体执行契约。当前真实模型/OpenRouter 调用数为 0，未接生产、提交、推送或部署；完整 Data Agent 目标继续保留。
+
+#### 14.12.17 第五批第三步：OpenRouter 执行契约与非付费预检（2026-10-15）
+
+**本步完成的是可 review 的具体执行准备，不是付费准入或真实接入。** 契约为 [gateway-contract.draft.v1.json](../config/data_platform/gateway-contract.draft.v1.json)，状态 `prepared_not_executable`、`execution_enabled=false`。两套新增 profile 均为 `unverified`，各自 prompt 正文与 hash 不同；当前产品 runtime 仍拒绝真实配置，未通过改状态绕过离线保护。本步未修改生产 Python/SQL、依赖声明或两套锁。证据入口：[verification.json](../output/data-agent-gateway-20261015/verification.json)。
+
+**模型与实际请求。** 冻结候选为两侧 `deepseek/deepseek-v4.1-flash`、OpenRouter、第一方 `deepseek` 上游；无模型/上游 fallback。版本为 OpenAI Agents SDK 0.22.2、OpenAI 3.13.0、Claude Agent SDK 0.2.166、随包 CLI 2.1.299。按主锁全新普通安装并强制重建当前项目，43 个包依赖检查通过，包内 61 个 Data Python/SQL 文件及 3 个预算模块逐项核对。仓库外 `-I` 运行的实际请求预检分别使用 OpenAI `httpx2.MockTransport` 和 Claude 原生 CLI＋本机合成 Messages/SSE 服务，各捕获 1 次请求，大小分别为 43,094 / 44,239 字节。精确模型、独立应用 prompt、六业务工具＋deliver/clarify 的 schema 及 4,096 输出限制均一致；OpenAI 原始合成 usage.cost 保留。原生进程退出及进程组清理已观察，不能据此推断远端收费或网关支持。
+
+OpenAI 使用 Chat Completions，实际发送 `provider.only/order=['deepseek']`、`allow_fallbacks=false`、`require_parameters=true` 和 `reasoning.enabled=false`；非流式 get_response 的 `stream=false` 在锁定 SDK 中省略该字段。Claude 使用原生 Messages，thinking disabled、显式完整应用 prompt；CLI 发出 `unrecognized_model` 提示，但仍把精确 DeepSeek ID 发给合成端点。本地没有证明 OpenRouter 接受这些请求。[OpenRouter 官方说明](https://openrouter.ai/docs/cookbook/coding-agents/claude-code-integration)只保证 Claude Code 与 Anthropic 第一方上游的兼容性，因此该 DeepSeek 路径保留为实验；不自动改用 Sonnet 或直连。Claude 的上游约束拟用任务 key 的模型/供应商限制，尚未配置或验证；本机请求没有提供该保证。虽然空 Skills/plugins 配置下请求中的工具清单仅含八个 MCP 工具，init 仍列出原生内置 Skills/plugins，本步不能声称已禁用全部配套能力；完整配套隔离留 Prompt 9。
+
+**输入和案例。** [fixture-contract.json](../output/data-agent-gateway-20261015/fixture-preflight-2/fixture-contract.json)保存完整合成原件、附属资源、输入清单、处理配置与十份上下文模板；临时 Catalog 中十个独立上下文均创建成功后关闭，未启动 runtime。每侧依次为正常循环、首次完整工具结果后退出/恢复、首个 find_assets 受控错误、派发后取消、应用暂未观察到收费；请求上限分别 10/10/4/1/1，共最多 52 次，串行、无自动重试，单请求 45 秒、单场景 180 秒、批次执行 1,800 秒。故障场景必须实际到达并观察指定边界，否则记未覆盖。最后一项保留真实响应原件，仅隔离应用收费观察，不伪造“网关没返回 usage”。实际运行 ID 在新隔离 Catalog 创建后、派发前冻结；不同内核/场景的原生身份与业务上下文分别保存，批次账本不得借澄清机制扩大权限。
+
+原草案把 fixture 的 `Cash movement` 写成“operating cash flow”，已对照原件修正；问题明确两个实际财政年度及变化率，保留原单位和脚注，不给数值答案、脚本动作或预选语义块。恢复、取消及收费故障用宿主注入，模型收到完整普通问题，不会收到“执行 G01”等内部场景指令。当前仅准备合成功能材料，不算真实财报业务验收。
+
+**价格、预留与充值。** 保存的公开端点快照显示第一方 DeepSeek 有分时价格；按最高档输入 $0.30/百万 token、输出 $1.20/百万 token 计算，未套用最低第三方或直连价格。128 KiB 请求字节＋16,384 token 余量、4,096 输出的估算为每次 $0.049152、52 次 $2.555904，**字节不等于可证明的 token 上限，该估算不能直接充当硬预留**。在更紧的收费 token 上界尚未验证时，按端点所列 1,048,576 context 与 393,216 completion 的保守包络预留每次 $0.786432；52 次均取包络为 $40.894464。该包络本身仍依赖选定上游继续遵守公开上限、价格及收费项，派发前须复核。$3 仅是本次待确认的批次停止上限提案，不保证能执行完矩阵：串行请求结算后释放差额；下一请求预留放不下即停止，不能为了跑完而追加额度。主请求、辅助、失败、未知费用共用现有 RunBudget 权威；真实传输和跨场景累计还须在 Prompt 4 实现/验证。
+
+当前进程的 OpenRouter/DeepSeek 凭据存在性检查均为 false，未读取其他私密存储，认证账户请求为 0。账户余额、任务 key 剩余额度及是否需充值均未知，不能写成余额不足。[当前 key 接口](https://openrouter.ai/docs/api/api-reference/api-keys/get-current-api-key)与[账户 credits 接口](https://openrouter.ai/docs/api/api-reference/credits/get-remaining-credits)能力不同，后者要求 management key；不为检查余额索取管理凭据或修改共享账户设置。原 Sonnet $3 提案不继承为本次授权。
+
+| 真实执行准入 | 当前状态 |
+|---|---|
+| L1 实际 SDK 请求装配 | 限定本地通过；新安装结果 request-probe-4，非网关/业务通过 |
+| L2 真实 transport、原始响应/收费与调用前控制 | 待 Prompt 4 非付费工程实现/验收 |
+| L3 两套内核、全部场景共用批次预算与停止状态 | 待 Prompt 4 非付费工程实现/验收；不得重置未知费用 |
+| L4 有效凭据、余额/key 限额、实际模型/上游约束 | 未验证 |
+| L5 具体矩阵与额度授权 | 未取得；不自动充值或调用 |
+| L6 开跑前价格、收费 token 上限与必要参数复核 | 待执行前核对；不把工程估算当网关保证 |
+
+**原失败和范围。** 前两次探针分别因脚本误用未安装的旧 `httpx` 和误断言必须包含 `stream=false` 失败；按锁定 SDK 的 `httpx2` 依赖和序列化行为修正，保留日志及与原 hash 一致的脚本版本。全新安装首次 `--offline` 因固定 wheel 不在缓存失败，之后按原锁下载成功；依赖检查首次受默认缓存目录权限限制，`--no-cache` 重放通过，均未改锁或放宽检查。14.12.16 的四项历史偶发故障仍未关闭。仅 macOS arm64/Python 3.13、本机合成传输；本轮没有重跑未变化的全部 325 项历史测试，真实模型/OpenRouter 推理为 0，未接生产、提交、推送或部署。下一步只推进 L2/L3 可独立完成的工程；全部 14 项完整目标保留。
 
 ### 14.13 各功能维度的运行流程与接口
 

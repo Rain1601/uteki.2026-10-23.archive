@@ -1,4 +1,4 @@
-# 当前动作：第五批第三步——OpenRouter 验证契约准备
+# 当前动作：第五批第四步——真实网关路径的非付费工程实现
 
 核心文档：[DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md](docs/DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md)；接口：[DATA_AGENT_API.zh-CN.md](docs/DATA_AGENT_API.zh-CN.md)。
 
@@ -11,9 +11,12 @@
 | M0 两套 SDK 接入 | 离线部分完成；真实模型/网关/工具循环未验收 |
 | 第四批：六工具与可追溯交付 | 原限定验收及 review 记录保留；R1–R4 已关闭，187 项测试与旧格式兼容核验通过，14.12.14 |
 | 第五批：双 SDK 离线绑定及运行控制 | 已完成 Prompt 1–2 限定离线验收，七项收尾审计见 14.12.15–14.12.16；真实网关未验收 |
+| 第五批：OpenRouter 验证准备 | Prompt 3 的具体契约、独立 profile、请求捕获及合成输入准备已完成；仍不可实跑，见 14.12.17 |
 | 第五至七批 | 两套真实 Agent、配套与业务验收、迁移试用尚未完成；路线见 14.1.5 |
 
-**当前唯一动作：**按目标附件 Prompt 3 准备两套 SDK 经 OpenRouter 的具体执行契约：核对实际版本/兼容路径、精确模型与上游、独立 prompt、请求/输出/超时限制、费用预留及已有凭据可支持的只读余额检查。先完成配置与离线预检，再列需用户决定的模型或额度；不发送推理请求、不充值、不接生产。Prompt 2 的七项限定离线验收已完成，完整目标及后续步骤不因本步完成而缩小。
+**当前唯一动作：**按目标附件 Prompt 4，先补齐真实 transport、原始响应/收费捕获和两侧多场景共用的批次预算控制，以离线事件完成验收。入口仍拒绝未经授权的真实运行。具体候选及准入见 [gateway-contract.draft.v1.json](config/data_platform/gateway-contract.draft.v1.json)；缺凭据或额度不阻塞这些工程工作，但不发送推理请求、不充值、不接生产。完整目标及后续步骤保持，不因单批完成缩小。
+
+**Prompt 3 准备结果：**两侧候选均为 DeepSeek V4.1 Flash，经 OpenRouter；Claude 非 Anthropic 模型路径仍为兼容性实验。全新普通安装的实际 OpenAI SDK 与 Claude SDK/CLI 请求捕获各 1 次，模型名、独立 prompt、八个工具 schema 与 4,096 输出限制核对通过；仅合成响应，未验证网关或真实选工具。冻结五场景/侧、最多 52 个物理请求、十份上下文模板及完整合成原件/附件/处理配置。$3 仅是未授权的停止上限提案；字节估算约 $2.56 不作为硬预留，保守端点上限预留与无法跑完整组时的停止规则已另列。当前进程无 OpenRouter 凭据，余额及是否需要充值未知，认证账户查询与真实推理均为 0。证据：[verification.json](output/data-agent-gateway-20261015/verification.json)，具体限制与原失败见 14.12.17。
 
 **第五批第一步证据：**[verification-final.json](output/data-agent-sdk-20261015/verification-final.json)、[review-final.json](output/data-agent-sdk-20261015/review-final.json)。两侧实际 SDK；Claude 另运行原生 CLI 与本机合成 Messages 服务。7 项 SDK 单测、2 项 native 集成测试（5 场景）、140 项核心单测和 18 项 data-only 进程测试通过，48 个包文件与安装内容一致。主锁只新增 Claude SDK，原版本及 M0 锁未改。原失败全部保留；真实模型/OpenRouter 调用为 0。当前 fixture profile、原生消息边界及差异见 14.12.15，不当作真实业务或配套能力完成。
 

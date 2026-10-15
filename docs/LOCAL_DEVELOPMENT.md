@@ -108,7 +108,7 @@ uv pip check --python "$uteki_sdk_env/venv/bin/python"
 
 第二组会启动本机回环服务和随包 Claude CLI，需允许监听 127.0.0.1。worker 使用独立临时配置、虚拟令牌及拒绝外部连接的代理；没有真实模型推理或 OpenRouter 请求。OpenAI 使用实际 Runner 和脚本 Model；Claude 使用实际 SDK/CLI 与脚本 Messages 服务。缺少本机端口/子进程权限时明确记未运行，不能以 scripted CLI Transport 的结果替代此组。
 
-当前 `agent.openai_runtime.run_offline` / `agent.claude_runtime.run_offline` 接受调用者提供的 DataService、context_ref 和精确 profile；不提供默认模型或付费入口。`config/data_platform` 中只有明确标为 offline_fixture_only 的 query profile，不能用于真实模型。推理配置未经对应能力验证会拒绝；不是已完成真实路由或 prompt 业务调优。
+当前 `agent.openai_runtime.run_offline` / `agent.claude_runtime.run_offline` 接受调用者提供的 DataService、context_ref 和精确 profile；不提供默认模型或付费入口。运行只接受明确标为 `offline_fixture_only` 的 fixture profile。2026-10-15 新增两侧 DeepSeek `unverified` profile 与 `gateway-contract.draft.v1.json`，仅用于执行契约 review 和隔离请求装配预检；现有 runtime 继续拒绝它们，修改配置状态不产生调用授权。推理配置未经对应能力验证会拒绝；不是已完成真实路由或 prompt 业务调优。当前 OpenAI 3.13.0 的锁定传输依赖是 `httpx2`，离线捕获须使用实际安装的客户端类型，不为历史示例另加旧 `httpx`。准备证据及限制见核心设计 14.12.17。
 
 确定性核心的进程测试包含“SDK 未安装”的安装边界断言，必须在仅安装 `data` 的另一干净环境运行，不能在 agent 环境中删除或放宽该断言。第五批第一步限定验收及已知差异见核心设计 14.12.15。
 
