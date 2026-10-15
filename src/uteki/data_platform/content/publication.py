@@ -213,7 +213,11 @@ class Publication:
             write_control(stage/"manifest.json",manifest.canonical_bytes())
             self.verify_build(build,final=False)
             reference = self.catalog.content.put_object(manifest.canonical_bytes())
-            schema = BuildSchema.model_validate_json(files["asset-schema.json"])
+            if manifest.schema_version == "uteki-html-build-v1":
+                from ..contracts.evidence import HtmlSchema
+                schema = HtmlSchema.model_validate_json(files["asset-schema.json"])
+            else:
+                schema = BuildSchema.model_validate_json(files["asset-schema.json"])
             with self.catalog.database.transaction():
                 self.catalog._db.execute("UPDATE asset_builds SET manifest_ref=?,readiness_json=?,updated_at=? WHERE build_id=?",
                     (reference.model_dump_json(),schema.published_readiness.canonical_bytes().decode(),utc_now(),build_id))
@@ -241,7 +245,11 @@ class Publication:
             if build["manifest_ref"] is not None:
                 if self.catalog.content.read_object(ObjectRef.model_validate_json(build["manifest_ref"])) != raw:
                     raise CatalogError("PUBLICATION_INVALID", "manifest differs from sealed candidate")
-            if {f.path for f in manifest.files} != REQUIRED_FILES or file_names(directory) != REQUIRED_FILES | {"manifest.json"}:
+            required_files = REQUIRED_FILES
+            if manifest.schema_version == "uteki-html-build-v1":
+                from ..build.pipeline import HTML_FILES
+                required_files = HTML_FILES
+            if {f.path for f in manifest.files} != required_files or file_names(directory) != required_files | {"manifest.json"}:
                 raise CatalogError("PUBLICATION_INVALID", "unsupported, missing or extra build files")
             payloads = {}
             for item in manifest.files:
@@ -249,8 +257,17 @@ class Publication:
                 if len(content) != item.object_ref.byte_length or digest(content) != item.object_ref.sha256:
                     raise CatalogError("PUBLICATION_INVALID", "artifact hash or size mismatch: "+item.path)
                 payloads[item.path] = content
-            self.catalog.read_snapshot(build["snapshot_id"])
+            frozen_snapshot = self.catalog.read_snapshot(build["snapshot_id"])
             inputs = self.catalog.content.read_manifest(manifest.input_manifest)
+            if manifest.schema_version == "uteki-html-build-v1":
+                representation = next(r for r in frozen_snapshot["representations"] if r["representation_id"] == manifest.asset_ref.representation_id)
+                if representation["format"] != "html":
+                    raise CatalogError("PUBLICATION_INVALID", "HTML build must bind an HTML representation")
+                from ..build.validate import validate_html_artifacts
+                schema = validate_html_artifacts(self.catalog.content, manifest, inputs, payloads)
+                if build["readiness_json"] is not None and build["readiness_json"] != schema.published_readiness.canonical_bytes().decode():
+                    raise CatalogError("PUBLICATION_INVALID", "database readiness differs from frozen HTML schema")
+                return manifest
             sections = [validated_json(Section,line) for line in payloads["sections.jsonl"].splitlines()]
             blocks = [validated_json(Block,line) for line in payloads["blocks.jsonl"].splitlines()]
             if len({s.id for s in sections}) != len(sections) or len({b.id for b in blocks}) != len(blocks):

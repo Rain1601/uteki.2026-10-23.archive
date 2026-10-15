@@ -361,7 +361,8 @@ def _annual_package(config):
 
 
 def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=None, clock=None,
-                    prior_repeat_verification=None, blocked_sources=None, _session_only=False) -> dict:
+                    prior_repeat_verification=None, blocked_sources=None, _session_only=False,
+                    request_guard=None) -> dict:
     """Fetch and freeze a bounded source run. Inject fetch(url, headers=..., timeout=...) -> bytes.
 
     Filing selection is required. latest_10k_and_subsequent_filings selects the
@@ -387,6 +388,8 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     ``clock`` may supply an aware datetime for deterministic offline recovery tests.
     """
     symbol, market, as_of, ua, entries, limits, updates_window = _configuration(config)
+    if request_guard is not None and not callable(request_guard):
+        raise ValueError('request_guard must be callable')
     proxy_transport = _transport(config)
     selection, mode, target_period, annual_form, period_range = _filing_selection(config, as_of)
     requested_cik = config.get('cik')
@@ -609,6 +612,8 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
 
     def redirect(previous_url, target):
         check_stop()
+        if request_guard is not None:
+            request_guard(target)
         enforce_cooldown(target)
         if report['requests'] >= limits['max_requests']:
             raise LimitReached('request_limit')
@@ -620,6 +625,8 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
     def request(url, allowed):
         check_stop()
         url = _url(url, allowed)
+        if request_guard is not None:
+            request_guard(url)
         if url in (blocked_sources or {}):
             report['discovery'].append({'source_url': url, 'status': 'deferred',
                 'reason': 'permanent_failure_in_current_batch', 'http_status': blocked_sources[url]})
@@ -659,6 +666,8 @@ def prepare_sources(config: dict, workspace: Path, *, fetch=None, should_stop=No
                         info['cache_headers'] = {k: response.headers.get(k) for k in
                             ('Date', 'ETag', 'Last-Modified', 'Age', 'Cache-Control') if response.headers.get(k) is not None}
                         _url(response.url, request_allowed)
+                        if request_guard is not None:
+                            request_guard(response.url)
                         if use_proxy:
                             info.update(transport='trusted_local_http_proxy', proxy_url=proxy_transport['proxy_url'])
                         if response.status != 200:

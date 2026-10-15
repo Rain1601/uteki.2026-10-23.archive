@@ -159,6 +159,71 @@ uteki_catalog_root="$(mktemp -d "${TMPDIR:-/tmp}/uteki-catalog-data.XXXXXX")"
 
 本地备份只支持：关闭所有 Catalog 句柄、完成 checkpoint 且停止其他写入后，复制完整 data_root 到另一显式根，再用 `Catalog.open` 完整核验。不要单独恢复 SQLite；其 head/文件不一致会被拒绝。失败 staging/未知残留保留，不通过删除或覆盖它们伪装恢复成功。本批只验证 macOS arm64 本地 POSIX，其他平台、网络文件系统和真实断电尚未验证。
 
+## 官方 HTML/iXBRL 材料链的独立验收（2026-10-14）
+
+第三批仍只用主锁 `data` extra，普通安装，不加载 Agent SDK 或调用模型。下例从仓库根开始；先安装并核对当前包，再从仓库外运行测试。首次同步可以下载锁定依赖，已有完整缓存时可加 `--offline`，不能用更换版本解决缺缓存。
+
+```bash
+uteki_html_repo="$PWD"
+uteki_html_env="$(mktemp -d "${TMPDIR:-/tmp}/uteki-html-env.XXXXXX")"
+UV_PROJECT_ENVIRONMENT="$uteki_html_env/venv" uv --cache-dir "$uteki_html_env/cache" sync --locked --python 3.13 --extra data --no-editable
+uv --cache-dir "$uteki_html_env/cache" pip install --reinstall-package uteki-eval --no-deps . --python "$uteki_html_env/venv/bin/python"
+uv --cache-dir "$uteki_html_env/cache" pip check --python "$uteki_html_env/venv/bin/python"
+"$uteki_html_env/venv/bin/python" -I - <<'PY'
+import hashlib
+import sys
+from pathlib import Path
+import uteki.data_platform
+
+source = Path('src/uteki')
+installed = Path(uteki.data_platform.__file__).resolve().parents[1]
+assert installed.is_relative_to(Path(sys.prefix).resolve()) and 'site-packages' in installed.parts
+paths = [p for p in (source/'data_platform').rglob('*') if p.suffix in {'.py', '.sql'}]
+paths += [source/p for p in (
+    'infrastructure/document_sources/company_acquisition.py',
+    'infrastructure/document_sources/official_discovery.py',
+    'infrastructure/document_sources/sec_index.py',
+    'infrastructure/document_sources/sec.py',
+    'infrastructure/document_sources/sec_settings.py',
+    'infrastructure/document_sources/filing_integrity.py',
+    'domain/documents/__init__.py', 'domain/documents/models.py')]
+for path in sorted(paths):
+    target = installed/path.relative_to(source)
+    assert path.read_bytes() == target.read_bytes(), path
+    print(path.relative_to(source), hashlib.sha256(target.read_bytes()).hexdigest())
+assert (installed/'data_platform/catalog/migrations/0001_catalog.sql').is_file()
+PY
+(
+  cd "$uteki_html_env"
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_html_repo/tests/unit/data_platform" -p 'test_*.py' -v
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_html_repo/tests/integration/data_platform" -p 'test_*_processes.py' -v
+  ./venv/bin/python -I -W error::ResourceWarning -m unittest discover -s "$uteki_html_repo/tests/unit" -p test_company_acquisition.py -v
+)
+```
+
+真实材料示例为 [official_html.py](../examples/data_platform/official_html.py)。输入是显式审阅的公司/材料/期间/来源策略、编码及未知时间声明；验收 gold 不传入产品入口。已有本次本地证据时，以下复用已成功获取的冻结原件，不再次联网：
+
+```bash
+uteki_html_evidence="$uteki_html_repo/output/data-agent-html-20261014"
+uteki_html_data="$(mktemp -d "${TMPDIR:-/tmp}/uteki-html-data.XXXXXX")"
+"$uteki_html_env/venv/bin/python" -I "$uteki_html_repo/examples/data_platform/official_html.py" \
+  --request "$uteki_html_evidence/request-A24-K.json" \
+  --data-root "$uteki_html_data" --initialize \
+  --acquisition-root "$uteki_html_evidence/acquisition-A24-K" \
+  --receipt "$uteki_html_evidence/acquisition-A24-K/result-final.json" \
+  > "$uteki_html_env/example-A24.json"
+"$uteki_html_env/venv/bin/python" -I "$uteki_html_repo/scripts/data_agent/verify_html_material.py" \
+  --data-root "$uteki_html_data" \
+  --gold "$uteki_html_evidence/acceptance/frozen.v1.json" \
+  --source-id A24-K --example-result "$uteki_html_env/example-A24.json"
+```
+
+示例关闭并重新打开 Catalog，再沿完整 AssetRef 读回正文与可解析数值；Microsoft 将 request、acquisition-root、receipt、source-id 换成对应 M25-K，使用另一个新根。其 HTML 没有 inline facts，因此只读回正文/表格，不补造数值记录。实际验收结果见核心设计 14.12.11。
+
+`output/` 原件、收据与 gold 是本地证据，不随 Git 安装；新检出须先恢复完整证据目录，不能将缺文件记为通过。另行获准获取时，可将 `--receipt` 换为 `--acquire --settings-root <已有私密设置目录>`，并提供新的显式 acquisition-root、核对 request 中精确 URL 清单及请求/字节/时间限制。SEC 联系信息继续由 `resolve_sec_contact` 读取，不能写进公开 request。当前批次网络验收已完成，不因复现说明自动追加请求；下载版本变化须重新独立核验，不能覆盖冻结预期。
+
+当前支持 UTF-8 静态 HTML 和声明的 iXBRL 数字转换子集。HTML 恢复、推断章节、nil、未支持转换/维度和未取得图片均可观察；不支持 PDF/OCR、外部 CSS/脚本渲染、图片理解、结构化查询或搜索。`HtmlReader` 是构造时验证的字节视图，重新构造才重新检查磁盘完整性。Catalog 单根排他；不得并行打开同一 data_root。旧四文件 build、HTML v1/v2 各按其版本复验。
+
 ## Agent 执行监控（2026-10-06）
 
 启动工作台后打开 [Agent 运行](http://127.0.0.1:8765/agent-runs)。默认可回看两次已登记真实历史运行：`amd-fy2023-main-agent-v2-parent`（6 个父步骤、1 个提取任务、7 次调用）和 `amd-fy2023-cash-flow-main-agent-v2-parent`（7 个父步骤、1 个提取任务、8 次调用，以 `no_progress_limit` 停止）。从步骤展开子任务、输入、候选与用量；查看不会调用模型或改变采纳状态。历史记录没有心跳，也不会补造未保存的工具耗时。

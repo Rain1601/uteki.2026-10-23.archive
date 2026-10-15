@@ -169,7 +169,7 @@ class ArtifactFile(Contract):
 
 
 class BuildManifest(Contract):
-    schema_version: Literal["uteki-build-v1"]
+    schema_version: Literal["uteki-build-v1", "uteki-html-build-v1"]
     asset_ref: AssetRef
     input_manifest: ObjectRef
     recipe: BuildRecipe

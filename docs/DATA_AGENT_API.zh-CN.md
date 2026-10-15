@@ -1,12 +1,14 @@
 # Data Agent 接口契约
 
-日期：2026-10-14 · 版本：v0.4 · 状态：设计稿，五项契约修订待 review，尚未实现或联调。
+日期：2026-10-14 · 版本：v0.5 · 状态：用户已确认实施路线，最新指定模型 API 统一经 OpenRouter，对比 OpenAI Agents SDK 与 Claude Agent SDK 及配套能力两套实现；共享业务工具契约延续 v0.4。剩余缺口见核心设计 14.16，SDK/网关边界与交叉比较见 14.17，尚未实施或联调。
 
 本文件定义 Data 能力的全部对外与内部接口：请求上下文、6 个数据工具、模型可见输出、交付包、内部组件接口及 MCP 映射。职责与流程见[核心设计](DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md)第 7 节，技术方案见第 14 节；本文件只维护接口细节。
 
 **相对 v0.2 的变化：**按已确认的 A5（单进程库，不建 HTTP 服务），删除 HTTP 路由与状态码映射，改为 Python 进程内调用与 MCP 两种传输；`find_assets` 保留 v0.2 的字段与边界规则，增加证券代码解析与版本呈现规则；补齐其余 5 个工具、`create_context` 与交付包。
 
 **相对 v0.3 的变化：**补齐需求计划登记、统一结果引用、build 身份与完整输入、发布能力与实时能力、澄清返回与继续上下文五项契约；对应核心设计第 14.15 节的两条文档走查。此次仅修订设计，不表示通过实跑验收。
+
+**相对 v0.4 的变化：**通用执行由各自官方 SDK 承接，删除自定义 ModelClient 草案；Agent/Runner、FunctionTool、Session、RunState 是 OpenAI 侧映射，Claude 侧使用其原生循环、工具与会话。应用保留资产、来源/预算、需求状态、实际展示引用与交付校验；Skills/Memory 使用官方适用机制，不另造 Agent 协议。首期数据来源为官方来源；最新检查失败允许带日期与“未确认最新”标记返回符合硬边界的旧材料，并保留缺口（核心设计第 10 节）。两套实现共享此业务 API，内核选择留在应用装配配置，本次不向公开工具参数注入 SDK 类型或新字段。
 
 所有示例中的公司、期间、ID、URL 与数值均为虚构，不是公司事实或实跑结果。
 
@@ -455,7 +457,7 @@ Data Agent 内部的补数入口（核心设计第 8.2 节），把请求交给�
 
 ### 8.1 公共参数 `state`
 
-Data Agent 每次工具调用都携带 `state`，包含核心设计第 9.2 节的四项任务状态，以及可选的需求计划更新 `plan_update`。新任务的计划版本为 0、无需求；第一次调用必须提交非空计划，可以和第一次 `find_assets` 或 `clarify` 在同一次调用中完成：
+Data Agent 每次本接口定义的业务工具调用都携带 `state`，包含核心设计第 9.2 节的四项任务状态，以及可选的需求计划更新 `plan_update`。OpenAI 侧用官方 FunctionTool 接入 Runner，Claude 侧用 SDK 原生进程内 MCP 包装相同业务函数；state 是雨滴业务状态，不替代 SDK 会话。Skills/Memory 的辅助工具沿各自官方协议，不强行塞入本业务 schema，也不能绕过业务工具发布资产或交付证据。新任务的计划版本为 0、无需求；第一次业务调用必须提交非空计划，可以和第一次 `find_assets` 或 `clarify` 在同一次调用中完成：
 
 ```json
 {
@@ -527,6 +529,8 @@ issues: 无
 ### 9.1 `run_query`
 
 `DataService.run_query(context_ref) -> RunQueryResult`：在给定上下文中运行 Data Agent，直至交付、需要澄清、取消或达到停止条件。Python 与 MCP 使用相同的带 `kind` 联合返回类型：
+
+内部由所选 SDK 执行完整循环。OpenAI 侧拟用 `tool_use_behavior` 处理已校验的 deliver/clarify；Claude 侧须验证原生结束事件及结构化结果到同一业务终态的映射，不要求复制该 OpenAI 扩展点。错误工具结果不能触发成功终止；SDK 的自由文本不能直接变为 DeliveryPackage。保存内核/版本/原生 session 与业务 run/root/context ID 的显式映射，恢复不绕过范围、引用与账本检查；跨内核不承诺无损恢复。致命错误分支仍是核心设计 T6 待完成的契约，不能据 SDK 返回对象宣称已经闭合。
 
 | kind | 字段 | 含义 |
 |---|---|---|
@@ -600,10 +604,9 @@ class ContentIndex(Protocol):
     def text(self, ref: AssetRef, req: TextQuery) -> SearchPage: ...
     def concept(self, ref: AssetRef, req: ConceptQuery) -> SearchPage: ...   # 不支持时抛 CapabilityUnsupported
 
-class ModelClient(Protocol):
-    def complete(self, messages: list[Message], tools: list[ToolSchema], *, require_one_call: bool) -> ModelTurn: ...
-    # ModelTurn = 单个工具调用 + 用量；费用先预留后结算
 ```
+
+**Agent 集成边界：**不再定义独立 ModelClient、工具分发或会话协议。OpenAI 使用官方 Agent/Runner、FunctionTool、Session 等扩展点；Claude 使用其原生运行时、MCP 工具、会话及 hooks。共享 Catalog/Content/Build/Index 和业务 schema 不依赖 SDK 类型；网关统一并不要求内部事件与会话协议相同。费用保存 SDK 原始统计，并以可核对的 OpenRouter 记录对账及根任务累计，未知费用保留；既有 MeteredModel 不代表覆盖 Claude 内部调用或流式。网关路由、原生配套与验证条件见核心设计 14.17。
 
 - `ContentIndex` 的所有实现（FTS5 基线、PageIndex、OpenAI 文件检索）返回同一种 `SearchPage`，命中必须映射到 build 内的块 ID 与 locator；映射失败的命中进入 issues。
 - `SourceConnector.fetch` 对重定向目标与附件逐个重新检查策略；被拒绝时返回 `denied_by_policy`，不抛出静默异常。
