@@ -2,7 +2,7 @@
 
 2026-10-09。本次只移除已确认不被活动代码、测试、配置、数据注册及当前结果页依赖的历史实验和旧页面。保留依赖闭包，未追踪/忽略的文件、密钥和原费用账本未删除。
 
-- 清理前本地备份：`codex/backup-20261009-before-cleanup`。
+- 清理前本地备份：原为分支 `codex/backup-20261009-before-cleanup`。该提交已在 main 历史中，分支于 2026-10-23 删除，恢复时直接用基线 SHA `a4595ba8`。
 - 完整基线：`a4595ba82164f6597db72ee01891f3c2abf7cbf0`。备份未推送；在本机可恢复。
 - 移除 **3,729 个受版本管理文件 / 226.51 MiB**，来自 65 个历史目录。
 - 清理前 31,579 个跟踪文件，移除比例 11.8%。这降低工作目录文件量；Git 历史对象仍保留，不缩减完整历史克隆体积。
@@ -15,13 +15,13 @@
 只读查看旧文件：
 
 ```bash
-git show codex/backup-20261009-before-cleanup:TODO.md
+git show a4595ba8:TODO.md
 ```
 
 按需恢复一个归档目录（替换示例路径；先确认不会覆盖当前改动）：
 
 ```bash
-git restore --source=codex/backup-20261009-before-cleanup -- experiments/market_backtests
+git restore --source=a4595ba8 -- experiments/market_backtests
 ```
 
 C2清理阶段验收（后续工程和当前提交核验见[交接](MACHINE_HANDOFF.zh-CN.md)）：
