@@ -19,6 +19,7 @@ TRANSFORMS = {
 }
 
 
+# 沿当前节点和祖先查找命名空间声明，适配 HTML 解析后保留为属性的 xmlns。
 def namespace(node, prefix):
     key = 'xmlns:' + prefix.lower() if prefix else 'xmlns'
     for item in (node, *node.iterancestors()):
@@ -27,6 +28,7 @@ def namespace(node, prefix):
     return None
 
 
+# 把有效 QName 展开成 {命名空间}局部名，拒绝未绑定前缀或非法名称。
 def expanded(node, value):
     if not value or not re.fullmatch(r'(?:[A-Za-z_][\w.\-]*:)?[A-Za-z_][\w.\-]*', value):
         raise ValueError('invalid QName')
@@ -37,6 +39,7 @@ def expanded(node, value):
     return '{' + uri + '}' + local
 
 
+# 同时匹配命名空间和局部名，避免只按标签后缀误认 XBRL 元素。
 def is_element(node, uri, local):
     name = tag(node)
     if not name:
@@ -45,10 +48,12 @@ def is_element(node, uri, local):
     return tail == local.lower() and namespace(node, prefix) == uri
 
 
+# 返回指定 XBRL instance 元素，包括父节点自身及其后代。
 def instance_nodes(parent, local):
     return [n for n in parent.iter() if is_element(n, INSTANCE, local)]
 
 
+# 解析唯一上下文的实体、期间及维度；typed 维度保留原结构，不推断其语义值。
 def context_values(dom, ref):
     nodes = dom.by_id.get(ref, [])
     if len(nodes) != 1 or not is_element(nodes[0], INSTANCE, 'context'):
@@ -83,6 +88,7 @@ def context_values(dom, ref):
         raise ValueError('invalid duration/instant/forever period')
     if 'start' in period and period['start'] > period['end']:
         raise ValueError('reversed context period')
+    # 维度必须具有唯一展开名称；typed 维度留原始 HTML，交给事实状态标明 unsupported。
     dimensions = []
     dimension_names = set()
     for node in context.iter():
@@ -99,6 +105,7 @@ def context_values(dom, ref):
     return context, normalize(identifiers[0].text_content()), identifiers[0].get('scheme'), period, tuple(dimensions)
 
 
+# 解析普通或分式单位并展开 measure 的 QName，拒绝空单位及分式外额外 measure。
 def unit_values(dom, ref):
     nodes = dom.by_id.get(ref, [])
     if len(nodes) != 1 or not is_element(nodes[0], INSTANCE, 'unit'):
@@ -121,6 +128,7 @@ def unit_values(dom, ref):
     return node, unit
 
 
+# 仅执行白名单数值变换，再用 Decimal 应用 scale/sign；超出范围与格式非法分别报错。
 def numeric(node, raw):
     transform = node.get('format')
     if transform:
@@ -150,9 +158,11 @@ def numeric(node, raw):
     sign = node.get('sign')
     if sign not in (None, '-'):
         raise ValueError('invalid sign')
+    # decimals 在这里校验并保留精度声明，不据此重新舍入或改写源事实值。
     decimals = node.get('decimals')
     if decimals is not None and not re.fullmatch(r'[+-]?\d+|INF', decimals):
         raise ValueError('invalid decimals')
+    # 按原字符串长度和缩放幅度设足够十进制精度，避免默认精度造成无意舍入。
     with localcontext() as ctx:
         ctx.prec = max(28, len(raw) + abs(scale) + 8)
         value = Decimal(raw).scaleb(scale)
@@ -161,6 +171,7 @@ def numeric(node, raw):
         return format(value, 'f')
 
 
+# 逐个保留 nonfraction 数值事实及失败原因，再按显式语义维度标注重复组，不删除重复事实。
 def parse_inline(dom: SourceDOM, *, legacy_v1=False):
     records = []
     for node in dom.nodes:
@@ -181,6 +192,7 @@ def parse_inline(dom: SourceDOM, *, legacy_v1=False):
                 raise ValueError('duplicate fact ID')
         except ValueError as error:
             invalid = True; issues.append(str(error))
+        # 身份、上下文、单位分别核验并累积问题，某项无效仍保留该条源事实及其定位。
         try:
             context, identifier, scheme, period, dimensions = context_values(dom, node.get('contextref'))
             if any(d['kind'] == 'typed' for d in dimensions):
@@ -209,6 +221,7 @@ def parse_inline(dom: SourceDOM, *, legacy_v1=False):
                 unsupported = True; issues.append(str(error))
             except (ValueError, InvalidOperation) as error:
                 invalid = True; issues.append(str(error))
+        # 状态优先级为非法、不支持、显式 nil、解析成功；仅 parsed 输出解释后的十进制值。
         status = 'invalid' if invalid else 'unsupported' if unsupported else 'nil' if nil else 'parsed'
         records.append(InlineRecord(id='record-'+digest(path.encode())[:24],fact_id=node.get('id'),concept=concept,
             concept_namespace=concept_ns,context_ref=node.get('contextref'),unit_ref=node.get('unitref'),
@@ -217,6 +230,7 @@ def parse_inline(dom: SourceDOM, *, legacy_v1=False):
             period=period,dimensions=dimensions,unit=unit,status=status,issues=tuple(issues),locator=dom.locator(node,raw=True),
             context_path=dom.path(context) if context is not None else None,unit_path=dom.path(unit_node) if unit_node is not None else None,
             duplicate_group=None))
+    # 重复分组按概念、实体、期间、维度与单位判定，故意不含数值，便于保留同口径冲突事实。
     groups = defaultdict(list)
     for i, record in enumerate(records):
         # Context IDs and DOM paths do not define semantic equality. Retain all

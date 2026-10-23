@@ -17,11 +17,13 @@ from ..contracts.common import CatalogError, CatalogView, canonical, digest, new
 MIGRATIONS = ((1, "0001_catalog.sql"),)
 
 
+# 从包资源读取声明过的迁移原文；其哈希用于校验数据库实际采用的模式版本。
 def migration_sources():
     return [(version, resources.files(__package__).joinpath("migrations", name).read_bytes())
             for version, name in MIGRATIONS]
 
 
+# 只读取普通控制文件；打开前及打开后双重检查，并禁止跟随符号链接。
 def read_regular(path: Path) -> bytes:
     if not stat.S_ISREG(path.lstat().st_mode):
         raise CatalogError("CATALOG_INCONSISTENT", f"not a regular file: {path.name}")
@@ -32,6 +34,7 @@ def read_regular(path: Path) -> bytes:
         return stream.read()
 
 
+# 相对根目录逐层建立安全目录，拒绝绝对路径或向上逃逸。
 def ensure_directory(root: Path, relative: str) -> Path:
     current = root
     _directory(current, create=False)
@@ -43,6 +46,7 @@ def ensure_directory(root: Path, relative: str) -> Path:
     return current
 
 
+# 完整写稳临时文件后发布目录项；默认不可覆盖，仅提交头允许原子替换。
 def write_control(path: Path, raw: bytes, *, replace: bool = False) -> None:
     """Atomic complete-file visibility. Replacement is only for the commit head."""
     fd, name = tempfile.mkstemp(prefix=".pending-", dir=path.parent)
@@ -67,7 +71,9 @@ def write_control(path: Path, raw: bytes, *, replace: bool = False) -> None:
         temporary.unlink(missing_ok=True)
 
 
+# 管理目录独占锁、SQLite 连接、迁移历史及文件系统提交头，使数据库与已确认版本可核对。
 class Database:
+    # 取得非阻塞独占锁后打开显式初始化的数据库，再检查迁移和提交头；失败即释放资源。
     def __init__(self, data_root, *, initialize=False, recover_head=False):
         self.root = ContentStore(data_root).data_root
         self.connection = None
@@ -98,6 +104,7 @@ class Database:
             self.connection.row_factory = sqlite3.Row
             self.connection.execute("PRAGMA foreign_keys=ON")
             self.connection.execute("PRAGMA synchronous=FULL")
+            # WAL 保存事务日志，FULL 要求提交同步；这仍需与独立 head 文件一起检查发布确认。
             self.connection.execute("PRAGMA journal_mode=WAL")
             self._check_migrations()
             self._check_head(recover=recover_head)
@@ -105,6 +112,7 @@ class Database:
             self.close()
             raise
 
+    # 在临时数据库中完成迁移与初始提交，再无覆盖发布数据库文件及 revision=0 的提交头。
     def _initialize(self, path: Path):
         if path.exists() or path.is_symlink() or (self.root / "catalog-head.json").exists():
             raise CatalogError("INVALID_STATE", "catalog already exists; use open")
@@ -148,6 +156,7 @@ class Database:
         temporary.unlink()
         write_control(self.root / "catalog-head.json", view.canonical_bytes())
 
+    # 核对迁移顺序与源码哈希，并执行数据库及外键完整性检查；不自动升级未知历史。
     def _check_migrations(self):
         db = self.connection
         try:
@@ -160,6 +169,7 @@ class Database:
         except sqlite3.DatabaseError as error:
             raise CatalogError("MIGRATION_MISMATCH", "catalog schema cannot be opened") from error
 
+    # 返回当前 catalog_id、revision、token，作为目录视图和后续游标的一致性凭据。
     def view(self) -> CatalogView:
         self.assert_open()
         row = self.connection.execute("SELECT catalog_id,revision,token FROM catalog_meta WHERE singleton=1").fetchone()
@@ -167,6 +177,7 @@ class Database:
             raise CatalogError("CATALOG_INCONSISTENT", "missing catalog identity")
         return CatalogView(**dict(row))
 
+    # 比较数据库提交链与独立提交头，识别回滚/替换；只有显式恢复才补确认落后的头文件。
     def _check_head(self, *, recover=False):
         current = self.view()
         history = self.connection.execute("SELECT revision,token,parent_token FROM catalog_commits ORDER BY revision").fetchall()
@@ -190,6 +201,7 @@ class Database:
                 raise ValueError("noncanonical head")
         except (ValueError, OSError) as error:
             raise CatalogError("CATALOG_INCONSISTENT", "invalid or missing catalog head") from error
+        # 头文件必须属于同一目录且仍在数据库提交链内；领先或 token 不符说明历史被独立替换/回滚。
         if head.catalog_id != current.catalog_id or head.revision > current.revision or history[head.revision]['token'] != head.token:
             raise CatalogError("CATALOG_INCONSISTENT", "database was replaced or rolled back independently")
         if head != current:
@@ -197,12 +209,14 @@ class Database:
                 raise CatalogError("RECOVERY_REQUIRED", "database committed; filesystem head not acknowledged")
             write_control(path, current.canonical_bytes(), replace=True)
 
+    # 禁止使用已关闭、跨进程继承或提交结果未确认的句柄。
     def assert_open(self):
         if self.closed or self.connection is None or os.getpid() != self.owner_pid:
             raise CatalogError("INVALID_STATE", "closed catalog or connection inherited across processes")
         if self.head_uncertain:
             raise CatalogError("RECOVERY_REQUIRED", "reopen with explicit recovery before further operations")
 
+    # 以 IMMEDIATE 事务串行写入；有变更才推进修订，数据库提交成功后再持久化提交头。
     @contextmanager
     def transaction(self):
         self.assert_open()
@@ -221,12 +235,14 @@ class Database:
                 db.execute("INSERT INTO catalog_commits VALUES (?,?,?,?,?)", (current.revision,current.token,old.token,stamp,stamp))
             else:
                 current = None
+            # 必须先提交数据库再写头文件；之后发生的错误不能回滚已经生效的事务。
             db.commit()
             committed = True
             if current:
                 try:
                     write_control(self.root / "catalog-head.json", current.canonical_bytes(), replace=True)
                 except OSError as error:
+                    # 提交成功而头文件未确认时封锁当前句柄，要求显式重新打开恢复，避免继续写入掩盖不确定性。
                     self.head_uncertain = True
                     raise CatalogError("RECOVERY_REQUIRED", "commit succeeded but head sync failed") from error
         except BaseException:
@@ -234,6 +250,7 @@ class Database:
                 db.rollback()
             raise
 
+    # 尝试收敛 WAL 后关闭连接；即使数据库关闭失败，也释放目录锁并标记句柄关闭。
     def close(self):
         try:
             if self.connection is not None:

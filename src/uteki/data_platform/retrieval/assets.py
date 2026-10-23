@@ -11,6 +11,7 @@ from ..contracts.common import CatalogError, SourceTime, canonical, digest
 from ..contracts.query import Entities, ReadPolicy, parse
 
 
+# 把 ID、名称和证券分别解析为已登记公司集合；多类线索必须完全一致，不能取并集扩范围。
 def resolve_entities(catalog, entities, clock):
     groups, securities = [], []
     if entities.company_ids:
@@ -32,6 +33,7 @@ def resolve_entities(catalog, entities, clock):
     return sorted(groups[0]), securities
 
 
+# 验证完整引用确属同一已发布构建及冻结快照，再返回用于权限和发现的有效元数据。
 def metadata(catalog, reference):
     reference = parse(AssetRef, reference)
     build = catalog.get_build(reference.build_id)
@@ -46,6 +48,7 @@ def metadata(catalog, reference):
     source = catalog._get('sources','source_id',snapshot['source_id'])
     representation = catalog._get('snapshot_representations','representation_id',reference.representation_id)
     # The payload is the original registration, not the current revision view.
+    # 资产 payload 保留初次登记内容；标题单独取当前列值，使发现反映已生效的标题修订。
     effective = json.loads(asset['payload']) | {'title': asset['title']}
     return dict(asset=asset, asset_data=effective, snapshot=snapshot,
         acquisition=json.loads(snapshot['payload'])['acquisition'], source_id=snapshot['source_id'],
@@ -53,6 +56,7 @@ def metadata(catalog, reference):
         relations=catalog.snapshot_relations(reference.snapshot_id))
 
 
+# 继承上下文历史截止；请求只能给更早的时点，不能突破冻结范围。
 def cutoff(context, requested=None):
     value = context['request'].get('as_of')
     bound = datetime.fromisoformat(value) if value else None
@@ -63,6 +67,7 @@ def cutoff(context, requested=None):
     return bound.astimezone(timezone.utc) if bound else None
 
 
+# 所有读取共用的硬范围检查：公司关系已确认、来源被允许、历史可用时间可证明。
 def check_scope(catalog, context, reference, *, requested_as_of=None, roles=('issuer','subject')):
     meta = metadata(catalog, reference)
     allowed = set(context['company_ids'])
@@ -78,11 +83,13 @@ def check_scope(catalog, context, reference, *, requested_as_of=None, roles=('is
         available = parse(SourceTime, meta['acquisition']['available_at'])
         if available.value is None:
             raise CatalogError('SCOPE_TIME_UNKNOWN', 'source availability is unknown; historical cutoff not proven')
+        # 采用可能可用时间的上界：只有整个不确定时间范围都不晚于截止，才允许历史读取。
         if datetime.fromisoformat(available.value.bounds()[1]) > bound:
             raise CatalogError('SCOPE_DENIED', 'source availability exceeds or straddles cutoff')
     return meta
 
 
+# 对影响资产发现的目录内容求摘要；读取运行日志不参与，元数据修订和排序版本参与。
 def view_token(catalog):
     """Material view excludes read-run bookkeeping, includes metadata revisions."""
     tables = ('assets','asset_snapshots','snapshot_representations','asset_builds','asset_relations',
@@ -94,6 +101,7 @@ def view_token(catalog):
         discovery_version='effective_metadata_rrf_v1')))
 
 
+# 三态期间匹配：True 为确认命中，False 为确认不符，None 为元数据不足。
 def period_match(period, wanted):
     if period is None:
         return None
@@ -109,25 +117,37 @@ def period_match(period, wanted):
     return True
 
 
+# 先以公司、来源、期间等约束筛选可读资产，再对元数据相关性排序，返回候选、缺口和视图 token。
 def candidates(catalog, context, request, *, limit=None):
     filters = request.filters
+    # 在任何候选枚举之前拒绝越界截止，不能因为目录为空而跳过范围校验。
     cutoff(context, request.as_of)  # Invalid expansion fails even in an empty catalog.
     company_ids = set(context['company_ids'])
+    symbols = []
     if filters and (filters.company_ids or filters.company_names or filters.securities):
         clock = datetime.fromisoformat(context['clock'])
-        selected, _ = resolve_entities(catalog, Entities(company_ids=filters.company_ids,
+        selected, symbols = resolve_entities(catalog, Entities(company_ids=filters.company_ids,
             company_names=filters.company_names,securities=filters.securities), cutoff(context,request.as_of) or clock)
         if not set(selected) <= company_ids:
             raise CatalogError('SCOPE_DENIED', 'entity filters widen the context')
         company_ids = set(selected)
     if filters:
         for name in filters.material_types:
-            catalog._get('material_types','name',name)
+            try:
+                catalog._get('material_types','name',name)
+            except CatalogError as error:
+                if error.code != 'NOT_FOUND':
+                    raise
+                registered = [r[0] for r in catalog._db.execute('SELECT name FROM material_types ORDER BY name LIMIT 25')]
+                raise CatalogError('INVALID_REQUEST', 'unknown filters.material_types value '+repr(name)+
+                    '; registered names (up to 25): '+json.dumps(registered,ensure_ascii=False)+
+                    '. Use an exact registered name, or omit this optional filter and discover via query.') from error
     # Rank only the most recent published build of each representation. Scope
     # checks precede content loading, so denied sources are never read as evidence.
     rows = catalog._db.execute("""SELECT b.* FROM asset_builds b JOIN assets a USING(asset_id)
         WHERE b.status='published' AND a.status!='retired'
         ORDER BY b.asset_id,b.snapshot_id,b.representation_id,b.published_at DESC,b.build_id DESC""").fetchall()
+    # 每个快照/表示只选择排序后的最新已发布构建，其他构建仅作为版本信息返回。
     groups = {}
     for row in rows:
         key = (row['asset_id'],row['snapshot_id'],row['representation_id'])
@@ -182,6 +202,7 @@ def candidates(catalog, context, request, *, limit=None):
                         continue
                     if (bounds.gte and lower < bounds.gte) or (bounds.lt and upper >= bounds.lt):
                         unresolved.append('published_at')
+        # 元数据未知不会伪装成匹配成功：候选保留 unresolved 状态，并另附可追踪的缺口。
         if unresolved:
             issues.append(dict(code='METADATA_UNRESOLVED',message='requested metadata could not be confirmed',
                 asset_ref=reference.model_dump(mode='json'),unresolved_fields=unresolved))
@@ -194,6 +215,11 @@ def candidates(catalog, context, request, *, limit=None):
             versions=dict(other_builds=len(builds)-1,revision_relations=[json.loads(r['payload']) for r in meta['asset']['relations']]),
             match=dict(status='unresolved' if unresolved else 'matched',unresolved_fields=unresolved),
             freshness=dict(status='not_confirmed_latest',acquired_at=meta['acquisition']['acquired_at']),issues=[])
+        if symbols:
+            # 仅在按证券过滤时附带匹配依据；映射已在截止时点校验有效期。
+            item['metadata']['symbol_matches'] = [dict(ticker=s['ticker'],exchange_mic=s['exchange_mic'],company_id=s['company_id'],
+                basis='confirmed_registered_mapping',temporal_validity='checked_at_cutoff')
+                for s in symbols if s['company_id'] in {e['company_id'] for e in entities}]
         items.append(item)
         aliases = []
         for entity in entities:
@@ -205,6 +231,7 @@ def candidates(catalog, context, request, *, limit=None):
         if limit is not None:
             db.set_progress_handler(lambda:int(limit.stopped()),1000)
         try:
+            # 两个索引只包含已通过范围检查的元数据；词项和三元子串检索互补，不读取被拒绝资产正文。
             db.execute("CREATE VIRTUAL TABLE terms USING fts5(i UNINDEXED, body, tokenize='porter unicode61')")
             db.execute("CREATE VIRTUAL TABLE grams USING fts5(i UNINDEXED, body, tokenize='trigram')")
             values = list(enumerate(search_text))
@@ -214,17 +241,20 @@ def candidates(catalog, context, request, *, limit=None):
             ranked = [db.execute('SELECT i, bm25(terms) FROM terms WHERE terms MATCH ? ORDER BY bm25(terms), i', (phrase,)).fetchall()]
             folded_phrase = '"'+request.query.casefold().replace('"','""')+'"'
             ranked.append(db.execute('SELECT i, bm25(grams) FROM grams WHERE grams MATCH ? ORDER BY bm25(grams), i', (folded_phrase,)).fetchall())
+            # 三元子串索引无法覆盖短于三个字符的词，补用显式子串命中候选。
             if len(request.query)<3:
                 ranked.append(sorted((i,-t.casefold().count(request.query.casefold()))
                     for i,t in enumerate(search_text) if request.query.casefold() in t.casefold()))
             # BM25 values from distinct tokenizers are not directly comparable.
             # Equal scores share a dense rank; fuse ranks with exact fractions.
+            # 不同分词器的 BM25 不直接相加；先转为同分同名次，再以精确分数做 RRF 融合。
             scores = {}
             for matches in ranked:
                 ranks = {score:rank for rank,score in enumerate(sorted({s for _,s in matches}),1)}
                 for i,score in matches:
                     scores[i] = scores.get(i,Fraction()) + Fraction(1,60+ranks[score])
             selected = [(i,item) for i,item in enumerate(items) if i in scores]
+            # 融合分数相同时按完整资产引用稳定排序，防止分页结果在同一视图内漂移。
             selected.sort(key=lambda pair:(-scores[pair[0]],canonical(pair[1]['asset_ref'])))
             items = []
             for i,item in selected:

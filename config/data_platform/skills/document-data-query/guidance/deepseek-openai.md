@@ -1,0 +1,1 @@
+DeepSeek 经 OpenAI Agents SDK：先读取本 Skill 的完整正文。使用精确 FunctionTool 参数，保留 request/state 分层。每次调用解决一个明确缺口，已有完整证据不重复搜索。所需读取可以合并多个 targets，记录和计算可以在同次 query_records 提交；引用仅限前次已返回的结果。解释使用 $output_language。模型版本 $model_version，SDK 版本 $sdk_version；本配置为待真实验收候选。

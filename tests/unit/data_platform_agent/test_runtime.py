@@ -258,17 +258,19 @@ class RuntimeTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(model.inputs),1)
 
     async def test_business_turn_and_no_progress_stops_preserve_last_state(self):
-        for policy,reason in [('max_turns','max_turns'),('max_no_progress_turns','no_progress')]:
+        # New discovery metadata is progress; only the identical repeat counts toward no_progress.
+        for policy,reason,scenario,turns in [('max_turns','max_turns','success',1),
+                                             ('max_no_progress_turns','no_progress','repeat_discovery',2)]:
             with self.subTest(policy=policy):
                 request=deepcopy(self.case.request)
                 request['run_policy'][policy]=1
                 context=self.case.service.create_context(request,request_key=policy)['context_ref']
-                model=F['ScriptedModel']()
+                model=F['ScriptedModel'](scenario)
                 result=await run_offline(self.case.service,context,profile(),model=model,limits=F['runtime_limits']())
                 self.assertEqual(result['status'],'partial')
                 self.assertEqual(result['delivery']['delivery']['stop_reason'],reason)
-                self.assertEqual(len(model.inputs),1)
-                self.assertEqual(self.case.service.inspect_context(context)['turns'],1)
+                self.assertEqual(len(model.inputs),turns)
+                self.assertEqual(self.case.service.inspect_context(context)['turns'],turns)
 
     async def test_wall_deadline_does_not_request_a_model_written_summary(self):
         request=deepcopy(self.case.request)

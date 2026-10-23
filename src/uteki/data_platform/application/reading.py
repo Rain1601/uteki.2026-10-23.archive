@@ -1,3 +1,5 @@
+# 按块、表格、记录或精确 Locator 读取已发布 HTML，并返回所需上下文。
+# 分页以“目标片段及其依赖”为完整单位，避免数字返回了但表头、单位或脚注被截掉。
 """Read source targets with indivisible, returned context dependencies."""
 from __future__ import annotations
 
@@ -7,6 +9,7 @@ from ..retrieval.cursors import position, advance
 from .evidence import source_evidence, text_fragments, result_item
 
 
+# 读取表头、相邻原文和脚注；缺乏显式表头关联时仅标为候选并返回缺口。
 def table_context(reader, inventory, table, cells, options):
     values, issues = [], []
     if 'table_headers' in options:
@@ -15,6 +18,7 @@ def table_context(reader, inventory, table, cells, options):
         unresolved = []
         for cell in table['cells']:
             if cell['header'] or cell['id'] in explicit or cell['id'] in candidates:
+                # 只把原表头标记或显式引用视为已确认；位置推测不能伪装成表头语义。
                 confirmed = cell['header'] or cell['id'] in explicit
                 kind = 'table_headers' if confirmed else 'table_header_candidate'
                 values.append(source_evidence(reader,'table_cell',cell['id'],role='context',context_kind=kind))
@@ -40,6 +44,7 @@ def table_context(reader, inventory, table, cells, options):
     return values, issues
 
 
+# 按请求补充章节标题与相邻块，均保留独立原文出处，不生成解释性内容。
 def block_context(reader, inventory, block, options, neighbors):
     values = []
     if 'section_title' in options and block['section_id']:
@@ -57,6 +62,7 @@ def block_context(reader, inventory, block, options, neighbors):
     return values
 
 
+# 将已验证的定位地址映射回已发布投影，优先使用记录/单元格等更具体视图。
 def locator_values(reader, locator, max_chars):
     """Resolve only a published projection, never reinterpret a caller locator."""
     reader._dom.resolve(locator)
@@ -76,6 +82,7 @@ def locator_values(reader, locator, max_chars):
     return [source_evidence(reader,kind,key,start=start,end=end)], kind, key
 
 
+# 解析所有目标及依赖，按预算分页返回实际片段，并列出本页尚未返回的目标。
 def read_targets(execution):
     request = execution.request
     if request.include_image or 'continuation' in request.context:
@@ -105,6 +112,7 @@ def read_targets(execution):
             if any(r>=table['row_count'] for r in target.rows) or any(c>=table['column_count'] for c in target.cols):
                 raise CatalogError('TARGET_NOT_FOUND','table row/column out of range')
             # A merged cell covers its complete span, not only its top-left slot.
+            # 行列选择按合并单元格覆盖范围相交判断，而不只检查左上角坐标。
             cells = [c for c in table['cells'] if (not target.rows or any(c['row']<=r<c['row']+c['row_span'] for r in target.rows))
                 and (not target.cols or any(c['col']<=col<c['col']+c['col_span'] for col in target.cols))]
             values = [source_evidence(reader,'table_cell',c['id']) for c in cells]
@@ -147,6 +155,7 @@ def read_targets(execution):
             issues += gaps
         keys = []
         for value in dependent:
+            # 同一上下文可被多个目标共享；先去重，再让目标引用同一个返回结果。
             key = digest(canonical(value))
             if key not in contexts:
                 contexts[key] = result_item(execution.session,execution.operation,'evidence',value)
@@ -162,6 +171,7 @@ def read_targets(execution):
     selected,required,end = [],{},offset
     while end<len(all_items):
         item,keys = all_items[end]
+        # 先计算加入当前目标后的全部依赖，再决定是否装入本页，保证依赖闭合。
         proposed = required | {key:contexts[key] for key in keys}
         # Include envelope slack. The service also enforces the final full size.
         if len(canonical(dict(items=selected+[item],context_evidence=list(proposed.values()))))>request.max_bytes-1200:

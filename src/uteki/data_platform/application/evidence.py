@@ -1,3 +1,5 @@
+# 把原文投影封装为带出处的候选结果，并且只登记最终响应实际包含的证据。
+# ResultRef 标识本次返回；locator 与内容摘要标识原件位置，两者承担不同的追溯职责。
 """Prepare source-bound response items; only final returned items are registered."""
 from __future__ import annotations
 
@@ -5,17 +7,21 @@ from copy import deepcopy
 
 from ..contracts.common import CatalogError, canonical, digest, new_id
 from ..contracts.evidence import HtmlEvidenceRef
-from ..contracts.run import ResultRef
+from ..contracts.run import ResultRef, result_handle
 from .session import ref_key
 
 
+# 为候选结果分配本次运行/操作的引用；仅创建返回对象，此时尚未登记为已展示。
 def result_item(session, operation, kind, value):
     reference = ResultRef(run_id=session.data['context']['run_id'],operation_id=operation,kind=kind,item_id=new_id('res'))
-    return deepcopy(value) | dict(result_ref=reference.model_dump(mode='json'))
+    return deepcopy(value) | dict(result_ref=reference.model_dump(mode='json'),
+                                  result_handle=result_handle(reference))
 
 
+# 递归收集响应中的结果，校验归属与依赖闭包，登记后返回新增证据数量。
 def register_returned(session, operation, response):
     found = {}
+    # 遍历响应中的嵌套结果；同一个 ResultRef 若对应不同内容则拒绝登记。
     def visit(value):
         if isinstance(value,dict):
             if 'result_ref' in value:
@@ -32,6 +38,7 @@ def register_returned(session, operation, response):
             for item in value:
                 visit(item)
     visit(response)
+    # 依赖必须与目标一起出现在最终响应；不能引用生成过却未实际返回的候选。
     for value in found.values():
         for ref in value.get('operand_refs',[]) + value.get('dependency_refs',[]):
             if ref_key(ref) not in found:
@@ -39,16 +46,74 @@ def register_returned(session, operation, response):
     seen = set(session.data['seen_results'])
     before = len(seen)
     for item in found.values():
+        if item['result_ref']['kind']=='metadata':
+            # Existing metadata progress keys are independent of page grouping
+            # and citation IDs. Do not count the same navigation twice.
+            continue
         # A fresh ResultRef for the same source range/value is not new evidence.
-        stable = {k:v for k,v in item.items() if k not in {'result_ref','operand_refs','dependency_refs','requested_target_index'}}
+        # 忽略每次新分配的结果 ID，按原文范围和依赖内容判断是否真的取得新证据。
+        stable = {k:v for k,v in item.items() if k not in {'result_ref','result_handle','operand_refs','dependency_refs','requested_target_index'}}
         for key in ('operand_refs','dependency_refs'):
-            stable[key] = [{k:v for k,v in found[ref_key(r)].items() if k not in {'result_ref','operand_refs','dependency_refs'}} for r in item.get(key,[])]
+            stable[key] = [{k:v for k,v in found[ref_key(r)].items() if k not in {'result_ref','result_handle','operand_refs','dependency_refs'}} for r in item.get(key,[])]
         seen.add(digest(canonical(stable)))
     session.data['seen_results'] = sorted(seen)
     session.data['results'].update(found)
     return len(seen)-before
 
 
+def metadata_keys(tool, response):
+    """Navigation progress is metadata, distinct from source-fact progress.
+
+    Ignore request IDs, timing, cursors, ranking and page grouping. Splitting or
+    reordering the same metadata must not reset the no-progress limit.
+    """
+    if response.get('status') not in {'ok','partial'}:
+        return set()
+    if tool == 'search_asset' and response.get('navigation_asset_ref'):
+        return {digest(canonical(dict(kind='document_navigation',asset_ref=response['navigation_asset_ref'],
+                    item={k:v for k,v in item.items() if k not in {'result_ref','result_handle'}})))
+                for item in response['items']}
+    if tool not in {'find_assets','get_asset_schema'}:
+        return set()
+    keys = set()
+    for item in response['items']:
+        if tool=='find_assets':
+            value = {k:item[k] for k in ('asset_ref','title','metadata','readiness')}
+            keys.add(digest(canonical(dict(kind='asset_metadata',value=value))))
+        else:
+            # Capability/index generation tokens can change without providing
+            # new information; retain actual readiness and source metadata.
+            value = {k:item[k] for k in ('asset_ref','overview','readiness','capabilities','coverage')}
+            value['capabilities'] = sorted(value['capabilities'])
+            keys.add(digest(canonical(dict(kind='schema_metadata',value=value))))
+            for facet in item['facets']:
+                keys.add(digest(canonical(dict(kind='schema_facet',asset_ref=item['asset_ref'],facet=facet))))
+            for node in item.get('directory',{}).get('nodes',[]):
+                keys.add(digest(canonical(dict(kind='document_directory',asset_ref=item['asset_ref'],node=node))))
+    return keys
+
+
+def metadata_history(session):
+    if 'seen_metadata' in session.data:
+        return set(session.data['seen_metadata'])
+    # Older saved sessions have no metadata history field. Reconstruct it from
+    # completed responses, so reopening/upgrading cannot make old pages new.
+    seen = set()
+    for operation in session.data['operations'].values():
+        if operation['status']=='completed':
+            seen.update(metadata_keys(operation['tool'],operation['response']))
+    return seen
+
+
+def register_metadata(session, tool, response):
+    seen = metadata_history(session)
+    before = len(seen)
+    seen.update(metadata_keys(tool,response))
+    session.data['seen_metadata'] = sorted(seen)
+    return len(seen)-before
+
+
+# 按冻结读者定位原文，可截取精确字符范围；保留来源对象、定位摘要与类型上下文。
 def source_evidence(reader, kind, item_id, *, start=None, end=None, role='target', context_kind=None):
     evidence_ref = HtmlEvidenceRef(asset_ref=reader.reference,kind=kind,item_id=item_id,
         field='raw_value' if kind=='record_field' else 'text')
@@ -60,6 +125,7 @@ def source_evidence(reader, kind, item_id, *, start=None, end=None, role='target
     if lower < 0 or upper < lower or upper > len(text):
         raise CatalogError('INVALID_REQUEST','source range is outside the returned item')
     text = text[lower:upper]
+    # 截取后同步调整原件坐标和文本 hash，避免片段沿用全文定位。
     locator.update(char_start=locator['char_start']+lower,char_end=locator['char_start']+upper,text_sha256=digest(text.encode()))
     value = dict(asset_ref=reader.reference.model_dump(mode='json'),locator=locator,
         reader_ref=evidence_ref.model_dump(mode='json'),kind='record' if kind=='record_field' else 'table' if kind=='table_cell' else 'text',
@@ -79,6 +145,7 @@ def source_evidence(reader, kind, item_id, *, start=None, end=None, role='target
     return value
 
 
+# 把已解析记录与原始值、XBRL 期间/单位上下文和来源地址一起返回。
 def record_item(reader, record):
     evidence = reader.read(HtmlEvidenceRef(asset_ref=reader.reference,kind='record_field',item_id=record['id'],field='raw_value'))
     from ..retrieval.index import concept_id
@@ -91,6 +158,7 @@ def record_item(reader, record):
         context_source=evidence['context']['xbrl_context'],unit_source=evidence['context']['xbrl_unit'])
 
 
+# 在条数和字节预算内选择完整条目，返回选中项、下一位置及预算截断标记。
 def fit_page(items, start, *, limit, max_bytes):
     """Whole items only. Callers split long text with exact ranges beforehand."""
     selected = []
@@ -104,6 +172,7 @@ def fit_page(items, start, *, limit, max_bytes):
     return selected, index, index<len(items) and len(selected)<limit
 
 
+# 将指定块范围拆成带精确出处的小片段；空范围也保留可追踪的空结果。
 def text_fragments(reader, block_id, *, start=None, end=None, max_chars=500):
     block = reader._blocks.get(block_id)
     if block is None:

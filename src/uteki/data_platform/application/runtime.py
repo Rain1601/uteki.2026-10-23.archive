@@ -1,3 +1,5 @@
+# SDK 无关的运行记录与准入控制：把原生调用、业务工具、可见证据、预算和结束结果绑定起来。
+# 本模块保存事实并检查能否继续；实际模型循环及原生会话恢复由各 SDK 适配层执行。
 """Durable business runtime records; never an SDK loop or a second cost ledger."""
 from __future__ import annotations
 
@@ -26,6 +28,7 @@ from .gateway_batch import load_gateway_binding, open_runtime_budget
 
 FORCED_STOPS = {'cancelled','wall_time','max_turns','no_progress','model_budget','native_max_turns'}
 
+# 同一目录/上下文的并发调用共享一个在途任务；不同绑定拒绝合并，取消也汇入同一清理流程。
 async def run_once(service, context_ref, identity, factory):
     """Join the same live host execution; this is not a replacement SDK loop."""
     registry = getattr(service.catalog, '_native_executions', None)
@@ -39,18 +42,21 @@ async def run_once(service, context_ref, identity, factory):
         task = current['task']
     else:
         current = dict(fingerprint=fingerprint,journal=None,cancel_requested=False)
+        # 把日志对象挂到共享任务；初始化期间收到的取消会在挂接后立即生效。
         def attach(journal):
             current['journal']=journal
             if current['cancel_requested']:journal.stop('cancelled')
         task = asyncio.create_task(factory(attach))
         current['task']=task
         registry[context_ref] = current
+        # 任务结束后只移除自己仍持有的登记项，避免误清理后续执行。
         def completed(done):
             if registry.get(context_ref) is current:registry.pop(context_ref,None)
         task.add_done_callback(completed)
     try:
         while True:
             try:
+                # 屏蔽调用者对共享任务的直接取消；下方显式记录停止决定后只触发一次清理。
                 return deepcopy(await asyncio.shield(task))
             except asyncio.CancelledError:
                 if task.done():return deepcopy(task.result())
@@ -68,12 +74,14 @@ async def run_once(service, context_ref, identity, factory):
             registry.pop(context_ref, None)
 
 
+# 原生运行的持久记录门面；会话写入限定在目录所属线程，传输线程使用预算与只读绑定。
 class RuntimeJournal:
     """One immutable context/native binding, stored in the existing Session head.
 
     Model transport threads may use only `budget`, `guard_transport` and the
     immutable binding. Session mutations stay on the Catalog owner's thread.
     """
+    # 校验 profile/限额/账本绑定；返回既有结果、显式恢复原运行，或持久初始化新运行。
     def __init__(self, service, context_ref, profile, limits, *, recover=False, checkpoint=None, started=None, gateway_binding=None):
         now=time.monotonic()
         if started is not None and (type(started) not in (int,float) or not math.isfinite(started) or not 0<=started<=now):
@@ -111,6 +119,7 @@ class RuntimeJournal:
             raise CatalogError('RECOVERY_REQUIRED','result timing confirmation is incomplete; use explicit recovery')
         if recovery_pending and not recover:
             raise CatalogError('RECOVERY_REQUIRED','interrupted recovery requires explicit reconciliation')
+        # 恢复必须沿用原模型、SDK、限额和网关绑定，不能把改配置当成原运行继续。
         if current is not None and current['binding'] != binding:
             raise CatalogError('IDEMPOTENCY_CONFLICT', 'native kernel/profile/limits differ from this context')
         pending_result = current is not None and current.get('outcome_intent') and not current.get('outcome_object')
@@ -155,6 +164,7 @@ class RuntimeJournal:
         path = (self.catalog.root/self.gateway['ledger_path'] if self.gateway else
             ensure_directory(self.catalog.root, 'runs/'+self.context['root_run_id'])/'budget.sqlite')
         existing_root = root_session.data.get('root_budget') or root_session.data.get('native_execution')
+        # 没有可验证根描述的既存账本不能自动认领，避免串账或重置费用历史。
         if self.gateway is None and existing_root is None and (path.exists() or path.is_symlink()):
             raise CatalogError('RECOVERY_REQUIRED','unexpected existing root ledger; never adopt it')
         if existing_root is not None:
@@ -189,6 +199,7 @@ class RuntimeJournal:
         session.data['native_execution']['phase'] = 'active'
         session.save()
 
+    # 原 SDK 尚未启动时，核验旧进程退出并完成原初始化意图，然后开始新计时段。
     def _resume_initialization(self):
         """No SDK was started: finish the original intent after observing its owner."""
         if not self.state().get('exit_observation'):
@@ -214,6 +225,7 @@ class RuntimeJournal:
             self.recovery_clock.close()
             raise
 
+    # 先核清在途请求、业务副作用和耗时，再判断能否恢复原生会话或确认原终态。
     def _recover_existing_results(self):
         """Reconcile effects/time; only an adapter's verified state can continue."""
         saved=self.session()
@@ -274,6 +286,7 @@ class RuntimeJournal:
                 and session.data['status']=='open'
                 and ((self.profile['kernel']=='openai' and native.get('openai_checkpoint') is not None)
                      or (self.profile['kernel']=='claude' and native.get('claude_session') is not None))):
+            # 业务副作用已核清仍不足以续跑；模型响应或收费未知也必须先解决。
             if self.budget.summary()['unknown_requests'] or self.budget.inspect_root()['request_stages'].get('outcome_unknown'):
                 return self._recovery_pending('root response or fee remains unknown; native continuation blocked',reconciled)
             self.resuming = True
@@ -296,6 +309,7 @@ class RuntimeJournal:
             native_events=[dict(type='terminal_reconciled_without_sdk_restart')],tool_events=[],
             mode='offline',real_model_calls=0,gateway_cost_usd=None))
 
+    # 把尚不能安全继续的原因与已核清操作保存为恢复待办结果。
     def _recovery_pending(self, error, reconciled):
         return self.finish(dict(kind='recovery_required',status='failed',delivery=None,clarification=None,
             committed_delivery=None,committed_clarification=None,error=error,native_success=False,
@@ -303,12 +317,15 @@ class RuntimeJournal:
             native_events=[dict(type='existing_tool_results_reconciled',operation_ids=reconciled)],tool_events=[],
             mode='offline',real_model_calls=0,gateway_cost_usd=None))
 
+    # 每次重新加载会话最新 head，避免用旧内存副本覆盖其他已提交记录。
     def session(self):
         return Session(self.catalog, self.context_ref)
 
+    # 返回原生执行记录副本，供 SDK 适配层检查恢复点和可见结果。
     def state(self):
         return deepcopy(self.session().data['native_execution'])
 
+    # 适配层验证原生恢复数据后，结束恢复计时并开始新的受剩余额度约束的执行段。
     def begin_continuation(self):
         """Start a new timed execution only after the adapter validates its state."""
         if not self.resuming:
@@ -321,11 +338,13 @@ class RuntimeJournal:
         begin_segment(session,started=self.started,prior_elapsed=self.prior_elapsed)
         self.checkpoint('native_continuation_started')
 
+    # 幂等结束本宿主的恢复计时，把恢复耗时计入原任务。
     def finish_recovery(self):
         if self.recovery_clock is not None and not self.recovery_clock.closed:
             self.recovery_clock.close()
             self.checkpoint('host_recovery_completed')
 
+    # 发送模型请求前检查取消、持久停止标记及总时限；不写业务会话。
     def guard_transport(self):
         if self.stopped.is_set():
             raise CatalogError('RUN_STOPPED', self.stop_reason or 'runtime stopped')
@@ -338,6 +357,7 @@ class RuntimeJournal:
             self.stop('wall_time')
             raise CatalogError('BUDGET_EXCEEDED', 'root execution time exhausted')
 
+    # 记录首次停止原因；预算类停止同步到根账本或当前网关 scope，阻止后续请求。
     def stop(self, reason):
         if not self.stopped.is_set():
             self.stop_reason = reason
@@ -346,14 +366,17 @@ class RuntimeJournal:
             self.stop_reason=(self.budget.stop_scope(self.gateway_binding['scope_id'],reason)['stop_reason']
                 if self.gateway_binding else self.budget.stop_root(reason)['stop_reason'])
 
+    # 根运行停止优先，其次读取当前控制 scope 的停止原因。
     def _persistent_stop(self):
         root_stop=self.budget.inspect_root()['stop_reason']
         return root_stop or (self.budget.inspect_scope(self.gateway_binding['scope_id'])['stop_reason']
             if self.gateway_binding else None)
 
+    # 核清本运行或 scope 中断请求；沿用原账本，不创建新的请求额度。
     def _recover_requests(self):
         return self.budget.recover_requests(**({'scope_id':self.gateway_binding['scope_id']} if self.gateway_binding else {}))
 
+    # 把当前执行段耗时累计到会话；恢复阶段交由独立 RecoveryClock 防止混算。
     def tick(self, *, completion=False):
         if self.recovery_clock is not None and not self.recovery_clock.closed:
             self.recovery_clock.tick()
@@ -368,6 +391,7 @@ class RuntimeJournal:
                 through_monotonic=now,wall_seconds=session.data['wall_seconds'])
         session.save()
 
+    # 业务工具开始前进一步检查未确认操作、未知费用、金额、轮次及无进展限制。
     def guard_action(self):
         self.guard_transport()
         self.tick()
@@ -384,7 +408,11 @@ class RuntimeJournal:
             self.failure_code = 'RECOVERY_REQUIRED'
             raise CatalogError('RECOVERY_REQUIRED','root request/fee uncertainty must be reconciled before continuing')
         cost = self.budget.summary()
-        if Decimal(cost['estimated_spent_usd'])+Decimal(cost['held_usd'])>Decimal(policy['max_usd']):
+        # Gateway scopes share a registered batch allowance. An explicit money-
+        # only revision preserves their original context snapshots; the current
+        # binding carries the authorized pool ceiling. Offline child caps stay local.
+        monetary_limit = self.gateway['plan']['limit_usd'] if self.gateway else policy['max_usd']
+        if Decimal(cost['estimated_spent_usd'])+Decimal(cost['held_usd'])>Decimal(monetary_limit):
             self.stop('model_budget')
             raise CatalogError('BUDGET_EXCEEDED','child monetary limit is below cumulative root costs')
         if data['turns'] >= policy['max_turns']:
@@ -394,6 +422,7 @@ class RuntimeJournal:
             self.stop('no_progress')
             raise CatalogError('BUDGET_EXCEEDED', 'no-progress limit exhausted')
 
+    # 仅为离线模型请求登记零费用预留并标记发出；真实网关必须在 HTTP 边界计量。
     def prepare_model(self, request, *, request_bytes=None, request_key=None):
         if self.gateway_binding is not None:
             raise CatalogError('INVALID_STATE','gateway requests must use the physical HTTP boundary, not zero-cost offline metering')
@@ -407,6 +436,7 @@ class RuntimeJournal:
             raise CatalogError('REQUEST_TOO_LARGE', 'model request exceeds the explicit envelope bound')
         key = request_key or 'model:'+uuid.uuid4().hex
         try:
+            # 账本先登记请求意图，再标记已发出；两步间的中断与发出后的未知结果可分别恢复。
             self.budget.prepare_request(key, dict(run_id=self.context['run_id'],
                 context_ref=self.context_ref, profile=self.profile, request=request), reserve_usd='0')
         except BudgetExceeded:
@@ -422,6 +452,7 @@ class RuntimeJournal:
         self.checkpoint('model_dispatched')
         return key
 
+    # 保存离线模型响应；完整响应记合成零费用，不完整响应保留未知。
     def record_model(self, key, response, *, complete):
         if self.gateway_binding is not None:
             raise CatalogError('INVALID_STATE','gateway responses require raw transport and billing evidence')
@@ -429,6 +460,7 @@ class RuntimeJournal:
         self.budget.record_response(key, response, billed_usd='0' if complete else None)
         self.checkpoint('model_response_committed')
 
+    # 将 SDK call_id 与工具名/参数绑定为幂等键；重复调用复用原输出而不重新执行。
     def tool_key(self, call_id, name, arguments):
         nonblank(call_id)
         session = self.session()
@@ -450,6 +482,7 @@ class RuntimeJournal:
         self.checkpoint('native_tool_prepared')
         return key, None
 
+    # 保存 SDK 工具的精确返回；同一调用 ID 已确认的输出不可改变。
     def record_tool(self, call_id, output):
         identity = digest(canonical(dict(call_id=call_id, kernel=self.profile['kernel'])))
         session = self.session()
@@ -460,6 +493,7 @@ class RuntimeJournal:
         session.save()
         self.checkpoint('native_tool_response_committed')
 
+    # 登记原生 SDK 实际观察到的结果引用与事件，供交付可见性检查使用。
     def observe(self, references, event):
         session = self.session()
         native = session.data['native_execution']
@@ -469,6 +503,7 @@ class RuntimeJournal:
         native['events'].append(deepcopy(event))
         session.save()
 
+    # 核清在途请求，必要时生成受证据约束的部分交付，再持久保存运行终态和结束耗时。
     def finish(self, outcome):
         self.tick()
         value = deepcopy(outcome)
@@ -496,6 +531,7 @@ class RuntimeJournal:
         self.stop('terminal')
         session = self.session()
         native=session.data['native_execution']
+        # 只有当前进程持有的执行段才能记录自身结束计时；恢复宿主不能冒记原 worker 的时间。
         owns_clock=(self.recovery_clock is None or self.recovery_clock.closed) and (
             native.get('owner_pid')==os.getpid() and native.get('execution_clock',{}).get('started_monotonic')==self.started)
         if owns_clock:
@@ -514,6 +550,7 @@ class RuntimeJournal:
         self.finish_recovery()
         return result
 
+    # SDK 装配阶段尚无工具绑定时，构造失败结果并区分普通失败与需恢复状态。
     def failure_outcome(self, error, *, error_code=None, events=None):
         """A failed SDK assembly has no ToolBinding from which to build a result."""
         return dict(kind='recovery_required' if error_code in {'RECOVERY_REQUIRED','CATALOG_INCONSISTENT'} else 'failed',

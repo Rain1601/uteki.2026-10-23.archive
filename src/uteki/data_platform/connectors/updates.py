@@ -20,6 +20,7 @@ from ..retrieval.assets import cutoff, period_match
 from .official import acquire_html, store_acquisition
 
 
+# 宿主预先批准的精确采集计划：冻结请求、身份、时间、URL 范围、限制与构建配方信息。
 class OfficialAcquisitionPlan(Contract):
     """Trusted host configuration; tool callers cannot supply or broaden it."""
     request: AcquireUpdate
@@ -41,7 +42,9 @@ class OfficialAcquisitionPlan(Contract):
     taxonomy_ref: Text
 
 
+# 把宿主批准计划接入一次受控更新，串联权限检查、回执记录、快照冻结与 HTML 构建。
 class OfficialAcquisitionAdapter:
+    # 预先校验计划与私密设置目录；真实联网需明确开启，受控 fetch 只作为可注入传输。
     def __init__(self, plans, *, settings_root: Path, fetch=None, allow_network=False):
         self.plans=tuple(parse(OfficialAcquisitionPlan,p) for p in plans)
         self.settings_root=settings_root
@@ -57,10 +60,12 @@ class OfficialAcquisitionAdapter:
             if 'sec_user_agent' in plan.config:
                 raise CatalogError('INVALID_REQUEST','contact must come from private settings, never a stored acquisition plan')
 
+    # 将计划与传输模式生成指纹，用于把宿主执行选择绑定到操作身份。
     def binding(self):
         return digest(canonical(dict(plans=[p.model_dump(mode='json') for p in self.plans],
             network_enabled=self.allow_network,controlled_transport=self.fetch is not None)))
 
+    # 要求唯一精确计划，并逐项验证来源、主体、材料、期间与截止日是否在当前读策略内。
     def validate(self, execution):
         request=execution.request.acquire
         matches=[p for p in self.plans if p.request==request]
@@ -90,6 +95,7 @@ class OfficialAcquisitionAdapter:
             raise CatalogError('SCOPE_DENIED','target asset reporting period is not confirmed within requested scope')
         if execution.context['request']['periods'] and not any(period_match(payload['reporting_period'],p) is True for p in execution.context['request']['periods']):
             raise CatalogError('SCOPE_DENIED','target period is outside or unresolved in this context')
+        # 截止日检查采用来源可用时间的上界；时间未知或无法证明在界内时拒绝采集。
         bound=cutoff(execution.context)
         if bound is not None:
             if plan.available_at.value is None:
@@ -101,6 +107,7 @@ class OfficialAcquisitionAdapter:
         # Freeze host-side execution choices in the same operation fingerprint.
         return plan
 
+    # 先冻结执行意图及回执，再登记原件、快照与构建；全过程保留资源用量和未决副作用。
     def execute(self, execution, plan):
         catalog=execution.catalog
         workspace=ensure_directory(catalog.root,'acquisitions/'+execution.operation)
@@ -109,6 +116,7 @@ class OfficialAcquisitionAdapter:
         execution.prepare_acquisition(plan_ref=frozen_plan.model_dump(mode='json'),recipe=recipe.model_dump(mode='json'),
             transport_journal_version='uteki-acquisition-transport-v1')
 
+        # 每次进度先持久化回执，再更新用量和意图引用，供中断后核验原请求。
         def progress(report):
             receipt=catalog.content.put_object(canonical(report))
             execution.resource_usage.update(transport_requests=report['requests'],bytes_received=report['bytes_received'],
@@ -126,6 +134,7 @@ class OfficialAcquisitionAdapter:
             if execution.limit is not None:
                 execution.limit.check('acquisition_stopped')
             raise
+        # 无论成功失败，都从保留的来源运行回执汇总实际用量，避免异常路径丢失请求和字节计数。
         finally:
             reports=[json.loads(p.read_bytes()) for p in (workspace/'source-runs').glob('*/manifest.json')]
             requests=sum(r['requests'] for r in reports)
@@ -134,6 +143,7 @@ class OfficialAcquisitionAdapter:
             if reports:
                 execution.effect(kind='acquisition_receipt',status='recorded',operation_id=execution.operation,
                     source_run_ids=[r['run_id'] for r in reports],transport_requests=requests)
+        # 先冻结所得输入和最终回执，再登记采集完成；后续恢复可核验同一份原件而无需再请求。
         input_ref=store_acquisition(catalog.content,acquired,main_url=plan.main_url)
         inputs=catalog.content.read_manifest(input_ref)
         receipt=catalog.content.put_object(canonical(acquired['report']))
@@ -164,11 +174,13 @@ class OfficialAcquisitionAdapter:
         except (CatalogError,OSError) as error:
             pending = (catalog._db.execute("SELECT 1 FROM asset_builds WHERE run_id=? AND status='staging'",(run,)).fetchone()
                 or catalog._db.execute("SELECT 1 FROM asset_snapshots WHERE run_id=? AND status='collecting'",(run,)).fetchone())
+            # 没有 collecting/staging 遗留且提交头明确时才结束失败任务；否则保留原状态交恢复确认。
             if not pending and not catalog.database.head_uncertain and catalog._get('runs','run_id',run)['status']=='running':
                 code=getattr(error,'code','STORAGE_IO_ERROR')
                 catalog.finish_run(run,status='cancelled' if code=='CANCELLED' else 'failed',
                     failure_code=None if code=='CANCELLED' else code)
             raise
+        # 对外逐项报告实际快照/构建副作用与恢复需求，不用函数抛错概括为“什么都没发生”。
         finally:
             for row in catalog._db.execute('SELECT * FROM asset_snapshots WHERE run_id=?',(run,)):
                 execution.effect(kind='snapshot',snapshot_id=row['snapshot_id'],status=row['status'],failure_code=row['failure_code'],
@@ -180,6 +192,7 @@ class OfficialAcquisitionAdapter:
         return acquisition_result(catalog,reference,inputs,execution.resource_usage,frozen_plan,execution.operation,acquired['report']['run_id'])
 
 
+# 为正常执行和恢复确认生成同形结果；输入资源缺口决定 partial，并保留计划与回执入口。
 def acquisition_result(catalog, reference, inputs, resource_usage, frozen_plan, operation_id, source_run_id):
     """Same result shape for normal execution and verified existing publication."""
     gaps=[r.reason for r in inputs.resources if isinstance(r,MissingResource)]

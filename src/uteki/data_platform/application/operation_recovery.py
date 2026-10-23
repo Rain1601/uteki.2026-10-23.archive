@@ -1,3 +1,4 @@
+# 中断工具恢复只确认原响应或已有副作用，不自动重新执行工具、下载或计算。
 """Reconcile accepted tool results/effects without dispatching another tool."""
 from copy import deepcopy
 
@@ -6,6 +7,7 @@ from ..retrieval.content import HtmlReader
 from ..retrieval.index import DerivedIndex
 
 
+# 按原幂等键和指纹找已接受操作；完成原响应意图，或验证可恢复的索引/获取副作用。
 def recover_operation(service, session, request_key, fingerprint, request, *, checkpoint=None):
     checkpoint = checkpoint or (lambda phase: None)
     operation = next((o for o in session.data['operations'].values() if o['request_key']==request_key),None)
@@ -18,6 +20,7 @@ def recover_operation(service, session, request_key, fingerprint, request, *, ch
     if operation['status']=='completed':
         return deepcopy(operation['response'])
     intent = operation.get('response_intent')
+    # 没有完整响应时，仅索引 head 和官方获取的已保存意图有专门核验路径。
     if intent is None:
         effect = operation.get('effect_intent')
         if operation['tool']!='request_asset_update' or not isinstance(effect,dict):
@@ -39,6 +42,7 @@ def recover_operation(service, session, request_key, fingerprint, request, *, ch
             raise CatalogError('RECOVERY_REQUIRED','no supported effect intent; no tool was repeated')
         checkpoint('tool_effect_reconciled')
         lower = operation['elapsed_lower_bound']
+        # 副作用可确认不代表耗时可精确恢复；仅保留下界并阻止未经核清的后续执行。
         response['resource_usage'] = dict(elapsed_ms=None,elapsed_lower_bound_ms=round(lower*1000,3),
             execution_time_uncertain=True,**operation.get('resource_usage',dict(external_calls=0,model_calls=0,cost_usd='0')))
         response['recovery'] = dict(kind=kind,execution_time_uncertain=True)

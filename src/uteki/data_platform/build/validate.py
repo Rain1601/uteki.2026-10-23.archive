@@ -6,6 +6,7 @@ from ..contracts.evidence import HtmlBlock,HtmlImage,HtmlQuality,HtmlSchema,Html
 from .pipeline import HTML_FILES,artifact_payloads
 
 
+# 先验证各产物结构，再从冻结原件与配方重建并逐字节比对，返回核验后的能力 schema。
 def validate_html_artifacts(content, manifest, inputs, payloads):
     from ..content.publication import validated_json
     if set(payloads)!=HTML_FILES:
@@ -18,6 +19,7 @@ def validate_html_artifacts(content, manifest, inputs, payloads):
     # Hashes alone only prove transport. Reconstruct from the frozen bytes and
     # supported versioned recipe to verify exact source bindings, tables, facts,
     # exclusions and capability declarations. Independent gold is test-only.
+    # 哈希只证明产物没变；同版本重建校验来源绑定与处理结果，仍不替代独立业务答案核验。
     expected=artifact_payloads(content,reference=manifest.asset_ref,inputs=inputs,recipe=manifest.recipe)
     for name in sorted(HTML_FILES):
         if payloads[name]!=expected[name]:

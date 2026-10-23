@@ -1,3 +1,5 @@
+# 以宿主实际观察的进程组退出证明跨进程耗时，而不是接受调用者填入一个持续时间。
+# 单调时钟只有在同一系统启动和时钟实现下可比较；恢复核验同时绑定上下文与原生会话。
 """Observed worker exit bounds execution time; it never resumes an SDK loop."""
 from copy import deepcopy
 import hashlib
@@ -16,10 +18,12 @@ from ..contracts.content import ObjectRef
 from .session import Session
 
 
-def _boot_metadata():
+# 读取当前系统启动标识；不支持的平台或无法读取时明确报错。
+def _boot_metadata(*, version=2):
     try:
         if sys.platform=='darwin':
-            return subprocess.check_output(['/usr/sbin/sysctl','-n','kern.boottime'],timeout=5,stderr=subprocess.PIPE)
+            key='kern.bootsessionuuid' if version==3 else 'kern.boottime'
+            return subprocess.check_output(['/usr/sbin/sysctl','-n',key],timeout=5,stderr=subprocess.PIPE)
         elif sys.platform.startswith('linux'):
             return Path('/proc/sys/kernel/random/boot_id').read_bytes()
         else:
@@ -28,9 +32,17 @@ def _boot_metadata():
         raise CatalogError('RECOVERY_REQUIRED','cannot establish the local monotonic clock domain') from error
 
 
+# 按版本生成时钟域摘要；v2 规范化启动信息，v1 保留旧算法以核验历史记录。
 def _domain(boot,version):
-    if type(version) is not int or version not in (1,2):
+    if type(version) is not int or version not in (1,2,3):
         raise CatalogError('RECOVERY_REQUIRED','unsupported execution clock domain version')
+    if version==3:
+        # kern.boottime changes when macOS adjusts calendar time. A boot
+        # session UUID identifies the boot independently of that adjustment.
+        boot=boot.strip().lower()
+        if not re.fullmatch(rb'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}',boot):
+            raise CatalogError('RECOVERY_REQUIRED','invalid boot session UUID')
+        boot=b'\x00boot-v3\x00'+boot
     if version==2:
         if sys.platform=='darwin':
             match=re.match(rb'^\{\s*sec\s*=\s*(\d+)\s*,\s*usec\s*=\s*(\d+)\s*\}',boot)
@@ -45,13 +57,15 @@ def _domain(boot,version):
     return hashlib.sha256(sys.platform.encode()+boot+time.get_clock_info('monotonic').implementation.encode()).hexdigest()
 
 
-def clock_domain(*,version=2):
+# 返回当前启动周期与单调时钟实现的身份，用于跨进程比较之前的同域检查。
+def clock_domain(*,version=3):
     """Compare only the same boot/clock kind; retain the exact legacy algorithm."""
-    return _domain(_boot_metadata(),version)
+    return _domain(_boot_metadata(version=version),version)
 
 
+# 保存执行段起点及已累计时间；域不可获取时保留原因，进程内限时仍可使用。
 def start_clock(started, initial_wall_seconds):
-    value=dict(started_monotonic=started,initial_wall_seconds=initial_wall_seconds,domain_version=2)
+    value=dict(started_monotonic=started,initial_wall_seconds=initial_wall_seconds,domain_version=3)
     try:
         value['domain']=clock_domain()
     except CatalogError as error:
@@ -61,43 +75,60 @@ def start_clock(started, initial_wall_seconds):
     return value
 
 
+# 查询指定进程组的现存成员，供启动前能力检查及退出清理确认。
 def _members(pgid):
     rows=subprocess.check_output(['/bin/ps','-axo','pid=,pgid=,stat='],text=True,timeout=5)
     return [dict(pid=int(pid),state=state) for pid,group,state in
             (line.split() for line in rows.splitlines()) if int(group)==pgid]
 
 
+# 宿主拥有的真实子进程组；负责启动、停止/回收及保存可核验的退出观察。
 class ObservedWorker:
     """Host-only owner of a real process group. Call record after wait succeeds."""
+    # 要求显式绝对路径和环境；确认可检查进程组后再创建隔离会话中的 worker。
     def __init__(self, command, *, cwd, env, stdout, stderr):
         if (not isinstance(command,(list,tuple)) or not command or any(not isinstance(v,str) or not v for v in command)
                 or not Path(command[0]).is_absolute() or not Path(cwd).is_absolute() or not isinstance(env,dict)):
             raise CatalogError('INVALID_REQUEST','explicit absolute executable/cwd and environment required')
         boot=_boot_metadata()
         self.domains={version:_domain(boot,version) for version in (1,2)}
-        self.domain=self.domains[2]
+        self.domains[3]=clock_domain(version=3)
+        self.domain=self.domains[3]
         _members(os.getpgrp())  # Fail before spawning if membership cannot be inspected.
         self.launched=time.monotonic()
         self.child=subprocess.Popen(command,cwd=cwd,env=env,stdout=stdout,stderr=stderr,start_new_session=True)
         self.observation=None
         self.cleanup=None
 
-    def wait(self, *, timeout):
+    # 等待退出并处理超时或外部停止；清理整个进程组后才生成退出观察。
+    def wait(self, *, timeout, stop_requested=None, on_stop=None):
         if self.observation is not None:
             return deepcopy(self.observation)
         if type(timeout) not in (int,float) or not math.isfinite(timeout) or timeout<=0:
             raise CatalogError('INVALID_REQUEST','positive finite supervisor timeout required')
-        timed_out=False
+        if any(callback is not None and not callable(callback) for callback in (stop_requested,on_stop)):
+            raise CatalogError('INVALID_REQUEST','supervisor callbacks must be callable')
+        timed_out=False;reason=None;failure=None
         try:
-            self.child.wait(timeout=timeout)
-        except subprocess.TimeoutExpired:
-            timed_out=True
-        except BaseException:
-            try:os.killpg(self.child.pid,signal.SIGKILL)
-            except ProcessLookupError:pass
-            self.child.wait(timeout=5)
-            raise
+            deadline=time.monotonic()+timeout
+            while self.child.poll() is None:
+                reason=stop_requested() if stop_requested is not None else None
+                if reason is not None:
+                    if not isinstance(reason,str) or not reason:
+                        raise CatalogError('INVALID_REQUEST','supervisor stop reason must be nonempty text')
+                    break
+                remaining=deadline-time.monotonic()
+                if remaining<=0:
+                    timed_out=True;reason='wall_time';break
+                try:self.child.wait(timeout=min(remaining,.05) if stop_requested is not None else remaining)
+                except subprocess.TimeoutExpired:pass
+            if reason is not None and on_stop is not None:on_stop(reason)
+        except BaseException as error:
+            # Even persistence/observer failures must not leave a native group
+            # running after the host loses its ability to supervise it.
+            failure=error
         before=_members(self.child.pid)
+        # 先请求退出，再强制回收残留成员；主进程退出不代表 SDK 派生子进程全部停止。
         for sig in (signal.SIGTERM,signal.SIGKILL):
             if not _members(self.child.pid):break
             try:os.killpg(self.child.pid,sig)
@@ -114,8 +145,11 @@ class ObservedWorker:
         self.observation=dict(schema_version='uteki-observed-exit-v1',owner_pid=self.child.pid,
             clock_domain=self.domain,launched_monotonic=self.launched,exited_monotonic=time.monotonic(),
             observed_at=utc_now(),returncode=self.child.returncode,timed_out=timed_out,process_group_empty=True)
+        if reason is not None:self.observation['stop_reason']=reason
+        if failure is not None:raise failure
         return deepcopy(self.observation)
 
+    # 把退出观察绑定到该进程实际拥有的原生执行或恢复区间，存成不可变对象。
     def record(self, catalog, context_ref):
         if self.observation is None:
             raise CatalogError('RECOVERY_REQUIRED','worker exit has not been observed')
@@ -146,12 +180,15 @@ class ObservedWorker:
         return reference
 
 
+# 携带验证失败诊断的恢复异常，保留证据入口但不把失败观察当成有效计时。
 class TimeObservationError(CatalogError):
+    # 复制诊断并统一标为 RECOVERY_REQUIRED，供上层保存失败证据。
     def __init__(self, diagnostic):
         self.diagnostic = deepcopy(diagnostic)
         super().__init__('RECOVERY_REQUIRED', 'execution time observation could not be verified: '+diagnostic['reason'])
 
 
+# 旧执行计时核清后归档原段，再把计时所有权交给当前进程的新执行段。
 def begin_segment(session, *, started, prior_elapsed):
     """Transfer the reconciled clock to a new, explicitly authorized worker."""
     native = session.data['native_execution']
@@ -173,6 +210,7 @@ def begin_segment(session, *, started, prior_elapsed):
     session.save()
 
 
+# 核验退出观察的字节、身份、时钟域及时间区间，再以可证明上界补记原执行耗时。
 def reconcile_time(session, *, active_recovery_id=None):
     """Consume an actual supervisor observation, not a caller-supplied duration."""
     native=session.data['native_execution']
@@ -217,6 +255,7 @@ def reconcile_time(session, *, active_recovery_id=None):
             if not any(c['request_key']==operation['request_key'] for c in native['tool_calls'].values()):
                 raise ValueError('observation cannot reconcile an earlier deterministic operation')
         upper=clock['initial_wall_seconds']+observed['exited_monotonic']-clock['started_monotonic']
+        # 恢复宿主耗时单独计算；核对原 worker 上界前先扣除它，提交时再加回总额。
         host_seconds=recovery_seconds(native)
         known_native_wall=session.data['wall_seconds']-host_seconds
         diagnostic.update(recovery_seconds=host_seconds,known_native_wall_seconds=known_native_wall)
@@ -226,6 +265,7 @@ def reconcile_time(session, *, active_recovery_id=None):
             raise ValueError('execution was already reconciled against a different observation')
         if previous is None:
             diagnostic['reason']='upper_below_recorded_execution'
+            # 观察上界若小于已记录消耗则证据自相矛盾，不能用它倒扣任务耗时。
             if upper<known_native_wall:
                 raise ValueError('observed upper bound is below recorded execution time')
             native['time_reconciliation']=dict(kind='supervised_upper_bound',observation_ref=reference,

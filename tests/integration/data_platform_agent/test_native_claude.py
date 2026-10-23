@@ -97,14 +97,21 @@ def run_scenario(scenario, *, evidence_directory=None, options=None):
                 requests.append(body)
                 if len(requests)>15:self.send_error(400);return
                 compact=bool((options or {}).get('compact_response') and compaction_request(body))
-                try:action=None if compact else script.next(outputs(body.get('messages',[])))
+                skill_step=bool((options or {}).get('skills') and len(requests)<=2)
+                try:
+                    if skill_step:
+                        action=(('Skill',dict(skill='financial-data-query')) if len(requests)==1 else
+                                ('Read',dict(file_path=str(work.resolve()/'.claude/skills/financial-data-query/references/tool-use.md'))))
+                    else:
+                        action=None if compact else script.next(outputs(body.get('messages',[])))
                 except Exception as error:
                     requests[-1]['fixture_error']=repr(error);self.send_error(400);return
-                message=dict(id=('msg_compact_'+str(len(requests)) if compact else 'msg_'+str(script.count)),type='message',role='assistant',model=body['model'],content=[],stop_reason=None,stop_sequence=None,
+                message=dict(id=('msg_skill_'+str(len(requests)) if skill_step else 'msg_compact_'+str(len(requests)) if compact else 'msg_'+str(script.count)),type='message',role='assistant',model=body['model'],content=[],stop_reason=None,stop_sequence=None,
                     usage=dict(input_tokens=(options or {}).get('first_input_tokens',10) if len(requests)==1 else 10,output_tokens=1))
                 if action:
                     name,arguments=action
-                    block=dict(type='tool_use',id='tool_'+str(script.count),name='mcp__data__'+name,input={})
+                    block=dict(type='tool_use',id=('skill_'+str(len(requests)) if skill_step else 'tool_'+str(script.count)),
+                        name=name if skill_step else 'mcp__data__'+name,input={})
                     delta=dict(type='input_json_delta',partial_json=json.dumps(arguments));reason='tool_use'
                 else:
                     text=('<summary>The user requested a synthetic Data task. find_assets completed. '
@@ -181,12 +188,14 @@ def run_scenario(scenario, *, evidence_directory=None, options=None):
                         path=transcripts[0]
                         rows=[json.loads(line) for line in path.read_text().splitlines()]
                         if history_fault=='missing':path.unlink()
-                        elif history_fault in {'tool_output','assistant'}:
+                        elif history_fault in {'tool_output','assistant','skill_body'}:
                             changed=False
                             for row in rows:
                                 content=row.get('message',{}).get('content',[])
                                 if not isinstance(content,list):continue
                                 for block in content:
+                                    if history_fault=='skill_body' and row.get('isMeta') and block.get('type')=='text' and 'Base directory for this skill:' in block.get('text',''):
+                                        block['text']+='\nAltered Skill body fixture.';changed=True
                                     if history_fault=='tool_output' and block.get('type')=='tool_result':
                                         block['content']=[dict(type='text',text='{"status":"ok","items":[]}')];changed=True
                                     elif history_fault=='assistant' and block.get('type')=='tool_use':

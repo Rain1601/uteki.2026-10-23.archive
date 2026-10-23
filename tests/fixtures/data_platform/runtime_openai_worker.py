@@ -21,10 +21,12 @@ async def main():
     root,context,config,phase=sys.argv[1:5]
     acquisition=len(sys.argv)>5 and sys.argv[5]=='acquisition'
     recover=len(sys.argv)>5 and sys.argv[5]=='resume'
+    skills=len(sys.argv)>5 and sys.argv[5]=='skill'
     config=Path(config)
     fixture=runpy.run_path(str(Path(__file__).with_name('sdk_fixture.py')))
-    profile=load_profile(config/'model-profiles/openai/fixture-query/query.json',config_root=config,
-        kernel='openai',model_id='fixture/openai-query-v1',role='query')
+    variant='fixture-skill-query' if skills else 'fixture-query'
+    profile=load_profile(config/f'model-profiles/openai/{variant}/query.json',config_root=config,
+        kernel='openai',model_id='fixture/openai-skill-query-v1' if skills else 'fixture/openai-query-v1',role='query')
     target, _, occurrence = phase.partition('@')
     seen = 0
     def checkpoint(point):
@@ -38,7 +40,7 @@ async def main():
                 os._exit(79)
     with Catalog.open(root) as catalog:
         scenario='free_text' if len(sys.argv)>5 and sys.argv[5]=='failure' else 'clarify' if phase.startswith('clarification_') else 'success'
-        model=fixture['ScriptedModel'](scenario)
+        model=fixture['SkillScriptedModel' if skills else 'ScriptedModel'](scenario)
         if recover:
             data=Session(catalog,context).data
             ledger=RunBudget.open_existing(Path(root)/data['native_execution']['ledger_path'],'0',

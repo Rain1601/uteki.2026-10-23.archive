@@ -18,7 +18,9 @@ from .store import ContentStoreError, _fsync_directory
 REQUIRED_FILES = {"sections.jsonl", "blocks.jsonl", "quality.json", "asset-schema.json"}
 
 
+# 先拒绝重复键和非有限数，再由模型按 JSON 规则校验，避免宽松解析掩盖输入歧义。
 def validated_json(model, raw):
+    # 逐对构造对象，重复键立即失败，避免 JSON 默认以后值覆盖前值。
     def unique_pairs(pairs):
         value = {}
         for key,item in pairs:
@@ -26,6 +28,7 @@ def validated_json(model, raw):
                 raise ValueError("duplicate JSON key")
             value[key] = item
         return value
+    # 拒绝 NaN/Infinity 等非标准 JSON 常量。
     def invalid_constant(value):
         raise ValueError("non-finite JSON constant")
     json.loads(raw,object_pairs_hook=unique_pairs,parse_constant=invalid_constant)
@@ -33,6 +36,7 @@ def validated_json(model, raw):
     return model.model_validate_json(raw)
 
 
+# 枚举产物目录的相对文件集合；拒绝链接与特殊文件，供完整性检查发现缺件或额外文件。
 def file_names(directory: Path) -> set[str]:
     if not directory.is_dir() or directory.is_symlink():
         raise CatalogError("PUBLICATION_INVALID", "missing or unsafe artifact directory")
@@ -47,6 +51,7 @@ def file_names(directory: Path) -> set[str]:
     return result
 
 
+# 在目录独占锁下把完整候选版移动到不可覆盖的最终位置，并同步文件和两侧父目录。
 def move_complete(source: Path, destination: Path, *, checkpoint=None):
     if destination.exists() or destination.is_symlink():
         raise CatalogError("CATALOG_INCONSISTENT", "immutable version directory already exists")
@@ -66,8 +71,10 @@ def move_complete(source: Path, destination: Path, *, checkpoint=None):
     _fsync_directory(destination.parent)
 
 
+# 对内容依赖图作深度优先检查，拒绝悬空引用和循环依赖。
 def check_graph(edges: dict[str, tuple[str, ...]]):
     visiting, done = set(), set()
+    # visiting 表示当前递归路径，done 表示已完成节点；二者区分环与正常共享依赖。
     def visit(node):
         if node not in edges:
             raise CatalogError("PUBLICATION_INVALID", "reference points to a missing content item")
@@ -84,37 +91,45 @@ def check_graph(edges: dict[str, tuple[str, ...]]):
         visit(node)
 
 
+# 协调文件产物和 SQLite 状态；先校验并移动文件，再确认数据库发布，保留中断后的恢复边界。
 class Publication:
+    # 绑定目录与可选阶段回调；回调可用于观察或注入中断，不承担自动重试。
     def __init__(self, catalog, *, checkpoint=None):
         self.catalog = catalog
         self.root = catalog.root
         self.checkpoint = checkpoint
 
+    # 若配置了回调则报告当前阶段，回调异常直接传播。
     def check(self, phase):
         if self.checkpoint is not None:
             self.checkpoint(phase)
 
+    # 统一最终目录移动入口，并把阶段回调传给底层持久化流程。
     def move(self, source, destination):
         if self.checkpoint is None:
             move_complete(source,destination)
         else:
             move_complete(source,destination,checkpoint=self.checkpoint)
 
+    # 根据 final 选择快照最终目录或以 snapshot_id 命名的暂存目录。
     def snapshot_path(self, row, *, final):
         if final:
             return self.root / "assets" / row["asset_id"] / "snapshots" / row["snapshot_id"]
         return self.root / "staging" / ("snapshot-" + row["snapshot_id"])
 
+    # 构建最终路径按 build_id 定位，暂存路径按该次作业的 job_id 隔离。
     def build_path(self, row, *, final):
         if final:
             return self.root / "assets" / row["asset_id"] / "builds" / row["build_id"]
         return self.root / "staging" / row["job_id"]
 
+    # 按稳定顺序重建快照的表示列表，并将持久化引用恢复成类型化对象。
     def _representations(self, snapshot_id):
         return [Representation(representation_id=row["representation_id"],format=row["format"],
                                input_manifest=ObjectRef.model_validate_json(row["input_ref"]))
                 for row in self.catalog._db.execute("SELECT * FROM snapshot_representations WHERE snapshot_id=? ORDER BY representation_id", (snapshot_id,))]
 
+    # 由当前登记数据生成待封存快照；完整性声明为 complete 时禁止存在缺失资源。
     def _snapshot_value(self, row, frozen_at):
         representations = self._representations(row["snapshot_id"])
         if not representations:
@@ -128,6 +143,7 @@ class Publication:
                     frozen_at=frozen_at,metadata=metadata,representations=[r.model_dump(mode="json") for r in representations],
                     relations=self.catalog.snapshot_relations(row["snapshot_id"]))
 
+    # 封存快照清单、写入暂存文件、验证并移动，最后将 collecting 确认为 frozen。
     @operation
     def freeze_snapshot(self, snapshot_id):
         self.check('snapshot_freeze_started')
@@ -140,6 +156,7 @@ class Publication:
         try:
             value = self._snapshot_value(row,utc_now())
             raw = canonical(value)
+            # 清单字节先写入对象仓库，再将引用登记为封存点；之后不能继续补改快照输入。
             reference = self.catalog.content.put_object(raw)
             self.check('before_snapshot_seal')
             with self.catalog.database.transaction():
@@ -152,11 +169,13 @@ class Publication:
             for item in value["representations"]:
                 self.check('snapshot_representation_write')
                 write_control(representations/(item["representation_id"]+".json"),canonical(item))
+            # 暂存版先完整验证，再移动到最终目录；数据库 frozen 只在移动并同步成功后确认。
             self.verify_snapshot(snapshot_id,final=False)
             target_parent = ensure_directory(self.root,f"assets/{row['asset_id']}/snapshots")
             self.move(stage,target_parent/snapshot_id)
             self.commit_snapshot(snapshot_id)
         except (CatalogError, ContentStoreError, OSError, ValidationError) as error:
+            # 目录已移动或数据库提交头不确定时保留原状态供恢复，不能因末尾 I/O 错误抹成失败。
             if not self.catalog.database.head_uncertain:
                 current = self.catalog.get_snapshot(snapshot_id)
                 # A complete moved version can be recovered; do not discard the
@@ -166,6 +185,7 @@ class Publication:
             raise
         return self.catalog.get_snapshot(snapshot_id)
 
+    # 显式继续既有快照候选：只接纳可验证的原文件，不重写已封存内容。
     @operation
     def continue_snapshot(self, snapshot_id):
         """Explicitly publish an intact candidate; never repair sealed files."""
@@ -183,6 +203,7 @@ class Publication:
             self.commit_snapshot(snapshot_id)
         return self.catalog.get_snapshot(snapshot_id)
 
+    # 先验证最终快照并补做目录同步，再在事务内确认 frozen 及资产的 has_snapshot 状态。
     def commit_snapshot(self, snapshot_id):
         row = self.catalog.get_snapshot(snapshot_id)
         self.verify_snapshot(snapshot_id)
@@ -196,6 +217,7 @@ class Publication:
             self.catalog._db.execute("UPDATE asset_snapshots SET status='frozen',updated_at=? WHERE snapshot_id=?", (utc_now(),snapshot_id))
             self.catalog._db.execute("UPDATE assets SET status='has_snapshot',updated_at=? WHERE asset_id=? AND status='registered'", (utc_now(),row["asset_id"]))
 
+    # 只允许 collecting 快照转成失败；已冻结或已失败版本不再更改终态。
     def fail_snapshot(self, snapshot_id, code):
         row = self.catalog.get_snapshot(snapshot_id)
         if row["status"] != "collecting":
@@ -203,6 +225,7 @@ class Publication:
         with self.catalog.database.transaction():
             self.catalog._db.execute("UPDATE asset_snapshots SET status='failed',failure_code=?,updated_at=? WHERE snapshot_id=?", (code,utc_now(),snapshot_id))
 
+    # 交叉比对封存对象、目录字节、数据库输入和完整文件集合，返回通过验证的快照值。
     def verify_snapshot(self, snapshot_id, *, final=True):
         row = self.catalog.get_snapshot(snapshot_id)
         if row["manifest_ref"] is None:
@@ -227,6 +250,7 @@ class Publication:
             raise CatalogError("PUBLICATION_INVALID", "snapshot file set differs")
         return value
 
+    # 核对构建身份与全部文件字节，写入并验证暂存候选后，封存清单引用和能力就绪状态。
     @operation
     def stage(self, build_id, *, files: dict[str, bytes], manifest: BuildManifest):
         self.check('build_stage_started')
@@ -247,6 +271,7 @@ class Publication:
                 parent = ensure_directory(stage, str(Path(item.path).parent))
                 write_control(parent/Path(item.path).name,raw)
             write_control(stage/"manifest.json",manifest.canonical_bytes())
+            # 先从实际落盘文件验证内容，再封存清单及就绪状态，避免仅凭调用方声明宣布候选完整。
             self.verify_build(build,final=False)
             reference = self.catalog.content.put_object(manifest.canonical_bytes())
             if manifest.schema_version == "uteki-html-build-v1":
@@ -264,6 +289,7 @@ class Publication:
             raise
         return self.catalog.get_build(build_id)
 
+    # 构建清单必须同时匹配资产版本、输入、配方及构建键，防止混用另一份产物。
     def _binding(self, build, manifest):
         if (manifest.asset_ref != self.catalog.asset_ref(build)
                 or manifest.input_manifest != ObjectRef.model_validate_json(build["input_ref"])
@@ -271,6 +297,7 @@ class Publication:
                 or manifest.recipe.build_key(manifest.asset_ref,manifest.input_manifest) != build["build_key"]):
             raise CatalogError("PUBLICATION_INVALID", "manifest identity, input or recipe differs from registered build")
 
+    # 校验文件集、哈希、版本绑定及内容约束；HTML 另按冻结输入重建比对，成功返回清单。
     def verify_build(self, build, *, final):
         directory = self.build_path(build,final=final)
         try:
@@ -282,6 +309,7 @@ class Publication:
             if build["manifest_ref"] is not None:
                 if self.catalog.content.read_object(ObjectRef.model_validate_json(build["manifest_ref"])) != raw:
                     raise CatalogError("PUBLICATION_INVALID", "manifest differs from sealed candidate")
+            # 不同版本采用各自精确文件集合；缺文件和额外文件都失败，防止混入旧构建残留。
             required_files = REQUIRED_FILES
             if manifest.schema_version == "uteki-html-build-v1":
                 from ..build.pipeline import HTML_FILES
@@ -294,6 +322,7 @@ class Publication:
                 if len(content) != item.object_ref.byte_length or digest(content) != item.object_ref.sha256:
                     raise CatalogError("PUBLICATION_INVALID", "artifact hash or size mismatch: "+item.path)
                 payloads[item.path] = content
+            # 构建验证还要回到冻结快照和输入原件，确保内容哈希正确但版本绑错的产物不能通过。
             frozen_snapshot = self.catalog.read_snapshot(build["snapshot_id"])
             inputs = self.catalog.content.read_manifest(manifest.input_manifest)
             if manifest.schema_version == "uteki-html-build-v1":
@@ -310,6 +339,7 @@ class Publication:
             if len({s.id for s in sections}) != len(sections) or len({b.id for b in blocks}) != len(blocks):
                 raise CatalogError("PUBLICATION_INVALID", "duplicate content item ID")
             section_ids = {s.id for s in sections}
+            # 章节父关系与块依赖分别验图；重复 ID、悬空引用和环都会拒绝发布。
             check_graph({s.id:(s.parent_id,) if s.parent_id else () for s in sections})
             check_graph({b.id:b.dependency_ids for b in blocks})
             original_refs = {None:inputs.main} | {r.resource_key:r.object_ref for r in inputs.resources if isinstance(r,PresentResource)}
@@ -323,6 +353,7 @@ class Publication:
             quality = validated_json(Quality,payloads["quality.json"])
             if schema.asset_ref != manifest.asset_ref or schema.content_readiness != schema.published_readiness:
                 raise CatalogError("PUBLICATION_INVALID", "schema identity/readiness mismatch")
+            # 能力状态需与原件缺口、实际内容和覆盖声明相容；数据结构合法不代表业务事实已独立验真。
             readiness = schema.content_readiness
             gap = any(isinstance(r,MissingResource) for r in inputs.resources)
             if readiness.original != ("partial" if gap else "ready"):
@@ -343,6 +374,7 @@ class Publication:
                 raise
             raise CatalogError("PUBLICATION_INVALID", "invalid content schema or reference") from error
 
+    # 把已封存的 staging 构建发布为不可变版本；发现已移动未提交目录时要求显式恢复。
     @operation
     def publish(self, build_id):
         build = self.catalog.get_build(build_id)
@@ -352,6 +384,7 @@ class Publication:
         if build["status"] != "staging":
             raise CatalogError("INVALID_STATE", "failed build requires explicit new attempt")
         destination = self.build_path(build,final=True)
+        # 目录已在最终位置意味着可能停在移动与事务确认之间，只能走恢复核验，不重新发布。
         if destination.exists():
             raise CatalogError("RECOVERY_REQUIRED", "build already moved; explicitly recover")
         try:
@@ -367,6 +400,7 @@ class Publication:
             raise
         return self.catalog.asset_ref(self.catalog.get_build(build_id))
 
+    # 重新验证最终产物并同步目录后，仅将 staging 构建确认为 published。
     def commit_build(self, build_id):
         build = self.catalog.get_build(build_id)
         self.verify_build(build,final=True)
@@ -381,6 +415,7 @@ class Publication:
                                      (utc_now(),utc_now(),build_id))
         self.check('after_build_commit')
 
+    # 补做重命名后的目录同步；目录可见不等于持久化已确认，恢复时需要再次执行。
     def _sync_moved(self, directory):
         # Recovery repeats syncs which may have failed after rename. A visible
         # complete directory alone does not acknowledge persistence.

@@ -1,3 +1,5 @@
+# 交付只复制本会话已登记的结果及其依赖，不让模型在终态包中重新填写原文或数值。
+# 格式、引用闭包与状态一致性可以确定性校验；这些检查不等于已判断业务证据充分。
 """Copy registered, actually returned results into an immutable dependency closure."""
 from __future__ import annotations
 
@@ -7,8 +9,10 @@ from uteki.infrastructure.run_budget import RunBudget
 from ..contracts.common import CatalogError, canonical, new_id, utc_now
 from ..contracts.run import DeliveryRequest, TaskState
 from .session import ref_key
+from .delivery_checks import section_coverage, checked_source_claims
 
 
+# 从根运行唯一账本读取已核费用、未知/在途预留及调用数，区分合成与真实运行。
 def delivery_usage(session):
     root_session = session.root_session()
     native = session.data.get('native_execution') or root_session.data.get('root_budget') or root_session.data.get('native_execution')
@@ -42,11 +46,17 @@ def delivery_usage(session):
                 for r in budget.inspect_requests() if r.get('control_scope_id')==scope_id))
         if gateway['mode']=='gateway_synthetic':
             usage.update(real_model_calls=0,cost_usd=None,synthetic_cost_usd=root['cost']['known_billed_usd'])
+        # 保留全额预留后继续不代表费用已核实，不能把账本中的确定部分冒充完整实付费用。
+        if summary.get('unbilled_bounded_requests'):
+            usage.update(cost_usd=None,
+                unbilled_bounded_reserved_usd=root['cost']['unbilled_bounded_reserved_usd'],
+                provider_billing_verified=False)
     if session.data.get('time_reconciliations'):
         usage['time_reconciliations']=deepcopy(session.data['time_reconciliations'])
     return usage
 
 
+# 宿主停止时依据最后已接受状态构造部分交付；只保留原生执行中可见的完整证据。
 def stopped_request(session, reason, visible_results):
     """Only the last accepted state may support a host-generated partial result."""
     visible = {canonical(r) for r in visible_results}
@@ -63,6 +73,7 @@ def stopped_request(session, reason, visible_results):
     gaps = {n['need_id']:n for n in prior['gaps']}
     needs, accepted, missing = [], [], []
 
+    # 递归检查结果及全部依赖均已展示；循环依赖属于非法引用。
     def is_visible(reference, active=None):
         key = canonical(reference)
         active = set() if active is None else active
@@ -78,6 +89,7 @@ def stopped_request(session, reason, visible_results):
         previous = supported.get(identity) or gaps.get(identity) or {}
         refs = previous.get('result_refs',[])
         usable = [r for r in refs if is_visible(r)]
+        # 原来标记满足的需求，只有全部支撑引用都可见时才保持满足，否则降为带缺口的状态。
         if identity in supported and usable and len(usable)==len(refs):
             accepted.append(dict(need_id=identity,result_refs=usable))
             needs.append(dict(need_id=identity,status='supported',result_refs=usable,gaps=[]))
@@ -93,6 +105,7 @@ def stopped_request(session, reason, visible_results):
     return request, state
 
 
+# 校验每个需求的状态和引用，再递归收集证据闭包，生成可冻结的交付包。
 def assemble(session, request, state, plan):
     needs = {n.need_id:n for n in request.needs}
     planned = {n['need_id'] for n in plan['needs']}
@@ -105,6 +118,8 @@ def assemble(session, request, state, plan):
         raise CatalogError('INVALID_REQUEST','conflict refers to unknown need')
     roots = []
     for name, need in needs.items():
+        if need.note is not None:
+            raise CatalogError('DELIVERY_NOTE_UNSUPPORTED', 'delivery does not accept free-form note; source_claims require exact source quotes, disclosed qualifications go in limitations, and missing work stays in gaps')
         if need.status == 'supported':
             if not need.result_refs or need.gaps or name in conflicts or name not in satisfied:
                 raise CatalogError('INVALID_REQUEST','supported need has a gap, conflict or inconsistent state')
@@ -119,6 +134,7 @@ def assemble(session, request, state, plan):
             expected = gaps[name].result_refs
             if gaps[name].missing not in need.gaps:
                 raise CatalogError('INVALID_REQUEST','delivery omitted the accepted state gap')
+        # 交付引用必须与已提交任务状态完全一致，防止终态临时换证据或丢弃已知缺口。
         if {ref_key(r) for r in expected} != {ref_key(r) for r in need.result_refs}:
             raise CatalogError('RESULT_REF_INVALID','delivery and task-state result references differ')
         roots.extend(need.result_refs)
@@ -126,6 +142,7 @@ def assemble(session, request, state, plan):
         roots.extend(conflict.result_refs)
     visited, active = {}, set()
 
+    # 深度遍历证据/操作数依赖并去重；active 用于检测循环，visited 保存已收集结果。
     def visit(reference):
         key = ref_key(reference)
         if key in active:
@@ -141,7 +158,7 @@ def assemble(session, request, state, plan):
 
     for reference in roots:
         visit(reference)
-    groups = {'evidence':[], 'record':[], 'calculation':[]}
+    groups = {'evidence':[], 'record':[], 'calculation':[], 'metadata':[]}
     assets = {}
     for item in visited.values():
         kind = item['result_ref']['kind']
@@ -151,13 +168,22 @@ def assemble(session, request, state, plan):
                 raise CatalogError('RESULT_REF_INVALID','original result lacks a frozen source binding')
             assets[canonical(item['asset_ref'])] = item['asset_ref']
     context = session.data['context']
+    delivered_needs = [n.model_dump(mode='json') | dict(
+        note_origin='caller_statement_not_semantically_verified',
+        source_claims=checked_source_claims(n, visited)) for n in request.needs]
     return dict(schema_version='uteki-delivery-v1',delivery_id=new_id('dl'),context_ref=context['context_ref'],
         run_id=context['run_id'],root_run_id=context['root_run_id'],prior_delivery_refs=context['request']['caller']['prior_delivery_refs'],
-        needs_plan=plan,needs=[n.model_dump(mode='json') | {'note_origin':'caller_statement_not_semantically_verified'} for n in request.needs],
+        needs_plan=plan,needs=delivered_needs,
         evidence=groups['evidence'],records=groups['record'],calculations=groups['calculation'],
+        metadata=groups['metadata'],
+        read_coverage=section_coverage(groups['evidence']),
         assets_used=[assets[k] for k in sorted(assets)], conflicts=[c.model_dump(mode='json') for c in request.conflicts],
         gaps=[dict(need_id=n.need_id,reason=g) for n in request.needs for g in n.gaps],
+        limitations=[dict(need_id=n.need_id,reason=limitation,origin='caller_statement_not_semantically_verified')
+                     for n in request.needs for limitation in n.limitations],
+        completion_basis='requested_work_not_source_quality_certification',
         search_log_ref=dict(run_id=context['run_id'],session_revision=session.data['revision']),
         usage=delivery_usage(session),
         stop_reason='delivered',business_status='completed' if all(n.status=='supported' for n in request.needs) else 'partial',
+        # 此标志明确：引用与包结构通过，并不代表系统独立验证了整题业务充分性。
         created_at=utc_now(),business_sufficiency_evaluated=False)

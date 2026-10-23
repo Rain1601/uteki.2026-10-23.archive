@@ -21,8 +21,9 @@ from uteki.data_platform.service import DataService
 async def main():
     data_root,context,config_root,output=map(Path,sys.argv[1:5])
     options=json.loads(sys.argv[5]) if len(sys.argv)>5 else {}
-    loaded=load_profile(config_root/'model-profiles/claude/fixture-query/query.json',config_root=config_root,
-        kernel='claude',model_id='fixture/claude-query-v1',role='query')
+    variant='fixture-skill-query' if options.get('skills') else 'fixture-query'
+    loaded=load_profile(config_root/f'model-profiles/claude/{variant}/query.json',config_root=config_root,
+        kernel='claude',model_id='fixture/claude-skill-query-v1' if options.get('skills') else 'fixture/claude-query-v1',role='query')
     with Catalog.open(data_root) as catalog, ExitStack() as stack:
         service=DataService(catalog)
         if options.get('wire_fault') and options.get('recover'):

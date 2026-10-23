@@ -16,10 +16,12 @@ from ..contracts.content import InputManifest, MissingResource, PresentResource
 from ..build.dom import SourceDOM, excluded, srcset_key
 
 
+# 以完整来源 URL 的哈希稳定标识图片，使采集、冻结输入和恢复核验使用同一资源键。
 def image_key(url):
     return "image-" + digest(url.encode("utf-8"))
 
 
+# 在明确 URL 白名单、请求/字节/时间限制内获取 HTML 及图片，返回原件与回执，尚不发布资产。
 def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url: str,
                  allowed_urls: tuple[str, ...], max_seconds: float, fetch=None, should_cancel=None,
                  on_progress=None):
@@ -45,6 +47,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
     if main_url not in approved:
         raise CatalogError("INVALID_ARGUMENT", "main URL must be explicitly approved")
     copied = deepcopy(config)
+    # 继续复用既有 SEC 联系信息解析和传输入口；凭据只进入传输配置，不作为回执返回。
     contact, origin = resolve_sec_contact(configured=copied.pop("sec_user_agent", None), settings_root=settings_root)
     if contact is None:
         raise CatalogError("INVALID_ARGUMENT", "SEC contact is not configured")
@@ -57,6 +60,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
         raise CatalogError("INVALID_ARGUMENT", "explicit acquisition limits and retries=0 required")
     deadline = time.monotonic() + max_seconds
 
+    # 主请求和跳转都必须命中冻结的完整 URL 白名单，禁止按主机名放宽范围。
     def guard(url):
         if url not in approved:
             raise AcquisitionError("URL outside frozen exact allowlist")
@@ -72,6 +76,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
     report['transport_state'] = None
     hosts = {urlsplit(url).hostname for url in allowed_urls}
     result = {"main": None, "resources": {}, "missing": {}, "unsupported": {}, "excluded": [], "report": report}
+    # 把当前回执副本交给持久化回调；回执写入失败要求恢复，不能当作远端资源缺失。
     def record_progress():
         if on_progress is not None:
             try:
@@ -79,6 +84,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
             except (OSError,ContentStoreError) as error:
                 raise CatalogError('RECOVERY_REQUIRED','acquisition receipt persistence failed') from error
 
+    # 发起传输前记录 dispatched，返回或报错后再写回执，使中断时的未确认请求可辨识。
     def request(url):
         report['transport_state'] = dict(status='dispatched',url=url,ordinal=report['requests']+1)
         record_progress()
@@ -94,6 +100,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
 
     # Persist the source-run identity before transport, and completed receipts
     # before another request. An in-flight request can still be unconfirmed.
+    # 在任何请求发生前先记录来源运行；请求发出后中断仍可能结果未知，回执不能据此伪造完成。
     record_progress()
     try:
         raw = request(main_url)
@@ -123,6 +130,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
                 continue
             if url in result["resources"] or url in result["missing"]:
                 continue
+            # 不在精确白名单内的可见资源记显式缺口，不为补全页面自动扩大采集范围。
             if url not in approved:
                 result["missing"][url] = "not_allowed_by_frozen_source_policy"
                 session["gap"]("resource_not_allowed", url)
@@ -133,6 +141,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
                 continue
             try:
                 result["resources"][url] = request(url)
+            # 回执写入故障与取消必须向上传播；只有普通资源获取失败才登记为 missing。
             except CatalogError:
                 # Journal failures are not missing remote resources.
                 raise
@@ -155,6 +164,7 @@ def acquire_html(*, config: dict, workspace: Path, settings_root: Path, main_url
     return result
 
 
+# 只导入实际取得的字节，并把缺失/不支持资源及其原因一并写入不可变输入清单。
 def store_acquisition(store: ContentStore, acquired: dict, *, main_url: str):
     """Import only obtained bytes; preserve explicitly absent resource reasons."""
     if not isinstance(acquired.get("main"), bytes):

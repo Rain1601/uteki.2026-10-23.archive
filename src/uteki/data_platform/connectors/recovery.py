@@ -10,6 +10,7 @@ from .official import image_key
 from .updates import OfficialAcquisitionPlan, acquisition_result
 
 
+# 仅接受已完成采集的冻结输入，逐项比对计划、传输回执、资源覆盖及累计用量。
 def acquired_inputs(catalog, operation, request):
     """Read complete frozen inputs and verify their original acquisition receipt."""
     target = operation['effect_intent']['target']
@@ -33,6 +34,7 @@ def acquired_inputs(catalog, operation, request):
             matches = [r for r in report['discovery'] if r['status']=='fetched' and r['source_url']==resource.source_url]
             if len(matches)!=1 or matches[0]['content_sha256']!=resource.object_ref.sha256 or resource.resource_key!=image_key(resource.source_url):
                 raise CatalogError('RECOVERY_REQUIRED','resource input and source receipt differ')
+    # present、missing、unsupported 集合必须与完成回执完全一致，且不能留有 dispatched 未确认传输。
     declared = report['input_resources']
     if (sorted(r.source_url for r in inputs.resources if isinstance(r,PresentResource))!=declared['present']
             or {r.source_url:r.reason for r in inputs.resources if isinstance(r,MissingResource) and r.source_url is not None}!=declared['missing']
@@ -45,6 +47,7 @@ def acquired_inputs(catalog, operation, request):
     return plan_ref, plan, report, inputs, usage
 
 
+# 只确认原运行中已移动且完整的快照/构建；不重新联网、解析或创建发布动作。
 def confirm_acquisition(catalog, context, operation, request, *, checkpoint):
     """Only already-moved versions may be committed. Never adopt another run."""
     target = operation['effect_intent']['target']
@@ -84,6 +87,7 @@ def confirm_acquisition(catalog, context, operation, request, *, checkpoint):
         publication = Publication(catalog,checkpoint=checkpoint)
         # Verify both final directories before acknowledging either. Staged-only
         # files are retained; recovery cannot start a new publication action.
+        # 先验证两个最终目录，再补数据库确认；只有暂存文件时不启动新的移动或解析。
         publication.verify_snapshot(snapshot['snapshot_id'])
         publication.verify_build(build,final=True)
         publication.commit_snapshot(snapshot['snapshot_id'])

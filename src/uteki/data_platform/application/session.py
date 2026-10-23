@@ -1,3 +1,5 @@
+# 业务会话的持久状态：不可变内容对象保存历史，head.json 指向最新已写状态。
+# 上下文映射、创建意图与完成标记共同区分“尚未写完”与“已完成后损坏”，避免恢复丢历史。
 """Bounded local read runs stored through ContentStore and atomic control heads."""
 from __future__ import annotations
 
@@ -12,12 +14,15 @@ from ..contracts.query import parse
 from ..contracts.run import ResultRef
 
 
+# 将完整结果引用规范化后取摘要，作为会话结果表的稳定键。
 def ref_key(reference):
     reference = parse(ResultRef, reference)
     return digest(reference.canonical_bytes())
 
 
+# 承载一个上下文的计划、操作、实际结果和资源累计；不承担 SDK 的模型循环。
 class Session:
+    # 按上下文映射打开运行，验证 head、上下文对象与目录身份绑定；损坏时拒绝加载。
     def __init__(self, catalog, context_ref):
         self.catalog = catalog
         self.uncertain = False
@@ -48,6 +53,7 @@ class Session:
         except (OSError, ValueError, KeyError, TypeError) as error:
             raise CatalogError('CONTEXT_NOT_FOUND', 'context or run state is missing, corrupt or incompatible') from error
 
+    # 幂等创建会话，分阶段写入创建意图、head 和上下文映射；recover 仅续接可验证的原状态。
     @classmethod
     def create(cls, catalog, context, request_key, *, recover=False, checkpoint=None, inherited=None):
         """Explicit recovery completes creation only; it never rewinds a running session."""
@@ -66,11 +72,13 @@ class Session:
                 reference = ObjectRef.model_validate_json(read_regular(path/'creation.json'))
                 prepared = json.loads(catalog.content.read_object(reference))
             if (path/'head.json').exists():
+                # 优先恢复当前 head，它可能包含已执行操作；创建快照只供未完成的创建流程使用。
                 instance.head_ref = ObjectRef.model_validate_json(read_regular(path/'head.json'))
                 instance.data = json.loads(catalog.content.read_object(instance.head_ref))
                 if prepared is not None and prepared['context'] != instance.data['context']:
                     raise CatalogError('CONTEXT_INVALID','creation and current context differ')
             elif prepared is not None:
+                # 完成标记或映射已存在却丢失 head，说明历史状态可能损坏，不能退回初始快照。
                 if (path/'creation-complete.json').exists() or (catalog.root/'contexts'/prepared['context']['context_ref']).exists():
                     raise CatalogError('CONTEXT_INVALID','completed context lost its head; cannot reset to its initial state')
                 if not recover:
@@ -150,11 +158,13 @@ class Session:
         except (ValueError,KeyError,TypeError) as error:
             raise CatalogError('CONTEXT_INVALID','saved context creation data is invalid; no recovery was performed') from error
 
+    # 先写不可变状态对象，再原子切换 head；写入结果未知后禁止在该实例上继续保存。
     def save(self):
         self.catalog.database.assert_open()
         if self.uncertain:
             raise CatalogError('RECOVERY_REQUIRED','session head outcome uncertain; reopen before inspecting results')
         self.data['revision'] += 1
+        # 每次新状态指回上一对象，保留修订链；head 只负责当前可见版本。
         self.data['previous'] = self.head_ref.model_dump(mode='json') if self.head_ref else None
         reference = self.catalog.content.put_object(canonical(self.data))
         try:
@@ -164,6 +174,7 @@ class Session:
             raise CatalogError('RECOVERY_REQUIRED','session head write outcome uncertain; no successful response returned') from error
         self.head_ref = reference
 
+    # 只接受本运行已完成操作实际登记过的结果引用，返回副本以免外部修改会话。
     def lookup(self, reference):
         reference = parse(ResultRef,reference)
         if reference.run_id != self.data['context']['run_id']:
@@ -176,6 +187,7 @@ class Session:
             raise CatalogError('RESULT_REF_INVALID','operation has no completed response')
         return deepcopy(value)
 
+    # 沿澄清续跑记录找到根会话并核对身份，使累计预算始终归属于原运行。
     def root_session(self):
         context = self.data['context']
         if context['root_run_id']==context['run_id']:
@@ -188,31 +200,38 @@ class Session:
             raise CatalogError('RECOVERY_REQUIRED','continuation root context differs from its run identity')
         return root
 
+    # 校验拟提交计划与状态覆盖，返回新计划副本；此处不提交计划或增加工具轮次。
     def proposed_plan(self, state, tool):
         if self.data.get('execution_time_uncertain'):
             raise CatalogError('RECOVERY_REQUIRED','interrupted tool execution time requires reconciliation')
         if state.next_action != tool:
-            raise CatalogError('INVALID_REQUEST','state.next_action must equal current tool')
+            raise CatalogError('INVALID_REQUEST','state.next_action must equal current tool: '+tool+' (exact name, not a sentence)')
         plan = deepcopy(self.data['plan'])
+        # 计划采用版本比较；只允许增补需求，不允许悄悄删除或重写已承诺的需求。
         if state.plan_update:
             update = state.plan_update
             if update.base_version != plan['version']:
-                raise CatalogError('PLAN_VERSION_MISMATCH','plan base version changed')
+                raise CatalogError('PLAN_VERSION_MISMATCH','plan base version changed; committed version is '+str(plan['version']))
             needs = [n.model_dump(mode='json') for n in update.needs]
             mapped = {n['need_id']:n for n in needs}
             if any(mapped.get(n['need_id']) != n for n in plan['needs']):
                 raise CatalogError('INVALID_REQUEST','existing needs cannot be removed or rewritten')
             plan = dict(version=plan['version']+1,needs=needs)
         if not plan['needs']:
-            raise CatalogError('INVALID_REQUEST','first tool call requires a nonempty plan')
+            raise CatalogError('INVALID_REQUEST','first tool call requires a nonempty plan_update with base_version=0; rejected preflight calls do not commit a proposed plan')
+        # 每个需求必须恰好归入 satisfied 或 gaps；引用合法性另逐条检查，不靠模型自报。
         current = [n.need_id for n in state.satisfied]+[n.need_id for n in state.gaps]
         if len(current) != len(set(current)) or set(current) != {n['need_id'] for n in plan['needs']}:
-            raise CatalogError('INVALID_REQUEST','state must cover every need exactly once')
+            required = {n['need_id'] for n in plan['needs']}
+            raise CatalogError('INVALID_REQUEST','state must cover every need exactly once across satisfied and gaps; '+
+                'missing='+json.dumps(sorted(required-set(current)))+'; unknown='+json.dumps(sorted(set(current)-required))+
+                '; duplicated='+json.dumps(sorted({n for n in current if current.count(n)>1})))
         for entry in (*state.satisfied,*state.gaps):
             for reference in entry.result_refs:
                 self.lookup(reference)
         return plan
 
+    # 在预检通过后持久接受操作，同时提交计划和状态；未确认操作存在时阻止继续。
     def accept(self, *, key, fingerprint, tool, request, state, plan, terminal_intent=None, count_turn=True):
         if self.data['status'] != 'open':
             raise CatalogError('INVALID_STATE','query run is terminal')
@@ -235,6 +254,7 @@ class Session:
         self.save()
         return identity
 
+    # 按幂等键查找完成响应；参数不同报冲突，操作未确认报中断，不自动重执行。
     def replay(self, key, fingerprint):
         matches = [v for v in self.data['operations'].values() if v['request_key']==key]
         if not matches:
@@ -246,6 +266,7 @@ class Session:
             raise CatalogError('OPERATION_INTERRUPTED','previous response is uncertain; effects are not automatically repeated')
         return deepcopy(operation['response'])
 
+    # 给一次实际结果分配带运行/操作身份的 ResultRef，存入会话内的结果登记表。
     def register(self, operation_id, kind, item):
         item = deepcopy(item)
         reference = ResultRef(run_id=self.data['context']['run_id'],operation_id=operation_id,
@@ -254,6 +275,7 @@ class Session:
         self.data['results'][ref_key(reference)] = item
         return item
 
+    # 保存即将返回的精确响应与资源累计，作为中断后完成确认的唯一依据。
     def prepare_response(self, operation_id, response, elapsed):
         """Persist result IDs/state and the exact return before acknowledging it."""
         operation = self.data['operations'][operation_id]
@@ -263,6 +285,7 @@ class Session:
             wall_seconds=self.data['wall_seconds']+elapsed,completed_at=utc_now())
         self.save()
 
+    # 确认操作响应并保存会话；存在响应意图时核对原响应，避免恢复重复计入耗时。
     def complete(self, operation_id, response, elapsed):
         operation = self.data['operations'][operation_id]
         intent = operation.get('response_intent')

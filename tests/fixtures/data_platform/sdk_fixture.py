@@ -39,6 +39,18 @@ def acquisition_case():
         value.doCleanups();raise
 
 
+def progress(state):
+    """Express a scripted full state as the model-facing delta; the host owns versions and next_action."""
+    value = dict(reason=state['reason'], satisfied=deepcopy(state.get('satisfied', [])), gaps=deepcopy(state.get('gaps', [])))
+    if state.get('plan_update'):
+        value['add_needs'] = deepcopy(state['plan_update']['needs'])
+    return value
+
+
+def handle(item):
+    return dict(handle=item['result_handle'])
+
+
 class AcquisitionScript:
     def __init__(self, invocation):
         self.invocation=invocation;self.count=0
@@ -46,7 +58,7 @@ class AcquisitionScript:
     def next(self, outputs):
         self.count+=1
         if self.count>1:return None
-        return 'request_asset_update',deepcopy({k:self.invocation[k] for k in ('request','state')})
+        return 'request_asset_update',dict(request=deepcopy(self.invocation['request']),state=progress(self.invocation['state']))
 
 
 @contextmanager
@@ -95,6 +107,15 @@ class Script:
     def next(self, outputs):
         step = self.count
         self.count += 1
+        if self.scenario == 'repeat_discovery':
+            # Identical discovery every turn: only the first response returns new metadata.
+            delta = dict(reason='Repeat synthetic discovery', satisfied=[],
+                gaps=[dict(need_id='cash', missing='Read synthetic source and cash comparison')])
+            if step == 0:
+                delta['add_needs'] = [dict(need_id='cash', description='Synthetic cash comparison and source', required=True)]
+            result = 'find_assets', dict(request=dict(filters={}), state=delta)
+            self.requests.append(deepcopy(result))
+            return result
         if self.scenario == 'free_text' or (self.scenario not in {'success','tool_error','after_clarification'} and step) or (self.scenario == 'tool_error' and step > 1):
             return None
         state = dict(satisfied=[], gaps=[dict(need_id='cash', missing='Read synthetic source and cash comparison')],
@@ -109,7 +130,7 @@ class Script:
             return tool, dict(unexpected='invalid')
         if self.scenario == 'forged_delivery':
             tool = 'deliver'
-            request = dict(needs=[dict(need_id='cash', status='supported', result_refs=[dict(run_id='run_00000000000000000000000000',operation_id='op_00000000000000000000000000',kind='record',item_id='invented')],gaps=[])])
+            request = dict(needs=[dict(need_id='cash', status='supported', result_refs=[dict(handle='rr_0000000000000000')],gaps=[])])
         if step:
             reference = outputs[0]['items'][0]['asset_ref']
             if step == 1:
@@ -133,17 +154,15 @@ class Script:
                     output_unit='ratio',period_policy='distinct_nonoverlapping',comparison_basis='Synthetic matching entity/unit and annual periods')
                 tool, request = 'query_records', dict(asset_ref=reference,select={'concepts':['{https://example.com/taxonomy}Cash']},calculations=[calc])
             elif step == 7:
-                refs = [outputs[4]['items'][0]['result_ref'],outputs[6]['calculations'][0]['result_ref']]
-                state.update(satisfied=[dict(need_id='cash',result_refs=refs)],gaps=[])
+                refs = [handle(outputs[4]['items'][0]),handle(outputs[6]['calculations'][0])]
                 tool, request = 'deliver', dict(needs=[dict(need_id='cash',status='supported',result_refs=refs,gaps=[])])
             else:
                 return None
-        state['next_action'] = tool if self.scenario != 'tool_error' else 'unknown-action'
-        if self.scenario == 'tool_error':
-            if step:
-                tool,request='query_records',dict(asset_ref=reference,select={'concepts':['{https://example.com/taxonomy}Cash']})
-            state['next_action']=tool
-        result = tool, dict(request=request,state=state)
+        delta = progress(state)
+        if self.scenario == 'tool_error' and step:
+            # Schema-valid business error: records are queried before the asset is processed.
+            tool,request='query_records',dict(asset_ref=reference,select={'concepts':['{https://example.com/taxonomy}Cash']})
+        result = tool, (dict(request=request) if tool == 'deliver' else dict(request=request,state=delta))
         self.requests.append(deepcopy(result))
         return result
 
@@ -169,3 +188,30 @@ class ScriptedModel(Model):
     async def stream_response(self,*args,**kwargs):
         raise NotImplementedError('This fixture checks non-streaming OpenAI Runner only')
         yield
+
+
+class SkillScriptedModel(ScriptedModel):
+    """Native Skill calls followed by the same Data tools, without real inference."""
+    async def get_response(self, system_instructions, input, model_settings, tools, output_schema, handoffs, tracing, **kwargs):
+        names = [i['name'] for i in input if isinstance(i,dict) and i.get('type')=='function_call']
+        self.inputs.append(dict(system=system_instructions,input=deepcopy(input),tools=[t.name for t in tools]))
+        outputs=[]
+        for item in input:
+            if not isinstance(item,dict) or item.get('type')!='function_call_output':continue
+            try:value=json.loads(item['output'])
+            except (ValueError,TypeError):continue
+            if isinstance(value,dict) and value.get('status') in {'ok','partial','error'}:outputs.append(value)
+        if 'load_skill' not in names:
+            name,args='load_skill',dict(skill_name='financial-data-query')
+            identity='skill-load'
+        elif 'exec_command' not in names:
+            name,args='exec_command',dict(cmd='cat .agents/financial-data-query/SKILL.md',max_output_tokens=12000)
+            identity='skill-read'
+        else:
+            self.script.count=len(outputs)
+            action=self.script.next(outputs)
+            if action is None:raise AssertionError('script should stop through accepted deliver')
+            name,args=action;identity='data-'+str(self.script.count)
+        return ModelResponse(output=[ResponseFunctionToolCall(type='function_call',name=name,
+            arguments=json.dumps(args),call_id=identity,id='tool-'+identity)],usage=Usage(requests=1),
+            response_id='fixture-'+identity,raw_usage=None)

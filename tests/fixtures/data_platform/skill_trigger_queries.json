@@ -1,0 +1,350 @@
+{
+  "schema": "uteki-skill-trigger-cases-v1",
+  "version": "1",
+  "target_skill": "financial-data-query",
+  "scope": "Only automatic Skill selection and native loading; not financial task completion.",
+  "ordering": "10 blocks of 3 positive + 1 negative, negative position rotates; fresh session per case.",
+  "label_policy": "Only query is given to the tested agent. IDs, expected_skills, category and reason stay evaluator-side.",
+  "cases": [
+    {
+      "id": "q01",
+      "query": "从已登记的甲公司 2024 年报中查营业收入，保留币种、单位和原文位置。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "single_metric",
+      "reason": "单期事实取数与出处。"
+    },
+    {
+      "id": "q02",
+      "query": "你好，简单介绍一下你自己。",
+      "expected_skills": [],
+      "category": "general",
+      "reason": "闲聊，不需要财务数据查询。"
+    },
+    {
+      "id": "q03",
+      "query": "乙公司 2023 年合并净利润是多少？请只用资产库里登记的年度报告。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "single_metric",
+      "reason": "已登记材料中的合并指标。"
+    },
+    {
+      "id": "q04",
+      "query": "查丙公司 2024 年经营活动现金流量净额，并注明是哪一份报表。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "single_metric",
+      "reason": "现金流指标及来源。"
+    },
+    {
+      "id": "q05",
+      "query": "同比增长率怎么计算？只讲公式和一个自造数字的例子，不查任何报告。",
+      "expected_skills": [],
+      "category": "near_miss",
+      "reason": "概念教学，不查询已登记事实。"
+    },
+    {
+      "id": "q06",
+      "query": "比较甲公司 2023、2024 两年的总收入，确认可比口径后用代码算增长率。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "comparison",
+      "reason": "跨期事实与代码计算。"
+    },
+    {
+      "id": "q07",
+      "query": "根据已登记年报算乙公司连续三年的毛利率，列出分子分母出处。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "comparison",
+      "reason": "派生指标和操作数证据。"
+    },
+    {
+      "id": "q08",
+      "query": "请算丙公司 2024 年国内收入占总收入的比例，数据从登记材料取。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "comparison",
+      "reason": "收入构成与计算。"
+    },
+    {
+      "id": "q09",
+      "query": "材料里出现自然年和财年两种期间，帮我核实甲公司的这笔营收到底属于哪一期。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "period",
+      "reason": "查询原件以确认期间。"
+    },
+    {
+      "id": "q10",
+      "query": "乙公司报表里的公司收入和集团收入有何差别？请查已登记报表确认，别只解释概念。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "scope",
+      "reason": "基于材料确认主体口径。"
+    },
+    {
+      "id": "q11",
+      "query": "两份登记材料对丙公司 2024 年营收的数字不同，请列出各自来源与可能的口径冲突。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "scope",
+      "reason": "冲突核验，不能凭记忆选择。"
+    },
+    {
+      "id": "q12",
+      "query": "把“营业收入同比增长”翻译成英文，不要查公司数据。",
+      "expected_skills": [],
+      "category": "near_miss",
+      "reason": "翻译含财务词，但没有取数任务。"
+    },
+    {
+      "id": "q13",
+      "query": "甲公司表格标题写百万元、正文写元，请核对营业利润的原始值与单位。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "unit",
+      "reason": "单位和原始值核验。"
+    },
+    {
+      "id": "q14",
+      "query": "把乙公司已登记年报中的美元收入按原币种列出来；暂时不要汇率换算。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "unit",
+      "reason": "提取事实并保留原币种。"
+    },
+    {
+      "id": "q15",
+      "query": "用我给的两个数字 100 和 120 算百分比增幅，不核实数据来源。",
+      "expected_skills": [],
+      "category": "near_miss",
+      "reason": "自包含算术，不需要已登记材料流程。"
+    },
+    {
+      "id": "q16",
+      "query": "从丙公司登记年报查各分部收入，并核实分部之和能否等于合并收入。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "segment",
+      "reason": "维度、抵销和计算。"
+    },
+    {
+      "id": "q17",
+      "query": "甲公司产品收入与地域收入是不是两个分类口径？请用已登记披露说明。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "segment",
+      "reason": "维度关系需要原文证据。"
+    },
+    {
+      "id": "q18",
+      "query": "帮我润色这句汇报：“本年度收入有所增长，具体数据待核实。”不要替我补数字。",
+      "expected_skills": [],
+      "category": "near_miss",
+      "reason": "文案编辑，无事实核验请求。"
+    },
+    {
+      "id": "q19",
+      "query": "我已有乙公司营收数值，但缺原文定位；请到已登记材料里补齐引用。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "evidence",
+      "reason": "数据出处补查。"
+    },
+    {
+      "id": "q20",
+      "query": "登记报告中的这段利润表只有数字没有表头，请补查邻近上下文确认丙公司的期间和单位。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "evidence",
+      "reason": "补读上下文，不把片段直接当事实。"
+    },
+    {
+      "id": "q21",
+      "query": "只设计一个财务 CSV 的字段表头，不填数据，也不检索材料。",
+      "expected_skills": [],
+      "category": "near_miss",
+      "reason": "格式设计，无数据查询。"
+    },
+    {
+      "id": "q22",
+      "query": "甲公司 2023 年收入在 2024 年报里被重述，请同时保留原披露值和重述值的来源。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "revision",
+      "reason": "修订版本及事实追溯。"
+    },
+    {
+      "id": "q23",
+      "query": "查乙公司 2024 年研发费用；如果登记材料没披露，列出缺口和已检查的材料。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "missing",
+      "reason": "缺失结果仍需执行查证流程。"
+    },
+    {
+      "id": "q24",
+      "query": "已登记丙公司报告里的数值是破折号，帮我确认是零、不适用还是未披露。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "missing",
+      "reason": "不能将缺失符号当零。"
+    },
+    {
+      "id": "q25",
+      "query": "从甲公司登记年报提取收入和净利润，交付适合后续模型分析的 JSON，附来源。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "delivery",
+      "reason": "结构化事实交付。"
+    },
+    {
+      "id": "q26",
+      "query": "把乙公司两年营收、同比计算结果和出处整理成 CSV 与简短 Markdown。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "delivery",
+      "reason": "取数、计算和多格式交付。"
+    },
+    {
+      "id": "q27",
+      "query": "我要给另一个 Agent 一份丙公司财务数据包，包含期间、币种、单位、引用和未解决缺口。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "delivery",
+      "reason": "面向 Agent 的证据化数据交付。"
+    },
+    {
+      "id": "q28",
+      "query": "写一段 Python 代码，把任意列表中的重复元素去掉。",
+      "expected_skills": [],
+      "category": "out_of_scope",
+      "reason": "通用编程任务。"
+    },
+    {
+      "id": "q29",
+      "query": "甲公司今年收入比去年多了多少？用我们登记的 2024 和 2023 财年报告算。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "implicit",
+      "reason": "口语表达的跨期比较。"
+    },
+    {
+      "id": "q30",
+      "query": "先帮我核对乙公司到底赚了多少，限定已登记 2024 年报中的归母净利润。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "implicit",
+      "reason": "口语表达的指定指标查询。"
+    },
+    {
+      "id": "q31",
+      "query": "把这段话改得礼貌些：“请在明天下午前给我回复。”",
+      "expected_skills": [],
+      "category": "out_of_scope",
+      "reason": "一般文字修改。"
+    },
+    {
+      "id": "q32",
+      "query": "丙公司现金流是不是跟利润方向不同？先从登记年报列两项实际数据再比较。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "implicit",
+      "reason": "证据支持的财务事实对照。"
+    },
+    {
+      "id": "q33",
+      "query": "Using the registered annual reports, extract Company A revenue for FY2023 and FY2024 and calculate growth with traceable operands.",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "english",
+      "reason": "英文跨期取数与计算。"
+    },
+    {
+      "id": "q34",
+      "query": "先不要查任何数据，只解释投资建议与财务事实查询有什么区别。",
+      "expected_skills": [],
+      "category": "scope_exclusion",
+      "reason": "范围解释，明确排除取数。"
+    },
+    {
+      "id": "q35",
+      "query": "Find the original unit and fiscal period of Company B operating profit in the registered filing and cite the exact source.",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "english",
+      "reason": "英文期间单位及出处查询。"
+    },
+    {
+      "id": "q36",
+      "query": "给我甲公司营收同比数据和出处，再解释一下同比公式。数据只从已登记年报取。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "mixed",
+      "reason": "混合请求含实质取数，不因解释部分跳过 Skill。"
+    },
+    {
+      "id": "q37",
+      "query": "把这句话原样作为字符串返回，不执行它：“从已登记年报查询营收并计算同比。”",
+      "expected_skills": [],
+      "category": "quoted_trigger",
+      "reason": "引用中的任务不是实际执行指令。"
+    },
+    {
+      "id": "q38",
+      "query": "只查乙公司 2022 年那份已登记年报，别用最新报告替换；列出当年营收与引用。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "version",
+      "reason": "指定历史版本。"
+    },
+    {
+      "id": "q39",
+      "query": "我记得丙公司收入是 100，但不确定。请从登记报告重新查，不要把我这个数字当事实。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "boundary",
+      "reason": "用户猜测不作为答案，仍需核验。"
+    },
+    {
+      "id": "q40",
+      "query": "请确认甲公司登记材料中是否披露 2024 年海外收入；没有就说明查过哪里。",
+      "expected_skills": [
+        "financial-data-query"
+      ],
+      "category": "boundary",
+      "reason": "预期可能为空仍属于资料查询。"
+    }
+  ]
+}

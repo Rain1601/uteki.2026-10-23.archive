@@ -50,7 +50,7 @@ class ClockDomainProcessTests(unittest.TestCase):
             after=Session(catalog,case.context).data
             self.assertGreaterEqual(after['wall_seconds'],before)
             native_state=after['native_execution']
-            self.assertEqual(native_state['execution_clock']['domain_version'],2)
+            self.assertEqual(native_state['execution_clock']['domain_version'],3)
             self.assertEqual(native_state['recovery_attempts'][0]['status'],'reconciled')
             self.assertGreater(native_state['recovery_attempts'][0]['charged_seconds'],0)
             self.assertEqual(journal.budget.summary()['requests'],0)

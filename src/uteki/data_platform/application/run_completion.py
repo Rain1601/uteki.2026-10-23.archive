@@ -1,3 +1,5 @@
+# 统一冻结运行结果并同步业务会话与目录终态；SDK 结束事件本身不等于业务已经完成。
+# 宿主关闭只用于已观察退出的遗留运行，保留未确认费用、原操作和已提交交付。
 """Durable business completion and explicit host closure; no SDK loop/history edits."""
 from copy import deepcopy
 from decimal import Decimal
@@ -15,10 +17,12 @@ from .session import Session
 from .gateway_batch import load_gateway_binding, open_runtime_budget
 
 
+# 汇总业务交付、原生执行状态、预算及不确定项，形成类型化运行结果快照。
 def result_value(session, budget, outcome):
     value=deepcopy(outcome)
     delivery=value.get('delivery') or value.get('committed_delivery')
     clarification=value.get('clarification') or value.get('committed_clarification')
+    # 已持久确认的业务包不能因后续 SDK 报错被抹掉；原生错误单独保留供追溯。
     if delivery is not None or clarification is not None:
         value.update(native_error=value.get('native_error') or value.get('error'),error=None,
             kind='delivery' if delivery else 'needs_clarification',
@@ -27,6 +31,7 @@ def result_value(session, budget, outcome):
     native=session.data['native_execution'];context=session.data['context']
     root=budget.inspect_root()
     uncertain=bool(native.get('execution_time_uncertain') or session.data.get('execution_time_uncertain'))
+    # 本地关闭获取任务不等于已确认远端请求结果；把仍未知的传输证据带入运行结果。
     unknown_transports=[]
     for operation in session.data['operations'].values():
         details=((operation.get('response') or {}).get('error') or {}).get('details') or {}
@@ -43,7 +48,10 @@ def result_value(session, budget, outcome):
         scope_id=gateway['binding']['scope_id']
         records=[r for r in budget.inspect_requests() if r.get('control_scope_id')==scope_id]
         value['runtime'].update(gateway_binding=gateway['binding'],control_scope=budget.inspect_scope(scope_id))
-        remote=gateway['plan']['origin']=='openrouter'
+        # 同一 scope 可包含多次已登记会话；单次结果费用只统计当前上下文的物理请求。
+        if 'attempt_ref' in gateway['binding'] or gateway.get('allowance_revision'):
+            records=[r for r in records if r['request'].get('context_ref')==context['context_ref']]
+        remote=gateway['plan']['origin'] in {'openrouter','live'}
         known=all(r['cost_state']=='settled' for r in records)
         value.update(mode=gateway['mode'],real_model_calls=sum(r['stage'] in {'dispatched','responded','outcome_unknown'} for r in records) if remote else 0,
             gateway_cost_usd=str(sum((Decimal(r['settled_usd']) for r in records),Decimal(0))) if remote and known else None)
@@ -58,6 +66,7 @@ def result_value(session, budget, outcome):
     return RunQueryResult.model_validate(value).model_dump(mode='json')
 
 
+# 验证结果与上下文、profile、账本 scope 和不可变业务包绑定，防止错接或遗漏终态。
 def validate_result(session, value):
     """Validate immutable result bindings, including any already accepted package."""
     RunQueryResult.model_validate(value)
@@ -91,6 +100,7 @@ def validate_result(session, value):
             raise CatalogError('RECOVERY_REQUIRED','runtime result package differs from immutable bytes')
 
 
+# 从已保存意图读取原结果，依次确认会话、目录及原生终态，支持中断后继续提交。
 def commit_result(session, *, checkpoint=None):
     checkpoint=checkpoint or (lambda phase:None)
     native=session.data['native_execution'];intent=native['outcome_intent']
@@ -120,12 +130,14 @@ def commit_result(session, *, checkpoint=None):
     return deepcopy(value)
 
 
+# 非终态保存为待恢复；终态先写不可变结果和提交意图，再走统一确认流程。
 def save_result(session, budget, outcome, *, checkpoint=None):
     checkpoint=checkpoint or (lambda phase:None)
     value=result_value(session,budget,outcome)
     validate_result(session,value)
     native=session.data['native_execution']
     if not value['terminal']:
+        # 恢复待办不结束目录运行；它与已确认终态采用不同提交路径。
         native.update(phase='recovery_required',outcome=value)
         session.save();checkpoint('native_outcome_committed')
         return deepcopy(value)
@@ -139,6 +151,7 @@ def save_result(session, budget, outcome, *, checkpoint=None):
     return commit_result(session,checkpoint=checkpoint)
 
 
+# 读回已保存结果，并核对不可变字节与会话/目录状态一致性。
 def read_result(session):
     native=session.data.get('native_execution') or {}
     value=native.get('outcome')
@@ -159,6 +172,7 @@ def read_result(session):
     return deepcopy(value)
 
 
+# 宿主显式关闭已经退出的原生运行；核清时间、停止账本准入并保留可放弃操作的记录。
 def close_run(service, context_ref, *, request_key, reason, checkpoint=None):
     """Close an observed, abandoned native run; retain unknown costs and history."""
     started=time.monotonic();checkpoint=checkpoint or (lambda phase:None)
@@ -178,6 +192,7 @@ def close_run(service, context_ref, *, request_key, reason, checkpoint=None):
         if native.get('outcome_object'):return read_result(session)
         return commit_result(session,checkpoint=checkpoint)
     if saved is None:
+        # 已有交付或澄清不可被关闭操作撤销；关闭只处理没有业务终态的遗留运行。
         if session.data['status']!='open' or any(o['tool'] in {'deliver','clarify'} for o in session.data['operations'].values()):
             raise CatalogError('INVALID_STATE','existing delivery/clarification cannot be revoked by closure')
         abandoned=[]
@@ -210,6 +225,7 @@ def close_run(service, context_ref, *, request_key, reason, checkpoint=None):
     else:budget.stop_root('run_closed');budget.recover_requests()
     for request in budget.inspect_requests():
         if gateway and request.get('control_scope_id')!=gateway['scope_id']:continue
+        # 只放弃尚未发出的请求；已发出而结果未知的费用预留继续保留。
         if request['stage']=='prepared':budget.abandon_prepared(request['request_key'],reason='run_closed_before_dispatch')
     checkpoint('run_close_root_stopped')
     for identity in saved['abandoned_operation_ids']:

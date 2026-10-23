@@ -17,10 +17,12 @@ PROCESSOR_VERSION = 'uteki-html-parser-v2'
 CANDIDATE_VERSION = 'sec-source-blocks-v0.1.13'
 
 
+# 以源 DOM 路径生成稳定内容 ID，类型前缀区分块、节、表、单元格等对象。
 def item_id(kind, path):
     return kind + '-' + digest(path.encode())[:24]
 
 
+# 在扩展表格网格前限制 rowspan/colspan，只接受 1..1000 的有限整数。
 def spans(dom,cell):
     values=[]
     for attr in ('rowspan','colspan'):
@@ -31,6 +33,7 @@ def spans(dom,cell):
     return values
 
 
+# 承载一次解析得到的结构化内容及质量信息；冻结容器避免结果字段被重新赋值。
 @dataclass(frozen=True)
 class ParsedHtml:
     sections: tuple
@@ -41,6 +44,7 @@ class ParsedHtml:
     quality: HtmlQuality
 
 
+# 为候选块遗漏的单个 text/tail 建立精确区间，避免补块时重复复制相邻文本。
 def atom_locator(dom, node, *, tail):
     """Range for an otherwise uncovered text atom, without copying its siblings."""
     owner = node.getparent() if tail else node
@@ -55,6 +59,7 @@ def atom_locator(dom, node, *, tail):
         start, end = len(prefix), len(prefix) + len(node.tail or '')
     else:
         start, end = 0, len(node.text or '')
+    # 同步建立规范化字符到源文本位置的映射，才能把 text/tail 的范围投影回稳定定位区间。
     chars, origins = [], []
     for token in re.finditer(r'\S+', raw):
         if chars:
@@ -70,8 +75,10 @@ def atom_locator(dom, node, *, tail):
     return locator, text
 
 
+# 从源表格重建占位网格、显式表头、候选表头及脚注关系，保留原始出处和相邻块上下文。
 def table_artifact(dom, node, blocks, block_index, table_ids, *, legacy_v1=False):
     path = dom.path(node); table_id = table_ids[path]
+    # 只处理最近祖先表格就是当前表的行，嵌套表格有自己的网格与身份。
     rows = [r for r in node.iter('tr') if next(r.iterancestors('table'),None) is node and not excluded(r)]
     occupied, cells, node_cells = {}, [], []
     for row_index, row in enumerate(rows):
@@ -84,6 +91,7 @@ def table_artifact(dom, node, blocks, block_index, table_ids, *, legacy_v1=False
             rowspan,colspan = spans(dom,cell)
             if row_index+rowspan > len(rows):
                 raise CatalogError('PARSE_FAILED','rowspan exceeds source table rows')
+            # 合并单元格占据整个矩形范围；先验越界和重叠，再记录占位，避免错列后继续产出。
             coords=[(r,c) for r in range(row_index,row_index+rowspan) for c in range(col,col+colspan)]
             if any(key in occupied for key in coords):
                 raise CatalogError('PARSE_FAILED','overlapping source table cells')
@@ -95,6 +103,7 @@ def table_artifact(dom, node, blocks, block_index, table_ids, *, legacy_v1=False
                 href=link.get('href','')
                 if not href:continue
                 entry={'href':href,'link_path':dom.path(link),'status':'external'}
+                # 内部脚注仅在锚点唯一时解析；缺失或多义都保留链接状态，不静默丢弃。
                 if href.startswith('#'):
                     targets=(dom.by_id if legacy_v1 else dom.by_anchor).get(href[1:],[])
                     entry['status']='missing_target' if not targets else 'ambiguous_target' if len(targets)>1 else 'resolved'
@@ -112,6 +121,7 @@ def table_artifact(dom, node, blocks, block_index, table_ids, *, legacy_v1=False
         references=source.get('headers','').split()
         if any(ref not in source_ids for ref in references):
             raise CatalogError('PARSE_FAILED','table headers attribute references unknown/ambiguous cell')
+        # headers 属性是显式关联；位置/文字规则只生成候选表头，不能冒充已确认语义。
         candidates=tuple(c.id for c in cells if c.id!=cell.id and c.text and
             (((c.header or re.search('[A-Za-z]',c.text) or re.fullmatch(r'[12][0-9]{3}',c.text))
               and c.row<cell.row and c.col<cell.col+cell.col_span and cell.col<c.col+c.col_span)
@@ -128,6 +138,7 @@ def table_artifact(dom, node, blocks, block_index, table_ids, *, legacy_v1=False
         context_block_ids=tuple(before+after),nested_table_ids=tuple(table_ids[dom.path(n)] for n in node.iterdescendants('table') if dom.path(n) in table_ids))
 
 
+# 验证冻结输入后生成正文、章节、表格、数值事实及图片清单，显式记录排除项与处理缺口。
 def parse_html(raw: bytes, inputs: InputManifest, *, encoding: str, form_type: str, legacy_v1=False):
     inputs=InputManifest.model_validate(inputs)
     if digest(raw)!=inputs.main.sha256 or len(raw)!=inputs.main.byte_length:
@@ -148,6 +159,7 @@ def parse_html(raw: bytes, inputs: InputManifest, *, encoding: str, form_type: s
     selected={p for p,b in candidates.items() if p in dom.paths and not excluded(dom.paths[p]) and b.type!='image'
               and (dom.text(dom.paths[p]) or tag(dom.paths[p])=='table')}
     table_nodes=[n for n in dom.nodes if tag(n)=='table' and not excluded(n)]
+    # 可见源表格全部纳入，避免旧候选规则未选中某张表而导致结构遗漏。
     selected.update(dom.path(n) for n in table_nodes)
     table_ids={dom.path(n):item_id('table',dom.path(n)) for n in table_nodes}
     positions={dom.path(n):i for i,n in enumerate(dom.nodes) if tag(n)}
@@ -157,6 +169,7 @@ def parse_html(raw: bytes, inputs: InputManifest, *, encoding: str, form_type: s
         kind='table' if tag(node)=='table' else 'heading' if re.fullmatch('h[1-6]',tag(node)) or old_block and old_block.type=='heading_candidate' else 'list_item' if old_block and old_block.type=='list_item' else 'paragraph' if old_block and old_block.type=='paragraph' else 'other'
         entries.append((positions[path],0,HtmlBlock(id=item_id('block',path),kind=kind,text=text,locator=dom.locator(node),section_id=None,
             dependency_ids=(),table_id=table_ids.get(path),layout_role=old_block.layout_role if old_block else None)))
+    # 逐个审计源 text/tail：排除项留原因，未被候选块覆盖的可见文本补成精确小块。
     exclusions=[];total_atoms=visible_atoms=covered_atoms=0
     # Check every non-whitespace source text/tail, including outside legacy candidates.
     for node in dom.nodes:
@@ -181,6 +194,7 @@ def parse_html(raw: bytes, inputs: InputManifest, *, encoding: str, form_type: s
                 locator=locator,section_id=None,dependency_ids=(),table_id=None,layout_role='unwrapped_text')))
             covered_atoms+=1
     entries.sort(key=lambda entry:(entry[0],entry[1],entry[2].id))
+    # 真实 h1..h6 用层级栈建父子关系；样式推断标题只标 inferred_style，不虚构标题等级。
     sections=[];blocks=[];stack=[];current=None
     for _,_,block in entries:
         node=dom.paths[block.locator.dom_path]
@@ -212,6 +226,7 @@ def parse_html(raw: bytes, inputs: InputManifest, *, encoding: str, form_type: s
         path=dom.path(node);src=node.get('src');url=urljoin(inputs.main_source_url or '',src) if src else None
         resource=resources.get(url);reason=excluded(node)
         if not src:reason=reason or 'image_without_src'
+        # 可见图片必须在冻结输入中明确 present 或 missing；未登记的依赖使输入不完整。
         if reason is None and resource is None:
             raise CatalogError('INPUT_INCOMPLETE','visible image is neither present nor declared missing: '+path)
         status='excluded' if reason else 'present' if isinstance(resource,PresentResource) else 'missing'
@@ -234,6 +249,7 @@ def parse_html(raw: bytes, inputs: InputManifest, *, encoding: str, form_type: s
     for record in records:
         if record.status in {'unsupported','invalid'}:issues.append(record.status+':'+record.id+':'+ ';'.join(record.issues))
     if not blocks:raise CatalogError('PARSE_FAILED','no supported visible content')
+    # HTML 解析器修复、未解脚注及不支持事实均进入质量问题，保留 partial 与能力降级的依据。
     if dom.diagnostics:issues.extend('html_recovery:'+code for code in dom.diagnostics)
     counts=dict(source_text_atoms=total_atoms,visible_text_atoms=visible_atoms,covered_text_atoms=covered_atoms,
         excluded_text_atoms=sum(e['kind']=='text_atom' for e in exclusions),source_tables=sum(tag(n)=='table' for n in dom.nodes),

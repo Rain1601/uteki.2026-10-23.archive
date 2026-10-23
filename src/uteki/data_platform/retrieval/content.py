@@ -9,12 +9,14 @@ from ..build.dom import SourceDOM,normalize
 from ..build.pipeline import recipe_config
 
 
+# 针对一个已发布 HTML 构建创建原件读取视图，证据值和上下文都回到同一份冻结原文。
 class HtmlReader:
     """A verified immutable byte view. Construct again to audit current disk state.
 
     No online fallback, latest-version selection or untrusted XPath evaluation.
     All visible inventory items carry a full version reference when returned.
     """
+    # 先读取发布清单与输入原件，再逐文件核对长度和摘要；打开过程中变化的产物立即拒绝。
     def __init__(self,catalog,reference):
         manifest=catalog.read_published(reference)
         if manifest.schema_version!='uteki-html-build-v1':
@@ -25,6 +27,7 @@ class HtmlReader:
         rules=recipe_config(catalog.content,manifest.recipe)
         self._dom=SourceDOM(raw,encoding=rules['encoding'])
         payloads={}
+        # 发布校验后再次读取实际产物并核对摘要，捕捉打开读取器过程中的文件变化。
         for item in manifest.files:
             content=read_regular(catalog.root/'assets'/reference.asset_id/'builds'/reference.build_id/item.path)
             if len(content)!=item.object_ref.byte_length or digest(content)!=item.object_ref.sha256:
@@ -38,21 +41,25 @@ class HtmlReader:
         self._records={item.id:item for item in self._items['records']}
         self._cells={cell.id:(table,cell) for table in self._items['tables'] for cell in table.cells}
 
+    # 返回脱离内部模型的 JSON 值副本，调用方修改清单不会污染后续证据读取。
     def inventory(self):
         # Return detached values, not mutable containers used by later reads.
         return dict(asset_ref=self.reference.model_dump(mode='json'),schema=self._schema.model_dump(mode='json'),
                     **{name:[item.model_dump(mode='json') for item in values] for name,values in self._items.items()})
 
+    # 由受控 DOM 定位解析原文，返回原件引用、URL、定位、投影文本和 HTML 片段。
     def _source(self,locator):
         node,text=self._dom.resolve(locator)
         return dict(source_object=self.inputs.main.model_dump(mode='json'),source_url=self.inputs.main_source_url,
                     locator=locator.model_dump(mode='json'),text=text,
                     raw_node_text=normalize(node.text_content()),html=self._dom.snippet(node))
 
+    # 附上完整表结构和已登记的相邻上下文块，保留解释单元格所需背景。
     def _table_context(self,table):
         return dict(table=table.model_dump(mode='json'),
             adjacent_blocks=[self._blocks[identity].model_dump(mode='json') for identity in table.context_block_ids])
 
+    # 按块、单元格或记录字段读取，并校验版本、字段与解析状态；返回值、来源和上下文。
     def read(self,evidence:HtmlEvidenceRef):
         evidence=HtmlEvidenceRef.model_validate(evidence)
         if evidence.asset_ref!=self.reference:
@@ -83,10 +90,12 @@ class HtmlReader:
             context['record']=item.model_dump(mode='json')
             for key,path in [('xbrl_context',item.context_path),('xbrl_unit',item.unit_path)]:
                 context[key]=dict(dom_path=path,html=self._dom.snippet(self._dom.paths[path])) if path else None
+            # 事实可能位于嵌套表格，选择路径最深的包围表，避免错配外层布局表的上下文。
             enclosing=[t for t in self._items['tables'] if item.locator.dom_path.startswith(t.locator.dom_path+'/')]
             if enclosing:
                 context.update(self._table_context(max(enclosing,key=lambda t:len(t.locator.dom_path))))
         source=self._source(item.locator)
+        # 块和单元格必须逐字匹配冻结原文；记录数值可能经过 XBRL 转换，因此另保留原文及转换信息。
         if evidence.kind!='record_field' and value!=source['text']:
             raise CatalogError('INVALID_LOCATOR','content differs from its frozen source range')
         return dict(evidence_ref=evidence.model_dump(mode='json'),value=value,source=source,context=context)

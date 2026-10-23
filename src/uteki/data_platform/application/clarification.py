@@ -1,14 +1,17 @@
+# 澄清是原问题的受限续接：一个已提交追问只绑定一份回答和一个子上下文。
+# 子上下文继承累计消耗与需求计划，但必须重新读取证据，不能借澄清扩大范围或重置预算。
 """A clarification has one immutable answer binding and one child context."""
 from copy import deepcopy
 from datetime import datetime
 from decimal import Decimal
 import json
 
-from ..contracts.common import CatalogError
+from ..contracts.common import CatalogError, canonical
 from ..contracts.content import ObjectRef
 from .session import Session
 
 
+# 验证被续接上下文确已完成匹配的澄清，且原执行与恢复计时均无未确认状态。
 def parent_session(catalog, request):
     if request.revises_context_ref is None:
         return None
@@ -35,9 +38,20 @@ def parent_session(catalog, request):
     return parent
 
 
+# 逐项检查问题、调用者、公司、期间、来源及额度；回答只能保持或缩小原授权范围。
 def validate_narrowing(parent, request, company_ids, read_policy):
     before = parent.data['context']
     old, new = before['request'], request.context_payload()
+    if (old.get('required_securities') and
+            {canonical(s) for s in old['required_securities']} !=
+            {canonical(s) for s in new.get('required_securities',[])}):
+        raise CatalogError('SCOPE_VIOLATION','clarification cannot remove or replace required security lookups')
+    if old.get('documents') or new.get('documents'):
+        prior_documents, next_documents = old.get('documents'), new.get('documents')
+        if (not prior_documents or not next_documents
+                or prior_documents['data_root'] != next_documents['data_root']
+                or not {canonical(b) for b in next_documents['bindings']} <= {canonical(b) for b in prior_documents['bindings']}):
+            raise CatalogError('SCOPE_VIOLATION','clarification cannot change the store or widen document versions/bindings')
     if new['question']!=old['question'] or new['caller']!=old['caller']:
         raise CatalogError('CLARIFICATION_MISMATCH','original question and caller must be preserved')
     if not set(company_ids)<=set(before['company_ids']):
@@ -64,6 +78,7 @@ def validate_narrowing(parent, request, company_ids, read_policy):
         raise CatalogError('SCOPE_VIOLATION','clarification cannot expand acquisition/processing permissions')
 
 
+# 在目录事务中绑定澄清 ID、回答内容与请求键；相同回答的不同调用键归并到原始子运行。
 def bind_answer(catalog, parent, request, policy, request_key, *, recover, checkpoint):
     """Existing registration transactions enforce both caller keys and answer IDs."""
     binding = dict(request=request.context_payload(),read_policy=policy.model_dump(mode='json'))
@@ -74,6 +89,7 @@ def bind_answer(catalog, parent, request, policy, request_key, *, recover, check
         if error.code=='IDEMPOTENCY_CONFLICT':
             raise CatalogError('CLARIFICATION_MISMATCH','this clarification already has a different answer/context') from error
         raise
+    # 先前已登记的回答拥有唯一原始键；调用者换键不能创建第二份子上下文。
     original_key = first or request_key
     run = catalog._db.execute('SELECT parent_run_id FROM runs WHERE request_key=?',('data-context:'+request_key,)).fetchone()
     if run is not None and (request_key!=original_key or run['parent_run_id']!=parent.data['context']['run_id']):
@@ -91,13 +107,17 @@ def bind_answer(catalog, parent, request, policy, request_key, *, recover, check
     return original_key
 
 
+# 复制计划和累计计数，但把所有需求重新标为待核验，不复制旧运行的可用结果引用。
 def inherited_state(parent):
+    from .evidence import metadata_history
     data = parent.data
     value = {k:deepcopy(data[k]) for k in ('plan','plan_history','turns','wall_seconds','no_progress_turns','seen_results')}
     value['seen_updates'] = deepcopy(data.get('seen_updates',[]))
+    value['seen_metadata'] = sorted(metadata_history(parent))
     if data.get('time_reconciliations'):
         value['time_reconciliations']=deepcopy(data['time_reconciliations'])
     value['inherited_state'] = deepcopy(data['state'])
+    # 保留需求意图而重置证据满足状态：旧 ResultRef 属于父运行，不能直接冒充新运行已读。
     value['state'] = dict(plan_update=None,satisfied=[],gaps=[dict(need_id=n['need_id'],
         missing='Revalidate this need after clarification; previous-run evidence is not yet reread',result_refs=[])
         for n in data['plan']['needs']],next_action='pending_model_decision',reason='Continue with inherited plan and explicit answer')

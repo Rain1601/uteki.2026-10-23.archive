@@ -70,7 +70,9 @@ class DerivedQueryTests(unittest.TestCase):
         self.assertEqual([r['fact_id'] for r in rows], ['r4'])
         rows, _ = self.index.record_rows(filters=RecordFilters(statuses=('nil','unsupported')))
         self.assertEqual({r['fact_id'] for r in rows}, {'r5','r7'})
-        rows, _ = self.index.record_rows(concepts=("' OR 1=1 --",))
+        with self.assertRaisesRegex(CatalogError,'exact expanded'):
+            self.index.record_rows(concepts=("' OR 1=1 --",))
+        rows, _ = self.index.record_rows(concepts=("{https://example.com/taxonomy}Cash'OR1=1--",))
         self.assertEqual(rows, [])
 
     def test_corrupt_index_requires_explicit_rebuild_and_keeps_source(self):
@@ -376,6 +378,71 @@ class DataToolTests(unittest.TestCase):
             self.assertEqual(result['status'],'ok',result)
         denied=self.call('read_evidence',args,context=context)
         self.assertEqual(denied['error']['code'],'BUDGET_EXCEEDED')
+
+    def test_schema_pagination_progress_survives_reopen_and_legacy_history(self):
+        from uteki.data_platform.application.session import Session
+        from uteki.data_platform.application.clarification import inherited_state
+        request=deepcopy(self.request)
+        request['run_policy']['max_no_progress_turns']=2
+        context=self.service.create_context(request,request_key='metadata-progress')['context_ref']
+        args=dict(asset_ref=self.reference.model_dump(mode='json'),facets=['fields','concepts'],limit=1)
+        pages=0
+        while True:
+            result=self.call('get_asset_schema',args,context=context)
+            self.assertEqual(result['status'],'ok',result)
+            self.assertEqual(self.service.inspect_context(context)['no_progress_turns'],0)
+            pages+=1
+            self.assertLess(pages,30)
+            if not result['next_cursor']:break
+            args=args|dict(cursor=result['next_cursor'])
+        self.assertGreater(pages,6,'exercise more new pages than the original stop threshold')
+        session=Session(self.catalog,context)
+        self.assertEqual(session.data['results'],{},'schema must not become deliverable evidence')
+        seen=session.data.pop('seen_metadata');session.save()  # A saved pre-upgrade session.
+        self.assertEqual(inherited_state(session)['seen_metadata'],seen)
+        self.catalog.close()
+        self.catalog=Catalog.open(self.root);self.addCleanup(self.catalog.close)
+        self.service=DataService(self.catalog)
+        for expected in (1,2):
+            result=self.call('get_asset_schema',args,context=context)
+            self.assertEqual(result['status'],'ok',result)
+            self.assertEqual(self.service.inspect_context(context)['no_progress_turns'],expected)
+        denied=self.call('get_asset_schema',args,context=context)
+        self.assertEqual(denied['error']['code'],'BUDGET_EXCEEDED')
+
+    def test_metadata_reordering_and_new_query_do_not_manufacture_progress(self):
+        from uteki.data_platform.application.session import Session
+        args=dict(asset_ref=self.reference.model_dump(mode='json'),facets=['concepts','fields'])
+        self.assertEqual(self.call('get_asset_schema',args)['status'],'ok')
+        self.assertEqual(self.service.inspect_context(self.context)['no_progress_turns'],0)
+        for expected,facets in enumerate((['fields','concepts'],['concepts']),1):
+            self.assertEqual(self.call('get_asset_schema',args|dict(facets=facets))['status'],'ok')
+            self.assertEqual(self.service.inspect_context(self.context)['no_progress_turns'],expected)
+        found=self.call('find_assets',dict(filters=dict(company_ids=[self.setup['company_id']])))
+        self.assertEqual(found['status'],'ok')
+        self.assertEqual(self.service.inspect_context(self.context)['no_progress_turns'],0)
+        again=self.call('find_assets',dict(query=found['items'][0]['title'],limit=1))
+        self.assertEqual(again['status'],'ok')
+        self.assertEqual(self.service.inspect_context(self.context)['no_progress_turns'],1)
+        self.assertEqual(Session(self.catalog,self.context).data['results'],{})
+
+    def test_metadata_history_commits_with_response_and_idempotent_replay(self):
+        from uteki.data_platform.application.session import Session
+        args=dict(asset_ref=self.reference.model_dump(mode='json'),facets=['fields'],limit=1)
+        state=self.state('get_asset_schema')
+        def interrupt(phase):
+            if phase=='tool_response_prepared':raise RuntimeError('controlled interruption')
+        with self.assertRaises(RuntimeError):
+            self.service.get_asset_schema(self.context,args,state=state,request_key='metadata-interrupt',checkpoint=interrupt)
+        before=Session(self.catalog,self.context).data
+        result=self.service.get_asset_schema(self.context,args,state=state,request_key='metadata-interrupt',recover=True)
+        self.assertEqual(result['status'],'ok',result)
+        after=Session(self.catalog,self.context).data
+        self.assertEqual(after['seen_metadata'],before['seen_metadata'])
+        self.assertEqual(after['no_progress_turns'],0)
+        replay=self.service.get_asset_schema(self.context,args,state=state,request_key='metadata-interrupt')
+        self.assertEqual(replay,result)
+        self.assertEqual(Session(self.catalog,self.context).data['seen_metadata'],after['seen_metadata'])
 
     def test_search_contexts_are_source_evidence_and_delivered_with_snippet(self):
         self.process()

@@ -4,6 +4,7 @@ from __future__ import annotations
 from contextlib import contextmanager
 import json
 import os
+import re
 import sqlite3
 import threading
 
@@ -18,16 +19,19 @@ INDEX_VERSION = 'uteki-derived-html-v2'
 FILES = {'fts.sqlite', 'records.duckdb'}
 
 
+# 把来源前缀化概念展开为 {命名空间}本地名，避免不同前缀或同名概念发生混淆。
 def concept_id(record):
     name = record['concept']
     namespace = record['concept_namespace']
     return '{'+namespace+'}'+name.split(':')[-1] if name and namespace else None
 
 
+# 提取显式维度成员用于精确匹配；typed 等未支持维度仍须由调用处另行排除。
 def dimensions(record):
     return {d['dimension']:d['value'] for d in record['dimensions'] if d['kind'] == 'explicit'}
 
 
+# 创建受限 DuckDB 连接，禁用外部访问/自动扩展并限制资源；超时或取消会中断查询。
 @contextmanager
 def sql_connection(path, *, readonly=True, timeout=20, limit=None):
     if limit is not None:
@@ -35,10 +39,12 @@ def sql_connection(path, *, readonly=True, timeout=20, limit=None):
     connection = duckdb.connect(str(path), read_only=readonly, config={
         'enable_external_access': False, 'autoinstall_known_extensions': False,
         'autoload_known_extensions': False, 'threads': 1, 'memory_limit': '128MB'})
+    # 计时器处理中途超时，watcher 处理共享取消；finally 会停止线程并关闭连接，避免后台残留。
     timer = threading.Timer(timeout, connection.interrupt)
     timer.daemon = True
     timer.start()
     done = threading.Event()
+    # 运行期间观察共享限制，一旦任务停止就中断正在执行的 SQL，而不是等结果全部生成。
     def watch():
         while not done.wait(0.02):
             if limit.stopped():
@@ -64,8 +70,10 @@ def sql_connection(path, *, readonly=True, timeout=20, limit=None):
         connection.close()
 
 
+# 管理每个 HTML 构建的派生索引代次：写入由目录独占锁保护，读取只验证且不自动修复。
 class DerivedIndex:
     """Catalog's exclusive lock owns writes. Reads never repair an index."""
+    # 把索引绑定到读取器的固定构建与共享资源限制，不在此隐式创建或刷新索引。
     def __init__(self, catalog, reader, *, limit=None):
         self.catalog = catalog
         self.reader = reader
@@ -73,14 +81,17 @@ class DerivedIndex:
         self.base = catalog.root/'derived'/self.reference.build_id
         self.limit = limit
 
+    # 在处理阶段边界检查取消/时间限制，避免已经停止的任务继续做索引工作。
     def check(self):
         if self.limit is not None:
             self.limit.check('derived_index')
 
+    # 重新读取已发布清单并求摘要，作为索引与源构建绑定的校验依据。
     def _source_hash(self):
         manifest = self.catalog.read_published(self.reference)
         return digest(manifest.canonical_bytes())
 
+    # 检查目录安全、head、清单、源版本以及每个文件的字节摘要；返回当前代次和游标版本 token。
     def current(self):
         self.check()
         source = self._source_hash()
@@ -94,6 +105,7 @@ class DerivedIndex:
                 raise CatalogError('BUILD_NOT_READY', 'unsafe derived directory')
             head_raw = read_regular(self.base/'head.json')
             head = json.loads(head_raw)
+            # 控制文件必须是规范字节且字段集合固定，不能接受含混或多余内容后继续使用索引。
             if canonical(head) != head_raw or set(head) != {'generation', 'manifest'}:
                 raise ValueError('invalid index head')
             generation = head['generation']
@@ -109,6 +121,7 @@ class DerivedIndex:
                 raise ValueError('index source/version mismatch')
             if set(p.name for p in directory.iterdir()) != FILES:
                 raise ValueError('unexpected index files')
+            # 每次取当前索引都核验两个文件，文件存在或数据库可打开并不足以证明属于此源版本。
             for name, meta in manifest['files'].items():
                 raw = read_regular(directory/name)
                 if len(raw) != meta['bytes'] or digest(raw) != meta['sha256']:
@@ -119,6 +132,7 @@ class DerivedIndex:
                 raise
             raise CatalogError('BUILD_NOT_READY', 'derived index missing, corrupt or stale; explicit processing required') from error
 
+    # 将索引未就绪转换为显式状态供能力查询使用，其他错误继续上抛。
     def availability(self):
         try:
             _, manifest, token = self.current()
@@ -128,6 +142,7 @@ class DerivedIndex:
                 raise
             return dict(status='not_ready', generation=None, token=None, issue=str(error))
 
+    # 恢复时只确认中断操作已可见的同一代次，核验通过后重新持久化 head，不激活别的版本。
     def confirm_head(self, intent):
         """Confirm only this already-visible generation; never activate another."""
         expected = dict(generation=intent['generation'],manifest=intent['manifest'])
@@ -144,6 +159,7 @@ class DerivedIndex:
         except (OSError,ValueError) as error:
             raise CatalogError('RECOVERY_REQUIRED','cannot confirm interrupted index publication: '+str(error)) from error
 
+    # 在新代次目录构造全文和记录索引，先持久化文件与意图，再切换 head 发布。
     def build(self, *, checkpoint=lambda phase: None, on_effect=lambda **value: None, on_prepare=lambda intent: None):
         """Build a new generation. Failure leaves old generations and head intact."""
         source_hash = self._source_hash()
@@ -152,6 +168,7 @@ class DerivedIndex:
         generation = new_id('idx')
         directory = ensure_directory(self.catalog.root, 'derived/'+self.reference.build_id+'/'+generation)
         checkpoint('index_started')
+        # 全文侧分别保存词干索引和大小写折叠的三元索引，后者另保留原文以映射字符位置。
         connection = sqlite3.connect(directory/'fts.sqlite')
         if self.limit is not None:
             connection.set_progress_handler(lambda:int(self.limit.stopped()),1000)
@@ -173,6 +190,7 @@ class DerivedIndex:
             db.execute('CREATE TABLE blocks (id VARCHAR PRIMARY KEY, body VARCHAR)')
             if values:
                 db.executemany('INSERT INTO blocks VALUES (?,?)', values)
+            # 记录侧把期间、维度和单位存为规范 JSON 字符串，实现精确结构匹配而非模糊语义匹配。
             db.execute('''CREATE TABLE records (id VARCHAR PRIMARY KEY, concept VARCHAR, status VARCHAR,
                 period VARCHAR, period_end VARCHAR, dimensions VARCHAR, unit VARCHAR, payload VARCHAR)''')
             rows = []
@@ -186,6 +204,7 @@ class DerivedIndex:
                 db.executemany('INSERT INTO records VALUES (?,?,?,?,?,?,?,?)', rows)
             db.execute('CHECKPOINT')
         checkpoint('index_records_written')
+        # 先刷盘索引文件及目录，再把摘要清单写入内容存储；head 是最终可见版本入口。
         files = {}
         for name in sorted(FILES):
             raw = read_regular(directory/name)
@@ -198,12 +217,14 @@ class DerivedIndex:
             generation=generation, source_manifest_sha256=source_hash, files=files,
             blocks=len(values), records=len(rows), created_at=utc_now())
         reference = self.catalog.content.put_object(canonical(manifest))
+        # 发布前记录意图，使 head 切换附近发生中断时能确认同一代次，而不是盲目重建。
         on_prepare(dict(asset_ref=self.reference.model_dump(mode='json'),generation=generation,manifest=reference.model_dump(mode='json')))
         checkpoint('index_intent_prepared')
         checkpoint('index_before_head')
         self.check()
         try:
             write_control(self.base/'head.json', canonical(dict(generation=generation, manifest=reference.model_dump(mode='json'))), replace=True)
+        # head 写入报错时可能已发生可见切换，记录 uncertain 留给恢复流程判断，不能声称未生效。
         except OSError:
             on_effect(kind='index_head',status='uncertain',asset_ref=self.reference.model_dump(mode='json'),generation=generation)
             raise
@@ -211,12 +232,14 @@ class DerivedIndex:
         checkpoint('index_after_head')
         return manifest
 
+    # 根据匹配方式在已验证索引中选出块 ID，可同时返回原文字符范围及索引版本。
     def text_candidates(self, request, *, with_ranges=False):
         directory, manifest, token = self.current()
         text = request.value
         if request.match == 'regex':
             try:
                 with sql_connection(directory/'records.duckdb',limit=self.limit) as db:
+                    # 用不透明标记替换首个 RE2 命中，从替换前后长度求原文范围；不执行调用方 Python 正则。
                     marker = '__'+new_id('match')+'__'
                     flag = 'c' if request.case_sensitive else 'i'
                     rows = db.execute('SELECT id, body, regexp_replace(body, ?, ?, ?) FROM blocks WHERE regexp_matches(body, ?, ?) ORDER BY id',
@@ -236,6 +259,7 @@ class DerivedIndex:
         if not terms:
             raise CatalogError('INVALID_REQUEST', 'empty search terms')
         # Quoted literals never expose FTS's boolean/column query language.
+        # 用户词项始终作为引用后的字面值进入 FTS，不向用户开放 FTS 的布尔/列选择语法。
         quote = lambda s: '"'+s.replace('"', '""')+'"'
         if request.match == 'phrase':
             query = quote(text.casefold())
@@ -248,6 +272,7 @@ class DerivedIndex:
             db.set_progress_handler(lambda:int(self.limit.stopped()),1000)
         ranges = {}
         try:
+            # 短语少于三个字符时无法依靠 trigram 索引，先扫描块文本，再执行同样的字面匹配。
             if request.match == 'phrase' and len(text) < 3:
                 rows = db.execute('SELECT id, body FROM terms ORDER BY id').fetchall()
             else:
@@ -270,6 +295,7 @@ class DerivedIndex:
         self.check()
         # Phrase means a literal substring. FTS term matching uses the declared
         # unicode61/porter semantics; case-sensitive matching also checks source.
+        # 索引只生成候选；短语最终必须满足字面子串条件，大小写敏感搜索也需回看原文。
         if request.match == 'phrase':
             target = text if request.case_sensitive else text.casefold()
             rows = [(i,b) for i,b in rows if target in (b if request.case_sensitive else b.casefold())]
@@ -281,6 +307,7 @@ class DerivedIndex:
                 for identity,body in rows:
                     target_terms = [text] if request.match=='phrase' else terms
                     original = body if request.case_sensitive else body.casefold()
+                    # casefold 可能把一个原字符展开成多个字符，显式保存索引映射，才能返回正确的原文字符范围。
                     origins = list(range(len(body))) if request.case_sensitive else [i for i,char in enumerate(body) for _ in char.casefold()]
                     matches = [(original.find(term if request.case_sensitive else term.casefold()),len(term if request.case_sensitive else term.casefold())) for term in target_terms]
                     lower,length = min((p,n) for p,n in matches if p>=0)
@@ -288,7 +315,17 @@ class DerivedIndex:
             return [r[0] for r in rows],token,{identity:ranges[identity] for identity,_ in rows}
         return [r[0] for r in rows], token
 
+    # 将明确的概念、期间、维度、单位等选择器编成参数化 SQL，返回原始记录与索引 token。
     def record_rows(self, *, concepts=(), filters=None, selector=None, order=None):
+        identifiers=list(concepts)
+        if selector is not None and selector.concept_id is not None:
+            identifiers.append(selector.concept_id)
+        if any(re.fullmatch(r'\{[^{}\s]+\}[^{}:\s]+',value) is None for value in identifiers):
+            raise CatalogError('INVALID_REQUEST',
+                'concept_id must be the exact expanded {namespace}local-name returned by '
+                'get_asset_schema facets=["concepts"]. A prefix:local-name is not a stored identifier; '
+                'do not infer that records are unavailable from this rejected query.')
+        # 存在维度并不能证明“分部”，没有维度也不能证明“合并”，当前能力显式拒绝这一口径推断。
         if filters is not None and filters.entity_scope:
             raise CatalogError('CAPABILITY_UNSUPPORTED','dimension presence does not prove consolidated or segment scope')
         directory, _, token = self.current()
@@ -310,6 +347,7 @@ class DerivedIndex:
                     params.extend(v if field=='status' else canonical(v).decode() for v in values)
             if filters.dimensions is not None:
                 clauses.append('dimensions=?'); params.append(canonical(filters.dimensions).decode())
+        # 排序字段来自契约白名单，并以记录 ID 打破同分；用户提供的值全部通过参数绑定。
         field = {'record_id':'id', 'concept_id':'concept', 'period_end':'period_end'}[order.field] if order else 'id'
         direction = ' DESC' if order and order.direction=='desc' else ' ASC'
         query = 'SELECT payload FROM records'+(' WHERE '+' AND '.join(clauses) if clauses else '')+' ORDER BY '+field+direction+', id ASC'
@@ -319,5 +357,6 @@ class DerivedIndex:
         if (filters is not None and filters.dimensions is not None) or (selector is not None and selector.dimensions is not None):
             # A typed/unsupported dimension cannot be reduced to an empty set
             # of explicit members and then match an undimensioned selector.
+            # 不能把 typed/不支持维度过滤掉后当作空维度命中，否则会将未知维度事实误当成无维度事实。
             records = [r for r in records if all(d['kind']=='explicit' for d in r['dimensions'])]
         return records, token

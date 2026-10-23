@@ -1,3 +1,5 @@
+# 宿主对中断获取作显式处置：仅续做已冻结输入的本地建设，或关闭未完成候选。
+# 不会重新访问 URL、重新启动 SDK 或删除原件；获取、发布与费用的不确定性仍须单独保留。
 """Host-only resolution of one interrupted acquisition; no transport or SDK loop."""
 from copy import deepcopy
 import json
@@ -22,6 +24,7 @@ from .session import Session
 from .tools import ToolExecution
 
 
+# 按原操作 ID 查找获取子运行并核对父/根身份；不认领其他运行的建设成果。
 def owned_run(catalog, context, operation):
     row = catalog._db.execute('SELECT * FROM runs WHERE request_key=?',
         ('acquisition:'+operation['operation_id'],)).fetchone()
@@ -36,6 +39,7 @@ def owned_run(catalog, context, operation):
     return row
 
 
+# 复用原计划、回执与输入清单，续接快照、表示形式、HTML build 和发布确认。
 def continue_local(execution, frozen):
     catalog, operation = execution.catalog, execution.session.data['operations'][execution.operation]
     plan_ref, plan, report, inputs, usage = frozen
@@ -88,6 +92,7 @@ def continue_local(execution, frozen):
     if publisher.build_path(build,final=True).exists() or build['status']=='published':
         publisher.commit_build(build['build_id'])
         reference = catalog.asset_ref(catalog.get_build(build['build_id']))
+    # 已有封存清单时按原产物继续验证与发布，不能重新解析来掩盖文件损坏。
     elif build['manifest_ref'] is not None:
         # A sealed candidate is verified as-is, never reparsed to repair damage.
         reference = publisher.publish(build['build_id'])
@@ -99,6 +104,7 @@ def continue_local(execution, frozen):
     return acquisition_result(catalog,reference,inputs,usage,plan_ref,execution.operation,report['run_id'])
 
 
+# 核验并保留回执与原字节，只关闭本操作拥有的未发布候选；已发布内容必须确认。
 def close_local(catalog, context, operation, checkpoint):
     """Retain every receipt/file; fail only candidates owned by this operation."""
     target = operation['effect_intent']['target']
@@ -127,6 +133,7 @@ def close_local(catalog, context, operation, checkpoint):
                 raise CatalogError('RECOVERY_REQUIRED','retained acquisition original is damaged')
     transport = receipt.get('transport_state') if receipt else None
     journal_version = receipt.get('transport_journal_version') if receipt else target.get('transport_journal_version')
+    # 没有可识别传输日志，或最后停在 dispatched，都不能声称已知远端请求结局。
     unknown = (journal_version!='uteki-acquisition-transport-v1'
         or transport is not None and transport['status']=='dispatched')
     run = owned_run(catalog,context,operation)
@@ -138,6 +145,7 @@ def close_local(catalog, context, operation, checkpoint):
     builds = [dict(r) for r in catalog._db.execute('SELECT * FROM asset_builds WHERE run_id=?',(run['run_id'],))]
     # Validate all visible publications before changing any candidate state.
     for build in builds:
+        # 在修改候选前先检查已发布/已移动的 build；关闭不能撤销已可见成果。
         if build['status']=='published' or publisher.build_path(build,final=True).exists():
             raise CatalogError('RECOVERY_REQUIRED','existing final build must be confirmed; closure cannot revoke publication')
     for snapshot in snapshots:
@@ -158,6 +166,7 @@ def close_local(catalog, context, operation, checkpoint):
     return retained
 
 
+# 绑定宿主的继续/关闭决定，校验原适配器、退出计时与预算后提交原操作的恢复响应。
 def resolve_update(service, context_ref, *, request_key, action, checkpoint=None, should_cancel=None):
     """No new request parameters/URLs. An explicit host decision binds the action."""
     from ..service import error_response
@@ -173,6 +182,7 @@ def resolve_update(service, context_ref, *, request_key, action, checkpoint=None
     request = parse(TOOLS['request_asset_update'],operation['request'])
     if request.action!='acquire':raise CatalogError('INVALID_REQUEST','only acquisition can be resolved here')
     resolution = operation.get('resolution')
+    # 只允许尚未完成且没有响应意图的本地续做改为关闭，并保留原处置历史。
     close_after_continue = resolution and resolution['action']=='continue_local' and action=='close' and operation['status']=='accepted' and operation.get('response_intent') is None
     if resolution and resolution['action']!=action and not close_after_continue:
         raise CatalogError('IDEMPOTENCY_CONFLICT','original resolution action differs')
@@ -189,6 +199,7 @@ def resolve_update(service, context_ref, *, request_key, action, checkpoint=None
         adapter = service.acquisition_adapter
         if adapter is None:raise CatalogError('RECOVERY_REQUIRED','original acquisition adapter binding is required')
         signed = dict(tool=operation['tool'],request=operation['request'],state=operation['state'],adapter_binding=adapter.binding())
+        # 继续必须使用原接受操作绑定的适配器，不能通过恢复替换来源策略或输入。
         if digest(canonical(signed))!=operation['fingerprint']:
             raise CatalogError('IDEMPOTENCY_CONFLICT','acquisition adapter binding changed')
         execution.preflight()
@@ -197,6 +208,7 @@ def resolve_update(service, context_ref, *, request_key, action, checkpoint=None
         recipe_config(service.catalog.content,BuildRecipe.model_validate(operation['effect_intent']['target']['recipe']))
     native = session.data.get('native_execution')
     accounted = reconcile_time(session) if native else None
+    # 继续本地工作也消耗原任务时间，因此必须先核清原 worker 的退出区间。
     if accounted is None and (native or action=='continue_local'):
         raise CatalogError('RECOVERY_REQUIRED','observed original worker exit is required')
     if action=='continue_local':
@@ -243,6 +255,7 @@ def resolve_update(service, context_ref, *, request_key, action, checkpoint=None
     elapsed = time.monotonic()-started
     # An older synchronous operation has no reconciled native clock. Charge its
     # persisted lower bound once, but never call that lower bound complete time.
+    # 没有原生时钟证据时只计入已知下界一次，同时保留总耗时未知标记。
     lower = operation.get('elapsed_lower_bound',0.0) if accounted is None else 0.0
     response['resource_usage'] = dict(execution.resource_usage,elapsed_ms=None,
         resolution_elapsed_ms=round(elapsed*1000,3),execution_time_uncertain=accounted is None,
