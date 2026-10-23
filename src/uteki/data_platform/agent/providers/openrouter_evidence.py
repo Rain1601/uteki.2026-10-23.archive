@@ -21,6 +21,7 @@ _HEADERS = {'content-type', 'content-length', 'content-encoding',
             'x-generation-id', 'x-request-id', 'request-id'}
 
 
+# 对响应 JSON 同样拒绝重复键，避免不同解析结果影响身份和费用核验。
 def _object(pairs):
     value = {}
     for key, item in pairs:
@@ -30,15 +31,18 @@ def _object(pairs):
     return value
 
 
+# 非有限数字不构成合法的费用或响应证据，解析时即拒绝。
 def _constant(_):
     raise ValueError('nonfinite_json_number')
 
 
+# 用 Decimal 保留响应费用精度，并使用严格键及数值检查。
 def _json(raw):
     return json.loads(raw.decode('utf-8'), parse_float=Decimal,
                       parse_constant=_constant, object_pairs_hook=_object)
 
 
+# 观测值中的 Decimal 转为十进制文本，持久化时避免二进制浮点误差。
 def _serializable(value):
     if isinstance(value, Decimal):
         return str(value)
@@ -49,10 +53,12 @@ def _serializable(value):
     return value
 
 
+# 仅接受明确的 gen- 命名空间，不把其他消息 ID 推测成 OpenRouter generation ID。
 def _generation(value):
     return isinstance(value, str) and len(value) <= 128 and bool(re.fullmatch(r'gen-[0-9A-Za-z-]+', value))
 
 
+# 账单金额只接受有效非负数值，不把字符串、布尔值或上游估算隐式转换成实付费用。
 def _cost(value):
     # No coercion of booleans, strings, upstream costs or SDK estimates.
     if type(value) not in {int, Decimal}:
@@ -63,6 +69,7 @@ def _cost(value):
     return str(amount)
 
 
+# 有界保存 HTTP 实体原始字节及必要响应头；中断、超限和长度冲突都保留已有前缀。
 def capture_response(protocol, status, headers, chunks, *, max_bytes):
     """Consume bounded HTTP entity chunks, retaining a prefix on failure.
 
@@ -108,6 +115,7 @@ def capture_response(protocol, status, headers, chunks, *, max_bytes):
         body_base64=base64.b64encode(raw).decode('ascii'), body_sha256=digest(raw), byte_length=len(raw))
 
 
+# 消费收据前复核格式、摘要、字节数及完整性字段，防止存储损坏被当作可信响应。
 def response_bytes(capture):
     if capture.get('schema') != 'gateway-http-observation-v1':
         raise ValueError('Unknown HTTP observation schema')
@@ -119,12 +127,14 @@ def response_bytes(capture):
     return raw
 
 
+# 只解析 SSE 信封及事件类型，用于完整性与计量观察；模型正文和工具参数由 SDK 解释。
 def _events(raw):
     """Read SSE envelopes only; never assemble model text or tool arguments."""
     text = raw.decode('utf-8').replace('\r\n', '\n').replace('\r', '\n')
     if not text.endswith('\n\n'):
         raise ValueError('incomplete_sse_event')
     events = []
+    done = False
     for block in text.split('\n\n'):
         lines, name = [], None
         for line in block.split('\n'):
@@ -136,13 +146,24 @@ def _events(raw):
                 name = line[6:].strip()
         if not lines:
             continue
-        event = _json('\n'.join(lines).encode('utf-8'))
+        if done:
+            raise ValueError('sse_data_after_done')
+        payload = '\n'.join(lines)
+        # OpenRouter may append its SSE sentinel after the native Messages
+        # terminal event. It is not JSON and cannot replace message_stop.
+        if payload == '[DONE]':
+            if name not in (None, 'data') or not events or events[-1].get('type') != 'message_stop':
+                raise ValueError('sse_done_without_message_stop')
+            done = True
+            continue
+        event = _json(payload.encode('utf-8'))
         if not isinstance(event, dict) or (name is not None and name != event.get('type')):
             raise ValueError('invalid_sse_envelope')
         events.append(event)
     return events
 
 
+# 提取可证实的协议完成、generation 身份、用量和账单；不据此宣称业务成功或路由正确。
 def observe_response(capture):
     """Return observed identity/usage without asserting route or business success."""
     raw = response_bytes(capture)
@@ -166,9 +187,14 @@ def observe_response(capture):
             result['issues'].append('http_error')
             return result
         media = headers.get('content-type', '').split(';', 1)[0].strip().lower()
-        if headers.get('content-encoding', 'identity').strip().lower() != 'identity':
+        # Official HTTP clients decode response.content while retaining the
+        # original Content-Encoding header. Only an explicitly tagged SDK
+        # capture may parse those decoded bytes; raw-wire captures stay strict.
+        if (headers.get('content-encoding', 'identity').strip().lower() != 'identity'
+                and capture.get('body_representation') != 'decoded_by_httpx2'):
             raise ValueError('unsupported_content_encoding')
         protocol = capture['protocol']
+        # Messages 必须有唯一起止事件及明确 stop_reason；传输 EOF 本身不等于模型流结束。
         if protocol == 'anthropic_messages' and media == 'text/event-stream':
             events = [e for e in _events(raw) if e.get('type') != 'ping']
             starts = [e.get('message') for e in events if e.get('type') == 'message_start']
@@ -205,6 +231,7 @@ def observe_response(capture):
                     raise ValueError('incomplete_message')
         else:
             raise ValueError('unsupported_response_media')
+        # 优先保留原始身份；头部与正文 generation 冲突时，后续不得猜测使用哪一个。
         response_id = message.get('id')
         if not isinstance(response_id, str) or not response_id:
             raise ValueError('missing_response_identity')
@@ -223,13 +250,26 @@ def observe_response(capture):
             result['issues'].append('generation_identity_unavailable')
         elif protocol == 'generation':
             result.update(billed_usd=_cost(message.get('total_cost')), billing_source='generation.total_cost')
+        # 只有明确的 Chat usage.cost 或 generation.total_cost 才作为账单；token 数仍是用量。
         elif protocol == 'chat_completions' and isinstance(message.get('usage'), dict):
             value = message['usage'].get('cost')
             if value is not None:
                 result.update(billed_usd=_cost(value), billing_source='chat.usage.cost')
-        # Messages token counters/session estimates are not a documented bill.
+        elif protocol == 'anthropic_messages' and usages and isinstance(usages[-1], dict):
+            # OpenRouter reports account cost in the final message_delta usage.
+            # Its Messages adapter can serialize this decimal as a string.
+            # Native token counters, upstream cost and CLI session estimates
+            # remain distinct; a verified gen-* identity is still required.
+            value = usages[-1].get('cost')
+            if value is not None:
+                if isinstance(value, str):
+                    if len(value) > 64 or not re.fullmatch(r'(?:0|[1-9][0-9]*)(?:\.[0-9]+)?', value):
+                        raise ValueError('invalid_messages_billed_cost')
+                    value = Decimal(value)
+                result.update(billed_usd=_cost(value), billing_source='messages.usage.cost')
         if result['billed_usd'] is None:
             result['issues'].append('billing_not_observed')
+    # 解析或身份冲突保留原始证据与问题清单，撤销无法确认的金额，等待后续对账。
     except (ValueError, TypeError, KeyError, RecursionError) as exc:
         # Keep raw bytes and any unambiguous header identity for reconciliation.
         result.update(billed_usd=None, billing_source=None)
@@ -241,6 +281,7 @@ def observe_response(capture):
     return result
 
 
+# 将账单绑定来源命名空间、generation ID 和整份收据摘要，隔离合成与真实证据。
 def _receipt(capture, observed, origin):
     if origin not in {'openrouter', 'synthetic'}:
         raise ValueError('Explicit response origin required')
@@ -249,6 +290,7 @@ def _receipt(capture, observed, origin):
         identity_namespace=origin+':generation', evidence=capture)
 
 
+# 在现有根账本提交响应与账单；恢复响应必须延续原始前缀，不能覆盖成另一份响应。
 def record_response(budget, request_key, capture, *, origin, withhold_billing=False):
     """Save raw response and bill atomically in the existing root ledger."""
     if origin not in {'openrouter', 'synthetic'} or type(withhold_billing) is not bool:
@@ -264,6 +306,7 @@ def record_response(budget, request_key, capture, *, origin, withhold_billing=Fa
                 or capture['headers'] != old['headers']
                 or not response_bytes(capture).startswith(response_bytes(old))):
             raise RequestIdentityConflict('Recovered HTTP response differs from the original prefix/identity')
+    # HTTP 错误可以是已知结果；成功响应则须同时满足传输完整与协议完整，费用另行判断。
     complete = capture['transport_complete'] and (capture['status'] != 200 or observed['protocol_complete'])
     amount = None if withhold_billing else observed['billed_usd']
     receipt = _receipt(capture, observed, origin) if amount is not None else None
@@ -282,6 +325,7 @@ def record_response(budget, request_key, capture, *, origin, withhold_billing=Fa
         billed_usd=amount, receipt=receipt, outcome_known=complete)
 
 
+# 账单只能补到原响应已观察的同源 generation，不重发模型请求，也不猜测缺失身份。
 def reconcile_response(budget, request_key, capture, *, origin):
     """Attach a generation bill to its already observed ID, never resend."""
     current = budget.inspect_request(request_key)

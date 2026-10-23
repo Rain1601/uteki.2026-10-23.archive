@@ -1,0 +1,31 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "fixture/openai-skill-query-v1",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "offline_fixture_only",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/fixture-skill-query/query.md",
+    "version": "offline-skill-v1",
+    "sha256": "88d3721fb317a40e225a10c347c147c8b48786680c0824c15eb6329c48bbd525"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "fixture-only"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "reasoning_effort": null,
+  "skills": [
+    "financial-data-query"
+  ]
+}

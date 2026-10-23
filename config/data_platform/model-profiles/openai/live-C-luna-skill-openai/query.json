@@ -1,0 +1,37 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "openai/gpt-5.6-luna",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "unverified",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/live-C-luna-skill-openai/query.md",
+    "version": "live-skill-v1",
+    "sha256": "f0d270408f25bf36a857b4924ffd5a3af4001ed5018002dbafb66dce09c680ca"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "openai"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "parallel_tool_calls": null,
+  "reasoning_effort": "low",
+  "request_controls": {
+    "reasoning": {
+      "effort": "low"
+    }
+  },
+  "skills": [
+    "financial-data-query"
+  ]
+}

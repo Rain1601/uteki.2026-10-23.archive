@@ -1,0 +1,34 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "unverified",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/live-D-sonnet-openai/query.md",
+    "version": "live-function-v1",
+    "sha256": "8ed7ff87413528ce53f423011abbb7b0d350b8bcf2754c7305dfae4ce84b7d86"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "anthropic"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "parallel_tool_calls": null,
+  "reasoning_effort": "low",
+  "request_controls": {
+    "reasoning": {
+      "effort": "low"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "deepseek-flash",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "unverified",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/document-ab-deepseek-flash/query.md",
+    "version": "document-ab-v1",
+    "sha256": "b992f2f54c40bcff8760fd30f1b73c0878dfb67a347027bd4906b16d850c4b4d"
+  },
+  "route": {
+    "provider": "deepseek",
+    "protocol": "chat_completions",
+    "upstream": [
+      "deepseek"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "reasoning_effort": "low",
+  "request_controls": {
+    "thinking": {
+      "type": "enabled"
+    },
+    "reasoning_effort": "low"
+  },
+  "skills": [
+    "document-data-query"
+  ],
+  "model_version": "DeepSeek-V4.1-Flash-1017"
+}

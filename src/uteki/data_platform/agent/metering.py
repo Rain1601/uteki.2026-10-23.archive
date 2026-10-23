@@ -11,6 +11,7 @@ from agents import Model
 from ..contracts.common import CatalogError, canonical
 
 
+# 将 SDK 对象递归转为可持久化 JSON，保留字段别名及未设置字段与显式 null 的区别。
 def json_value(value):
     if hasattr(value, 'model_dump'):
         # SDK models have wire aliases (e.g. async/async_) and distinguish
@@ -29,6 +30,7 @@ def json_value(value):
     raise ValueError('Unsupported value at the durable model boundary: '+type(value).__name__)
 
 
+# 包装明确标记的离线脚本模型，复用请求账本、截止时间及恢复能力，不发真实模型请求。
 class OfflineMeteredModel(Model):
     offline_fixture = True
 
@@ -38,6 +40,7 @@ class OfflineMeteredModel(Model):
         self.inner, self.journal = inner, journal
         self.state = state
 
+    # 先冻结请求意图并尝试精确重放，再登记调用；完整响应落盘后才推进 SDK 恢复游标。
     async def get_response(self, system_instructions, input, model_settings, tools,
                            output_schema, handoffs, tracing, **kwargs):
         self.journal.guard_action()
@@ -65,6 +68,7 @@ class OfflineMeteredModel(Model):
                 self.state.responded()
             self.journal.guard_transport()
             return response
+        # 已登记发送却没有完整结果时保存失败记录；取消和超时同时停止后续业务动作。
         except BaseException as error:
             if isinstance(error, asyncio.CancelledError):
                 self.journal.stop('cancelled')
@@ -75,6 +79,7 @@ class OfflineMeteredModel(Model):
                 self.journal.record_model(key, dict(complete=False, error_type=type(error).__name__), complete=False)
             raise
 
+    # 当前离线适配器未定义流式持久化契约，显式报不支持，不能静默转成另一种调用。
     async def stream_response(self, *args, **kwargs):
         raise CatalogError('CAPABILITY_UNSUPPORTED', 'scripted streaming needs an explicit verified adapter')
         yield

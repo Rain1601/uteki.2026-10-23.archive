@@ -1,0 +1,37 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "openai/gpt-5.6-sol",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "unverified",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/compare-sol-skill/query.md",
+    "version": "skill-comparison-v1",
+    "sha256": "2f8a86704e4b580262320a247da5334fe086dc84014a08d38d46f92a1fb56480"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "openai"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "parallel_tool_calls": null,
+  "reasoning_effort": "low",
+  "request_controls": {
+    "reasoning": {
+      "effort": "low"
+    }
+  },
+  "skills": [
+    "financial-data-query"
+  ]
+}

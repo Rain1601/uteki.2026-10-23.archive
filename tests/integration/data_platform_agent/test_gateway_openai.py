@@ -11,6 +11,8 @@ import unittest
 from unittest.mock import patch
 
 from uteki.data_platform.agent.openai_runtime import run_gateway
+from uteki.data_platform.agent.skills import get_skill
+from uteki.data_platform.agent.binding import ENVELOPES
 from uteki.data_platform.application.execution_clock import ObservedWorker
 from uteki.data_platform.application.gateway_batch import load_gateway_binding
 from uteki.data_platform.application.session import Session
@@ -23,6 +25,11 @@ from uteki.infrastructure.run_budget import RequestRecoveryRequired
 
 ROOT=Path(__file__).resolve().parents[3]
 F=runpy.run_path(str(ROOT/'tests/fixtures/data_platform/gateway_peer.py'))
+REASONING_DETAILS=[
+    dict(type='reasoning.text',text='Synthetic protocol fixture.',signature='fixture-signature',
+         format='anthropic-claude-v1',index=0),
+    dict(type='reasoning.encrypted',data='fixture-ciphertext',format='anthropic-claude-v1',index=1),
+]
 
 
 class GatewayOpenAITests(unittest.IsolatedAsyncioTestCase):
@@ -62,6 +69,10 @@ class GatewayOpenAITests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(request['messages'][0]['content'],F['profile']('openai').text)
                 self.assertEqual(request['model'],scope['profile']['model_id'])
                 self.assertEqual(len(request['tools']),8)
+            exposed = json.dumps(json.loads(peer.requests[0])['tools'])
+            self.assertIn('Exact name of the tool being called now',exposed)
+            self.assertIn('Never copy context.clock/created_at',exposed)
+            self.assertIn('UTF-8 budget for the complete response',exposed)
             self.assertEqual(await self.run_case(case.service,scope,bindings[scope['scope_id']],peer.endpoint),result)
             self.assertEqual(len(peer.requests),8)
 
@@ -155,7 +166,7 @@ class GatewayOpenAITests(unittest.IsolatedAsyncioTestCase):
 
     async def test_observed_exit_resumes_original_sdk_state_without_repeating_http_or_tools(self):
         for phase in ('gateway_request_prepared','gateway_response_committed','native_tool_response_committed'):
-            with self.subTest(phase=phase),F['ChatPeer']() as peer:
+            with self.subTest(phase=phase),F['ChatPeer'](reasoning_details=REASONING_DETAILS) as peer:
                 case,args,bindings=self.setup_case('G02-resume');scope=args['scopes'][0]
                 spec=case.root/'gateway-worker.json'
                 spec.write_text(json.dumps(dict(context_ref=scope['context_ref'],binding=bindings[scope['scope_id']],
@@ -180,6 +191,10 @@ class GatewayOpenAITests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(result['runtime']['control_scope']['request_stages'],{'responded':8})
                     after=Session(catalog,scope['context_ref']).data
                     for key,value in before['operations'].items():self.assertEqual(after['operations'][key],value)
+                    for raw in peer.requests[1:]:
+                        assistants=[m for m in json.loads(raw)['messages'] if m['role']=='assistant' and m.get('tool_calls')]
+                        self.assertTrue(assistants)
+                        for message in assistants:self.assertEqual(message.get('reasoning_details'),REASONING_DETAILS)
 
     async def test_unknown_dispatch_and_missing_sdk_response_do_not_restart_requests(self):
         for phase,damage in [('gateway_request_dispatched',False),('native_tool_response_committed',True)]:
@@ -238,6 +253,103 @@ class GatewayOpenAITests(unittest.IsolatedAsyncioTestCase):
                 finally:case.catalog=original_catalog
                 self.assertEqual(len(peer.requests),1)
                 self.assertEqual(result['kind'],'recovery_required',result)
+
+
+class GatewaySkillTests(unittest.IsolatedAsyncioTestCase):
+    """The real Chat adapter serializes native Skill tools over metered HTTP."""
+    native_actions=(('load_skill',dict(skill_name='financial-data-query')),
+        ('exec_command',dict(cmd='cat .agents/financial-data-query/SKILL.md',max_output_tokens=12000)))
+
+    async def asyncSetUp(self):
+        asyncio.get_running_loop().set_debug(False)
+
+    def setup_case(self):
+        self.loaded=F['profile']('openai',skills=True)
+        case,args,bindings=F['fixture'](profile_overrides={'openai':self.loaded.metadata()})
+        self.addCleanup(case.doCleanups)
+        return case,args['scopes'][0],bindings[args['scopes'][0]['scope_id']]
+
+    async def invoke(self,service,scope,binding,peer,**kwargs):
+        return await run_gateway(service,scope['context_ref'],self.loaded,gateway_binding=binding,
+            endpoint=peer.endpoint,credential='uteki-synthetic-gateway',limits=scope['limits'],**kwargs)
+
+    def skill_body(self):
+        return get_skill('financial-data-query',config_root=F['CONFIG'],sdk='openai',
+            model=self.loaded.profile.model_id,sdk_version=self.loaded.profile.sdk_version,
+            available_tools=tuple(ENVELOPES)).content.split('---',2)[2].strip()
+
+    async def test_native_skills_cross_real_chat_http_and_complete_delivery(self):
+        case,scope,binding=self.setup_case()
+        with F['ChatPeer'](native_actions=self.native_actions,reasoning_details=REASONING_DETAILS) as peer:
+            result=await self.invoke(case.service,scope,binding,peer)
+            self.assertEqual(result['status'],'completed',result['error'])
+            self.assertEqual(len(peer.requests),10,peer.errors)
+            requests=[json.loads(r) for r in peer.requests]
+            first=requests[0]
+            self.assertEqual({t['function']['name'] for t in first['tools']},set(ENVELOPES)|{'load_skill','exec_command'})
+            self.assertTrue(all(t['type']=='function' for t in first['tools']))
+            self.assertIn('Available skills',first['messages'][0]['content'])
+            body=self.skill_body()
+            self.assertNotIn(body,first['messages'][0]['content'])
+            read=next(m for m in requests[2]['messages'] if m['role']=='tool' and m['tool_call_id']=='call-gateway-2')
+            self.assertIn(body,read['content'])
+            for request in requests:
+                self.assertEqual(request['model'],self.loaded.profile.model_id)
+                self.assertEqual(request['provider'],dict(only=['deepseek'],order=['deepseek'],allow_fallbacks=False,require_parameters=True))
+                self.assertEqual(request['reasoning'],{'enabled':False})
+                self.assertNotIn('store',request)
+                self.assertNotIn('parallel_tool_calls',request)
+                for message in request['messages']:
+                    if message['role']=='assistant' and message.get('tool_calls'):
+                        self.assertEqual(message.get('reasoning_details'),REASONING_DETAILS)
+            self.assertEqual(result['delivery']['delivery']['calculations'][0]['value'],'-2.250000000000000000')
+            self.assertEqual(result['runtime']['control_scope']['request_stages'],{'responded':10})
+            self.assertEqual(result['real_model_calls'],0)
+            self.assertEqual(Decimal(result['delivery']['delivery']['usage']['synthetic_cost_usd']),Decimal('.10'))
+            self.assertEqual(await self.invoke(case.service,scope,binding,peer),result)
+            self.assertEqual(len(peer.requests),10,'completed replay must not make another request')
+
+    async def test_native_skill_results_resume_without_repeating_http(self):
+        case,scope,binding=self.setup_case()
+        with F['ChatPeer'](native_actions=self.native_actions,reasoning_details=REASONING_DETAILS) as peer:
+            spec=case.root/'gateway-skill-worker.json'
+            spec.write_text(json.dumps(dict(context_ref=scope['context_ref'],binding=binding,
+                limits=scope['limits'],endpoint=peer.endpoint,skills=True)))
+            case.catalog.close()
+            with (case.root/'gateway-skill-worker.log').open('w') as log:
+                worker=ObservedWorker([sys.executable,'-I',str(ROOT/'tests/fixtures/data_platform/gateway_openai_worker.py'),
+                    str(case.root),str(spec),'native_tool_response_committed'],cwd=case.root,
+                    env={'PATH':'/usr/bin:/bin'},stdout=log,stderr=log)
+                observed=worker.wait(timeout=40)
+            self.assertEqual(observed['returncode'],89,(case.root/'gateway-skill-worker.log').read_text())
+            self.assertEqual(len(peer.requests),3,peer.errors)
+            with Catalog.open(case.root) as catalog:
+                before=deepcopy(Session(catalog,scope['context_ref']).data['native_execution'])
+                worker.record(catalog,scope['context_ref'])
+                with patch('uteki.data_platform.agent.skill_runtime.get_skill',side_effect=AssertionError('restore frozen Skill')):
+                    result=await self.invoke(DataService(catalog),scope,binding,peer,recover=True)
+                self.assertEqual(result['status'],'completed',result['error'])
+                after=Session(catalog,scope['context_ref']).data['native_execution']
+                self.assertEqual(after['skill_snapshot'],before['skill_snapshot'])
+                self.assertEqual(after['skill_tool_calls'],before['skill_tool_calls'])
+                self.assertEqual(len(peer.requests),10,peer.errors)
+                self.assertEqual(len(after['openai_requests']),10)
+                self.assertEqual(Decimal(result['delivery']['delivery']['usage']['synthetic_cost_usd']),Decimal('.10'))
+
+    async def test_native_file_read_denial_returns_to_model_without_exposing_other_files(self):
+        import shlex
+        case,scope,binding=self.setup_case()
+        outside=case.root/'outside-skill.txt';marker='PRIVATE_SYNTHETIC_FILE_NOT_A_SKILL_0192';outside.write_text(marker)
+        actions=(self.native_actions[0],('exec_command',dict(cmd=shlex.join(['cat',str(outside)]))))
+        with F['ChatPeer'](native_actions=actions) as peer:
+            result=await self.invoke(case.service,scope,binding,peer)
+            self.assertEqual(result['status'],'completed',result['error'])
+            self.assertEqual(len(peer.requests),10,peer.errors)
+            third=json.loads(peer.requests[2])
+            denial=next(m['content'] for m in third['messages'] if m['role']=='tool' and m['tool_call_id']=='call-gateway-2')
+            self.assertIn('SKILL_READ_DENIED',denial)
+            self.assertNotIn(marker,b''.join(peer.requests).decode())
+            self.assertEqual(outside.read_text(),marker)
 
 
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,31 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "claude",
+  "model_id": "fixture/claude-skill-query-v1",
+  "role": "query",
+  "sdk_version": "0.2.167",
+  "status": "offline_fixture_only",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/claude/fixture-skill-query/query.md",
+    "version": "offline-skill-v1",
+    "sha256": "05e7c86b492648693339748308b703cbcadf6d09e1b7e5ca4ea89d0e88a1fbb7"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "anthropic_messages",
+    "upstream": [
+      "fixture-only"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "reasoning_effort": null,
+  "skills": [
+    "financial-data-query"
+  ]
+}

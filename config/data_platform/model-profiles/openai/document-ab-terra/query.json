@@ -1,0 +1,37 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "openai/gpt-5.6-terra",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "unverified",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/document-ab-terra/query.md",
+    "version": "document-ab-v1",
+    "sha256": "9c53e2695d7b664179b12b7fae499224a56f4acd54459e784aa7931eeb3a2a4a"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "openai"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "reasoning_effort": "low",
+  "request_controls": {
+    "reasoning": {
+      "effort": "low"
+    }
+  },
+  "skills": [
+    "document-data-query"
+  ],
+  "parallel_tool_calls": null
+}

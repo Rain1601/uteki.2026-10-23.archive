@@ -37,6 +37,24 @@ def generation(*, identity='gen-synthetic-a', cost='0.04'):
 
 
 class GatewayEvidenceTests(unittest.TestCase):
+    def test_messages_optional_done_is_framing_not_json_or_proof_of_completion(self):
+        events=[dict(type='message_start',message=dict(id='msg_native',model=MODEL,
+                    type='message',usage=dict(input_tokens=4,output_tokens=0))),
+                dict(type='message_delta',delta=dict(stop_reason='tool_use'),usage=dict(output_tokens=5)),
+                dict(type='message_stop')]
+        raw=''.join('event: '+e['type']+'\ndata: '+json.dumps(e)+'\n\n' for e in events).encode()
+        for suffix in (b'',b'data: [DONE]\n\n',b'event: data\ndata: [DONE]\n\n: comment\n\n'):
+            cap=capture(raw+suffix,'anthropic_messages',media='text/event-stream')
+            with self.subTest(suffix=suffix):
+                self.assertTrue(observe_response(cap)['protocol_complete'])
+                self.assertEqual(response_bytes(cap),raw+suffix)
+        done=b'event: data\ndata: [DONE]\n\n'
+        for bad in (done,raw[:raw.index(b'event: message_stop')]+done,
+                    raw+done+done,raw+done+b'event: ping\ndata: {"type":"ping"}\n\n',
+                    raw+done[:-2]):
+            with self.subTest(bad=bad):
+                self.assertFalse(observe_response(capture(bad,'anthropic_messages',media='text/event-stream'))['protocol_complete'])
+
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(prefix='uteki-gateway-evidence-')
         self.addCleanup(self.temp.cleanup)
@@ -182,16 +200,34 @@ class GatewayEvidenceTests(unittest.TestCase):
         result=observe_response(cap)
         self.assertIsNone(result['billed_usd']);self.assertFalse(result['protocol_complete'])
 
-    def test_native_messages_need_gateway_bill_not_session_cost_or_token_estimate(self):
+    def test_native_messages_account_cost_requires_generation_and_not_session_estimate(self):
         raw=json.dumps(dict(id='msg_native',type='message',model=MODEL,stop_reason='end_turn',
             content=[dict(type='text',text='synthetic')],usage=dict(input_tokens=10,output_tokens=5,cost=.01),
             total_cost_usd=.02)).encode()
         no_id=observe_response(capture(raw,'anthropic_messages'))
         self.assertIsNone(no_id['generation_id']);self.assertIsNone(no_id['billed_usd'])
         cap=capture(raw,'anthropic_messages',headers=[('X-Generation-Id','gen-synthetic-a')])
-        saved=self.record(cap);self.assertEqual(saved['cost_state'],'unknown')
-        final=reconcile_response(self.budget,'first',generation(),origin='synthetic')
-        self.assertEqual(final['settled_usd'],'0.04')
+        saved=self.record(cap);self.assertEqual(saved['settled_usd'],'0.01')
+        self.assertEqual(saved['bill']['receipt']['source'],'synthetic:messages.usage.cost')
+        value=json.loads(raw);del value['usage']['cost']
+        self.assertIsNone(observe_response(capture(json.dumps(value).encode(),'anthropic_messages',
+            headers=[('X-Generation-Id','gen-synthetic-a')]))['billed_usd'])
+
+    def test_messages_final_usage_decimal_string_is_an_account_charge(self):
+        def stream(cost):
+            events=[dict(type='message_start',message=dict(id='msg_native',type='message',model=MODEL,
+                usage=dict(input_tokens=1,output_tokens=0,cost=999))),
+                dict(type='message_delta',delta=dict(stop_reason='tool_use'),usage=dict(output_tokens=21,cost=cost)),
+                dict(type='message_stop')]
+            raw=b''.join(('event: '+e['type']+'\ndata: '+json.dumps(e)+'\n\n').encode() for e in events)+b'event: data\ndata: [DONE]\n\n'
+            return capture(raw,'anthropic_messages',media='text/event-stream',headers=[('X-Generation-Id','gen-synthetic-a')])
+        cap=stream('0.0033128');saved=self.record(cap)
+        self.assertEqual(saved['settled_usd'],'0.0033128')
+        self.assertEqual(response_bytes(saved['response_event']['response']['http']),response_bytes(cap))
+        for cost in (True,'NaN','-1',' 0.1','1e2',None):
+            with self.subTest(cost=cost):self.assertIsNone(observe_response(stream(cost))['billed_usd'])
+        incomplete=stream('0.0033128');incomplete['transport_complete']=False;incomplete['error']='interrupted'
+        self.assertIsNone(observe_response(incomplete)['billed_usd'])
 
     def test_native_sse_envelopes_preserve_usage_and_require_real_terminal_events(self):
         events=[dict(type='message_start',message=dict(id='msg_native',model=MODEL,type='message',

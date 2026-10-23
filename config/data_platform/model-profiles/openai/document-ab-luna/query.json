@@ -1,0 +1,37 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "openai/gpt-5.6-luna",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "unverified",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/document-ab-luna/query.md",
+    "version": "document-ab-v1",
+    "sha256": "d100257354b27d79ffb554aa1876b1efc9ec8464ab19b043b3b57c0f2a0cc003"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "openai"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "reasoning_effort": "low",
+  "request_controls": {
+    "reasoning": {
+      "effort": "low"
+    }
+  },
+  "skills": [
+    "document-data-query"
+  ],
+  "parallel_tool_calls": null
+}

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 
+# 从已加载配置生成显式路由说明；只提供配置数据，不查找密钥或发起请求。
 def configuration(loaded):
     p = loaded.profile
     return dict(provider='openrouter', protocol=p.route.protocol, model=p.model_id,

@@ -8,14 +8,15 @@ import sys
 from urllib.parse import urlsplit
 
 
-async def main(config_root, output):
+async def main(config_root, output, profile_relative=None):
     import claude_agent_sdk
     from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, PermissionResultDeny, create_sdk_mcp_server, tool
     from uteki.data_platform.agent.binding import DESCRIPTIONS, ENVELOPES
     from uteki.data_platform.agent.profiles import load_profile
     contract=json.loads((config_root/'gateway-contract.draft.v1.json').read_text())
-    model=contract['model']['gateway_id']
-    loaded=load_profile(config_root/'model-profiles/claude/deepseek-v4.1-flash/query.json',
+    relative=profile_relative or 'model-profiles/claude/deepseek-v4.1-flash/query.json'
+    model=json.loads((config_root/relative).read_text())['model_id']
+    loaded=load_profile(config_root/relative,
         config_root=config_root,kernel='claude',model_id=model,role='query')
     endpoint=urlsplit(os.environ['ANTHROPIC_BASE_URL'])
     if endpoint.scheme!='http' or endpoint.hostname!='127.0.0.1' or not endpoint.port:
@@ -24,7 +25,8 @@ async def main(config_root, output):
     async def deny(*args,**kwargs):return PermissionResultDeny(message='Wire fixture has no business execution')
     handlers=[tool(name,DESCRIPTIONS[name],schema.model_json_schema())(prohibited) for name,schema in ENVELOPES.items()]
     options=ClaudeAgentOptions(model=model,fallback_model=None,system_prompt=loaded.text,
-        thinking={'type':'disabled'},effort=None,tools=[],allowed_tools=[],permission_mode='default',
+        thinking={'type':'disabled'} if loaded.profile.reasoning_effort is None else {'type':'adaptive'},
+        effort=loaded.profile.reasoning_effort,tools=[],allowed_tools=[],permission_mode='default',
         setting_sources=[],skills=[],plugins=[],strict_mcp_config=True,can_use_tool=deny,
         mcp_servers={'data':create_sdk_mcp_server('data',version='1.0.0',tools=handlers)},
         cwd=Path.cwd(),cli_path=Path(claude_agent_sdk.__file__).parent/'_bundled/claude',max_turns=1)
@@ -37,4 +39,4 @@ async def main(config_root, output):
     output.write_text(json.dumps(dict(events=events,tool_handlers_executed=0),ensure_ascii=False,indent=2)+'\n')
 
 
-if __name__=='__main__':asyncio.run(main(Path(sys.argv[1]),Path(sys.argv[2])))
+if __name__=='__main__':asyncio.run(main(Path(sys.argv[1]),Path(sys.argv[2]),sys.argv[3] if len(sys.argv)>3 else None))

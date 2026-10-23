@@ -19,6 +19,7 @@ from urllib.parse import urlsplit
 from ...contracts.common import canonical, digest
 
 
+# 拒绝重复 JSON 键，防止同一原始请求被不同解析器解释为不同内容。
 def unambiguous_object(pairs):
     result = {}
     for key, value in pairs:
@@ -28,7 +29,9 @@ def unambiguous_object(pairs):
     return result
 
 
+# 本地 HTTP 桥接器原样转发 Claude 协议，仅连接回环 fixture，并持久化每次原生请求。
 class OfflineClaudeTransport:
+    # 先核验回环上游，再建立私有令牌入口；工作线程中的宿主回调返回原事件循环执行。
     def __init__(self, journal, upstream, *, before_request, observed_request, validate_request=None):
         parsed = urlsplit(upstream)
         if (parsed.scheme != 'http' or parsed.hostname != '127.0.0.1' or not parsed.port
@@ -61,10 +64,12 @@ class OfflineClaudeTransport:
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.base_url = 'http://127.0.0.1:'+str(self.server.server_port)
 
+    # 进入异步上下文时才启动本地服务，保证调用方可以成对管理其生命周期。
     async def __aenter__(self):
         self.thread.start()
         return self
 
+    # HTTP 线程同步等待事件循环完成状态操作，并受同一宿主截止时间约束。
     def callback(self, callback, *arguments):
         async def invoke():
             return callback(*arguments)
@@ -75,6 +80,7 @@ class OfflineClaudeTransport:
             future.cancel()
             raise
 
+    # 逐次核验令牌、路径、重试标记、大小及冻结模型参数，登记请求后才转发原始字节。
     def handle(self, handler):
         key, connection, raw_response = None, None, b''
         try:
@@ -129,6 +135,7 @@ class OfflineClaudeTransport:
                     raise ValueError('Native model stream ended without message_stop')
             saved = dict(complete=True, status=response.status, content_type=content_type,
                          body_sha256=digest(raw_response), body_base64=base64.b64encode(raw_response).decode())
+            # 先持久化原始响应再发回 CLI；成功响应还需确认该请求中的工具结果已被观察。
             self.journal.record_model(key, saved, complete=True)
             self.journal.guard_transport()
             if response.status == 200:
@@ -139,6 +146,7 @@ class OfflineClaudeTransport:
             handler.end_headers()
             handler.wfile.write(raw_response)
             self.events.append(dict(request_key=key, status='forwarded', body_sha256=metadata['body_sha256']))
+        # 失败仍保留已收到的有限响应前缀；不能把已发请求的中断当作零调用或无副作用。
         except Exception as error:
             self.events.append(dict(request_key=key, status='blocked_or_interrupted', error_type=type(error).__name__))
             if key is not None:
@@ -161,6 +169,7 @@ class OfflineClaudeTransport:
                 with self.lock:
                     self.connections.discard(connection)
 
+    # 主动关闭仍在读写的连接，再等待服务线程退出，避免取消后继续转发。
     def close(self):
         with self.lock:
             for connection in self.connections:
@@ -174,5 +183,6 @@ class OfflineClaudeTransport:
         self.server.server_close()
         self.thread.join()
 
+    # 在线程中关闭服务器，避免阻塞事件循环使待处理的宿主回调无法完成。
     async def __aexit__(self, *errors):
         await asyncio.to_thread(self.close)

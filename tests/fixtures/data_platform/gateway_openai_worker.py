@@ -18,7 +18,7 @@ def checkpoint(current):
     if current==phase:os._exit(89)
 
 with Catalog.open(Path(root)) as catalog:
-    result=asyncio.run(run_gateway(DataService(catalog),spec['context_ref'],fixture['profile']('openai'),
+    result=asyncio.run(run_gateway(DataService(catalog),spec['context_ref'],fixture['profile']('openai',skills=spec.get('skills',False)),
         gateway_binding=spec['binding'],limits=spec['limits'],endpoint=spec['endpoint'],
         credential='uteki-synthetic-gateway',checkpoint=checkpoint))
     (Path(root)/'unexpected-worker-result.json').write_text(json.dumps(result))

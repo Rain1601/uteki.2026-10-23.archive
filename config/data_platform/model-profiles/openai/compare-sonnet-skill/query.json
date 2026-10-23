@@ -1,0 +1,37 @@
+{
+  "schema_version": "uteki-agent-profile-v1",
+  "kernel": "openai",
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "role": "query",
+  "sdk_version": "0.24.0",
+  "status": "unverified",
+  "capabilities": [
+    "tool_calls",
+    "tool_results"
+  ],
+  "prompt": {
+    "path": "prompts/openai/compare-sonnet-skill/query.md",
+    "version": "skill-comparison-v1",
+    "sha256": "d889f3d3b6b4bd0271f6cc123487b4249112aa8703217f4d8c10c6875bdea654"
+  },
+  "route": {
+    "provider": "openrouter",
+    "protocol": "chat_completions",
+    "upstream": [
+      "anthropic"
+    ],
+    "allow_fallbacks": false,
+    "require_parameters": true
+  },
+  "max_output_tokens": 4096,
+  "parallel_tool_calls": null,
+  "reasoning_effort": "low",
+  "request_controls": {
+    "reasoning": {
+      "effort": "low"
+    }
+  },
+  "skills": [
+    "financial-data-query"
+  ]
+}
