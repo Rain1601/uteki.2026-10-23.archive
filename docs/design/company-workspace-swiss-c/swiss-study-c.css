@@ -1,36 +1,46 @@
-/* Swiss C reorganizes the presentation. Dates, geometry and research state remain
-   owned by the existing models and the C renderer; SVGs keep their native ratio. */
+/* Editorial presentation on the adopted C workspace. Editorial hierarchy and blue-white brand
+   roles share the existing silk-blue logo; data colors, geometry and state stay owned
+   by the existing models. This file owns the shared shell and page composition. */
 :root {
-  --bg:#eef2f5;--paper:#fff;--rail:#f2f5f8;--ink:#15212e;
-  --muted:#607080;--line:#d8e0e7;--soft:#f2f5f8;--accent:#215bd1;
-  --wash:#e8efff;--green:#087447;--amber:#995100;--radius:8px;
+  --bg:#f7f9fc;--paper:#f7f9fc;--rail:#edf2f8;--ink:#202c3e;
+  --muted:#56657a;--line:#d5dee9;--soft:#edf2f8;--accent:#315d9e;
+  --wash:#e0eafa;--green:#356249;--amber:#885323;--radius:6px;
   --entity-width:224px;--font:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
-  --swiss-portfolio:#f4f6f8;--swiss-rule:#becbd7;
+  --swiss-portfolio:#edf2f8;--swiss-rule:#a9b7cb;
 }
 :root[data-theme=dark] {
-  --bg:#11161c;--paper:#181f27;--rail:#131a21;--ink:#edf3f8;
-  --muted:#a8b8c8;--line:#354353;--soft:#222e3a;--accent:#95baff;
-  --wash:#283e60;--green:#79dbae;--amber:#edb773;
-  --swiss-portfolio:#202a35;--swiss-rule:#4a5b6b;
+  --bg:#24262b;--paper:#24262b;--rail:#1d1f23;--ink:#edeef0;
+  --muted:#b4bac4;--line:#424750;--soft:#2d3036;--accent:#b1c4df;
+  --wash:#343d4b;--green:#9dccac;--amber:#edbd84;
+  --swiss-portfolio:#2d3036;--swiss-rule:#67707c;
 }
 body {font-size:14px;line-height:1.6;letter-spacing:0}
 button,input,select {letter-spacing:0}
 h1,h2,h3 {font-family:var(--font);font-synthesis:none}
 time {font-variant-numeric:tabular-nums}
 .workspace {transition:grid-template-columns 240ms cubic-bezier(.22,.61,.36,1)}
-.global-nav {padding:14px 8px 12px;background:var(--rail)}
+.global-nav {padding:14px 8px 12px;background:var(--rail);overflow-y:auto;scrollbar-width:none}
 .nav-brand {height:44px;padding:4px 10px;margin-bottom:20px}
 .nav-brand-symbol {width:24px;height:36px}
 .nav-brand-symbol img {width:24px;height:auto}
+/* Lift the silk folds on graphite without changing the source or daytime logo. */
+:root[data-theme=dark] .nav-brand-symbol img {filter:brightness(1.65) saturate(.7) contrast(.88)}
 .nav-label {right:auto;width:126px;font-size:13px;transform:translateX(-3px);transition:opacity 90ms ease-out,transform 160ms ease-out;transition-delay:0ms}
 .workspace[data-navigation=expanded] .nav-label {transform:translateX(0);transition-duration:130ms,180ms;transition-delay:110ms}
 .nav-brand-name {left:46px;font-family:var(--font);font-size:23px;line-height:1.1;font-weight:550;letter-spacing:-.04em}
 .nav-item {height:44px;border-radius:7px}
-.nav-item.active,.nav-item.active:hover {background:var(--paper);color:var(--accent)}
+.nav-item.active,.nav-item[aria-pressed=true] {background:var(--paper);color:var(--accent)}
+.nav-preferences {display:flex;flex-direction:column;gap:6px}
+.nav-typography {display:flex;position:relative;align-items:center;padding:10px;min-height:44px;flex-shrink:0;border-radius:7px;color:var(--muted);cursor:pointer}
+.nav-typography:is(:hover,:focus-visible),.nav-typography:focus-within {background:var(--paper);color:var(--ink)}
+.nav-typography:focus-within {outline:2px solid var(--accent);outline-offset:-2px}
+.nav-language,.nav-typography .nav-glyph {font-size:14px;font-weight:500}
+.nav-typography select {position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font:12px/1.5 var(--font);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px}
+.workspace[data-navigation=expanded] .nav-typography select {inset:auto 4px auto 46px;width:calc(100% - 50px);height:30px;padding:3px 4px;opacity:1}
 .entity-sidebar {padding:18px 12px 14px}
 .entity-list-heading {padding:3px 6px 15px}
-.entity-list-heading h2 {font-size:15px;font-weight:600}
-.search {border-radius:6px;background:var(--soft);border-color:transparent}
+.entity-list-heading h2 {font-size:17px;font-weight:650;letter-spacing:-.025em}
+.search {border-radius:4px;background:transparent;border-color:var(--line)}
 .entity-row {border-radius:6px}
 .entity-row.selected {background:var(--wash)}
 .entity-row .company-row {padding:10px 8px;gap:10px}
@@ -58,18 +68,20 @@ time {font-variant-numeric:tabular-nums}
 .content-tab.active {font-weight:550}
 .content-tab small {font-size:12px}
 .content,.content[data-entity=company],.content[data-entity=company][data-view=overview],.content[data-entity=manager]:not([data-view=report]) {padding:24px 28px 32px}
+/* Route changes focus the reading region; interactive controls keep their rings. */
+.content:focus {outline:none}
 .company-overview,.page-inner,.manager-workspace {max-width:none;margin:0}
 
 /* Entity pages use the same compact identity/tool line as the institution,
    followed by their persistent content tabs. No duplicate heading band. */
-.workspace:is([data-mode=company],[data-mode=manager]) .workarea {grid-template-rows:minmax(56px,auto) 0 auto minmax(0,1fr)}
+.workspace:is([data-mode=company],[data-mode=manager]) .workarea {grid-template-rows:minmax(64px,auto) 0 auto minmax(0,1fr)}
 .workspace:is([data-mode=company],[data-mode=manager]) .company-header {display:none}
 .workspace:is([data-mode=company],[data-mode=manager]) .reading-layout {grid-row:4}
 .workspace:is([data-mode=company],[data-mode=manager]) .toolbar {padding:8px 28px;flex-wrap:wrap;gap:8px 18px}
 .workspace:is([data-mode=company],[data-mode=manager]) .toolbar-start {gap:10px;flex:1;min-width:200px}
 .workspace:is([data-mode=company],[data-mode=manager]) .tools {margin-left:auto}
 .workspace:is([data-mode=company],[data-mode=manager]) .company-heading {min-width:0}
-.workspace:is([data-mode=company],[data-mode=manager]) .company-heading h1 {font-size:20px;line-height:1.4}
+.workspace:is([data-mode=company],[data-mode=manager]) .company-heading h1 {font-size:24px;line-height:1.3}
 .workspace:is([data-mode=company],[data-mode=manager]) .company-heading p {display:flex;flex-wrap:wrap;gap:3px 10px;margin-top:0;line-height:1.45;color:var(--muted)}
 .workspace:is([data-mode=company],[data-mode=manager]) .toolbar-start>.company-icon,
 .workspace:is([data-mode=company],[data-mode=manager]) .hero-avatar {width:32px;height:32px;flex-shrink:0;font-size:16px}
@@ -77,32 +89,32 @@ time {font-variant-numeric:tabular-nums}
 .workspace:is([data-mode=company],[data-mode=manager]) .content-tab {min-height:38px}
 .entity-nav-summary {display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-left:auto;padding-block:7px;font-size:12px;line-height:1.5;color:var(--muted);font-variant-numeric:tabular-nums}
 .entity-provenance {padding-left:12px;border-left:1px solid var(--line)}
-.content[data-entity=company],.content[data-entity=company][data-view=overview],.content[data-entity=manager] {padding:16px 28px 28px}
-.content[data-entity=manager]:not([data-view=report]) {padding:16px 28px 28px}
+.content[data-entity=company],.content[data-entity=company][data-view=overview],.content[data-entity=manager] {padding:24px 28px 40px}
+.content[data-entity=manager]:not([data-view=report]) {padding:24px 28px 40px}
 .content:is([data-entity=company],[data-entity=manager]) .reader-nav {margin-bottom:18px}
 
 /* Institution: comparison above, performance and current portfolio side by side. */
-.workspace[data-mode=institution] .workarea {grid-template-rows:minmax(56px,auto) 0 0 minmax(0,1fr)}
+.workspace[data-mode=institution] .workarea {grid-template-rows:minmax(68px,auto) 0 0 minmax(0,1fr)}
 .workspace[data-mode=institution] .company-header {display:none}
-.workspace[data-mode=institution] .toolbar {padding:10px 32px;flex-wrap:wrap;gap:8px 20px}
-.workspace[data-mode=institution] .toolbar-start {gap:6px 18px;flex-wrap:wrap}
+.workspace[data-mode=institution] .toolbar {padding:20px 32px 0;border-bottom:0;flex-wrap:wrap;gap:8px 20px}
+.workspace[data-mode=institution] .toolbar-start {gap:6px 18px;flex-wrap:wrap;width:100%;max-width:1536px;margin-inline:auto}
 .workspace[data-mode=institution] .tools {margin-left:auto}
-.workspace[data-mode=institution] .company-heading h1 {font-size:20px;font-weight:600;line-height:1.4;letter-spacing:-.035em}
+.workspace[data-mode=institution] .company-heading h1 {font-size:var(--t-display);line-height:var(--lh-title)}
 .institution-heading {gap:14px;align-items:center}
-.institution-heading .simulation-label {font-size:12px;background:var(--soft);padding:4px 8px;border-radius:4px}
-.institution-header-meta {font-size:12px;font-variant-numeric:tabular-nums}
-.content[data-entity=institution] {padding:12px 32px 24px;container-type:normal;container-name:none}
-.institution-dashboard {display:grid;grid-template-columns:minmax(0,2fr) minmax(320px,1fr);gap:20px 32px;max-width:1536px;margin:0 auto;align-items:start}
-.swiss-comparison-strip {grid-column:1/-1;display:grid;grid-template-columns:128px minmax(0,1fr) 152px 96px;align-items:stretch;gap:20px;padding:0 0 12px;border-bottom:1px solid var(--swiss-rule);min-width:0}
+.institution-heading .simulation-label {font-size:12px;background:none;padding:2px 0;color:var(--muted);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.institution-header-meta {font-size:12px;font-variant-numeric:tabular-nums;margin-left:auto;color:var(--muted)}
+.content[data-entity=institution] {padding:24px 32px 32px;container-type:normal;container-name:none}
+.institution-dashboard {display:grid;grid-template-columns:minmax(0,2fr) minmax(320px,1fr);gap:28px 32px;max-width:1536px;margin:0 auto;align-items:start}
+.swiss-comparison-strip {grid-column:1/-1;display:grid;grid-template-columns:128px minmax(0,1fr) 152px 96px;align-items:stretch;gap:20px;padding:0 0 24px;border-bottom:1px solid var(--swiss-rule);min-width:0}
 .swiss-comparison-label {display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:5px;font-size:13px;font-weight:550;line-height:1.5;color:var(--ink)}
 .swiss-comparison-label small {font-size:12px;font-weight:400;color:var(--muted)}
 .swiss-comparison-strip .portfolio-thumbnail-list.institution-agent-legend {display:flex;flex-direction:row;flex-wrap:nowrap;gap:10px;align-items:stretch;overflow:auto;scrollbar-width:thin;scroll-snap-type:none;padding:2px;margin:0;min-width:0}
 .swiss-comparison-strip .portfolio-thumbnail.institution-agent-selector {display:grid;grid-template-columns:minmax(0,1fr) 68px;grid-template-rows:auto auto;align-content:center;align-items:center;justify-content:initial;gap:7px 14px;flex:1 0 214px;min-height:80px;min-width:214px;aspect-ratio:auto;padding:9px 16px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--ink);overflow:hidden;text-align:left;box-shadow:none}
-.swiss-comparison-strip .portfolio-thumbnail.institution-agent-selector:hover {background:var(--soft)}
-.swiss-comparison-strip .portfolio-thumbnail.institution-agent-selector.is-selected {border-color:color-mix(in srgb,var(--agent-color) 45%,var(--line));background:color-mix(in srgb,var(--agent-color) 6%,var(--paper));box-shadow:none}
+.swiss-comparison-strip .portfolio-thumbnail.institution-agent-selector:is(:hover,:focus-visible) {background:var(--soft)}
+.swiss-comparison-strip .portfolio-thumbnail.institution-agent-selector.is-selected {border-color:transparent;background:transparent;border-radius:0;box-shadow:inset 0 -2px 0 var(--interactive)}
 .swiss-agent-name {display:flex;align-items:center;gap:8px;grid-column:1;grid-row:1;font-size:13px;font-weight:550;white-space:nowrap}
 .swiss-agent-name i {width:8px;height:8px;border-radius:50%;background:var(--agent-color);flex-shrink:0}
-.swiss-comparison-strip strong[data-agent-return] {grid-column:1;grid-row:2;font-size:30px;line-height:1.1;font-weight:550;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.swiss-comparison-strip strong[data-agent-return] {grid-column:1;grid-row:2;font-size:34px;line-height:1.1;font-weight:500;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
 .swiss-comparison-strip .portfolio-thumbnail-chart {grid-column:2;grid-row:1/3;width:68px;height:32px;display:block;align-self:center}
 .swiss-comparison-strip .portfolio-thumbnail-chart svg {width:100%;height:100%;overflow:visible;fill:none;stroke:var(--agent-color);stroke-width:1.8}
 .swiss-comparison-strip svg.portfolio-thumbnail-chart {fill:none;stroke:var(--agent-color);stroke-width:1.8}
@@ -115,12 +127,16 @@ time {font-variant-numeric:tabular-nums}
 .institution-performance {grid-column:1;min-width:0;padding:0;margin:0;border:0}
 .institution-chart-controls {align-items:flex-start;gap:20px;margin:0 0 14px;min-height:42px}
 .institution-comparison-heading {display:flex;flex-direction:column;align-items:flex-start;gap:5px;flex-shrink:0}
-.institution-comparison-heading h2 {font-size:18px;font-weight:600;line-height:1.35;letter-spacing:-.025em}
+.institution-comparison-heading h2 {font-size:var(--t-h1);line-height:var(--lh-title)}
 .institution-comparison-heading p {font-size:12px;line-height:1.5;margin:0}
 .institution-performance-actions {gap:9px;justify-content:flex-end}
-.institution-periods {background:var(--soft);padding:2px;border-radius:5px}
-.institution-periods button {font-size:12px;padding:4px 9px;border-radius:4px}
-.institution-periods button[aria-pressed=true] {background:var(--ink);color:var(--paper);box-shadow:none}
+.institution-periods {position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;background:var(--soft);padding:2px;border-radius:5px}
+.institution-periods::before {content:"";position:absolute;z-index:-1;top:2px;bottom:2px;left:2px;width:calc((100% - 10px)/3);border-radius:4px;background:var(--ink);transform:translateX(0);transition:transform 200ms cubic-bezier(.22,.61,.36,1)}
+.institution-periods:has(button:nth-of-type(2)[aria-pressed=true])::before {transform:translateX(calc(100% + 3px))}
+.institution-periods:has(button:nth-of-type(3)[aria-pressed=true])::before {transform:translateX(calc(200% + 6px))}
+.institution-periods button {font-size:12px;padding:4px 9px;border-radius:4px;transition:color 160ms ease-out}
+.institution-periods button[aria-pressed=true] {background:transparent;color:var(--paper);box-shadow:none}
+@media(prefers-reduced-motion:reduce) {.institution-periods::before,.institution-periods button {transition:none}}
 .allocation-history-open {font-size:12px;border-radius:5px;padding:5px 8px}
 .institution-chart {width:100%;height:auto;display:block}
 .institution-chart text {font-size:14px;font-variant-numeric:tabular-nums;fill:var(--muted)}
@@ -142,13 +158,13 @@ time {font-variant-numeric:tabular-nums}
 /* A single reading surface keeps allocation, current date and companies together. */
 .institution-portfolio {grid-column:2;min-width:0;margin:0;align-self:start}
 .institution-portfolio-layout {display:block}
-.portfolio-stage {padding:18px 20px 16px;border-radius:9px;border:1px solid var(--line);background:var(--swiss-portfolio);min-height:0}
+.portfolio-stage {padding:24px;border-radius:0;border:0;background:none;min-height:0}
 .section-kicker {display:flex;align-items:baseline;gap:10px;margin-bottom:8px;font-size:12px;font-weight:500;color:var(--muted);line-height:1.4}
 .portfolio-stage-heading {align-items:flex-start;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .portfolio-stage-identity {gap:10px;align-items:flex-start}
 .portfolio-stage-heading .avatar {width:29px;height:29px;border-radius:6px;font-family:var(--font);font-size:15px;font-weight:600;background:color-mix(in srgb,var(--agent-color) 12%,var(--paper));margin-top:1px}
-.portfolio-stage-heading h3,.portfolio-stage-heading h2 {font-size:23px;font-weight:600;line-height:1.25;letter-spacing:-.035em}
-.portfolio-stage-heading h3>span,.portfolio-stage-heading h2>span {font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0;margin-left:5px}
+.portfolio-stage-heading h3,.portfolio-stage-heading h2 {font-size:var(--t-h2);line-height:var(--lh-title)}
+.portfolio-stage-heading h3>span,.portfolio-stage-heading h2>span {font-family:var(--font-sans);font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0;margin-left:5px}
 .portfolio-stage-heading p {font-size:12px;line-height:1.45;margin-top:4px}
 .portfolio-stage-heading a {font-size:12px;padding-top:3px}
 .portfolio-snapshot {font-size:12px;line-height:1.45;color:var(--muted);font-variant-numeric:tabular-nums;margin:0 0 8px}
@@ -172,7 +188,8 @@ time {font-variant-numeric:tabular-nums}
 .institution-company-link>span:not(.cash-symbol) {display:flex;flex-direction:column;align-items:flex-start;gap:0;min-width:0}
 .institution-company-link strong {font-size:13px;font-weight:500;line-height:1.4}
 .institution-company-link small {font-size:11px;line-height:1.4}
-.holding-report-gap {font-size:11px;white-space:normal;max-width:72px;line-height:1.4}
+.holding-report-gap {font-size:var(--t-meta);white-space:nowrap;line-height:1.4}
+.content[data-entity=institution] .holding-weight-bar {display:none}
 .holding-weight {min-width:58px;max-width:78px;gap:5px;font-size:14px;font-weight:550;padding:4px 3px;font-variant-numeric:tabular-nums;flex-shrink:0}
 .holding-weight-bar {height:3px;max-width:22px}
 .holding-report-menu {background:var(--paper);z-index:4}
@@ -182,6 +199,7 @@ time {font-variant-numeric:tabular-nums}
 .swiss-palette-disclosure>summary>span {margin-left:auto;color:var(--ink)}
 .swiss-palette-disclosure>summary::after {content:'+';font-size:17px;font-weight:400;line-height:1}
 .swiss-palette-disclosure[open]>summary::after {content:'−'}
+.swiss-palette-disclosure>summary:is(:hover,:focus-visible),.swiss-palette-disclosure[open]>summary {color:var(--accent)}
 .swiss-palette-disclosure>summary:focus-visible {outline:2px solid var(--accent);outline-offset:4px}
 .swiss-palette-disclosure .allocation-palette-picker {display:block;padding:12px 0 0;margin:0;border:0}
 .swiss-palette-disclosure .allocation-palette-label {display:none}
@@ -195,8 +213,7 @@ time {font-variant-numeric:tabular-nums}
 .institution-section-note {font-size:12px;line-height:1.45;margin-top:8px}
 .institution-footer-note {grid-column:1/-1;font-size:12px;line-height:1.6;margin:0;padding:12px 0 0;border-top:1px solid var(--line)}
 .institution-dashboard[data-history-open=true] {grid-template-columns:minmax(0,1fr)}
-.institution-dashboard[data-history-open=true] #institution-performance,.institution-dashboard[data-history-open=true] #institution-portfolio,.institution-dashboard[data-history-open=true] .institution-footer-note {grid-column:1}
-.institution-dashboard[data-history-open=true] #institution-portfolio,.institution-dashboard[data-history-open=true] .institution-footer-note {display:block}
+.institution-dashboard[data-history-open=true] #institution-performance {grid-column:1}
 .allocation-history-heading {margin-bottom:18px}
 .allocation-history-heading h3 {font-size:18px;font-weight:550}
 .allocation-history-holdings thead th {font-size:12px;font-weight:500;background:var(--soft)}
@@ -207,11 +224,11 @@ time {font-variant-numeric:tabular-nums}
 .overview-heading {margin-bottom:18px}
 .overview-heading h2 {font-size:20px;font-weight:600;letter-spacing:-.025em}
 .overview-deck {grid-template-columns:180px minmax(0,1fr);gap:20px}
-.overview-tab {padding:11px 12px;border-radius:6px}
+.overview-tab {padding:14px 12px;border-radius:4px}
 .overview-tab-top {font-size:13px;font-weight:550}
-.overview-stage {border-radius:8px}
-.overview-module {padding:16px 20px 14px;border-radius:8px 8px 0 0}
-.overview-module-heading h2,.overview-module-heading h3 {font-size:19px;font-weight:550}
+.overview-stage {border:0;border-top:1px solid var(--ink);border-radius:0}
+.overview-module {padding:22px 20px 20px;border-radius:0}
+.overview-module-heading h2,.overview-module-heading h3 {font-size:22px;font-weight:650;letter-spacing:-.025em}
 .overview-item {padding:14px 0}
 .overview-item-title {font-size:15px;line-height:1.7}
 .overview-status,.overview-note {font-size:12px}
@@ -220,7 +237,7 @@ time {font-variant-numeric:tabular-nums}
 .directory-heading h2 {font-size:16px;font-weight:600}
 .directory-row {padding:11px 10px;border-radius:6px}
 .directory-row-title {font-size:13px;font-weight:500}
-.item-detail {padding-left:28px;border-left:1px solid var(--line)}
+.item-detail {padding-left:0;border-left:0}
 .item-detail .reader,.detail-article {max-width:780px;margin:0 auto}
 .report-title,.item-detail .report-title {font-size:29px;font-weight:600;line-height:1.45;letter-spacing:-.035em}
 .report-section h2 {font-size:23px;font-weight:550;letter-spacing:-.025em}
@@ -228,33 +245,34 @@ time {font-variant-numeric:tabular-nums}
 .report-section th {font-size:12px;font-weight:500}
 .report-section td {font-size:14px;font-variant-numeric:tabular-nums}
 .detail-article>h2 {font-size:26px;font-weight:550;line-height:1.5}
-.detail-placeholder {align-items:flex-start;text-align:left;max-width:650px;margin:0;padding:28px 0}
+.detail-placeholder {align-items:flex-start;text-align:left;max-width:780px;margin:0 auto;padding:28px 0}
 .detail-placeholder h2 {font-size:21px;font-weight:550}
-.manager-summary {padding-bottom:12px}
+.manager-summary {padding-bottom:24px}
 .manager-metrics {gap:22px 0}
 .manager-metric {padding-right:26px;margin-right:26px;border-right:1px solid var(--line)}
 .manager-metric:last-child {padding-right:0;margin-right:0;border:0}
-.manager-metric>strong {font-size:30px;font-weight:550;line-height:1.25;letter-spacing:-.035em}
-.manager-section-head h2 {font-size:18px;font-weight:550}
-.manager-section-head {margin-top:14px}
+.manager-metric>strong {font-size:clamp(24px,4.5cqi,30px);font-weight:550;line-height:1.25;letter-spacing:-.035em}
+.manager-section-head h2 {font-size:22px;font-weight:650;letter-spacing:-.025em}
+.manager-section-head {margin-top:24px;margin-bottom:16px}
 .manager-workspace>.manager-section-head:first-child {margin-top:0}
 .manager-section-head>div:first-child {flex-wrap:wrap;gap:4px 10px}
-.manager-table th {font-weight:500;background:var(--soft)}
-.manager-table th,.manager-table td {padding:10px 12px}
+.manager-table th {font-weight:550;background:transparent;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.manager-table th,.manager-table td {padding:12px}
 .manager-table tbody tr {height:56px}
 .manager-coverage-groups {gap:20px}
 .manager-coverage-group-head {border-bottom:1px solid var(--swiss-rule)}
-.manager-coverage-card {border-radius:7px;padding:14px}
 
 /* Use the viewport, not the width that changes while the navigation opens.
    1124px = the existing 1000px content breakpoint + 60px rail + 64px padding.
    Navigation still pushes the page, but does not switch its composition. */
 @media (min-width:1125px) {
   .portfolio-stage {display:grid;grid-template-columns:minmax(0,1fr) 136px;column-gap:12px;padding:16px 18px 14px}
+  /* Rows 1-6 are the fixed identity/chart block; every later block spans in DOM order. */
+  .portfolio-stage>* {grid-column:1/-1}
   .section-kicker {grid-column:1/-1;grid-row:1;margin-bottom:9px}
   .portfolio-stage-heading {grid-column:1;grid-row:2;display:flex;flex-direction:column;gap:5px;border:0;padding:0;margin:0 0 7px}
-  .portfolio-stage-heading h3,.portfolio-stage-heading h2 {font-size:22px}
-  .portfolio-stage-heading h3>span,.portfolio-stage-heading h2>span {display:block;margin:2px 0 0;font-size:11px}
+  .portfolio-stage-heading h3,.portfolio-stage-heading h2 {font-size:var(--t-h2)}
+  .portfolio-stage-heading h3>span,.portfolio-stage-heading h2>span {font-size:var(--t-meta)}
   .portfolio-stage-heading a {font-size:11px;padding:0}
   .portfolio-snapshot {grid-column:1;grid-row:3;margin:0 0 7px;font-size:11px}
   .institution-portfolio-body,.institution-allocation {display:contents}
@@ -264,8 +282,6 @@ time {font-variant-numeric:tabular-nums}
   .institution-portfolio-value strong {font-size:16px;line-height:1.35}
   .allocation-caption {grid-column:1/-1;grid-row:5;font-size:11px;line-height:1.5;padding:8px 0;margin:0}
   .institution-holdings {grid-column:1/-1;grid-row:6}
-  .swiss-palette-disclosure {grid-column:1/-1;grid-row:7}
-  .institution-section-note {grid-column:1/-1;grid-row:8}
 }
 @media (max-width:1324px) {
   .swiss-comparison-strip {grid-template-columns:100px minmax(0,1fr) 126px 90px;gap:14px}
@@ -318,11 +334,11 @@ time {font-variant-numeric:tabular-nums}
 }
 @container company-content (max-width:660px) {
   .item-workspace {grid-template-columns:170px minmax(0,1fr);gap:16px}
-  .item-detail {padding-left:16px}
+  .item-detail {padding-left:0}
 }
 @container company-content (max-width:430px) {
   .item-workspace {grid-template-columns:minmax(0,1fr)}
-  .item-detail {border-left:0;border-top:1px solid var(--line);padding:20px 0 0}
+  .item-detail {border:0;padding:0}
 }
 @container (max-width:560px) {.overview-deck {grid-template-columns:minmax(0,1fr);gap:12px}}
 @media(max-width:860px) {

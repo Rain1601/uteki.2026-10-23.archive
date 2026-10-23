@@ -4,8 +4,8 @@ import { catalog, getCompany, getManager, getReport, getEvidence, getMaterial, g
 import { resolveBrand } from '../../../apps/uteki_zero/brands.mjs';
 import { createRiskRegisterViews } from './risk-register-view.mjs?v=20261006-risk1';
 import { createPortfolioDecisionViews } from './portfolio-decision-view.mjs?v=20261006-risk1';
-import { createManagerViews } from './manager-view.mjs?v=20261006-risk1';
-import { createInstitutionViews } from './institution-view.mjs?v=20261006-risk1';
+import { createManagerViews } from './manager-view.mjs?v=20261015-micro1';
+import { createInstitutionViews } from './institution-view.mjs?v=20261021-updates16';
 import { INSTITUTION_DEMO_SCOPE } from './institution-data.mjs';
 import { investmentEventFixture } from './investment-events.mjs';
 import { managerCoverageFixture, getManagerCoverage } from './manager-coverage.mjs';
@@ -27,7 +27,7 @@ const paths = {
   link:'<path d="m10 13 4-4m-5 7-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m2 0 2-2a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/>',
 };
 export const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.file}</svg>`;
-export const TYPOGRAPHY_MODES = Object.freeze(['swiss','hybrid','editorial']);
+export const TYPOGRAPHY_MODES = Object.freeze(['publication','swiss','hybrid','editorial']);
 
 export function createRenderer(lang = 'zh', registry = {brands:{}}) {
   const t = (zh,en) => lang === 'en' ? en : zh;
@@ -44,7 +44,7 @@ export function createRenderer(lang = 'zh', registry = {brands:{}}) {
   const decisionViews=createPortfolioDecisionViews({t,companyIcon});
   const riskViews=createRiskRegisterViews({t,companyIcon});
   const managerViews=createManagerViews({t,companyIcon,decisionSummary:decisionViews.summary,riskSummary:riskViews.summary,institutionContext:getInstitution(INSTITUTION_DEMO_SCOPE.institutionId),executionContext:investmentEventFixture,coverageContext:managerCoverageFixture});
-  const institutionViews=createInstitutionViews({t,companyIcon,decisionSummary:decisionViews.summary,riskSummary:riskViews.summary});
+  const institutionViews=createInstitutionViews({t,companyIcon});
   const entityKey=route=>route.institutionId?`institution-${route.institutionId}`:route.managerId?`manager-${route.managerId}`:`company-${route.companyId}`;
   const leafRoute=(route,view)=>route.institutionId?{institutionId:route.institutionId,view}:route.managerId?{managerId:route.managerId,view}:{companyId:route.companyId,view};
   function sections(route) {
@@ -83,7 +83,7 @@ export function createRenderer(lang = 'zh', registry = {brands:{}}) {
       const target=isManager?{managerId:item.id,view:'overview'}:{companyId:item.id,view:'overview'};
       const key=entityKey(target),selected=entityKey(route)===key;
       const n=isManager?0:new Set(catalog.events.filter(event=>event.companyId===item.id).map(event=>event.id)).size;
-      return `<div class="entity-group"><div id="row-${key}" data-key="${key}" class="entity-row ${selected?'selected':''}"><a id="${key}" class="company-row" data-entity-key="${key}" href="${e(formatRoute(target))}" title="${e(item.name)}">${isManager?`<span class="avatar entity-avatar">${e(item.name[0])}</span>`:companyIcon(item)}<span class="company-copy"><strong>${e(item.name)}</strong><small>${e(item.ticker || item.style)}</small></span>${n?`<span class="count" title="${t('演示事件数，非未读数','Demo event count, not unread')}">${n}</span>`:''}</a><button id="menu-${key}" class="entity-menu-button" data-action="entity-menu" data-key="${key}" aria-expanded="false" aria-controls="entity-flyout" aria-label="${e(item.name)} · ${t('打开内容目录','Open contents')}">${icon('chevron')}</button></div></div>`;
+      return `<div class="entity-group"><div id="row-${key}" data-key="${key}" class="entity-row ${selected?'selected':''}"><a id="${key}" class="company-row" data-entity-key="${key}" href="${e(formatRoute(target))}" title="${e(item.name)}" aria-label="${e(item.name)}" aria-current="${selected?'page':'false'}">${isManager?`<span class="avatar entity-avatar">${e(item.name[0])}</span>`:companyIcon(item)}<span class="company-copy"><strong>${e(item.name)}</strong><small>${e(item.ticker || item.style)}</small></span>${n?`<span class="count" title="${t('演示事件数，非未读数','Demo event count, not unread')}">${n}</span>`:''}</a><button id="menu-${key}" class="entity-menu-button" data-action="entity-menu" data-key="${key}" aria-expanded="false" aria-controls="entity-flyout" aria-label="${e(item.name)} · ${t('打开内容目录','Open contents')}">${icon('chevron')}</button></div></div>`;
     }).join('') || `<p class="note">${t('没有匹配的对象','No matching entities')}</p>`;
   }
   function entityMenu(key,route) {
@@ -95,30 +95,38 @@ export function createRenderer(lang = 'zh', registry = {brands:{}}) {
     const selected=entityKey(route)===key;
     return `<div class="flyout-heading"><strong>${e(item.name)}</strong><span>${e(item.ticker || item.style)}</span></div><nav aria-label="${e(item.name)} · ${t('内容目录','Contents')}">${tabs(selected?route:target,selected)}</nav>`;
   }
-  function globalNavigation(route,expanded=false) {
+  function globalNavigation(route,expanded=false,{theme='light',panel=null,typography='publication'}={}) {
     const isManager=!!route.managerId,isInstitution=!!route.institutionId;
     return `<div class="nav-brand"><span class="nav-brand-symbol"><img src="${e(new URL('./assets/uteki-drop-silk.png',import.meta.url).href)}" alt="Uteki" width="296" height="382"></span><span class="nav-label nav-brand-name" aria-hidden="true">uteki</span></div>
       <nav class="global-modes" aria-label="${t('工作台导航','Workspace navigation')}"><button id="mode-institution" class="nav-item ${isInstitution?'active':''}" data-action="mode" data-mode="institution" aria-pressed="${isInstitution}" aria-label="${t('机构总览','Institution overview')}" title="${t('机构总览','Institution overview')}"><span class="nav-glyph">${icon('home')}</span><span class="nav-label">${t('机构总览','Overview')}</span></button><button id="mode-company" class="nav-item ${!isManager&&!isInstitution?'active':''}" data-action="mode" data-mode="company" aria-pressed="${!isManager&&!isInstitution}" aria-label="${t('公司','Companies')}" title="${t('公司','Companies')}"><span class="nav-glyph">${icon('company')}</span><span class="nav-label">${t('公司','Companies')}</span></button><button id="mode-manager" class="nav-item ${isManager?'active':''}" data-action="mode" data-mode="manager" aria-pressed="${isManager}" aria-label="Managers" title="Managers"><span class="nav-glyph">${icon('manager')}</span><span class="nav-label">Managers</span></button></nav>
-      <div class="global-nav-footer"><button id="nav-toggle" class="nav-item navigation-toggle" data-action="toggle-navigation" aria-expanded="${expanded}" aria-controls="global-nav" aria-label="${expanded?t('收起导航','Collapse navigation'):t('展开导航','Expand navigation')}" title="${expanded?t('收起导航','Collapse navigation'):t('展开导航','Expand navigation')}"><span class="nav-glyph">${icon('panel')}</span><span id="nav-toggle-label" class="nav-label">${expanded?t('收起导航','Collapse navigation'):t('展开导航','Expand navigation')}</span></button></div>`;
+      <div class="global-nav-footer">${displayControls(theme,panel,typography)}<button id="nav-toggle" class="nav-item navigation-toggle" data-action="toggle-navigation" aria-expanded="${expanded}" aria-controls="global-nav" aria-label="${expanded?t('收起导航','Collapse navigation'):t('展开导航','Expand navigation')}" title="${expanded?t('收起导航','Collapse navigation'):t('展开导航','Expand navigation')}"><span class="nav-glyph">${icon('panel')}</span><span id="nav-toggle-label" class="nav-label">${expanded?t('收起导航','Collapse navigation'):t('展开导航','Expand navigation')}</span></button></div>`;
   }
   function sidebar(route,query='') {
     if(route.institutionId) return institutionViews.sidebar(route);
     const isManager=!!route.managerId;
-    return `<div class="entity-list-heading"><h2>${isManager?t('投资 Managers','Investment Managers'):t('关注的公司','Following companies')}</h2><span>${isManager?catalog.managers.length:catalog.companies.length}</span></div>
+    return `<div class="entity-list-heading"><h2>${isManager?t('投资 Managers','Investment Managers'):t('关注的公司','Following companies')}</h2><span>${isManager?catalog.managers.length:catalog.companies.length}</span><button id="entity-list-toggle" class="entity-list-toggle" data-action="toggle-entity-list" aria-expanded="true" aria-controls="entity-list" aria-label="${t('收起对象列表','Collapse entity list')}" title="${t('收起对象列表','Collapse entity list')}">${icon('chevron')}</button></div>
       <label class="search">${icon('search')}<span class="sr-only">${t('搜索当前实体','Search entities')}</span><input id="entity-search" type="search" placeholder="${isManager?t('搜索 Manager','Search Managers'):t('搜索公司或代码','Company or ticker')}" value="${e(query)}" autocomplete="off"></label>
       <nav class="company-list" id="entity-list" aria-label="${t('对象列表与内容目录','Entities and contents')}">${entityRows(route,query)}</nav>
       <p class="entity-sidebar-footer">${t('设计样板 · 虚构资料','Design sample · Fictional data')}</p>`;
   }
-  function toolbar(route,theme,panel,typography='swiss') {
+  function themeControl(theme) {
+    const label=theme==='dark'?t('切换亮色','Light theme'):t('切换暗色','Dark theme');
+    return {label,content:`<span class="nav-glyph">${icon(theme==='dark'?'sun':'moon')}</span><span class="nav-label">${label}</span>`};
+  }
+  function displayControls(theme,panel,typography) {
     if(!TYPOGRAPHY_MODES.includes(typography)) throw new Error('Unknown typography preference');
+    const themeButton=themeControl(theme);
+    return `<div class="nav-preferences" role="group" aria-label="${t('显示与帮助','Display & help')}">
+      <label class="nav-typography" title="${t('字体方案','Typography')}"><span class="nav-glyph" aria-hidden="true">Aa</span><select id="typography-select" aria-label="${t('字体方案','Typography')}">${[['publication','Editorial'],['swiss',t('瑞士','Swiss')],['hybrid',t('书刊混排','Mixed')],['editorial',t('经典宋体','Classic')]].map(([id,label])=>`<option value="${id}" ${id===typography?'selected':''}>${label}</option>`).join('')}</select></label>
+      <button id="language-button" class="nav-item" data-action="language" aria-label="${t('Switch to English','切换中文')}" title="${t('Switch to English','切换中文')}"><span class="nav-glyph nav-language" aria-hidden="true">${t('EN','中')}</span><span class="nav-label">${t('English','简体中文')}</span></button>
+      <button id="theme-button" class="nav-item" data-action="theme" aria-label="${themeButton.label}" title="${themeButton.label}">${themeButton.content}</button>
+      <button id="design-button" class="nav-item" data-action="design" aria-label="${t('设计说明','Design notes')}" title="${t('设计说明','Design notes')}" aria-pressed="${panel?.kind==='design'}"><span class="nav-glyph">${icon('file')}</span><span class="nav-label">${t('设计说明','Design notes')}</span></button>
+    </div>`;
+  }
+  function toolbar(route) {
     routeContext(route);
     const location=route.institutionId?institutionViews.header(route):entityHeading(route);
-    return `<div class="toolbar-start">${location}</div><div class="tools">
-      <button id="design-button" class="utility" data-action="design" aria-pressed="${panel?.kind==='design'}">${t('设计说明','Design notes')}</button>
-      <label class="typography-control" title="${t('瑞士：当前字体；书刊混排：标题与报告用宋体和 Times；经典宋体：更多内容文字使用衬线字体。按本机已安装字体显示。','Swiss: current sans-serif. Mixed: serif headings and reports. Classic: more serif text. Uses locally installed fonts.')}"><span aria-hidden="true">Aa</span><select id="typography-select" aria-label="${t('字体方案','Typography')}">${[['swiss',t('瑞士','Swiss')],['hybrid',t('书刊混排','Mixed')],['editorial',t('经典宋体','Classic')]].map(([id,label])=>`<option value="${id}" ${id===typography?'selected':''}>${label}</option>`).join('')}</select></label>
-      <button id="language-button" class="utility" data-action="language" aria-label="${t('Switch to English','切换中文')}">${t('EN','中文')}</button>
-      <button id="theme-button" class="utility" data-action="theme" aria-label="${theme==='dark'?t('切换亮色','Light theme'):t('切换暗色','Dark theme')}">${icon(theme==='dark'?'sun':'moon')}</button>
-      <button id="context-button" class="utility" data-action="context" aria-label="${t('研究上下文','Research context')}" aria-pressed="${panel?.kind==='context'}">${icon('panel')}<span class="tool-label">${t('上下文','Context')}</span></button></div>`;
+    return `<div class="toolbar-start">${location}</div>`;
   }
   function header(route) {
     // Identity now lives in the toolbar; the stable shell node stays empty.
@@ -333,5 +341,5 @@ export function createRenderer(lang = 'zh', registry = {brands:{}}) {
     }
     return `<div class="panel-title"><h2 id="panel-title" tabindex="-1">${title}</h2><button id="close-panel" class="panel-close" data-action="close-panel" aria-label="${t('收起侧栏，返回阅读','Close panel and return to reading')}">×</button></div><div class="panel-body">${body}</div>`;
   }
-  return { t, globalNavigation, sidebar, entityRows, entityMenu, contentNavigation, toolbar, header, tabs, main, detail, panel, companyReportDirectory, managerMain:managerViews.main, investmentEvents:institutionViews.events, allocationHistory:institutionViews.history, institutionPortfolio:institutionViews.portfolio, institutionChartBody:institutionViews.chartBody, institutionTrades:institutionViews.trades };
+  return { t, globalNavigation, themeControl, sidebar, entityRows, entityMenu, contentNavigation, toolbar, header, tabs, main, detail, panel, companyReportDirectory, managerMain:managerViews.main, investmentEvents:institutionViews.events, allocationHistory:institutionViews.history, institutionPortfolio:institutionViews.portfolio, institutionChartBody:institutionViews.chartBody, institutionTrades:institutionViews.trades, institutionPerformance:institutionViews.performance };
 }

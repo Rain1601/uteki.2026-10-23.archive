@@ -117,7 +117,15 @@ export function createInvestmentEventViews({ t, companyIcon }) {
     const { data,manager,kind,granularity } = selection(options);
     const filters = Object.entries(labels).map(([value,label]) => `<button id="investment-kind-${value}" data-action="investment-event-kind" data-kind="${value}" aria-pressed="${value === kind}">${e(label)}</button>`).join('');
     const grains = Object.entries(grainLabels).map(([value,label]) => `<option value="${value}" ${value === granularity ? 'selected' : ''}>${e(label)}${value === 'auto' ? ` · ${e(grainLabels[data.granularity])}` : ''}</option>`).join('');
-    return `<div class="investment-timeline-heading"><div class="investment-timeline-title"><h3>${t('投资事件','Investment events')}</h3><span>${e(manager.name)}</span><small>${t('模拟','Simulated')}</small><span class="investment-event-total">${data.events.length} ${t('条','events')}</span></div><div class="investment-timeline-controls"><div class="investment-kind-filter" role="group" aria-label="${t('事件类型','Event type')}">${filters}</div><label class="investment-granularity"><span class="investment-sr-only">${t('报告聚合粒度','Report grouping')}</span><select id="investment-event-granularity" aria-label="${t('报告聚合粒度','Report grouping')}" ${kind === 'buy' || kind === 'sell' ? 'disabled' : ''}>${grains}</select></label></div></div>`;
+    return `<div class="investment-timeline-heading"><div class="investment-timeline-title"><h3>${t('投资事件','Investment events')}</h3><span>${e(manager.name)}</span><small>${t('模拟','Simulated')}</small><span class="investment-event-total">${data.events.length} ${t('条','events')}</span></div><div class="investment-timeline-controls"><div class="investment-kind-filter" role="group" aria-label="${t('事件类型','Event type')}">${filters}</div><label class="investment-granularity"><span class="investment-sr-only">${t('报告聚合粒度','Report grouping')}</span><select id="investment-event-granularity" aria-label="${t('报告聚合粒度','Report grouping')}" ${kind === 'buy' || kind === 'sell' ? 'disabled' : ''}>${grains}</select></label></div></div>${eventRecords(data.events)}`;
+  }
+
+  function eventRecords(events) {
+    return `<div class="investment-event-records">${[...events].sort((a,b)=>b.date.localeCompare(a.date)||a.id.localeCompare(b.id)).map(event=>{
+      const company=getCompany(event.companyId).company;
+      const title=t(event.title,event.titleEn),repeatedTitle=title===`${labels[event.kind]} ${company.name}`;
+      return `<details class="investment-event-record" data-event-record="${e(event.id)}"><summary><time datetime="${e(event.date)}">${e(event.date)}</time>${companyIcon(company)}<strong>${e(company.name)}</strong><span class="investment-event-kind">${e(labels[event.kind])}</span><span class="event-record-title">${e(repeatedTitle?'':title)}</span></summary><div class="event-record-detail"><p>${e(title)}</p>${event.kind==='report'?reportLink(event):t('模拟事件，未提供成交价和数量。','Illustrative event; execution price and quantity are not provided.')}</div></details>`;
+    }).join('')||`<p class="investment-events-empty">${t('该区间暂无事件。','No events in this period.')}</p>`}</div>`;
   }
 
   function timeline(options) {

@@ -1,0 +1,13 @@
+/* The object index keeps its links mounted while the shared grid changes width. */
+.entity-list-heading h2 {flex:1;min-width:0}
+.entity-list-toggle {display:grid;place-items:center;flex:none;width:26px;height:28px;border-radius:4px;color:var(--muted)}
+.entity-list-toggle:is(:hover,:focus-visible) {background:var(--soft);color:var(--ink)}
+.entity-list-toggle svg {width:14px;height:14px;transform:rotate(180deg)}
+.workspace[data-entity-list=collapsed] {--entity-width:64px}
+.workspace[data-entity-list=collapsed] .entity-sidebar {padding:18px 8px 14px}
+.workspace[data-entity-list=collapsed] .entity-list-heading {justify-content:center;padding:0 0 12px}
+.workspace[data-entity-list=collapsed] .entity-list-toggle svg {transform:none}
+.workspace[data-entity-list=collapsed] .entity-sidebar :is(.entity-list-heading h2,.entity-list-heading>span,.search,.company-copy,.count,.entity-menu-button,.entity-sidebar-footer) {display:none}
+.workspace[data-entity-list=collapsed] .entity-row .company-row {justify-content:center;gap:0;padding:8px;min-height:48px}
+.workspace[data-entity-list=collapsed] .entity-row .company-icon,
+.workspace[data-entity-list=collapsed] .entity-row .entity-avatar {width:32px;height:32px;flex:none}

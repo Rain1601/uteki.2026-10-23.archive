@@ -1,0 +1,105 @@
+/* A bounded workspace: the shell never scrolls; each reading region owns overflow.
+   Keep chart geometry intact so event anchors use the same SVG coordinate space. */
+html,body {height:100%;overflow:hidden}
+.workspace[data-mode=institution] .workarea {grid-template-rows:36px 0 0 minmax(0,1fr)}
+.workspace[data-mode=institution] .toolbar {padding:4px 32px;border-bottom:0}
+.content[data-entity=institution] {overflow:hidden;display:flex;flex-direction:column;padding:8px 32px 12px}
+.institution-dashboard {width:100%;height:100%;min-height:0;grid-template-rows:minmax(0,1fr) auto;align-items:stretch;gap:16px 32px}
+.institution-dashboard>.institution-performance {grid-row:1;grid-column:1;min-height:0;min-width:0;display:flex;flex-direction:column}
+.institution-dashboard>.institution-portfolio {grid-row:1;grid-column:2;min-height:0;align-self:stretch;overflow:hidden;background:transparent}
+.institution-dashboard>.institution-footer-note {grid-row:2;grid-column:1/-1}
+.institution-chart-controls {flex-shrink:0}
+.institution-performance .institution-chart-controls {display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:10px 24px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.performance-agent-legend {display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;min-width:0}
+.performance-agent-legend .portfolio-thumbnail-list {flex-direction:row;gap:6px;padding:2px;overflow:auto}
+.performance-agent-legend .portfolio-thumbnail.institution-agent-selector {box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) 44px;grid-template-rows:18px 23px;align-items:center;gap:3px 8px;flex:0 0 156px;width:156px;min-width:156px;max-width:156px;height:58px;min-height:58px;aspect-ratio:auto;padding:7px 10px;border:0;border-radius:5px;background:transparent;white-space:nowrap;box-shadow:none;transition:background-color 160ms ease}
+.performance-agent-legend .institution-agent-selector:is(:hover,:focus-visible) {background:var(--soft)}
+.performance-agent-legend .institution-agent-selector.is-selected {background:color-mix(in srgb,var(--agent-color) 7%,var(--paper));box-shadow:none}
+.performance-agent-legend .swiss-agent-name {font-size:13px}
+.performance-agent-legend strong[data-agent-return] {grid-column:1;grid-row:2;font-size:20px;line-height:1.1;font-weight:500;font-variant-numeric:tabular-nums}
+.performance-agent-legend .portfolio-thumbnail-chart {grid-column:2;grid-row:1/3;width:44px;height:23px;fill:none;stroke:var(--agent-color);stroke-width:1.6}
+.performance-agent-legend .institution-benchmark-legend {display:flex;align-items:center;gap:7px;flex:0 0 146px;font-size:12px;white-space:nowrap;color:var(--muted);font-variant-numeric:tabular-nums}
+.performance-agent-legend .institution-benchmark-legend>span {display:flex;align-items:center;gap:6px}
+.performance-agent-legend .institution-benchmark-legend strong {font-size:13px;font-weight:400}
+.institution-performance .institution-performance-actions {grid-column:1/-1;justify-content:flex-end;margin-left:auto;max-width:none}
+#institution-chart-body {flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:8px}
+#investment-chart-surface {flex:1;min-height:0;container-type:size;display:flex;flex-direction:column;align-items:center;background:transparent}
+#investment-performance-plot {width:100%;flex:1;min-height:0;margin:0}
+#investment-performance-plot>.institution-chart {width:100%;height:100%;display:block}
+#investment-timeline-host {width:100%;flex:none;height:66px}
+#investment-controls-host {flex:0 1 34%;min-height:90px;overflow:hidden;display:flex;flex-direction:column;background:transparent;border-top:1px solid var(--line)}
+#investment-controls-host>.investment-timeline-heading {position:static;flex:none;background:transparent;padding:8px;margin:0}
+.institution-portfolio .swiss-palette-disclosure {border:0;margin:0;max-height:160px;overflow:auto;padding:0;font-size:12px;color:var(--muted)}
+.institution-portfolio .swiss-palette-disclosure>summary {justify-content:flex-end;padding:4px 0;gap:8px}
+.institution-portfolio .swiss-palette-disclosure:not([open])>summary>span {display:none}
+.institution-portfolio .swiss-palette-disclosure .institution-section-note {margin:8px 0}
+.institution-portfolio .portfolio-stage {box-sizing:border-box;height:100%;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1.15fr) auto minmax(0,1fr);gap:12px;padding:4px 8px 0}
+.institution-portfolio .portfolio-stage>* {grid-column:1;grid-row:auto;min-width:0}
+.institution-portfolio .portfolio-overview {display:grid;grid-template-columns:minmax(0,1fr) 124px;gap:12px;align-items:center;padding-bottom:12px}
+.portfolio-overview-copy {min-width:0}
+.portfolio-overview .section-kicker {margin:0 0 8px;font-size:12px}
+.institution-portfolio .portfolio-stage-heading {display:flex;flex-direction:row;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px 10px;padding:0;margin:0;border:0}
+.portfolio-overview .portfolio-stage-heading h3 {font-family:var(--font-title);font-size:24px;line-height:1.2;font-weight:400;letter-spacing:0}
+.portfolio-overview .portfolio-stage-heading h3>span {font-family:var(--font-sans);font-size:12px;color:var(--muted)}
+.portfolio-overview .portfolio-detail-link {font-size:12px;padding:0;white-space:nowrap}
+.portfolio-style {margin:6px 0 12px;font-size:12px;color:var(--muted)}
+.portfolio-overview .institution-portfolio-value {display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:0}
+.portfolio-overview .portfolio-snapshot {margin:6px 0 0;font-variant-numeric:tabular-nums}
+.portfolio-overview-chart {min-width:0;align-self:center}
+.portfolio-overview-chart .allocation-visual {width:124px;max-width:100%;margin:0;grid-column:auto;grid-row:auto}
+.portfolio-overview-chart .allocation-caption {font-size:11px;line-height:1.5;min-height:33px;margin:6px 0 0;padding:0;text-align:center;overflow-wrap:anywhere}
+.portfolio-holdings-panel {min-height:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.portfolio-holdings-panel .swiss-holdings-heading {flex:none;margin:0;padding:8px 0;font-size:12px}
+.institution-portfolio .portfolio-holdings-panel .institution-holdings {display:block;flex:1;min-height:0;width:100%;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable}
+.portfolio-followups {min-height:0;min-width:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.portfolio-followups-heading {display:flex;flex:none;align-items:center;justify-content:space-between;gap:8px;padding:10px 0}
+.portfolio-followups-heading h3 {font-family:var(--font-sans);font-size:13px;font-weight:500;white-space:nowrap}
+.portfolio-followups-heading [role=group] {display:flex;gap:2px;flex-wrap:wrap}
+.portfolio-followups-heading button {font-size:12px;line-height:1.5;padding:3px 8px;border:0;border-radius:4px;color:var(--muted);background:transparent}
+.portfolio-followups-heading button[aria-pressed=true] {background:var(--soft);color:var(--ink)}
+.portfolio-followups-heading button:is(:hover,:focus-visible) {color:var(--ink)}
+.portfolio-followup-list {flex:1;min-height:0;min-width:0;max-width:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-gutter:stable;list-style:none;padding:0;margin:0}
+.portfolio-followup-list>li {display:block;min-width:0;padding:0;border-top:1px solid var(--line)}
+.portfolio-followup-list>li:first-child {border-top:0}
+.portfolio-followup-list>li[hidden] {display:none}
+.portfolio-update-link {display:block;min-width:0;max-width:100%;padding:12px 4px;white-space:normal;overflow-wrap:anywhere}
+.portfolio-update-link:is(:hover,:focus-visible) {background:var(--soft)}
+.portfolio-update-topline {display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;min-width:0;font-size:11px;color:var(--muted)}
+.portfolio-update-topline time {font-variant-numeric:tabular-nums}
+.portfolio-update-status {margin-left:auto}
+.portfolio-update-tag {background:var(--soft);border-radius:3px;padding:2px 5px;font-size:11px;line-height:1.6;color:var(--muted)}
+.portfolio-followup-list [data-followup-kind=risk] .portfolio-update-tag {color:var(--amber);background:color-mix(in srgb,var(--amber) 8%,var(--paper))}
+.portfolio-update-title {display:block;margin:6px 0 4px;font-size:13px;font-weight:500;line-height:1.65;color:var(--ink)}
+.portfolio-update-meta {display:block;font-size:11px;line-height:1.6;color:var(--muted)}
+.portfolio-followup-list>.portfolio-updates-empty {padding:12px 4px;font-size:12px;color:var(--muted)}
+.institution-portfolio .institution-portfolio-value>span,.institution-portfolio .portfolio-snapshot {color:var(--muted);font-size:12px}
+.institution-portfolio .institution-portfolio-value>strong {font-size:20px;font-weight:500}
+.investment-event-records {display:flex;flex-direction:column;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.investment-event-record {border-top:1px solid var(--line);font-size:13px}
+.investment-event-record>summary {display:grid;grid-template-columns:86px 22px minmax(80px,.6fr) 44px minmax(0,1fr);align-items:center;gap:12px;padding:10px 4px;cursor:pointer;list-style:none}
+.investment-event-record>summary::-webkit-details-marker {display:none}
+.investment-event-record>summary:is(:hover,:focus-visible) {background:var(--soft)}
+.investment-event-record time {font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.investment-event-record .company-icon {width:22px;height:22px}
+.investment-event-record .event-record-title {min-width:0;overflow-wrap:anywhere;color:var(--muted)}
+.investment-event-record .investment-event-kind {background:none;padding:0;font-weight:400;color:var(--muted)}
+.investment-event-record>summary>strong {font-weight:500}
+.investment-event-record .event-record-detail {padding:0 12px 12px 38px;color:var(--muted);line-height:1.7}
+.institution-dashboard[data-history-open=true] #institution-chart-body {display:block;overflow:auto}
+.institution-dashboard[data-history-open=true]>.institution-performance {grid-column:1/-1}
+/* Small windows retain both regions rather than forcing a page-sized vertical stack. */
+@media(max-width:1124px) {
+  .institution-dashboard {grid-template-columns:minmax(0,1fr) minmax(280px,.8fr)}
+  .institution-dashboard .institution-portfolio-body {display:flex;flex-direction:column;gap:14px}
+  .institution-dashboard .institution-allocation {border:0;padding:0;width:100%}
+  .institution-dashboard .institution-holdings {width:100%}
+}
+@media(max-width:804px) {
+  .institution-dashboard {grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,1fr) auto;gap:12px}
+  .institution-dashboard>.institution-portfolio {grid-column:1;grid-row:2}
+  .institution-dashboard>.institution-footer-note {grid-row:3}
+  .institution-dashboard[data-history-open=true] {grid-template-rows:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce) {
+  .performance-agent-legend .portfolio-thumbnail.institution-agent-selector {transition:none}
+}

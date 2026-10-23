@@ -1,5 +1,5 @@
 import { formatRoute, parseRoute, getReport, getInstitution, routeContext } from './model.mjs?v=20261006-risk1';
-import { createRenderer, escapeHTML, TYPOGRAPHY_MODES } from './render.mjs?v=20261006-risk1';
+import { createRenderer, escapeHTML, TYPOGRAPHY_MODES } from './render.mjs?v=20261021-updates16';
 import { INSTITUTION_DEMO_SCOPE } from './institution-data.mjs';
 import { DEFAULT_ALLOCATION_PALETTE, getAllocationPalette, allocationPaletteStyle } from './allocation-palettes.mjs';
 import { validateBrandRegistry } from '../../../apps/uteki_zero/brands.mjs';
@@ -29,9 +29,9 @@ export function createController({document:doc,window:win,registry}) {
   const managerSelections=new Map(),companyReportSelections=new Map();
   let reportComposing=false;
   let route=null, panel=null, query='', invokerId='', lastHash='', view;
-  let language='zh',theme='light',typography='swiss';
+  let language='zh',theme='light',typography='publication';
   let allocationPalette=DEFAULT_ALLOCATION_PALETTE;
-  let navigationExpanded=false,flyoutKey=null;
+  let navigationExpanded=false,entityListCollapsed=false,flyoutKey=null;
   let navigationPointerInside=false,navigationKeyboardFocus=false,keyboardInput=false;
   let navigationAnchor=null,navigationEnd=null,navigationAnimating=false;
   let overviewTimer=null;
@@ -65,7 +65,7 @@ export function createController({document:doc,window:win,registry}) {
     const data=getInstitution(route.institutionId);
     return {...(institutionSelections.get(route.institutionId)||{period:data.defaultPeriod,agentId:data.defaultAgentId,holdingId:null,eventKind:'all',eventGranularity:'auto'}),paletteId:allocationPalette,eventWidth:timelineWidth()};
   };
-  const managerState = () => route?.managerId?{researchFilter:'all',researchPage:0,reportCompany:'all',reportKind:'all',reportQuery:'',reportPage:0,coverageStage:'all',coveragePage:0,activityKind:'all',activityPage:0,...managerSelections.get(route.managerId),paletteId:allocationPalette}:null;
+  const managerState = () => route?.managerId?{researchFilter:'all',researchPage:0,reportCompany:'all',reportKind:'all',reportQuery:'',reportPage:0,coverageStage:'all',coveragePage:0,allocationHolding:null,activityKind:'all',activityPage:0,...managerSelections.get(route.managerId),paletteId:allocationPalette}:null;
   const companyReportState = () => route?.companyId&&!route.managerId?{counterpartId:'all',kind:'all',query:'',page:0,...companyReportSelections.get(route.companyId)}:null;
   function refreshReportFilter(patch,focusId,caret=null) {
     if(!route||!['reports','report'].includes(route.view)) throw new Error('Report filters require a report directory');
@@ -108,6 +108,7 @@ export function createController({document:doc,window:win,registry}) {
     const html=view.managerMain(route,next);
     managerSelections.set(route.managerId,next);
     content.innerHTML=html;content.scrollTop=0;
+    allocationHover=null;allocationFocus=null;updateAllocationDisplay();syncPanelControls();
     const focus=[el(button.id),el(`manager-${button.dataset.list}-prev`),el(`manager-${button.dataset.list}-next`)].find(node=>node&&node.getAttribute('disabled')===null);
     (focus||content).focus({preventScroll:true});
     announce(view.t('列表已更新','List updated'));
@@ -243,8 +244,21 @@ export function createController({document:doc,window:win,registry}) {
     try { win.localStorage.setItem(PALETTE_KEY,id); } catch { saved=false; }
     announce(view.t(`已切换为${palette.name}配色${saved?'':'，仅本次页面生效'}`,`${palette.nameEn} palette applied${saved?'':' for this visit only'}`));
   }
-  const allocationTarget = target => target?.closest?.('[data-action="institution-holding"]')||target?.closest?.('[data-allocation-row]');
+  const allocationTarget = target => target?.closest?.('[data-action="manager-holding"]')||target?.closest?.('[data-action="institution-holding"]')||target?.closest?.('[data-allocation-row]');
   function updateAllocationDisplay() {
+    if(route?.managerId&&route.view==='overview') {
+      const selected=managerState().allocationHolding,shown=allocationHover||allocationFocus||selected;
+      const item=shown?el(`manager-allocation-${shown}`):null;
+      for(const control of content.querySelectorAll('[data-action="manager-holding"]')) {
+        const id=control.dataset.holding;
+        control.setAttribute('aria-pressed',String(id===selected));
+        control.classList.toggle('is-emphasized',id===shown);
+        control.classList.toggle('is-muted',!!shown&&id!==shown);
+      }
+      const label=el('manager-allocation-label');
+      if(label) {label.textContent=item?.dataset.label||label.dataset.default;label.setAttribute('title',label.textContent);}
+      return;
+    }
     if(!route?.institutionId) return;
     const selected=institutionState().holdingId,preview=allocationHover||allocationFocus;
     const shown=preview||selected,item=shown?el(`allocation-${shown}`):null;
@@ -267,20 +281,50 @@ export function createController({document:doc,window:win,registry}) {
   }
   function previewAllocation(node,source) {
     const id=node?.dataset.holding||node?.dataset.allocationRow||null;
-    if(id&&!el(`allocation-${id}`)) return;
-    if(source==='focus') allocationFocus=id;else allocationHover=id;
+    if(id&&!el(`${route?.managerId?'manager-allocation':'allocation'}-${id}`)) return;
+    // The latest input modality owns the preview; an idle pointer must not mask keyboard focus.
+    if(source==='focus') {allocationFocus=id;if(id) allocationHover=null;}
+    else {allocationHover=id;if(id) allocationFocus=null;}
     updateAllocationDisplay();
+  }
+  function selectManagerHolding(id) {
+    if(!route?.managerId||route.view!=='overview'||!el(`manager-allocation-${id}`)) throw new Error('Holding is outside the current Manager portfolio');
+    const current=managerState(),selected=current.allocationHolding===id?null:id;
+    managerSelections.set(route.managerId,{...current,allocationHolding:selected});
+    updateAllocationDisplay();
+    announce(selected?view.t(`已固定：${el(`manager-allocation-${id}`).dataset.label}`,`Pinned: ${el(`manager-allocation-${id}`).dataset.label}`):view.t('已取消固定配置','Allocation unpinned'));
+  }
+  function syncPanelControls() {
+    const selections=[];
+    for(let selection=panel;selection;selection=selection.parent) selections.push(selection);
+    // The panel's real scope owns the state, including an event behind its evidence.
+    // Synchronize each surface after rendering; toolbar and nested sources may be replaced.
+    for(const surface of [content,panelElement,el('toolbar'),globalNav]) {
+      for(const button of surface.querySelectorAll('[data-action]')) {
+        const {action,company,evidence,event}=button.dataset;
+        let matches;
+        if(action==='manager-coverage-detail') matches=item=>item.kind==='coverage'&&item.companyId===company;
+        else if(action==='evidence') matches=item=>item.kind==='evidence'&&item.evidenceId===evidence;
+        else if(action==='event') matches=item=>item.kind==='event'&&item.eventId===event;
+        else if(action==='report-contents'||action==='context') matches=item=>item.kind==='context';
+        else if(action==='design'||action==='changes') matches=item=>item.kind===action;
+        else continue;
+        button.setAttribute('aria-controls','context-panel');
+        button.setAttribute('aria-expanded',String(selections.some(matches)));
+      }
+    }
   }
   function selectInstitution(patch,focusId) {
     if(!route?.institutionId) throw new Error('Institution selection requires an institution overview');
     const previous=institutionState(),next={...previous,...patch};
     const changedAgent=next.agentId!==previous.agentId;
     if(Object.keys(patch).length===1&&Object.hasOwn(patch,'agentId')&&!changedAgent) return;
+    if(Object.keys(patch).length===1&&Object.hasOwn(patch,'period')&&next.period===previous.period) return;
     if(changedAgent) {next.holdingId=null;next.historyDate=null;}
     if(next.period!==previous.period) next.historyDate=null;
     // Resolve all three scopes before any state or DOM changes.
     const html=view.main(route,null,'changes',null,next);
-    const top=content.scrollTop,railLeft=content.querySelector('.portfolio-thumbnail-list')?.scrollLeft||0;
+    const top=content.scrollTop,regions=regionPositions(),railLeft=content.querySelector('.portfolio-thumbnail-list')?.scrollLeft||0;
     if(investmentEvent&&(changedAgent||next.period!==previous.period||next.eventKind!==previous.eventKind||next.eventGranularity!==previous.eventGranularity)) closeInvestmentPopover({restoreFocus:false});
     institutionSelections.set(route.institutionId,next);
     allocationHover=null;allocationFocus=null;
@@ -295,11 +339,29 @@ export function createController({document:doc,window:win,registry}) {
       if(focusId) el(focusId)?.focus({preventScroll:true});
       return;
     }
+    if(Object.keys(patch).length===1&&Object.hasOwn(patch,'followupFilter')) {
+      for(const button of content.querySelectorAll('[data-action="portfolio-followup-filter"]')) button.setAttribute('aria-pressed',String(button.dataset.filter===next.followupFilter));
+      for(const item of content.querySelectorAll('[data-followup-kind]')) item.hidden=next.followupFilter!=='all'&&item.dataset.followupKind!==next.followupFilter;
+      el('portfolio-updates-empty').hidden=[...content.querySelectorAll('[data-followup-kind]')].some(item=>!item.hidden);
+      if(focusId) el(focusId)?.focus({preventScroll:true});
+      return;
+    }
     // Agent targets stay in the DOM across the first click, allowing a native
     // double-click on either an already selected or a different Agent.
-    if(Object.keys(patch).length===1&&Object.hasOwn(patch,'agentId')) {
+    if(Object.keys(patch).length===1&&Object.hasOwn(patch,'period')) {
+      // Keep the controls, portfolio and their scroll/focus nodes mounted.
+      const presentation=view.institutionPerformance(route,next);
+      for(const item of presentation.thumbnails) {
+        const button=el(`institution-agent-${item.id}`);
+        button.innerHTML=item.html;button.setAttribute('aria-label',item.label);
+      }
+      const benchmark=el('institution-benchmark-return');
+      benchmark.textContent=presentation.benchmark;
+      benchmark.dataset.benchmarkReturn=String(getInstitution(route.institutionId).periods.find(period=>period.id===next.period).benchmarkReturnPct);
+      for(const button of content.querySelectorAll('[data-action="institution-period"]')) button.setAttribute('aria-pressed',String(button.dataset.period===next.period));
+      el('institution-chart-body').innerHTML=view.institutionChartBody(route,next);
+    } else if(Object.keys(patch).length===1&&Object.hasOwn(patch,'agentId')) {
       const agents=getInstitution(route.institutionId).agents;
-      const index=agents.findIndex(agent=>agent.managerId===next.agentId);
       el('institution-dashboard').dataset.selectedAgent=next.agentId;
       for(const target of content.querySelectorAll('[data-action="institution-agent"]')) {
         const selected=target.dataset.agent===next.agentId;
@@ -314,21 +376,18 @@ export function createController({document:doc,window:win,registry}) {
       const stage=el('portfolio-stage');
       stage.innerHTML=view.institutionPortfolio(route,next);stage.dataset.agent=next.agentId;
       stage.style.setProperty?.('--agent-color',el(`institution-agent-${next.agentId}`).style.getPropertyValue('--agent-color'));
-      const position=el('institution-position');
-      position.textContent=`${String(index+1).padStart(2,'0')} / ${String(agents.length).padStart(2,'0')}`;
-      position.setAttribute('aria-label',view.t(`第 ${index+1} 个，共 ${agents.length} 个 Agent`,`Agent ${index+1} of ${agents.length}`));
       if(next.historyOpen) el('institution-chart-body').innerHTML=view.institutionChartBody(route,next);
     } else {
-      content.innerHTML=html;content.scrollTop=top;
+      content.innerHTML=html;content.scrollTop=top;restoreRegions(regions);
+      syncPanelControls();
     }
     refreshInvestmentTimeline(true);
+    if(Object.hasOwn(patch,'period')&&!win.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      el('investment-chart-surface')?.animate?.([{opacity:.8},{opacity:1}],{duration:180,easing:'ease-out'});
+    }
     const rail=content.querySelector('.portfolio-thumbnail-list');
     if(rail) rail.scrollLeft=railLeft;
     if(changedAgent) {
-      const agents=getInstitution(route.institutionId).agents;
-      const direction=agents.findIndex(a=>a.managerId===next.agentId)>agents.findIndex(a=>a.managerId===previous.agentId)?'next':'previous';
-      const stage=content.querySelector('.portfolio-stage');
-      if(stage) stage.dataset.transition=direction;
       const thumb=el(`institution-agent-${next.agentId}`);
       if(rail&&thumb) {
         const r=rail.getBoundingClientRect(),b=thumb.getBoundingClientRect();
@@ -348,7 +407,7 @@ export function createController({document:doc,window:win,registry}) {
     institutionSelections.set(route.institutionId,next);
     el('institution-chart-body').innerHTML=html;
     el('institution-dashboard').dataset.historyOpen=String(open);
-    el('institution-chart-title').textContent=open?view.t('持仓时间轴','Allocation timeline'):view.t('投资表现','Investment performance');
+    el('institution-chart-title').textContent=open?view.t('持仓时间轴','Allocation timeline'):view.t('投资总览','Investment overview');
     el('institution-chart-subtitle').textContent=open?view.t('逐次记录的公司占比与变化','Company weights at each recorded date'):view.t('同一区间，从 0% 开始比较','Same period, compared from 0%');
     el('allocation-history-open').setAttribute('aria-expanded',String(open));
     content.scrollTop=open?0:(previous.historyReturnScroll||0);
@@ -419,6 +478,7 @@ export function createController({document:doc,window:win,registry}) {
     closePanel();
     itemSelections.set(directoryKey(),{...selection});
     el('workspace-detail').innerHTML=html;
+    syncPanelControls();
     for(const button of content.querySelectorAll('button[data-action="item-select"]')) {
       const selected=button.dataset.kind===selection.kind&&button.dataset.id===selection.id;
       button.setAttribute('aria-current',String(selected));
@@ -432,8 +492,18 @@ export function createController({document:doc,window:win,registry}) {
     if(!route) return;
     const active=doc.activeElement;
     const eventAnchor=investmentEvent&&investmentPopover.contains(active)?`investment-group-${selectedInvestmentGroups(investmentEventOptions())[0]}`:null;
-    positions.set(formatRoute(route),{top:content.scrollTop,focus:eventAnchor||(content.contains(active)?active.id:'')});
+    positions.set(formatRoute(route),{top:content.scrollTop,regions:regionPositions(),focus:eventAnchor||(content.contains(active)?active.id:'')});
     if(el('item-directory')) directoryPositions.set(directoryKey(),el('item-directory').scrollTop);
+  }
+  function regionPositions() {
+    return Object.fromEntries(['institution-chart-body','investment-controls-host','institution-portfolio','portfolio-holdings-scroll','portfolio-followup-list'].flatMap(id=>{
+      const node=el(id);return node?[[id,{top:node.scrollTop,left:node.scrollLeft}]]:[];
+    }));
+  }
+  function restoreRegions(regions={}) {
+    for(const [id,position] of Object.entries(regions)) {
+      const node=el(id);if(node) {node.scrollTop=position.top;node.scrollLeft=position.left;}
+    }
   }
   function restorePosition() {
     const saved=positions.get(formatRoute(route));
@@ -441,6 +511,7 @@ export function createController({document:doc,window:win,registry}) {
       if(el('item-directory')) el('item-directory').scrollTop=directoryPositions.get(directoryKey())||0;
       if(saved) {
         content.scrollTop=saved.top;
+        restoreRegions(saved.regions);
         const focus=saved.focus && el(saved.focus);
         (focus || content).focus({preventScroll:true});
       } else if(route.sectionId) {
@@ -457,12 +528,26 @@ export function createController({document:doc,window:win,registry}) {
     doc.documentElement.lang=language==='en'?'en':'zh-CN';
     view=createRenderer(language,registry);
   }
-  function renderToolbar() { if(route) el('toolbar').innerHTML=view.toolbar(route,theme,panel,typography); }
+  function renderToolbar() {
+    if(route) el('toolbar').innerHTML=view.toolbar(route);
+    el('design-button')?.setAttribute('aria-pressed',String(panel?.kind==='design'));
+    syncPanelControls();
+  }
+  function renderGlobalNavigation() {globalNav.innerHTML=view.globalNavigation(route,navigationExpanded,{theme,panel,typography});}
   function renderSidebar() {
-    globalNav.innerHTML=view.globalNavigation(route,navigationExpanded);
+    renderGlobalNavigation();
     el('workspace').dataset.mode=mode(route);
     sidebar.hidden=mode(route)==='institution';
     sidebar.innerHTML=view.sidebar(route,query);
+    syncEntityList();
+  }
+  function syncEntityList() {
+    el('workspace').dataset.entityList=entityListCollapsed?'collapsed':'expanded';
+    const button=el('entity-list-toggle');
+    if(!button) return;
+    const label=entityListCollapsed?view.t('展开对象列表','Expand entity list'):view.t('收起对象列表','Collapse entity list');
+    button.setAttribute('aria-expanded',String(!entityListCollapsed));
+    button.setAttribute('aria-label',label);button.setAttribute('title',label);
   }
   function syncNavigation() {
     el('workspace').dataset.navigation=navigationExpanded?'expanded':'collapsed';
@@ -485,8 +570,11 @@ export function createController({document:doc,window:win,registry}) {
   }
   function setNavigation(expanded) {
     if(navigationExpanded===expanded) return;
+    updateNavigationLayout(()=>{navigationExpanded=expanded;syncNavigation();});
+  }
+  function updateNavigationLayout(update) {
     navigationAnchor=anchorPosition();navigationAnimating=true;
-    navigationExpanded=expanded;syncNavigation();
+    update();
     retainAnchor(navigationAnchor);
     if(navigationEnd!==null) clearTimeout(navigationEnd);
     if(win.matchMedia?.('(prefers-reduced-motion: reduce)').matches) finishNavigationLayout();
@@ -532,9 +620,11 @@ export function createController({document:doc,window:win,registry}) {
     el('content-nav').innerHTML=view.contentNavigation(route);
     content.dataset.entity=mode(route);content.dataset.view=route.view;
     content.innerHTML=view.main(route,route.view==='report'?returns.get(reportKey(route)):route.view==='decisions'?decisionReturns.get(decisionKey(route)):null,overviewSection()||'changes',itemSelection(),institutionState(),managerState(),companyReportState());
+    updateAllocationDisplay();
     panelElement.hidden=!panel;
     el('workspace').classList.toggle('panel-open',!!panel);
     panelElement.innerHTML=panel?view.panel(route,panel):'';
+    syncPanelControls();
     refreshInvestmentTimeline(true);
     renderInvestmentPopover({focus:false});
     doc.title=`${route.view==='report'?getReport(route.companyId,route.reportId,route.version).report.title:routeContext(route).entity.name} · Uteki`;
@@ -656,6 +746,11 @@ export function createController({document:doc,window:win,registry}) {
       if(navigationExpanded) {navigationKeyboardFocus=false;keyboardInput=false;navigationHover.close();}
       else navigationHover.open('navigation');
     }
+    else if(action==='toggle-entity-list'&&route&&!route.institutionId) {
+      hover.close();
+      updateNavigationLayout(()=>{entityListCollapsed=!entityListCollapsed;syncEntityList();});
+      el('entity-list-toggle').focus({preventScroll:true});
+    }
     else if(action==='overview-section') selectOverview(button.dataset.section);
     else if(action==='overview-step') {
       const current=overviewSection(),step=Number(button.dataset.step);
@@ -683,14 +778,8 @@ export function createController({document:doc,window:win,registry}) {
     else if(action==='allocation-history-close') setAllocationHistory(false);
     else if(action==='allocation-history-snapshot') selectHistorySnapshot(button);
     else if(action==='institution-agent') selectInstitution({agentId:button.dataset.agent},`institution-agent-${button.dataset.agent}`);
-    else if(action==='institution-step') {
-      if(!route?.institutionId) throw new Error('Agent selection requires an institution overview');
-      const step=Number(button.dataset.step);
-      if(step!==-1&&step!==1) throw new Error('Unknown portfolio step');
-      const agents=getInstitution(route.institutionId).agents;
-      const index=agents.findIndex(a=>a.managerId===institutionState().agentId);
-      selectInstitution({agentId:agents[(index+step+agents.length)%agents.length].managerId},button.id);
-    }
+    else if(action==='portfolio-followup-filter') selectInstitution({followupFilter:button.dataset.filter},button.id);
+    else if(action==='manager-holding') selectManagerHolding(button.dataset.holding);
     else if(action==='institution-holding') selectInstitution({holdingId:institutionState()?.holdingId===button.dataset.holding?null:button.dataset.holding},button.id);
     else if(action==='institution-section') {
       if(!route?.institutionId||!['performance','portfolio','agents'].includes(button.dataset.section)) throw new Error('Unknown institution section');
@@ -709,7 +798,13 @@ export function createController({document:doc,window:win,registry}) {
       closePanel();scrollSection(sectionId);
     } else if(action==='top') {content.scrollTop=0;el('report-title')?.focus({preventScroll:true});}
     else if(action==='language') {savePosition();language=language==='zh'?'en':'zh';saveDisplay();renderFrame();win.requestAnimationFrame(()=>el('language-button').focus({preventScroll:true}));}
-    else if(action==='theme') {theme=theme==='light'?'dark':'light';saveDisplay();setDisplay();renderToolbar();el('theme-button').focus({preventScroll:true});}
+    else if(action==='theme') {
+      doc.documentElement.dataset.themeMotion='enabled';
+      theme=theme==='light'?'dark':'light';saveDisplay();setDisplay();
+      const button=el('theme-button'),control=view.themeControl(theme);
+      button.innerHTML=control.content;button.setAttribute('aria-label',control.label);button.setAttribute('title',control.label);
+      button.focus({preventScroll:true});
+    }
   }
   function start() {
     if(!win.location.hash) win.history.replaceState(null,'',formatRoute(HOME_DEMO_LAUNCH));
@@ -801,6 +896,7 @@ export function createController({document:doc,window:win,registry}) {
           if(globalNav.contains(doc.activeElement)) el('nav-toggle')?.focus({preventScroll:true});
         }
         else if(panel) {event.preventDefault();closePanel();}
+        else if(route?.managerId&&route.view==='overview'&&managerState().allocationHolding) {event.preventDefault();selectManagerHolding(managerState().allocationHolding);}
         else if(institutionState()?.historyOpen) {event.preventDefault();setAllocationHistory(false);}
       }
     });
@@ -846,7 +942,7 @@ export function createController({document:doc,window:win,registry}) {
       }
     });
     doc.addEventListener('focusin',event=>{
-      const allocation=event.target.closest?.('[data-action="institution-holding"]');
+      const allocation=event.target.closest?.('[data-action="manager-holding"]')||event.target.closest?.('[data-action="institution-holding"]');
       if(allocation&&keyboardInput) previewAllocation(allocation,'focus');
       if(el(`overview-panel-${overviewSection()}`)?.contains(event.target)||panelElement.contains(event.target)) cancelOverviewHover();
       if(globalNav.contains(event.target)&&keyboardInput) {
@@ -855,7 +951,7 @@ export function createController({document:doc,window:win,registry}) {
       if(flyout.contains(event.target)) hover.enterMenu();
     });
     doc.addEventListener('focusout',event=>{
-      if(event.target.closest?.('[data-action="institution-holding"]')) previewAllocation(null,'focus');
+      if(event.target.closest?.('[data-action="manager-holding"]')||event.target.closest?.('[data-action="institution-holding"]')) previewAllocation(null,'focus');
       if(globalNav.contains(event.target)&&!globalNav.contains(event.relatedTarget)) {
         navigationKeyboardFocus=false;
         if(navigationPointerInside) navigationHover.enter('navigation');
@@ -865,7 +961,7 @@ export function createController({document:doc,window:win,registry}) {
     });
     doc.addEventListener('scroll',event=>{
       if(event.target===el('entity-list')) hover.close();
-      if(event.target===content) positionInvestmentPopover();
+      if(event.target===content||event.target===el('institution-chart-body')) positionInvestmentPopover();
     },true);
     // Follow the continuously changing grid width without rebuilding the reader.
     if(win.ResizeObserver) {

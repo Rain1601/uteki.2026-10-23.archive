@@ -19,35 +19,279 @@ const decode=s=>s.replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,
 const tagAttributes=tag=>Object.fromEntries([...tag.replace(/^<\/?[\w-]+\s*/, '').matchAll(/([\w:-]+)(?:="([^"]*)")?/g)].map(([,name,value])=>[name,value===undefined?'':decode(value)]));
 const tags=html=>[...html.matchAll(/<[a-zA-Z][^>]*>/g)].map(match=>tagAttributes(match[0]));
 
-test('typography switches in place and persists across route, language and theme changes without altering research scope',()=>{
-  const storage=new Map(),route={companyId:'alphabet',managerId:'north',view:'report',reportId:'alpha-north-main',version:'v1'};
+test('event records below the chart retain every filtered event alongside the chart markers',()=>{
+  const h=chartHarness();
+  for(const kind of ['all','buy','sell','report']) {
+    clickAction(h,`investment-kind-${kind}`,'investment-event-kind',{kind});
+    const records=tags(h.nodes.get('investment-controls-host').innerHTML).filter(tag=>tag['data-event-record']);
+    const expected=getInvestmentEvents({managerId:'north',start:'2025-12-31',end:'2026-09-30',kind}).events;
+    assert.deepEqual(records.map(tag=>tag['data-event-record']).sort(),expected.map(event=>event.id).sort());
+    assert.ok(h.nodes.get('investment-performance-plot'));
+    if(kind!=='report') assert.ok(h.nodes.get('investment-trades-host').innerHTML.includes('investment-trade-slot'));
+  }
+});
+
+test('homepage component reading positions survive language, period and route changes',()=>{
+  const h=harness('');
+  const chart=()=>h.nodes.get('institution-chart-body'),portfolio=()=>h.nodes.get('institution-portfolio');
+  chart().scrollTop=140;portfolio().scrollTop=210;
+  clickAction(h,'language-button','language');
+  assert.equal(chart().scrollTop,140);assert.equal(portfolio().scrollTop,210);
+  clickAction(h,'institution-period-1m','institution-period',{period:'1m'});
+  assert.equal(chart().scrollTop,140);assert.equal(portfolio().scrollTop,210);
+  h.controller.navigate({managerId:'north',view:'overview'});
+  h.controller.navigate(INSTITUTION_DEMO_SCOPE);
+  assert.equal(chart().scrollTop,140);assert.equal(portfolio().scrollTop,210);
+});
+
+test('theme toggles keep navigation, controls, reading nodes and focus stable',()=>{
+  const h=harness(''),ids=['theme-button','mode-institution','institution-simulation-label','institution-curve-north','portfolio-holdings-scroll','portfolio-followup-list'];
+  const original=ids.map(id=>h.nodes.get(id));
+  const holdings=h.nodes.get('portfolio-holdings-scroll');holdings.scrollTop=50;
+  assert.equal(h.document.documentElement.dataset.themeMotion,undefined,'saved display initializes directly');
+  for(const theme of ['dark','light','dark']) {
+    clickAction(h,'theme-button','theme');
+    assert.equal(h.document.documentElement.dataset.theme,theme);
+    for(const [index,id] of ids.entries())assert.equal(h.nodes.get(id),original[index]);
+    assert.equal(h.document.activeElement,original[0]);assert.equal(holdings.scrollTop,50);
+    assert.equal(original[0].getAttribute('aria-label'),theme==='dark'?'切换亮色':'切换暗色');
+  }
+});
+
+test('company and Manager indexes collapse in place, keep search and selection, and survive display and route changes',()=>{
+  for(const route of [{companyId:'alphabet',view:'overview'},{managerId:'field',view:'overview'}]) {
+    const h=harness(formatRoute(route)),sidebar=h.nodes.get('sidebar'),content=h.nodes.get('content');
+    const toggle=h.nodes.get('entity-list-toggle'),list=h.nodes.get('entity-list'),search=h.nodes.get('entity-search');
+    const entity=route.managerId?'manager-field':'company-alphabet',link=h.nodes.get(entity);
+    const originalContent=content.innerHTML,history=[...h.historyCalls];content.scrollTop=175;list.scrollTop=42;
+    clickAction(h,toggle.id,'toggle-entity-list');
+    assert.equal(h.nodes.get('workspace').dataset.entityList,'collapsed');
+    assert.equal(toggle.getAttribute('aria-expanded'),'false');assert.equal(sidebar.hidden,false);
+    assert.equal(h.nodes.get('entity-list-toggle'),toggle);assert.equal(h.nodes.get('entity-list'),list);
+    assert.equal(h.nodes.get('entity-search'),search);assert.equal(h.nodes.get(entity),link);
+    assert.equal(link.getAttribute('aria-current'),'page');assert.ok(link.getAttribute('aria-label'));
+    assert.equal(content.innerHTML,originalContent);assert.equal(content.scrollTop,175);assert.equal(list.scrollTop,42);
+    assert.equal(h.document.activeElement,toggle);assert.deepEqual(h.controller.getState().route,route);assert.deepEqual(h.historyCalls,history);
+    clickAction(h,'language-button','language');clickAction(h,'theme-button','theme');
+    assert.equal(h.nodes.get('workspace').dataset.entityList,'collapsed');
+    assert.equal(h.nodes.get('entity-list-toggle').getAttribute('aria-label'),'Expand entity list');
+    h.controller.navigate(INSTITUTION_DEMO_SCOPE);assert.equal(sidebar.hidden,true);
+    h.controller.navigate(route);assert.equal(sidebar.hidden,false);assert.equal(h.nodes.get('workspace').dataset.entityList,'collapsed');
+    clickAction(h,'entity-list-toggle','toggle-entity-list');
+    assert.equal(h.nodes.get('workspace').dataset.entityList,'expanded');
+    assert.equal(h.nodes.get('entity-list-toggle').getAttribute('aria-expanded'),'true');
+  }
+});
+
+test('entity list collapse retains an active search through width changes',()=>{
+  const h=harness(formatRoute(DEMO_LAUNCH)),search=h.nodes.get('entity-search'),content=h.nodes.get('content');
+  search.value='Micro';h.listeners.input({target:search});
+  const rows=h.nodes.get('entity-list').innerHTML;
+  clickAction(h,'entity-list-toggle','toggle-entity-list');
+  clickAction(h,'entity-list-toggle','toggle-entity-list');
+  assert.equal(search.value,'Micro');assert.equal(h.nodes.get('entity-list').innerHTML,rows);
+  assert.equal(h.nodes.get('content'),content);
+});
+
+test('period updates preserve portfolio and control nodes, update every return and respect reduced motion',()=>{
+  const h=chartHarness(),data=getInstitution(INSTITUTION_DEMO_SCOPE.institutionId);
+  const holdings=h.nodes.get('portfolio-holdings-scroll'),updates=h.nodes.get('portfolio-followup-list');
+  const selectors=data.agents.map(agent=>h.nodes.get(`institution-agent-${agent.managerId}`));
+  const periods=data.periods.map(period=>h.nodes.get(`institution-period-${period.id}`));
+  const motions=[];
+  h.nodes.get('content').constructor.prototype.animate=function(frames,options){motions.push({id:this.id,frames,options});};
+  let reduced=false;h.window.matchMedia=()=>({matches:reduced});
+  holdings.scrollTop=70;updates.scrollTop=90;
+  for(const period of ['1m','1y']) {
+    clickAction(h,`institution-period-${period}`,'institution-period',{period});
+    for(const [index,agent] of data.agents.entries()) {
+      assert.equal(h.nodes.get(`institution-agent-${agent.managerId}`),selectors[index]);
+      assert.match(selectors[index].innerHTML,new RegExp(`${agent.returns[period].toFixed(2)}%`));
+    }
+    for(const [index,item] of data.periods.entries()) {
+      assert.equal(h.nodes.get(`institution-period-${item.id}`),periods[index]);
+      assert.equal(periods[index].getAttribute('aria-pressed'),String(item.id===period));
+    }
+    assert.equal(h.nodes.get('portfolio-holdings-scroll'),holdings);assert.equal(holdings.scrollTop,70);
+    assert.equal(h.nodes.get('portfolio-followup-list'),updates);assert.equal(updates.scrollTop,90);
+    assert.ok(h.nodes.get('investment-trades-host').innerHTML.includes('investment-trade-slot'));
+    assert.equal(motions.at(-1).id,'investment-chart-surface');
+    reduced=true;
+  }
+  assert.equal(motions.length,1,'reduced motion switches directly to the new chart');
+  const plot=h.nodes.get('investment-performance-plot'),records=h.nodes.get('investment-controls-host');
+  clickAction(h,'institution-period-1y','institution-period',{period:'1y'});
+  assert.equal(h.nodes.get('investment-performance-plot'),plot,'reselecting the current period does not repaint the chart');
+  assert.equal(h.nodes.get('investment-controls-host'),records);
+  assert.equal(motions.length,1);
+});
+
+test('portfolio update filters retain holdings, chart, links and reading position across language changes',()=>{
+  const h=harness(''),holdings=h.nodes.get('portfolio-holdings-scroll'),curve=h.nodes.get('institution-curve-north');
+  const list=h.nodes.get('portfolio-followup-list'),markup=h.nodes.get('content').innerHTML;
+  const assertVisible=filter=>{
+    const manager=h.controller.getState().institutionAgent;
+    const rows=h.nodes.get('portfolio-followup-list').querySelectorAll('[data-followup-kind]');
+    assert.deepEqual(rows.map(row=>row.dataset.updateId).sort(),[...getManagerDecisions(manager),...getManagerRisks(manager)].map(row=>row.id).sort());
+    for(const row of rows)assert.equal(row.hidden,filter!=='all'&&row.dataset.followupKind!==filter);
+  };
+  list.scrollTop=35;holdings.scrollTop=60;
+  for(const filter of ['risk','decision','all']) {
+    clickAction(h,`portfolio-followup-${filter}`,'portfolio-followup-filter',{filter});
+    assertVisible(filter);
+    assert.equal(h.nodes.get(`portfolio-followup-${filter}`).getAttribute('aria-pressed'),'true');
+    assert.equal(h.nodes.get('portfolio-followup-list'),list);assert.equal(list.scrollTop,35);
+    assert.equal(h.nodes.get('portfolio-holdings-scroll'),holdings);assert.equal(holdings.scrollTop,60);
+    assert.equal(h.nodes.get('institution-curve-north'),curve);
+    assert.equal(h.nodes.get('content').innerHTML,markup,'filtering keeps the existing links mounted');
+  }
+  clickAction(h,'portfolio-followup-risk','portfolio-followup-filter',{filter:'risk'});
+  clickAction(h,'portfolio-followup-all','portfolio-followup-filter',{filter:'unknown'});
+  assert.equal(h.nodes.get('portfolio-followup-risk').getAttribute('aria-pressed'),'true');
+  assertVisible('risk');
+  clickAction(h,'language-button','language');
+  assert.equal(h.nodes.get('portfolio-followup-risk').getAttribute('aria-pressed'),'true');
+  assertVisible('risk');
+  assert.equal(h.nodes.get('portfolio-holdings-scroll').scrollTop,60);
+  assert.equal(h.nodes.get('portfolio-followup-list').scrollTop,35);
+  clickAction(h,'institution-agent-field','institution-agent',{agent:'field'});
+  assert.equal(h.nodes.get('portfolio-followup-risk').getAttribute('aria-pressed'),'true');
+  assertVisible('risk');
+});
+
+test('Manager allocation hover, focus and pinning link chart and legend without navigation or rebuilding',()=>{
+  const h=harness('#/manager/field?view=overview'),content=h.nodes.get('content');
+  const workspace=h.nodes.get('manager-workspace'),bar=h.nodes.get('manager-allocation-segment-arista'),legend=h.nodes.get('manager-allocation-arista'),cash=h.nodes.get('manager-allocation-cash');
+  const history=[...h.historyCalls];content.scrollTop=80;
+  h.listeners.pointerover({pointerType:'mouse',target:bar,relatedTarget:content});
+  assert.equal(legend.classList.contains('is-emphasized'),true);
+  assert.equal(h.nodes.get('manager-allocation-label').textContent,legend.dataset.label);
+  assert.equal(h.controller.getState().managerSelection.allocationHolding,null);
+  clickAction(h,bar.id,'manager-holding',{holding:'arista'});
+  assert.equal(legend.getAttribute('aria-pressed'),'true');
+  h.listeners.pointerout({pointerType:'mouse',target:bar,relatedTarget:cash});
+  assert.equal(cash.classList.contains('is-emphasized'),true);
+  assert.equal(bar.getAttribute('aria-pressed'),'true');
+  h.listeners.pointerout({pointerType:'mouse',target:cash,relatedTarget:content});
+  assert.equal(legend.classList.contains('is-emphasized'),true);
+  h.listeners.pointerover({pointerType:'mouse',target:bar,relatedTarget:content});
+  h.listeners.keydown({key:'Tab',target:content});cash.focus();h.listeners.focusin({target:cash});
+  assert.equal(h.nodes.get('manager-allocation-segment-cash').classList.contains('is-emphasized'),true);
+  assert.equal(h.nodes.get('manager-allocation-label').textContent,cash.dataset.label);
+  h.listeners.focusout({target:cash,relatedTarget:content});
+  assert.equal(legend.classList.contains('is-emphasized'),true);
+  assert.equal(h.nodes.get('manager-workspace'),workspace);assert.equal(h.nodes.get(bar.id),bar);
+  assert.equal(content.scrollTop,80);assert.deepEqual(h.historyCalls,history);
+  h.listeners.keydown({key:'Escape',target:content,preventDefault(){}});
+  assert.equal(legend.getAttribute('aria-pressed'),'false');
+  assert.equal(h.controller.getState().managerSelection.allocationHolding,null);
+  clickAction(h,cash.id,'manager-holding',{holding:'cash'});
+  h.controller.navigate({managerId:'north',view:'overview'});
+  assert.equal(h.controller.getState().managerSelection.allocationHolding,null);
+  h.controller.navigate({managerId:'field',view:'overview'});
+  assert.equal(h.nodes.get(cash.id).getAttribute('aria-pressed'),'true');
+  clickAction(h,cash.id,'manager-holding',{holding:'cash'});
+  assert.equal(h.nodes.get(cash.id).getAttribute('aria-pressed'),'false');
+});
+
+test('coverage details mark only the current source control and clear it when closed',()=>{
+  const h=harness('#/manager/north?view=companies');
+  const buttons=h.nodes.get('content').querySelectorAll('[data-action="manager-coverage-detail"]');
+  assert.ok(buttons.length>=2);
+  for(const button of buttons.slice(0,2)) {
+    clickAction(h,button.id,'manager-coverage-detail',{company:button.dataset.company});
+    for(const item of buttons) assert.equal(item.getAttribute('aria-expanded'),String(item===button));
+    assert.equal(button.getAttribute('aria-controls'),'context-panel');
+  }
+  h.controller.closePanel();
+  for(const item of buttons) assert.equal(item.getAttribute('aria-expanded'),'false');
+});
+
+test('report contents and citation controls reflect the actual panel through replacement, language changes and close',()=>{
+  const h=harness('#/company/alphabet?view=report&report=alpha-north-main&version=v2');
+  const contents='report-contents',cite='cite-business-demo-alpha-business';
+  for(const id of [contents,cite]) {
+    assert.equal(h.nodes.get(id).getAttribute('aria-controls'),'context-panel');
+    assert.equal(h.nodes.get(id).getAttribute('aria-expanded'),'false');
+  }
+  clickAction(h,contents,'report-contents');
+  assert.equal(h.nodes.get(contents).getAttribute('aria-expanded'),'true');
+  clickAction(h,cite,'evidence',{evidence:'demo-alpha-business',origin:'report'});
+  assert.equal(h.nodes.get(contents).getAttribute('aria-expanded'),'false');
+  assert.equal(h.nodes.get(cite).getAttribute('aria-expanded'),'true');
+  clickAction(h,'language-button','language');
+  assert.equal(h.nodes.get(cite).getAttribute('aria-expanded'),'true');
+  h.controller.closePanel();
+  assert.equal(h.nodes.get(cite).getAttribute('aria-expanded'),'false');
+  assert.equal(h.nodes.get(contents).getAttribute('aria-expanded'),'false');
+  assert.equal(h.document.activeElement.id,contents);
+});
+
+test('simulation and design entry states survive toolbar replacement and clear across routes',()=>{
+  const h=harness('');
+  const simulation='institution-simulation-label';
+  clickAction(h,simulation,'context');
+  assert.equal(h.nodes.get(simulation).getAttribute('aria-expanded'),'true');
+  assert.equal(h.nodes.get(simulation).getAttribute('aria-controls'),'context-panel');
+  clickAction(h,'language-button','language');
+  assert.equal(h.nodes.get(simulation).getAttribute('aria-expanded'),'true');
+  clickAction(h,'design-button','design');
+  assert.equal(h.nodes.get(simulation).getAttribute('aria-expanded'),'false');
+  assert.equal(h.nodes.get('design-button').getAttribute('aria-expanded'),'true');
+  h.controller.navigate({managerId:'field',view:'overview'});
+  assert.equal(h.nodes.get('design-button').getAttribute('aria-expanded'),'false');
+  assert.equal(h.nodes.get('design-button').getAttribute('aria-pressed'),'false');
+});
+
+test('display choices live in the sidebar on every workspace and design help returns focus without replacing content',()=>{
+  const h=harness('');
+  for(const route of [INSTITUTION_DEMO_SCOPE,{companyId:'alphabet',view:'overview'},{managerId:'field',view:'decisions'}]) {
+    h.controller.navigate(route);
+    const navigation=h.nodes.get('global-nav').innerHTML,toolbar=h.nodes.get('toolbar').innerHTML;
+    for(const id of ['typography-select','language-button','theme-button','design-button']) {
+      assert.equal(tags(navigation).filter(tag=>tag.id===id).length,1);
+      assert.ok(!toolbar.includes(`id="${id}"`));
+    }
+    assert.ok(!navigation.includes('context-button')&&!toolbar.includes('context-button'));
+    const content=h.nodes.get('content').innerHTML;
+    clickAction(h,'design-button','design');
+    assert.equal(h.controller.getState().panel.kind,'design');
+    assert.equal(h.nodes.get('design-button').getAttribute('aria-pressed'),'true');
+    h.controller.closePanel();
+    assert.equal(h.document.activeElement.id,'design-button');
+    assert.equal(h.nodes.get('content').innerHTML,content);
+  }
+});
+
+for (const chosen of ['publication','swiss','hybrid','editorial']) test(`${chosen} typography persists without changing research scope or rebuilding the reader`,()=>{
+  const storage=new Map([['uteki.company-design-swiss-c.display',JSON.stringify({typography:chosen==='publication'?'swiss':'publication'})]]),route={companyId:'alphabet',managerId:'north',view:'report',reportId:'alpha-north-main',version:'v1'};
   const h=harness(formatRoute(route),false,storage),content=h.nodes.get('content'),reader=h.nodes.get('report-title');
   const html=content.innerHTML,history=[...h.historyCalls],select=h.nodes.get('typography-select');
-  assert.equal(h.controller.getState().typography,'swiss');
-  content.scrollTop=310;select.focus();select.value='hybrid';h.listeners.change({target:select});
-  assert.equal(h.controller.getState().typography,'hybrid');
-  assert.equal(h.document.documentElement.dataset.typography,'hybrid');
+  assert.equal(h.controller.getState().typography,chosen==='publication'?'swiss':'publication');
+  content.scrollTop=310;select.focus();select.value=chosen;h.listeners.change({target:select});
+  assert.equal(h.controller.getState().typography,chosen);
+  assert.equal(h.document.documentElement.dataset.typography,chosen);
   assert.equal(h.document.activeElement,select);assert.equal(h.nodes.get('report-title'),reader);
   assert.equal(content.innerHTML,html);assert.equal(content.scrollTop,310);
   assert.deepEqual(h.controller.getState().route,route);assert.deepEqual(h.historyCalls,history);
-  assert.equal(JSON.parse(storage.get('uteki.company-design-swiss-c.display')).typography,'hybrid');
+  assert.equal(JSON.parse(storage.get('uteki.company-design-swiss-c.display')).typography,chosen);
   clickAction(h,'theme-button','theme');clickAction(h,'language-button','language');
-  assert.equal(h.controller.getState().typography,'hybrid');
-  assert.match(h.nodes.get('toolbar').innerHTML,/value="hybrid" selected/);
+  assert.equal(h.controller.getState().typography,chosen);
+  assert.match(h.nodes.get('global-nav').innerHTML,new RegExp(`value="${chosen}" selected`));
   h.controller.navigate({managerId:'field',view:'overview'});
-  assert.equal(h.document.documentElement.dataset.typography,'hybrid');
+  assert.equal(h.document.documentElement.dataset.typography,chosen);
   const reloaded=harness(formatRoute(route),false,storage);
-  assert.equal(reloaded.controller.getState().typography,'hybrid');
+  assert.equal(reloaded.controller.getState().typography,chosen);
 });
 
 test('unknown typography selections are rejected and unavailable storage does not prevent a temporary display choice',()=>{
   const key='uteki.company-design-swiss-c.display';
   const h=harness('',false,new Map([[key,JSON.stringify({typography:'unavailable'})]]));
-  assert.equal(h.controller.getState().typography,'swiss');
+  assert.equal(h.controller.getState().typography,'publication');
   const before={...h.controller.getState()},select=h.nodes.get('typography-select');
   for(const value of ['','unknown',null]) {
     select.value=value;h.listeners.change({target:select});
-    assert.deepEqual(h.controller.getState(),before);assert.equal(select.value,'swiss');
+    assert.deepEqual(h.controller.getState(),before);assert.equal(select.value,'publication');
   }
   const donut=h.nodes.get('institution-donut');
   h.window.localStorage.setItem=()=>{throw new Error('Storage disabled');};
@@ -787,7 +1031,8 @@ test('institution home opens the configured Agent portfolio and hides only the m
     assert.equal(h.nodes.get('content').dataset.entity,'institution');
     assert.ok(h.nodes.has('institution-dashboard'));
     assert.equal(h.nodes.get('company-header').innerHTML,'');
-    assert.match(h.nodes.get('toolbar').innerHTML,/<h1[^>]*>投资总览<\/h1>/);
+    assert.ok(!h.nodes.get('toolbar').innerHTML.includes('<h1'));
+    assert.match(h.nodes.get('content').innerHTML,/<h2 id="institution-chart-title">投资总览<\/h2>/);
     assert.match(h.nodes.get('toolbar').innerHTML,/模拟数据 · 非实盘/);
     const modes=tags(h.nodes.get('global-nav').innerHTML).filter(item=>item['data-action']==='mode');
     assert.deepEqual(modes.map(item=>item['data-mode']),['institution','company','manager']);
@@ -812,7 +1057,8 @@ test('institution period and allocation controls update presentation without rou
   assert.equal(h.controller.getState().institutionAgent,data.defaultAgentId);
   assert.equal(h.document.activeElement.id,'institution-period-1m');assert.equal(content.scrollTop,280);
   const agent=data.agents.find(item=>item.managerId===data.defaultAgentId);
-  assert.ok(content.innerHTML.includes(`${agent.returns['1m'].toFixed(2)}%`));
+  assert.ok(h.nodes.get(`institution-agent-${agent.managerId}`).innerHTML.includes(`${agent.returns['1m'].toFixed(2)}%`));
+  assert.equal(h.nodes.get('institution-benchmark-return').textContent,`+${data.periods.find(item=>item.id==='1m').benchmarkReturnPct.toFixed(2)}%`);
   clickAction(h,'allocation-alphabet','institution-holding',{holding:'alphabet'});
   assert.equal(h.controller.getState().institutionHolding,'alphabet');
   assert.equal(h.document.activeElement.id,'allocation-alphabet');assert.equal(content.scrollTop,280);
@@ -869,6 +1115,7 @@ test('allocation hover and focus preview a holding without rebuilding or committ
   h.listeners.pointerout({pointerType:'mouse',target:weight,relatedTarget:row});assertPreview(preview);
   h.listeners.pointerout({pointerType:'mouse',target:row,relatedTarget:content});assertPreview(selected);
   h.listeners.pointerover({pointerType:'touch',target:preview,relatedTarget:content});assertPreview(selected);
+  h.listeners.pointerover({pointerType:'mouse',target:selected,relatedTarget:content});
   h.listeners.keydown({key:'Tab',target:preview});preview.focus();h.listeners.focusin({target:preview});assertPreview(preview);
   content.focus();h.listeners.focusout({target:preview,relatedTarget:content});assertPreview(selected);
   assert.deepEqual(h.historyCalls,history);assert.deepEqual(h.controller.getState().route,INSTITUTION_DEMO_SCOPE);
@@ -934,7 +1181,7 @@ test('holdings without an authored report remain explicit gaps and cannot open a
   }
 });
 
-test('institution legends, thumbnails and Agent steps switch one portfolio manually and keep the period while clearing holding selection',()=>{
+test('institution legend buttons switch one portfolio manually and keep the period while clearing holding selection',()=>{
   const h=harness(''),data=getInstitution(INSTITUTION_DEMO_SCOPE.institutionId),content=h.nodes.get('content');
   const route={...h.controller.getState().route},hash=h.window.location.hash,history=[...h.historyCalls];
   const select=(agentId,id=`institution-agent-${agentId}`)=>{
@@ -952,17 +1199,12 @@ test('institution legends, thumbnails and Agent steps switch one portfolio manua
   assert.equal(h.controller.getState().institutionAgent,'field');assert.equal(h.controller.getState().institutionHolding,'arista');
   assert.equal(h.controller.getState().institutionPeriod,'1y','changing the comparison interval keeps the selected Agent and current holding snapshot');
   select('north','institution-agent-north');assert.equal(h.controller.getState().institutionHolding,null);
-  clickAction(h,'institution-prev','institution-step',{step:'-1'});
-  assert.equal(h.controller.getState().institutionAgent,data.agents.at(-1).managerId);
+  assert.ok(!content.innerHTML.includes('id="institution-prev"'));
+  assert.ok(!content.innerHTML.includes('id="institution-next"'));
   for(const agent of data.agents) {
-    clickAction(h,'institution-next','institution-step',{step:'1'});
+    select(agent.managerId);
     assert.equal(h.controller.getState().institutionAgent,agent.managerId);
   }
-  clickAction(h,'institution-next','institution-step',{step:'1'});
-  assert.equal(h.controller.getState().institutionAgent,data.agents[0].managerId);
-  const before={...h.controller.getState()},html=content.innerHTML;
-  clickAction(h,'institution-next','institution-step',{step:'2'});
-  assert.deepEqual(h.controller.getState(),before);assert.equal(content.innerHTML,html);
   assert.deepEqual(h.controller.getState().route,route);assert.equal(h.window.location.hash,hash);assert.deepEqual(h.historyCalls,history);
 });
 
@@ -1030,15 +1272,16 @@ test('institution language, theme and context preserve selection, while invalid 
   assert.equal(h.controller.getState().institutionPeriod,'1m');assert.equal(h.controller.getState().institutionHolding,'cash');
   assert.equal(h.controller.getState().institutionAgent,'field');
   assert.match(h.nodes.get('toolbar').innerHTML,/Illustrative data|Not a live account/);
-  assert.match(h.nodes.get('toolbar').innerHTML,/<h1[^>]*>Investment overview<\/h1>/);
+  assert.ok(!h.nodes.get('toolbar').innerHTML.includes('<h1'));
+  assert.match(h.nodes.get('content').innerHTML,/<h2 id="institution-chart-title">Investment overview<\/h2>/);
   assert.match(h.nodes.get('toolbar').innerHTML,/Uteki Investment/);
   const main=h.nodes.get('content').innerHTML;
   clickAction(h,'theme-button','theme');assert.equal(h.document.documentElement.dataset.theme,'dark');
   assert.equal(h.nodes.get('content').innerHTML,main);
-  clickAction(h,'context-button','context');
+  clickAction(h,'institution-simulation-label','context');
   assert.equal(h.controller.getState().panel.kind,'context');
   assert.match(h.nodes.get('context-panel').innerHTML,/uteki-institution-ui-2026-09-30/);
-  h.controller.closePanel();assert.equal(h.document.activeElement.id,'context-button');
+  h.controller.closePanel();assert.equal(h.document.activeElement.id,'institution-simulation-label');
   assert.equal(h.nodes.get('content').innerHTML,main);
   for(const hash of ['#/institution/unknown?view=overview','#/institution/uteki?view=reports','#/institution/uteki?view=overview&company=alphabet']) {
     const invalid=harness(hash);
@@ -1124,7 +1367,7 @@ test('overview keyboard controls are scoped to its tabs and preserve each compan
   assert.equal(h.controller.getState().language,'en');
   assert.match(h.nodes.get('content').innerHTML,/Open questions/);
   h.controller.navigate({companyId:'microsoft',view:'overview'});assertOverview(h,'materials');
-  assert.deepEqual(JSON.parse(storage.get('uteki.company-design-swiss-c.display')),{language:'en',theme:'light',typography:'swiss'});
+  assert.deepEqual(JSON.parse(storage.get('uteki.company-design-swiss-c.display')),{language:'en',theme:'light',typography:'publication'});
   const fresh=harness(formatRoute(DEMO_LAUNCH),false,storage);assertOverview(fresh,'changes');
 });
 
@@ -1830,7 +2073,7 @@ test('click toggles global navigation immediately and old sidebar preferences ca
   assert.equal(content.scrollTop,415);assert.deepEqual(initial.controller.getState().route,originalRoute);
 
   clickAction(initial,'theme-button','theme');
-  assert.deepEqual(JSON.parse(storage.get(key)),{language:'en',theme:'light',typography:'swiss'},'only language, theme and typography preferences are persisted');
+  assert.deepEqual(JSON.parse(storage.get(key)),{language:'en',theme:'light',typography:'publication'},'only language, theme and typography preferences are persisted');
   const refreshed=harness(formatRoute(DEMO_LAUNCH),false,storage);
   assert.equal(refreshed.controller.getState().navigationExpanded,false);
   assert.equal(refreshed.nodes.get('sidebar').hidden,false);
@@ -1838,35 +2081,37 @@ test('click toggles global navigation immediately and old sidebar preferences ca
   assert.equal(refreshed.controller.getState().theme,'light');
 });
 
-test('navigation-width reflow compensates a visible reading anchor across successive resize frames without rebuilding the report',()=>{
-  const route={managerId:'north',companyId:'alphabet',view:'report',reportId:'alpha-north-main',version:'v2'};
-  const h=harness(formatRoute(route));
-  const content=h.nodes.get('content'),anchor=h.nodes.get('section-business');
-  const originalContent=content.innerHTML;
-  content.top=30;content.scrollTop=650;anchor.top=700;
-  anchor.getBoundingClientRect=()=>{
-    const top=content.top+anchor.top-content.scrollTop;
-    return {top,bottom:top+40,height:40,width:220,left:0,right:220};
-  };
-  content.querySelectorAll=()=>[anchor];
-  const originalY=anchor.getBoundingClientRect().top;
-  clickAction(h,'nav-toggle','toggle-navigation');
-  assert.equal(h.controller.getState().navigationExpanded,true);
+test('navigation and object-list width changes retain a visible report anchor across successive resize frames',()=>{
+  for(const toggle of [{id:'nav-toggle',action:'toggle-navigation'},{id:'entity-list-toggle',action:'toggle-entity-list'}]) {
+    const route={managerId:'north',companyId:'alphabet',view:'report',reportId:'alpha-north-main',version:'v2'};
+    const h=harness(formatRoute(route));
+    const content=h.nodes.get('content'),anchor=h.nodes.get('section-business');
+    const originalContent=content.innerHTML;
+    content.top=30;content.scrollTop=650;anchor.top=700;
+    anchor.getBoundingClientRect=()=>{
+      const top=content.top+anchor.top-content.scrollTop;
+      return {top,bottom:top+40,height:40,width:220,left:0,right:220};
+    };
+    content.querySelectorAll=()=>[anchor];
+    const originalY=anchor.getBoundingClientRect().top;
+    clickAction(h,toggle.id,toggle.action);
+    assert.equal(h.nodes.get(toggle.id).getAttribute('aria-expanded'),toggle.id==='nav-toggle'?'true':'false');
 
-  anchor.top=742;
-  assert.equal(h.triggerResize('content'),1,'the controller observes the reading content');
-  assert.equal(content.scrollTop,692);
-  assert.equal(anchor.getBoundingClientRect().top,originalY);
-  anchor.top=812;
-  h.triggerResize('content');
-  assert.equal(content.scrollTop,762);
-  assert.equal(anchor.getBoundingClientRect().top,originalY);
-  h.listeners.transitionend({target:h.nodes.get('workspace'),propertyName:'grid-template-columns'});
-  assert.equal(content.scrollTop,762);
-  assert.equal(content.innerHTML,originalContent);
-  assert.equal(h.nodes.get('section-business'),anchor);
-  assert.equal(anchor.isConnected,true);
-  assert.deepEqual(h.controller.getState().route,route);
+    anchor.top=742;
+    assert.equal(h.triggerResize('content'),1,'the controller observes the reading content');
+    assert.equal(content.scrollTop,692);
+    assert.equal(anchor.getBoundingClientRect().top,originalY);
+    anchor.top=812;
+    h.triggerResize('content');
+    assert.equal(content.scrollTop,762);
+    assert.equal(anchor.getBoundingClientRect().top,originalY);
+    h.listeners.transitionend({target:h.nodes.get('workspace'),propertyName:'grid-template-columns'});
+    assert.equal(content.scrollTop,762);
+    assert.equal(content.innerHTML,originalContent);
+    assert.equal(h.nodes.get('section-business'),anchor);
+    assert.equal(anchor.isConnected,true);
+    assert.deepEqual(h.controller.getState().route,route);
+  }
 });
 
 test('institution navigation reflow retains a visible holding row without rebuilding or changing the selected portfolio view',()=>{
@@ -2023,11 +2268,11 @@ test('homepage decision entry follows the selected portfolio without assigning i
   clickAction(h,'institution-agent-field','institution-agent',{agent:'field'});
   const stage=h.nodes.get('portfolio-stage');
   const decisionLinks=tags(stage.innerHTML).filter(item=>item.href?.includes('view=decisions'));
-  assert.ok(decisionLinks.length>0);
+  assert.deepEqual(decisionLinks.map(item=>parseRoute(item.href).decisionId).sort(),getManagerDecisions('field').map(item=>item.id).sort());
   decisionLinks.forEach(item=>{
     const route=parseRoute(item.href);
     assert.equal(route.managerId,'field');
-    assert.equal(route.decisionId,getFeaturedDecisionId('field'));
+    assert.ok(getManagerDecisions('field').some(record=>record.id===route.decisionId));
   });
   const holdingBefore=h.controller.getState().institutionHolding;
   h.controller.navigate(parseRoute(decisionLinks[0].href));
@@ -2143,20 +2388,18 @@ test('risk filters exclude old selection and have honest empty states while per-
   h.controller.navigate({managerId:'field',view:'risks'});assert.deepEqual(h.controller.getState().route,field);
 });
 
-test('homepage risk summary follows selected Agent and counts persistent risks rather than the latest decision opinions',()=>{
+test('homepage update list retains each persistent risk exactly once for the selected Agent',()=>{
   const h=harness('');
-  assert.ok(tags(h.nodes.get('content').innerHTML).some(item=>item['data-risk-summary']==='north'));
   for(const managerId of ['field','north']) {
     clickAction(h,`institution-agent-${managerId}`,'institution-agent',{agent:managerId});
-    const html=h.nodes.get('portfolio-stage').innerHTML;
-    const risks=getManagerRisks(managerId);
-    assert.ok(tags(html).some(item=>item['data-risk-summary']===managerId));
+    const html=h.nodes.get('portfolio-stage').innerHTML,risks=getManagerRisks(managerId);
+    const rows=tags(html).filter(item=>item['data-followup-kind']==='risk');
+    assert.deepEqual(rows.map(item=>item['data-update-id']).sort(),risks.map(item=>item.id).sort());
     const links=tags(html).filter(item=>item.href?.includes('view=risks'));
-    assert.ok(links.length>=1);links.forEach(item=>assert.equal(parseRoute(item.href).managerId,managerId));
-    assert.ok(risks.some(item=>item.id===getFeaturedRiskId(managerId)));
-    const counters=[...html.matchAll(/data-status-count="([^"]+)"[^>]*>[^<]*<strong>([0-9]+)<\/strong>/g)];
-    assert.equal(counters.length,2);
-    for(const [,status,count] of counters)assert.equal(Number(count),risks.filter(item=>item.status===status).length);
+    assert.deepEqual(links.map(item=>parseRoute(item.href).riskId).sort(),risks.map(item=>item.id).sort());
+    links.forEach(item=>assert.equal(parseRoute(item.href).managerId,managerId));
+    for(const status of ['needs_review','monitoring','resolved'])assert.equal(rows.filter(item=>item['data-update-status']===status).length,risks.filter(item=>item.status===status).length);
+    assert.ok(!html.includes('data-risk-summary='));
   }
 });
 

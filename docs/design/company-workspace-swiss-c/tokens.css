@@ -1,0 +1,28 @@
+/* Swiss C shared design tokens (2026-10-21, Anthropic-native rules in the interface style guide).
+   Loaded first. Defines roles and the type scale only; colour values stay in the theme blocks and
+   font families stay in typography.css schemes. Page files consume these instead of raw values. */
+:root {
+  /* Type roles: titles use the scheme's serif at regular weight; body and UI use its sans. */
+  --font-title:var(--font-serif);
+  --weight-title:400;
+
+  /* Type scale: replaces ad-hoc sizes. 12px is the floor for text a reader must use. */
+  --t-display:40px;
+  --t-h1:28px;
+  --t-h2:20px;
+  --t-h3:16px;
+  --t-body:15px;
+  --t-reading:16px;
+  --t-ui:13px;
+  --t-meta:12px;
+  --lh-title:1.2;
+  --lh-body:1.7;
+
+  /* Interaction emphasis is ink; brand blue (--accent) is kept for logo, links and chart series. */
+  --interactive:var(--ink);
+  --selected-wash:color-mix(in srgb,var(--ink) 6%,transparent);
+  --hairline:var(--line);
+
+  --radius-control:6px;
+  --radius-float:12px;
+}

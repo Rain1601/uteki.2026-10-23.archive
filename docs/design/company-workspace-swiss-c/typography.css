@@ -1,5 +1,11 @@
-/* Local-font comparisons only. Load after swiss-study-c.css. The default Swiss
-   stack is identical to the adopted C baseline; no font files are requested. */
+/* Editorial uses the reference's bundled fonts. The three existing comparison
+   modes retain their installed-font stacks and saved preference identities. */
+@font-face {font-family:UtekiEditionSans;src:url('../dashboard-demos/editorial/fonts/LiberationSans-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face {font-family:UtekiEditionSans;src:url('../dashboard-demos/editorial/fonts/LiberationSans-Bold.ttf') format('truetype');font-weight:600 900;font-display:swap}
+@font-face {font-family:UtekiEditionSCSans;src:url('../dashboard-demos/editorial/fonts/NotoSansSC.ttf') format('truetype');font-weight:100 900;font-display:swap}
+@font-face {font-family:UtekiEditionSerif;src:url('../dashboard-demos/editorial/fonts/LiberationSerif-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face {font-family:UtekiEditionSerif;src:url('../dashboard-demos/editorial/fonts/LiberationSerif-Bold.ttf') format('truetype');font-weight:600 900;font-display:swap}
+@font-face {font-family:UtekiEditionSCSerif;src:url('../dashboard-demos/editorial/fonts/NotoSerifSC.ttf') format('truetype');font-weight:100 900;font-display:swap}
 :root {
   --font-sans:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
   --font-serif:"Times New Roman",Times,"Songti SC",STSong,SimSun,serif;
@@ -9,6 +15,22 @@
 :root[data-typography="swiss"] {--font:var(--font-sans);--font-reading:var(--font-sans)}
 :root[data-typography="hybrid"],
 :root[data-typography="editorial"] {--font:var(--font-sans);--font-reading:var(--font-serif)}
+
+/* The reference separates structural headings, sustained reading and numbers.
+   The host keeps its existing geometry, language and per-page reading state. */
+:root[data-typography="publication"] {
+  --font-sans:UtekiEditionSans,UtekiEditionSCSans,Arial,"PingFang SC",sans-serif;
+  --font-serif:UtekiEditionSerif,UtekiEditionSCSerif,Georgia,"Songti SC",serif;
+  --font:var(--font-sans);
+  /* 2026-10-21 Anthropic-native roles: serif regular titles, sans reading and UI. */
+  --font-reading:var(--font-sans);
+  --font-display:var(--font-sans);
+  --font-numeric:var(--font-sans);
+}
+:root[data-typography="publication"] :is(h1,h2,h3) {font-family:var(--font-display)}
+:root[data-typography="publication"] :is(h1,h2,.portfolio-stage-heading h3) {font-family:var(--font-title);font-weight:var(--weight-title);letter-spacing:0}
+:root[data-typography="publication"] :is(.detail-lead,.detail-article blockquote,.detail-section>p,.decision-lead) {font-family:var(--font-reading);font-size:18px;line-height:1.85}
+:root[data-typography="publication"] :is(.swiss-agent-name,.manager-metrics,.institution-portfolio-value,.holding-weight,table,svg text) {font-family:var(--font-numeric);font-variant-numeric:lining-nums tabular-nums}
 
 .typography-control {display:inline-flex;align-items:center;gap:6px;min-width:0;font-family:var(--font-sans);font-size:12px;line-height:1.5;color:var(--muted);white-space:nowrap}
 .typography-control select {font-family:var(--font-sans);font-size:12px;line-height:1.5;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:5px;min-height:28px;max-width:130px;padding:3px 6px;cursor:pointer}

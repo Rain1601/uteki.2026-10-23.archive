@@ -23,7 +23,7 @@
 .investment-kind-filter{display:flex;align-items:center;gap:2px;background:var(--soft);padding:2px;border-radius:6px}
 .investment-kind-filter button{font:inherit;padding:3px 9px;color:var(--muted);border-radius:4px;line-height:1.5;white-space:nowrap}
 .investment-kind-filter button[aria-pressed=true]{color:var(--ink);background:var(--paper);box-shadow:0 1px 3px #00000009}
-.investment-kind-filter button:hover{color:var(--ink)}
+.investment-kind-filter button:is(:hover,:focus-visible){color:var(--ink)}
 .investment-granularity select{font:inherit;padding:4px 23px 4px 7px;max-width:118px;background:var(--paper);color:var(--muted);border:1px solid var(--line);border-radius:5px}
 .investment-event-track{position:relative;height:62px;margin-top:0}
 .investment-event-axis{position:absolute;top:0;left:4.2%;right:2.4%;height:1px;background:var(--line)}
@@ -41,7 +41,7 @@
 .investment-marker[data-kind=sell],.investment-event-entry[data-kind=sell],#investment-event-popover[data-kind=sell]{--event-color:var(--trade-sell);--event-bg:var(--trade-sell-bg);--event-hover:var(--trade-sell-hover)}
 .investment-marker[data-kind=report],.investment-event-entry[data-kind=report],#investment-event-popover[data-kind=report]{--event-color:var(--trade-report);--event-bg:var(--trade-report-bg);--event-hover:var(--trade-report-hover)}
 .investment-marker[data-kind=mixed],#investment-event-popover[data-kind=mixed]{--event-color:var(--trade-mixed);--event-bg:var(--trade-mixed-bg);--event-hover:var(--trade-mixed-hover)}
-.investment-marker:hover{background:var(--event-hover,var(--soft));border-color:var(--event-color,var(--accent))}
+.investment-marker:is(:hover,:focus-visible){background:var(--event-hover,var(--soft));border-color:var(--event-color,var(--accent))}
 .investment-marker[aria-expanded=true]{background:var(--event-hover,var(--soft));border-color:var(--event-color,var(--accent));box-shadow:0 0 0 2px color-mix(in srgb,var(--event-color,var(--accent)) 15%,transparent);z-index:2}
 .investment-marker:focus-visible,.investment-kind-filter button:focus-visible,.investment-granularity select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .investment-marker-date{display:block;margin-top:5px;font-size:10px;line-height:1.4;letter-spacing:-.03em;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -77,7 +77,7 @@
 .investment-event-company small{font-size:11px;color:var(--muted)}
 .investment-event-detail .investment-event-entry p{font-size:13px;line-height:1.8;margin-top:10px;color:var(--ink)}
 .investment-event-report-link{display:flex;justify-content:space-between;gap:10px;margin-top:11px;color:var(--accent);font-size:12px;padding:6px 0}
-.investment-event-report-link:hover{text-decoration:underline}
+.investment-event-report-link:is(:hover,:focus-visible){text-decoration:underline}
 .investment-event-report-link span{color:var(--muted);font-size:11px}
 .investment-event-report-gap{display:block;margin-top:11px;color:var(--muted);font-size:12px}
 #investment-chart-surface{position:relative}
@@ -99,7 +99,7 @@
 .investment-popover-identity p{font-size:12px;line-height:1.6;color:var(--muted)}
 .investment-popover-identity p span{font-size:10px;margin-left:4px}
 .investment-popover-close{display:grid;place-items:center;flex-shrink:0;width:26px;height:26px;font-size:21px;line-height:1;color:var(--muted);border-radius:5px}
-.investment-popover-close:hover{background:var(--soft);color:var(--ink)}
+.investment-popover-close:is(:hover,:focus-visible){background:var(--soft);color:var(--ink)}
 .investment-popover-body{padding:10px 18px 12px}
 .investment-popover-provenance{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted)}
 .investment-popover-provenance strong{font-weight:500;color:var(--ink)}
@@ -116,14 +116,14 @@
 .investment-popover-report>span b{font-weight:500;color:var(--event-color)}
 .investment-popover-report h3{font-size:14px;line-height:1.65;font-weight:500;color:var(--ink);margin-top:0;overflow-wrap:anywhere}
 .investment-popover-report .investment-event-report-link{padding:7px 11px;margin-top:9px;border:1px solid var(--line);border-radius:6px;font-size:12px;color:var(--ink)}
-.investment-popover-report .investment-event-report-link:hover{background:var(--soft);text-decoration:none;border-color:var(--event-color)}
+.investment-popover-report .investment-event-report-link:is(:hover,:focus-visible){background:var(--soft);text-decoration:none;border-color:var(--event-color)}
 .investment-popover-pagination{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 15px 8px 18px;border-top:1px solid var(--line);background:var(--soft)}
 .investment-popover-pagination>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}
 .investment-popover-pagination>div>span{font-size:11px;color:var(--ink)}
 .investment-popover-pagination small{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
 .investment-popover-pager{display:flex;align-items:center;gap:4px;flex-shrink:0}
 .investment-popover-pager button{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--line);border-radius:5px;background:var(--paper);font-size:23px;line-height:1}
-.investment-popover-pager button:not(:disabled):hover{border-color:var(--event-color);color:var(--event-color)}
+.investment-popover-pager button:not(:disabled):is(:hover,:focus-visible){border-color:var(--event-color);color:var(--event-color)}
 .investment-popover-pager button:disabled{opacity:.35}
 .investment-popover-count{min-width:37px;text-align:center;font-size:11px;white-space:nowrap;font-variant-numeric:tabular-nums}
 :root[data-theme=dark] #investment-event-popover{box-shadow:0 16px 48px #0006,0 3px 10px #0003}
