@@ -1383,6 +1383,20 @@ OpenAI 候选包含两种接入方式，先作为同一检索后端的选项记�
 - **Responses + `file_search`：**由 OpenAI 托管模型与工具之间的检索调用，并可生成带文件引用的回答。
 - **直接调用 Retrieval `vector_stores.search`：**返回命中片段、文件身份、属性与分数，由雨滴工具继续适配结果，交 Data Agent 判断与组织交付。
 
+**2026-10-19 File Search 对照接入核对（真实效果未测）。**用户在 14.20 五模型对照后要求加入官方 File Search，并询问能否使用 OpenRouter。当前安装的 Agents SDK 0.24.0 中 `FileSearchTool` 声明只支持 OpenAI 模型的 Responses API；实际调用 SDK 的 Chat Completions 工具转换器，在发送 HTTP 前报 `Hosted tools are not supported with the ChatCompletions API`。项目 `GatewayOpenAIModel` 当前使用 `OpenAIChatCompletionsModel`，`profiles.py` / `live_policy.py` 的 provider 仅含 OpenRouter、DeepSeek，不能只加一个 tool 就声称接通。环境及项目 `.env` 未发现 OpenAI 官方凭据，未读取或输出密钥值。
+
+已读 [OpenRouter Server Tools](https://openrouter.ai/docs/guides/features/server-tools) 及官方索引，并使用现有凭据只读请求 `GET https://openrouter.ai/api/v1/tools`：HTTP 200，返回 11 项工具，无 `file_search`。SDK/响应类型里出现相关字段、支持 Responses 格式或允许上传 PDF，都不能单独证明支持 OpenAI 的 vector store 托管工具；未执行付费失败探针，也不声称穷尽了未来/未公开路由。
+
+| 对照方式 | 模型入口 | 检索入口及可比性 |
+|---|---|---|
+| 原生 File Search 对照（建议先做） | 同一 OpenAI Agents SDK、同一 Terra 模型，两侧均使用 OpenAI 官方 Responses | A 使用现有数据工具；B 使用 `FileSearchTool`、同一组原始 PDF，由 OpenAI 建索引。只改检索能力及必要工具说明，比较完整链；旧 OpenRouter/Chat 结果只能作历史参照，不能当严格 A 组 |
+| 五模型检索后端对照（可选扩展） | 保持此前 OpenRouter/DeepSeek 路由 | 将官方 `vector_stores.search` 包为普通 function，五模型均可调用。检索仍需 OpenAI 凭据；这是 Retrieval 后端，不是原生 File Search 工具循环 |
+| 仅 OpenRouter 凭据 | 保持 OpenRouter | 本次未找到可直接使用的 OpenAI 原生 File Search 服务；PDF 输入/自建检索属于另一候选，不能替代原生对照后仍用同一名称 |
+
+首个问题沿用 14.20 原 C2、相同 Apple/Alphabet 材料白名单，原件/问题/业务 prompt/计算与验收目标不变，双方全新会话；不把 gold 数值、指定页/单元格或摘要预先交给模型。原生 B 先上传完整原 PDF，等待真实索引完成、保存 file/vector-store ID 与原件 hash，并启用 `include_search_results`。OpenAI 自行解析切块与当前 Docling/目录/表格处理的差异属于被测能力，不把其返回片段预先补齐成本站解析结果。业务上分别看数值/期间/币种/单位/合并口径、代码计算、出处、完整交付；工程上看回合、错误、返回体/累计上下文、耗时、token 与费用。原生文件引用中的 `index` 不能当成 PDF 页码；引用不能精确对齐原件时列为定位缺口，不制造 row/column/block_ref，也不直接进入生产证据链。检索命中、答案正确和达到现有证据契约分开报告。
+
+官方 [Terra 模型页](https://developers.openai.com/api/docs/models/gpt-5.6-terra) 列出 File Search 支持，但尚未验证本地账户权限。按当前 [OpenAI 价格页](https://developers.openai.com/api/docs/pricing)，Responses File Search 每千次工具调用 $2.50，检索内容另计模型 token，向量存储首 1GB 免费、超出 $0.10/GB/日；不能仅凭 PDF 原件大小估算处理后索引占用。实施前需接通官方 Responses、保存原生搜索结果/引用并将模型、工具和索引费用纳入原账本；只创建本次临时远程索引，设置到期并保留清理记录。金额、次数和预留不因更换提供方重置，原五路授权不自动扩成新的十路。此处完成的是接入核对和可比较方案，尚未增加生产代码、上传文件、建立索引或执行真实 File Search；不以本地 SDK 拒绝复现冒充服务验收。
+
 候选的比较应分别关注文档结构导航、内容片段召回及原文读回；选中检索后端不替代 Data Agent 对获取、处理、说明维护、补查和交付的整体职责。“定位内容 → 必要时展开原文”沿用第 7.2.3 节已确认的衔接原则，具体后端实现仍待验证；纳入 OpenAI 候选不改变第 7.2.1–7.2.2 节已确认的职责。
 
 **其他层的历史候选：**[历史抽取设计第 6 节](DATA_AGENT_EXTRACTION_DESIGN.zh-CN.md#6-pageindex-与类似技术如何使用)还记录了 Docling（文档解析与表格结构）和 LangExtract（文本信息抽取与来源对齐）。它们分别与现有解析、直接抽取路径比较，属于可组合的不同环节；本次保留历史候选身份，不恢复旧评测任务，也不将旧版本调研视为当前能力验证。
@@ -1709,6 +1723,37 @@ Skills/Memory 首期放在两个 runtime 的官方装配配置中，业务数据
 
 **本轮完成边界：**只更新目录设计与名称说明，没有创建空目录、搬迁源码、改变依赖或运行付费模型。14.1.6 的文件数量是该次检查快照，不随其他清理工作自动成为当前数量。后续环境修复已完成（14.12.8），再进入首批存储验收；目录标准化不另开一轮全库重构。
 
+#### 14.1.8 剩余任务 review：业务、原子能力与 subagent 分工（2026-10-15）
+
+本节是现有 Prompt 4–14 的执行分解，不新增一套目标或自动恢复已暂停 goal。subagent 指开发协作助手，不表示产品 Data Agent 必须新增子 Agent 调度。用户要求功能优先、验收轻量；已完成的存储、目录、HTML/iXBRL、六工具和运行控制复用，缺失的能力按下表补齐。
+
+**当前源码约束。** connectors/official.py 的 acquire_html 要求显式 main_url/allowed_urls，尚非从公司输入自主发现；connectors/sec.py 尚未创建，旧获取设施可按现有入口复用。contracts/evidence.py 和 contracts/query.py 使用 HtmlLocator，application/tools.py 直接装配 HtmlReader，build/pipeline.py 仍是 HTML 发布链，因此 PDF/OCR/API 不能只加解析文件就宣称接入完成。agent/profiles.py 当前仅允许 OpenRouter 路由，带 reasoning_effort 的配置仍被拒绝；gateway_http.py 的推理守卫对应旧契约，新模型接入须显式适配。这里先固定最小格式/请求契约，再按现有模块加薄适配，不预建通用插件平台。
+
+| 原任务 | 用户能完成的业务 | 原子能力与现有基础 | 剩余最小交付 / 完成观察 | 执行归属 |
+|---|---|---|---|---|
+| P4 | 用指定 SDK/模型回答一个材料问题 | 独立 prompt/profile、协议装配、function call/result、usage；已有本机模拟闭环 | 按 14.17.10 路径真实调用、至少一次实际业务工具、合法交付与费用可核对；兼容能力分别标支持/跳过/未验证/失败 | 主 Agent；实跑串行 |
+| P5.1 | 输入公司和期间即可找到官方材料 | 主体/证券解析、官方候选发现、来源核验；已有目录登记及精确 URL 获取 | 一个新主体的候选→选择→获取→原件登记可复跑，不把人工正确 URL 当发现结果 | 来源 subagent；登记/权限契约由主 Agent负责 |
+| P5.2 | 查询官方 API 数字，缺材料时补数 | SEC companyfacts 原始 JSON、概念/期间/单位、null/修订处理、缺口分类、受限更新 | 一个数值能从 API 原件读回并被 query_records 使用；扩展关闭不联网；最新检查失败明确日期与未确认最新 | 来源 subagent；记录 schema/公共工具接线由主 Agent负责 |
+| P6.1 | 从 PDF 正文读到原文出处 | 冻结 PDF、文本顺序、物理页/印刷页、区域定位 | 一份 PDF 从解析发布到 search/read_evidence，能读回原页；旧 HTML 入口仍可用 | PDF subagent；Locator/reader 接口先固定 |
+| P6.2 | 从 PDF 表格取数并计算 | 行列/跨页表头、脚注、数值与单位、记录→计算依赖 | 一张有表头/脚注的表完成取数、计算与出处交付；无法确定结构明确缺口 | PDF subagent；复用共享计算 |
+| P7 | 读取扫描页和图中明确标签 | 页面渲染、OCR、旋转/坐标、原图区域、质量标记、解释与原文分离 | 扫描正例和区域出处可读回，估读不变成精确财务数；依赖 P6 的页/区域契约 | PDF subagent 后续小批次，非与 P6 同时改契约 |
+| P8 | 选择正确版本、识别冲突并纠错 | 带依据的公司/产品/关系、重复披露去重、重述选择、历史截止、修订传播；已有不可变快照/部分修订 | 同一指标新旧披露按请求选对，冲突可见；新修订生效且旧交付读回不变 | 主 Agent 集成；局部提取/独立案例可委派 |
+| P9 | 复用任务经验、按复杂度选模型 | 原生 Skills、会话/压缩、经验记忆、权限、角色 profile、独立 prompt；已有会话与 profile 基础 | 一项适用原生能力接入一个业务案例；跨任务无事实污染；可选不支持能力显式跳过 | 单个 SDK 子任务可委派；运行/预算/选择规则由主 Agent负责 |
+| P10–11 | 确认回答在业务上可用 | 正常/缺数/冲突案例、独立原件核验、口径/公式/出处、共同模型与不同模型比较 | 每条业务链先一个正常案例和必要反例；完整 BC01–BC14 仍保留、分批覆盖，未覆盖明确列出 | 主 Agent 跑集成；可委派独立原件核验，不把 gold 给产品 Agent |
+| P12 | 必要时提高检索效果 | FTS5 基线、外部命中映射、精确读回、召回/耗时/成本 | 比较与选型仍在总目标，排在正常功能链之后；没有授权或不适用候选明确记录 | 适合后置独立子任务；不得抢占当前功能链 |
+| P13 | 从 Python/CLI/MCP 使用新能力 | 已有 Python DataService；补薄 CLI/MCP、分析补数、迁移映射、备份/回退 | 同一输入经入口得到一致结果；隔离副本迁移/回退可演示，来源/账本连续 | CLI/MCP 薄适配可委派；迁移、共享状态与最终接线由主 Agent负责 |
+| P14 | 在实际使用中交付并决定切换 | 受控切换、观察窗口、质量/费用/失败记录、回退及操作说明 | 按授权范围实际完成用户任务，保留已知缺口；未通过的一侧不标完成 | 主 Agent 与用户决定，不能委派自动生产切换 |
+
+**建议并行方式：一个主 Agent + 最多两个开发 subagent，按小批次启用。** 先由主 Agent 固定本批会用到的最小输入/输出、来源策略、记录及 Locator/reader 扩展点；主 Agent 独占 contracts、service/application、共享 catalog/SQL、SDK/HTTP/预算、依赖锁和顶层 TODO/设计写入。第一轮来源 subagent 做 P5.1，PDF subagent 做 P6.1；主 Agent 处理 P4 的最小真实入口及两者接线。缺少实跑授权不阻止来源/PDF 的非模型实现，也不允许子任务自行花费。
+
+来源 subagent 主要改 connectors 的独立实现及对应 fixture/示例；PDF subagent 主要改 build/pdf 与对应读取适配、fixture/示例（新增文件实际需要时再建）。P5.2/P6.2 复用各自分工顺序接上，P7 等页/区域契约稳定后再做。P8、P9 分小任务穿插，但不同时修改公共文件。公共文件需求先反馈主 Agent，不能各自复制一套 schema/预算机制；所有最终代码串联仍由主 Agent负责。
+
+每张任务卡沿用 AGENTS.md 的最小格式：目标、显式输入与接口、允许写入文件、一个运行命令、关键预期/必要反例、资源边界和停止点。共享环境的重装由主 Agent 串行执行；子任务使用独立临时 data_root，不共写 Catalog/账本，也不按分支或检查点复制依赖环境。交付后先看 diff，再用当前安装包执行一个核心正例及受影响反例，最后把来源/PDF 结果接到现有工具→计算→出处交付；不以子任务“完成”报告代替集成。
+
+不默认启用多模型顾问或循环审查。开发 subagent 也有上下文/调度成本，数量多不保证更快；实现效果由可复跑业务结果决定。该方案是可行性评审与后续分工建议，本轮未启动 subagent、模型调用、完整回归或业务开发。
+
+**已有实现的保留缺口也不遗漏。** 14.12.16 的四项历史偶发事件（收尾恢复、初始化观察归属、澄清 worker 超时、恢复时钟失败）尚缺原现场因果证明，不因后续通过就关闭；由主 Agent 在受影响链上保留诊断、按证据修复，不无变化循环重跑。网关澄清后继、真实费用、原生配套隔离与业务效果分别并入 P4/P9/P10–11；其他平台、真实断电及网络文件系统未验证仍是适用边界，不自动变成当前小批次的新增平台任务。
+
 ### 14.2 标识、时间与证据地址
 
 **系统 ID：**类型前缀 + ULID，由程序生成，时间可排序，不含业务含义；名称、证券代码和 URL 都不作 ID。
@@ -1756,6 +1801,8 @@ build 内的块、章节、表格、图片和记录使用 build 内唯一 ID（�
 所有 locator 都绑定外层的 `asset_ref`（`asset_id / snapshot_id / representation_id / build_id`）。
 
 ### 14.3 内容存储布局
+
+> 2026-10-16：下列布局记录已有 HTML/SDK 链路；用户确认的新文档查询存储见 14.18。新查询不沿用读取时完整重解析，也不把 iXBRL 概念目录当作业务标签索引。旧资产与账本保持原状，不能将两套入口的验收状态混为一谈。
 
 `data_root` 由配置显式给出，代码中不设默认路径。
 
@@ -2787,7 +2834,7 @@ Claude 使用锁定 SDK 的 `PostToolUse` → `continue_=False`，仅在 DataSer
 
 **模型与实际请求。** 冻结候选为两侧 `deepseek/deepseek-v4.1-flash`、OpenRouter、第一方 `deepseek` 上游；无模型/上游 fallback。版本为 OpenAI Agents SDK 0.22.2、OpenAI 3.13.0、Claude Agent SDK 0.2.166、随包 CLI 2.1.299。按主锁全新普通安装并强制重建当前项目，43 个包依赖检查通过，包内 61 个 Data Python/SQL 文件及 3 个预算模块逐项核对。仓库外 `-I` 运行的实际请求预检分别使用 OpenAI `httpx2.MockTransport` 和 Claude 原生 CLI＋本机合成 Messages/SSE 服务，各捕获 1 次请求，大小分别为 43,094 / 44,239 字节。精确模型、独立应用 prompt、六业务工具＋deliver/clarify 的 schema 及 4,096 输出限制均一致；OpenAI 原始合成 usage.cost 保留。原生进程退出及进程组清理已观察，不能据此推断远端收费或网关支持。
 
-OpenAI 使用 Chat Completions，实际发送 `provider.only/order=['deepseek']`、`allow_fallbacks=false`、`require_parameters=true` 和 `reasoning.enabled=false`；非流式 get_response 的 `stream=false` 在锁定 SDK 中省略该字段。Claude 使用原生 Messages，thinking disabled、显式完整应用 prompt；CLI 发出 `unrecognized_model` 提示，但仍把精确 DeepSeek ID 发给合成端点。本地没有证明 OpenRouter 接受这些请求。[OpenRouter 官方说明](https://openrouter.ai/docs/cookbook/coding-agents/claude-code-integration)只保证 Claude Code 与 Anthropic 第一方上游的兼容性，因此该 DeepSeek 路径保留为实验；不自动改用 Sonnet 或直连。Claude 的上游约束拟用任务 key 的模型/供应商限制，尚未配置或验证；本机请求没有提供该保证。虽然空 Skills/plugins 配置下请求中的工具清单仅含八个 MCP 工具，init 仍列出原生内置 Skills/plugins，本步不能声称已禁用全部配套能力；完整配套隔离留 Prompt 9。
+OpenAI 使用 Chat Completions，实际发送 `provider.only/order=['deepseek']`、`allow_fallbacks=false`、`require_parameters=true` 和 `reasoning.enabled=false`；非流式 get_response 的 `stream=false` 在锁定 SDK 中省略该字段。Claude 使用原生 Messages，SDK 配置 thinking disabled、显式完整应用 prompt；实际 CLI 请求未传达 disabled，检查点 7 已发现并阻止真实派发，详见 14.12.18；CLI 发出 `unrecognized_model` 提示，但仍把精确 DeepSeek ID 发给合成端点。本地没有证明 OpenRouter 接受这些请求。[OpenRouter 官方说明](https://openrouter.ai/docs/cookbook/coding-agents/claude-code-integration)只保证 Claude Code 与 Anthropic 第一方上游的兼容性，因此该 DeepSeek 路径保留为实验；不自动改用 Sonnet 或直连。Claude 的上游约束拟用任务 key 的模型/供应商限制，尚未配置或验证；本机请求没有提供该保证。虽然空 Skills/plugins 配置下请求中的工具清单仅含八个 MCP 工具，init 仍列出原生内置 Skills/plugins，本步不能声称已禁用全部配套能力；完整配套隔离留 Prompt 9。
 
 **输入和案例。** [fixture-contract.json](../output/data-agent-gateway-20261015/fixture-preflight-2/fixture-contract.json)保存完整合成原件、附属资源、输入清单、处理配置与十份上下文模板；临时 Catalog 中十个独立上下文均创建成功后关闭，未启动 runtime。每侧依次为正常循环、首次完整工具结果后退出/恢复、首个 find_assets 受控错误、派发后取消、应用暂未观察到收费；请求上限分别 10/10/4/1/1，共最多 52 次，串行、无自动重试，单请求 45 秒、单场景 180 秒、批次执行 1,800 秒。故障场景必须实际到达并观察指定边界，否则记未覆盖。最后一项保留真实响应原件，仅隔离应用收费观察，不伪造“网关没返回 usage”。实际运行 ID 在新隔离 Catalog 创建后、派发前冻结；不同内核/场景的原生身份与业务上下文分别保存，批次账本不得借澄清机制扩大权限。
 
@@ -2863,6 +2910,41 @@ OpenAI Chat 适配器顶层 `ModelResponse.response_id` 为 `None`，见[官方 
 两套现有环境各 68 个普通安装 Python/SQL 文件匹配源码，data-only/SDK 分别 9/43 个发行包通过依赖检查；没有新建环境，主锁、M0 锁、profile/prompt 和网关草案未改。测试使用 `-I` 和合成材料，最终集成组从仓库外运行。原失败、原始响应、原生记录、安装内容及范围差异见 [checkpoint-5/verification.json](../output/data-agent-gateway-runtime-20261015/checkpoint-5/verification.json)。
 
 **未完成项不能合并旧证据计作通过。** 本检查点按独立合成场景创建 fixture 批次，每批登记两侧 scope，但只实际执行 OpenAI；尚未执行双侧十场景共享同一冻结批次。G04 当前验证响应尚未收到时取消的未知结果分支，整批后续场景不能绕过该未知状态另开账本。下一步是 Claude 原生业务接线、必要收费观察及完整宿主截止/取消监督，再核验整组执行/停止顺序。真实模型、OpenRouter 路由/收费、认证 generation 查询、完整原生能力隔离、网关澄清后继及其他平台均未验证；四项历史偶发问题保留，真实调用/费用为 0。L2/L3 不记整体通过，尚未达到用户约定的 Prompt 4 非付费暂停点。
+
+**检查点 6：Claude 官方循环接入与持久收费观察（2026-10-15，限定非付费工程）。** 新增 `agent.claude_runtime.run_gateway` 和 `providers/gateway_claude.py`，沿既有官方 SDK/CLI、MCP、Pre/PostToolUse 与 session/resume 执行。内部共享原离线循环，网关配置和授权边界分别检查；CLI 使用隔离环境和私有 loopback token，宿主凭据不写入原生运行绑定。HTTP 线程对 Session 的操作仍回到 Catalog 所属线程，退出时在线程中关闭代理并等待请求线程，避免阻塞原生回调。依据为 [Claude 官方 session 文档](https://code.claude.com/docs/en/agent-sdk/sessions)和 [hooks 文档](https://code.claude.com/docs/en/agent-sdk/hooks)；原生历史读取及工具终止机制保持，未复制官方循环。
+
+Messages token usage 不作为账单。新增受控 `GET /v1/generation?id=...`，依据 [OpenRouter 官方 generation 接口](https://openrouter.ai/docs/api/api-reference/generations/get-request-%26-usage-metadata-for-a-generation)，只使用原响应明确取得的 generation ID；原生 msg ID 不猜成 generation ID。每次最多一次只读 HTTP，同一请求最多两次观察；网络前在原 RunBudget 写入序号，原响应及查询原字节分别保留。查询中断占次数；完整账单已落盘而结算未完成时，重新打开后从同一字节结算，不再查询、更不重发模型。查询与 POST 共用已有字节上限、连接关闭、deadline、无重试/重定向边界；同一响应和账单身份验证后才释放预留。停止允许受限只读核费，不允许新模型或业务动作。新表位于同一账本，不新增余额；旧账本缺少该表不会自动修复。
+
+Claude 在原始 SSE 与收费落盘后才将原字节交给 CLI。缺少收费或 generation 身份时阻止工具执行；恢复沿原生会话，并校验已观测 assistant 消息对原 HTTP 响应的覆盖。仅有完整 HTTP/账单而没有原生历史仍返回 recovery_required；不能把核费当作模型会话恢复成功。测试使用合成 `X-Generation-Id`，不证明真实 OpenRouter 会提供该 header；缺身份路径保留未知。
+
+本轮首次新增测试有两类测试侧错误：一条把 `inspect_root().cost.unknown_reserved_usd` 当成 `summary()` 的直接字段；两条中断案例把已经完成自身恢复时钟的 worker 再登记为原生执行 owner，生产检查正确拒绝。先核对既有字段与 `ObservedWorker.record`/`RecoveryClock` 的持有人规则，再修正测试宿主，只重放原失败；没有修改生产时钟归属检查或降低恢复标准。原日志与测试源码保留。
+
+本检查点共 **111 项不同检查通过，新增 14 项**：Claude 网关 7、只读核费 7、共享 HTTP 15、预算单测 27、SDK 单测 40、OpenAI 网关回归 10、Claude 旧离线恢复 5。Claude 网关组第一次完整运行的五个通过案例保留，两条测试宿主归属错误单独修正重放；费用字段断言错误也保留原日志后重放。生产源码在最终安装后未再改变。真实 CLI 验证正常 8 次合成 POST/8 次合成 GET、工具后退出恢复仍 8 次、工具错误进入下次原生输入、核费后取消无业务工具执行；缺身份/账单保持未知。两处新增真实退出证明：账单原字节已保存时无需新 GET 即可核费；派发状态未知时不重发。旧离线恢复覆盖不同工具位置、历史丢失/篡改、未知响应与根请求上限，未将合成结果当真实模型效果。
+
+复用检查点 4 的两套普通安装环境，核心/SDK 均有 69 个 Python/SQL 文件与当前源码相同，9/43 个发行包依赖检查通过；没有创建新环境，未修改依赖、锁、profile/prompt 或执行草案。测试从仓库外以 `-I` 运行。依赖检查首次被 uv 缓存的沙箱读权限阻止，原失败保留，取得现有缓存访问权限后检查通过。代码版本、受影响差异、失败及原始/原生证据见 [checkpoint-6/verification.json](../output/data-agent-gateway-runtime-20261015/checkpoint-6/verification.json)。
+
+**下一步及边界：**完成整体宿主监督（特别是 DNS/响应头阻塞时的截止、取消及子进程退出观察），然后在一个冻结批次及一个账本内执行双侧 G01–G05。当前各案例是独立 fixture 批次；未证明同批十场景执行/停止顺序。新增 Claude asyncio deadline 不是阻塞系统调用的完整强制监督证据。真实 OpenRouter 身份、路由与收费、真实模型效果、网关澄清后继、完整原生能力隔离和其他平台仍未验证；四项历史偶发问题不因本轮回归通过而关闭。真实模型调用/费用为 0，L2/L3 不记整体通过，尚未到用户约定的 Prompt 4 非付费暂停点。
+
+**检查点 7 收尾：宿主监督、同批十场景及真实参数缺口（2026-10-15）。** 本轮已完成可执行的非付费工程与限定验收，按用户要求暂停 goal 供 review，不进入 Prompt 5。完整 Prompt 4 仍未通过；不能用本机合成结果替代真实 OpenRouter、模型或费用验收。证据入口：[verification.json](../output/data-agent-gateway-runtime-20261015/checkpoint-7/verification.json)、同目录 `changes.diff`；历史检查点的下一步描述保留为当时记录。
+
+宿主新增薄层 `GatewaySupervisor`，复用 `ObservedWorker` 的真实进程组退出观察和唯一 RunBudget。请求派发后即使 DNS 或滴流响应头阻塞，父进程仍可按请求/场景/批次剩余时间或显式取消停止该 scope 并回收所属组。账本轮询采用有限锁等待；停止记录写入失败仍终止子进程、保留原失败，不当作完成。连接建立后再检验 deadline，避免 DNS 迟到返回后继续发送。九个实际 SDK 故障场景覆盖双侧 DNS、响应头、取消、初始化总截止及一次停止写入失败；均观察到所属进程组清空。实际恢复继续使用既有 RuntimeJournal，不增加模型循环、独立账本或 SDK 依赖到共享核心。轮询、清理宽限及 OS 调度不等于实时系统保证。
+
+一个派发前冻结的批次包含十个业务上下文/原生身份，两侧依序执行 G01 正常、G02 首次工具后退出恢复、G03 工具错误、G04 已派发后取消、G05 收费观察扣留。请求数分别为 8/8/2/1/1，双侧共 40 次本机合成 POST；Claude 20 次及 OpenAI G05 一次 generation GET，共 21 次。40 个不同 generation 身份结算在同一账本，累计合成 $0.40；没有每个业务根另建预算库。G02 原身份及先前工具结果保持，G04 由宿主生成部分交付，G05 两侧均阻止未知费用下新增请求，再以原 generation 查询结算而不重发模型。G05 旧 recovery_required 结果不被事后结算改写。真实模型调用/费用均为 0。
+
+**实际参数偏差必须保留。** 20 个 Claude 原始请求均省略 `thinking`，同时包含 `output_config.effort=high`，与配置 disabled 的预期不同。锁定 Python SDK 0.2.166 的 subprocess_cli.py 已把 disabled 映射为 `--thinking disabled`；最早已观察偏差是随包 CLI 2.1.299 的 HTTP 序列化结果，内部机制及受支持修复尚未证实。[OpenRouter 官方映射](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens#reasoning-with-the-anthropic-messages-api)表明 effort 会映射为推理设置，必须显式 disabled 才能覆盖它。历史 [SDK issue 693](https://github.com/anthropics/claude-agent-sdk-python/issues/693)涉及另一旧版参数映射，不能直接当作当前根因。当前最小修正是在真实发送的校验层拒绝缺失 disabled；20 个捕获原字节在最终安装包中重放，均在预算预留及连接前拒绝。另验显式 disabled 与 effort 共存可校验、enabled/adaptive/null 拒绝。合成端点继续保留诊断原字节，未改协议、模型、别名、SDK 版本或冻结契约，不宣称已修好 CLI。
+
+当前 66 项不同测试通过：监督 5 项（九个 SDK 场景）、同批次 1 项（十场景）、当前时钟进程 12 项、预算 27 项、HTTP 15 项、根停止 4 项、query host 超时 1 项、参数拒绝 1 项。另有 3 项旧安装包时钟兼容检查因未提供显式旧环境而跳过，不计通过。最后仅增加真实来源参数拒绝，65 项既有通过证据按安装 hash 保留；重放受影响的新检查与 20 个捕获请求，不重复合成十场景。两个复用的普通安装环境各 70 个源码/SQL 文件与当前源码一致，仓库外 `-I` 运行、无路径注入，依赖检查通过；锁和 SDK 版本未变。`output` 保存本地验收材料，不是产品部署入口：当前固定复用检查点 4 的核心/SDK 环境，不按检查点复制依赖；历史环境及失败未删除。
+
+| Prompt 4 条件 | 本轮非付费结论 | 尚未完成 |
+|---|---|---|
+| 1. 两侧工具闭环 | 两套实际 SDK/CLI 经本机合成 HTTP 完成 G01–G05，工具与交付可读回 | 真实模型经 OpenRouter 的工具选择及闭环 |
+| 2. 模型、路由、参数、独立 prompt | 捕获精确模型、独立应用 prompt、八工具 schema；OpenAI provider/reasoning 字段一致；Claude 推理字段偏差已阻止真实发送 | Claude disabled 传达的官方兼容修复；实际供应商及路由核验 |
+| 3. 错误、取消、恢复、用量 | 同批次及宿主故障的限定行为通过；未知费用保留并阻止新增请求 | 真实网关下的对应行为、跨平台稳定性 |
+| 4. 原生证据与费用 | 原请求/响应字节、原生身份、工具结果、交付及合成账本关联已核对 | 实际 OpenRouter generation、收费和账户核对 |
+| 5. 不兼容定位 | 区分 SDK 配置、CLI 传输字段与网关映射；原请求未篡改，未替换组合 | CLI 内部原因及受支持解决路径 |
+| 6. 最小修正与重放 | 实际发送前拒绝偏差；受影响检查及捕获重放通过，其他证据按版本保留 | 授权后真实原失败的复验；当前不存在真实模型失败记录 |
+
+**暂停与保留缺口。** 当前冻结契约仍为不可执行，L2/L3 的本机功能证据不等于真实准入，L4/L5/L6 不因本轮通过而放行。四项历史偶发问题继续按 14.12.16 保留；网关澄清后继、完整原生 Skills/Memory 等隔离、真实财报业务效果、其他平台及真实断电/网络故障未覆盖。下一动作等待用户 review 决定，goal 只暂停、不缩小或标完成。
 
 ### 14.13 各功能维度的运行流程与接口
 
@@ -3339,6 +3421,8 @@ M0 联调前冻结其小范围接入用 profile 与日志字段；M4 业务比�
 
 #### 14.17.8 低成本功能验证、DeepSeek 与可切换模型入口（2026-10-14）
 
+本节保留当时的 DeepSeek 选择及证据；后续轻量原则和价格快照见 14.17.9，最新 SDK/模型组合以 14.17.10 为准。旧冻结契约不被新偏好自动授权或改写。
+
 **用户确认：保留 OpenRouter 适配以便换模型；SDK 继续使用 OpenAI Agents SDK / Claude Agent SDK。** DeepSeek 优先作为链路与功能验证候选，此阶段不评价财报分析效果或确定生产模型。默认模型入口仍为 OpenRouter；DeepSeek 官方直连只作为已查明的兼容路径，不据此切换默认入口或静默 fallback。
 
 | 路径 | 本轮核对结果 | 尚不能宣称 |
@@ -3356,3 +3440,1255 @@ M0 联调前冻结其小范围接入用 profile 与日志字段；M4 业务比�
 **功能验收与业务验收分开：**两条 DeepSeek 路径记为功能探针，验证“模型选只读工具 → SDK 执行 → 模型消费结果 → 应用校验交付”，再按 M0 契约验证错误、取消、恢复及用量。它们不改写 14.17.3 的 B/C 共同 Claude 比较，也不据此宣布 Skills/Memory 增益或业务质量通过；不兼容时保留具体缺口，Sonnet v1 草案仍是另一个候选，不自动追加调用。
 
 **充值与开工：**当前不需要为离线开发充值。只检查了当前进程是否有 OpenRouter/DeepSeek 凭据，均未配置；未查询真实账户余额，因此不能判断账户是否需要充值。实际调用前再核对账户余额、任务 key 剩余额度与最终批次上限。原 Sonnet `$3` 是未授权的任务上限提案，不是充值金额或既有消费；DeepSeek 要按 OpenRouter 实际上游重新冻结价格和预留，不能沿用直连价格。真实调用继续为 0；M1 独立切片按 14.12.7 推进。
+
+
+#### 14.17.9 功能优先、轻量验收与新模型偏好（2026-10-15）
+
+用户要求后续以功能跑通为首要目的，验收侧轻量、模型调用低频。每批默认交付一个可运行入口、一条正常链与本次必要反例，输出状态、关键结果和缺口；不例行全量回归或扩大比较矩阵，必要回归由改动影响决定。复用已有环境，避免按检查点创建安装副本；源码改变时重装并核对导入。既有费用/权限/原件完整性/未知状态仍保留，合成功能验证不改写为业务效果验收。可复制的本机命令集中在 LOCAL_DEVELOPMENT.md，不另建验收体系。
+
+本节初稿沿用 OpenRouter；用户随后确认 DeepSeek 官网直连、OpenRouter 用于 GPT/Sonnet，最新路由见 14.17.10。用户指定 Claude Sonnet 5.5 与 GPT-5.6 Luna/Terra/Sol；以下为当日 OpenRouter 普通同步请求的公开标价，单位 USD / 百万 token，不含缓存、附加工具、长上下文或供应商差异。价格在真正调用前按选定端点复核。
+
+| 准确模型 ID | 输入 / 输出 | 建议用途 |
+|---|---|---|
+| `anthropic/claude-sonnet-5.5` | $2 / $10 | 按最新要求，经 OpenRouter 接入 OpenAI Agents SDK；见 14.17.10 |
+| `openai/gpt-5.6-luna` | $0.20 / $1.20 | OpenAI SDK 常规功能验证的默认候选 |
+| `openai/gpt-5.6-terra` | $2 / $12 | Luna 确认存在能力缺口时按需升级 |
+| `openai/gpt-5.6-sol` | $4 / $20 | 复杂问题按需使用，不例行参与所有用例 |
+
+依据：[Sonnet 5.5](https://openrouter.ai/anthropic/claude-sonnet-5.5)、[Luna](https://openrouter.ai/openai/gpt-5.6-luna)、[Terra](https://openrouter.ai/openai/gpt-5.6-terra)、[Sol](https://openrouter.ai/openai/gpt-5.6-sol)。OpenAI 官方对 [Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) 和 [Sol](https://developers.openai.com/api/docs/models/gpt-5.6-sol) 的模型身份也已核对；网关调用价格仍按选定 OpenRouter 端点计。
+
+Sonnet 5.5 的官方网关说明为 thinking 始终开启，以 effort 控制深度/成本；下一轮应验证低 effort 和输出 token 上限，不沿用 DeepSeek 的 disabled 条件。不同模型仍分别维护 prompt 正文/version/hash。现有 HTTP 验证器与冻结契约只适用于此前配置，本轮未通过改 ID、放宽守卫或覆盖原契约假装完成迁移。未来先完成新配置的本机请求捕获，再做真实调用。每 SDK 选一个正常链，只能证明各自路径功能，不等于同模型的 SDK 公平比较；完整比较仍在后续业务阶段。
+
+**充值建议与调用预算分开。** 未读取账户余额或私密账户配置；有足够可用余额则无需新增充值，否则建议首次购买 $5 credits。[官方条款 4.1](https://openrouter.ai/terms)最低单次购买 $5；[官方费用说明](https://openrouter.ai/blog/insights/governing-team-ai-spend/)标准银行卡充值费为 5.5%、最低 $0.80，故 $5 credits 预计支付 $5.80，税费及实际结账为准。不建议为本轮一次性购入大量余额或开启自动充值。
+
+**原最小真实联调提案（组合已被 14.17.10 修正，未执行）：**当时拟 Luna/OpenAI SDK 与 Sonnet/Claude SDK 各一条正常功能链、最多各 10 次物理模型请求、合计 20 次。最新组合不再沿用这一模型分工，也不把 20 次复制给每个新组合。整轮共享总预算 $1、$0.80 预警仍仅为待确认提案，不是每个 Prompt 可重置的 $1。实际先固定一个最小批次及物理请求上限，串行，不自动重试或切换模型；每次请求须有保守预留，失败/未知继续计入，余额不足以覆盖下一次预留时停止。完整历史、工具定义、工具结果和推理输出均纳入费用。输出上限初拟 4,096 tokens（含适用的推理），若不足明确失败后再调整方案。核费查询复用既有受限机制，不另行扩大调用。
+
+上述是后续选择与预算建议，尚非执行授权、已安装 profile 或已配置 key 限额；旧 DeepSeek 草案、累计证据和历史失败保持。当前 goal 仍暂停；本轮仅复跑存储示例、OpenAI/Claude 各一条已有合成功能链，各 8 次本机请求并成功交付，真实模型调用/费用 0。用户恢复并确认具体实跑额度后，再按此方向形成新的短执行契约，余额不等于可自行花费的任务额度。
+
+#### 14.17.10 最新 SDK/模型矩阵与可选能力跳过规则（2026-10-15）
+
+本节保留实跑前的规划与准入状态；其后用户已授权本批 $1 / 40 请求，真实执行及升级后的结论见 14.17.11。
+
+用户明确要求以下组合；SDK 是运行内核，模型品牌不决定必须使用哪家 SDK。这里的 OpenAI SDK 指 OpenAI Agents SDK，Claude SDK 指 Claude Agent SDK，不以裸 HTTP 客户端代替 Agent 运行。此前将 Sonnet 默认分给 Claude SDK 的建议已修正。
+
+| 运行内核 | 模型与入口 | 最小验证目的 | 当前状态 |
+|---|---|---|---|
+| OpenAI Agents SDK | DeepSeek 官网直连，OpenAI 兼容 Chat Completions 入口 | 模型选择业务工具→SDK 执行→结果返回模型→合法交付 | 可复用本机合成工具循环；直连 provider 适配及真实路径未验收 |
+| Claude Agent SDK | DeepSeek 官网直连，`https://api.deepseek.com/anthropic` | 同一业务输入下核对工具循环及可用原生配套 | 可复用本机合成循环；旧 OpenRouter 请求存在 thinking/effort 契约偏差，直连须重新按能力配置并验证，不能沿用旧失败宣称直连失败或成功 |
+| OpenAI Agents SDK | OpenRouter → `openai/gpt-5.6-luna`；Terra/Sol 按需 | 低成本 GPT 功能链；有明确能力缺口时再验证强模型 | 新模型 profile、能力参数与真实链尚未验收 |
+| OpenAI Agents SDK | OpenRouter → `anthropic/claude-sonnet-5.5` | 同一 SDK 下切换模型，使用 Sonnet 独立 prompt/profile | 新模型 profile、能力参数与真实链尚未验收 |
+
+**用户已确认：DeepSeek 官网直连，OpenRouter 用于 GPT/Sonnet。** 当前 `Route.provider` 只允许 OpenRouter，需要小范围扩展端点、认证、usage 与费用适配；继续复用两套 SDK、共享 Data 工具和现有任务预算机制，仍保留 OpenRouter。供应商支持和价格以具体端点为准，OpenRouter generation 核费接口不能套用到 DeepSeek 直连。DeepSeek 直连账户与 OpenRouter credits 分开，任务总成本合并控制，不把某一账户余额当另一入口可用额度或各开一份任务上限。未经实际请求核对，不把官网兼容表套用到 OpenRouter 转换结果。各路径实跑时还须固定精确模型、实际上游和对应版本，不用可静默映射的模型别名绕过独立 prompt 要求。路线选择已确认，真实调用额度尚未授权。
+
+**用户允许跳过不支持的可选能力，规则如下：**
+
+- 逐项记录“已验证支持 / 已确认不支持并跳过 / 未验证 / 验证失败”，附 SDK 版本、路由、官方依据或最小探针证据及业务影响；临时故障和未知不能伪装成已确认不支持。能力不同不直接判整个 SDK 不可用，也不为补齐可选项自建通用 Agent 框架。
+- 可按需跳过供应商不支持的托管工具、原生强制结构化输出、缓存控制或特定 reasoning 参数；参数省略须由具体能力配置决定，保留独立 prompt、应用侧交付校验、实际用量和预算限制。模型强制产生推理时记录并计费，不能因跳过参数而伪称推理已关闭。
+- 核心业务 function call、tool result 和可校验交付是该材料查询路径的必要能力。若不支持，记录该路径对当前任务不可用或部分可用；不能跳过核心调用、预填答案或静默换模型后记为整条路径通过。修订能力契约需保留旧失败，不能仅放宽 HTTP 守卫掩盖真实偏差。
+- DeepSeek 官网 Anthropic 兼容表明确列出支持工具定义、tool_use/tool_result，同时忽略或不支持部分字段。`mcp_servers` 服务端字段被忽略，不等于 Claude SDK 本地 MCP 工具不可用；Skills、会话与记忆也应按 SDK 本地机制和实际任务逐项核对，不因模型品牌整体删除。旧资料与锁定版本不一致时，先核对官方文档和实际版本源码，再做最小验证。
+
+依据：[OpenAI Agents SDK 模型兼容说明](https://openai.github.io/openai-agents-python/models/)、[DeepSeek Anthropic 兼容字段表](https://api-docs.deepseek.com/guides/anthropic_api/)、[OpenRouter Claude Code 接入边界](https://openrouter.ai/docs/cookbook/coding-agents/claude-code-integration)。优先使用 SDK 现有兼容模型入口与原生机制；不因增加组合引入新模型框架。
+
+**调用与开发顺序：**先完成对应 profile/请求的非付费核对，再按明确额度串行验证最小真实业务链；首次正常结果只能证明该组合的功能，业务效果与 SDK 公平比较仍分别报告。DeepSeek 同模型双 SDK 可用于内核对照；OpenAI SDK 内的 DeepSeek/GPT/Sonnet 可用于模型对照，不混合归因。四条路径是待覆盖矩阵，不是要求同一批全部跑完，更不自动追加 Terra/Sol、费用或重试。后续开发 subagent 分工见 14.1.8；本次只有源码 review 和文档更新，goal 仍暂停，没有启动 subagent 或真实调用。
+
+
+#### 14.17.11 四路径真实功能验收及 SDK 升级（2026-10-15）
+
+**只读 review：提前交付与接口开销。**最新 Sonnet 的 6 个原 HTTP 请求均包含 `query_records` 等全部 8 个工具，实际 system prompt hash 与独立配置一致并明确要求代码计算；6 个响应均 HTTP 200、finish_reason=tool_calls、输出 383–1545 tokens，均未触及 4096 上限。首两步是 find_assets/search_asset，第三步开始 deliver；之后 3 次请求纠正重复 state/delivery 的覆盖、缺口、引用不一致，报告费用 $0.311986，占本次 $0.525774 的 59.3%。底层 `calculate` 在验收侧从同份原件得到的两个实际记录上返回增长比例 `0.020219940775141213`（2.02%）；这是定向能力检查，不是产品 Agent 自主选择记录或业务通过。由此排除本例“工具未传给 SDK”“HTTP 错误强迫结束”“输出截断”作为提前交付原因；仍不能证明模型选择提前结束的内部原因。
+
+首个真实请求 59,585 字节，工具 schema 为 55,553 字节（93.2%）；各工具重复的 TaskState/PlanUpdate/Need/Satisfied/Gap/ResultRef 定义合计 27,832 字节。此计量只说明请求开销，不能单凭字节推导 token 数或模型能力下降。**供 review 的候选，尚未采纳/实现：**保持内部 DataService 的引用可见性、证据闭包、状态一致性及合法 partial；终态工具是否让模型只写一次 need/status/refs/gaps，再由薄适配机械生成重复的 state，减少两份相同信息的不同步。另按各模型单独版本化提示词，区分“尚未尝试读取”与“工具确认不可用”，不把固定工具序列、样本答案或特定公司的记录喂给 Agent。前者涉及模型可见契约和旧请求兼容，需 review 后决定；不能以方便通过为由删除业务验证。证据位于 `extended-verification.json` 的 `read_only_delivery_review`，本次新增模型调用 0、未改任何 SDK/runtime/prompt。
+
+**最新收尾：**Sonnet 在上述修正后追加 6 次、响应报告 $0.525774，仍提前返回 partial：只执行 find_assets/search_asset，未尝试 typed records 或代码计算，随后多轮修正 deliver/state 不一致。原文片段引用 3 条均可读回，营收值一致，但这不满足完整链路；不把模型未使用能力归因为 SDK 不支持。四路仍为 0/4 完整通过。当前同账本 A/B/C/D＝20/17/20/16，共 73/80 次；响应报告累计 $1.26415393、未核账预留 $1.4361136、可用 $0.29973247，无在途/未知传输。原 33 个请求逐项保持，追加授权后新增共 40 次。停止重复实跑；先 review 工具使用、state/deliver 重复表达及提前交付，再决定下一批，未追加次数、费用、模型或业务范围。证据：[extended-verification.json](../output/data-agent-live-20261015/continuation-fix/extended-verification.json)。
+
+**追加授权后的复验与必要修复（2026-10-15）：**A/B/C/D 新执行分别新增 10/7/5/7 个物理请求。A/C 在发送前触发本项目 200 KB 请求限制；这与单次工具页上限、供应商上下文上限是不同边界。B 的最后一条是 SDK 带 `error` 的合成 API 错误，本地原审计误报为会话身份缺失；旧代理未记拒绝原因，不能把其具体底层原因也认定为字节超限。依照 [官方 AssistantMessage 与 error 定义](https://code.claude.com/docs/en/agent-sdk/python#assistantmessage)，现先保存错误消息并分类，非错误助手消息仍执行原身份/原件审计；本地拒绝记录只保存有限已知错误码与字节数，避免泄露任意异常文本。两项官方 Claude SDK 本地回归通过，零真实调用。
+
+D 已产出明确 partial 的 JSON：营收数值与验收侧重读原件一致，3 个片段引用可逐字读回，但没有 typed records、代码计算及完整期间/口径证据，因此仍不通过。根因之一是 `query_records` 接收了前缀式概念而索引只存展开名称，返回空集合被模型当成数据缺失。现共享索引对非法概念标识明确报错，工具 schema 给出获取实际标识的方法；不替换概念、不猜命名空间。C 的后续实跑又暴露未声明的记录字段，现统一字段名单与错误反馈；旧非法请求仍非法，允许字段及来源语义未放宽。
+
+新执行可通过 `prepare-attempt --max-request-bytes 512000` 显式调整本地请求字节上限，按原计价提高该执行的单次预留上界，保留原批次/原 scope/原累计限制。这是本地工程参数修正，不新增额度或原生 Agent 框架；每次发送仍按实际字节与输出上限预留。12 项受影响行为检查通过，包括两套官方 SDK 合成链、拒绝/正常响应、原账本历史/次数边界和概念查询；字段反馈扩展后复跑对应检查通过，不重复计数。C 已用新执行追加 5 次，未再触发字节限制，但未完成取数计算便用尽累计 20 次；原 200 KB 以上的真实请求尚未由本轮 C 结果证明可通过。原问题/材料/profile/prompt 均保持，版本与结果入口见 `continuation-fix/extended-verification.json` 及 `LOCAL_DEVELOPMENT.md`；下文保留各历史执行当时的费用和限制。
+
+**追加授权（2026-10-15，执行中）：**用户明确批准本批累计上限 $3、每路 20 次、整批 80 次，继续原四路验收。新增 `extend-allowance` 只为这一既有批次登记显式授权和修订意图，原 SQLite 账本内原子更新累计上限及绑定；旧请求/响应、费用预留和旧会话不重写，旧停止原因保存在不可变授权记录中。仅允许这次继续的 native_max_turns 场景停止解除，不解除取消、根停止或未知传输。新上下文仅更新已授权费用上限及当前 SDK 配置，原问题、材料、解释时钟、prompt、路由及传输字节上限保持。原 descriptor/ready 标记留存，新 descriptor 指回原件；旧 manifest 可读历史，但不能据此创建新的旧策略执行。4 项行为检查和 14 项既有批次回归通过；实际旧 33 个请求逐项与原证据一致，唯一账本不变，变更后的剩余额度 $2.16029964。原授权/失败段落保留历史含义；当前执行使用 [extended-batch.json](../output/data-agent-live-20261015/extended-batch.json)，证据见 [allowance-extension-verification.json](../output/data-agent-live-20261015/continuation-fix/allowance-extension-verification.json)。
+
+**恢复实跑的最新状态（2026-10-15）：**用户恢复 goal 后，当前源码普通重装并核对 7 个修复模块；新增注释不改变原验收代码语法树。A 新会话新增 5 次 DeepSeek HTTP 200，修正筛选后发现材料，但旧计划版本及把资产 ID 拼成 evidence ResultRef 的调用仍被拒绝，累计 10 次停止。D 新会话新增 2 次 OpenRouter HTTP 200，响应确认 Sonnet 5.5 / Anthropic 上游；两次资产发现无工具错误并最终找到材料，下一次请求在派发前因预留超过剩余额度停止。两路均没有计算或交付，未进入本轮修复的 search_asset 分页；A 的 reasoning_content 实际返回，D 两次响应没有 reasoning_details，不能据此宣称签名推理回传已真实验证。两路首次自然语言 query 均未命中，而当前 find_assets 是元数据短语检索；此外 AssetRef 不是可直接交付的 ResultRef，这两项模型可见契约仍需澄清，未放宽原引用/计划校验。
+
+原账本现累计 A/B/C/D=10/10/10/3，共 33 请求，无在途。响应报告累计收费 $0.16685756，未核账预留 $0.6728428，剩余 $0.16029964；本轮 Sonnet $0.109454，DeepSeek 按 usage 保守估算 $0.032616（不是核实账单）。A/B/C 已用完次数，D 余额不足以覆盖当前下一请求。原 $1/40 请求及各路 10 次契约未改变，目标未完成。新尝试使用同一账本、原问题、原材料和独立 profile/prompt；不向产品 Agent 提供冻结答案。D 首次输出 manifest 因父目录缺失失败，创建目录后用同一 attempt-key 读回已登记上下文，无重复请求。证据：[resume-verification.json](../output/data-agent-live-20261015/continuation-fix/resume-verification.json)；以下初次运行和后续修复段落保留其历史含义。
+
+**范围与结论：**依据本轮任务附件，固定 Apple FY2024 Form 10-K，问 FY2024/FY2023 合并净销售额、同比、币种/单位/期间和可读回出处。四路使用同一材料与业务 context，独立 SDK×模型 prompt；一个独立验收 Agent 只读原件核验，答案未给产品 Agent。仅验收固定材料功能，不包含自主来源发现、PDF 或模型排名。共享工具/存储/交付继续复用，两侧均由官方 SDK 原生执行循环。**没有完整业务案例通过。**
+
+| 路径 | 真实请求与已观察能力 | 结果及缺口 |
+|---|---|---|
+| A：OpenAI Agents → DeepSeek `deepseek-flash` 直连 | 4 次完整模型响应，自主工具调用、Data 工具执行与结果回传已观察 | failed。搜索结果约 167 KB，下一完整请求 231,228 字节，超过冻结 200,000 上限，发送前拒绝。原 openai 客户端把本地校验异常包装成连接失败；已修正分类并用原未发送字节重放，变为明确 INVALID_REQUEST。结果体积问题尚未修复，没有提高上限或注入正确调用 |
+| B：Claude Agent → DeepSeek 同模型 Anthropic 接口 | 10 次完整 SSE，实际 SDK/CLI、本地 MCP、thinking 和多轮 tool_use/tool_result 已观察；取得结构化记录 | partial。原生 10 轮达到上限，宿主已确认进程组退出并确定性收尾；模型未完成计算或有效交付，交付中没有证据/记录/计算，6 项需求仍缺失。工具参数与状态约束多次报错，暴露契约可发现性问题；不能只归因模型便宜 |
+| C：OpenAI Agents → OpenRouter `openai/gpt-5.6-luna` / OpenAI 上游 | 1 次外部 POST，路由前 HTTP 404；不是模型成功返回 | failed。路由漏斗在参数筛选排除候选，generation 查询 404，账单未确认。官方文档核对后新请求配置省略未声明的 `store`，保留官方支持的 `parallel_tool_calls=false` 和严格 provider 路由；尚未真实复验，不能宣称已确定哪个字段导致原 404 |
+| D：OpenAI Agents → OpenRouter `anthropic/claude-sonnet-5.5` / Anthropic 上游 | 0 次真实请求 | not_executed。同批 C 未知费用阻塞新请求；另有 SDK Chat 适配器丢失 reasoning_details 的本地反例。未执行不计成功或已确认不支持 |
+
+**费用与停止：**15 次外部推理 POST / 14 次确认模型响应；无隐式重试，没有重开账本。DeepSeek usage 按峰值非缓存价估算合计 **$0.1033662**，不是实际账单；完整 usage 无单次账单的 14 次请求仍保留全部 **$0.4133265** 预留。OpenRouter 404 的 **$0.0171616** 未知预留继续保留；合计占用 **$0.4304881**、剩余 **$0.5695119**，无在途请求、未越 $1 上限。账本 known_billed=0 表示未取得可核验单次账单，不表示免费。两次账户观察间 DeepSeek 余额从 ¥63.15 到 ¥63.00，OpenRouter 可用 credits 为 $16.218016 且未变；账户差额不能冒充逐请求核费或据此把未知费用置零。凭据有效，本轮不需要充值。
+
+**最小机制修改：**`Route` 和 provider 薄层增加 DeepSeek 两种协议及完整 usage 证据；复用同一个 RunBudget，把价格估算、实际扣费和完整预留分开。未知/不完整响应继续阻塞，只有完整、模型匹配且有受约束 usage 的响应可保留全额预留后继续；不从估算释放额度。`live_function.py` 负责一次准备、官方 SDK 执行、宿主终止收尾、读取状态及既有受限核费；partial/failed 不返回成功退出码。原始响应、原生请求、失败、独立原件核验和旧恢复结果保留。
+
+**官方优先与版本升级：**先核对 [OpenRouter OpenAI SDK 接入](https://openrouter.ai/docs/guides/community/openai-sdk)、[工具调用](https://openrouter.ai/docs/guides/features/tool-calling)、[参数路由](https://openrouter.ai/docs/guides/routing/provider-selection) 和 [推理信息保留](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens#preserving-reasoning)。端点 supported_parameters 列表缺项不单独证明 API 不支持；撤回了据此省略 parallel_tool_calls 的临时判断，原捕获仍保留。
+
+用户进一步要求版本问题升级、保持最新稳定。于本轮核对官方发布后，主环境升级为 **openai-agents 0.24.0、openai 3.31.0、claude-agent-sdk 0.2.167（随包 CLI 2.1.300）**；主锁另外仅升级新版 Agents 必需的 pyjwt 2.15.1、urllib3 2.8.0。当前 profile 和未启用的合成网关草案更新绑定；旧实跑 batch.json、账本、prompt 和版本归属不改写。M0 的独立原版本与锁保留用于复现，不冒充已用新版本验收，也不在恢复旧原生状态时偷偷换 SDK。以后相关 SDK 故障先查官方变更并验证最新稳定，锁定经过核验的版本；不使用无上限浮动依赖。
+
+升级后，实际官方 Runner 的两轮本地响应探针仍丢失 OpenRouter 的 signed/encrypted `reasoning_details`，只有普通 reasoning 字符串被带回。**兼容检查失败，升级未解决；不以改写、伪造签名或静默关闭推理通过验收。** 探针仅表明这条 Chat 适配路径有缺口，不证明所有 OpenAI SDK 接口或 Sonnet 模型不可用。后续应优先评估官方受支持的原样回传入口，再决定必要薄适配，保留同一原例验证。
+
+**验证与局限：**升级前本轮 65 项不同的预算、HTTP、接入及捕获检查通过；升级后 32 项本地行为检查通过（25 项 runtime、3 项四 profile 请求装配/本地错误分类、OpenAI 与 Claude 各正常链和恢复两项）。这些使用合成模型响应，不是 32 次业务实跑通过。主环境复用并普通重装源码，依赖/锁与安装文件 hash 核对；M0 只复核声明解析与原锁相同，未重新安装运行。完整历史回归、其他平台、真实模型在新 SDK 上的效果、原生 Skills/记忆/结构化输出及端到端自主来源发现未验收。
+
+**能力分层：**DeepSeek 双侧 function calls / tool results 已验证；Claude 本地 MCP 已验证；两侧可观察到推理响应，但完整推理连续性与业务效果分别核验。服务端 MCP、托管工具、原生强制结构化输出、Skills/Memory 本批未验证，不能把未用记为“不支持”。C 未进入模型、D 未执行。代码计算和有效来源交付四路均未取得通过证据，不能跳过这两项后判完整功能通过。
+
+**交付与下一动作：**[汇总证据](../output/data-agent-live-20261015/verification-final.json)、[当前状态](../output/data-agent-live-20261015/inspection-final.json)、[独立原件核验](../output/data-agent-live-20261015/acceptance/original_case_A24_K.json)、[升级后推理兼容反例](../output/data-agent-live-20261015/openrouter-reasoning-compatibility-latest.json)。可复制命令见 [本地开发说明](LOCAL_DEVELOPMENT.md#四路径真实接入的运行与复核2026-10-15)。按任务约定暂停供 review，目标仍未完成；下一小批先评审工具输出大小/参数契约和 OpenRouter 兼容修复，沿用原费用与失败证据，不自动进入来源/PDF 开发或追加实跑。
+
+
+**同日追加：用户授权一次 Luna 最小请求，先区分网络与参数路由。**复用官方 OpenAI 3.31.0 客户端及标准 HTTP transport，直连 `https://openrouter.ai/api/v1`；仅传 `model=openai/gpt-5.6-luna`、消息 `Reply with OK.`、`max_tokens=64`，关闭 SDK 重试，30 秒超时，不带工具、reasoning、store、parallel_tool_calls 或 provider 筛选。唯一一次请求 2.793 秒返回 HTTP 200、文本 `OK`，响应模型相同、实际上游 OpenAI；usage 为输入 10 / 输出 5 tokens，供应商响应 cost 为 **$0.000008**，已按原账本登记。这证明当前网络/凭据/基础模型接入可用，不证明原完整参数请求或 Agent 业务链已修复；只改变整组额外参数不能定位具体字段。
+
+原 404 已用原机制完成第二次、也是最后一次 generation 核费查询，仍 404；未将其费用改成 0。为执行用户这次明确授权的单次排查，RunBudget 增加**主机显式传入、绑定请求 hash / 原未知响应 hash / 原根与 scope、最多一次的诊断授权**。原未知费用保持未知及全额预留，普通调用仍阻塞，未扩大原金额/请求/并发上限；未知派发或不完整响应不能用此授权绕过。诊断计入原 Luna scope，累计整批 16 次、Luna 2 次 POST（其中 1 次业务失败、1 次基础诊断成功），不是另开额度或自动恢复整批。
+
+诊断首版捕获遇到官方 HTTP 客户端已解压 `response.content`、同时保留 gzip header 的表示差异，导致本地观察器暂记未知；对照实际客户端源码后给 SDK 捕获增加显式 decoded 标记，保留原 header、正文及首次失败观察，用相同已保存响应离线恢复核费，**没有第二次模型请求或新增核费 GET**。5 项诊断边界、27 项原预算回归和原网关响应证据回归结果见该目录检查日志；第一次回归的测试注入签名不兼容也保留，修正后重放。累计已核实响应费用 $0.000008，未知 $0.0171616 与完整 usage 保留 $0.4133265 不变，原 $1 预算剩余 $0.5695039。结果：[result-reconciled.json](../output/data-agent-live-20261015/C-luna-openai/minimal-probe/result-reconciled.json)，入口：[probe_openrouter_minimal.py](../scripts/data_agent/probe_openrouter_minimal.py)。旧汇总继续代表诊断前状态；其余工作保持暂停，下一步仅需隔离原请求额外参数。
+
+**同日追加：Luna Agent 原请求的参数兼容修复。**用户要求继续 fix Agent 请求，并结合两方官方文档。OpenAI [Chat Completions](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create) 声明 `store` 和 `parallel_tool_calls`；OpenRouter [Chat API](https://openrouter.ai/docs/api/api-reference/chat/create-a-chat-completion) 声明后者而未声明前者，[严格参数路由](https://openrouter.ai/docs/guides/routing/provider-selection) 会排除不支持所有请求参数的端点。文档支持不等于特定端点严格路由一定接受。沿用原业务输入、独立 prompt、8 个工具、max_tokens=4096、reasoning.effort=low、OpenAI 上游及 require_parameters=true，由实际 Agents SDK Runner 发送两个单变量对照：
+
+| 请求 | 实际结果 |
+|---|---|
+| 原请求仅省略 store | HTTP 404，仍失败于 Filter by Parameters |
+| 在上一请求基础上仅再省略 parallel_tool_calls=false | HTTP 200，5.895 秒，模型 openai/gpt-5.6-luna、上游 OpenAI；find_assets 工具调用被原生 SDK 解析，停在审批点 |
+
+这将当前复现的触发项定位到 **parallel_tool_calls 与该模型/上游的严格参数路由组合**。未查到 OpenRouter 内部实现，不能进一步断言是上游能力缺失还是路由能力登记问题，也不推广成该 API 全面不支持此参数。store 是否还有独立影响未单独证实；省略它沿用此前兼容配置，不能再将“只去掉 store”称为修复。
+
+实现采用显式 profile 能力差异：`Profile.parallel_tool_calls` 默认 False；仅具备显式 request_controls 的 OpenAI/OpenRouter Chat profile 可填 null，表示 SDK 不发送该字段。当前只给 Luna 配置 null，其余 profile 保持原请求。默认值不进入旧 profile metadata，保留既有身份；新的 null 会进入冻结 metadata，网关在发送前拒绝重新注入字段（包括 null）。模型可以一次提出多个工具，**不再声称上游保证每轮最多一个**；本地统一使用 OpenAI SDK 原生 `ToolExecutionConfig(max_function_tool_concurrency=1)` 顺序执行，见 [官方 SDK 示例](https://developers.openai.com/cookbook/examples/agents_sdk/security_scanners_with_agents_sdk)。保留审批、业务状态验证和严格 provider 路由，不手写替代工具调度器、不修改各模型 prompt。
+
+普通重装当前源码后，实际 Runner 序列化与成功请求逐字段一致；已保存真实响应离线回放后仍解析出同一 find_assets，真实业务工具执行数为 0。29 项不同检查最终通过：22 项 runtime、5 项请求/配置/串行工具检查、2 项原网关正常/恢复链。首轮一项反例因测试对 JSON metadata 使用了 Python 严格 tuple 入口而未到达目标校验，改为与实际配置一致的 model_validate_json 后单独复跑通过；未改生产校验或降低标准。诊断脚本最初写补充 native-result 时调用了不存在的 ToolApprovalItem.to_dict，发生在 HTTP 响应、核费和结果落盘之后；保留原响应，用当前源码离线恢复原生解析证据，没有重发付费请求。证据：[verification.json](../output/data-agent-live-20261015/C-luna-openai/agent-request-fix/verification.json)、[installed-replay.json](../output/data-agent-live-20261015/C-luna-openai/agent-request-fix/installed-replay.json)。
+
+本轮只新增 2 个 POST，无重试；成功请求 usage 为 8218 输入 / 368 输出 tokens（其中 16 reasoning），供应商报告 $0.00249595。新增 404 费用未知，保留 $0.075 保守预留；原 404 的 $0.0171616 未改写。整批累计 18 POST，known_billed=$0.00250395、unknown_reserved=$0.0921616、DeepSeek 完整 usage 未核费预留 $0.4133265，余额 $0.49200795、在途为 0。该结论仅完成请求兼容验收；真实工具执行、结果回传、计算与最终交付仍待完整业务链验证。旧冻结 SDK/profile/批次不改写，其余路径、Sonnet reasoning_details、来源/PDF 保持暂停。
+
+**同日追加：其他模型的首轮请求测试。**用户要求“测试一下其它的模型”，本轮限定已有 A/D 两路，每路一次官方 Agents SDK 0.24.0 首轮请求，使用各自独立 prompt、原业务 context 和 8 个工具，保留原 max_tokens=4096/low 配置，不执行工具或进入后续轮次。A 使用其原首轮输入；D 从自身冻结 context 按生产 ToolBinding 构造输入，不传验收答案。仍计入原 scope 和唯一账本，未知费用及原上限不重置。
+
+| 路径 | 首轮实测 | 验证边界 |
+|---|---|---|
+| OpenAI Agents → OpenRouter → Sonnet 5.5 / Anthropic | HTTP 200，4.934 秒；find_assets；参数 schema 校验通过；报告 cost=$0.047068 | 使用 parallel_tool_calls=null 候选配置并已同步当前 D profile；没有测试旧 false 请求，不据此声称 Sonnet 也复现了 Luna 的 404。响应 reasoning_tokens=0、无 reasoning_details，未覆盖旧推理字段回传反例 |
+| OpenAI Agents → DeepSeek 官网 deepseek-flash | HTTP 200，2.233 秒；find_assets；参数 schema 校验通过；输入 15195 / 输出 355（reasoning 45）tokens | 保留原 parallel_tool_calls=false/thinking/effort。按官方峰值非缓存价估算 $0.0049845，非实际账单，完整保留 $0.0243918 预留 |
+
+只变更 Sonnet 当前 profile 和对应装配检查，不改业务实现或独立 prompt。一个本地测试覆盖 A/C/D 三份 profile 装配；当前安装包的实际导入路径/源码 hash 核对，两个已保存真实响应通过当前 profile 离线重放，序列化与真实请求逐字段相同，未新增推理调用。两路真实工具执行数均为 0；HTTP、原生函数解析、参数 schema 与实际业务行为分开，不记多轮链或业务验收完成。Claude SDK + DeepSeek scope 原上限 10 已耗尽且已停止，本轮不追加；Terra/Sol 未纳入测试范围。
+
+实跑前读取 [Sonnet 官方端点价格](https://openrouter.ai/api/v1/models/anthropic/claude-sonnet-5.5/endpoints)，保守预留覆盖最高输入缓存写入价 $4/M 和输出 $10/M；发送 Sonnet 时总占用暂达 $0.80915205，已提示触及 $0.80 预警，未越 $1 硬限，取得报告费用后释放差额。[DeepSeek 官方价格](https://api-docs.deepseek.com/quick_start/pricing/) 峰值非缓存 $0.3/M 输入、$1.2/M 输出。结束时累计 20 POST，已核实 $0.04957195、未知预留 $0.0921616、完整 usage 未核费预留 $0.4377183，剩余 $0.42054815，无在途。证据：[verification.json](../output/data-agent-live-20261015/other-model-probes/verification.json)。其余工作保持暂停；后续仍需工具执行、结果回传、计算及有效交付，Sonnet reasoning_details 连续性单独补证。
+
+**同日追加：原 goal 恢复后的非付费修正。**对照官方 SDK 源码与 [OpenRouter 的推理块回传要求](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens#preserving-reasoning)，确认 openai 3.31.0 的额外字段机制保留原始数组，但 Agents 0.24.0 的 Chat 转换仅消费 reasoning_content/reasoning/thinking_blocks，忽略 reasoning_details；文本 replay hook 不能承载签名和密文数组。现有公开 `Model` / HTTP transport 可用于薄适配，不必覆盖私有 `_fetch_response` 或替换 Runner。
+
+实现位于 `agent/providers/openrouter_reasoning.py`，由既有 `gateway_openai.py` transport 调用。仅 OpenRouter Chat 路径从当前 SDK 已消费请求前缀读取持久 HTTP 回执，校验原会话/context/profile/模型、完整响应及费用状态，再以完整工具调用身份（ID、类型、名称、原参数）、原 assistant 内容及顺序匹配，原样回填 reasoning_details。没有进程内“最近一次签名”缓存，不跨会话找裸 tool_call_id。缺失、歧义、顺序/签名冲突、损坏或不完整记录明确 RECOVERY_REQUIRED。回填发生在网关准入、费用预留、最终请求 hash 之前；当前冻结范围仍为非流式 Chat 工具循环，未承诺非工具推理消息的跨轮会话支持。
+
+重新普通安装当前源码并核对两份变更模块的实际导入路径/hash 后，7 项相关检查通过：4 项字段/绑定/损坏反例，1 项官方网关恢复测试（分别在请求预留后、响应落盘后、业务工具落盘后退出进程，3 个位置均恢复到完整 8 请求合成工具链，签名和密文数组完整，未重复 HTTP 或旧工具），1 项无 reasoning_details 的原正常链，1 项本地准入错误分类。保留原 signed/encrypted 反例内容，覆盖真实 SDK 的输入转换与持久恢复；这是本地合成协议验证，**未新增真实模型调用，也不等于 Sonnet 真实多轮业务验收**。证据：[continuation-fix/verification.json](../output/data-agent-live-20261015/continuation-fix/verification.json)。汇总脚本首次未区分缺失键与显式 null，已修正差异列举并保留初版记录；不涉及生产代码或重跑模型。
+
+**最小续跑扩展（第 2 项新会话接线已实现，未知费用准入未改变）：**用户随后确认使用当前新版 SDK，以新会话执行；不做旧 SDK 会话恢复或通用版本管理。主环境、主锁与四份当前 profile 已核对一致。版本不一致由项目冻结绑定拒绝，不能据此认定官方 SDK 必然不兼容旧会话。第 1 项共享搜索分页仍待范围确认；未知费用准入规则及原额度保持。以下保留原提案证据，最新实现见段末。
+
+1. **搜索结果预算。**原 A 的 search_asset 返回 167,177 字节，主要来自每个命中附带的全表候选表头、单位邻接块及重复证据依赖；下一完整请求 231,228 字节超过原 200,000 上限。当前搜索只有条数上限，内部页预算 180,000 字节；read_evidence 已有 max_bytes，但 SearchAsset 没有对应调用参数。建议在共享搜索契约/实现中增加显式返回字节预算，使用现有分页机制保留依赖完整性，单项放不下则明确 ITEM_TOO_LARGE 与继续位置。保留旧返回与引用，不事后裁剪已登记证据、不按样本预选块、不提高模型请求上限。涉及 `contracts/query.py`、`application/tools.py`、对应工具说明/独立 prompt 和必要行为测试，超出本批原定 provider/SDK 接线范围。
+2. **同账本的新执行版本。**当前四路冻结 profile 的 SDK 分别为 0.22.2/0.2.166，当前安装为 0.24.0/0.2.167；C/D 另显式省略 parallel_tool_calls。`load_gateway_binding` 精确绑定旧 context/profile/limits，四份当前 profile 的只读准入检查均正确返回 RECOVERY_REQUIRED；旧 RunState 也不能冒充当前版本。建议追加明确的新执行版本与原 lane 关联，使用相同业务输入/材料和当前独立 profile，保留旧会话/批次/原始失败；共用原账本、原 lane 次数和停止状态，不创建新额度。对两笔已完整收到 404 但账单未知的请求，仅在显式续跑授权下保留原预留后允许新请求，不能重发它们或绕过未知派发/部分响应。此项扩展现有不可变批次的续跑契约，不能通过直接改旧 manifest 或借用单次诊断接口循环调用实现。
+
+两项若采纳，验收只补“原失败输出分页/依赖可读、旧引用兼容、升级新执行沿用原费用与次数、损坏/未知派发拒绝”等必要行为，再从 A/C/D 的剩余额度内尝试完整链。B 仍受原 10 次上限停止，不由新版本解锁。当前仍为 A=5、B=10、C=4、D=1，共 20 POST；已核实 $0.04957195、未知预留 $0.0921616、usage 未核费预留 $0.4377183、可用 $0.42054815。四路均未通过完整原业务验收；本次未实现以上扩展，也未开启后续来源/PDF 工作。
+
+**随后实现：当前 SDK 新会话接原账本。**`gateway_batch.prepare_gateway_attempt` 复用现有 Session、ContentStore 和登记键，为同一 lane 保存新的 context/profile 绑定；不新建预算、不改原 scope/contract，不复制或迁移原 SDK 状态。新 context 保留原业务问题、解释时钟、主体和读取策略；只更换运行身份与创建时间。新增 binding 的 attempt_ref 必须有原 Catalog 登记，回读时校验原批次、业务输入及 hash，丢失/伪造或变更模型、路由、prompt、限额均拒绝。允许变化仅限已经确认的 sdk_version、parallel_tool_calls、mcp_max_result_chars。HTTP 接线使用新会话的有效配置，但预算、费用价格、停止和次数继续由原 scope 控制；同一会话重放仍严格绑定当前配置。旧结果保持原语义，新会话结果单独统计自身请求，原 scope/root 仍提供累计数。
+
+CLI 新增 `prepare-attempt`，不读取凭据或发请求；`run` 先核对当前安装/profile 和账本状态，再创建 worker/工作目录。当前 Luna 新 manifest 已准备并通过实际批次的 profile/官方入口准入；旧 manifest、旧会话 head 及原 ledger 字节未变。两笔完整 404 的未知费用仍让发送前校验拒绝，因此没有创建真实 worker 或追加模型调用。已用 20 次、剩余 $0.42054815 及 B 停止状态不变。
+
+5 项新增行为检查与 14 项既有批次检查通过。两套当前 SDK 分别从冻结旧版本元数据的新会话启动，实际 SDK/CLI 各完成 8 请求合成工具链、证据及计算交付；原请求费用使各自 lane 累计为 9 次/$0.09 合成收费，始终只有一个账本，旧结果可原样读回。覆盖剩余次数耗尽、原停止、未知费用/派发、跨 lane、错误限额及未登记绑定拒绝；不宣称真实模型或新版业务效果通过。初版历史响应 fixture 缺 object/Content-Type，协议检查正确判为不完整，修正后仅重放受影响 4 项；旧失败保留。普通安装后 6 份变更模块 hash 与源码一致。证据：[new-session-verification.json](../output/data-agent-live-20261015/continuation-fix/new-session-verification.json)；新配置：[current-sdk-manifest.json](../output/data-agent-live-20261015/C-luna-openai/current-sdk-manifest.json)；命令见 [本地开发说明](LOCAL_DEVELOPMENT.md#四路径真实接入的运行与复核2026-10-15)。共享搜索分页、允许带未知费用预留继续发送及 B 新次数均未由本次实现放开。
+
+**同日追加：已有真实回执的能力复核。**只读原 HTTP 请求/回执与当前运行状态，核对原证据中的请求/响应 hash 与同一账本一致；未新增模型请求。证据：[capability-audit.json](../output/data-agent-live-20261015/continuation-fix/capability-audit.json)。以下“已观察”只覆盖相应原子行为，不代表整条业务链通过。
+
+| 原子能力 | A：OpenAI + DeepSeek | B：Claude + DeepSeek | C：OpenAI + Luna | D：OpenAI + Sonnet |
+|---|---|---|---|---|
+| 指定入口/模型响应及自主业务函数调用 | 已观察 | 已观察 | 修复请求后已观察 | 已观察 |
+| 共享工具执行、结果回到模型输入 | find_assets 完整回传；search_asset 结果过大，尚未送入下一请求 | 本地 MCP 的 find_assets/get_asset_schema/一页 query_records 完整回传；search_asset 只有 CLI 预览 | 首轮停在审批，未执行工具 | 首轮停在审批，未执行工具 |
+| 后续模型响应 | 有；完整链失败 | 有；完整链 partial | 未验证 | 未验证 |
+| 代码计算与有效交付 | 未完成 | 未完成，收尾包 evidence/records/calculations 均为 0，6 项需求 unresolved | 未完成 | 未完成 |
+| 费用与 usage | 5 次；usage 峰值非缓存价估算 $0.0276633，非账单 | 10 次；同口径估算 $0.0806874，非账单 | 4 次，2 次 404 费用仍未知；成功响应费用 $0.00250395 | 1 次，响应报告费用 $0.047068 |
+
+| 可选能力 | 核对结论 |
+|---|---|
+| DeepSeek 思考与回传 | A 原真实响应到下一请求的 3 个相邻轮次 reasoning_content 文本逐值一致；B 的 9 个相邻轮次 thinking 文本及 signature 组装后完整一致。证明这些已执行轮次的传输，不证明模型推理正确 |
+| Luna / Sonnet 推理连续性 | Luna 已报告 reasoning usage，但没有真实第二轮；Sonnet 首轮没有 reasoning_details。项目适配已通过合成检查，真实多轮仍未验证 |
+| 服务端强制结构化输出 | 四路均未启用/未验证，不记为已确认不支持。业务仍使用工具参数及应用侧交付校验 |
+| SDK 本地 MCP | B 已验证原生 CLI 调用和结果回传；OpenAI 三路使用 FunctionTool，本批未验证它们的本地 MCP，不因此判定 SDK 不支持 |
+
+**新定位的 B 大结果边界：**search_asset 的完整 canonical JSON 为 69,036 字节，CLI 将较大的序列化输出保存为文件，后续 5 个真实请求只携带 2,407 字节的 `<persisted-output>` 预览。该结果 20 个 ResultRef 的 observed 数为 0，现有可见性校验没有把预览误记为完整证据；最后一次 query_records 的结果也没有后续模型请求消费。不能将“工具处理成功”或“落盘文件存在”称为模型已读到结果。[Claude Code 官方文档](https://code.claude.com/docs/en/mcp#mcp-output-limits-and-warnings)说明：默认成功纯文本结果超过 50,000 字符会落盘，MAX_MCP_OUTPUT_TOKENS 不能调整这个字符阈值；可用每工具的 `_meta["anthropic/maxResultSizeChars"]` 提高阈值，最高 500,000 字符。当前 Claude SDK 0.2.167 的公开 `ToolAnnotations(maxResultSizeChars=...)` 已提供该入口，不需要自建文件读取工具或改 SDK 私有实现。用户随后明确选择调整这一阈值；未授权增加真实调用次数/费用，也未据此解锁旧批次的新执行版本。
+
+**该阈值的实现与限定验收：**当前 B profile 设置 `mcp_max_result_chars=200000`，共享 Profile 校验仅允许 Claude 使用且范围为 1–500,000；缺省字段不进入历史 profile metadata，旧绑定身份保持。`claude_runtime.make_options` 使用公开 ToolAnnotations 为既有 MCP 工具声明阈值，不改提示词、数据结果或提供额外文件读取权限。200,000 字符覆盖已观察的约 69 KB 成功结果，同时保留转存边界；它不是整请求可发送大小承诺，原网关仍按整个序列化请求的 200,000 字节限制准入。
+
+普通重装后两份变更模块的安装路径/hash 与源码一致。4 项本轮检查及 1 项原生 Claude 正常链回归通过：真实 SDK/CLI 对接本机合成响应，69,085 字符默认仅回传预览，配置 200,000 后完整回传相同 JSON；210,085 字符仍转文件。每例只有 2 次合成生成请求及 1 次工具调用。初版测试把 CLI 的 `/v1/messages/count_tokens` 辅助请求误当第二次生成，导致后续返回 500 并触发原生重试直至超时；按官方 [计数接口](https://platform.claude.com/docs/en/api/http/beta/messages/count_tokens) 单独处理并将未知端点明确返回 400 后，原对照通过，不增加超时或重试来掩盖失败。一次沙盒禁止本地监听的检查未通过，随后获准本地监听完成验证；失败日志保留。证据：[claude-inline-verification.json](../output/data-agent-live-20261015/continuation-fix/claude-inline-verification.json)。本轮新增真实模型调用 0；未验证新配置下的真实 DeepSeek/B 业务链，原 B 次数上限、费用和旧会话不变。前述搜索分页及同账本新执行版本仍为待确认提案。
+
+
+**最新追加：保留预留放行与 Luna 新会话实跑（2026-10-15）。**用户明确要求预算处理从简并直接通过。根因是本项目将“完整失败响应但未核费”和“派发/响应不明”一并阻止后续请求，并非供应商或 SDK 要求再次审批。本次仅复用既有 bounded 状态：`RunBudget.retain_response_reservation` 为指定完整响应追加用户决定，原 HTTP、请求、预留金额及实际费用未知状态保留；全额预留继续计入 $1 上限，旧请求不能重发。没有新表、通用绕过开关或新预算，不改变模型、prompt、工具及次数。新缺失账单或不完整响应仍未被该记录授权。CLI 的 `retain-reservation` 不读取凭据或联网；两笔完整 404 合计 $0.0921616 已登记，放行前后剩余额度均为 $0.42054815。
+
+9 项必要检查通过（3 项新增保留预留边界、5 项既有诊断检查、1 项实际 OpenAI SDK 本机合成工具链）；覆盖重开后继续、原金额/次数限制、停止、旧请求不重发、新未知账单/部分响应拒绝和后续真实账单可核销。复用环境普通重装，安装模块与源码 hash 一致。真实运行前只读核对 OpenRouter 所选端点价格，未改冻结价格。上述检查不冒充真实业务通过。
+
+随后 Luna 新会话发送 6 次真实 POST，均返回 HTTP 200 / OpenAI / openai/gpt-5.6-luna，响应报告费用合计 $0.00783161。前 4 次工具调用依次返回 next_action 不等于工具名、需求覆盖不全、筛选名称未知、首调用缺少计划；第 5 次 find_assets 返回 partial（SCOPE_TIME_UNKNOWN），第 6 次 get_asset_schema 返回 ok。下一请求在发送前被原 lane 10 次上限拒绝；未取得记录、代码计算或有效交付，不记业务成功。
+
+首个偏差已与源码对照：`TaskState.next_action` 的 schema 只声明 Text，缺少“当前工具名”的语义说明；`Session.proposed_plan` 实际要求该值严格匹配，并要求 satisfied/gaps 恰好覆盖全部 needs。工具说明和独立 prompt 尚未完整表达这些约束；失败调用不提交计划，随后省略 plan_update 又触发首调用校验。此为项目接口说明缺口的证据，不是 SDK 不支持工具；筛选名称/时效元数据还需分别核查。下一小任务优先补齐模型可见契约及有用错误反馈，用捕获输入做离线复现，不能自动填值或放宽校验。该业务修正、共享搜索分页及新增次数本轮均未实施。
+
+当前累计 A/B/C/D=5/10/10/1，共 26 次；已核费 $0.05740356，未核费全额保留 $0.5298799（含两笔 404），剩余 $0.41271654，无在途，未超原额度。B/C 原次数已用尽；未自动展开 A/D 或后续来源/PDF。证据：[放行记录及检查](../output/data-agent-live-20261015/continuation-fix/reservation-retention.json)、[Luna 新结果](../output/data-agent-live-20261015/C-luna-openai/current-sdk-run/result.json)、[原始请求及工具记录](../output/data-agent-live-20261015/C-luna-openai/current-sdk-run/evidence.json)。四路完整功能验收仍未完成，前文旧状态保留历史含义。
+
+**本轮已实现：工具契约反馈与搜索预算（2026-10-15，用户要求优先 fix）。**修复范围扩至已经指出的共享工具接口，不扩展业务来源或模型调用。`TaskState/PlanUpdate` 字段及共用工具说明明确：next_action 是本次工具名、所有 need 恰好进入 satisfied/gaps、失败前检不提交计划；SDK 错误附真实 current_task_state.plan 和 operation_accepted，已有校验不放宽、不会代模型补参数。两套官方 SDK 的真实本机请求均含这些说明，各自 system prompt/profile 仍独立且未改。原 Luna 6 次工具参数在临时数据副本原样重放，前 4 次仍拒绝，但字段错误、缺失需求和已提交版本可以定位；最后发现 partial、schema ok 与原案一致，不能据此宣称模型已学会正确调用。
+
+筛选错误的根因已确认：原参数 material_types=[10-K]，当前登记分类为 official-annual-html。现在在分类校验层报 INVALID_REQUEST，指出字段/输入及最多 25 个实际注册名，不硬编码分类别名或静默移除过滤。时效问题来自原任务 as_of=null，而模型在 find_assets 中把 context.clock 作为额外截止日；缺少 available_at 证明时拒绝是正确行为。字段说明明确省略继承上下文、解释时钟不自动成为 cutoff。显式上下文历史截止、直接读与越界行为经合成检查仍拒绝，没有补造来源可用时间。
+
+search_asset 增加 2,000–200,000 字节的 max_bytes，默认完整响应预算 24,000，包含命中、依赖和必要元数据。每个命中和所请求依赖作为整体分页；未返回内容不登记。单条无法容纳则返回 ITEM_TOO_LARGE、target、保守 required_bytes 和停留原 offset 的 cursor，不伪装成功证据、不自动省略上下文。max_bytes 不改变搜索结果身份/排序，故允许同 cursor 调整预算；查询/include/limit 等变化仍拒绝，索引/材料变更仍过期。新预算未显式传入时保留旧请求序列化身份，旧响应与 ResultRef 按原样重放；新执行才采用新默认分页。
+
+原 A 搜索的保存响应按 canonical UTF-8 度量为 158,338 字节（历史其他序列化边界的约 167 KB 记录保留）。原请求带全表候选表头/单位，首条完整依赖约需 66 KB，默认页明确给出 ITEM_TOO_LARGE，不声称已读到证据；离线按所需预算逐页取得全部 10 个命中，无重复，所返回依赖闭合，88 个旧引用仍可读。相同搜索词采用摘要发现时，13,902 字节取得首批 8 个命中；这是接口功能对照，不是模型自主业务成绩。说明建议先摘要定位、再按表格行列精读。单页预算不保证整个累计模型历史低于原 200,000 字节限制；新的真实链仍须核验。
+
+30 项不同检查通过：24 项受影响查询回归、4 项本轮行为检查、OpenAI/Claude 各一条实际 SDK 对本机合成服务的 8 请求工具/计算/交付链。初次单测入口意外也收集了导入的 24 项既有测试，已改为字典持有 fixture，后续默认只跑 4 项；不把重复复验算新增通过。普通重装，7 个变更生产模块与安装包 hash 一致；限定 diff 检查通过。真实请求/新增费用均为 0，原账本 hash 不变，不扩大额度或次数，不进入来源/PDF。证据：[验证汇总](../output/data-agent-live-20261015/continuation-fix/tool-contract-verification.json)、[原例重放](../output/data-agent-live-20261015/continuation-fix/tool-contract-replay-final.json)；可复制合成验证命令见 LOCAL_DEVELOPMENT.md。下一步是一条真实功能回归；当前修复不代表四路完整验收完成。
+
+#### 14.17.12 财务交付要求与业务 Skill（2026-10-16，限定路径 1＋2）
+
+**范围与现状。**用户要求先完成交付契约和业务 Skill，测试加载与执行后停止。本批不修改 `DeliveryRequest`、`TaskState` 或两套生产 runtime，不实施重复状态简化；原四路 prompt/profile、原交付及费用记录保持。下面补清的是财务取数/比较的业务要求与可执行辅助检查，不把尚未接入生产的要求冒充已生效的硬拦截。原 Sonnet 结果应描述为“合法 partial，但未完成指定计算和期间要求”，不能泛化为模型/SDK 不支持。
+
+**当前机制。**模型通过 `deliver(request,state)` 提交需求状态和已观察引用，Python 校验并组装 `uteki-delivery-v1`。OpenAI 工具参数设置 `strict_json_schema=False`，未设置 `Agent.output_type`；应用仍严格校验 JSON/字段/引用。Claude 生产配置 `skills=[]`、`setting_sources=[]`，没有本任务业务 Skill。四份 live prompt 只有首段不同，共同正文没有完成独立业务调优。新增 Skill 是方法组件，不是另一套 Agent 循环。
+
+**业务契约：financial-data-query v1.0.0。**适用于显式范围内的财务取数、跨期比较与代码计算；不把每个任务都强制转为同比任务。JSON 为本批交付接口，Markdown/CSV 是后续可选呈现，本批不实现导出，也不以未生成这些文件判失败。
+
+| 需求类别 | 应交付的信息与现有字段 | 完成标准 |
+|---|---|---|
+| 来源事实 | `records` 的 value/raw_value、unit、period、entity、concept、dimensions、asset_ref、locator、source_object；通过 `needs[].result_refs` 关联 | 使用可取得的来源记录，保留原单位/期间。展示换算写明依据，不覆盖原数值；`note` 不能作为唯一数值载体来冒充结构化取数完成 |
+| 计算 | `calculations` 的 value、unit、formula、operand_refs、comparison_basis、period_policy、limitations | 请求确实需要计算时必须有代码结果；操作数能读回、可比性有证据，未解决限制或空值不能支撑 supported |
+| 期间和口径 | `records` 的期间/主体/维度，加上 `evidence` 的表头、单位、脚注或口径原文；需求明确关联引用 | 不把财年当自然年，不把无维度推定为合并，不以 ID 存在代替语义正确 |
+| 缺口与停止 | `needs[].gaps`、`status` 及 `state.reason`；现有 package 的 stop_reason 仍为 delivered | 区分 not_attempted、unavailable、conflict、permission_blocked、resource_limited；说明已检查的范围和停止依据。当前没有新增枚举字段，类别以明确文字表达 |
+| 覆盖和来源 | 需求计划、全部 needs、证据/操作数依赖、冻结资产版本 | 对照原问题覆盖必需需求；部分交付不能自称完整，缺失/伪造引用不能以缺口标签绕过校验 |
+
+**继续/结束规则。**尚未尝试且存在获准、可用、与缺口相关的工具动作时继续。已证实来源/能力不足、权限或资源阻止继续时允许真实 partial；重大输入歧义用 clarify。不为了凑齐要求猜测事实；不能仅因不想再调用工具就将 not_attempted 改称 unavailable。计划和停止理由由同一 Agent 判断，仍按第 9 节由工程检查形状与来源依赖，不引入审核模型或公司特例。
+
+**实现与检查边界。**[Skill 正文](../config/data_platform/skills/financial-data-query/SKILL.md)包含上述方法的运行说明；[工具参考](../config/data_platform/skills/financial-data-query/references/tool-use.md)解释实际参数语义、增长率操作数顺序、现有重复 state 约束及虚构示例。[检查脚本](../config/data_platform/skills/financial-data-query/scripts/validate_delivery.py)读取现有交付 JSON 与显式需求类别文件，检查需求覆盖、引用依赖、所需结果类别和 partial 状态；默认允许合法 partial，`--require-complete` 对它返回 2，不合法返回 1。脚本不读取 gold，不验证业务语义，不改写交付，也没有自动接入生产 `deliver`。需求类别文件只有 need_id 和 required_result_kinds，不含答案、正确记录或固定工具序列。
+
+**原生接入测试。**复用已安装 OpenAI Agents 0.24.0 / Claude Agent SDK 0.2.167。OpenAI 使用官方 `SandboxAgent`、`Skills(LocalDirLazySkillSource)`、`Shell` 及本机 Unix sandbox，在临时目录检查发现、load_skill、正文进入模型输入和辅助脚本执行。Claude 使用官方 CLI 的项目 Skill 发现、明确 skills 白名单和 Skill/Bash 工具；只连接本机合成 Messages 服务，检查调用 Skill 后正文进入下一请求、随后脚本执行结果进入下一请求。Unix 本机后端仅用于可信合成测试，不作为生产隔离承诺。官方依据：[OpenAI Sandbox Skills](https://developers.openai.com/api/docs/guides/agents/sandboxes)、[Claude SDK Skills](https://code.claude.com/docs/en/agent-sdk/skills)。
+
+**本批验收层次。**前置 DataService 使用已有合成 HTML fixture 实际执行查找、schema、索引、搜索、读取、取数、代码计算和交付；SDK 加载测试的模型决策由脚本提供，不能称为真实模型根据 Skill 自主完成业务。真实模型效果、生产 Skill 装配、两套模型独立 prompt 调优、接口简化及原四路续跑均未完成，不在本次停止点之后自动启动。
+
+复跑入口（不调用付费模型，临时数据自动清理）：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I tests/integration/data_platform_agent/test_financial_skill.py -v
+```
+
+**验证结果：**3 项限定测试通过，覆盖交付正常/合法 partial/文字冒充计算/缺失操作数依赖/partial CLI 非零，以及 OpenAI、Claude 原生 Skill 加载与脚本执行。两侧均验证正文在调用前不在模型输入、加载后出现在输入，脚本实际输出进入后续输入；不是只检查 Skill 名称。OpenAI 还逐字节核对 materialize 后的 Skill 文件。macOS 原生 sandbox 初次拒绝测试虚拟环境读取，按已安装 SDK 的 `Manifest.extra_path_grants` 为 `sys.prefix/sys.base_prefix` 配置只读路径后通过，未关闭 sandbox。skill-creator 格式校验通过；其 PyYAML 仅在临时 uv 环境安装，项目依赖未改。7 个相关生产模块与普通安装包逐字节一致，本批没有生产源码变更。真实模型调用 0，原四路结果不改变。证据：[verification.json](../output/data-agent-skill-20261016/verification.json)。本批完成后停止，生产装配及效果验证另行推进，当前状态见 TODO。
+
+#### 14.17.13 按运行配置获取完整 Skill（2026-10-16，加载器及原生加载限定验收）
+
+**当前决定。**按用户反馈，将上一版设计收敛为「default＋template＋映射＋参数＋get_skill」。default 是明确允许的指导内容兜底；未配置专属 Skill 的模型组合可以使用默认指导，不因缺少调优稿阻断。此决定替代上一版“Skill 必须精确匹配，否则未配置报错”的设计；它不替换实际模型、SDK、路由，也不改变 14.17.6 对独立 system prompt 的要求。用户随后同意实现：本批已完成获取方法、配置与两套 SDK 原生加载的限定离线验证；正式 profile/runtime 的自动装配及恢复接入仍在后续，不启动真实模型调用或恢复旧 goal。
+
+**1. 首期只维护四类内容。**
+
+| 内容 | 职责 |
+|---|---|
+| `SKILL.md` | 默认、完整的公共业务规则；现有财务取数/计算/出处/交付规则保持一处维护 |
+| `SKILL.template.md` | 固定组装格式，插入公共正文、所选指导和实际工具说明；不由模型生成或改写模板 |
+| `mapping.json` | 登记 default、SDK 默认及 model×SDK×version 对应的指导文件和默认参数 |
+| `guidance/*.md` | 默认或专属使用指导；references/scripts 继续共用，业务函数继续由 DataService 提供 |
+
+模板可仅含 `$base_skill`、`$model_guidance`、`$tool_guidance` 三个插槽：`base_skill` 读取现有 `SKILL.md` 的完整内容（含标准 frontmatter），其余插入选中的指导与工具说明。这样不复制财务业务规则，也不需要引入模板依赖。首期用标准库的简单字符串模板；参数不完整或出现未知插槽时报错，不做执行表达式、条件脚本或任意文件包含。
+
+**2. 一条固定的匹配顺序。**对已存在的 Skill，按下列顺序选择一份指导，首个匹配即停止，不叠加多套指导：
+
+1. **精确版本配置**：model＋SDK＋model_version＋sdk_version。
+2. **model＋SDK 默认**：相同 model/SDK，两个 version 均为 `*`。
+3. **SDK 默认**：当前 SDK 的通用使用指导。
+4. **全局 default**：该业务 Skill 的通用指导。
+
+首期不做复杂通配符或版本范围。精确版本条目写明两个实际版本；没有版本特例就只维护 model＋SDK 默认。版本未知（`None`）不猜测、不匹配具体版本，继续走默认项。同优先级重复映射作为配置错误报出。模型 ID 已包含版本时按原值精确使用，不拆字符串猜家族；供应商仅提供滚动别名时保留未知 revision。SDK 版本取实际安装值，运行参数可声明预期版本，但不能在加载 Skill 时安装/升级 SDK。
+
+例如 DeepSeek/OpenAI 新版本没有专属条目时使用 DeepSeek/OpenAI 默认；没有该组合时使用 OpenAI 默认；仍未配置时使用公共 default。结果记录所命中的层级。SDK 默认或全局默认不等于该模型已调优，精确匹配也不自动等于已验证。既有模型调用授权、权限与业务标准不因使用 default 改变，也不因 default 本身新增审批步骤。
+
+以下是映射结构简例；实际 [mapping.json](../config/data_platform/skills/financial-data-query/mapping.json) 另含 Luna/OpenAI 与 Sonnet/OpenAI 条目。未列举的组合按上述顺序取默认，不需要先填满所有组合：
+
+```json
+{
+  "version": "1",
+  "default": {
+    "guidance": "guidance/default.md",
+    "params": {"output_language": "zh-CN"}
+  },
+  "sdk_defaults": {
+    "openai": {"guidance": "guidance/openai.md"},
+    "claude": {"guidance": "guidance/claude.md"}
+  },
+  "bindings": [
+    {
+      "model": "deepseek-flash",
+      "sdk": "openai",
+      "model_version": "*",
+      "sdk_version": "*",
+      "guidance": "guidance/deepseek-openai.md"
+    },
+    {
+      "model": "deepseek-flash",
+      "sdk": "claude",
+      "model_version": "*",
+      "sdk_version": "*",
+      "guidance": "guidance/deepseek-claude.md"
+    }
+  ]
+}
+```
+
+**3. 一个获取方法，返回可交给 SDK 的完整内容。**[agent/skills.py](../src/uteki/data_platform/agent/skills.py) 已提供下面的接口；先普通安装当前项目，再传入明确的配置根目录即可调用：
+
+```python
+skill = get_skill(
+    "financial-data-query",
+    config_root=config_root,
+    model="deepseek-flash",
+    sdk="openai",
+    model_version=None,
+    sdk_version="0.24.0",
+    params={"output_language": "zh-CN"},
+)
+# skill.content: 已组装的完整 SKILL.md
+# skill.files: 所需 references/scripts 的相对路径与内容
+# skill.selection: 请求组合、命中规则、指导路径、版本和验证状态
+# skill.sha256: 本次正文与资源的确定性内容摘要
+```
+
+方法仅做「查映射 → 读模板/选中文件 → 合并参数 → 渲染 → 返回」。不选择业务模型、不调用模型、不安装组件、不运行脚本。默认参数按“全局 default → SDK 默认 → 命中条目 → 显式 params”覆盖；全局 default.params 的键即允许调整的参数，例如输出语言，不另建参数配置表。业务规则、身份、权限和工具能力不允许通过普通 params 覆盖。实际工具名称通过独立的 `available_tools` 参数由宿主注入，省略时不宣称任何新增能力；模型与 SDK 标识取函数的明确参数。`skill.write_to(绝对新目录)` 可输出本次包，拒绝覆盖已有目录；只包含最终 SKILL.md 和 references/scripts，不泄漏未选指导。
+
+映射没有命中才进入下一层；已命中的文件缺失、解析失败、路径越界或参数缺失必须报错，不能继续兜底掩盖配置故障。未知 Skill 名称或没有全局 default 也属于配置错误。加载器计算内容及来源摘要，返回不可变正文/资源快照；后续运行绑定负责与已冻结 hash 对照，不能将“计算出 hash”当作已经实现跨进程恢复校验。必需工具不支持仍由现有 runtime 报出，可选能力关闭并记录；default 不会补出缺失的 function，也不降低交付标准。
+
+**4. 先发现，再由 Agent 按需加载（2026-10-16 补充）。**用户指出 `get_skill` 前需要展示可用 Skill 的名称与描述。这层能力必须存在，但优先采用 SDK 原生目录与加载工具，不要求模型先调用一个自建的 `list_available_skills` FunctionTool。名称和描述统一来自所选包的 `SKILL.md` frontmatter，不另建一份描述映射；模型只选择业务 Skill，不选择 model×SDK×version 的指导稿。
+
+**接口澄清。**`get_skill(name, model, model_version, sdk, sdk_version, ...)` 获取一个适配后的完整包，不能替代 `list_skills`。逻辑上的 `list_skills` 只返回当前范围内所有业务 Skill 的名称、描述等元数据，不渲染完整正文，不要求先选定一个 Skill。供模型使用时，这层发现由 SDK 自动执行；供应用独立查询时，才需要宿主只读列表接口。当前只有 `get_skill` 是项目自建接口，尚无统一的项目 `list_skills` 函数，也没有用 `get_skill` 冒充它。宿主提前组装文件与模型按需读取正文是两个时点。
+
+实际顺序是：
+
+1. **宿主准备**：按 profile 的 Skill 白名单以及实际 model/SDK/version，用 `get_skill` 组装并冻结所选包。此时可以准备磁盘文件，但不把完整正文塞入初始模型输入。
+2. **SDK 发现**：SDK 从本次包生成 available skills，向模型展示 `name`、`description` 与原生入口/路径。仅显示本次允许的业务 Skill，不展示所有适配稿。
+3. **Agent 选择并加载**：根据用户任务与描述，由 Agent 调用原生加载工具；需要时再读取 references、执行被宿主允许的工具或脚本。
+4. **执行与核验**：内容进入输入、工具执行和业务交付分别记录。目录中列出名称不等于已加载，已加载不等于已完成任务。
+
+| SDK | 发现/展示 | Agent 加载完整内容 |
+|---|---|---|
+| OpenAI Agents SDK 0.24.0 | `LocalDirLazySkillSource.list_skill_metadata()` 返回 `SkillMetadata(name, description, path)`；`Skills` 自动生成 `Available skills` 指令 | 原生 `load_skill(skill_name=...)` 将单个包放入工作目录，随后通过 Shell 读取 `SKILL.md`；`load_skill` 返回成功本身不等于正文已进入模型输入 |
+| Claude Agent SDK 0.2.167 | 通过隔离项目的 `.claude/skills/`、`setting_sources=["project"]` 和精确 `skills=[...]` 白名单，原生启动发现并展示元数据 | 原生 `Skill` 工具将所选正文加入后续模型输入；显式设置 `tools` 时须包含 `Skill`，读文件/执行脚本仍受宿主权限限制 |
+
+以上通过已安装 SDK 实现及官方资料核对：[OpenAI Sandbox Agents 的 Skills/lazy local source](https://developers.openai.com/api/docs/guides/agents/sandboxes#load-skills)、[Claude Agent SDK Skills](https://code.claude.com/docs/en/agent-sdk/skills)。因此首期不另写 frontmatter 解析器、Skill 注册表或重复的模型加载循环。`list_available_skills` 是这层能力的业务称呼，并非两套 SDK 都具有同名公共方法；OpenAI 可直接使用上表公共方法查看目录，Claude 使用原生发现。若以后工作台需要统一列表，再做宿主只读适配，不改变模型的原生加载路径。
+
+Claude 的 `system/init.skills` 与 `slash_commands` 不是精确的模型可见白名单：其中可能包含内置项或未列入本次白名单的用户可调用项。验收检查首个实际模型请求中的名称/描述，而不是只看 init 列表。`skills` 白名单也不是文件访问隔离；仍需要限定本次项目目录与工具权限。
+
+**运行配置接入。**profile 继续负责模型、SDK、路由、独立 system prompt 与运行限制，现已增加可选 `skills` 名称列表及 `model_version`；共享 `get_skill` 负责内容，两个 runtime 把冻结后的包交给原生 SDK。2026-10-16 先完成加载器独立验证，后续正式 runtime 接入结果见本节第 6 项。路由的协议参数留在现有 provider adapter；模型可见工具能力作为装配输入，不额外展开一份路由继承树。
+
+OpenAI 候选接入沿用上轮验证的 `SandboxAgent`/`Skills`，Claude 沿用隔离项目目录、精确 Skill 白名单及 Skill 工具。官方机制分别见 [OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes) 与 [Claude Agent SDK Skills](https://code.claude.com/docs/en/agent-sdk/skills)。这两个 SDK 的加载入口不同，共用的是获取方法及业务包，不重写 SDK 循环。上轮合成加载测试仍不等于已与生产 Data runtime 接通。
+
+宿主每次新执行选择并冻结组合；模型只决定何时使用已配置 Skill，不选择适配版本。只把本次选中的指导和资源交给 SDK，不挂载全部适配稿。沿用现有运行记录保存命中规则、实际模型/SDK、所用文件版本/hash，以及正文是否进入模型输入、工具是否执行；已发现名称不能算已执行。旧配置未声明 Skill 时保持原有行为及序列化身份，新配置不改写旧四路 prompt、结果或费用。
+
+恢复使用原执行的内容快照及绑定，不从最新模板重建；复用现有 ContentStore 和运行记录保存正文/资源引用。运行目录只 materialize 本次选中包；可恢复执行保留稳定目录，随所属运行目录的既有生命周期清理，测试使用临时目录并在结束后清理。不新增全量工程副本、虚拟环境或每轮报告。短期不做中途切模型/SDK/Skill；需要切换时创建新执行版本，沿用原任务与费用记录。
+
+**5. 文件范围与验证。**
+
+| 位置 | 内容与状态 |
+|---|---|
+| `config/data_platform/skills/financial-data-query/` | 已保留公共 SKILL/references/scripts，新增 template、mapping 和 default/SDK/四条模型路径的 guidance。没有新增 `skill.json`；专属指导都是未经过真实调优的候选 |
+| `src/uteki/data_platform/agent/skills.py`、`examples/data_platform/skill.py` | 已实现 `get_skill`、不可变返回值、写入新目录和可复制 CLI 示例；不增加运行依赖 |
+| 现有 `agent/profiles.py`、两个 runtime 及必要状态记录 | 加载器独立验证阶段未修改；后续正式接入见第 6 项，独立 system prompt 仍在现有 prompts 目录维护 |
+| `test_skills.py`、现有 `test_financial_skill.py` | 已检查匹配顺序、参数、确定性、失败边界及两侧实际正文/脚本；未把其他适配稿复制给 SDK |
+
+加载器至少验证精确版本、model/SDK 默认、SDK 默认和全局 default 四种选择，以及未知版本、重复规则、已命中文件损坏和缺失参数；同一输入生成相同包，未选指导不进入返回内容。随后各 SDK 跑一条合成加载/业务工具链，保留事实、计算与出处校验。真实效果优化另行使用原失败和独立案例，不能把配置可加载或 default 可运行当作模型已完成业务适配。
+
+**限定结果。**5 项加载器测试通过，覆盖四级选择、未知版本、参数优先级/保护、正文和资源确定性、不可变返回包、重复映射、源文件缺失/越界与模板参数错误；CLI 已实际输出完整 Skill。普通重装后核对实际导入位置，安装的 `skills.py` 与当前源码逐字节一致。另 3 项原生/交付检查通过：已有 DataService 合成 8 工具链生成交付后，OpenAI 与 Claude 分别加载 `get_skill` 选择的 DeepSeek/OpenAI、DeepSeek/Claude 正文并执行只读检查脚本。模型决策是脚本，DataService 链在加载测试的准备阶段执行，不称为模型根据 Skill 自主完成业务或完整生产 runtime 已接通。真实模型调用 0，依赖版本未改。
+
+首次 OpenAI 动态包测试因源目录移到 host cwd 之外未发现 Skill；已根据安装的官方 `LocalDir._resolved_src_input` 与 `LocalDirLazySkillSource` 实现确认原因，为本次生成包父目录增加显式只读 source grant 后，原失败单项重放通过，没有扩大到整个仓库或关闭 sandbox。Claude 与交付检查此前已通过，未无变化复跑。原 1.0.0 验证记录保留，新证据为 [configured-verification.json](../output/data-agent-skill-20261016/configured-verification.json)。调用/复跑入口见 [LOCAL_DEVELOPMENT](LOCAL_DEVELOPMENT.md#配置化-skill-获取与限定离线验证)。
+
+**发现环节补充核验（2026-10-16）。**按用户反馈增强并复跑 2 条原生 SDK 测试，均通过：首个模型输入含业务名称与完整描述，尚无完整正文；原生加载后出现所选正文，随后执行检查脚本。OpenAI 同时验证公共 `list_skill_metadata` 的返回内容及首次调用前未 materialize；Claude 在项目中额外放入一个未启用的合成 Skill，验证它的名称与描述没有进入模型目录。原记录保留，新结果追加至同一 `configured-verification.json` 的 `discovery_followup`。仍使用脚本化决策、真实模型调用 0；没有新增生产发现接口或更改现有 runtime。
+
+本批加载器及原生发现/加载限定验收完成后停止。下一批是正式 profile/runtime 接入及旧执行恢复绑定验证，之后才进入真实效果调优；不自动切换旧四路、调用真实模型、简化工具接口或恢复旧 goal。
+
+**6. 正式 runtime 接入（2026-10-16）。**用户批准实现并测试。新 `agent/skill_runtime.py` 负责使用现有 ContentStore 冻结正文与资源，在 `native_execution.skill_snapshot` 保存引用、命中规则及 hash；不自建 Agent 循环。新配置可声明 `skills: ["financial-data-query"]` 与可选 `model_version`，没有 Skill 的旧配置仍使用原有路径，新增默认字段不进入旧序列化身份。没有改写旧四路模型配置、prompt 或费用记录。
+
+两侧实际目录如下。`source` 是仅含本次包的 SDK 源，`workspace/.agents` 由原生 `load_skill` 按需装载；不复制整个配置树或安装环境。Claude 使用调用方已隔离的 worker cwd，不能把项目 checkout 当作该目录。
+
+```text
+config/data_platform/skills/financial-data-query/       # 人维护：公共正文、template、mapping、guidance、资源
+<data_root>/runs/<run_id>/skill-runtime/               # OpenAI，本机 UnixLocalSandboxClient
+  source/financial-data-query/{SKILL.md,references/,scripts/}
+  workspace/.agents/financial-data-query/             # 调用 load_skill 后才存在
+<isolated Claude cwd>/.claude/skills/
+  financial-data-query/{SKILL.md,references/,scripts/}
+```
+
+OpenAI 启用 `SandboxAgent + Skills + Shell`，原生 `load_skill` 负责装载，Shell 仅允许 `cat` 读取本包的已冻结文件；Claude 启用项目发现、精确 Skill 白名单和 `Skill/Read`，Read 同样受文件范围及内容 hash 校验。两侧 DataService 业务工具、计算及交付仍在原宿主执行。这一接入不开放任意 Shell/Bash 或脚本执行；Skill 中的检查脚本可按现有独立示例运行，但正式 runtime 仅使用本包指导＋既有业务工具。
+
+恢复复用原 Skill 快照，即使当前模板改变也不重新渲染；快照缺失、hash 不符、运行包改变时明确失败。OpenAI 原生加载/阅读工具结果按首次实际文本保存，避免字典持久化排序或 Shell 时间字段变化导致恢复请求不同。Claude 的公开 `get_session_messages` 过滤 `isMeta`（含 Skill 正文展开），因此先校验其普通会话，再在首次恢复 HTTP 请求派发前校验先前观察的精确 Skill 展开及工具结果；不修改 CLI 历史或取消严格恢复核对。
+
+新增的两份 opt-in 配置是 `model-profiles/{openai,claude}/fixture-skill-query/query.json`，各自拥有独立 system prompt。可复制测试入口、验证结果和真实模型基线边界见 [LOCAL_DEVELOPMENT](LOCAL_DEVELOPMENT.md#正式-runtime-的-skill-装配与恢复)。原生 SDK 接线测试使用脚本化模型响应；40 条 query 的自主选择基线仍单独进行，不用合成链通过代替。
+
+**本轮限定验收结果。**13 项通过：5 项加载器、7 项正式 runtime、1 项旧 Claude 正常链（旧 OpenAI 正常链包含在 7 项内）。两侧均验证首请求展示名称/描述但无正文、原生加载后正文实际进入输入，再执行 8 次业务工具得到计算及交付。OpenAI 进程中断恢复的总模型请求仍为 10，已回答请求不重新调用；Claude 正常恢复通过，改动 isMeta 中 Skill 正文在下一 HTTP 派发前拒绝。内容快照缺失/变更、运行文件越界/修改明确失败。实际安装的 6 个相关模块与当前源码一致，16 份原配置/prompt 未变。模型为脚本，真实调用 0；未运行 gateway/live Skill 回归、40 条真实选择基线或模型效果调优。失败摘要及检查结果追加到现有 [configured-verification.json](../output/data-agent-skill-20261016/configured-verification.json) 的 `runtime_integration`，没有新建平行报告。
+
+**7. OpenRouter 协议链补充实现与 review（2026-10-16）。**用户继续要求实现、测试和 review。本轮确认生产 `run_gateway → GatewayOpenAIModel → OpenAIChatCompletionsModel → GatewayHTTP` 已可与 Sandbox Skills 组合，不重复实现适配器或新增 Agent 循环。补齐现有合成 HTTP peer 的原生工具动作、Skill 专用合成配置及进程恢复入口；不修改现有真实模型 profile/prompt 或原账本准入。
+
+`tests/integration/data_platform_agent/test_gateway_openai.py` 的 `GatewaySkillTests` 覆盖：原生 `load_skill/exec_command` 序列化为 Chat 的 function tools；首请求仅展示 metadata，第三次请求实际携带所选完整正文；保留 model/provider/reasoning 配置，按显式 profile 省略 `store/parallel_tool_calls`；原样传回 OpenRouter 的 `reasoning_details`。正常链用 10 次本机 HTTP 请求完成加载、阅读及原有 8 次业务工具交付；交付后重放不新增请求。中断发生在第三次请求后的业务工具提交边界，恢复总数仍为 10，Skill 快照和原生输出不变。越界文件读取返回 `SKILL_READ_DENIED`，结果确实进入下一次模型请求，文件标记没有泄漏。
+
+本轮新增 3 项与旧正常链 1 项限定验证；SDK 和正式网关适配器实际执行，服务端响应是脚本，不是 OpenRouter 实网。review 检查配置绑定、参数传输、原生输出恢复、权限拒绝及旧路径兼容；没有发现需修改生产代码的问题。初版测试配置错误地将 JSON 列表送入严格 Python tuple 校验入口，已改用项目原有 `model_validate_json`；失败发生在请求前，未放宽契约。合成 peer 按原生工具调用 ID 排除加载/阅读文本，业务工具返回仍须合法 JSON，不能吞掉业务格式错误。
+
+8 个已安装生产模块与源码相同，20 份已有配置/prompt 原字节不变。依赖、生产源码、真实费用记录均未更改。本轮真实模型调用 0；**实际 OpenRouter 服务兼容、具体模型的 Skill 选择能力及 40 条自主基线仍未验证**。记录追加到现有 `configured-verification.json` 的 `gateway_skill_integration`；复跑见 LOCAL_DEVELOPMENT 的正式 runtime 小节。
+
+**8. 真实调用准备与旧执行配置修订（2026-10-16）。**用户要求在前置检查通过后继续真实调用。实际检查发现两项前置限制：原 Luna lane 已累计 20/20 请求；旧 prompt 末尾明确禁止 Skill。新增独立 `model-profiles/openai/live-C-luna-skill-openai/query.json` 及对应 prompt，启用 `financial-data-query` 和受控原生阅读说明，保留模型、路由、参数、原业务问题与验收标准；不覆盖原 profile/prompt。
+
+复用 `extend_gateway_batch`：授权记录可携带 `profile_revisions[lane] = {previous_sha256, current_sha256}`，只在精确匹配时允许该 lane 的 prompt/skills 改变；模型、路由及其余能力继续受原限制。原费用、请求、终态、旧绑定均保持；不新增账本。`RunBudget.extend_root` 支持在金额保持不变时显式增加次数，仍不能降金额或自动增次数。6 项相关测试通过，包括旧引用可读、历史费用不变、错误指纹/未授权/更换模型拒绝、中断与取消边界。4 个安装模块与源码一致。
+
+OpenRouter 只读端点预检为 200，指定 `openai` 路由的 Luna 单价仍为 $0.2/$1.2 每百万输入/输出 token（标准文本低于 272k 输入），与原契约一致。原账本仍为 73 次：已报告 $1.26415393，未核账保留 $1.4361136，剩余 $0.29973247，没有在途或未知传输。提出保留 $3、每路 40/整批 120 的次数调整后，用户询问原因，尚未确认该调整；真实推理调用为 0、原账本未变。准备证据追加至现有 `configured-verification.json.live_preparation`。这些准备不算真实加载/业务通过，40 query 基线仍未运行。
+
+**9. Luna / Sol / Sonnet 真实对照与循环定位（2026-10-16）。**用户明确批准原账本累计上限从 $3 提高至 $6，各模型最多新增 30 请求、串行各一条，并要求定位循环卡点。新增三个 `model-profiles/openai/compare-{luna,sol,sonnet}-skill/query.json`、各自 prompt，以及 Sol 的配置化 Skill guidance/mapping；三条均为 OpenAI Agents SDK 0.24.0 经 OpenRouter、精确指定对应官方上游、reasoning low、无 fallback。保留原 Apple 问题、材料、验收及业务限制（30 turns / 6 no-progress / 600 秒）；仅 max_usd 随明确授权变化。模型及各自指导的比较不是纯模型能力实验，不能由单例推断稳定排名。
+
+`extend-allowance --add-scopes` 在原账本新增 E/F/G 比较 scope，精确授权完整配置及限额；原 A–D 不换模型、不重置计数。原 73 次请求加最多 90 次形成根上限 163，不自动用满。9 项必要行为检查覆盖旧记录保留、未授权/指纹错误/取消拒绝、中断幂等及旧失败 worker 的只读退出证明。旧 B 有原始退出与已完成操作证据，但跨启动时钟域导致旧关闭入口拒绝；仅新增独立比较可用该证据确认无活动，原 recovery_required、不确定历史及费用预留均保留，不伪造旧会话关闭。4 个已安装相关模块与源码一致。
+
+**验收案例的输入、来源与目标结果。**本轮冻结 query 为：
+
+> 请根据 Apple Inc. FY2024 Form 10-K，给出 FY2024 与 FY2023 的合并年度营业收入（Total net sales），统一以百万美元列示，并计算 FY2024 相对 FY2023 的同比增长率（保留两位小数）；说明两个财年的起止日期、币种和合并口径，给出可回查的原件引用及计算式。
+
+输入还包括已验证的 Apple 公司标识、两个财年、允许来源及禁止 acquire/process 的范围；本轮测试查询已入库材料，不测试现场上网发现和下载报告。Agent 自行 find_assets、定位/阅读原件、选择记录、调用代码计算和 deliver。下表是**验收侧独立核对结果，不注入 Agent 输入、prompt 或 Skill**：
+
+| 业务字段 | FY2024 | FY2023 |
+|---|---|---|
+| Total net sales（百万美元） | 391,035 | 383,285 |
+| 财年开始 / 结束 | 2023-10-01 / 2024-09-28 | 2022-09-25 / 2023-09-30 |
+| 主体 / 口径 | Apple Inc. 合并年度 | Apple Inc. 合并年度 |
+
+同比计算为 `(391035 - 383285) / 383285 × 100% = 2.02%`，实际计算工具保留 USD 原值和 ratio 结果。来源是 [Apple FY2024 Form 10-K](https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/aapl-20240928.htm) 已冻结的原始 HTML：合并利润表 `CONSOLIDATED STATEMENTS OF OPERATIONS` 的 `Total net sales` 行给出两年收入，表名/表头证明合并及百万单位，原件内嵌 XBRL context/unit 给出准确开始/结束日期与 USD。验收定位为 `/html/body/div[509]`（标题）、`div[510]`（单位）、`div[512]/table`（表格）；这些路径仅为该原件验收入口，不是生产检索规则。
+
+预期交付是含两年记录、代码计算、单位/期间/口径说明及可读回原件引用的 JSON；不能只返回一个百分数。当前交付包由宿主从实际 result_refs 组装。数值正确、引用可读、口径得到证明和完整交付分别验收。
+
+| 模型 | 真实请求 / 响应报告费用 | 实际 Skill 暴露 | 结果及独立核验 |
+|---|---|---|---|
+| GPT-5.6 Luna | 15 / $0.03397973 | load_skill 完成落盘，但两次 cat 都被 workdir 规则拒绝；正文及工具指南未进入模型输入 | 程序 completed；两年值、日期、币种、2.02% 计算原件核对正确；合并口径缺明确上下文证据，不算完整业务通过 |
+| GPT-5.6 Sol | 12 / $0.6199860 | 首次 cat 被同一规则拒绝，随后正文与工具指南均进入输入 | 宿主 no_progress 提前停止，partial；无收入记录和计算 |
+| Claude Sonnet 5.5 | 12 / $1.539366 | 正文进入输入，但没有读取正文要求的工具指南 | 两年记录及计算正确；主动 partial，明确缺合并报表标题证据，但仍有可用且未尝试的补查路径 |
+
+**原始症状到机制证据。**
+
+- `agent/skill_runtime.py` 接入官方 Shell 后拒绝任何非空 workdir，连本次合法 workspace 也拒绝；通用错误没有说明触发字段。Luna 改成绝对文件路径仍携带相同 workdir，重复失败后继续业务；Sol 去掉 workdir 后读成功。原生操作日志的 completed 只表示调用结束，不能证明读取成功；本轮核查实际 tool 文本和下一请求正文后纠正了初步成功判断。待修复应仅允许已验证同一工作目录，保持冻结文件 hash、越界与任意命令拒绝，并分别记录发现、落盘、正文可见和指南执行。
+- `DataService._register_response` 只以新增证据/记录/计算 ResultRef 或建设成果重置 no_progress；`get_asset_schema` 新概念页不产生这些引用，因此持续取得新元数据也累加无进展。Sol 在 40 项混合分页中先被 outline 占满，再翻 31/40/40/40 个新概念（151 个不同 ID），仍未到收入概念。使用这四个原始响应离线重放同一登记方法，计数依次变为 1/2/3/4；原完整轨迹又夹杂游标/能力错误，最终达到 6 被停止。加大模型请求上限不会修正此误判。候选修复是识别有界的新元数据进展、重复页不刷新，以及提供更直接的概念发现；尚未实现，不将原失败记为修复通过。
+- Sol 有 3 个业务工具错误（2 次游标参数变化、1 次专用 reader 不支持）；Luna 有 3 次参数修正（reason 层级两次、deliver reason/gaps 一次）；Sonnet 有 3 个业务工具错误（不支持的 entity_scope、分页时变更 select.fields、交付与 state 引用不一致）。游标绑定整个查询的机制正确，但说明/错误缺少具体差异，交付的 request.needs 与 state 双份引用仍增加负担。Skill 指导未完整读取也影响遵循；本轮不把这些都归因于模型能力。
+- Luna 的 FY2024 记录来自地理披露的 Total net sales 总行，FY2023 来自合并利润表；其单位片段来自 reportable segments 说明，无维度不等于合并口径证明。独立检查原件合并报表标题、单位及总收入行，确认两年金额和计算一致，但不替 Agent 将未取得的上下文补进交付。Sonnet 两年均选中合并利润表记录，却未交付标题证据并提前结束。两者数值正确、引用可读与完整业务验收分开。
+- 输入不断携带既有工具结果：Luna/Sol/Sonnet 累计输入分别 432,293 / 373,768 / 733,543 token，报告缓存命中 363,249 / 299,130 / 0；Sonnet 输入从首轮 33,960 增至末轮 95,385。本次费用差由价格、实际输入量和缓存共同决定，不能仅按轮数比较。原生加载/阅读本身的必要动作也不能一概记作失败循环；后续优化应先减少误拒绝、无效分页和参数返工，再评估上下文体积。
+
+**交付与停止点。**新增共 39 请求、报告费用 $2.19333173；原账本累计 112 请求、已报告 $3.45748566，旧未核账保留 $1.4361136，可用余量 $1.10640074，无在途或未知传输。原 73 请求规范摘要完全一致；问题、prompt 和 Skill 快照核对通过。证据追加至 `configured-verification.json.model_comparison`，原失败及三条结果不改写。对照期间没有修改业务 runtime/Skill/工具实现、没有重跑或升级依赖。当前完成本轮对照及定位后停止；下一小任务建议先修合法 Skill 读取与新元数据进展判定，再以原输入回归。40 query 自主基线、完整业务验收和旧四路 goal 仍未完成。
+
+**10. 通用 Harness 确定性修复（2026-10-16）。**用户要求把可由工程保证的约束和能力放在宿主，不做公司特例。本轮在上一项证据支持的责任层修正两类机制，不更换模型、prompt、Skill 指导或验收标准。
+
+- **合法 Skill 读取。**先核对已安装官方 OpenAI Agents SDK 0.24.0 的 `Shell.configure_tools`、`ExecCommandArgs.workdir` 与 `_resolve_workdir_command`：SDK 原生支持显式 cwd，问题来自项目包装器。包装器现在允许省略、`.` 或解析到同一 workspace 的合法路径；其他目录、符号链接、TTY、非单文件 cat、包外文件和 hash 不符继续拒绝。错误指出实际 workdir/path/tty 原因。仍复用官方 Shell，不新建命令执行器。`skill_file_read.full_content_returned` 按冻结文件字节与实际输出记录，截断为 false；completed 仍只表示调用结束，不宣称模型已理解或执行指导。
+- **新元数据进展。**`application/evidence.py` 将 find_assets 的来源绑定资产元数据与 get_asset_schema 的真实概览/能力/逐项 facet 求规范摘要，`DataService._register_response` 以首次实际返回的新摘要重置 no_progress。请求 ID、游标、耗时、排序/页分组及索引代次不创造进展；重复页、分面重排或换查询取到同内容仍累加。元数据不获得 ResultRef，不能充当已读事实或交付证据。总轮数、墙钟、费用、取消边界不变。
+- **历史与恢复。**seen_metadata 随原会话响应提交；旧状态缺字段时从已完成响应重建，不把升级/重开当作新知识；澄清继承摘要和累计次数。中断按既有响应意图恢复，幂等重放不重复登记。原已停止的真实会话和失败结果保持，修复不自动复活或重置它们。
+
+12 项必要检查通过：5 项共享进展/既有停止行为，5 项 Skill 正常读取/工作目录边界/快照篡改/进程恢复/正文截断，1 项 HTTP 包外读取拒绝，1 条 Claude 原有合成正常链。OpenAI 相对/绝对文件路径加显式合法 workdir 均无需权限修正就完成 10 次脚本响应的功能链。用原 Sol 四个响应离线重放，31/40/40/40 个新概念的 no_progress 为 0/0/0/0；重复末页为 1/2/3。重放原 13 个已接受操作，最大计数 3、末值 0，不再触发原阈值 6。另用独立合成材料验证超过六页、重开、旧格式、澄清继承及中断。首次 SDK 执行受外层沙盒阻止 sandbox-exec/kern.boottime；获准本机执行后通过，不取消官方 Sandbox 或时钟校验。
+
+普通源码重装、安装位置/hash 和范围内 diff 检查已完成；真实调用新增 0、费用新增 0。证据追加至现有 `configured-verification.json.harness_fix`，命令见 LOCAL_DEVELOPMENT。这里只保证这些明确的工程行为，尚未真实重跑模型，不声称模型已能选对指标、补齐口径或完整遵循 Skill。定向概念发现、游标续页便利接口、交付重复字段简化及上下文裁剪仍需各自契约与验收，不以自动补参/填证据掩盖语义缺口。
+
+#### 14.17.14 Skill 自动选择基线（2026-10-16，用例与评分入口已准备，真实基线待运行）
+
+用户要求配置 40 条 query，其中 30 条预期加载 `financial-data-query`、10 条预期不加载，交错验证并观察初始基线。该基线只评估“是否自主选择正确 Skill，以及原生加载是否成功”；不执行财务业务，不把加载通过记为数据、计算或交付通过。与上一批脚本强制调用 Skill 的接线测试分开。
+
+**冻结用例。**[skill_trigger_queries.json](../tests/fixtures/data_platform/skill_trigger_queries.json) 是本批唯一用例集，包含 query、预期 Skill 集合、类别和判定理由。30 条正例覆盖取数、比较、期间/单位/主体、冲突、分部、版本、出处补查、缺口、交付、中英表达及混合请求；10 条反例包含一般任务及易混淆的财务词翻译、概念解释、纯算术、空表头设计和被引用的取数指令。虚构主体仅用于意图识别，不提供公司事实或答案。每连续 4 条含 3 正例、1 反例，反例位置轮换；固定同一顺序供两套 SDK 比较。
+
+**运行规则。**每条 query 启动独立会话，仅给模型 query、固定的该 SDK/model system prompt 和 SDK 原生 available skills。`id`、`expected_skills`、类别和理由只留评测侧；不传入预期比例，不在 prompt 中写“本条应加载”，不默认添加 `/financial-data-query`，也不要求所有 query 都调用 Skill。模型只选业务名称，适配版本由运行配置固定。建议以 DeepSeek 官网直连、两套 SDK 各 40 条作为首轮，共 80 个独立案例；SDK/model/路由选择已向用户询问，未据此自动新增付费授权或恢复旧四路额度。
+
+**观察和评分。**记录实际原生工具调用中的 `selected_skills`，以及成功加载的 `loaded_skills`；不能用模型文字“我会加载”代替事件证据。OpenAI 的 `load_skill` materialize 与后续读取正文分开，Claude 的 `Skill` 调用成功与后续输入中的正文分开；报告明确检查到哪一步。初始目录可见、调用成功、正文可见和业务效果不得混为一个成功字段。
+
+- 正例选择率：TP / (TP + FN)；误触发率：FP / (FP + TN)。同时给出选择精确率、总体选择准确率和覆盖率。
+- 选中但加载失败单独统计 `load_failed`，不能计为完整加载通过；选择了非目标 Skill 单独报出。
+- 请求/鉴权/超时/SDK 错误、未运行均记 unknown，不计为正确不加载；部分结果可以算已知样本指标，但必须同时显示分母、覆盖率和未完成项。
+- 首轮如实保留每条错例与原始事件，不边跑边修改描述、prompt 或期望标签。首轮是基线，没有预设“全部通过”结论；后续调优使用新版本，并保留本轮不变。
+
+**已实现与未实现。**[skill_trigger_baseline.py](../scripts/data_agent/skill_trigger_baseline.py) 当前提供用例校验、可读列表和已有观察结果的离线评分，`model_input` 仅返回 query；它不会调用模型，也尚未提供真实 SDK 批量采集。观察文件需带用例 hash、model、SDK/版本、route、prompt hash 和 Skill hash，版本不一致拒绝评分。2 项测试覆盖 30/10 与交错排列、仅 query 投影、异常/缺失非通过、误触发/漏触发及加载失败统计。首轮曾在测试中误写类别数断言，已改为检查必要的行为类别后复跑通过；未修改用例标签来通过测试。
+
+当前真实基线为 **not_run**，真实模型调用 0。下一步先确定具体运行组合与本批额度，再接通原生 SDK 观察采集；沿用现有 HTTP 计量与费用记录机制，不通过新基线绕过旧四路次数上限，不为此开发通用评测平台或改变生产 runtime。
+
+### 14.18 文档解析结果的查询存储（2026-10-16，用户确认后实施）
+
+**本轮契约。**一篇材料是资产；原件版本、解析版本、内容块独立标识。内容块统一支持文本/图片/表格、原件位置、阅读顺序、OCR、派生描述、上下文、超链接、目录归属和固定词表标签。目录保留父子层级与重复标题；路径歧义返回候选节点，不选择第一个。原件有目录而未提取完只能声明 partial，不能说没有目录。目录外内容显式标记。标签为空时区分未处理、无匹配、失败；缺少正式标签定义时不自动补造。
+
+**实现边界。**本轮实现 `contracts/documents.py` 和 `documents/` 的规范解析包、SQLite 存储及查询 API，输入由显式解析器/调用方提供。材料与原件身份不从文件名或内容推测；解析工具/模型、时间、配置及词表版本必须记录。原件与资源复用 `ContentStore`；发布包保存为不可变对象，并在 SQLite 单事务写入材料/原件版本/解析/块/目录与关联/标签/全文索引。尚未提交的对象可残留但不可见；重新提交相同 parse_id 和相同包幂等，冲突拒绝。旧引用精确绑定解析版本，默认版本切换不改变旧结果。
+
+**查询路径。**材料筛选 → 指定版本 schema（目录、标签与可用状态）→ 路径/节点（含子树可选）/标签 any 或 all/内容类型/关键词组合 → 块与明确上下文 → 原件或资源读回。常用筛选、关联和顺序用 SQL 列及索引，复杂表格/位置保存在块 JSON。搜索区分 source/OCR/description；标签没有命中不证明原件未披露。分页有界且绑定查询与版本。只读不会创建数据根、初始化库、重新解析、生成标签或调用模型。
+
+**部署与复用。**根目录须显式、绝对、已存在；新存储使用 `documents.sqlite` 与既有 `objects/`，不写死 output 路径，不修改旧 catalog.sqlite/SDK 协议。它是获准的新文档存储入口，旧 DataService 尚未切换；后续按新契约接入解析器和工具，不以兼容旧内部格式为前提。原件/资源先写对象库，解析包是冻结的可恢复输入，SQLite 是一次发布生成的查询投影；显式 reindex 从冻结包重建单版本投影，不重新解析原文。首次模型接入、PDF/OCR 选型、正式词表和自动打标不在本轮实现中。
+
+**验收。**用无模型的合成解析包覆盖九种查询，验证同名路径歧义、跨版本/非法引用、循环目录、未知标签、重开后旧引用、组合筛选去重、中文/短词与 OCR/描述来源、分页继续、发布中断、资源缺失或损坏，以及从冻结包重建索引。安装当前源码后运行，明确导入位置。可视化/真实解析/真实模型与多进程高并发不记为通过；后续不自动恢复旧付费 goal。
+
+**官方机制。**复用 SQLite [FTS5](https://www.sqlite.org/fts5.html) 和[递归 CTE](https://www.sqlite.org/lang_with.html)；精确中文子串不能假设 unicode61 自动分词，使用明确的子串查询策略。SQLite 事务只保证数据库提交；对象库先写后登记，未提交残留不冒充发布成功。
+
+**实现落点与读写职责。**
+
+| 文件 | 本轮职责 |
+|---|---|
+| `contracts/documents.py` | Material、SourceVersion、ParseVersion、ContentBlock、Directory、Taxonomy、BlockRef/BlockQuery；位置、处理来源、状态与关联闭包校验 |
+| `documents/schema.py` | SQLite 表、外键、目录/标签关联和 FTS5 索引；每个块一行，表格单元格和多处位置存于该行 JSON |
+| `documents/store.py` | 显式初始化/打开、不可变包发布、幂等冲突、默认版本、原件/资源读取、从冻结包重建查询投影 |
+| `documents/query.py` | 材料筛选、分层目录浏览、路径/子树、标签 any/all、类型/关键词、精确块/上下文读取；只查询 SQL |
+| `documents/__main__.py` | `python -m uteki.data_platform.documents` 命令行入口，失败返回非零及错误 JSON |
+| `examples/data_platform/documents.py`、`tests/unit/data_platform/test_documents.py` | 可复制合成示例与必要行为验收；不调用解析/OCR/模型服务 |
+
+原件和图片以 `ObjectRef` 指向 `objects/sha256/...`；冻结的 `DocumentPackage` 也以内容寻址文件保存。SQL 的 `materials/sources/parses/blocks/directory_nodes` 分别存材料、原件版本、解析版本、内容块与目录节点；关联表支持一块属于多个目录/标签。整篇规范 JSON 包是恢复输入，正常查询不会读整包再做解析。`get_schema` 返回本解析版本的目录树、实际标签数量、各类型块数量、OCR/描述/打标状态统计、完成打标但无匹配的块数量，以及解析工具/模型、配置 hash 和处理时间；不把空标签或空搜索结果解释为原件没有披露。
+
+全文默认检索 source（正文/结构化表格单元格）与 OCR；description 必须显式选入，并在命中结果标明来源。英文词组采用 FTS5 unicode61，显式 substring 查询采用 trigram，少于三个字符使用当前解析版本范围内的子串匹配；不宣称具备中文语义分词、向量召回或自动分类。目录 `block_count` 仅计直接归属，查询后代须显式 `include_descendants=true`。路径由字符串数组表示，同名完整路径也可能歧义，此时改用返回的节点 ID。目录 schema 过大可只取概览，再按父节点分页。
+
+发布先核对原件/资源字节并保存冻结包，再用一个数据库事务生成完整投影。提交前中断：该版本不可见，旧版本不受影响，对象可能留下未引用残留，不自动清理。提交后、响应前中断：数据库可能已完成，调用方用同一个 parse_id 和同一包核查或重放，返回 reused；不得新造版本掩盖不确定结果。重复发布旧版本不把默认版本切回去。相同身份但不同包/材料/原件/词表定义明确拒绝。显式 reindex 只读取冻结包并在事务内重建该版本目录/块/标签/全文索引；失败回滚，原件丢失或损坏不被静默修复。
+
+**本轮实际验收（2026-10-16）。**复用已有环境，从当前源码普通重装；6 个新模块的安装路径位于该环境 site-packages，字节/hash 与源码一致。`python -I tests/unit/data_platform/test_documents.py -v` 的 14 项通过，包含独立的无目录、多页位置合成输入、中文短词、原文/OCR/描述区分、部分打标、原件/资源损坏、SQL 块载荷损坏后显式重建，以及提交前后真实子进程退出。阻断对象读取后，材料/schema/目录/搜索/块读取仍通过；reindex 只读一次冻结包，证明本入口普通查询不重新读取/解析原件。CLI 实跑 example、schema、组合 query、带标题/脚注的 read、export 和同包 publish 幂等重放；原件字节一致、重开后旧引用相同。首次损坏测试直接改写只读合成对象触发 PermissionError，修正测试故障注入后通过；未放宽生产完整性校验或修改原件权限规则。
+
+本轮证据输出只在临时目录，仓库不新增 output 产物或平行报告；可按 LOCAL_DEVELOPMENT 重现。没有依赖升级、网络取数或真实模型/OCR 调用。**OCR 提供方尚未选择或接入**；示例 OCR/描述由合成 fixture 填写，1 像素图片仅测试资源存取，不能据此判断识别效果。真实 PDF/OCR、正式词表/自动打标、旧 DataService/SDK 工具切换、历史数据迁移、规模性能和多进程高并发未验收；下批先确定真实解析器/OCR 及其输入输出边界，再接入本存储。既有旧路径的重解析行为未在本轮切换，不以新存储测试冒充旧 runtime 已修复。
+
+
+### 14.18.1 真实 PDF 接入、展示及验收材料纠正（2026-10-16）
+
+`documents/pdf.py` 已接入 Docling 2.139.0：本地 Heron 布局、TableFormer Accurate 表格、RapidOCR/ONNX 的 PP-OCRv6 小模型。依赖使用 `pdf` 可选组并锁定，未改已有依赖版本；模型权重显式预下载至 data/model_cache/docling，转换时关闭 Hugging Face 联网。当前适配仅声明 en，auto 优先使用文字层；full_page 用于强制 OCR 对照。正式多材料 Docling/PyMuPDF A/B 尚未完成，本次功能接入不构成选型胜出结论。官方机制见 [Docling advanced options](https://docling-project.github.io/docling/usage/advanced_options/)。
+
+原件身份与材料元数据显式输入，不从文件名补造公司/期间。SourceVersion 的 acquired_at 记录本次本地导入事件，不冒充原互联网下载时间。同一原件可发布多版解析；版本相同且输入、配置、依赖及权重指纹相同则复用冻结包，不重新推理，冲突明确失败。模型/工具版本、权重 hash、OCR/source/mixed/unknown 来源及原始观察被保留；原始 Docling 输出和 OCR 坐标/置信度写入 CAS，由 parser_output_ref 引用。表格、裁图及 PDF 坐标进入统一契约，原件和资源先写对象库，再单事务发布查询投影。
+
+目录当前从 PDF 原生书签提取，保留 parent、重复标题、页号与目的地纵坐标；同页两个目录可分别定位。无书签不代表无印刷目录，未解析印刷目录时状态不能假称完整。原生目录节点构建完成也不证明印刷目录/正文小标题已全面覆盖。正文标题目前保存为 heading 块，尚未全部组织为更细的目录层级。表格单元格保存行列、合并及位置；概览 content_preview 是阅读展示，不替代精确 cells。图片/表格语义描述、固定标签词表及自动打标尚未实现，PDF 全部链接尚未验收，故本批两版均 partial。本例未生成 caption/footnote 关系，block_relations 为 0；neighbors 可读相邻块，但不是已确认的语义关联。
+
+实际运行材料是 **Alphabet Announces Fourth Quarter and Fiscal Year 2024 Results**，发布日期 2025-02-04，原件来自已有 reading_library（10 页，sha256 f6779037aa896d961bd14fa415eff46d56213407b9a6f78b4ddf86faab8697b8）。auto 默认版约 24 秒，90 块（76 文本/14 表格），9 个一级原生书签；full_page 对照约 41 秒、1,125 条真实 OCR 观察，同样 90 块。首表 11×5、48 个含合并信息的单元格；收入行数值与原件一致。强制 OCR 的部分引语和脚注出现乱码，auto 从原文字层读回后恢复；未宣称全篇/跨材料质量通过。这是显式选材的解析功能验证，不是 Agent 自主选材验收。没有独立图片块，不能据此验收图片理解。
+
+**用户 review 纠正：**当前讨论和截图是 Apple FY2024 Form 10-K，本轮却用 Alphabet 业绩稿验证并发送“原文目录”链接。库中实际只有 Alphabet 一份原件及两版解析，未发现 Apple 数据串入；但验证选材与说明不符合原案例。Apple 截图明确有 Part → Item 层级，不能用 Alphabet 的平面书签解释。Apple 原件目录解析、锚点/页号/正文范围映射和逐项对照仍待完成；不得手工复制截图后称自动解析通过。
+
+展示使用 [Datasette](https://docs.datasette.io/en/stable/getting_started.html) 0.65.5，只监听本机 127.0.0.1:8001。inspect_materials/directory/blocks/table_cells 是只读 SQL 视图，无第二套持久数据。目录、块、单元格均展示材料身份；目录路径以标题数组保存，多归属为路径数组列表。概览加入表格预览，精确行列仍看 cells。日期显示原声明日期，不能把筛选区间下界当发布时间；JSON 数字显式 CAST，使网页字符串筛选正确生效。普通查询不导入 Docling、不重新解析。
+
+已核对真实来源字节、目录定位利润表、同页两书签、旧引用重开、重复导入无推理、默认版不被 OCR 对照切换。首次 full_page 规范化因 PDFium PdfPage 不支持 context manager 而失败，改为显式 close 后在同一原件/模式重放成功。浏览器连接曾被自动审批拒绝（可能读取无关私人会话）；改为只核对本地 HTTP，随后用户自行打开并提供截图。旧 Agent 工具仍未切换，无远程付费调用。本批证据与缺口不替代 Apple 原案例或完整业务验收。
+
+### 14.18.2 目录定位、跨页合并与正文层级恢复（2026-10-16，技术调研与拟议实现）
+
+**目标与状态。**用户已确认目录节点应有独立 code、原文 title、父节点、深度、顺序、拼接路径，并能用 `Business.Company_Background` 定位正文。目标是“确定材料及版本 → 查看目录 schema → 按目录路径/子树取内容块 → 返回原文位置”，不是只展示目录页上的文字。以下算法、字段扩展及分步实施是调研后的方案，尚未实现或验收；14.18/14.18.1 保留当时实现状态。本轮不调用远程模型，不改变现有解析包、数据库或旧引用。
+
+**官方能力与现有缺口（已核对）。**
+
+| 能力 | 可复用依据 | 项目需补的部分 |
+|---|---|---|
+| PDF 书签、层级和目的地 | [pypdfium2 Python API](https://pypdfium2.readthedocs.io/en/stable/python_api.html)：`get_toc`、`get_dest`、`get_index/get_view` | 书签只是一个来源；无书签不等于无纸面目录，目的地仍须核对正文 |
+| PDF 页标签 | 同上：`get_page_label` 返回 PDF 声明的页标签 | 页标签不保证与页面印刷页码一致；缺失、重置及冲突需要单独处理 |
+| 正文标题层级 | [Docling PDF heading levels](https://docling-project.github.io/docling/usage/heading_levels/)：书签、编号、样式三类信号；层级阶段本身不新增模型下载 | 需要保留 `SectionHeaderItem.level` 并接入导航树；不能把遍历容器的深度直接当标题层级 |
+| 内容、位置及阅读顺序 | [DoclingDocument](https://docling-project.github.io/docling/concepts/docling_document/) 的内容、body/furniture、provenance | 目录条目、正文标题、内容范围三类位置必须分开；目录行不能充当章节正文 |
+| 整套树检索候选 | [PageIndex 官方仓库](https://github.com/VectifyAI/PageIndex) 当前 local mode 提供树索引及模型检索，local/cloud 的定位和 OCR 能力不同 | 本轮只作候选比较，未安装或实跑；暂不替换既有块级存储与解析管道，不用其 QA 宣称证明本项目目录提取质量 |
+
+已安装 Docling 2.139.0 的 `HeadingHierarchyModel` 默认编号识别未专门覆盖 `Item 1A`；这不代表整套解析器一定无法识别该标题，仍可能命中书签或样式。官方层级阶段还会忽略未匹配的书签、默认将深度截到 6。项目必须独立保留原始观察及未解决项，深层原文树不能静默截断。布局后处理存在 `document_index` 标签处理，但标签/API 存在不证明当前模型能在目标材料中准确检测全部纸面目录。
+
+项目 `documents/pdf.py` 已开启 `HeadingHierarchyOptions(enabled=True)` 和 `generate_parsed_pages=True`；`_native_directory` 仍只读取书签，`_blocks` 未将标题层级组织为目录树，`_assign_directory` 只按最近书签目的地归属内容。`contracts/documents.py.DirectoryNode` 尚无 code/机器路径。旧 HTML 路径 `build/dom.py` 已有锚点索引，`build/html.py` 已有链接和标题候选，可复用来源定位能力，但尚未接入新文档存储目录契约。
+
+**一、获取结构证据，不预设目录必在前几页。**
+
+1. 固定材料、原件 hash、解析配置/工具版本。PDF 采集书签、内部链接目的地、页标签，以及解析已有的逐页文字/布局/阅读顺序；HTML 直接解析原 DOM 的目录区域、内部 href 和目标 id/name，不先转 PDF 再 OCR。PDF 链接能力须按官方接口补齐并真实验证。
+2. 对整篇已有文字/布局作轻量候选扫描；前部页面可以优先处理，但不能把“前 N 页未发现”解释为全篇无目录。扫描件复用真实 OCR 观察；无法读清或仅扫描部分页面时保留 `unknown/partial` 和覆盖范围。
+3. 目录候选以多类信号组合：目录/Contents 等标题、连续的条目编号、缩进层级、标题与页码的列对齐、点引线、内部跳转链接、对应正文标题。没有“Contents”标题仍可成为候选；单独出现关键词、编号或一张表均不足以确认目录。图目录、表目录及正文中的引用列表单独分类，不能直接并入章节目录。
+4. 候选判定保留区域、原文和命中理由；正文目标解析作为后续交叉核对。不得把正文标题误识别导致的“找不到目标”反向解释为目录不存在。
+
+**二、跨页目录先合并为一个逻辑目录，再构树。**
+
+- 连续页面上的候选区域按编号延续、缩进/列布局、条目格式、目标页码/锚点关系判断是否属于同一目录组；后一页不必重复目录标题。遇到空白页或插页只在有延续证据时跨越，不能无限拼接邻页。正文可能占用目录结束页的余下部分，因此检测单位是区域，不是整页。
+- 在组内恢复阅读顺序和跨页父节点栈。多栏先判定栏内阅读顺序，不能按 y 坐标把左右栏交错；换页不清空父子层级。
+- 长条目换行、页码独占下一行、条目横跨两页时，依照缩进、编号、页码列及相邻条目边界合并；一个条目保存多个来源区域。不能仅因上一行没页码就把下一行强行接上。
+- 主目录、附录目录、每章的局部目录分别保留组和作用域。相同标题不跨组自动去重；多处目录指向同一正文节点时可保留多条来源关系。
+
+**三、把目录条目映射到正文，而不是只得到页号。**
+
+定位依次尝试：有效 HTML 锚点/PDF 内部目的地 → 已核对的页标签/印刷页码映射 → 编号、标题、顺序、父目录和版式共同匹配正文标题。明确链接也需检查目标存在且与条目相符；链接错位或多个目标冲突保留错误/候选，不自动选第一个。文字匹配先做保守的空白、换行、点引线规范化，不删除有区分作用的编号和限定语。
+
+纸面“第 1 页”与 PDF 第 1 张不同。分别保存物理页序、PDF 页标签及原文印刷页码；映射按前言罗马数字、正文、附录等连续区段建立，并用多个标题/页码对应点检查。不能整篇固定加一个偏移。没有页码但有明确目标/标题证据仍可定位；重复标题、页码缺损或 OCR 冲突返回未解决项。
+
+一个章节的范围从正文标题起，到下一个同级或更高层标题前，按全文阅读顺序计算，可跨页、可在同页结束；父章节范围包含子章节。父章节引言等直接内容归父节点，子章节内容归最深已验证节点；查询整章时明确包含后代并去重。同一块跨边界时保留真实片段/多处位置，不能只看首个 bbox 粗暴归属。表格/图片/脚注保留自身块和来源关系，跨页表格的行列合并是另一项能力，目录正确不代表其已经验收。
+
+**四、补正文小标题，以及没有目录的材料。**
+
+| 原文状态 | 构建方式 | 对 Agent 的说明 |
+|---|---|---|
+| 有目录，但只列 Part/Item | 以目录建立骨架，在已定位的章节范围内融合正文小标题与层级证据 | 区分原目录节点、正文标题节点及推断的父子关系 |
+| 没有纸面目录，但有有效书签 | 用书签及正文标题构建并核对 | 原生书签来源，不能称纸面目录已提取 |
+| 无目录/书签，有正文标题 | 优先复用 Docling 标题层级，以编号、样式和上下文构建导航 | `source_heading`；若父子关系由样式推断，另标 `hierarchy_basis=inferred` |
+| 无目录，也无可靠标题 | 保留页/块阅读导航；语义章节可作为显式启用的模型补充任务 | 不凭空生成 Business 等原文标题；生成节点标 inferred，不能冒充原目录 |
+| 目录或正文无法读清 | 保存已取得结构和明确缺口 | unknown/partial，不输出“文档无目录”或完整成功 |
+
+模型补充仅处理难以判断的候选区域及必要相邻上下文，返回引用到已取得块/区域的结构化结果，由代码校验引用、顺序和无环；不能生成不存在的原文。代码校验不能证明语义父子关系正确，仍需真实样本验收。该分支尚未选择并验证具体模型/路由，本轮未调用；不能将它写成已交付能力。目录状态应分别报告原目录发现/解析、正文层级恢复及覆盖率；无原目录也可能有可用的标题导航。
+
+**五、统一目录数据与机器路径。**
+
+在既有解析包/SQLite 投影内扩展，不新增平行数据库。最少区分：
+
+- 原始目录观察：来源种类（PDF bookmark/printed TOC/HTML TOC）、目录组、原始标题/编号/层级、目录页区域数组、声明的页码/目标、解析状态。全部保留，未匹配观察不丢弃。
+- 规范节点：`node_id / parent_id / code / title / order`，标题来源与层级判断依据分别记录；关联原始观察、正文 heading_block、目标位置与内容范围。`depth / path_segments / path` 由父子关系派生并校验，不同时手工维护多份层级。
+- 内容归属：复用目录—块关联，记录直接归属及未解决/目录外状态；原目录页上的条目单独识别为索引内容，默认章节正文查询不返回这些条目，但仍可回查。
+
+`code` 由原文标题作确定性规范化（保留原语言，空白转 `_`、保留可区分编号；具体规范化版本入解析配置），不由查询时模型翻译或猜测。同父节点 code 唯一；冲突用可追溯的原编号或稳定来源标识消歧。英文示例 `Company Background → Company_Background`。code 不承担跨材料业务分类职责，业务标签仍是独立固定词表。
+
+以完整原文树 `Part_I → Business → Company_Background` 为例：完整路径为 `Part_I.Business.Company_Background`；指定 `scope_node_id=Part_I` 后相对路径为 `Business.Company_Background`。部分路径必须有显式作用域或唯一性校验，不默认剥去 Part，也不匹配第一个同名目录。`node_id` 是引用身份；code/path 在同一发布版本冻结。修正层级、增加子节点生成新版本，旧引用仍读旧版本。用户提供的 Apple HTML fragment 仍须按原 DOM 校验具体目标，不能直接假定该 fragment 就是 Company Background。
+
+**六、实现落点、真实验证和停止点。**
+
+| 落点 | 拟议职责 |
+|---|---|
+| `contracts/documents.py` | 原始观察、code、层级依据、正文范围与状态契约 |
+| `documents/pdf.py` | 输出 PDF 原生结构、Docling 标题/区域和页码证据，复用已有解析结果 |
+| `documents/html.py`（新增） | 将既有 DOM/锚点/标题能力接入新文档契约；无公司特例 |
+| `documents/directory.py`（新增） | 目录候选分组、跨页条目合并、目标消歧、树/范围/code 构建；规模需要时再拆分 |
+| `documents/schema.py / store.py / query.py` | 发布新版本及查询投影、完整/相对路径与子树读取；旧冻结包显式版本处理，不静默重写 |
+| 现有 CLI/示例、文档行为测试 | 可复制真实材料命令、数据库查看入口和本次必要行为检查 |
+
+先完成 Apple FY2024 10-K 原 HTML 的“目录 → 正文标题 → Company Background 内容块 → 原文出处”真实链；SEC 获取沿用已批准的 acquire/prepare_sources 入口。随后选定并冻结真实多页纸面目录 PDF 与无目录材料，不能只用合成样例宣称完成；既有 Alphabet 仅作书签正常链的独立检查。补充真实材料尚未选定；不得将手工拼出的目录传入生产解析器冒充自动提取。
+
+验收按失败层分别展示：目录区域召回/误检、条目提取、父子关系、正文目标、正文范围/块归属、路径查询。以冻结的原文人工核对作为独立预期；关键路径必须精确读到正文而非目录行，同页/跨页起止不能混入下一章节。必要边界包括：目录续页无标题、跨页条目/多栏、罗马页码与正文页码重置、同名标题、同页多节、无目录有标题、既无目录又无标题、损坏锚点/无法识别。合成输入只辅助故障与确定性边界，不替代真实解析。
+
+先交付原案例及上述公共机制的实际结果和剩余缺口，再决定是否需要模型补充；不承诺仅靠确定性规则覆盖任意版式，不自动进入 Agent 联调、旧 goal 或付费评测。本轮仅完成资料/源码核对和设计记录，所有新增识别/查询行为仍待实现与真实运行。
+
+**七、合订年报的按页处理与多级目录（用户补充 NVIDIA 实例）。**
+
+本轮下载并用已安装 PDFium 实际检查用户提供的 [NVIDIA 2026 Annual Report](https://s201.q4cdn.com/141608511/files/doc_financials/2026/ar/2026-Annual-Report-Web.pdf)：15,850,437 字节，SHA256 `0e725ba048221539dca3eb1a4e70febfcbb785e9afb96cd3ff0b035d7d734e5c`，175 个物理页，读取到 223 个书签。对全部页的原生文字作了轻量目录候选扫描，并渲染检查第 14、21、90 页；没有调用 Docling 或 DeepSeek 模型。本次下载仅作临时只读检查，尚未发布至文档库。
+
+| 已观察位置 | 原文结构 | 对方案的影响 |
+|---|---|---|
+| 物理第 14 页 | 三栏及跨栏图片，包含 Fiscal 2026: A Defining Year、Inference Inflection Driving Compute Growth、Computing Architecture Defines AI Factory Economics 等正文标题 | 正文标题必须独立提取；按栏目阅读顺序组织，不能按整页 y 坐标串行，也不能因为没有被纸面目录列出就丢弃 |
+| 物理第 21 页，印刷页码 2 | Proxy 部分的目录；多层缩进，正文在其后 | 此目录有局部作用域，不统管前置叙述或后面的 10-K |
+| 物理第 89/90 页 | 第 89 页为 Form 10-K 封面，第 90 页是它的 Part → Item 目录，印刷页码再次为 2 | 同一原件有多个文档部分和独立页码序列，必须支持多个目录组 |
+| 物理第 92 页，印刷页码 4 | Part I → Item 1. Business → Our Company | 纸面目录骨架需继续补入正文小标题，最终路径可到章节内部 |
+| 原生书签 | 同时存在真实章节、源 PDF 文件名、重复嵌套，前几个目的地亦非正文顺序 | 原始书签不能直接作为最终业务目录，须筛选并与正文证据融合 |
+
+上述是原件结构观察，不是自动目录解析的通过结果。本文件中核对到的第 21 和 90 页各自是一处目录；不能据此声称跨页续目录已验收。第 14 页三个标题的跨栏关系与边界尚需自动版面/阅读顺序结果验证；它们不是相互的天然父子节点。
+
+**处理顺序细化。**用户确认此类材料先拆，具体指逻辑按页处理，原件仍保存一份，不生成 175 个材料资产，也不在拆页时丢掉全局书签和链接目标。
+
+1. **原件登记与页面清单。**记录原件、物理页序、尺寸、文字层质量，以及整份 PDF 的书签/链接。每页保持全局位置引用；PDF 内嵌页标签与页面上印刷的页码分开。
+2. **逐页初读。**有可用文字层时先获取文字/坐标；扫描或文字不可用页再走真实 OCR。按需获取布局和缩略图。对全部页建立目录区域、封面/文档起点、正文标题、表格/图片及未知区域候选，不只扫描前 20 页；可以一页同时有目录与正文。这里只生成候选，不单页定最终层级。
+3. **文档部分与目录组。**结合封面、明确文档标题、目录目标、页码序列和连续性，划分前置叙述、Proxy、10-K 等作用域。系统补的分组节点标明 grouping/inferred，不冒充原文标题；范围不明时保留待确认。多个目录先判断是否同一组的续页，或属于不同部分，不能看到新目录标题就盲目合并。
+4. **结构化页面解析。**复用/补齐 Docling 的布局、内容块、真实标题级别和阅读顺序；初读已取得的信息不重复 OCR。读取 `SectionHeaderItem.level` 和原始样式/编号证据，不能用 `iterate_items` 的容器遍历深度代替。对不可信书签不能让默认高优先级推断覆盖正文证据；使用官方可配置的信号开关/层级处理，再在已识别作用域内合并验证。若只能取得不可信的全局书签，关闭其层级权威信号，原观察仍保留。
+5. **全局融合。**有效原目录提供章节骨架；每一文档部分的正文标题补齐小节。无目录的部分直接从正文标题构树。结合栏目顺序、跨页继续关系和下一同级/上级标题建立正文范围；同页标题的 y 高低不能决定父子关系。分别保留标题存在的来源证据和父子关系的推断依据。
+6. **发布与查询。**在一个冻结解析版本中保存文档部分、目录组、节点、路径及块归属。`Form_10K.Part_I.Business.Our_Company` 是该实例的拟议完整导航形式；前置叙述标题属于自己的分组，不能挂到 Proxy 或 10-K 下。按页缓存是解析过程能力，不改变查询时只读持久结果的约定。
+
+**书签不符合业务需求时。**文件名壳层、纯页导航、重复目标和冗余嵌套先保留在 raw 观察中，经“是否有章节标题/目的地/范围证据”判定是否参与规范树；不是按某个公司名或单个数字正则一刀切删除。标题只是一串数字也可能是真实编号，必须核对上下文。原文已有真实章节但不符合某一业务分类时，保留原文结构，通过独立标签/业务索引提供视角，不重命名原目录来迎合查询。
+
+**10-K、8-K、Annual Report 的边界。**三类共用页面块与目录融合能力；仅在材料/文档部分类型有证据时应用相应结构规则。10-K 可以检查 Part/Item 编号关系，不能凭模板补齐缺失 Item；8-K 保留实际披露 Item、签名及 Exhibit 的独立范围，不强制套 10-K 目录。Annual Report 可能合订叙述、Proxy、10-K 等，不能仅凭文件名把全部页当作 10-K。范围分类或语义标签来自模型时记录模型/提示版本及依据，不能当作原文事实。
+
+**DeepSeek-OCR 的角色与当前限制。**已查 [DeepSeek-OCR](https://github.com/deepseek-ai/DeepSeek-OCR) 与 [DeepSeek-OCR-2 官方仓库](https://github.com/deepseek-ai/DeepSeek-OCR-2)。官方示例提供页面图片转 Markdown（含 grounding）和 Free OCR，可作为扫描件、复杂版面等页面识别的候选后端；“是否为目录、目录属于哪一文档部分、如何跨页连接”仍需单独的分类/结构判断及验证，不能把 OCR 模型存在等同于已验证的目录分类器。可试页面图像加明确分类任务，但该任务的稳定性与所需细度须实测，不承诺纯 yes/no 或模型自报置信度能保证可靠。
+
+默认先利用原生文字与已有布局结果筛选，再对难以判断的页面/区域运行候选模型并保留未知状态；没有文字层时，按实际成本选择轻量页分类或直接复用 OCR 的结构输出，避免每页先完整 OCR、再完整 OCR 一遍。目录分类应输出多标签/区域、相关条目或标题证据，而非仅一个布尔值。若首轮扫描覆盖受限，不能宣告全篇无目录。
+
+官方 OCR-2 示例是 CUDA/Transformers 或 vLLM 推理，本机 macOS 上未验证其部署，也未配置并核实可用 OCR 服务；既有 DeepSeek 文本调用凭据不构成 OCR 接入证据。本轮没有安装或运行该模型，没有费用调用。该提供方仍是待实测候选；实施需要真实可用的推理入口时应立即暴露缺口，不能用 mock 标记完成。
+
+**八、首批收敛至 SEC 原生 HTML 10-K（2026-10-16，范围调整与源码核对）。**
+
+用户认为复杂合订年报难度偏高，提出先从 SEC 提供的 10-K 开始。当前主链以 SEC 原生 HTML/iXBRL 主文档为范围；此前 PDF 拆页、合订文档部分、多目录作用域和候选 OCR 的方案保留，不作为本批前置要求。此轮仅核对实现与状态，没有重新取 SEC 原件、执行解析或授权扩展模型调用。
+
+实际源码已有可复用能力：`infrastructure/document_sources/sec_index.py` 的 `_toc_entries` 提取 Part/Item 目录，`build_legal_outline` 核对正文结构并建立法律章节导航；`data_platform/build/dom.py` 建立 id/name 锚点与精确来源定位；`build/html.py` 提取正文、表格单元格/跨度/脚注、图片资源状态及 Inline XBRL 数值事实。但 `build/html.py` 目前只使用旧解析器的 blocks，未把 `toc_entries/build_legal_outline` 的目录结果接入其 sections；真实 h1–h6 用层级栈，样式推断标题的 parent_id 为 None。底层目录识别也仍有版式范围限制，存在代码不等于任意 SEC 原文已通过。
+
+新 `documents/` 尚无 HTML ingestion 适配；其 DirectoryNode 无独立 code，`resolve_directory` 使用原文 title 数组。只读核对当前 `documents.sqlite` 仍只有 Alphabet 业绩稿，不含已发布 SEC 10-K。旧 HTML 链路、新存储、真实目录业务验收必须分开报告；本轮源码阅读没有重跑旧测试。
+
+下一小批建议复用现有 DOM/SEC 目录/表格机制：固定一份 SEC HTML 与资源清单 → 目录条目和正文锚点核对 → 在 Item 范围内补齐正文小标题与范围 → 映射新 DocumentPackage → 生成版本固定的 code/path → 从 SQLite 读取章节和表格及原文出处。以此前 Apple 原案例的 `Business.Company_Background` 路径作为实际检查入口，不能硬编码其节点/正文；结构错误与不支持版式保持缺口。图片内文字/图表理解仍须独立说明，不因为 HTML 主链不需要整页 OCR 就宣称图片内容已解析。交付以真实 HTML 目录/正文逐项核对、重复查询不重新解析和旧引用可读为准；不自动扩展到 PDF、8-K、Agent 联调或恢复旧 goal。
+
+**九、明确两份带书签 PDF 与小节粒度（2026-10-16 输入，2026-10-17 确认方向）。**
+
+用户进一步指定本批提取对象为以下两份 10-K PDF，要求一个标题下的文章不要拆开，先明确“最小一级标题”。这次明确输入优先于第八部分暂拟的 HTML 路径；不扩展到 NVIDIA 合订年报或任意无目录扫描件。
+
+| 固定输入 | 本轮只读核对 | 原件 SHA256 |
+|---|---|---|
+| [Alphabet 2025 10-K](https://s206.q4cdn.com/479360582/files/doc_financials/2025/q4/GOOG-10-K-2025.pdf) | 99 页，103 个原生书签，940,068 字节 | `9953e8d2e70b18c5bf0af3b2b2a1e96de0555f51cbb39a625497b434e19fb43a` |
+| [Apple 2025 As-Filed 10-K](https://s2.q4cdn.com/470004039/files/doc_financials/2025/ar/_10-K-2025-As-Filed.pdf) | 80 页，102 个原生书签，1,858,048 字节 | `3eb270b22acb7d8d8e9c32a43dc221dec3345f8e4bca02755fdbc1ee16c823de` |
+
+实际用 PDFium 读取书签及前部原生文字，渲染查看正文页。Apple Business 下的书签已经包含 Company Background、Products、Services、Segments 等，但没有 Products 下的 iPhone/Mac 等或 Services 下的 Advertising/AppleCare 等。因此“PDF 自带目录”和“全部正文标题都已编码在书签里”不同；书签可作为骨架，仍需补正文标题。Alphabet 的 Overview 书签也包含多种正文小标题，不能简单把整份文档固定成三级或四级。上述为原件观察，未运行 Docling/OCR，也未验收自动层级提取。
+
+**本批粒度：**用户在讨论短标题和长风险标题后认可“书签建立骨架、正文样式补齐标题、模型处理歧义、代码合并原文”的方向，并补充无效信息过滤。以没有已确认子标题的正文小节作为最小业务读取单元，其标题下多个自然段、列表及跨页连续正文保持完整，不按段落、固定字数或页边界切成独立小节。Products/Services 保留为父节点，可聚合读取其全部内容；认可方向不代表具体自动识别效果已经验收。
+
+- Apple `Business.Products.iPhone`、`Business.Services.AppleCare` 为拟议叶子小节；`Business.Segments` 和 `Business.Competition` 也可以是叶子，叶子不要求处于相同深度。
+- `Digital Content` 下的多个自然段保持在同一小节；`Wearables, Home and Accessories` 下的多段同样保持完整。正文句子中的品牌或普通加重文字不自动升级为标题。
+- 原标题单独成行、样式/间距及同级模式、已知父章节共同用于判断；不能用“所有斜体都是末级标题”之类规则。无法确认是标题还是强调文本时保留疑点，不擅自切开正文。
+- 父标题有自己的引言时，直接正文保存在父节点，不能因只抽叶子而丢弃；读取整个父章节按顺序组合自身正文和子小节，避免重复。
+- 最小单元是逻辑小节，不改变精确来源要求。内部仍可保留多个段落/页的坐标与原始块引用，输出合并正文同时保持原段落边界。表格、图片仍保留结构/资源引用及所在章节位置，不强行改成无结构纯文本。
+- 小节过长时传输可分页并标明继续位置，不静默截断或改变其 section 身份；重复查询读取持久化结果，不重新解析。
+
+长句也可能是原文末级标题。Business Risks 下每个经确认的风险标题及其后全部自然段组成一个小节，父节点仍支持完整读取；不得按标题字数限制、截图边缘或换页拆节。标题候选要从原生文字和布局中补充，不能只对 Docling 已识别的 section_header 分层。正文中的粗体/斜体强调和表头不自动升级为标题；跨行标题的合并和父子关系有歧义时保留候选及出处。模型补充只选择已有原文块/范围及关系，正文仍由代码组合；具体模型、路由及真实效果尚未验证，不能作为已接入能力。
+
+下一小批以这两份原件的目录骨架、Apple Products/Services 与 Business Risks、Alphabet Business 为实际验证范围，展示原文标题、父路径、正文首尾、来源页与识别/过滤理由。它是限定的真实材料解析验证，不是两份全文业务验收或自主 Agent 评测。本轮只完成设计补充和源码核对，没有运行新的解析或模型调用。
+
+**十、无效信息过滤：保留原件，净化默认正文（2026-10-17，新增要求与实施约定）。**
+
+用户要求解析后减少无效信息。本批先处理有位置和结构证据的排版噪声；是否默认隐藏封面登记、签字等辅助章节的偏好尚未收到答复，因此先保留这些章节，不将未回复视为扩大过滤授权。业务上的相关性随问题变化，不能在入库时让模型自由删除“看起来不重要”的披露。
+
+**已核对的现状。**[DoclingDocument 官方说明](https://docling-project.github.io/docling/concepts/docling_document/) 区分 body 与 furniture，并保留位置和来源。当前 `documents/pdf.py::_blocks` 显式遍历两者，把 page_header/page_footer 映射为 header/footer；原始块保留是正确的，但 `contracts/documents.py::BlockQuery` 和 `documents/query.py::query_blocks` 尚未提供相应正文过滤。这里缺少的是块分类到读取视图的连接，而非必须更换 OCR 模型。分类本身仍可能出错；本次源码检查不证明两份新 PDF 的噪声识别质量。旧 SEC HTML 的重复导航识别依赖已验证目录和链接，只复用证据原则，不直接套用到 PDF。
+
+| 内容 | 默认正文处理 | 保留方式及约束 |
+|---|---|---|
+| 已核实的页眉、页脚、独立页码、重复返回目录导航 | 排除 | 保留原始块、位置和排除理由；不能仅因位于页边或文字重复就删除 |
+| 空白、纯装饰性分隔线 | 不作为正文内容输出 | 保留原件及已有布局观察；不能把图表轴线、表格边界或负号按装饰清掉 |
+| 原目录页的目录条目 | 用于建目录，不混入对应章节正文 | 保留目录观察和定位来源；有正文的混合页面按区域处理，不整页删除 |
+| 单位、币种、期间、合并口径、表头、脚注、图注、来源说明 | 保留，并关联相应表格/正文 | 跨页重复表头属于理解数据的上下文，不按通用重复文本规则删除 |
+| 风险披露、限制条件、前瞻性声明、审计意见 | 保留 | 不凭“法律措辞/模板/长段落”判作无效；后续查询可按章节选择 |
+| 封面登记、证券信息、签字、附件等辅助章节 | 本批保留，可按目录查询 | 辅助内容不等于噪声；未来默认隐藏仅改变读取视图，仍可精确访问 |
+| 无法可靠分类、识别冲突或疑似乱码 | 保留并报告疑点 | 不能通过过滤掩盖 OCR 错误、缺失内容或不完整解析 |
+
+**在同一解析链中完成，不另建清洗平台。**
+
+1. 先保留原始提取块、原始角色/内容层、阅读顺序及坐标，再判定用途。目录条目先用于结构恢复；噪声候选不参与自动标题推断，判定不确定时不静默排除。
+2. Docling 的角色/内容层是信号，结合页内位置、重复布局、实际导航目标及邻接关系判断。正文、表格、图注/脚注的明确关联优先保护；若同一块混有页脚和正文，只能对可精确定位的片段处理，否则保留并标疑点。不用公司名、固定页码或样本答案作通用规则。
+3. 复用块的身份，在新解析版本内保存最少的过滤判定：保留/排除/待核对、原因、依据的块/区域引用，以及解析级策略版本。原始标签与最终判定分开，排除不代表删除原始存储；由规则版本和冻结输入得到可复查结果。
+4. 小节合并、正文搜索和默认正文读取共用同一判定；提供明确的完整内容读取方式。精确块引用仍能取回被排除的原文并看到排除理由。查询视图纳入分页游标签名，不能中途切换视图造成漏项；旧版本没有过滤记录时明确说明，不冒充已经清洗或静默改写旧包。
+5. 对 Agent 返回简短过滤摘要和待核对项，按需查看详细记录；数据库查看保留原文、角色、判定、理由和位置。原件不变；过滤政策变化发布新解析版本，读取已发布版本不重新解析或临时让模型决定删什么。
+
+**限定验收。**沿第九部分的真实 PDF 小节验证，不另做大规模评测：核对跨页正文没有夹入页脚、没有丢失段落；长风险标题及后续全部正文保留；表格单位/脚注和重复表头保留；目录条目与正文分离；被排除内容能由精确引用读回。逐条展示被排除的文字、页/区域和理由，再检查相关保留内容，不能以“删除比例高”代表效果好。真实材料未覆盖的失败边界可用合成例补充，但必须单独标明，不能算真实解析通过。
+
+**状态。**本节是设计约定；过滤判定、查询视图和上述真实验收尚未实现/运行。本轮仅更新核心设计和 TODO，未修改解析器、数据库或旧引用，未调用付费模型。
+
+**十一、Docling 可行性实测（2026-10-17，限定六页基线）。**
+
+用户要求先明确 Docling 的处理机制及能否满足需求。核对官方文档、当前安装源码，并直接对第九部分两份原 PDF 运行真实本地 Docling：Apple 物理页 4–5、11–12，Alphabet 物理页 4–5。没有制作删减 PDF 或更换输入字节，用官方 `page_range` 限定页范围。版本为 docling-slim 2.139.0、docling-core 2.101.1、docling-ibm-models 4.0.3、docling-parse 7.22.3；后端为 ThreadedDoclingParseDocumentBackend，CPU 四线程，本地缓存权重，远程服务关闭。启用 OCR auto、表格处理、标题层级、parsed pages，与项目现有核心选项一致。本次是组件评估，未经过 DocumentStore 发布或运行 Agent。
+
+处理机制：后端取得原生文字、位置和字体 → OCR 补充需要识别的图像区域 → 布局模型将区域标成标题、正文、表格、图片、页眉页脚等 → 布局后处理将文字归到区域，表格阶段恢复单元格 → 阅读顺序与文档组装 → 标题层级阶段按书签、编号、样式依次赋 level → 导出/读取按内容层选择。当前文档导出接口 `export_to_markdown` 默认选择 BODY；原始表示仍保留 FURNITURE。不能把布局模型的角色预测当成对业务重要性的判断。官方依据见 [文档结构](https://docling-project.github.io/docling/concepts/docling_document/)、[标题层级](https://docling-project.github.io/docling/usage/heading_levels/)；具体流水线与默认值以本轮安装版本源码为准。
+
+| 实际检查 | 观察结果 | 对实现的判断 |
+|---|---|---|
+| 六页解析是否真实运行 | 三次转换均返回 success；原生 textline cells 共 300 条，均有字体名，from_ocr 均为 false | 布局模型真实执行，文字使用原生 PDF 文本；没有强制 OCR，不把“无 OCR 文字”理解为 mock。success 仅说明转换结束 |
+| Apple 四页的页脚 | 四个带公司、年报名和页码的块标成 page_footer/FURNITURE | 默认 Markdown 排除这四块，原始 JSON 可读回 |
+| Alphabet 两页的导航/页眉/页码 | 两处 Table of Contents、两处公司页眉、两个页码，共六块标成 FURNITURE | 显式 BODY 导出与默认导出相等；全部内容导出多出上述六处。正文中的公司名称仍保留，没有按字符串全局删除 |
+| Apple Products/Services 的短标题 | Products、iPhone、Services、AppleCare 等均识别为 section_header，但都被赋 level=3 | 标题发现可用，本例层级不满足父子要求；不能直接用 level 栈生成最终目录 |
+| Apple 物理第 11 页的三条长风险标题 | 前两条是独立 text 块，第三条为 section_header；文字没有因此消失 | 布局分类漏掉标题，后续层级阶段不会把这些普通 text 自动恢复为标题，单纯开启层级开关无法解决 |
+| Alphabet 正文小标题 | Google Services 与其下 Serving Our Users 都为 level=3 | 独立材料也出现层级不足，需要书签作用域和局部版式共同约束 |
+| 结构与字体保留 | 观察的相关标题 parent 仍为 body；原生字体存在，但项目 `_observations` 未持久化字体信息 | 不能把 heading.level 当成完整目录树；保留解析字体/样式证据后补目录构建，不重新 OCR 来弥补结构信息丢失 |
+
+根因与候选风险分开：已确认的漏标题发生在布局分类；层级阶段只改已识别标题的 level（书签匹配的 list_item 是有限例外），不能补普通 text。已安装实现对书签/编号/样式分别推断后逐标题按优先级取值，没有显式建立“当前书签父节点下的局部子标题”约束；本例输出证明不能直接作为最终父子树，但页范围解析会影响相对层级，全文结果尚未测。另作无推理的字体解析检查：`HelveticaLTStd-Obl` 可识别斜体，`HelveticaLTStd-BoldObl` 被识别为粗体但 italic=false；这是组合字体名兼容问题，不是前两条标题被标为 text 的已证实原因，不能只修字体映射就宣称漏标题已解决。
+
+**可行性结论与最小补充。**继续复用 Docling；页眉页脚的内容层过滤已有官方能力和本例证据，项目只需接到统一正文视图并保留理由。完整小节需要在项目适配层补齐三件事：保留字体/位置/原始角色，给普通 text 中的标题候选留入口；以校验过的书签范围约束正文子标题层级和原文路径；按已确认边界组合完整正文及跨页来源。短标题/长标题都不能靠公司名或全局粗斜体规则决定。歧义可交模型判断已有原文范围，但目前未选择或验证具体调用，不将其作为现成兜底。
+
+**最小标题和父子关系的具体解法（2026-10-17 补充，待实现）。**先判断原文标题及其 parent，再从树派生 depth/path，不让全局字号排序或模型独立填写绝对 level。限定当前两份带书签 PDF，采用以下步骤：
+
+1. **建立已核对的章节边界。**书签目的地与正文标题/页内位置匹配后成为锚点，范围截至下一个同级或上级锚点。保留全文书签，不把局部页范围缺少祖先解释成根节点；未匹配/冲突书签不强行使用。后续候选的父节点必须处于同一章节作用域，不能因另一章节有同名标题而跨区匹配。
+2. **从所有原始文字中补标题候选。**已有 section_header、与书签匹配的文字，以及普通 text 中独立成段、与正文样式不同且重复出现结构模式的文本共同组成候选。按原字体标识、相对字号、缩进、前后间距、连续行和阅读顺序分组，保留信号依据；多行长标题先按来源区域组合，不能用字数门槛排除。字体名的粗斜体解析失灵时仍可比较同一文档内的原字体标识，不把字体名称映射表作为唯一依据。整块混有标题与正文时仅在原始行/字符位置能区分时提出片段候选。页眉页脚、表格内表头、图注脚注的已验证身份优先保护；样式相似只生成候选，不自动认定标题。
+3. **在局部范围内决定同级/子级。**先沿用已核对的书签父子边和明确原文编号关系，再用本节已知标题的局部样式、缩进和相邻结构约束新增边。候选只能挂在阅读顺序中仍有效的前置标题下，同级标题关闭前一个同级小节。相同字号不等于同级，相同字体也不等于同级；缩进仅是证据之一。Apple 的 Services/AppleCare 同级输出和 Alphabet 的 Google Services/Serving Our Users 同级输出都要按此重新判断，不能通过整体 level 加一解决。前者有已核对书签锚点和短标题的局部样式差别；后者实际左边界为 43.2/65.7 PDF 点，提供了 Docling 本次层级排序未使用的缩进证据。
+4. **歧义交给有约束的模型判定。**一个局部作用域批量提供候选原文块/片段 ID、来源位置、样式、已确认父节点及必要的前后正文；多栏或纯文本证据不足时才补原页面图。输出限于是否标题、标题源片段、parent 候选 ID、判断依据和 unresolved，不能改写正文或凭业务知识新增原文标题。候选互相影响时一并判断，跨页提供连续上下文，不逐行孤立请求。具体模型/路由及触发阈值仍待限定实跑验证，本轮没有调用；后续若执行到此必须接真实入口，不能用人工补树或 mock 宣称自动解析成功。
+5. **代码构树、分配正文并核验。**校验引用存在、来源顺序、父节点在允许范围、无环和章节不交叉；从 parent 计算 level/code/path。确认标题后的内容延续到下一同级或上级标题，父节点引言归父节点直接内容；每段正文/表格/图片只保留一个直接归属，读取父节点时按顺序聚合后代。被排除噪声有独立记录，尚未解决的边界不从覆盖清单中消失。若无法确定叶子边界，允许显式读取完整上级原文并报告“最细粒度未完成”，不将其标为叶子解析成功。以上结构检查不代替原文语义核验。
+
+本批先在既有真实原件和候选上复现修正：短标题、三条长风险标题及独立材料的嵌套标题均须定位到准确原文范围，普通正文强调不被升级；多段小节不丢段，不混入下一小节或页脚。确认后再验证全文锚点和跨页边界。人工标注只作独立核对，不注入生产解析器；不以样本公司/标题白名单修复。模型分支未运行时单独标未验证，不宣称整条自动流程完成。
+
+本轮仅评估，没有修改项目解析实现或发布存储。默认内容层排除的 10 个块可逐条核对，不能外推为所有版式的过滤准确率；未验收财务表格/脚注保护、纸面目录页分离、跨页小节完整性、全文父子关系及任何远程模型分支。下一小批的通过标准仍是第九、十部分的实际小节与过滤对照；当前已具备开始限定实现的证据，尚未具备宣称完整解析交付的证据。
+
+
+**十二、带书签 PDF 的小节实现与限定实跑（2026-10-17）。**
+
+用户授权实现，目的是观察真实解析效果；本批只接现有 Docling、DocumentStore 和查询入口，没有恢复旧 goal、Agent 联调或模型消歧。前述“待实现/本轮仅评估”是第十一部分的基线状态；本节记录之后的工程结果。原件仍为第九部分指定的 Apple / Alphabet 2025 10-K，均保留完整字节，只通过官方 page_range 限定处理范围。实际选定 Apple 物理页 4–5、11–12、32–33，Alphabet 4–7，共 10 个不同页面；修正与扩大覆盖的运行版本分别保留，不能把累计处理页数当作覆盖页数。
+
+实现位置与职责：
+
+- `documents/pdf.py` 保存 Docling 原始输出、原生文字/字体/位置和原书签，记录实际处理页、模型权重 hash、页范围和策略版本。复用官方字体解析器，并规范化组合的 BoldObl 后缀；不以字体解析修正冒充标题发现完成。
+- 新 `documents/directory.py` 以书签标题与目的页匹配建立锚点，在局部作用域内结合字号、字重/斜体、缩进和相邻正文补充标题/parent。普通 text 仅在与该范围已识别标题的纯字体模式相同、后续为不同正文样式等条件下恢复；不按公司/标题白名单，也不因标题过长排除。当前仅支持完整来源块的恢复，不支持混合标题正文的字符级拆分。层级不确定时标明 `unresolved_parent_candidate`，原块不删；当前规则仍是候选层级，不能代替全文业务验收。
+- `DirectoryNode` 增加 code、heading_block_id、hierarchy_basis；schema 从 parent 派生 depth、code_path，原 title 与位置保留。code 是当前解析版本的可读段，不冒充跨公司统一分类；同级碰撞按节点 ID 加后缀。`ContentBlock.body_selection` 记录 keep/exclude/uncertain、原因和策略版本，当前仅默认排除解析器识别的 header/footer，保留原块及原角色。目录片段/无书签/复杂多栏过滤没有另作未验证的规则。
+- 规范包采用 `document-v2`，继续存入原 SQLite/对象库；无需新数据库或物理表迁移。旧 v1 缺省扩展字段不进入序列化，因此旧冻结字节和引用不被改写。新目录校验同级 code 唯一、标题块引用存在和每块过滤政策存在。
+- `documents/query.py` 新增 resolve_code_path / read_section，查询已有版本不再次解析。小节聚合自身与后代块，保留段落边界和每块引用；超出返回上限明确失败，不截断成功。`truncated=false` 只代表传输没有截断；局部页覆盖和 `source_completeness=not_verified` 明示源文档完整性未证明。表格/图片在 blocks 中保留专属结构，text 仅拼接文本块。section 默认 body，旧通用 query 默认 all，正文搜索须显式 body；精确引用可取回被排除内容。
+- `examples/data_platform/pdf_sections.py` 将已有版本导出为 sections.md、schema.json 和 package.json：显示目录路径、正文、表格网格、块/物理页、过滤对照及缺口，不执行解析或模型调用。实际运行方式写在 LOCAL_DEVELOPMENT 的“带书签 10-K”一节。
+
+真实执行：现有普通安装环境、Docling 2.139.0、本地 Heron/TableFormer/RapidOCR 权重，CPU 四线程、远程服务关闭；选定页有原生文字，OCR auto 本轮未生成 OCR 文字，因此只证明真实布局/表格及原生文字链，不能计为扫描件 OCR 通过。付费/远程模型调用 0。财务页曾出现“标题与单位同块 → 书签精确匹配失败 → 父节点不确定”；补充完整标题加尾部括号副标题匹配，仍保留整块文字，并将跨页重复、紧接已匹配标题的展示文字保留为该节正文，避免生成虚假的子目录。另修正局部页缺少祖先标题时的目录顺序计算，使祖先先于后代。财务 v1/v2 观察结果不覆盖，最终策略 `pdf-sections-3` 在财务 v3 真实复跑；前三组真实 Docling 冻结输出经当前策略重放，父子关系、code 与正文归属不变，重放不冒充新的模型推理。
+
+| 审阅版本 | 实际页/产物 | 原文核对结果 |
+|---|---|---|
+| apple-2025-business-sections-v1 | 4–5；17 目录、37 块 | Services → AppleCare，Products → iPhone 等；AppleCare、Digital Content、Wearables 三个完整小节逐段与原 PDF 文字层一致，分别保留 1/2/3 段正文 |
+| apple-2025-risks-sections-v1 | 11–12；9 目录、18 块 | Business Risks 下 6 个长标题；第 11 页原问题的 3 个小节与原文范围一致，下一标题未混入当前节 |
+| alphabet-2025-business-sections-v2 | 4–7；15 目录、78 块 | Google → Google Services → Serving Our Users；Serving Our Users 与 Google Cloud 跨页连续，How We Make Money 下普通粗体列表未升级标题；这 3 个小节与原文范围一致 |
+| apple-2025-financial-sections-v3 | 32–33；4 目录、11 块 | 两张表分别 26×4、15×4；标题在正确 Item 8 下，三年列头、单位和表后附注保留；抽查总营收 416,161 / 391,035 / 383,285 和综合收益 113,611 / 98,016 / 96,652 与原页一致，不作为全部单元格准确率 |
+
+原文检查采用独立 PDFium 文本及原页图，九个小节比较时只统一 Unicode/空白/标点并去除已目视核对的页眉页脚；不是逐字节一致或全文质量指标。四组最终审阅版本共排除 18 个页眉、页脚、页码/导航块，原文与位置逐条保留且精确引用可读回；单位/附注保护已在两张真实表上检查。此处未把原文目录页作为输入，**纸面目录条目与正文分离尚未验收**，不能用页眉 Table of Contents 导航文本被过滤来替代。
+
+证据保存在 `data/data_agent_documents/reviews/<parse_id>/`；每组都有 sections.md / schema.json / package.json；`reviews/source-checks.json` 包含九小节核对、18 条排除记录、表格抽查、安装源码 hash 与不可变包核对。原件、原始模型输出、旧解析版本及本轮失败版本在同一 data 根，未切换默认版本。当前 9 份已发布包读回的规范字节与冻结对象完全一致；最终财务 v3 相同输入/recipe 再执行返回 reused=true、local_inference_ran=false。
+
+工程验证：从当前源码普通重装，不升级依赖；五个安装模块与源码逐字节匹配，均来自 site-packages，命令使用 Python -I，未注入导入路径。4 项小节/兼容边界测试及 16 项既有文档存储测试通过；包括多页查询聚合、超限明确失败、过滤视图游标不可混用、旧格式、未观测祖先顺序和合并标题/单位边界。全项目测试、其他平台未运行。无需据此新开大规模回归。
+
+**停止点与未完成项：**本批完成限定实现和上述实际页面核对，停下供用户 review。两份全文、纸面目录定位/跨页目录、复杂合订报告、无书签/扫描件、混合块标题切分、普通强调的广泛误判率、模型消歧和固定业务标签/图片语义描述未完成；完整语义层级仍待进一步验收。所有新解析保持 partial，不自动设为默认。下一步先审阅现有四组结果的最小标题与正文边界，再决定是否扩到这两份 10-K 的全文；不自动启动该扩展。
+
+### 十三、两份 10-K 全文解析与代码 review（2026-10-17）
+
+用户随后授权继续，范围扩至同两份 PDF 全文，并要求一起 review。原件、存储与本地模型沿用前节；没有调用付费模型或进入 Agent 联调。官方标题层级机制依据：<https://docling-project.github.io/docling/usage/heading_levels/>；标准解析与可配置 prompt 的 VLM 管线须区分：<https://docling-project.github.io/docling/usage/vision_models/>。当前仍用标准 PdfPipelineOptions，不启用 VlmPipeline / 图片语义描述。
+
+**现象与修正：**初次全文运行 Apple 发布成功，Alphabet 在第 99 页签字表因模型输出单元格重叠而发布失败，原始 Docling 输出保留在对象库。检查原页和原始单元格确认是网格冲突，不是网络问题。适配器版本 3 对明确的重叠/越界网格记录 table.status=failed、block.status=partial，不选取冲突值；保留原始解析与截图，缺少截图则仍失败。该处理是暴露局部失败、允许发布 partial 文档，不是修复表格识别质量。
+
+目录策略升级为 pdf-sections-4：书签匹配可保护被布局模型误判为页眉的真实标题；在同页和目的地位置约束下匹配很小的标题拼写差异，或合并标题块内的完整原文行；未匹配书签仍保留目的地与章节范围，避免正文串入前章；标题层级回退受当前书签范围约束。纸面目录表过滤须同时具备目录上下文及多个原书签行匹配，不将任意含数字的表格当作目录。没有使用公司或答案特例。
+
+| 全文版本 | 实际覆盖 / 块 / 目录节点 | 书签匹配 | 层级候选 / 表格缺口 |
+|---|---|---|---|
+| apple-2025-full-sections-v2 | 80 页 / 970 块 / 248 节点 | 99/102；3 个仅保留目的地 | 3 个父子候选；52 张表未触发网格错误，不代表全部数值已核验 |
+| alphabet-2025-full-sections-v2 | 99 页 / 1,427 块 / 309 节点 | 91/103；12 个仅保留目的地 | 16 个父子候选；74 张表中 1 张结构失败，73 张通过网格约束 |
+
+最终两次真实本地转换耗时约 51.0 / 45.7 秒，远程调用 0；OCR 观测数均为 0，不作为扫描件 OCR 验收。原九个小节在相同源页范围回查一致；两张 Apple 财务表的文本、单位、附注及全部结构化单元格与此前原页核对版一致。Apple 71 个页脚及 1 张主目录表、Alphabet 193 个页眉、97 个页脚及 2 张目录表从正文视图排除，原引用保留；Apple 7 个有书签依据的标题得到保护。Apple 第 31、57 页财务索引表仍在正文视图，过滤尚不完整。
+
+当前源码普通重装后，两个改动安装模块与源码逐字节核对一致；7 项小节边界测试与 16 项文档存储测试通过。12 份已发布包的规范字节与冻结对象一致；原件字节准确读回、默认版本不变。证据位于 `data/data_agent_documents/reviews/full-source-checks.json`；两份全文各有 `reviews/<parse_id>/sections.md`、schema.json、package.json，失败表截图也已导出。全项目回归及全文逐项业务验收未运行。
+
+**review 新发现：**虽然 PdfPipelineOptions 启用 HeadingHierarchyOptions，但 `_blocks` 没有向 `build_sections` 传递官方 SectionHeaderItem.level；目录父子推断主要依赖原生书签与本项目排版规则。原始模型输出保存了官方 level，可直接比较，不必重跑模型。官方 level 也不能直接当作正确答案：实际 Alphabet 的 Google Services 与 Serving Our Users 均为 6，不能仅依该值恢复已确认的父子关系；是否受默认 max_level=6 或其他推断机制影响尚未验证。应先对照官方层级、当前规则和原页，再决定接入或参数调整。此次只记录发现，未改变解析策略、增加业务 prompt 或启用 VLM。
+
+**停止点：**两份全文均为 partial，供用户 review；未匹配书签、候选关系、失败表、过滤遗漏均保留。无书签/扫描件、复杂合订材料、语义消歧和业务标签仍未完成，不因全文转换成功扩大完成定义。
+
+
+**十四、原生目录与 passages（2026-10-19，替代本批正文扩目录策略）。**
+
+用户审阅指出 Macroeconomic and Industry Risks 与 Business Risks 粒度不一致，随后明确采用文档原生目录；风险主题句及说明用 `passages[0]`、`passages[1]` 读取。原生书签已有的 Products and Services Performance → iPhone 保留。`passage` 是一个完整内容组，可包含多个自然段、表格/图片与跨页内容，不是单个排版段落。第九至十三部分是旧版本过程记录；不再以恢复全部正文标题树作为本批目标。
+
+- 目录只采用原书签 node/parent/title/order，规范 code 并保留目的地、标题匹配依据及未匹配问题。字体、长句、正文小标题不会增加导航节点；缺失或不可靠目录不冒充已解决，本批不扩展该类材料。
+- 章节内保留有序原始 blocks。原生目录标题单独保存，不重复加入 passage。完整块的突出样式及后续普通正文、解析器标题标签作为分组信号；它们仅影响平面分组，不生成层级。没有可靠主题边界时保留该章节连续内容，不按页码/长度切段；排版信号不宣称语义已验收。
+- 同章不再要求先存在一个被布局模型标作标题的同样式 seed。此前 Apple Macro 的长风险主题样式无此 seed，而 Business 有 `texts-143`，导致前者保留正文、后者其余长句被扩成目录；两组应共用相同 passage 规则。原始文字始终保留。
+- 新 document-v3 将 `passages` 元数据冻结在 ParseVersion（现有 parses.payload）中，每组只有 `passage_id/directory_node_id/index/block_ids/lead_block_id/grouping_basis`；文本、表格和坐标继续引用 blocks，不另建一套正文或新数据库。发布验证同章节成员、阅读顺序、连续索引、无重复及已归属正文完整覆盖。
+- `read_passage(parse_id, path="<code_path>.passages[N]")` 或版本内 passage_id 返回完整成员、原文、位置与状态；`list_passages` 只列当前章节直接组，不把子章节混成同一索引。`read_section` 继续可聚合章节/子树。旧版本未分组明确返回 PASSAGES_NOT_AVAILABLE，不能在读取时临时按新规则改写旧结果。
+- 文本块新增 `text_lines`：冻结 line_id、原始行文字、物理页及 PDF 左上角 pt 矩形；可唯一对齐时记录 block.text 的 Unicode 字符范围，采用 NFKC/去空白对齐，范围左闭右开。不能对齐时 char_range=null，保留原观测而不造位置。表格沿用行列/跨度与单元格位置；单元格未有坐标时仍明确为空。组合定位须绑定 material_id/parse_id/block_id，跨页分别保存区域。
+- document-v1/v2 的新增可选字段默认不序列化，冻结字节不变；新解析需新 ID/recipe。原生书签、正文页/表格、主题分组的质量分别核对，不以目录数量或测试成功代替业务验收。
+
+本轮限定真实输入、运行及验证结果在本节后续记录；证据追加现有 `reviews/full-source-checks.json`，不建立平行验收台账。
+
+
+**本轮实际运行与核验结果。**原始输入 hash 沿用第九部分，没有重新取得或替换材料；Docling 本地 CPU 转换 Apple 53.46 秒、Alphabet 47.17 秒，真实覆盖 80/99 物理页。发布 `apple-2025-native-passages-v1`（102 原生目录、229 passages、970 blocks）、`alphabet-2025-native-passages-v1`（103 原生目录、276 passages、1,427 blocks）。两份原生目录的节点、父级、标题、顺序完全一致；原先多出的正文目录节点不进入新版本，原 blocks 的文本/类型/区域/表格结构与旧全文版逐块一致。重跑确实执行了本地模型，local_inference_ran=true；远程付费调用 0，OCR auto 未生成 OCR 文字，不作为扫描件 OCR 验收。
+
+- 原例：Business Risks.passages[0] 对应 texts-138/139；[1] 对应 texts-140/141/142。两组逐块 PDF 矩形取文比对通过，第二组的第二自然段未丢。Macro 由统一规则分为 3 passages；原生 MD&A → Products and Services Performance → iPhone 仍是 outline-42，其正文单组可读。
+- 跨页：Apple 机密信息风险主题及全部六段说明保留在同一 passage（物理 14–15 页）；Alphabet Serving Our Users（5–6 页）与 Google Cloud（6–7 页）跨页内容保留。Google Cloud 的七条列表项比较差异仅为前导项目符号：PDFium 返回符号，Docling 的 marker/orig 独立保留符号、text 不含符号，当前规范块仍使用 text；不称逐字一致，列表嵌套未另建结构。另两块仅直/弯引号差异，初次比较 false 与诊断、显式引号规范化比较均保留。抽查不等于全篇业务验收。
+- 文字位置：Apple 2,569 条源行中 2,446 条唯一对齐，Alphabet 3,472 条中 3,300 条唯一对齐，其余 123/172 条 char_range=null，不造精确字符位置；全部观测仍保存原文字/矩形。已有表格单元格行列与已观测坐标原样保留。
+- 质量缺口：原生标题未匹配仍为 3/12 个；Alphabet tables-73 的签字表网格失败仍明确保存，Apple 两处财务索引表过滤遗漏未扩大修复。目录自身质量、全篇 passage 语义、未匹配行/列表呈现、标签/图像描述、无书签/复杂合订材料与扫描件仍未完成，两版均 partial。
+- 工程与持久化：9 项章节/分组/行定位/引用及失败边界检查、16 项存储检查通过。review 补充跨 passage 的原始阅读顺序验证和旧 schema 禁止挂载未校验 passages；只收紧发布校验，未修改已发布包。原 12 份包按当前契约导出与 CAS 原字节一致，默认版本不变；未改数据库表结构或升级依赖。源码普通重装、安装内容逐文件核对，CLI 从包读取真实结果，不依赖 PYTHONPATH/sys.path 注入。
+
+审阅导出仍在同一 data 根：新版 `passages.json` 为章节＋内容组＋原始块/区域的 JSON，`package.json` 包含完整行与单元格结构，`sections.md` 仅为阅读视图。证据追加 `reviews/full-source-checks.json.native_passages_20261019`，保留原核验记录和失败比较。本轮完成后停止供 review，不恢复旧 goal、不进入 Agent 联调或其余材料。
+
+### 14.19 新目标：新版文档库接入 Agent 并完成限定业务交付（2026-10-19）
+
+**目标与当前状态。**用户已认可 14.18.2 第十四部分的原生目录＋passages 结果，要求重新制定目标并在完成后 review。本节固定本批执行目标及验收边界。2026-10-19 首次完成共享接入、工程验证及 C1 真实业务核验后暂停。用户随后确认累计 $12／本批 $6 并恢复执行；本轮进展与新契约见本节末尾“扩额恢复”。目标尚未整体完成，保留首次暂停时的证据。旧 goal 的失败、费用及未完成记录保持。
+
+> 完成新版文档库到共享 Agent 工具的接入。在已入库的 Apple、Alphabet 2025 10-K 上，让 Agent 自主发现材料、查看版本 schema/原生目录、选择并读取 passages 或表格，形成可追溯记录，按需用代码计算，交付 JSON、Markdown 和适用的 CSV。完成下面三个 case、两套 SDK 的限定运行、原件核对及代码/差异 review 后停止，不自动进入新材料采集、复杂 PDF、40-query 基线、工作台或生产切换。
+
+**输入与范围。**
+
+- 本批材料为 `apple-2025-native-passages-v1`、`alphabet-2025-native-passages-v1`，使用现有 `data/data_agent_documents` 的冻结原件/解析包，不再运行 Docling。运行配置显式固定允许的材料与解析版本；Agent 在该范围内自行选择材料、章节、块及单元格。这个实验是“已入库材料查询”，不是官网自主发现/获取验收。
+- 运行可以选择本批解析版本，但不得更改存储的全局默认版本或在查询时生成新解析。`passages[index]` 只在指定解析版本及章节内有意义；持久引用须包含材料、原件/解析版本和块/位置，不能只保存可变路径或索引。
+- 保留原生目录；正文主题句只影响平面 passages。不扩正文目录树、通用 OCR、合订文档拆分、正式标签词表、图像语义描述或解析器更换。现有 partial/未匹配标题/行位置/失败表格等状态必须对调用者可见；与本题无关的局部失败不自动否定整题，影响所需证据的失败必须处理或如实交付缺口。
+- 保留既有未提交改动、旧冻结包、旧引用、账本与历史结果；不执行历史数据迁移、不提交/推送、不启用未授权的外部系统。
+
+**接入前源码 review 与责任边界。**接入前 `documents/query.py` 已有材料筛选、schema、分层目录、组合块查询、章节/passages 与精确块读取；旧 `service.py` 将业务操作交给使用 `HtmlReader`/旧索引的 `application/tools.py`。当时资产引用、HTML locator、记录选择器及交付来源约束尚未表示新文档引用。因此在共享业务层扩展文档引用和读取/提取能力，沿用现有服务及官方 runtime，不为 PDF 单独复制 Agent 循环、账本或交付系统。
+
+| 步骤 | 本步目的及完成条件 | 主要预期文件范围 |
+|---|---|---|
+| 1. 版本与读取接入 | 在显式材料范围内发现正确版本；schema 展示原生目录和真实能力；可按路径/节点读取完整 passage 或表格，返回版本、原始位置、上下文及缺口；读取不触发解析 | `contracts/query.py`、必要的引用契约、`service.py`、`application/tools.py`；必要时新增同目录的文档工具适配模块，复用 `documents/query.py` |
+| 2. 提取、计算与交付 | PDF 表格/正文中的事实成为带来源的记录；计算用实际记录作操作数；交付保留记录、计算、证据和缺口；人读 Markdown/表格 CSV 从同一交付对象导出 | `application/evidence.py`、`application/reading.py`、`structured/`、`application/delivery.py`、必要契约及导出入口 |
+| 3. SDK 运行与收尾 review | 两套 SDK 使用同一业务能力、各自冻结 prompt/Skill 配置；真实执行下述 case，检查模型实际看到的工具结果，独立对照原件；复盘错误/循环/费用并报告完成项和缺口 | `agent/binding.py`、必要的 runtime 装配、profile/prompt/Skill 配置、现有示例/CLI、相关行为测试、`docs/LOCAL_DEVELOPMENT.md`、TODO |
+
+步骤 1 以安装后的包对真实已入库材料走通读取及非法/跨版本引用边界后，进入步骤 2；步骤 2 的记录、计算与导出能由同一份真实证据读回后，进入步骤 3。这些工程检查不替代真实 Agent 运行。源码需普通重装并核对导入位置；按影响选择必要测试，不例行全库重跑。
+
+**接入时必须落实的约束。**
+
+1. PDF 原件/解析/块引用与旧 AssetRef 的关系必须显式，不能伪造 HTML DOM、XBRL QName 或将内容 hash 当作公司/业务身份。两套格式引用有明确判别方式；旧请求的序列化、回放和旧结果语义保持。
+2. 保留现有工具职责，避免把同一能力同时包装为两组相似工具。参数及返回说明应让模型知道如何发现、分页、读完整上下文和引用结果。大章节/表格以有界读取返回；不能静默截断后把片段当完整证据，也不能固定注入整篇文档。
+3. PDF 提取记录区分原文观测和模型解释。数值保留 raw_value、解析数值、单位/倍率、期间、主体/合并或分部口径及支持这些字段的证据；模型提交的解释只能标作解释，不能借格式校验升级为语义已核实。值/期间/口径无法证明时保留缺口，不套用 iXBRL 的字段存在假设。
+4. 位置采用现有 PDF 物理页、矩形、块及已观测行/表格单元格。char_range 或单元格坐标为空时如实返回，不制造精确位置。文件输出和最终引用均绑定本次冻结版本，可从引用读回原件。
+5. 计算沿用代码执行、单位与可比性检查及操作数依赖；禁止模型只在文字里填百分比冒充计算。先验证实际数值及口径再判通过，工程引用闭包不代表业务正确。
+6. 按 model × SDK × route × prompt/Skill 版本由配置装配，分别保留厂商指导；使用官方发现/加载机制，实际观察 Skill 正文进入模型输入。遇到 SDK/协议问题先核对官方资料、实际版本及最小失败，不叠加猜测修复。
+
+**冻结业务 case 与产物。**测试预期只由验收侧持有，不能把答案、块 ID、正确目录或数值送入产品 Agent。材料白名单及明确的公司/期间属于调用输入。
+
+| Case | 给 Agent 的问题 | 完成标准 |
+|---|---|---|
+| C1 内容组读取 | 从 Apple 2025 Form 10-K 中列出 Business Risks 的前两项风险，保留每项完整说明并给出出处。 | 顺序正确；主题及全部连续说明保留，不遗漏第二项的第二自然段；JSON/Markdown 可读，引用能回到原件 |
+| C2 表格与计算 | 从 Apple 2025 Form 10-K 提取 FY2025、FY2024 合并营收，说明期间、币种和单位，用代码计算 FY2025 同比增长率并给出出处。 | 两条结构化记录和来源上下文齐全；公式/操作数/结果来自代码；合并口径有证据；JSON、Markdown、CSV 一致；原件数值及位置独立核对 |
+| C3 独立材料 | 从 Alphabet 2025 Form 10-K 提取 Google Cloud 的业务范围说明，保留相关列表与跨页内容并给出出处。 | Agent 自主选对材料和章节；相关正文/列表内容完整且顺序正确；跨页引用可读；列表结构未保留等已知限制显式说明，不暗称排版逐字一致 |
+
+主路线拟使用现有 OpenAI Agents SDK＋DeepSeek 官网直连，运行 C1–C3；Claude Agent SDK＋DeepSeek 官网直连以同一 C2 验证共享能力与独立 prompt/Skill 装配。精确 model ID 以运行前核对的现有 profile 为准，不将目录名当成模型版本。OpenRouter 适配保留，本批不自动增加多模型对照。官方接口不支持的可选 SDK 功能明确标记跳过；读取、提取、计算、证据交付这些核心能力不能通过跳过记为完成。
+
+交付 JSON 是机器可读主对象，Markdown 为同一对象的人读视图，CSV 仅导出有表格记录的 case；C1/C3 不为凑格式生成空 CSV。此前解析审阅用 `sections.md` 不是 Agent 交付。输出目录由命令显式指定，解析数据库和原件仍在原 data 根；不为每个 case 复制数据根或解析环境。
+
+**运行资源与阻塞处理。**2026-10-19 已通过现有 `live_function.py inspect` 只读核对原账本：上限 $6、112/163 次、已报告收费 $3.45748566、未核账保留 $1.4361136、剩余 $1.10640074，无在途。这里是核对时快照，运行前需重查。新批次拟在原累计上限内最多新增 $1、四条执行合计最多 48 个物理请求、每条最多 12 个、串行运行；不自动用满、不释放未经核实的预留、不新增充值或额度。能力不支持、无进展或费用不足应停止对应执行并报告，不能改题/换答案/降低标准以求通过。
+
+现有追加 scope 实现继承旧问题；本批材料和问题已经改变，因此旧冻结执行契约不可直接复用。需明确保存新输入、允许版本、profile/Skill hash 和本批限制，并复用原累计账本的准入与记账能力，不重置历史费用。若当前接口无法安全表达，先在原账本/执行契约的责任层补齐最小能力并核验；不得另开一个不计旧费用的账本或把本批请求伪装成旧 case。费用/运行限制在正式执行前具体化，不将本段拟定限制冒充已经应用的账本状态。
+
+**完成后的 review。**
+
+- 实现：检查是否复用了新文档库与共享工具；是否存在样本路径/公司特例、重解析、静默旧版本回退或第二套运行系统。
+- 工程：核对安装内容、旧引用、跨版本/缺失/损坏/未观测引用、真实 partial 及必要的有界读取行为；不拿 mock 的正常链替代模型结果。
+- 运行：逐条记录实际 SDK/model/route/prompt/Skill、工具执行及可见结果、真实请求数、停止原因、费用与未核账项。模型自然语言声称完成不算工具成功。
+- 业务：独立对照原 PDF 核对内容范围、表格值、期间/单位/合并口径、计算及引用；主路线 C1–C3 与 Claude C2 分别报告。任一必需 case 未通过时整批不能标完成，不宣称全材料、全部模型或端到端来源发现已验收。
+- 差异与收尾：保留旧包、默认版本及无关改动；交付可复制命令和产物入口；修复本批发现的阻塞性问题后重放对应原例。报告通过、失败、未运行和剩余缺口，更新当前 TODO 后停止。
+
+**实施与首次收尾 review（2026-10-19，扩额前）。**当时已执行到 C1，并按用户决定暂停；以下区分工程、真实运行与业务核验，未降低前述完成标准。
+
+- **共享实现。**新增 `contracts/document_query.py` 表示显式材料/来源/解析包引用及调用方绑定；`service.py` 根据冻结 context 选择 `application/document_tools.py`，复用现有六工具、证据登记和交付。目录/passage/块/表格引用保留版本与位置；读原件时校验完整性。`structured/document_records.py` 校验实际已读数值、原文引句及依赖闭包，用共享 Decimal 算法计算；口径、期间等语义解释仍标为未独立核验，不把引句存在当业务正确。`application/exports.py` 从同一个交付对象生成 JSON/Markdown/适用 CSV，新目录写入并以 manifest 为完成标志，不覆盖既有导出。
+- **SDK 与 Skill。**`config/data_platform/skills/document-data-query/` 保留通用业务指导和按 SDK/模型选择的指导；两侧分别使用 `model-profiles/<sdk>/document-deepseek/query.json` 与对应 prompt。沿用官方 runtime 和原生 Skill 机制。C1 观察到 Skill 文件全文加载；Claude 本批只有配置及共享接线，未进行真实调用，不以 OpenAI 成功替代 Claude 验收。两侧 profile 的验收状态未整体提升。
+- **原账本接入。**在 `gateway_extension.py` 增加显式新 context，并保留旧 scopes/profile/stop 状态；`run_budget.py` 在同一原账本约束本批新增 scopes 的合计 $1 上限。未改变 DeepSeek 用量估算后的全额预留规则。原 112 条请求的规范序列化 hash 不变；两份冻结解析包与原件 hash 不变，未重新解析或切默认。
+- **工程证据。**普通重装当前源码后核对 11 个实际 site-packages 模块与源码字节；9 项文档行为检查、37 项旧查询检查、10 项账本扩展检查通过。真实 Apple 材料的直接工具调用已走通读取→两条记录→代码增长率→三格式导出，位于 `engineering-export/`；这是宿主选择操作的工程验证，不能计作自主 C2 通过。收尾发现图片返回与紧凑表格选项会被忽略，已改为 `CAPABILITY_UNSUPPORTED` 并增加行为检查；C1 没有使用这两个选项，修正后未新增真实调用。
+
+| 实际执行 | 状态及证据 | 尚未证明的部分 |
+|---|---|---|
+| OpenAI Agents SDK 0.24.0＋DeepSeek 官网直连，C1 / `H-C1` | 12 个物理请求，runtime completed；Skill 全文加载。独立原 PDF 文字与图像核对通过：物理页 11 / 印刷页 8，两项风险的主题及完整说明保留，第二项两段均齐全；原文比较只规范空白及印刷引号 | 本次实际沿块读取完成内容任务；passage 入口有工程测试，但不能称此次模型已使用 passage 入口。额外上下文含页脚，展示仍可精简；12 次请求不代表效率已优化 |
+| OpenAI C2 / `I-C2` | 未运行，0 请求 | 自主数值提取、财年/币种/单位/合并口径、代码计算和交付的一体业务验收 |
+| OpenAI C3 / `J-C3` | 未运行，0 请求 | 第二份真实材料的自主完整列表、跨页读取及出处验收 |
+| Claude C2 / `K-C2-claude` | 未运行，0 请求 | Claude 原生 Skill 加载、共享文档工具调用及同题真实业务验收 |
+
+运行模型 ID 为 `deepseek-flash`，冻结配置记录 `DeepSeek-V4.1-Flash-1017`；请求仍使用供应商别名，此元数据不保证供应商未来不会改变别名路由。C1 导出为 `output/data-agent-documents-20261019/H-C1-delivery/{delivery.json,delivery.md,manifest.json}`。同根 `review.json` 保存原件核验、请求数、费用、安装位置及完整性检查；`manifest.json` 保存执行契约。原件和解析数据库仍只在原 data 根。
+
+**费用与停止决定。**C1 的完整响应按已报告 token、官方峰值非缓存价格估算为 $0.1529787，但这不是供应商账单。原有规则继续占用完整预留 $0.6137136；用户明确选择“维持全额预留，先交付现有结果和缺口”，因此未修改计费准入规则，也未追加其余模型请求。收尾累计 124/163 次，已报告收费 $3.45748566，未核账全额保留 $2.0498272，累计剩余 $0.49268714；本批 $1 剩余 $0.3862864，无未知费用或在途请求。未核账保留不等于已发生账单。
+
+**交付范围与缺口。**本批实现/差异 review 已完成；保留原有未提交文件，没有提交或推送。业务完成度是四条中的一条通过、三条未运行，goal 暂停而非完成。既有解析 partial、未匹配标题、未唯一定位行及失败表格等质量项仍保留；数值语义不自动核实，图片返回与 compact 表格明确不支持。下一步需用户 review 后决定是否恢复其余三条；恢复前核对原账本实际可用额，不自动释放预留、扩额或换题。查看及导出命令见 LOCAL_DEVELOPMENT 的新版文档库一节。
+
+
+**扩额恢复与第二次收尾 review（2026-10-19）。**用户先批准原累计池 $6→$12、本批四条合计 $1→$6，随后批准 I-C2/K-C2-claude 各追加最多 12 次（各累计 24），原根次数 163→187。两次授权分别保存在 `output/data-agent-documents-20261019/authorization-money-v2.json`、`authorization-requests-v3.json`，对应 `manifest-money-v2.json`、`manifest-requests-v3.json`。金额修订保留全部旧 context/profile/停止状态；次数修订只调整两条明确指定路线并解除其 native_max_turns，其他停止原因不解除。通过现有 prepare-attempt 创建同题新执行，不改旧结果、不复制账本。追加后的前 159 条请求规范 hash 与修订前一致，费用及全额预留未释放。
+
+本轮修正集中在共同机制：`document_tools.py` 的整表用一个完整网格返回，单元格依赖只保留列头及所选行名；文本搜索支持原生章节元数据、单章节含子孙及表格过滤；仅明确请求 neighbors 时展开，并分别遵守 before/after；`retrieval/cursors.py` 允许 read_evidence 在同一位置调整输出字节预算，同时拒绝改目标/上下文，保留旧游标原参数读法。两次安装均核对实际 site-packages 字节。14 项文档行为检查、14 项额度修订检查通过；相关旧查询游标回归结果见 review.json。原失败请求回放分别保存在 `I-C2-tool-replay.json`、`numeric-context-tool-replay.json`、`read-cursor-tool-replay.json`，均为 0 模型调用的工程验证，不能替代自主业务通过。
+
+| Case / SDK | 最终真实情况 | 原件业务验收 |
+|---|---|---|
+| H-C1 / OpenAI | 12 次，原成功结果保留；未重跑 | 通过：两项风险主题和全部说明，原件物理页 11 / 印刷页 8 |
+| J-C3 / OpenAI | 11 次，completed；完整 Skill 正文读取 | 通过：Google Cloud 介绍、五项类别及两项 Agents 子项，物理页 6–7；列表符号未保留的解析限制已披露 |
+| I-C2 / OpenAI | 首次 12 次 partial；修正后新执行再 12 次 failed，共 24。已读原生 passage、整表和精确单元格，继续补查币种及合并口径时额度耗尽；一次 any_terms 不支持 | 未通过：没有注册两条数值记录、代码增长率及本次完整交付 |
+| K-C2-claude / Claude | 首次 12 次 partial；修正后新执行再 12 次 failed，共 24。整表及单元格可读；issuer 过滤不支持；显式相邻上下文过大后增大预算遇到游标冲突 | 未通过：未注册数值记录或代码计算；最后的游标修正只有原请求工程回放，未进行修正后真实运行 |
+
+最新失败分别保留在 `I-C2-v2/`、`K-C2-claude-v2/`；不存在其完整业务导出。I-C2-v2 明确为物理请求次数耗尽；Claude 终态只暴露 MODEL_ERROR unknown，原账本显示该路 24 次已用尽，没有额外发出。结合传输层路径，下一请求的额度拒绝是最可能原因，但其到 SDK 错误的映射尚未独立复现；终态诊断仍需改进，不能把未知 SDK 错误直接当网络失败。本次两路 v2 使用相同业务工具修正；首次 I/J 在整表修正前、首次 Claude 在其后，不能作为同版本 SDK 对照。小样本也不能证明某 SDK 或模型普遍更优。
+
+**新增关键 review 发现：Claude prompt 隔离未完成。**两侧均实际加载 Skill。Claude 原生加载时去掉 YAML frontmatter，完整指令正文已在请求中逐字确认；不能要求元数据原样出现来误判加载失败。然而 Claude v2 的实际模型输入还出现了仓库 AGENTS.md 的开发协作规则。当前 make_options 使用 `setting_sources=['project']`，cwd 位于仓库内；“隔离的工作子目录”不能保证不继承父级项目指令。这是确认的输入污染，尚未证明它造成了哪些具体业务错误，尚未修复。官方 [Skills 文档](https://code.claude.com/docs/en/agent-sdk/skills) 说明项目来源会发现父目录的 Skills，支持通过明确 plugins 路径加载；[Plugins 文档](https://code.claude.com/docs/en/agent-sdk/plugins) 是后续隔离实现的优先依据。该方案尚未实施或验收。证据见 `skill-runtime-audit.json`；原始输入仍保存在原运行/账本中。
+
+**费用与停止。**本批总计 71 个真实请求（12+24+11+24），根账本累计 183/187。已报告历史收费 $3.45748566，未核账全额预留 $5.0673235，累计可用 $3.47519084；本批预留 $3.6312099，$6 中剩余 $2.3687901。按报告 token 的峰值非缓存价估算本批约 $0.8909277，仅作参考，不是账单。未知费用/在途均为 0，没有充值或释放预留。金额仍有余量，但两条数值路线授权次数均已用满，因此本轮停止，不再追加调用、不标 goal 完成；平台 goal 最后核对仍为 paused，工具不能代用户恢复 active。
+
+**本次 review 时的后续建议（随后用户转向见 14.20）。**修复 Claude 的业务指令/Skill 与仓库开发指令隔离，并将公开工具参数收敛到文档后端实际支持的能力；先用原生请求捕获证明无仓库规则混入、Skill 正文仍加载，再考虑新的数值业务复验。同时保留单位/合并口径的原文证据要求，不降低本节 C2 标准、不把工程计算样例算作业务完成。余下两条业务验收、最新游标修正后的真实验证及供应商账单核对均未完成。原始解析包、默认版本、旧引用与无关改动保持，未提交/推送或部署。
+
+### 14.20 同一 OpenAI Agents SDK 的五模型对照（2026-10-19，已实跑并 review，停止待审阅）
+
+**目的与边界。**用户要求先保留 Data Agent，比较同一 SDK 下不同模型的效果。首轮只运行 14.19 的原 C2：从 Apple 2025 Form 10-K 提取 FY2025/FY2024 合并营收、期间/币种/单位，代码计算增长率并交付出处。一题×五模型各一次，观察完整交付与最早偏差；不是统计基准，也不以旧 HTML 或两段 12 次会话结果充当本轮对照。模型自己找材料、目录及证据；不提供验收答案、单元格或语义块选择。
+
+| 实验路线 | 请求模型 ID | 路由与版本依据 |
+|---|---|---|
+| Sol | `openai/gpt-5.6-sol` | OpenRouter，仅 OpenAI；目录当前显示 20260709 版本 |
+| Terra | `openai/gpt-5.6-terra` | OpenRouter，仅 OpenAI；目录当前显示 20260709 版本 |
+| Luna | `openai/gpt-5.6-luna` | OpenRouter，仅 OpenAI；目录当前显示 20260709 版本 |
+| DeepSeek Pro | `deepseek-v4-pro` | 官网直连；官方文档当前版本 DeepSeek-V4-Pro-0813 |
+| DeepSeek Flash | `deepseek-flash` | 官网直连；当前 DeepSeek-V4.1-Flash-1017，旧 v4-flash 已重定向 |
+
+[DeepSeek 官方模型/价格表](https://api-docs.deepseek.com/quick_start/pricing/)与只读 `/models` 已核对；GPT 的模型 ID、工具/推理参数及价格来自 OpenRouter 三个 `/api/v1/models/openai/gpt-5.6-*/endpoints`。目录观察不等于真实响应版本，实跑须记录响应 model/provider，无法确认快照时如实标未知；GPT profile 不填未验证的固定快照。按 [OpenRouter Provider Routing](https://openrouter.ai/docs/guides/routing/provider-selection#base-slug-matching)，基础 `openai` 不自行启用 fast/flex 服务档，本轮沿用标准档，不增加 tier 参数或回退路由。
+
+**共同条件。**复用安装的 openai-agents **0.24.0** / openai **3.31.0**、当前业务代码、工具 schema、原文档库/解析包和原 C2 的材料白名单。每路创建独立连续会话，不继承旧轨迹或其他模型答案。每路最多 24 次物理请求，串行；统一 `reasoning=low`、输出上限 4096、请求 400000 字节、响应 1000000 字节、单次超时 90 秒。保留原业务 600 秒期限、6 次无进展停止。首轮 low 为与原任务相近的成本设置，各厂商档位不等于相同内部算力；达到输出/时间上限要分类，不直接归因为模型不会做题。预算、请求上限是停止条件，不保证全部用满或业务通过。
+
+**prompt/Skill。**新增 `model-profiles/openai/document-ab-{sol,terra,luna,deepseek-pro,deepseek-flash}/query.json` 及对应独立 prompt。五份业务正文与现有 document-deepseek 相同，首段绑定实际模型/路由；本轮不逐模型调题。`skills/document-data-query/mapping.json` v2 为 GPT 三款和 Pro 添加明确映射，GPT 指导位于 `guidance/gpt56-openai.md`，DeepSeek 复用原厂商指导。业务 Skill/工具指南不改、旧已冻结 Skill 不重写。生产侧仍由 SDK 发现与加载，预检 get_skill 成功不能替代实际完整正文进入模型输入的检查。
+
+**已知共同限制与观察方式。**公开通用 schema 仍包含文档后端不支持的部分过滤/模式，状态与引用操作仍较复杂。本轮冻结这些条件，记录模型是否避开、纠正或反复触发，不中途给某一路修工具/补答案。若发现影响所有路线的硬阻塞，停止受影响比较并记录结果，先说明再决定另开修订；不拿受阻结果排序。Claude 项目指令混入问题仍未修复，但不属于此次 OpenAI SDK 五路执行。GPT 与 DeepSeek 路由、身份/版本前缀及协议参数不同，业务指导主体相同；结果反映当前五套运行配置，不能严格归因于模型权重。
+
+**验收与交付。**分别记录 Skill 完整加载、取数/期间/币种/单位/合并口径证据、记录注册、实际代码计算及 JSON/Markdown/CSV 导出；由验收侧独立核对原 PDF。展示五路的完整/部分/失败/未运行状态，以及请求数、业务工具调用数、参数错误、重复调用、首次偏差、耗时、token、已核账费用和保留金额。工程错误、网络/提供方错误、额度停止和业务错误分开。首轮结束 review 后停止，不自动加题、加轮次、换强推理档或恢复 Claude 修复。
+
+**准备期费用与授权申请（历史快照，批准及执行见下文）。**只读余额预检成功，当时 OpenRouter 可用约 $12.76053034、DeepSeek ¥61.65，不需要先充值。原账本当时为 183/187、上限 $12，已报告收费 $3.45748566、全额未核账预留 $5.0673235，剩余 $3.47519084。拟申请累计上限 **$24**、本轮五路合计 **$15**（包括未核账保守预留）、根次数 **307**（新增五路各最多 24，共最多 120）。原金额与请求记录保留，不释放预留、不拆账、不充值。原扩展机制要求先单独修订累计金额，再添加 scope；两步均依同一次明确授权执行，旧 scopes 原样保留。
+
+费用仅作场景估算：将原 C2 的 24 个请求报告的 944129 输入 token、10000 输出 token，按当前标准/峰值非缓存价重估，五路约为 Sol $3.98、Terra $2.01、Luna $0.20、Pro $1.29、Flash $0.30，合计约 $7.77。这不是实际新账单或上界：分词、推理和执行轨迹会变，缓存会影响收费。按同一历史请求字节与原全额预留算法，DeepSeek 两路约占用 $6.47，故申请额保留余量；OpenRouter 按实际响应费用核账，未核账时不能静默释放。达到任一已批准上限即停，不保证 $15 能完成所有路线。
+
+**准备证据（历史快照）与执行入口。**`output/data-agent-model-ab-20261019/comparison-plan.json` 固定原 case、原账本/manifest hash、源码/工具 hash、五路 prompt/Skill 指纹和候选限额，保留准备时 `inference_authorized=false`；后续明确批准保存在 `authorization-money.json`、`authorization-scopes.json`，执行使用 `manifest.json`。`add-scopes.json` 供既有 `examples/data_platform/live_function.py extend-allowance --add-scopes` 使用，随后使用同一 CLI 的 run/inspect/export。`verification.json` 仅记录准备时配置加载、独立 prompt、共用业务正文、显式 Skill 映射及 **86 个源码文件与安装包字节一致**；当时尚无推理或业务验收。首次只读网络因外层 DNS 限制失败，获准网络只读重试成功；准备脚本一处 selection 字段误读已按源码纠正。官方网络预检成功不算模型链成功，旧 goal 仍 paused。
+
+
+**执行授权与准入修复（2026-10-19）。**用户确认上述 $15 本轮/$24 累计及 307 根次数，同时要求 prompt 除格式外大体一致。五份 prompt 去除模型/路由身份前缀后逐字一致；两厂商 Skill guidance 去除身份前缀后模板主体逐字一致，业务 Skill 与工具指南共用，已保存 `prompt-equivalence.json`。没有逐模型改写业务策略。
+
+首次添加新 scopes 在推理前失败：前一步金额修订保留了历史 context 原额度，但新增 scopes 分支重验全部旧 context 时要求它们等于新池额度；进一步回归暴露根次数增长只计算旧 scope 调额、未计算新增 scope 容量。修正 `gateway_extension.py` 保留旧冻结 scope、仅验证新业务根；`run_budget.py` 仅允许原批准根次数增加不超过新增 scope 的次数容量，原显式金额/次数授权校验继续保留。新增行为复现先失败，修复后 15 项扩额回归通过，含旧请求/预留/停止/引用保持、新组上限及超量拒绝。普通重装后核对 86 个安装文件。五模型在第一次推理前统一冻结为 `runtime-freeze.json`，prompt/工具/查询行为未改；保留准备期原 hash 和失败日志。五个新 scopes 已通过原 CLI 加入同一账本，不删除首次失败后创建但尚未运行的幂等上下文。后续运行中不改此版本。
+
+**真实结果与独立核验。**五路各执行一次，累计新增 **84 次**，无追加重跑。实际首个请求中的业务 request 和工具 schema 五路完全一致；完整解析后的 Skill 正文均出现在后续真实模型输入，运行结束的 86 个源码/安装文件仍与冻结 hash 一致。输入是用户指定且已入库的 Apple/Alphabet PDF 版本；模型自行选择材料和证据，不把本轮称为互联网自主找源验收。响应仅报告模型别名（GPT 同时报告 OpenAI provider），不能将目录里的版本名当成已验证的不可变模型快照。
+
+| 模型 | 真实请求 / 运行秒数 | 原件业务验收 | 费用状态 |
+|---|---:|---|---|
+| Sol | 12 / 142.1 | 未通过：已登记两条营收，未完成代码计算/交付；下次请求被本地 400000 字节上限拒绝 | 提供方报告 $0.9443034 |
+| Terra | 17 / 162.7 | 通过：两条营收、代码增长率、出处及导出齐全 | 提供方报告 $0.4958211 |
+| Luna | 23 / 288.6 | 未通过：两条营收及代码计算已完成，但交付前被同一本地请求上限拒绝 | 提供方报告 $0.07604941 |
+| DeepSeek Pro | 21 / 361.3 | 通过；中间两次工具参数输出被 4096 token 上限截断，后来恢复 | 未核账；峰值非缓存 token 估算 $1.5720408，全额预留 $5.85303576 |
+| DeepSeek Flash | 11 / 66.2 | 通过；纠正一次交付与任务状态引用不一致后交付 | 未核账；同口径估算 $0.1697277，全额预留 $0.6302241 |
+
+验收侧从原件 CAS 读回并核验 SHA-256，独立查看 PDF 物理页 **32**（印刷页 29）的合并经营报表：FY2025 Total net sales **416,161 百万美元**，FY2024 **391,035 百万美元**；财年截止 **2025-09-27 / 2024-09-28**。三条完整交付的代码结果均为 `(416161-391035)/391035 = 0.064255117828327388`，约 **6.43%**。引用闭合、原文引句、期间标签、数值/单位/合并口径、计算操作数及导出 hash 已核对；表内使用 `$`，USD 是结合 Apple 合并报表语境的币种解释，不声称原表逐字包含 ISO 标签。失败路线的部分记录/计算不算完整通过。
+
+**回合与卡点 review。**五路均遇到 `CAPABILITY_UNSUPPORTED`、`OUTPUT_LIMIT`，表明公开工具能力与文档后端、返回体预算之间仍有共同摩擦。Luna 另有多次不合法参数、错误证据引用、引句不匹配；不能全部归因于宿主。Pro 第 16、19 次响应明确 `finish_reason=length`、输出 4096 token，随后工具参数 JSON 解析失败；这两次恢复有输出额度证据，不简单归为业务理解差。Flash 最后一次重试纠正 `RESULT_REF_INVALID: delivery and task-state result references differ`。
+
+Sol/Luna 的最终错误是 `gateway_request_exceeds_bound`，发生在 `agent/providers/gateway_http.py` 的本地字节检查、下一次网络发送前，未观察到提供方上下文超限或网络错误。共享 `structured/document_records.py:59–83,158–161` 会复制证据依赖、重新登记引用并在记录响应中返回完整依赖；原始工具历史又继续进入后续请求。Sol 两次单条记录响应各约 44KB（紧凑 JSON），此前还有约 86KB 的宽范围证据读取；较长的 Luna 纠错历史同样累积到限制。最小共同问题是模型可见历史中的重复证据和引用/能力契约复杂度；本轮仅定位，没有中途扩大上限或修正某一路，因此不据这两个受阻结果排序模型能力。
+
+**费用、产物与停止。**本轮已报告收费 **$1.51617391**，DeepSeek 全额未核账预留 **$6.48325986**，合计占用 **$7.99943377 / $15**。token 估算仅供比较，不冒充账单、不释放预留。原账本累计 **267/307 次**，已报告 **$4.97365957**、全额未核账 **$11.55058336**，剩余 **$7.47575707 / $24**；未知传输/在途均为 0，旧记录保留，未充值。`final-ledger.json` 为收尾只读快照；`review.json` 汇总每路工具错误、token、响应型号、逐次请求大小、原件检查和一致性证据；原始轨迹在 `{sol,terra,luna,deepseek-pro,deepseek-flash}-live/{result,evidence}.json`。完整交付的 `{terra,deepseek-pro,deepseek-flash}-delivery/` 各含 `delivery.json`、`delivery.md`、`records.csv` 及 hash 清单；导出是已有公共导出函数对 committed delivery 的确定性处理，没有追加模型写作或调用。
+
+本题 Flash 请求最少、测得耗时最低，Terra 与 Pro 也完成真实业务链；这是一次受控案例观察，不是稳定性或通用能力排名。建议下一小批先压缩模型可见的重复工具结果、保留持久完整证据，收敛文档工具 schema 和引用操作；回放本轮失败及一个独立材料后，再冻结同题对照。**本轮收尾停止，不自动启动这些修改、追加试验或切换 Codex/MCP。**
+
+### 14.21 Flash/Luna 多题及模型 × SDK 对照（2026-10-19，已授权，后续执行已停止）
+
+用户要求扩展同题真实对照并考察复杂问题升级 Sonnet；不以离线测试或公开 benchmark 代替本项目效果。原件仍为调用方指定、已入库的 Apple/Alphabet 2025 10-K 和原生目录/passages 版本；不改解析、不预选语义块、不向模型传标准答案。完整可执行输入、profile、约束和验收口径放在 `output/data-agent-sdk-matrix-20261019/comparison-plan.json`，该文件当前明确 `prepared_not_authorized`。
+
+**后续执行授权与工程观察。**用户已批准本批 $20（含全额未核账预留）、原账本累计 $40／787 次，每路原上限 24 次；原准备快照保留，由 `authorization-money.json`、`authorization-scopes.json`、`manifest.json` 记录生效授权。真实运行首先发现两处 OpenRouter Messages 接入问题：完整 `message_stop` 后附加的 `[DONE]` 被当成 JSON；紧跟响应查询 generation 账单可能返回 404。依据官方 [streaming](https://openrouter.ai/docs/api_reference/streaming) 和 [usage accounting](https://openrouter.ai/docs/cookbook/administration/usage-accounting)，修正完整流的终止帧识别，并读取末次 `message_delta.usage.cost` 账户收费（支持该接口实际返回的严格十进制字符串），仍要求完整响应和明确 generation 身份，不拿 token 估算、上游成本或 SDK 会话费用代替账单。原始响应逐字回放、随后 generation 账单交叉核对及 24 项费用/证据行为检查通过。首次两条失败请求合计收费 $0.00662585，保留原请求和失败；新执行仍共用同一 scope 的 24 次限额。源码冻结从 v1→v2→v3 的变化仅为上述协议/账单解析，业务 prompt、Skill、工具和验收标准未改。准备期“0 次调用”仅指当时快照，不代表本批当前调用数。
+
+| 题目 | 所需业务结果 | 基础路线 |
+|---|---|---|
+| Q1 | Apple Business Risks 前两项完整风险说明及出处 | Flash/Luna 各 OpenAI、Claude SDK |
+| Q2 | 原 C2：Apple 两年合并营收、期间口径及代码同比 | 同上 |
+| Q3 | Alphabet 两年合并营收、期间口径及代码同比 | 同上 |
+| Q4 | 两家公司两年营收及同比，明确财年期间差异和比较限制 | 同上 |
+
+共 16 个独立连续会话。Sonnet 在 Q4 上分别用两 SDK 运行；若 Q2 任一基础路线未通过独立业务核验，再追加同题两 SDK 的 Sonnet，共最多 20 会话。此批升级是宿主按冻结条件启动新的同题会话，不是已经实现产品内部自动模型切换；不传入其他模型答案或人工 gold，基础失败和升级费用分别保留并报告合计。网络、额度、权限或共同工程失败先停止受影响路线定位，不拿这些失败证明强模型优越。
+
+**可比性。**六套独立 prompt/profile 由显式配置选择，业务正文逐字一致；SDK 差异只包括 Skill 加载、工具协议及名称。Skill 业务主体一致，差异指导只包含 SDK 的调用格式。Skill 映射版本 3，历史冻结快照不改写。固定 reasoning effort=low、输出 8192 token；这只固定请求参数，不能宣称不同厂商实际推理预算相同。模型仍为 Flash 官网直连、Luna/Sonnet 经 OpenRouter 固定供应商，无 fallback。SDK 为 OpenAI Agents 0.24.0、Claude 0.2.167，基础 openai 3.31.0。每题每路一次是探索性对照，不足以证明稳定成功率。SDK 自带工具包装、系统前缀和加载轮次也是观察对象，不能把整体差异全归为模型能力。
+
+**解除已有非模型阻塞。**新 profile 将原 400000 字节测试门槛替换为 8388608 字节传输保护；保留提供方真实上下文上限与 600 秒/24 请求会话边界。实际 token、请求字节、截断及缓存用量均记录。Claude 原生 Messages SDK 不直接提供 OpenRouter `provider` 参数，传输层只追加冻结的 only/order/禁 fallback/require_parameters，冲突拒绝，不修改 system/messages/tools；账本同时存原生 HTTP 请求与上游请求。Claude 工程运行目录采用仓库之外的全新私有目录，入口拒绝祖先 AGENTS.md/CLAUDE.md/项目 settings，私有 CLAUDE_CONFIG_DIR 与 project-only Skill 加载保留。官方依据：[OpenRouter Claude SDK](https://openrouter.ai/docs/guides/community/anthropic-agent-sdk)、[供应商路由](https://openrouter.ai/docs/guides/routing/provider-selection)、[Claude Skills](https://code.claude.com/docs/en/agent-sdk/skills)。非 Anthropic 模型经 Claude SDK 的实际提供方兼容仍须真实验收，不能用合成请求证明。
+
+**准备与额度。**重新普通安装源码后，原生 Claude CLI 的非 Anthropic 模型、low effort、8192 输出及路由追加/原始收据检查通过；原旧 Claude 合成业务链及两 SDK Skill 加载、祖先目录指导拒绝检查通过，共 7 项。初次受沙盒 localhost/子沙盒权限限制的检查未记为通过，放开本地执行后通过的证据单列。六套 profile/Skill 可加载，两处生产传输源码与已安装包 hash 一致。真实模型调用仍 0。只读预检已核对端点、参数、价格和余额，原账本为 267/307 次、$24 上限、剩余 $7.47575707（保留全部 $11.55058336 未核账预留）。建议本批上限 $20、原累计 $40、最多新增 480 次（累计 787）；这是费用与保守预留的停止上限，不是预计支出或充值请求，未经用户确认不扩额、不实跑。
+
+**交付与停止。**逐题列出业务通过/缺口、物理模型请求（包括失败）、SDK 轮次、工具次数/错误、耗时、可得 token/cache/reasoning 用量、提供方账单、token 估算、未核账全额预留；三种费用含义分开。检查实际请求中完整 Skill、原件版本、提示和工具一致性。成功交付导出 JSON/Markdown/适用 CSV；独立回原 PDF 核查原文完整性、数值、期间、口径、计算及位置。完成限定对照和 review 后停止，不自动推进工作台、File Search 或自动升级产品化。
+
+**Batch 仅讨论。**[OpenRouter Batch](https://openrouter.ai/docs/batch-quickstart) 当前提供异步请求批处理，24 小时完成窗口，通常 token 费用约为标准价的 50%，须有对应 `:batch` 端点；具体价格和可用供应商需运行前核实。适合独立的段落抽取、打标或离线评测请求；当前 Agent 下一轮依赖上一轮工具结果，不能将整个实时 loop 原样打包。尤其 Claude 当前采用 stream=true，而该 Batch 接口拒绝流式请求，需要另行适配和验收。本批保持同步真实请求，不新增 Batch 编排，不将折扣计入本批预算估算。
+
+#### 14.21.1 目录到正文的真实链路复盘与改进提案（2026-10-19，待 review，未实施）
+
+用户要求先审查调用过程。后续真实矩阵停止；停止时没有队列或模型 worker，也没有在途/未知传输。原始失败、费用、冻结配置和未运行项保留；不拿本节提案改写原试验。证据在本批 `business-review.json`、各 `runs/*/evidence.json` / `result.json`、`reviewer-only/source-checks.json`；代码核对覆盖 `application/document_tools.py`、`documents/query.py` / `passages.py` / `directory.py`、`agent/binding.py`、`application/delivery.py` 和文档 Skill。本节仅增加复盘和提案，没有修改工具、prompt 或解析包，没有新模型调用。
+
+**结论与最早偏差。**当前链路存在可泛化修复的接口与交付问题，不能根据这些运行将低成功率直接归于模型。底层已有完整原生目录与 passage，但对 Agent 的投影弱化了结构，公开参数比 PDF 后端能力更宽，交付又要求模型手工保持多份引用/状态一致。模型也确实出现选错章节和错误解释；工程可以保证已选范围的机械完整性，不能据此保证模型选对范围或解释正确。
+
+| 实际观察 | 机制及责任层 | 最小可证伪检查 / 改进方向 |
+|---|---|---|
+| Q1 Flash/OpenAI 展开 PART I，depth=3、limit=20；第一页到 Macroeconomic and Industry Risks，Business Risks 在后页。模型没有续页，转而交付错误章节 | `_outline` 广度优先展开后按扁平行分页；这次响应有 next_cursor，模型忽略游标是事实，但导航设计增加了选错相邻章节的风险 | 当前库 Apple 102 节点、Alphabet 103 节点，仅 id/parent/title/path 的紧凑 JSON 分别 18,220 / 21,700 字节；先让这种规模一次返回完整树，再检查同题是否准确选中原路径。大目录按明确子树浏览并返回 completeness / children / cursor，不能仅提高固定 limit |
+| Q1 Luna/Claude 使用 roles=issuer、paragraph/heading/list_item、text_layer，收到能力错误；随后只读 Risk Factors 引言 | 通用 JSON schema 允许这些参数，PDF 后端拒绝；get_asset_schema 的 capabilities 又是底层 store 方法名，不能直接当 SDK 工具调用 | 按本次 document backend 输出可执行的工具 schema/选项；保留不支持能力的明确错误，不靠 prompt 维护第二套规则，不将调用错误解释成原文缺失 |
+| 同一运行 mode=passages 对 Risk Factors 传 depth=3，仅返回该节点引言 | `list_passages` 本来是 direct-only，但共用的 outline.depth 被静默忽略；SectionTarget 描述为 complete section body，默认 include_descendants=False，底层 read_section 默认却为 True | 分开目录展开深度与内容范围；明确 direct/subtree，返回本节点及子树计数。拒绝无效参数组合；intro-only 不能让调用方误认整章内容 |
+| Q1 Flash/Claude 读到了第二组的 texts-140/141/142，交付时只关联前两块，并把 142 错说成下一项 | store 返回 passage_id、成员及分组；Agent 适配层仅返回逐块 ResultRef，没有可整体引用的组级 evidence。deliver 只验证被选引用的依赖闭包，不验证“完整组” | 将 passage 作为组级 evidence 引用，成员仍保留原块/位置。完整提取引用组后由代码展开全部成员；模型解释另存。验证不能通过遗漏成员冒充完整，也不能引用未展示内容 |
+| Q2 Luna/OpenAI 21 次物理请求，18 次工具返回中 14 次错误；已找到 tables-11，8 次记录请求均失败，5 次交付失败 | 公开记录契约混合 PDF/iXBRL；整表证据不是数值证据；还需反复复制完整版本/ResultRef，并在 request.needs 与 state 内重复维护相同引用/缺口。binding 的错误 current_task_state 仅返回 plan 和 operation_accepted，不是完整已提交 state | PDF 记录入口只暴露有效字段，整表展示提供确定的单元格选择入口；代码从已选单元格取 raw_value，不按数值猜坐标。引用可用会话内短句柄映射原不可变引用。业务满足/缺口由模型明确判断一次，宿主维护唯一状态；错误返回精确字段和当前权威状态。不能自动把存在证据等同需求已满足 |
+
+**建议的产品调用过程（复用现有工具，不另建 runtime）。**
+
+1. **确定材料和版本。**已有显式 binding 则直接用；否则 `find_assets` 返回候选，必要时澄清。固定 material/source_version/parse，不在每次查询重新解析，也不靠公司名猜财务口径。
+2. **读取目录地图。**`get_asset_schema` 返回实际 Agent 可用能力、紧凑原生目录、父子关系、精确 code_path、本节点/子树内容量及目录完整性。完整树能容纳则一次返回；不能容纳则显示哪些子树未展开、如何继续。某处标题未匹配的局部问题不要等同整个文档不可用。
+3. **选择明确章节。**模型根据用户问题从返回节点中选 path/id；章节名称明确时直接目录定位，无须先猜英文关键词全文搜索。同名或多个候选显示父路径，不静默取第一个。`search_asset` 留作目录候选检索、选定子树内定位术语/表格，或无可靠目录时的明确后备。
+4. **列出内容组并完整读取。**沿用 `search_asset(mode=passages)`，但独立定义章节范围，列表提供 lead 原文预览、组 ID、顺序、类型/页范围、成员数和分组依据。模型选择组后 `read_evidence` 一次读多个目标，返回完整组及可引用的组级 evidence。大组可以明确分段读取，但只在已观察片段覆盖整组后允许标为完整；不能悄悄截断。`passages[0]` 只是版本内顺序，不保证语义上必为第一项风险，存在引言时仍需识别。
+5. **按任务分支处理。**完整正文任务直接交付所选组；财务任务先查看所在章节的完整表格，再选明确行/列/单元格，连同实际表头、期间、单位、主体/合并口径和附注读取。模型负责选择和解释，代码从确定单元格建立记录及计算；缺少支持时留缺口，不自动按关键词补造事实。
+6. **一次声明交付状态。**模型提供需求对应的组/记录/计算引用及必要解释/缺口；宿主校验可见性、版本、完整组覆盖和依赖，并导出 JSON、Markdown、适用 CSV。不要要求模型重抄原文、raw_value、长引用及两份完全相同的状态。summary 与 source_text 分开；完整组原文仍不足以证明模型解释正确，语义业务核验保留。
+
+Q1 的期望业务过程为：已绑定 Apple 2025 10-K → 完整目录选择 `PART_I.Risk_Factors.Business_Risks` → 列内容组 → 一次读 `[0]` 与 `[1]` → 引用两组交付。当前库真实回读第一组为 texts-138/139，第二组为 texts-140/141/142，均在物理第 11 页，未截断；第二项补充段属于同组。这里把 4 次业务工具调用作为改进后的流程示意（schema、list、read、deliver），不将 Skill 加载或模型请求次数偷换成 4，也不承诺所有任务固定轮数。新组级引用和完整目录投影尚未实现。
+
+**解析层的保留与缺口。**本例已证实所需五块和两个分组正确，无须为了搜索失败重跑 Docling或重新推断标题树。当前只读结构检查中，Apple 的 799 个、Alphabet 的 1,044 个未排除且非目录标题块全部恰好归入一个 passage；这只是已解析块的覆盖，不证明 PDF 原件无漏字。原生书签继续作为目录，排版强调仅用于组内主题边界。无书签/不可靠书签的材料仍明确缺口，本批不扩展到拼接 annual report。
+
+- 局部锚点仍需观察：Apple 3 个、Alphabet 12 个书签标题未匹配正文标题，仍有原书签目标位置；Business Risks 不在这份缺口里。应将 boundary_basis、受影响节点/页和 issues 传到模型可见目录，不把全局 partial 当成“所有内容不可取得”。
+- 分组规则仍是字体/粗斜体和 parser_heading 启发式，不是已完成语义判断。保留 grouping_basis 与父章节；遇到可疑边界应读相邻组/原页核对，不能硬编码公司或风险句子。
+- 正文视图当前排除 Apple 的 71 个页脚＋1 个目录表，Alphabet 的 193 个页眉＋97 个页脚＋2 个目录表；原块未删除。不得把财务表头、单位、附注或看似冗长的风险解释作为无效信息删除。本次未逐项视觉核验全部排除项，不能声称过滤准确率通过。
+- 行位置数据已存，但仍有 Apple 123 / Alphabet 172 个行片段的 char_range 未对齐；Agent 的 `_evidence` 投影也未带 text_lines。需要精确到行时按需返回已确认行框及字符范围，未对齐保留 null；不能把块 bbox 冒称精确行定位。此项不是 Q1 已读补充段丢关联的原因。
+
+**Prompt 与工程的分工 / 下一小批。**Skill 保留简短的“先核对目录范围、完整组读取、搜索仅定位、按真实能力调用、错误不等于来源缺失”；工具返回已明确的范围/完整性/局部问题才是执行依据，不叠加冗长补丁 prompt。优先只做目录导航、实际能力 schema 和完整组读取/交付这条链，保持数据版本与业务标准不变；工程验证目录可达、direct/subtree、不完整/越界引用拒绝和完整组依赖，真实复验 Q1 原失败及一个 Alphabet 独立章节。对比路径选择、必需原文覆盖、工具错误及请求数。数值引用/状态输入简化再单独冻结，因涉及持久引用和调用契约，不在这次 review 中悄悄重构。修改后测试需使用新的实现版本，旧矩阵结果继续保留，不混作同一冻结版本的模型排名。
+
+
+#### 14.21.2 目录导航、完整组交付修复与真实复验（2026-10-19，限定实现完成，2/3 业务通过）
+
+**范围与版本。**用户要求优化修复后重新测试，仍有问题优先总结真实运行。本轮实施 14.21.1 的目录、实际能力和完整内容组部分；不改原 PDF、解析包、问题、验收标准或模型/SDK 版本，不重跑已通过路线，不扩到数值/状态重构。冻结为 `output/data-agent-sdk-matrix-20261019/runtime-freeze-navigation-v1.json`，三条真实回归使用同一实现；执行结束源码 hash 无漂移、安装源码一致。旧结果与费用原样保留，新结果不是原冻结矩阵的同版本排名。
+
+**实际实现。**
+
+- `application/document_tools.py`：`get_asset_schema` 默认提供先序紧凑目录（父节点、code_path、层级、本节点/子树内容计数、边界依据及局部 issues）。能容纳时一次返回全树，较大目录仍通过明确分页/子树读取，不截断后声称完整。Apple 102 节点约 35.4 KB、Alphabet 103 节点约 39.4 KB，均完整返回；目录完整不等于解析质量完整。
+- `agent/document_contracts.py` 与两 SDK binding：从文档后端真实支持能力投影工具 schema，去掉不支持的角色、证券、XBRL、读取选项和更新入口；保留 service 共用契约及明确错误。公开参数收敛后不把不支持字段静默忽略。`passage_scope=direct/subtree` 与目录 depth 分开，passages 模式不接受无效 depth；章节读取回传实际范围。
+- 完整 passage 读取增加组级 `group_evidence.result_ref`，依赖闭包包含所有展示成员；既有 deliver/导出按组展开原文与位置。模型无需重抄完整文本，逐块引用仍保留。超出限额的完整组不偷偷注册为可交付完整结果；失败/游标边界有行为验证。组级引用不代表模型选对主题或解释正确。
+- `skills/document-data-query/SKILL.md` 1.1.0、mapping v4：共享业务指导明确先目录、选择范围、列组、整组读取/引用；格式与 SDK/模型配置继续分开。错误反馈增加真实已提交 TaskState，未实行自动满足需求或两份状态合并。
+
+**验证分层。**当前源码普通 wheel 重装，使用现有 SDK 环境的 `python -I`，无 PYTHONPATH/sys.path 注入；18 项 document 工具、37 项原查询、5 项契约反馈检查共 60 项通过，日志在本批目录 `navigation-*-tests.log`。这是工程验证，不替代以下真实调用。独立 Alphabet 的 `Part_I.Business.Competition.passages[0]` 回读 17 个块，跨物理页 7/8，与原 PDF 文字/页面核对，排除下一标题；该项是宿主组件链与原件检查，不称自主模型验收。未重跑 Docling。
+
+| 原 Q1 失败路线 | 原模型请求/结果 | 本轮模型请求/耗时 | 本轮实际结果 |
+|---|---|---|---|
+| Flash × OpenAI | 13，误选 Macroeconomic 章节 | 10 / 80.667 秒 | 通过。准确选择 Business Risks，两组五块完整；8 次业务调用中仍有 2 次参数/状态错误，另有边界补读 |
+| Flash × Claude | 10，第二组补充段未正确关联交付 | 5 / 40.402 秒 | 通过。schema → passages 列表 → 一次读两组 → deliver，4 次业务调用、0 错误；第二组末尾补充段正确归属 |
+| Luna × Claude | 上次功能运行 14 次 partial，另有更早 2 次协议失败 | 本轮 8 / 123.390 秒；路线累计 24 | 失败。找到正确章节，正文可见，但 4 次交付均被拒绝；没有有效交付 |
+
+问题仍为从绑定的 Apple 2025 10-K 提取 Business Risks 前两项的主题、完整解释和精确出处。两条成功交付均以组级引用保存 texts-138/139 与 texts-140/141/142，物理页 11；独立核对原 PDF 原文、边界、补充段归属。原文比对仅归一化空白、NFKC 与弯/直引号；解析文本使用直引号而 PDF 部分使用弯引号，不能说逐字符/字节相同。原件字节未变。实际请求检查完整新版 Skill 已加载，未混入仓库 AGENTS。单题单次不能证明稳定成功率或 SDK 优劣。
+
+**Luna/Claude 的最早偏差和机制证据。**
+
+1. 目录返回完整且选中 Business Risks；没有再次触发旧的 PDF 参数能力错误。它未按 Skill 列内容组，而是两次直接读取整节 41 块。两个约 90 KB 响应在转发给模型的请求中均与处理器结果完整匹配；五个必要块齐全。排除了工具结果转文件、原样正文响应未进入模型输入及原文缺失作为这次失败的解释；拼错后的引用本身确实从未展示，拒绝正确。
+2. 第一次 deliver 有 1 个引用的 run_id/operation_id 错；第二次有 1 个 run_id 错。两次的 request.needs 错误，而重复填报的 state 引用正确。第三次 request/state 共 13 次引用出现错误（8 个不同引用）；部分 run_id 由 operation_id 拼成。item_id 对应的实际引用已展示。校验拒绝是正确行为，但四字段长引用重复复制、通用报错不指出具体字段，增加了无效纠错和重读。
+3. 第四次所有引用均正确，但 request.needs 已包含需求，state.satisfied/gaps 却同时为空，违反每项需求必须覆盖一次的约定。这是重复状态契约的问题暴露，不能把已取得原文等同业务交付成功。
+4. 本轮 8 次后该路线累计 24/24，后续两次本地发送尝试因 `BudgetExceeded` 被拦截，未产生额外供应商请求；SDK 外层最后表现为 `assistant error: unknown`。终止不是网络超时或金额池不足，更不能仅根据外层错误定位模型。该错误映射仍应改善，但发生在前三次引用和第四次状态错误之后。
+
+**下一步建议，未实施。**把机械复制从模型职责中移出：会话内短证据句柄由代码映射到已观察、不可变 ResultRef；跨会话、未知、未展示句柄明确失败，禁止靠相似字符串猜引用。每项需求的满足/缺口判断仅填一处，宿主生成权威状态，仍不替模型判断业务正确。整节读取应显式提供现有 passage 分组入口；纠错返回字段路径/真实状态。先用本轮原错误输入无付费重放验证机制，再在授权范围内真实复验；不能预先声称改善模型选择/解释能力。该部分及数值单元格流程不在本轮悄悄扩写。
+
+**证据、费用与停止。**本批 `business-review.json.navigation_fix` 分别记录原件核验和失败；`navigation_fix_summary` 为本轮停止快照；旧 `execution_stop` 保留前次 97 请求停止事实。`execution-metrics.json/.csv` 包含新旧各 attempt，成功交付在 `deliveries/MX-Q1-flash-{openai,claude}-navigation-v1/`，Luna 没有有效交付。准备 Luna attempt 时曾用含旧 attempt 的 manifest，被本地拒绝；改用原批次 binding 后准备成功，该失败未发模型请求。
+
+本轮新增真实请求 23，本批累计 120、原账本累计 387/787。增量已报告收费 $0.03180068（Luna），DeepSeek 全额未核账预留 $0.7415556（usage 估算合计 $0.1591581，仅估算）；原账本累计已报告收费 $5.11879648、全额未核账预留 $15.44064046，未知/在途为 0。仍沿用累计 $40／本批 $20、各路线 24 次，不扩额、不释放预留、不充值。三个进程已有退出记录，后续矩阵不自动启动。Luna/Claude 次数已尽，优先交付问题；Q2 数值/状态错误、Q2 两条 Claude、Q3/Q4、Sonnet 未因本轮变为通过。全文解析、精确行位置、无书签等质量边界继续保留。平台 goal 仍暂停。
+
+#### 14.21.3 公司 symbol 发现与父目录子树分页真实验证（2026-10-19，读取通过、交付失败）
+
+**用户范围与最早偏差。**用户要求由真实 Agent 获取 `PART_I.Risk_Factors` 的全部子目录和完整正文，超限分页、不逐个拼子路径；随后确认公司 symbol 在查找资产时传入，后续沿用绑定的 asset_ref。本次不重新解析、不重跑矩阵。旧 CLI 可返回完整子树，但旧 Agent 工具把一个 SectionTarget 当作不可分页整体；相同原件、父路径、include_descendants=true、max_bytes=80000 的实际工具复现为 ITEM_TOO_LARGE、0 正文。此前游标只能在多个 targets 间移动，不能据 CLI 成功推断 Agent 工具可分页。
+
+**实现与责任边界。**
+
+- `application/document_tools.py` 在仅有一个 SectionTarget 时，按该不可变版本的正文块顺序分页。保持 asset_ref、父路径、include_descendants、context，续传 next_cursor；max_bytes 可调整。每页提供实际范围、总块数及 page_evidence，仅依赖当页返回成员。最后一页不被标作整章完整；整章交付需引用所有页。单块超限明确报 ITEM_TOO_LARGE，游标位置不前移；旧单章节游标布局已失效，明确 CURSOR_EXPIRED，原有引用不改写。多 target 旧行为保持。
+- 文档 SDK 参数投影开放已有 `filters.securities:[{ticker,exchange_mic}]`，由确认的证券登记映射筛选公司及已获准材料；不扩大上下文白名单。未知/歧义明确失败。不指定 as_of 时仅作已登记证券别名定位，不推断当前上市状态；指定 as_of 则复用原严格有效期校验。目录/正文只使用精确 asset_ref，不再次传 symbol。AAPL 映射依据已入库原 PDF 封面证券表核验后登记；有效日期仍未知。XNAS 的交易所对应核对 [Nasdaq 官方交易所表](https://indexes.nasdaq.com/docs/Nasdaq_Index_Eligible_Stock_Exchanges.pdf)，来源记录在 `symbol-source-check.json`，不是公司特例逻辑。
+- `contracts/document_query.py`、`agent/document_contracts.py`、导出和共享 Skill 1.2.0 / mapping v5 同步；未升级 SDK/模型、未改原件/解析版本。模型仍自己发现、选材、读目录和分页；预检的块 ID/答案未注入模型。
+
+**工程验证。**当前源码强制普通安装到原 SDK 环境，`python -I` 导入，安装源码与冻结文件核对。22 项文档行为检查首跑 21 通过、1 项测试 fixture 把严格日期字段传字符串，修正为 date 后该项通过；随后旧游标和单块超限边界定向通过。保留首跑错误日志，不写成一次全绿。真实存储工具预检为四页 [0,33)、[33,67)、[67,99)、[99,107)，每页小于 80000 字节；107 块顺序、原文与库读取一致，无重复/遗漏。该预检是工程证据，下面另核验实际模型输入。
+
+**一次真实会话。**DeepSeek Flash（DeepSeek-V4.1-Flash-1017，官网直连）× Claude SDK 0.2.167；新问题使用独立 scope `SUBTREE-AAPL-flash-claude`，仍属于原累计账本，不改变旧矩阵问题/金额。宿主为本次选择最多 12 次请求、$1 全额预留上限，累计 $40/787 次保持；它们是本次执行限制，不冒称用户另行批准了这些具体数字。运行开始前冻结问题、代码、配置和验收；运行结束 hash 无漂移。
+
+| 实际阶段 | 证据与判断 |
+|---|---|
+| Skill | 完整 1.2.0 业务正文进入实际模型请求，非仅调用名称 |
+| 资产发现 | 首次 AAPL/XNAS＋2025 期间返回 REPORTING_PERIOD_UNKNOWN；第二次 AAPL/XNAS＋`Apple Form 10-K` 因整句匹配返回 0；第三次 company_id、query=null 找到 Apple。真实符号过滤被调用，但未通过它拿到候选，不能把宿主 symbol 预检当作模型闭环通过 |
+| 目录 | get_asset_schema 返回完整 102 节点目录，含目标下五个子目录，完整进入模型输入 |
+| 正文 | 四次 read_evidence 始终同一父路径、include_descendants=true、context 和 max_bytes=80000，续传原游标；107 块全部进入后续真实模型请求，响应与处理器结果完整一致，文本/顺序/出处与已存版本一致，物理页 8–20 |
+| 额外读取 | 读完后又分页读取 Cover_Page 两次，工具 state 明确为确认主体/期间。未逐个拼目标子目录，但严格“全部 read 只限父路径”的冻结条件不通过 |
+| 交付 | 最后真实 deliver 被 RESULT_REF_INVALID 拒绝：同一个错误在 request.needs 和 state.satisfied 重复出现，第二页的 item_id 配上第三页 operation_id；完整引用从未被展示，校验拒绝正确。随后 native_max_turns 停止，宿主保存 partial、无证据，不是成功业务交付 |
+
+本次 12 次真实模型请求，11 次业务调用（find_assets×3、schema×1、目标正文×4、封面×2、deliver×1）及 Skill×1。`agent-read-body.json/.md` 仅从实际模型可见工具响应导出，标明“核验导出、非 Agent 成功交付”。完整路径调用和错误在 `agent-call-trace.json`；独立核验在 `review.json`，原始模型请求及退出记录在 `run/`。目录/正文可达与交付正确是不同结论；全篇解析质量、标签和图表描述仍是原缺口，本次未重新验收。
+
+**原因与后续。**阻力不在目录不存在或正文未进入模型：第一处阻力是报告期间元数据未知、query 为整句子串匹配；最后失败与 14.21.2 相同，长引用的多字段复制把已有结果拼错。不能通过替模型猜引用或延长轮次称已修复。优先按原建议实现会话短引用与唯一状态，先重放实际失败参数，再决定同题真实复验。官方 [Python SDK 参考](https://code.claude.com/docs/en/agent-sdk/python) 将 max_turns 定义为工具往返轮数；本次源码映射、真实工具拒绝和持久停止记录一致，不将 native_max_turns 归为网络问题。发现元数据/查询匹配改进保留待办，不从标题静默造期间。
+
+**费用与停止。**新 scope 12/12 次，DeepSeek 未返回可核账收费，保留全额预留 $0.9789438／$1（不是实付）；无未知/在途。原账本累计 399/787 次，已报告收费 $5.11879648、全额未核账预留 $16.41958426、剩余可准入 $18.46161926／$40。旧费用、原矩阵 $20 范围和失败原样保留；未充值、未释放预留、未追加会话、未恢复平台 goal。
+
+
+#### 14.21.4 短引用与单次交付状态、父目录四路同题对照（2026-10-19）
+
+**范围与对照条件。**用户要求继续并跑其他组合，但 OpenAI/Anthropic 不交叉 SDK。本轮固定 DeepSeek Flash×OpenAI、Flash×Claude、GPT-5.6 Luna×OpenAI、Sonnet-5.5×Claude，各一条真实会话；同一原问题、原件/解析版本、业务 Skill、工具 schema 与共同业务 prompt。只有原生 SDK 指导/格式分开；不向模型提供核验块 ID、预期计数或 gold。仍复用原 $40/787 次账本；宿主为这轮收紧为合计 $6、各路最多 24 次，不冒称用户单独批准了这些数字。旧 scope、失败和预留不改写，不自动恢复旧 goal、其他问题或 File Search。
+
+**现象 → 责任层修复。**前次模型已读完四页，但用第二页 item_id 拼第三页 operation_id，且 request/state 重复填写同一错误。`ToolBinding` 的文档模式现在在 SDK 入参边界提供 `{handle:"rr_…"}`，按本次 SDK 真正观察到的完整 ResultRef 确定还原；服务/持久化继续保存完整引用。短句柄来自规范完整引用的 hash，不建立第二份事实库；未知、跨运行、未展示、歧义碰撞均拒绝，不根据字符串相似性修补。旧完整引用仍严格检查。结果进展指纹排除句柄，避免重复读取因 ID 变化被当作新进展。
+
+文档模式 `deliver` 只让模型提交一次 request.needs 的 supported/partial/unresolved、引用及 gaps，由绑定层机械派生一致 TaskState；缺口全文仍在交付中保留。计划覆盖、冲突、缺失证据及业务判断不放宽，其他业务工具仍携带 state。OpenAI/Claude 使用同一 schema 投影；没有升级 SDK、重写 SDK 循环、重解析或公司特例。Skill 升级 1.3.0，mapping 字符串 v6；四套独立 profile/prompt 采用 document-matrix-ref-v2，同一业务内容。
+
+**工程验证。**当前源码普通重装到既有 SDK 环境，以 python -I 运行并核对安装位置/源码；25 项文档检查首跑 24 通过、1 项新测试错误地用空 find_assets 请求，补齐 fixture filters 后定向通过；最终 3 项新行为边界重放通过，另 37 项原查询检查通过，共 62 项不同检查已通过，但不是一次全绿日志。检查覆盖句柄可见性/跨会话/坏引用拒绝、重开已有可见前缀、交付无重复状态、显式缺口和遗漏需求拒绝；保留首跑日志。`original-failure-replay.json` 保存前次原始错误参数仍被拒绝，以及核验者显式选择已观察句柄后准确还原；它不是自主模型成绩。
+
+首次 Claude 启动在请求前被 mapping 版本整数类型拒绝，新增调用/费用均为 0；修正为字符串后，四套完整 Skill 渲染与原生 SDK 工具构造全部检查通过。初始冻结与失败保留，新冻结 `runtime-freeze-ready.json` 用于随后全部四路真实调用。首次导出因父目录未建被拒绝，另一次导出因前一导出仍持有 Catalog 锁被拒绝；创建目录并等待前进程退出后顺序导出，均未触发模型请求。以上准备/导出问题不记作模型失败。
+
+
+**真实结果与独立核验。**四路均实际加载完整 Skill，经 AAPL/XNAS 找到 Apple 材料；目录响应中的五个子节点和同一父路径四页共 107 块正文全部进入后续模型输入。核验原始请求 body/hash、实际工具返回、已存解析中的文本/顺序/出处、已提交交付与 JSON/Markdown 导出：正文无遗漏/重复，导出与已提交对象一致，文件 hash 一致；全程运行代码/profile/Skill hash 未漂移。核验器最初只计 directory.nodes，遗漏 Sonnet 实际使用的 outline facets；对照原始响应后同时计入 facet 节点，无模型重跑、无验收标准变更。范围仅为现有解析的精确读取，未重做原 PDF 全文质量验收。
+
+| 路线 | 真实请求 / 业务工具 | 运行秒数 | 正文交付 | Agent 最终状态 / 额外行为 | 本路费用 |
+|---|---:|---:|---|---|---|
+| Flash × Claude | 12 / 11 | 77.5 | 107/107 块，四页 | completed；0 参数错误，额外读封面 2 次 | 供应商账单未返回；峰值非缓存 token 估算 $0.2757561，全额预留 $1.0808526 |
+| Flash × OpenAI | 13 / 13 | 81.5 | 107/107 块，四页 | partial；0 参数错误，额外读封面/块 3 次，重复查询目录证据 | 账单未返回；同口径估算 $0.3204045，全额预留 $1.2692706 |
+| Luna × OpenAI | 12 / 10 | 87.9 | 107/107 块，四页 | partial；3 参数错误，无额外正文路径 | OpenRouter 响应已报 $0.04506477，无未核账预留 |
+| Sonnet × Claude | 8 / 8 | 61.8 | 107/107 块，四页 | partial；1 未知句柄错误，无额外正文路径 | OpenRouter 响应已报 $0.4607377，无未核账预留 |
+
+耗时为 runtime.wall_seconds；监督进程完整耗时另列 review.json，不含本轮开发与人工核验。一次请求可含多个工具，Skill 另计，不能把工具数当模型请求数。DeepSeek 估算不是实际费用，未据此释放预留。Luna/Sonnet 的非缓存上界估算也不是实际账单，本表优先使用响应收费。
+
+**效果与剩余共同问题。**
+
+1. 四路最终 deliver 都用短句柄、没有重复 state，未再发生前次多字段拼接错误。Sonnet 在 get_asset_schema 前尝试引用 find_assets 并未给出的句柄，被明确拒绝，随后正确留缺口；不能宣称“引用错误已经全部消灭”。Luna 的三次错误分别是状态字段放错层级、satisfied 空引用、deliver 缺 needs；均修正后才提交最终交付。
+2. 资产、目录及 readiness 本来是导航/解析元数据，不是已注册业务证据；但计划状态要求每个 satisfied 都有 ResultRef。模型把“已找到资产/已读目录”列为需求后，没有直接可引用入口，因而补读封面、重复搜索或保持 partial。Flash/OpenAI 交付缺口明确写了 readiness 无句柄；Sonnet 的发现/目录两项也因此 partial。这是工具契约与任务状态之间的共同缺口，不宜简单归为模型弱，也不能给任意元数据贴正文证据标签解决。
+3. Luna 将原 PDF 解析质量的已知限制记作 partial；Flash/Claude 把“已披露限制”作为 supported；Sonnet 把完整正文记 supported 并在 note 披露原解析限制。三个 partial 均保存全部目标正文，不等同于正文提取失败；同时不能改写模型原状态为 completed。需区分“完成读取/披露”与“证明原解析无缺口”的任务要求及证据类型，避免用单一 completed 比较模型效果。
+4. 所有路线均未逐个拼目标子路径；Luna/Sonnet 严格只读父路径。两条 Flash 增加封面核验，因此严格“所有 read 只限父路径”条件未通过。Sonnet 本题调用最少且较快，Luna 响应收费低；一题各一次不能据此宣称稳定胜出。全篇解析/数值提取、多题效果不在本次结论内。
+
+**费用与停止。**新增 45 次真实请求；已报告收费增量 $0.50580247、DeepSeek 全额未核账预留增量 $2.3501232，本批占用合计 $2.85592567／$6。原根累计 444/787 次，已报告收费 $5.62459895，全额未核账预留 $18.76970746，剩余可准入 $15.60569359／$40；未知/在途均为 0，未充值、未扩额、未释放原预留。四进程正常退出，均已导出，当前停止，不自动追加对照或恢复旧 goal。
+
+**入口与下一步。**`output/data-agent-subtree-compare-20261019/review.json` 汇总本轮，`runs/<lane>/call-trace.json` 查看实际参数/错误，`deliveries/<lane>/delivery.json` / `delivery.md` 为同源交付。下一小批先明确并补齐资产/目录/解析状态的可追溯元数据引用及其任务状态语义，保留与正文证据的类型区别；据本轮失败参数做最小修正再按授权范围复验，不重新解析、不扩成通用框架。该下一批尚未启动。
+
+
+#### 14.21.5 元数据引用、任务缺口与来源限制分离（2026-10-20）
+
+**范围及根因。**用户授权修复后用原 query 真实复验；保持 14.21.4 四路、原 PDF 与解析版本，不交叉 OpenAI/Anthropic SDK，不开启其他问题。此前 find_assets / get_asset_schema 已返回导航信息，但 Satisfied 必须有 ResultRef，导致重复读封面/目录或 partial；DeliveryNeed 只有 gaps 和 note，缺少明确的来源限定字段，导致“已披露质量限制”和“未完成核验要求”混用。新实现不自动改变模型状态，不回写旧结果。
+
+**最小契约修复。**ResultRef 新增 metadata 类型，文档 find_assets 候选、get_asset_schema 实际返回页和 search_asset outline 节点提供 result_handle；复用既有持久结果登记、SDK 观察边界、句柄解析和依赖闭包。快照保留精确 asset_ref/package、来源原件、projection、登记主体的限定和原始未知字段，schema 只引用当页实际返回内容。引用说明明确是登记/解析元数据，不能据此证明原文财务事实；数值与口径提取仍要求 evidence，metadata 冒用会被拒绝。新元数据不作为正文新进展计数，既有去重/分页进展机制保持。
+
+交付新增 metadata 数组，与 evidence/records/calculations 分开；新 DeliveryNeed.limitations 保留已披露的限定，gaps 仍表示未完成的请求。状态聚合仍要求全部需求 supported 且无 gap/conflict/非法引用，缺口不会由代码移动、删除或改为成功。completion_basis 明确只表示请求工作完成，不是原件或解析质量认证；原始 readiness/coverage/issues 保存在可引用元数据中。若问题仅要求读全并披露限制，可以据此完成；若要求证明解析完整/正确，未核验仍须留 gap。业务充分性标志保持 false，语义判断仍需独立核验。新字段是 v1 交付的增量，旧对象原字节和旧导出可读，不迁移/改写原结果。
+
+**运行前验证。**当前源码普通重装到既有 SDK 环境，python -I 导入及安装字节核对；28 项文档行为、37 项原查询检查共 65 项通过。新增边界包括未观察元数据不可引用、分页快照不扩展、metadata 不得作为数值原文、supported 带 gap 被拒绝、partial 与 limitations 同时保留、JSON/Markdown 分类型导出。Apple/Alphabet 两份现有真实库的元数据读取/交付另作宿主工程链核验，明确 0 模型调用，不冒称自主业务验收。四路完整 Skill 和两 SDK 原生工具 schema 构造通过，业务 prompt 相同；Skill 1.4.0 / mapping 字符串 v7，prompt document-matrix-metadata-v3。
+
+**冻结及额度。**输入原问题与原四路模型/SDK/路由/推理设置不变，验收保持五个子目录、同父路径分页、正文精确覆盖/交付、限制诚实、额外读取单列；新增检查元数据引用分型和 gap/limitation 区分。旧 $40/787 次根账本已有 444 请求、已报 $5.62459895、全额未核账预留 $18.76970746；未知/在途 0。宿主收紧本轮合计 $3 含全额预留、每路 24 次，独立 scope META-* 仍累计同一账本，不重新授权费用池、不充值、不释放旧预留。冻结与准入见 output/data-agent-metadata-20261020/，每路仅一次，完成后 review 并停止。供应商公开路由/价格重新只读核对；未升级 SDK 或改变模型版本。
+
+**真实复验结果。**四路各一次新会话，原问题与原解析固定；完整 Skill 均进入模型输入。每路调用 find_assets 一次、get_asset_schema 一次、read_evidence 四次、deliver 一次，共 7 次业务工具调用；没有补读封面、拼子路径、未知句柄或参数错误。全部经 AAPL/XNAS 命中登记材料，获得五个子目录并沿原父路径与游标读完 107 块。实际模型收到的工具响应、文本/顺序/出处、最终交付与 JSON/Markdown 导出逐项相符；两份 metadata 快照均实际可见且与 evidence 分开。运行前后 117 个源码、安装及配置文件 hash 无漂移。各路页内分组可能随响应投影大小不同，核验连续的半开区间及最终 107 块，不硬编码每页块数。
+
+| 路线 | 请求：修复前 → 后 | 耗时秒：前 → 后 | 工具错误：前 → 后 | Agent 声明状态：前 → 后 | 本轮说明核验 |
+|---|---:|---:|---:|---|---|
+| Flash × Claude | 12 → 8 | 77.5 → 39.8 | 0 → 0 | completed → completed | 元数据/正文通过；期间与合并口径的额外声明缺证据 |
+| Flash × OpenAI | 13 → 9 | 81.5 → 46.0 | 0 → 0 | partial → completed | 元数据/正文通过；note 的最后块编号错一位 |
+| Luna × OpenAI | 12 → 9 | 87.9 → 68.0 | 3 → 0 | partial → completed | 本题限定内容及说明核验通过 |
+| Sonnet × Claude | 8 → 8 | 61.8 → 59.0 | 1 → 0 | partial → completed | 本题限定内容及说明核验通过 |
+
+耗时按 runtime.wall_seconds；请求总数 45→34，减少 11 次（24.4%）。同一路只有一次前后样本，耗时受服务端波动影响；此次同时修改契约与业务指导，不能进一步分离各自贡献，也不据此做稳定模型排名。DeepSeek 两路均不再因元数据引用去补读封面。Sonnet 业务工具从 8→7，但真实模型请求仍为 8；轮次改善不是所有路线都发生。
+
+**独立 review 与诚实状态边界。**
+
+1. Flash/Claude 的 n1 note 写“报告期间与合并口径已从原文读取”，该 need 引用的 metadata 中 reporting_period 仍 unknown；本题所读 Risk Factors 与登记信息不能证明这一步核验，原引用也不是原文口径证据。保留原声明并标 unsupported_claim，不因结构 completed 将它计为正确。元数据入口解决的是可追溯引用，不能机械保证自由文本断言均被引用蕴含。
+2. Flash/OpenAI 的 note 写 0–31、32–65、66–97、98–107 共 107 块，最后一组混用了开闭区间。实际规范 coverage 为 [0,32)、[32,66)、[66,98)、[98,107)，正文、顺序和导出全部正确；错误只在模型说明，应写末组闭区间 98–106。Sonnet 使用 0–34、34–69、69–103、103–107 表示半开端点，与工具值一致但未注明 end-exclusive，可读说明亦宜由代码统一表达。
+3. 四路都保留 parse_status=partial / source_completeness=not_verified 及已知 parser issues。当前任务要求“读完已有正文并披露限制”，该部分已完成；原 PDF 全篇质量、标签和图表描述未新增验证，不能由本次 completed 推出。Luna/Sonnet 的本题声明与已见证据一致；Flash 两路保留上述说明问题，不能汇报为四路全部业务语义通过。
+
+**费用及收尾。**本轮新增 34 次请求；Luna 响应收费 $0.04030342、Sonnet $0.4862895，合计 $0.52659292。它比上轮 OpenRouter 已报合计 $0.50580247 略高，不能说所有路线费用下降。Flash/Claude、Flash/OpenAI 供应商均未返回账单，分别保留全额预留 $0.5944263 / $0.6716256；按冻结峰值非缓存价格及响应 token 的上界估算为 $0.1429017 / $0.1575261，估算不当账单、不用于释放预留。本批占用 $1.79264482／$3。根累计 478/787 次、已报 $6.15119187、全额未核账预留 $20.03575936、剩余 $13.81304877／$40；未知/在途均为 0，旧记录不变。
+
+所有运行及导出结束，最终只读 inspect 与冻结差异检查通过。汇总脚本首跑在 inspect 文件尚未写完时读取，出现 JSONDecodeError；等待该进程完成后重新汇总通过。临时收尾断言还曾将累计 manifest 中历史未执行/失败 scope 一起要求 completed，已限定为本轮四条 META scope；历史状态未改写。两项是核验脚本问题，没有重跑模型或改变业务验收。源码测试与真实模型回归分开保留。入口为 `output/data-agent-metadata-20261020/review.json`、`runs/<lane>/review.json` / `call-trace.json` 和 `deliveries/<lane>/delivery.json` / `delivery.md`；数据根和解析包未更换，output 仅存本轮证据/导出。
+
+**停止及下一小步建议。**本批限定修复、真实复验、差异 review 已结束，停止新增模型调用，不恢复旧 goal。待 review 后，优先用代码生成计数/分页范围等确定说明，并明确期间/口径“已核验”声明所需的原文证据；自由文本语义核验仍不冒称可由引用合法性自动完成。该建议尚未开始实现。
+
+#### 14.21.6 代码生成分页覆盖、原文声明与摘录绑定（2026-10-20）
+
+**本批范围。**用户授权修复 14.21.5 两处说明问题，再按相同 query 只复验 Flash/OpenAI、Flash/Claude 各一次，完成后停止。原件/解析、实体绑定、路由及问题不变，不运行其他模型、不开发业务特例、不恢复旧 goal。
+
+**机制。**分页末尾编号错误来自模型在自由 note 中重写已正确返回的 coverage；无依据的“已核验”也通过同一个自由说明字段进入最终文件。文档 deliver 的 SDK schema 不再接受 note，服务层同样拒绝新提交的非空 note，错误明确指向替代方式；旧持久交付仍原样可读，不回写或清理旧说明。缺口 gaps 与限定 limitations 保留，业务指导禁止借用它们重写分页或正向核验声明。
+
+新 read_coverage 由已交付的 section_page 原件引用、解析版本、父路径、include_descendants 和冻结块位置生成；区间统一零起始半开 [start,end)，包含各页范围、去重块数、遗漏区间与 stored_section_complete。不同材料/解析/作用域不合并，重读/重叠不重复计数，位置对应不同块等不一致明确失败。该结果只证明交付所引用的已存内容范围，不证明原 PDF 全篇解析质量。
+
+原文说明使用 source_claims：每项 statement 配至少一条 {result_ref,quote}，复用数值提取的 SourceQuote 契约及 source_strings 文本投影。引用必须是该 need 的结果或依赖闭包内的原文 evidence，且在实际 SDK 输入中观察过；metadata、record、calculation 不能冒充原文，摘录必须逐字存在。宿主保存原件/版本/位置及 exact_substring 校验结果。输出只称 quote_presence_checked，模型 statement 仍标 semantic_verification=not_performed，不用引用合法性证明任意解释或“已核验”断言。若问题只要求完整读取和披露限制，source_claims 可以为空，不增加期间/合并口径任务；若明确要求核验且缺证据，仍须留 gap。
+
+业务 Skill 升级 1.5.0 / mapping 字符串 v8；Flash 两套独立 profile/prompt 使用相同业务正文 document-matrix-claims-v4。真实验收将逐项核对生成范围、原始正文、声明及出处，同时报告拒绝/额外读取/轮次，不以工具成功代替语义 review。
+
+**工程验收。**当前源码普通安装到原 SDK 环境，使用隔离导入入口运行 document_tools 31 项、queries 37 项，共 68 项必要检查；覆盖自由 note 拒绝、未观察/非本需求依赖引用拒绝、元数据不能充当原文、摘录不存在拒绝、正向摘录保留位置且语义未认证、分页遗漏/重叠/不同版本与范围区分。旧两路真实交付输入重放确认代码范围精确、旧元数据核验声明被拒、真实原文摘录可接受；重放不是新的自主模型验收。初次测试文件名误写而发现 0 项、初次重放误用严格 model_validate 导致列表/tuple 校验失败均保留，不记作通过；修正验收入口后通过，未修改产品契约绕过失败。
+
+**真实复验。**原 query、原 Apple PDF/解析包及 AAPL/XNAS 绑定不变，未预选正文块或注入答案；两路各一个真实会话，均完整加载 Skill、取得五个子目录、以同一父路径和游标读完四页 107 块并成功交付，0 工具错误、0 额外读取。实际模型输入、正文内容/顺序/位置、元数据引用与 JSON/Markdown 导出逐项一致，121 个运行文件 hash 无漂移。最终 read_coverage 为 [0,107)，四页分别 [0,32)、[32,66)、[66,98)、[98,107)，缺失为空；stored_section_complete=true，source_completeness=not_verified。两路未再提交自由 note 或无依据的期间/合并口径已核验声明。
+
+| 路线 | 前次→本次模型请求 | 前次→本次耗时 | 业务工具调用 | 结果 |
+|---|---:|---:|---:|---|
+| Flash / Claude SDK | 8→8 | 39.8→120.6 秒 | 7 | 完整读取与最终范围通过，说明字段仍有边界 |
+| Flash / OpenAI SDK | 9→9 | 46.0→111.9 秒 | 7 | 完整读取与最终范围通过，说明字段及过程范围措辞仍有边界 |
+
+本次两路仍在 limitations 中混入正向执行/元数据说明；Claude 重复写四页/107 块，OpenAI 过程消息写“0–32”等没有显式说明半开约定。实际数字与存储范围一致，但字段职责和过程文字未完全收口；不能宣称任何自由文本都被代码认证。两路 source_claims 均为空，本题不要求新增财务事实核验；正向带摘录声明的真实模型案例尚未发生，只通过安装包测试及保存真实输入重放。引用/摘录检查保证可追溯和字面存在，不保证 statement 的语义推导正确。
+
+请求数量未下降，耗时反而增加。日志请求创建至更新的区间总和由 Claude 28.386→42.052 秒、OpenAI 32.834→41.268 秒；请求之间合计由 6.967→63.063 秒、10.162→55.853 秒。这些时段混合网络、持久化、SDK、工具及本机处理，不能作为纯供应商延时，也不足以认定具体根因；保留观察，不扩大本批性能修复。
+
+**费用、证据与停止。**本批新增 17 次，未取得 DeepSeek 实际账单，全额未核账预留 $1.2782166（Claude $0.5982387、OpenAI $0.6799779），未释放或冒充实付。原根账本累计 495/787、已报告收费 $6.15119187、全额未核账预留 $21.31397596、剩余 $12.53483217／$40，未知/在途 0；本批占用低于原 $3 限制。证据位于 `output/data-agent-claims-20261020/`：`review.json`、`saved-input-replay.json`、`runtime-freeze.json`、`timing-observations.json`、`runs/<lane>/call-trace.json` 与 `deliveries/<lane>/delivery.json/.md`。原失败及旧交付保留。完成后停止 review，没有增加模型/题目、重新解析、扩额、充值或恢复旧 goal。
+
+#### 14.21.7 两年合并营收、原文支持与代码增长率（2026-10-20，已实跑，业务缺口待 review）
+
+用户确认进入下一批功能验收。问题固定为：查找 AAPL／XNAS 的已登记 Apple 2025 Form 10-K，提取 FY2025、FY2024 的合并总营收，确认期间、币种和单位；用代码计算同比增长率，交付 JSON、CSV、Markdown，并保留支撑各项事实的原文摘录与精确出处。无法确认的内容明确留缺口。
+
+沿用原件/解析及获准材料范围，由模型自行发现资产、选择目录和正文、读取数值单元格与表头、登记 source-backed records 并请求代码计算；验收侧的原 PDF 对照和答案不进入模型上下文。复用 `structured/document_records.py`、`application/exports.py` 及现有两套 SDK 的相同业务 Skill/prompt，不预先改写产品指导或拓展运行架构。只有实际发现共同工程缺陷时才作最小修正，并重放原失败。
+
+交付核对发现已有 `records.csv` 只包含提取记录，代码计算仅见 JSON/Markdown，因此本批在公共导出层补 `calculations.csv`：只要存在 calculations 就生成，保留 calc_id、公式、精确结果、单位、操作数引用、比较依据及语义限定；未解决计算仍保留空结果和原因，不填成零。原 `records.csv` 与历史已导出文件保持原样，不要求模型写 CSV 或再计算结果。此项适用于已有全部计算类型，与样本公司无关。
+
+先运行 Flash/OpenAI 一条真实会话，独立核对数值、财政年度、主体/合并口径、币种和倍率、原文支持、公式操作数及三格式交付一致性；通过后才启动 Flash/Claude 同题一条。各最多 24 次物理请求，沿原 $40/787 次根账本，新增两路合计限制 $3（含全额未核账预留），不扩额、不充值或释放旧预留。正向 `source_claims` 如生成则核对实际原文及含义，未生成时报告具体通过的是 record support；不以结构 completed 冒充业务核验。运行证据与冻结契约位于 `output/data-agent-revenue-20261020/`。完成本批 review 后停止，不恢复旧 goal 或自动加题。
+
+**准备中断与恢复。**初次准备在创建网关执行上下文时等待本地临时对象回读，温和中断后保留堆栈；恢复又因新增 exports.py 尚未安装被一致性检查拦截。源码构建阶段再次出现长等待，用户要求 hold 后停止所有相关进程，此时本批模型调用为 0。随后用户明确要求 retry；同一幂等授权、上下文键及根账本恢复成功，单包重装构建约 6.23 秒。没有改存储完整性规则、重置账本或把本地等待归为 SDK/模型故障；等待的具体 OS/文件系统原因仍未确定，也不能据本次恢复认定根因已修复。
+
+**实现与限定工程验证。**仅公共导出层补 calculations.csv，并扩展现有数值交付测试。当前源码普通安装后，该项定向检查 1 项通过（源数值登记、Decimal 增长、依赖交付、JSON/Markdown/两种 CSV 及禁止覆盖原目录）；11 个关键模块与安装内容逐字节一致。未无变化重跑前批 68 项，也不将其记成本批重新通过。123 个冻结运行文件在真实运行及导出后无漂移，业务 prompt/Skill、SDK、模型和路由均未改。
+
+**真实结果。**Flash/OpenAI 一个连续会话完成并声明 completed；14 次物理模型请求、14 次业务工具调用，完整 Skill 在第 3 次请求、首次业务调用前可见。共 16 次原生工具调用（另含 load_skill/exec_command），同一请求可能包含多项工具；不把工具数当物理请求数。耗时 150.337 秒，没有额外会话或网络重试。主链依次定位材料、读原生目录和合并利润表、财政年度及合并范围，搜索币种，登记记录并代码计算，最后 deliver。期间一次 VALUE_SOURCE_MISMATCH 是把整表当精确数值证据，后续按单元格读取修正；一次 OUTPUT_LIMIT 是登记响应的依赖超过默认输出预算，模型调大 max_bytes 后成功。两者保留为真实工具错误，没有当网络故障重试。
+
+独立原 PDF（SHA-256 `3eb270b22acb7d8d8e9c32a43dc221dec3345f8e4bca02755fdbc1ee16c823de`）核对：物理页 32／印刷页 29 的 Total net sales 为 FY2025 416,161、FY2024 391,035，原倍率 millions；表格零起始 row 5、column 1/2，单元格矩形及年份列对应正确。年末日期分别 September 27, 2025 / September 28, 2024，两年均 52 周；Apple Inc. 及全资子公司的合并范围原句在物理页 37／印刷页 34。代码用 416161000000 和 391035000000 得 `(本期-基期)/基期 = 0.064255117828327388`，约 6.4255%。四个导出文件与 committed delivery、原始数值、操作数及文件 hash 一致。真实模型提交 5 条 source_claims，原文逐字匹配均通过；语义单独核对。
+
+**未通过的两处门槛。**
+
+1. **证券条件未执行。**原生 find_assets 入参为 company_ids＋asset_kinds，没有 securities；宿主持久入参同样为空。模型选中正确的调用方绑定材料，但没有执行要求的 AAPL/XNAS 查找，不能把正确选材当作证券映射已核验。工具与 Skill 已有 securities 能力/指导，运行层没有把此显式要求设为强约束；Skill 未加载或目录缺失不是本次证据支持的原因。后续可在显式调用方证券约束与资产查找/绑定边界修正，不从自然语言或样本名补造公司事实。
+2. **币种确认只给出推断。**两条 record 的 unit 支持为 millions 说明和 `$ 307,003`；模型在 limitations 承认 USD 来自“$＋SEC 10-K 语境”的解释，仍将确认需要标 supported，且一条 source_claim 概括为“表头载明数百万美元”，实际表头仅写 In millions。逐字摘录存在和倍率检查并不证明 USD 或满足必需核验。模型两次搜索 U.S. dollar，收到 texts-393 等候选，却没有继续读该块；相关 snippet 在完整财报币种句结束前截断。验收侧原件物理页 30 有 net sales/gross margins “as expressed in U.S. dollars”的明确来源，这用于说明可补查路径，不加入模型原交付或替其升级状态。后续须区分明确币种证据、含糊符号及解释，必需项缺证据时继续读或留 gap。
+
+因此本批记录为“真实读取/提取/计算/导出功能通过，冻结业务门槛未全过”；保留原 completed 交付，不事后重写为另一个状态或放宽标准。按原条件，Flash/Claude 未启动、请求为 0。当前没有重新解析、付费补查、加题、换模型或新会话；下一步先 review 上述两个通用边界。
+
+**费用与证据。**新增 14 次，供应商实际账单尚未取得，全额未核账预留 $0.9503964（不是实付）／本批 $3。根累计 509/787、已报告收费 $6.15119187、全额未核账预留 $22.26437236、剩余 $11.58443577／$40，未知/在途为 0。`review.json` 保存整批判断；`runs/REV-flash-openai/review.json` 保存逐项机械检查与独立业务 review，`call-trace.json` 保存真实参数/响应，`native-assistant-text.json` 仅含公开文本；`deliveries/REV-flash-openai/` 有 delivery.json、delivery.md、records.csv、calculations.csv 与完成 manifest。原暂停/中断日志、失败和预留保留；停止待用户 review，不自动恢复旧 goal。
+
+
+#### 14.21.8 通用约束修复与 Agentic Loop 检查（2026-10-20，OpenAI 真实复验与 review 完成）
+
+**本次 review 结论。**已有可复用的 SDK 原生循环与工具/证据基础，但不能据此宣称业务泛化已成立。循环为显式任务与范围 → 模型提出 needs → 自主查找资产、目录/搜索/阅读 → 工具返回结果与错误 → 更新任务状态、补读或计算 → 交付或澄清。OpenAI `agent/openai_runtime.py` 的 Runner 与 Claude 原生会话负责模型/工具往返，宿主负责持久化、准入与结果约束；不另造固定公司步骤或通用 ReAct 框架。
+
+| 环节 | 当前有证据的能力 | 尚未解决或未证明的部分 |
+|---|---|---|
+| 理解任务 | 显式公司范围、材料版本与资源边界 | 用户问题由模型转成 needs，未独立证明需求分解没有遗漏 |
+| 规划 | 计划版本、已有需求不可静默删除、每项有 satisfied/gaps 状态 | 形式完整不等于计划符合用户原始意图；不能把模型自报当独立判断 |
+| 执行 | 原生目录、父路径分页、搜索和原文读取，策略由 Agent 选择 | 当前真实链依赖预先获准材料/解析，不是全网发现与任意文档解析的证明 |
+| 观察 | ToolBinding 只承认可观测 SDK 输入中的原样结果；引用/版本/位置可追溯 | 消息可见不代表模型理解；检索命中不代表已阅读全文 |
+| 修正 | 明确工具错误及 current_task_state，原例已在同会话修正数值证据和输出预算问题 | 未读币种候选却完成交付说明证据不足仍可能被模型忽视；无依据加轮次不是根因修复 |
+| 终止 | deliver 校验引用、依赖闭包、需求状态及导出 | business_sufficiency_evaluated=false；completed 不证明全部声明被原文语义支持 |
+
+**两个当前修复。**调用方显式传 required_securities，与许可的资产范围区分；find_assets 必须使用这些证券条件，后续读取/计算沿用实际发现并匹配公司的 asset_ref，澄清不能丢掉已要求的条件。单位记录必须有原文明确代码或完整名称的字面支持；不从含糊符号推断币种，不强制将原文全称归一成没有原文支持的 ISO 码。错误返回 Agent，由其自主补读或留 gap。公司、页码、块、数值和答案均不写入这些共享机制。两套 Flash 指导使用相同业务规则，保留 SDK 装配差异。
+
+单位检查只证明字面标签存在，不证明该句适用于目标数值；含糊名称表也不是世界所有币种/语言歧义的完备分类。需求语义完整性、证据含义与适用范围仍需模型判断及独立业务 review。本批不扩建自动评审平台，也不把两处守卫包装成完整语义认证。
+
+**验证分层。**当前源码普通安装后的 document_tools 35 项与 queries 37 项通过，覆盖其他证券标识、不同单位标签、拒绝旁路、澄清保留约束及旧上下文序列化。它们是确定性行为检查，不是跨公司真实业务验收。工程检查完成时真实复验尚未执行；原授权为先 Flash/OpenAI 业务通过后再 Claude，每路一会话、最多 24 次，沿原根账本与本批 $3 上限，失败不自动加题/加会话。以原输入验证修复，同时报告新增结构化证券约束，不称完全相同请求字节。真实跨材料/跨题的业务泛化本批尚未证明。证据入口：output/data-agent-revenue-guards-20261020/。
+
+
+**最新收紧与真实结果。**用户随后明确只运行 OpenAI 同 query 一次，结束即停下来 review，不运行 Claude。本次同一自然语言问题、原 PDF/解析及原许可材料范围保持，新增调用方明确 required_securities=AAPL/XNAS；这是结构化输入约束变化，不声称请求字节完全相同。冻结 125 个运行文件，13 个关键安装模块与源码一致；本次没有重新解析、升级依赖或给 Agent 传入验收答案。
+
+Flash/OpenAI 一个连续真实会话，21 次物理请求、19 次业务工具调用（含两次预检拒绝；持久业务操作 17 次），约 429.587 秒。完整 Skill 在首次业务调用前可见。实际 find_assets 使用 AAPL/XNAS 并取得对应公司映射，后续均沿冻结材料引用。Agent 最初仍尝试使用含糊的 `$`，UNIT_EVIDENCE_REQUIRED 拒绝后，自行继续检索并读取 texts-393／物理页 30 的“net sales and gross margins as expressed in U.S. dollars”，再以原名 U.S. dollars 登记两条记录；宿主未提供该块提示或补答案。独立原 PDF 核对 FY2025/FY2024 的 416,161/391,035 百万、物理页 32 表格 row5/cols1,2、年末日期与 52 周、物理页 37 合并口径、Decimal 增长率 0.064255117828327388，均一致。最终四个需求有支持，completed 与本题结果一致；JSON/Markdown/records.csv/calculations.csv 及 manifest hash 一致。
+
+**效果与过程分开。**本题业务通过，但效率退步：前次 14→21 次请求、150.337→429.587 秒，工具错误 2→4。当前 4 类为 PLAN_VERSION_MISMATCH、UNIT_EVIDENCE_REQUIRED、INVALID_REQUEST（遗漏 n2 状态）与 OUTPUT_LIMIT；均在同会话修正，没有网络重试或追加会话。18 次非终态业务调用都重复发送 plan_update，其中 17 次 needs 正文相同，另一次被拒调用还轻微改写 n4 文本；本来只需计划变化时更新。模型状态维护错误与接口负担同时存在，不直接归因 SDK。币种相关检索增至 6 次；query_records 默认 24000 字节不足以容纳依赖闭包，调为 60000 后成功，这类输出预算摩擦前次也出现。本次无法凭总耗时确定供应商、模型与本机延迟各自贡献。
+
+5 条 source_claims 与已读原文上下文一致；其中财政年度声明同时写“9月最后一个星期六”，该事实在同一已读 texts-302 中，但所选短摘录只包含 52 周，应扩展摘录使其单独可读。此为引文展示缺口，不是缺少原文或错误期间。仍未真实验证“始终找不到证据／证据冲突”时的模型停止行为；一个成功补证案例不能证明所有业务语义或跨公司泛化。
+
+**费用、证据与停止。**新增 21 次，供应商实际账单未取得，全额未核账预留 $1.8522156／$3，保留原预留；根账本 530/787、已报告收费 $6.15119187、全额未核账预留 $24.11658796、剩余 $9.73222017／$40，未知/在途 0。证据：output/data-agent-revenue-guards-20261020/{review.json,inspect-final.json,runtime-freeze.json}、runs/GUARD-flash-openai/{review.json,call-trace.json} 与 deliveries/GUARD-flash-openai/。首次导出因父目录不存在被明确拒绝，建立指定父目录后导出成功，未新增模型调用；独立检查脚本首次错误假设所有 plan 文本相同而中断，随后据实际 17+1 差异修正报告，不改产品或放宽验收。已停止，Claude 0 次，旧 goal 不恢复。
+
+
+#### 14.21.9 计划/状态增量与完整记录输出预算（2026-10-20，真实复验与 review 完成，已停止）
+
+用户要求定位上轮轮次与耗时增长，通用修复后同 query 真实复验 OpenAI 一次，结束即停止。沿原根 $40/787 次账本，新增本批 $3 含全额未核账预留、最多 24 次，不跑 Claude、扩额、充值或恢复旧 goal。
+
+**根因证据与边界。**上一轮 18 次非终态调用全部提交完整计划，17 次正文相同；错填版本引发 PLAN_VERSION_MISMATCH，另一次手工维护完整 satisfied/gaps 时遗漏 n2。接口要求模型重复输出代码已知的版本、工具名与未变化状态，是可移除的共同负担；不静默修正旧格式的错误版本或推断业务状态。query_records 的输出含完整记录、计算和来源依赖，但沿用了小页默认 24000 字节，实际同会话提升到 60000 才成功；不是传输失败，也不能通过删依赖或提高模型重试次数解决。官方 Function Calling 文档建议让代码承担已知参数、避免无效状态，依据 https://developers.openai.com/api/docs/guides/function-calling ，不把项目状态问题归因 SDK。
+
+14→21 次、150.337→429.587 秒不能全部用这三类错误解释：请求创建至更新区间累计 78.346→155.023 秒，请求之间累计 63.846→241.058 秒；两类区间都混合模型、网络、SDK、持久化与本机执行，并非纯供应商耗时。工具自报执行时间约 2.223→5.807 秒，同样不含全部宿主开销。本批移除确定性的协议摩擦，真实复验报告实际变化，不宣称全部耗时根因已解决。
+
+**最小共享修复。**文档模型工具 state 改为增量：reason、首次/新增 add_needs，以及可选的 changed satisfied/gaps。宿主在串行绑定处读取已提交快照，维护完整状态、next_action、CAS 版本；省略的需求沿用原状态，新需求始终未核验，不自动宣布支持。重复/重写已有需求、未知需求、重复状态和未观察引用明确拒绝。最终 deliver 仍显式判断所有需求与缺口，不改变证据或语义验收。服务内部完整 TaskState 和旧完整输入保持严格校验；旧错误版本不被静默绕过。模型 schema 移除不可达旧状态定义，减少提示冲突与体积；原生 SDK 循环不变。
+
+文档 query_records 省略 max_bytes 时默认使用已有 200000 字节硬上限，避免模型猜记录依赖闭包大小；不是无限输出，也不动态放大用户显式小预算。超限错误报告完整所需字节和当前预算，超硬上限仍需拆分任务；记录与证据不截断。其他查询/读取页预算保持。Skill 1.7.0/mapping10，Flash 两套指导同业务正文 document-matrix-progress-v6，保留独立 SDK 装配；本批仅实跑 OpenAI。
+
+**工程验证。**当前源码普通重装到原 SDK 环境、隔离导入，document_tools 39 项、queries 37 项通过。覆盖多需求增量保留、无重发计划版本稳定、新需求未核验、无效引用/重复或未知更新拒绝，以及显式小预算失败但默认完整返回全部记录/计算/证据。初次两项失败为新测试未传 find_assets 要求的 query/filters，补正测试输入后通过，产品要求未放宽。原失败日志保留。准备与真实证据入口 output/data-agent-loop-20261020/；不是跨公司业务泛化证明。
+
+
+**同题真实复验。**Flash/OpenAI 一会话，原 query、AAPL/XNAS、原件/解析、模型/路由/推理参数与业务标准保持；只改变上述工具投影与对应指导。16 次物理请求、12 次业务调用（find1/schema1/read5/search3/query_records1/deliver1），114.489 秒。11 次非终态调用均未提交 plan_update/next_action；6 个需求只新增一次（先5项，后新增合并范围），宿主最终计划版本2。没有计划版本错误、遗漏需求状态或 OUTPUT_LIMIT；query_records 原生参数确实省略 max_bytes，宿主默认200000，完整响应约33744字节（大于旧24000），保留2条记录、计算和原文依赖。没有自动扩大显式预算或内部重试。
+
+| 指标 | 前次 | 本次 |
+|---|---:|---:|
+| 物理请求 |21|16|
+| 业务调用 |19|12|
+| 耗时秒 |429.587|114.489|
+| 业务工具错误 |4|0|
+| 请求创建至更新区间累计秒 |155.023|64.397|
+| 请求之间区间累计秒 |241.058|43.345|
+| 最大请求字节 |421459|270634|
+
+两类耗时区间均下降，但单次运行不能证明长期稳定性或把全部下降归因于本次修改；可确定的是旧三类机械错误本次未再出现、原始记录查询一次完成。仍有2次原生 Skill 命令拒绝：Agent尝试组合 find/cat、ls-R，既有只读边界返回 SKILL_READ_DENIED，最后直接cat完整文件成功。这两次包含在16次请求内，不能把业务工具0错误说成全部原生工具0错误；本批不继续扩展Skill命令策略或追加运行。
+
+**独立业务 review。**原 PDF SHA256、物理页32的合并总营收416161/391035百万与年末日期、52周、物理页37全资子公司合并范围、物理页30明确U.S.dollars原文均与实际已读证据和两条记录一致。Agent在登记前自主读取币种块，未收到宿主块位置或答案。代码增长率0.064255117828327388及操作数顺序正确。6项需求完成与本题结果相符；JSON/Markdown/记录CSV/计算CSV及hash一致，126个冻结运行文件无漂移。5条声明与原文/记录/计算上下文一致；FY2024短摘录列表未重复币种词，但对应记录的unit支持和同版原文有明确依据；增长结论的摘录只提供数值输入，同need的计算引用给出推导，不将代码结果伪称原文直接披露。仍非跨公司或始终缺证据场景的泛化证明。
+
+**费用与交付。**新增16次，供应商实账未取得，全额未核账预留$0.9453198（前次$1.8522156），不释放旧预留；根累计546/787，已报告收费$6.15119187、全额未核账预留$25.06190776、剩余$8.78690037／$40，未知/在途0。新增占用低于本批$3。完整证据在output/data-agent-loop-20261020/review.json、timing-before.json、runs/LOOP-flash-openai/{review,call-trace}.json及deliveries/LOOP-flash-openai/。inspect-final为只读0模型调用。按指令完成后停止，Claude未运行，不自动进入下一批。

@@ -10,6 +10,67 @@
 
 2026-09-18 接手时部分资料尚未取得；下文保留恢复方法供实际缺失时使用，不表示列出的文件现在都缺失。新环境先运行工作区检查确认本次检出的状态。离线检查通过不代表 M0 验收、完整年报核验、模型质量达标或历史人工审核已恢复。
 
+## Data Agent 轻量功能 review（2026-10-15）
+
+本节复用已有入口，只查看正常功能链，不运行整套回归或创建新虚拟环境。**下述 SDK 验收使用本机模拟服务：实际 SDK/CLI 收到脚本预写的模型响应，再执行真实 Data 工具和计算。没有请求 OpenRouter/DeepSeek；模型名字段写着 DeepSeek 不表示它参与了推理。** 这些用例验证接线、工具执行及结果保存，不验证真实模型自主选工具或真实网关兼容。
+
+从仓库根设置路径。当前机器复用检查点 4 的普通安装 SDK 环境；新检出先按本文安装 data + agent，再将 uteki_review_py 指向该环境。源码变化时重装当前项目并核对导入；只改文档不重复安装。以下只创建临时数据/结果目录：
+
+```bash
+uteki_review_repo="$PWD"
+uteki_review_py="$uteki_review_repo/output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python"
+uteki_review_dir="$(mktemp -d "${TMPDIR:-/tmp}/uteki-review.XXXXXX")"
+export UTEKI_GATEWAY_OPENAI_EVIDENCE="$uteki_review_dir/openai"
+export UTEKI_GATEWAY_CLAUDE_EVIDENCE="$uteki_review_dir/claude"
+```
+
+原件存储示例：写入合成主文件、附图及一个未取得附件，重新打开并读回。storage.json 的 main_round_trip 应为 true，不代表来源业务身份已核验。
+
+```bash
+mkdir "$uteki_review_dir/storage"
+"$uteki_review_py" -I "$uteki_review_repo/tests/fixtures/data_platform/store_worker.py" \
+  example "$uteki_review_dir/storage" > "$uteki_review_dir/storage.json"
+```
+
+OpenAI SDK 本机模拟正常链：
+
+```bash
+"$uteki_review_py" -I -m unittest discover \
+  -s "$uteki_review_repo/tests/integration/data_platform_agent" \
+  -p test_gateway_openai.py \
+  -k test_actual_chat_client_and_runner_deliver_from_eight_shared_tool_requests -v
+```
+
+Claude SDK/CLI 本机模拟正常链，需要本机 loopback 和进程观察权限：
+
+```bash
+"$uteki_review_py" -I -m unittest discover \
+  -s "$uteki_review_repo/tests/integration/data_platform_agent" \
+  -p test_gateway_claude.py \
+  -k test_native_business_loop_bills_each_original_response_and_replays_delivery -v
+```
+
+各自应输出 Ran 1 test / OK。openai/normal.json、claude/normal.json 的 result.delivery.delivery 包含证据和计算。查看简要结果：
+
+```bash
+"$uteki_review_py" -I - "$uteki_review_dir" <<'PY'
+import json, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+print("results:", root)
+print("storage round trip:", json.loads((root / "storage.json").read_text())["main_round_trip"])
+for kernel in ("openai", "claude"):
+    item = json.loads((root / kernel / "normal.json").read_text())
+    result = item["result"]
+    print(kernel, {k: result[k] for k in ("status", "mode", "real_model_calls")})
+    print("calculation:", result["delivery"]["delivery"]["calculations"][0]["value"])
+PY
+```
+
+2026-10-15 已复跑这三个入口：存储读回为 true；两侧各 8 次本机合成 HTTP 请求，status=completed、mode=gateway_synthetic、real_model_calls=0，合成计算结果均为 -2.250000000000000000。所用普通安装的 70 个源码/SQL 文件与当前源码一致，未新建环境或调用远端模型。实际 OpenRouter + DeepSeek 路径尚未验证，Claude 另有推理参数传递缺口。
+
+真实 HTML/iXBRL 的程序验收已有 examples/data_platform/data_tools.py 和 scripts/data_agent/verify_tool_delivery.py，具体方式见本文“六工具与可追溯交付”段落；需显式的独立数据根、请求及验收材料。这同样不表示 Agent 自主选材；没有材料时使用本节合成入口即可。后续 Sonnet/GPT 的真实链路另需独立 profile 与已授权执行契约。
+
 ## 从新检出仓库开始
 
 项目声明 Python 3.11+；本轮环境复现使用 Python 3.13。Node.js 20+ 仅在使用对应前端/开发规范工具时需要，Python 安装与 M0 探针不需要 Node。归档存储使用 POSIX 文件锁。
@@ -29,7 +90,7 @@ uv pip check --python .venv/bin/python
 .venv/bin/python -I -c "import uteki, uteki_eval, agents, duckdb, pydantic, lxml.etree, mcp"
 ```
 
-`uv sync` 默认把项目安装为 editable，适合日常改代码；依赖仍按锁安装，锁与声明不一致时 `--locked` 会报错。环境验收应使用全新目录和普通安装，不能只依赖已有 `.venv`：
+`uv sync` 默认把项目安装为 editable，适合日常改代码；依赖仍按锁安装，锁与声明不一致时 `--locked` 会报错。首次环境可复现验收或安装机制变化时，使用全新目录和普通安装；后续功能 review 复用已核对的普通安装环境，源码变化时重装，不按检查点新建环境。首次干净安装示例：
 
 ```bash
 uteki_env_root="$(mktemp -d "${TMPDIR:-/tmp}/uteki-env.XXXXXX")"
@@ -91,7 +152,7 @@ uv pip compile pyproject.toml requirements/m0.in --python-version 3.13 --constra
 
 ## 第五批双 SDK 离线接入（2026-10-15）
 
-正式 runtime 使用主锁的 `agent` extra，包含 OpenAI Agents SDK 0.22.2、Claude Agent SDK 0.2.166 和 MCP 2.2.0；与 `data` 一起安装。主锁仅新增 Claude SDK，原包版本未升级。M0 独立声明与锁保持原样，继续用于历史探针复现，不作为正式 runtime 的隐式依赖来源。
+正式 runtime 使用主锁的 `agent` extra，与 `data` 一起安装。2026-10-15 按官方最新稳定版升级为 OpenAI Agents SDK 0.24.0、openai 3.31.0、Claude Agent SDK 0.2.167 / CLI 2.1.300；MCP 保持 2.2.0。主锁仅另变更新版 SDK 必需的 pyjwt、urllib3。M0 独立声明与锁保留原已验证 SDK 组合，继续用于历史探针复现，不作为正式 runtime 的隐式依赖来源。后续 SDK 升级先核对官方发布，再同步主锁、当前 profile 和必要回归，不使用浮动版本，也不改写旧运行绑定。
 
 ```bash
 uteki_sdk_repo="$PWD"
@@ -108,7 +169,7 @@ uv pip check --python "$uteki_sdk_env/venv/bin/python"
 
 第二组会启动本机回环服务和随包 Claude CLI，需允许监听 127.0.0.1。worker 使用独立临时配置、虚拟令牌及拒绝外部连接的代理；没有真实模型推理或 OpenRouter 请求。OpenAI 使用实际 Runner 和脚本 Model；Claude 使用实际 SDK/CLI 与脚本 Messages 服务。缺少本机端口/子进程权限时明确记未运行，不能以 scripted CLI Transport 的结果替代此组。
 
-当前 `agent.openai_runtime.run_offline` / `agent.claude_runtime.run_offline` 接受调用者提供的 DataService、context_ref 和精确 profile；不提供默认模型或付费入口。运行只接受明确标为 `offline_fixture_only` 的 fixture profile。2026-10-15 新增两侧 DeepSeek `unverified` profile 与 `gateway-contract.draft.v1.json`，仅用于执行契约 review 和隔离请求装配预检；现有 runtime 继续拒绝它们，修改配置状态不产生调用授权。推理配置未经对应能力验证会拒绝；不是已完成真实路由或 prompt 业务调优。当前 OpenAI 3.13.0 的锁定传输依赖是 `httpx2`，离线捕获须使用实际安装的客户端类型，不为历史示例另加旧 `httpx`。准备证据及限制见核心设计 14.12.17。
+当前 `agent.openai_runtime.run_offline` / `agent.claude_runtime.run_offline` 接受调用者提供的 DataService、context_ref 和精确 profile；不提供默认模型或付费入口。运行只接受明确标为 `offline_fixture_only` 的 fixture profile。2026-10-15 新增两侧 DeepSeek `unverified` profile 与 `gateway-contract.draft.v1.json`，仅用于执行契约 review 和隔离请求装配预检；现有 runtime 继续拒绝它们，修改配置状态不产生调用授权。推理配置未经对应能力验证会拒绝；不是已完成真实路由或 prompt 业务调优。当前 OpenAI 3.31.0 的锁定传输依赖仍是 `httpx2`，离线捕获须使用实际安装的客户端类型，不为历史示例另加旧 `httpx`。准备证据及限制见核心设计 14.12.17。
 
 确定性核心的进程测试包含“SDK 未安装”的安装边界断言，必须在仅安装 `data` 的另一干净环境运行，不能在 agent 环境中删除或放宽该断言。第五批第一步限定验收及已知差异见核心设计 14.12.15。
 
@@ -398,3 +459,566 @@ recomputed: 113296d3ee15d4cdb5ef858a780812ac2f8e7bafcd68608ae3cdd88d13e62cba
 - `GOOGLE_CLOUD_LLM_SPIKE`
 
 旧 README 对 M1 与交接契约只直接链接了中文版本，因此共有十个失效链接。此清单记录缺失事实，不重建或代替原设计决定。
+
+
+## 四路径真实接入的运行与复核（2026-10-15）
+
+用户随后明确批准本批累计 $3 / 80 请求、每路 20 次。已在原账本应用一次追加授权，旧 33 个请求及费用逐项未变；新运行入口使用 `output/data-agent-live-20261015/extended-batch.json`。该 manifest 的四个上下文属于新执行，旧结果保留在旧 manifest 中，累计账本相同。查看最新运行：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-live-20261015/extended-batch.json
+```
+
+追加额度使用 `extend-allowance --manifest <原 manifest> --authorization <显式用户决定 JSON> --output <新 manifest>`；没有授权不能调用。该入口已执行，无需重做；中断后用同一授权 ID 恢复，不能更换 ID 重置累计或解除取消。此次授权文件为 `continuation-fix/allowance-authorization.json`（相对本批输出目录）。正常运行仍用 `run --manifest <新 manifest> --lane <原 lane> --work <尚不存在的私密目录> --env-file .env`；已有运行目录拒绝覆盖。行为检查命令为 `python -I -m unittest discover -s tests/integration/data_platform_agent -p test_gateway_extension.py -v`，使用合成数据、不调用真实模型。
+
+**本地请求字节上限修正：**实际 A/C 执行曾因累计工具历史超过项目的 200,000 字节上限而在发送前失败，这不是供应商网络错误。`prepare-attempt` 现支持显式 `--max-request-bytes 512000`，只登记新执行的请求字节上限及按原价格计算的保守单次预留上界；原请求、业务输入、prompt、路由、输出限制、累计金额/次数及取消状态保持。每次请求仍按真实请求大小预留，余额不足即停止。扩大此项不意味着模型上下文无限，也不保证余下次数足以完成业务。新 manifest 不覆盖旧文件。
+
+已登记的 C/D 修正版本分别为 `C-luna-openai/request-bound-manifest.json` 和 `D-sonnet-openai/request-bound-manifest.json`（相对本批输出目录）；对应运行结果位于同 lane 的 `request-bound-run/`。C 已达到累计 20 次，不得照示例再跑。先执行上方 `inspect` 查看原账本；不要仅凭新的 `--work` 目录判断还有额度。
+
+本轮已停止重复调用，四路未完成完整验收。最新累计 A/B/C/D＝20/17/20/16；已报告收费 $1.26415393、未核账预留 $1.4361136，可用 $0.29973247。D 最新交付仍是 partial、计算为空；不能仅凭命令完成、JSON 存在或 native_success=true 记业务通过。结果、原文独立核验、安装包 hash 和剩余项汇总在 `continuation-fix/extended-verification.json`。
+
+`inspect` 的次数/费用是原账本累计，`session_status`/`session_requests` 则属于传入 manifest 绑定的会话，不会自动跳到另一 manifest 的新执行。查看 C/D 最新会话时分别将 `--manifest` 换成 `C-luna-openai/request-bound-manifest.json` / `D-sonnet-openai/request-bound-manifest.json` 的完整路径；旧 manifest 保留历史含义。
+
+记录查询必须使用 schema 返回的完整 `{namespace}local-name`，不能把 `prefix:name` 的零匹配当作原件缺数据。`select.fields` 的可选字段已写入工具 schema，非法字段返回具体名称与允许列表；`period`、`locator` 是嵌套字段，不能自造 `entity_scope`、`source_locator`。这些修正不填入任何样本答案。Claude SDK 合成 API 错误现在保留其 `error` 及已知本地拒绝码，不再误报为主会话身份缺失；原失败记录不改写。
+
+以下保留追加授权前的停止位置及旧命令说明。
+
+最新恢复执行已新增 A 5 次、D 2 次真实请求，均未完成计算/交付；A/B/C 累计各 10 次，D 累计 3 次，原 $1 额度剩余 $0.16029964，不足以覆盖 D 下一请求的保守预留。A/B/C 次数也已耗尽，以下运行命令不能作为重新获得额度的方式。当前结果与逐请求费用见 `output/data-agent-live-20261015/continuation-fix/resume-verification.json`。只读查看当前 A/D 新会话：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-live-20261015/A-deepseek-openai/tool-contract-manifest.json
+
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-live-20261015/D-sonnet-openai/tool-contract-manifest.json
+```
+
+各 manifest 的对应 lane 指向最新会话，其他 lane 仍是原冻结会话；累计费用和次数均来自同一原账本。结果分别在对应目录的 `tool-contract-run/result.json`，原始请求/响应证据为 `tool-contract-run/evidence.json`。两路均未进入 search_asset，本轮分页能力仍只有离线验证。
+
+本轮工具契约/搜索预算修复可先用合成数据验证，不读取凭据、不调用模型：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I -m unittest discover \
+  -s tests/unit/data_platform -p test_tool_contract_feedback.py -v
+```
+
+覆盖计划失败后的准确反馈、筛选错误、历史截止日不放宽、搜索按字节分页、依赖不拆分和游标继续/过期。原真实参数的离线重放记录见 `output/data-agent-live-20261015/continuation-fix/tool-contract-replay-final.json`，复核脚本在同目录 `replay_tool_contract.py`（使用临时完整副本，不改原账本；已有输出拒绝覆盖）。两套实际 SDK 各完成一条本机合成工具/计算/交付链，真实模型理解新说明的效果仍未验证。原次数与总预算保持。
+
+入口是 `examples/data_platform/live_function.py`，安装包来自主锁 `data + agent`。本批旧实跑 SDK 为 Agents 0.22.2 / openai 3.13.0 / Claude SDK 0.2.166；主环境已升级，**读取结果不要求旧 SDK，恢复旧原生会话则必须匹配原冻结版本**。当前 profile 与旧批次不匹配时运行应拒绝，不通过改 batch.json 继续。配置 key 不能代替调用授权；不自动复跑已失败路径、重建预算或将原额度授予另一个批次。
+
+用户已确认后续使用当前主锁版本（Agents 0.24.0 / openai 3.31.0 / Claude SDK 0.2.167），以新会话启动，不做旧 SDK 会话的跨版本恢复。上面的匹配要求是本项目当前冻结绑定的校验，不是已证实的官方 SDK 兼容性限制。现有 `prepare-attempt` 可为原 lane 登记当前 profile 的新会话，沿用同一账本与原次数；只有已确认的 SDK 版本、parallel_tool_calls、mcp_max_result_chars 可变，模型、路由、prompt、业务输入及限额保持。新会话结果中的 `real_model_calls` 是该会话的请求数，`runtime.control_scope` 和 `runtime.budget` 仍显示原 lane/整批累计。
+
+本批已准备好 Luna 的 `output/data-agent-live-20261015/C-luna-openai/current-sdk-manifest.json`。以下展示创建方式（该输出已存在，无需重建；已有文件会被拒绝覆盖）：
+
+```bash
+.venv/bin/python -I examples/data_platform/live_function.py prepare-attempt \
+  --manifest output/data-agent-live-20261015/batch.json --lane C-luna-openai \
+  --attempt-key a0a41db1-93a3-46b7-ab8e-e2d866dc0dad:C-luna-openai:current-sdk \
+  --output output/data-agent-live-20261015/C-luna-openai/current-sdk-manifest.json
+```
+
+准备过程无需凭据、不调用模型、不创建账本。明确使用同一 attempt-key 可返回同一登记，但不能通过换 key 重置次数或停止状态。查看已准备会话：
+
+```bash
+.venv/bin/python -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-live-20261015/C-luna-openai/current-sdk-manifest.json
+```
+
+真正执行仍通过 `run --manifest <新 manifest> --lane C-luna-openai --work <新的私密运行目录> --env-file .env`。用户已于 2026-10-15 明确放行两笔完整 404 的未核账费用：保留全部 $0.0921616 预留，在原额度/次数内继续。已通过 `retain-reservation --manifest <manifest> --lane <lane> --request-key <已完整响应的请求> --confirmation <已有用户决定>` 写入原账本，无需再次确认或执行。该入口不查询账单、不发模型请求，只把指定响应记为已确认保留预留；实际收费仍未核实，不释放资金、不重发旧请求。未来新增未知账单及不完整响应不会被这次记录自动放行。原预算和次数不因更换 manifest 清零，B 的停止状态也不解除。新会话本地合成闭环及必要边界可用以下命令复核（需允许本机监听）：
+
+```bash
+.venv/bin/python -I -m unittest discover -s tests/integration/data_platform_agent -p test_gateway_attempt.py -v
+```
+
+先阅读现有结果（无模型调用、无需凭据）：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-live-20261015/batch.json
+```
+
+如使用自己的主开发环境，把上方 Python 替换为 `.venv/bin/python`。本机 `output/.../sdk-env` 是本轮复用的验收环境，并非产品安装目录要求。最新原子能力复核见 `output/data-agent-live-20261015/continuation-fix/capability-audit.json`，推理回传修复见同目录 `verification.json`；原 `verification-final.json` / `inspection-final.json` 保留初次实跑状态。状态分开显示业务结果与宿主 session 状态，Claude 的宿主 completed 不等于业务完成。最新累计 26 POST：A/B/C/D 分别为 5/10/10/1。Luna 当前 SDK 新会话新增 6 次均 HTTP 200，响应费用 $0.00783161；因工具参数错误消耗前 4 轮，随后成功执行 find_assets（partial）及 get_asset_schema（ok），到原次数上限停止，未产生计算或交付。结果在 `C-luna-openai/current-sdk-run/result.json`，请求和工具记录在同目录 `evidence.json`；查看该会话用上方新 manifest，旧 manifest 仍只显示旧会话业务结果和最新累计费用。无需重跑模型。
+
+以下仅保留四条路径的原启动命令形式，**不是当前可直接续跑的命令**：A/B/C 已有终态，B 次数耗尽；D 仅完成另行授权的单请求诊断。当前 SDK/profile 与原批次不同，旧 `--work` 目录也已存在。新版新会话使用上方 `prepare-attempt` 入口，并继续服从原账本准入；不能删除目录或改旧 manifest 强行重跑。`--work` 是显式私密运行目录；`.env` 在本地配置 `DEEPSEEK_API_KEY` / `OPENROUTER_API_KEY`，不在命令行传密钥值。
+
+```bash
+.venv/bin/python -I examples/data_platform/live_function.py run --manifest output/data-agent-live-20261015/batch.json --lane A-deepseek-openai --work output/data-agent-live-20261015/A-deepseek-openai --env-file .env
+.venv/bin/python -I examples/data_platform/live_function.py run --manifest output/data-agent-live-20261015/batch.json --lane B-deepseek-claude --work output/data-agent-live-20261015/B-deepseek-claude --env-file .env
+.venv/bin/python -I examples/data_platform/live_function.py run --manifest output/data-agent-live-20261015/batch.json --lane C-luna-openai --work output/data-agent-live-20261015/C-luna-openai --env-file .env
+.venv/bin/python -I examples/data_platform/live_function.py run --manifest output/data-agent-live-20261015/batch.json --lane D-sonnet-openai --work output/data-agent-live-20261015/D-sonnet-openai --env-file .env
+```
+
+`prepare` 只为已有明确授权的批次冻结业务 context/profile/限额并复制指定数据根一次；不能用它绕过旧批次的未知费用或请求上限。本批配置、原件和账本已经准备，不再初始化另一份。`reconcile` 只查询既有 OpenRouter 请求的账单，沿用原每请求最多两次观察上限，不发模型 POST；原 404 请求已耗尽两次观察且仍未知，不能继续轮询或记作 0 费用。下方只保留核费入口形式，不是当前重试建议；执行时需原批次 manifest、lane 和一个尚不存在的输出路径：
+
+```bash
+.venv/bin/python -I examples/data_platform/live_function.py reconcile --manifest output/data-agent-live-20261015/batch.json --lane C-luna-openai --env-file .env --output output/data-agent-live-20261015/C-luna-openai/billing-observations-next.json
+```
+
+最新 SDK 的原生请求捕获仍可在本机验证（合成响应、真实模型调用 0，Claude 用临时隔离配置和回环服务）：
+
+```bash
+.venv/bin/python -I -m unittest discover -s tests/integration/data_platform_agent -p test_live_capture.py -v
+```
+
+不含项目适配的官方 Chat adapter 仍可用保留的两轮探针复现字段丢失；它不经过 `GatewayOpenAIModel`，因此仍失败不能证明项目修复失效。输出路径须尚不存在，字段未原样保留时退出码 1：
+
+```bash
+.venv/bin/python -I output/data-agent-live-20261015/check_reasoning_compatibility.py \
+  output/data-agent-live-20261015/openrouter-reasoning-compatibility.json \
+  output/data-agent-live-20261015/openrouter-reasoning-review.json
+```
+
+项目网关的原样回传及持久恢复已用下面的本机检查验证；包含 3 个实际进程退出位置，连接本机合成服务，真实模型调用为 0：
+
+```bash
+.venv/bin/python -I -m unittest discover -s tests/integration/data_platform_agent -p test_gateway_openai.py -k observed_exit -v
+```
+
+Claude 工具结果转文件阈值现由当前 B profile 的 `mcp_max_result_chars: 200000` 显式设置，经官方 `ToolAnnotations(maxResultSizeChars=...)` 传给 CLI。未设置的旧 profile 保持默认行为及原身份。这个单位是字符，与整请求的 200,000 字节限制不同；也不增加真实调用次数或费用额度。可在已按本说明安装当前源码的主环境复核（仅本机合成服务，无真实模型调用）：
+
+```bash
+.venv/bin/python -I -m unittest discover -s tests/integration/data_platform_agent -p test_claude_mcp_output.py -v
+```
+
+需要允许监听 `127.0.0.1`。测试覆盖默认转存、配置后完整回传、超限仍转存，以及旧 profile 身份/配置校验；fixture 单独处理 CLI 的 `/v1/messages/count_tokens` 辅助端点，不把计数响应当成推理回合。当前验证见 `output/data-agent-live-20261015/continuation-fix/claude-inline-verification.json`，原失败日志保留。真实 B 路径仍因原 10 次上限停止，未用新配置追加调用。
+
+探针和示例测试证明的是指定 SDK 的序列化/本地功能，不证明真实模型完成了问题。当前四路径无完整业务通过，详情与费用见核心设计 14.17.11；版本核对依据为 [Agents SDK 0.24.0](https://github.com/openai/openai-agents-python/releases/tag/v0.24.0)、[openai 3.31.0](https://github.com/openai/openai-python/releases/tag/v3.31.0)、[Claude Agent SDK 0.2.167](https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.167)。
+
+
+## 配置化 Skill 获取与限定离线验证
+
+加载器不调用模型、不启动 SDK，不读取密钥。配置根目录、Skill、模型和 SDK 均由调用方明确提供；输出包含公共正文、选中的指导和共用资源。模型版本未知时可省略，按明确的默认规则选择，不猜具体快照。模型×SDK 指导当前标为 unverified。
+
+在已普通安装当前源码的环境中，可直接查看完整正文：
+
+```bash
+.venv/bin/python -I examples/data_platform/skill.py \
+  --config-root config/data_platform --name financial-data-query \
+  --model deepseek-flash --sdk openai --sdk-version 0.24.0
+```
+
+如需生成文件，加 `--output /absolute/path/to/new-skill-directory`；目标必须是新的绝对目录，重复运行不会覆盖旧包。SDK 版本参数用于选择指导，不会安装或切换 SDK。程序接口为 `from uteki.data_platform.agent.skills import get_skill`；返回 `content`、`files`、`selection`、`sha256`，通过 `write_to()` 输出 SDK 可加载的标准目录。源码入口见 [skills.py](../src/uteki/data_platform/agent/skills.py)，配置见 [mapping.json](../config/data_platform/skills/financial-data-query/mapping.json)。
+
+限定复跑命令（真实模型调用为 0）：
+
+```bash
+.venv/bin/python -I tests/unit/data_platform/test_skills.py -v
+.venv/bin/python -I tests/integration/data_platform_agent/test_financial_skill.py -v
+```
+
+可将 `.venv/bin/python` 换成既有 `output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python`；本批使用该环境普通重装并核对源文件/安装文件一致。SDK 测试需本机回环服务和原生 sandbox 权限，不需要供应商凭据；OpenAI 测试只给生成包和所用 Python 环境添加必要只读路径。测试先用 DataService 合成材料生成交付，再验证两侧动态正文进入输入及只读检查脚本执行，模型响应由脚本提供。这组独立测试不覆盖正式 runtime；自动装配及恢复的后续检查见下节，也不称为真实模型自主业务验收。
+
+可用 Skill 目录由 SDK 原生生成：OpenAI 的 `LocalDirLazySkillSource.list_skill_metadata()` 返回名称、描述和路径，`Skills` 将目录加入模型指令；Claude 从本次项目目录按 `skills` 白名单发现。模型随后分别通过 `load_skill`＋读取文件、`Skill` 工具获取正文。`get_skill` 是宿主的配置组装方法，不是要模型自行调用的工具。本项目未新增 `list_available_skills` FunctionTool。
+
+只复跑这次“发现→加载→执行”验证：
+
+```bash
+.venv/bin/python -I tests/integration/data_platform_agent/test_financial_skill.py \
+  FinancialSkillTests.test_openai_native_skill_load_read_and_execute \
+  FinancialSkillTests.test_claude_native_skill_body_and_script -v
+```
+
+这两项会检查首个模型输入的名称/描述、完整正文尚未加载、原生加载后的正文及脚本结果，以及 Claude 未启用 Skill 不出现在目录。模型选择由脚本提供；未验证真实模型能否根据描述自主选择合适的 Skill。
+
+40 条自动选择基线的用例与离线评分入口（当前不会调用模型）：
+
+```bash
+.venv/bin/python -I scripts/data_agent/skill_trigger_baseline.py \
+  --cases tests/fixtures/data_platform/skill_trigger_queries.json --show
+.venv/bin/python -I tests/unit/data_platform/test_skill_trigger_baseline.py -v
+```
+
+用例共 30 条预期加载、10 条预期不加载，交错排列；`--show` 包含评测标签，不能将其输出交给被测 Agent。真实请求只接收每条 query。已有原生观察文件可通过 `--observations /absolute/path/to/observations.json` 评分；文件需包含用例 hash、SDK/模型/路由/prompt/Skill 版本及每条 `id/status/selected_skills/loaded_skills`。缺失、请求异常记为 unknown。真实批量采集入口尚未接通，当前不会生成模型基线分数；运行设计见核心文档 14.17.14。
+
+
+## 正式 runtime 的 Skill 装配与恢复
+
+新增示例配置：`config/data_platform/model-profiles/openai/fixture-skill-query/query.json` 和 `claude/fixture-skill-query/query.json`。每份绑定独立 prompt，配置 `skills: ["financial-data-query"]`；`model_version` 可选。旧配置省略这两个字段时保持原路径和身份。
+
+重新安装当前源码后运行（复用现有环境，无真实模型调用）：
+
+```bash
+uv --cache-dir /tmp/uteki-skill-uv-cache pip install --reinstall-package uteki-eval --no-deps . \
+  --python output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I \
+  tests/integration/data_platform_agent/test_skill_runtime.py -v
+```
+
+这组测试从正式 `run_offline` 入口执行：OpenAI 原生 `load_skill → exec_command(cat)`，Claude 原生 `Skill → Read`，随后调用现有 8 次 Data 工具完成取数、代码计算和交付。另检查进程中断恢复、冻结内容不从新模板重建、缺失/修改拒绝、Claude 恢复正文篡改，以及旧 OpenAI 配置兼容。两套原生 SDK 均实际运行，模型响应由脚本提供；这证明接线与恢复行为，不证明真实模型会选择 Skill 或自主完成业务。
+
+OpenAI 原生 Skill 能力属于 SandboxAgent；这里使用本机 `UnixLocalSandboxClient`，不创建远程容器或新虚拟环境。生成目录仅包含本次所选 Skill 的正文和资源；业务查询、计算、交付仍走宿主 DataService。OpenAI Shell 仅可 `cat` 本包文件，Claude 仅开放 Skill 和受控 Read，不因 Skill 中提到脚本而自动开放执行权限。运行中的小型包目录用于稳定恢复，随原运行目录管理；合成测试使用临时目录并清理。
+
+本轮 7 项 runtime 检查全部通过；另有 5 项加载器检查和 1 条旧 Claude 正常链通过。6 个相关安装模块已与源码逐字节核对，旧模型配置与 prompt 未变。
+
+40 条自主选择基线尚未运行；真实批量采集入口及 SDK/模型组合确认仍是独立后续任务，旧四路 goal 未恢复。
+
+
+补充检查 OpenRouter Chat 协议链（本机合成 HTTP，真实模型调用为 0）：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I \
+  tests/integration/data_platform_agent/test_gateway_openai.py \
+  GatewaySkillTests \
+  GatewayOpenAITests.test_actual_chat_client_and_runner_deliver_from_eight_shared_tool_requests -v
+```
+
+该入口实际运行 SandboxAgent、官方 OpenAI Chat 客户端及现有网关；检查原生 Skill function tools、正文回传、路由参数、reasoning_details、进程恢复、越界读取拒绝和旧配置兼容。合成配置只用于测试，不修改真实模型 profile，不需要密钥。正常与恢复链均为 10 次本机 HTTP；`.10` 等费用数值是 fixture，不能作为实际价格估算。此入口不访问 OpenRouter 实际服务，也不替代 40 条真实模型自主选择基线。
+
+### 真实 Skill 配置的追加准备
+
+`config/data_platform/model-profiles/openai/live-C-luna-skill-openai/query.json` 是独立候选配置，保留 Luna/OpenRouter 路由，启用 `financial-data-query`；原 live-C 配置保持历史含义。旧 prompt 曾明确禁止 Skill，不能只在运行时添加工具后直接复跑旧配置。
+
+现有 `extend-allowance` 的授权文件可包含 `profile_revisions`，按 lane 记录 `previous_sha256/current_sha256`（规范 JSON profile 摘要）。仅匹配这两个指纹的 prompt/skills 修订可进入新会话；模型和路由仍不可借此改变。金额允许保持原值、只显式增加次数；旧请求、费用和结果保持，不创建新账本。此前 $3、40/120 次调整未获确认；后续用户另行明确批准累计 $6 和三条各最多新增 30 次的比较，已按下一节应用。不要直接修改旧 manifest 或以新工作目录重置次数。
+
+本次相关行为检查（无真实模型）：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I -m unittest discover \
+  -s tests/integration/data_platform_agent -p test_gateway_extension.py -v
+```
+
+### 查看三模型真实 Skill 对照（2026-10-16）
+
+比较已完成并停止，不需再次调用模型。查看同一原账本和实际结果（以下命令不发出推理请求）：
+
+```bash
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I \
+  examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-skill-20261016/comparison-manifest.json
+
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I - <<'PY'
+import json
+from pathlib import Path
+root = Path('output/data-agent-skill-20261016')
+for name in ('luna', 'sol', 'sonnet'):
+    result = json.loads((root / f'{name}-live/result.json').read_bytes())
+    print(name, {key: result[key] for key in ('status', 'real_model_calls', 'gateway_cost_usd')})
+    print('结果：', root / f'{name}-live/result.json')
+audit = json.loads((root / 'configured-verification.json').read_bytes())['model_comparison']
+for result in audit['results']:
+    print(result['model'], result['skill'], result['source_audit']['gap'])
+PY
+```
+
+真实调用为 Luna 15、Sol 12、Sonnet 12 次；程序 completed/partial 不等于独立业务验收通过，已核验的 Skill 暴露、错误轮次、用量、原件检查和缺口见 `configured-verification.json.model_comparison`。没有重置原 73 次请求或旧费用。具体诊断见核心设计 14.17.13 第 9 项。
+
+本轮扩展复用 `extend-allowance --add-scopes <JSON>`；数组项为 `scope_id/source_scope_id/entry`，entry 使用现有 profile、limits、transport、pricing 格式，授权绑定展开配置的 `additional_scopes_sha256` 和明确的新 scope/次数。新模型使用独立 scope，继承原问题及材料，与旧路共用累计账本；不是修改原 lane 的模型。此次已执行，授权和 manifest 为本机私密证据，不重复初始化或再次追加额度。运行目录和审计文件含私密会话/机器路径，不纳入公开提交。
+
+### 通用 Harness 修复的离线验收
+
+2026-10-16：合法 workdir 的 Skill 读取和新资产/schema 元数据进展已修复。以下使用普通安装后的包、临时合成材料和脚本模型，无需 API Key，不调用真实模型：
+
+```bash
+uv --cache-dir /tmp/uteki-skill-uv-cache pip install --offline --reinstall-package uteki-eval --no-deps . \
+  --python output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I \
+  tests/unit/data_platform/test_queries.py \
+  DataToolTests.test_schema_pagination_progress_survives_reopen_and_legacy_history \
+  DataToolTests.test_metadata_reordering_and_new_query_do_not_manufacture_progress \
+  DataToolTests.test_metadata_history_commits_with_response_and_idempotent_replay \
+  DataToolTests.test_no_progress_limit_counts_same_evidence_despite_new_references \
+  DataToolTests.test_repeated_rebuild_without_new_material_is_not_new_progress -v
+
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I \
+  tests/integration/data_platform_agent/test_skill_runtime.py \
+  SkillRuntimeTests.test_openai_explicit_workspace_reads_body_and_completes_business \
+  SkillRuntimeTests.test_skill_workdir_is_same_directory_and_never_a_symlink_or_subdirectory \
+  SkillRuntimeTests.test_snapshot_resume_ignores_changed_sources_and_rejects_bad_files \
+  SkillRuntimeTests.test_openai_process_resume_keeps_skill_and_exact_native_results \
+  SkillRuntimeTests.test_openai_denied_and_truncated_reads_do_not_report_full_body \
+  SkillRuntimeTests.test_claude_discovery_loading_read_and_business_delivery -v
+
+output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python -I \
+  tests/integration/data_platform_agent/test_gateway_openai.py \
+  GatewaySkillTests.test_native_file_read_denial_returns_to_model_without_exposing_other_files -v
+```
+
+本机 SDK 验收需要系统允许 `sandbox-exec`、读取启动时钟及回环监听；外层执行沙盒拒绝时不能记作测试通过，也不通过关闭 SDK Sandbox 绕过。上述 12 项已在允许这些本机能力后通过。程序状态、完整正文返回、后续模型输入确含正文分别检查；对照案例及原件位置见核心设计 14.17.13 第 9 项，修复证据见第 10 项和 `configured-verification.json.harness_fix`。
+
+## 文档解析结果的查询存储
+
+新入口接收已生成的规范解析结果，存入 SQLite 并复用不可变对象库。原件、图片和冻结解析包在显式 `data_root/objects/`，查询表在 `data_root/documents.sqlite`；不默认使用 output，不依赖旧 catalog 或 SDK 会话。正式数据根由调用方指定并持久保存，下面只用临时合成数据演示，无网络和模型费用。
+
+从仓库根执行（也可将 `document_python` 换为按本文安装好的主环境 Python）：
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+uv --cache-dir /tmp/uteki-skill-uv-cache pip install --offline --reinstall-package uteki-eval --no-deps . \
+  --python "$document_python"
+
+document_data_root=$(mktemp -d /private/tmp/uteki-documents.XXXXXX)
+"$document_python" -I examples/data_platform/documents.py --data-root "$document_data_root"
+
+"$document_python" -I -m uteki.data_platform.documents --data-root "$document_data_root" \
+  schema --parse-id demo-parse-v1
+
+"$document_python" -I tests/unit/data_platform/test_documents.py -v
+```
+
+示例返回 1 篇合成材料、5 个块（3 文本、1 表格、1 图片），按「经营情况」子树＋收入/地区标签交集定位表格，并读出标题、脚注。`source_bytes_match` 和 `old_reference_after_reopen` 应为 true，`model_calls` 为 0。再次对同一目录运行同一示例返回 `publication.reused=true`，不会新增解析版本。OCR 与图片描述由 fixture 填入，不是识别结果；目前没有接入 OCR 服务提供方。
+
+可直接操作现有库的 CLI 命令为 `find/schema/browse/query/read/export/reindex`；新库须显式 `init`，原件或图片用 `put-object --file` 取得对象引用，再通过 `publish --package` 提交规范解析 JSON。`--data-root` 必须是已存在的绝对目录。`--no-default` 可发布但不设为材料默认版本；精确版本读取始终用 parse_id。`export --parse-id` 输出规范包，`reindex --parse-id` 从冻结包显式重建查询索引，不运行解析器。
+
+例如将以下查询保存到任意 JSON 文件，用 `query --request /absolute/path/query.json` 运行：
+
+```json
+{
+  "parse_id": "demo-parse-v1",
+  "directory_path": ["经营情况"],
+  "include_descendants": true,
+  "tags": ["finance.revenue", "business.region"],
+  "tag_match": "all",
+  "types": ["table"]
+}
+```
+
+结果中的 `items[0].ref` 可原样存为 JSON，交给 `read --reference /absolute/path/ref.json`，返回块正文/表格、位置和明确的上下文。有 `next_cursor` 时保持查询 JSON 不变，以 `--cursor` 续页；更改查询或版本会拒绝旧游标。Python 使用 `DocumentStore.open(root)`、`BlockQuery`、`BlockRef` 同一套方法；`read_source(parse_id)` 和 `read_resource(ref, resource_id)` 读取并校验实际字节。缺失、损坏、同名目录歧义和版本冲突不会降级为成功。
+
+本轮 14 项行为测试及上述 CLI 正常链已通过，6 个新安装模块已与当前源码逐字节核对。没有设置 PYTHONPATH 或注入 sys.path。旧 Agent runtime 仍走原 DataService，本入口不代表 PDF/OCR、真实自动打标或 Agent 业务验收已完成；详情见核心设计 14.18。
+
+
+## 真实 PDF 本地解析与数据库查看
+
+解析入口：`python -m uteki.data_platform.documents.pdf`。标准主环境可用 `uv sync --locked --extra data --extra pdf` 安装；已有环境使用相同锁定的 pdf 可选依赖，并从源码重装项目。首次需显式下载本地模型，转换本身不调用收费 API：
+
+```python
+from pathlib import Path
+from docling.utils.model_downloader import download_models
+model_root = Path("data/model_cache/docling").resolve()
+model_root.mkdir(parents=True, exist_ok=True)
+download_models(output_dir=model_root, with_layout=True, with_tableformer=True,
+                with_code_formula=False, with_picture_classifier=False,
+                with_rapidocr=True, rapidocr_models=["onnxruntime:en"], progress=True)
+```
+
+此前已运行的材料为 **Alphabet 2024 Q4 业绩稿，并非 Apple 10-K**。原件、元数据与数据库均已在本机。以下读取冻结版本，不运行解析；新版适配器的 recipe 已变化，不能用旧 parse_id 重跑新解析：
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+"$document_python" -I -m uteki.data_platform.documents \
+  --data-root "$PWD/data/data_agent_documents" \
+  schema --parse-id alphabet-2024-q4-docling-auto-v1
+```
+
+新库先创建明确的目录，再执行已有 `documents --data-root /absolute/root init`；材料 JSON 遵守 Material 契约，不能以本例公司/日期为默认。`--ocr-mode full_page` 强制 OCR，必须使用另一 parse_id；`--no-default` 保留已有默认版本。当前只声明 en 支持，缺少本地权重明确失败。SourceVersion 的取得时间是本次本地导入事件；原下载时间未知时不能由文件 mtime 补造。
+
+使用独立轻量工具环境，不修改项目 SDK 的依赖：
+
+```bash
+UV_TOOL_DIR=/tmp/uteki-viewer-tools uv --cache-dir /tmp/uteki-skill-uv-cache \
+  tool run --from datasette==0.65.5 datasette serve \
+  data/data_agent_documents/documents.sqlite \
+  --host 127.0.0.1 --port 8001 --metadata data/data_agent_documents/viewer.json
+```
+
+若 8001 已在运行则直接打开，不重复启动。材料、目录、正文/表格与单元格分别见 `http://127.0.0.1:8001/documents/inspect_materials`、`inspect_directory`、`inspect_blocks`、`inspect_table_cells`。用 parse_id 筛选版本；本次默认版是 `alphabet-2024-q4-docling-auto-v1`，OCR 对照是 `alphabet-2024-q4-docling-v1`。首表 block_id=tables-0；概览 content_preview 展示行文本，精确合并/行列/位置见 cells。目录与块显示 material_name，避免不同材料混看；directory_paths 是关联的完整标题路径数组。block_relations 当前为空，表示语义关联未生成，不能据此判断正文为空。
+
+数据在 `data/data_agent_documents/documents.sqlite` 与 `objects/`；可审阅导出 `normalized-auto.json`、`docling-auto.json`，强制 OCR 初次输出保留 `docling-real.json/md`。本地模型权重在 `data/model_cache/docling`。普通 find/schema/query/read 和数据库浏览不重新运行解析器。业务标签、语义描述、正文小标题层级及 Apple 原案例目录仍未验收；目前不代表完整 Data Agent 已接通。
+
+
+## 带书签 10-K 的小节与过滤视图（2026-10-17）
+
+当前已真实运行 Apple 2025 的物理页 4–5、11–12、32–33，以及 Alphabet 2025 的物理页 4–7；均为完整原件的选定页范围，不是全文验收。原件、Docling 输出、规范包在现有 `data/data_agent_documents/objects/`，查询在同一 SQLite；新增版本未设为默认。选定页有原生文字，本轮运行本地布局/表格模型，OCR auto 未产生 OCR 文字，远程付费调用为 0。不要把这些结果称为扫描件 OCR 验收。
+
+直接查看 `data/data_agent_documents/reviews/` 下各版本的 `sections.md`（目录、完整小节、表格、过滤记录）及 `schema.json` / `package.json`（实际结构、每块位置和不可变引用）：
+
+| parse_id | 处理页 | review 内容 |
+|---|---|---|
+| `apple-2025-business-sections-v1` | 4–5 | Products / Services 及其正文小标题 |
+| `apple-2025-risks-sections-v1` | 11–12 | Business Risks 下的长标题与各自段落 |
+| `alphabet-2025-business-sections-v2` | 4–7 | Google Services 子层级、两处跨页小节、普通强调列表 |
+| `apple-2025-financial-sections-v3` | 32–33 | 两张报表、标题、单位、附注与页脚 |
+
+查询已有解析结果，不需要导入 Docling 或重新推理：
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+"$document_python" -I -m uteki.data_platform.documents --data-root "$PWD/data/data_agent_documents" \
+  section --parse-id apple-2025-business-sections-v1 \
+  --code-path PART_I.Business.Services.AppleCare
+
+"$document_python" -I examples/data_platform/pdf_sections.py \
+  --data-root "$PWD/data/data_agent_documents" \
+  --parse-id alphabet-2025-business-sections-v2 \
+  --export-dir "$PWD/data/data_agent_documents/reviews/alphabet-2025-business-sections-v2"
+```
+
+`section` 的默认正文视图排除已记录的 header/footer，并聚合后代；`--direct-only` 只读当前节点直接内容。`--content-view all` 读取该目录中全部已登记块；噪声可能没有目录归属，查看全部噪声请使用导出的过滤记录或无目录限制的 `query`，精确 `read` 引用也始终能取回。`BlockQuery.content_view` 为兼容旧调用默认 `all`，正文搜索须显式传 `body`；旧 document-v1 请求 body 时返回 `FILTER_NOT_AVAILABLE`，不伪装已有过滤政策。路径只能在指定 parse_id 中解释；同名标题可用节点 ID 区分。旧包不补写新字段，旧引用可读。
+
+`section` 返回完整的已登记小节块，超过字节上限报错，不截断为成功；`truncated=false` 仅指响应未截断，`source_completeness=not_verified` 和 partial 页范围仍须保留，不能解释成源文档完整。`text` 是文本块的段落拼接，表格结构在 `blocks[].block.table`，图片在资源引用；Markdown 只作审阅视图。
+
+再次解析自己的 PDF 时使用现有 `documents.pdf` 入口并提供原件、材料 JSON、model-root、source-version-id 与新的 parse-id；`--page-start N --page-end M` 必须成对传入，指物理页，原件字节仍完整存储。相同 ID/原件/recipe 才能返回 reused；页范围或解析策略变化必须新版本，不覆盖旧包。当前策略版本为 `pdf-sections-4`、适配器版本为 `3`，此前观察记录继续保留。
+
+全文审阅版本为 `apple-2025-full-sections-v2`（80 页）与 `alphabet-2025-full-sections-v2`（99 页）。现有 section / 导出命令换用这两个 parse-id 即可，不需重新解析；`data/data_agent_documents/reviews/<parse_id>/sections.md` 已包含目录、正文、表格和待核对目录，schema.json / package.json 保存实际结构。两版均为 partial、未设默认；Alphabet 第 99 页失败签字表以明确错误和原页截图展示，不能当作已恢复结构化表格。
+
+限定测试：
+
+```bash
+"$document_python" -I tests/unit/data_platform/test_pdf_sections.py -v
+"$document_python" -I tests/unit/data_platform/test_documents.py -v
+```
+
+本批 4 项小节/兼容边界与 16 项存储测试通过；真实原文检查、已知缺口与停止点见核心设计 14.18.2 第十二部分。全文、纸面目录页识别、无书签材料、扫描件、复杂合订材料与模型消歧没有因此完成。
+
+
+## 原生目录与 passages（2026-10-19）
+
+新版本使用 `document-v3`、适配器 `4`、策略 `pdf-native-passages-1`。只以 PDF 原生书签建立目录，主题句及其连续说明组成平面 passages；旧 document-v1/v2 保持原样。当前两份输入不变，发布为 `apple-2025-native-passages-v1` / `alphabet-2025-native-passages-v1`，不切默认版本。
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+"$document_python" -I -m uteki.data_platform.documents \
+  --data-root "$PWD/data/data_agent_documents" passage \
+  --parse-id apple-2025-native-passages-v1 \
+  --path 'PART_I.Risk_Factors.Business_Risks.passages[0]'
+```
+
+改成 `passages[1]` 读取第二条风险及其全部说明。命令返回原文、成员 blocks、文字行位置、表格结构和版本引用；索引只在指定章节/解析版本内有效。也可使用 `--passage-id` 读取冻结组 ID。Python 用 `store.list_passages(parse_id, code_path=...)` 列出该章节的组，用 `store.read_passage(parse_id, path=...)` 或 `passage_id=...` 读取；无分组的旧版本明确返回 PASSAGES_NOT_AVAILABLE。
+
+`section --parse-id ... --code-path ...` 仍可读取整个章节及子章节，新版增加 passages 元数据；每个组的 block_ids 引用原始块，不用字符长度或页边界切组。`text_lines[].char_range` 是 block.text 内 Unicode 字符下标（左闭右开），源行与正文无法唯一对齐时为 null；原文行文字和 PDF 页/矩形仍保留。表格单元格 row/column 为零起始，连同跨度和已观测位置返回。上述引用均须绑定 parse_id，不能跨版本只用数字索引。
+
+使用原 `examples/data_platform/pdf_sections.py` 导出，新版目录中额外有 `passages.json`，包含章节、passage 路径、完整文本、块 ID 和区域；`package.json` 保存含文字行/单元格的完整结构，`sections.md` 仅为便于人阅读的同源视图。读取或导出不重新运行模型。
+
+## 新版文档库的 Agent 交付与只读复核（2026-10-19）
+
+本批复验后停止，四条真实 case 中 C1/C3 通过；OpenAI 与 Claude 的 C2 各累计 24 次后仍未完成数值记录和代码计算。完整范围与核验见核心设计 14.19。沿用既有 SDK 环境，源码变化后按前文安装方式普通重装；不依赖 PYTHONPATH。以下查看和导出均不调用模型。
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+document_manifest=output/data-agent-documents-20261019/manifest-requests-v3.json
+
+# 查看每条 case、原累计账本及未核账预留，不请求供应商接口。
+"$document_python" -I examples/data_platform/live_function.py inspect \
+  --manifest "$document_manifest"
+
+# 已有交付及独立原件核验。
+cat output/data-agent-documents-20261019/H-C1-delivery/delivery.md
+cat output/data-agent-documents-20261019/J-C3-delivery/delivery.md
+"$document_python" -I -m json.tool output/data-agent-documents-20261019/review.json
+
+# 从已保存交付重新导出到一个尚不存在的绝对路径；不重跑 Agent。
+"$document_python" -I examples/data_platform/live_function.py export \
+  --manifest "$document_manifest" --lane H-C1 \
+  --output "$PWD/output/data-agent-documents-20261019/H-C1-delivery-review"
+
+# 合成输入的工程边界检查，不替代真实业务验收。
+"$document_python" -I tests/unit/data_platform/test_document_tools.py
+```
+
+`delivery.json` 是完整机器交付；`delivery.md` 是同源人读视图；有数值记录时另有 `records.csv`。C1/C3 是文本任务，不生成空 CSV。`manifest.json` 记录导出文件 hash，并作为写入完成标志；已有目录会明确报错，不覆盖旧文件。`engineering-export/` 里的数值产物来自真实原件的宿主指定工具链，仅供工程 review，不能当作 Agent 自主 C2 的结果。
+
+配置入口为 `config/data_platform/model-profiles/{openai,claude}/document-deepseek/query.json`、各自 prompt 和共享 `skills/document-data-query/`。执行契约绑定现有两个解析版本及新问题，原件/解析继续位于 `data/data_agent_documents`，运行证据在 output，不为运行复制解析库。
+
+本次 `manifest-requests-v3.json` 用于查看原累计控制账本；两条新执行的精确 context 分别在 `manifest-I-C2-v2.json`、`manifest-K-C2-v2.json`。失败明细为 `I-C2-v2/{result,evidence}.json`、`K-C2-claude-v2/{result,evidence}.json`，不能从不存在的完整交付导出 CSV。两条路线次数均已用满，不重跑 `run`；已通过 C1/C3 不重跑。
+
+本轮发现 Claude 模型输入混入仓库开发 AGENTS.md，当前未修复。先完成业务指令隔离与原生请求捕获 review，再决定后续真实运行。累计 $12／本批 $6 仍有效，全额预留保留；本次截止状态与未核账金额以 review.json 和 inspect 为准，不把额度余额当业务通过。无付费的原失败回放证据为 `I-C2-tool-replay.json`、`numeric-context-tool-replay.json`、`read-cursor-tool-replay.json`。
+
+
+## 目录与完整内容组修复的真实结果（2026-10-19）
+
+当前限定结果见核心设计 14.21.2：Flash 两 SDK 原失败 Q1 通过，Luna/Claude 找到正文但引用/状态交付失败。本轮 23 次真实请求已停止；下列命令仅查看保存结果，不调用模型、不重新解析。
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+
+# 查看完整业务交付；JSON 为机器结果，Markdown 为同源人读视图。
+cat output/data-agent-sdk-matrix-20261019/deliveries/MX-Q1-flash-claude-navigation-v1/delivery.md
+"$document_python" -I -m json.tool \
+  output/data-agent-sdk-matrix-20261019/deliveries/MX-Q1-flash-claude-navigation-v1/delivery.json
+
+# 查看业务核验、失败定位与各 attempt 的轮次/费用/耗时。
+"$document_python" -I -m json.tool output/data-agent-sdk-matrix-20261019/business-review.json
+"$document_python" -I -m json.tool output/data-agent-sdk-matrix-20261019/execution-metrics.json
+
+# 读取现有运行/累计账本；不发供应商请求。
+"$document_python" -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-sdk-matrix-20261019/manifest-navigation-v3.json
+```
+
+两份 Flash 交付的精确运行绑定在 `manifest-navigation-v2.json`；Luna 失败运行绑定在 `manifest-navigation-v3.json`，三者均沿用同一原账本。文件名版本并不表示覆盖所有 attempt，不能由 v3 推断 Flash 的 context。Luna 的原路线累计 24 次已尽，不直接重跑 `run`。解析存储仍位于 `data/data_agent_documents`，output 只保存运行、导出及核验证据。
+
+## 公司 symbol 与父目录分页的真实验证（2026-10-19）
+
+用户确认：在 `find_assets` 传 `filters.securities:[{ticker:"AAPL",exchange_mic:"XNAS"}]`，后续 `get_asset_schema/read_evidence` 使用返回的精确 asset_ref。正文读取使用单个 `targets:[{section_path:"PART_I.Risk_Factors",include_descendants:true}]`；保持目标及 context，只续传 next_cursor，不拼子目录路径。
+
+本次真实 Flash × Claude 会话已停止，限定结果见核心设计 14.21.3。四页 107 块正文已进入模型，交付因引用拼接错误被拒绝；额外封面读取和 symbol 发现阻力照实保留。下列命令只查看已有结果，不发模型请求：
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+
+# 实际模型已看到的正文；这是核验导出，不是成功业务交付。
+cat output/data-agent-subtree-20261019/agent-read-body.md
+"$document_python" -I -m json.tool output/data-agent-subtree-20261019/review.json
+
+# 真实工具参数/结果摘要（含 find_assets、四次同父路径读取及失败 deliver）。
+"$document_python" -I -m json.tool output/data-agent-subtree-20261019/agent-call-trace.json
+
+# 读取本次会话和原累计账本，不重新运行。
+"$document_python" -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-subtree-20261019/manifest.json
+```
+
+`agent-read-body.json` 保留实际读取响应、目录和逐块出处。解析库仍为原 `data/data_agent_documents`，没有为本次调用重新解析。12 次本轮上限已满，不直接重复 run；下一批修复和真实复验须保持旧失败/费用及显式范围。
+
+
+## 父目录同题四路结果查看（2026-10-19）
+
+四路已运行结束；当前只读下面的保存结果，不会调用模型。正文均为四页 107 块，三路最终 partial 的具体原因及严格路径偏差见核心设计 14.21.4，不以导出成功代替业务状态。
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+"$document_python" -I -m json.tool output/data-agent-subtree-compare-20261019/review.json
+cat output/data-agent-subtree-compare-20261019/deliveries/SUBTREE2-sonnet-claude/delivery.md
+"$document_python" -I -m json.tool output/data-agent-subtree-compare-20261019/runs/SUBTREE2-sonnet-claude/call-trace.json
+"$document_python" -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-subtree-compare-20261019/manifest-ready.json
+```
+
+同目录另外三条 lane 为 `SUBTREE2-flash-claude`、`SUBTREE2-flash-openai`、`SUBTREE2-luna-openai`。每条都有 `delivery.json`、人读 `delivery.md` 和导出 hash manifest。机器交付保留完整 ResultRef，模型调用参数使用 `{handle:"rr_…"}`；文档 deliver 不再重复填写 state。原解析仍在 `data/data_agent_documents`，output 仅保存本轮运行/对照/导出。`manifest-ready.json` 为四路实际运行绑定；初始 manifest 与 0 调用配置失败另保留，不能混用。当前不直接重复 run 或创建下一批。
+
+## 元数据引用修复后的同题四路查看（2026-10-20）
+
+四路已结束并停止新增调用，结果与说明准确性问题见核心设计 14.21.5。下列入口只查看已有结果；Luna 交付含独立 metadata、完整正文 evidence 和来源 limitations，原 PDF 质量仍未认证。
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+"$document_python" -I -m json.tool output/data-agent-metadata-20261020/review.json
+cat output/data-agent-metadata-20261020/deliveries/META-luna-openai/delivery.md
+"$document_python" -I -m json.tool output/data-agent-metadata-20261020/deliveries/META-luna-openai/delivery.json
+"$document_python" -I -m json.tool output/data-agent-metadata-20261020/runs/META-luna-openai/call-trace.json
+"$document_python" -I examples/data_platform/live_function.py inspect \
+  --manifest output/data-agent-metadata-20261020/manifest.json
+```
+
+其他 lane 为 `META-flash-claude`、`META-flash-openai`、`META-sonnet-claude`，目录形式相同。`inspect-final.json` 是收尾账本快照，review 保留修复前后的请求/耗时/错误和原始说明问题。元数据不能作为财务数值原文；gaps 表示未完成请求，limitations 表示披露的限定。四路声明 completed 不代表所有自由文本说明均正确；不要以此直接重跑或启动其他 query。
+
+## 分页范围与原文声明修复后的 Flash 两路查看（2026-10-20）
+
+两条真实会话均已结束。本批只读入口如下，不会调用模型；把 `CLAIM-flash-openai` 换为 `CLAIM-flash-claude` 可看另一条。详细结论及尚未收口的自由说明见核心设计 14.21.6。
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+"$document_python" -I -m json.tool output/data-agent-claims-20261020/review.json
+cat output/data-agent-claims-20261020/deliveries/CLAIM-flash-openai/delivery.md
+"$document_python" -I -m json.tool output/data-agent-claims-20261020/deliveries/CLAIM-flash-openai/delivery.json
+"$document_python" -I -m json.tool output/data-agent-claims-20261020/runs/CLAIM-flash-openai/call-trace.json
+```
+
+JSON 的 `read_coverage` 与 Markdown 的 `Stored section coverage (code-generated)` 由实际交付页面生成，使用零起始半开区间 `[start,end)`，本题为 `[0,107)`；不是模型自行写的编号。`source_claims` 要求原文引用和逐字摘录，代码只检查摘录存在，语义正确性仍未认证；本题两路未提交此类声明。`limitations` 和公开过程消息仍有字段使用/范围措辞问题，详见 review，不把最终 coverage 通过扩大为所有文字均通过。`inspect-final.json` 保存最终费用/请求快照，`timing-observations.json` 保留前后耗时观察。不要直接重复真实运行或恢复旧 goal。
+
+## 两年营收与代码计算的真实链路查看（2026-10-20）
+
+Flash/OpenAI 已真实运行并导出；数值、期间、合并口径、代码增长率和导出一致性通过独立核对，但没有执行要求的 symbol 查找，USD 确认只给解释而未取得明确引用，严格业务门槛未全过。Flash/Claude 按先通过后继续的约定未运行，不能写作两路均通过。当前已停止。下列命令只读取保存结果，不会调用模型：
+
+```bash
+document_python=output/data-agent-gateway-runtime-20261015/checkpoint-4/sdk-env/bin/python
+"$document_python" -I -m json.tool output/data-agent-revenue-20261020/review.json
+cat output/data-agent-revenue-20261020/deliveries/REV-flash-openai/delivery.md
+cat output/data-agent-revenue-20261020/deliveries/REV-flash-openai/records.csv
+cat output/data-agent-revenue-20261020/deliveries/REV-flash-openai/calculations.csv
+"$document_python" -I -m json.tool output/data-agent-revenue-20261020/runs/REV-flash-openai/call-trace.json
+```
+
+当前公共导出除原有 JSON/Markdown/records.csv 外，有计算时另生成 calculations.csv，包含精确结果、公式和操作数引用。它直接来自同一个 committed delivery，没有模型重写、心算或补填事实；原历史导出不会自动补文件。`review.json` 与交付分开保留：原交付声明 completed，独立 review 明确两处未通过，不能用验收侧原 PDF 补查改写原生产结果。完整证据和停止边界见核心设计 14.21.7。
