@@ -1,6 +1,6 @@
 # 本地开发与资料恢复 / Local development and data recovery
 
-当前 Python 环境安装以本页“从新检出仓库开始”和“M0 独立验证环境”为准。2026-10-08 的 [交接说明](MACHINE_HANDOFF.zh-CN.md) 保留历史私密状态迁移与资料恢复边界，不作为当前依赖安装入口。
+当前 Python 环境安装以本页“从新检出仓库开始”和“M0 独立验证环境”为准。2026-10-08 的 交接说明（已归档：`docs/MACHINE_HANDOFF.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)） 保留历史私密状态迁移与资料恢复边界，不作为当前依赖安装入口。
 
 ## 当前交付状态
 

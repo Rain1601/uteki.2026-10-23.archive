@@ -2,7 +2,7 @@
 
 ## 系统自主取材并提取业务（2026-10-09）
 
-新增 `agent business`：从公司/报告范围和问题进入已有自主查询器，系统选择目录节点、读原文并冻结材料，再调用业务提取器。无调用者章节/block/摘录参数。共享模型预算和规则快照，保留选材与内容质量未评估状态。当前支持单份 SEC inline HTML 10-K / 10-K/A；[请求格式、产物与验收边界](DATA_AGENT_RUNTIME_MATERIALS.zh-CN.md)。旧 `--packet` 提取脚本仍用于实验重放，不能当作全程自主入口。
+新增 `agent business`：从公司/报告范围和问题进入已有自主查询器，系统选择目录节点、读原文并冻结材料，再调用业务提取器。无调用者章节/block/摘录参数。共享模型预算和规则快照，保留选材与内容质量未评估状态。当前支持单份 SEC inline HTML 10-K / 10-K/A；请求格式、产物与验收边界（已归档：`docs/DATA_AGENT_RUNTIME_MATERIALS.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。旧 `--packet` 提取脚本仍用于实验重放，不能当作全程自主入口。
 
 ## 只获取官方原件（2026-10-04）
 
@@ -246,7 +246,7 @@ Extractor 配置：
 
 `artifact-read.json` 使用 `artifact_id`、可选 JSON `pointer`、`cursor` 和 `limit`。ID 来自查询 `artifact-index.json`；游标绑定原 scope 和 hash，不能拿另一运行的游标续读。
 
-当前完整性边界与真实验证见[技术方案](DATA_AGENT_AUTONOMY_PLAN.zh-CN.md)和[benchmark](DATA_AGENT_BENCHMARK.zh-CN.md)。查询运行尚需 T4 专用导出，才能满足 benchmark 的题目/来源绑定及累计逐请求证据接口。
+当前完整性边界与真实验证见技术方案（已归档：`docs/DATA_AGENT_AUTONOMY_PLAN.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）和benchmark（已归档：`docs/DATA_AGENT_BENCHMARK.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。查询运行尚需 T4 专用导出，才能满足 benchmark 的题目/来源绑定及累计逐请求证据接口。
 
 ## 执行监控与历史导入（2026-10-06）
 
@@ -300,7 +300,7 @@ PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app \
 
 该历史适配器读取 company query、autonomous query 及其可选 batch/direct 提取层；不能把任意独立提取或其他 Agent 文件套用此格式。登记读取地址必须是仓库中明确的 `experiments/` 或 `data/` 相对路径；旧机器绝对路径只作历史声明，经 hash 和 scope 映射后读取本地文件。导入校验全部登记层并新增安全摘要，不覆盖原产物、不重跑模型、不替换已有根或子 ID。
 
-工程页登记不会自动改变 `/data-workspace` 的版本选择、采纳状态或旧财务页登记。未建立且核验旧页映射的新运行，仍可在工程页查看受控产物，但没有财务页链接。大内容按需展开与续读；私密配置只显示安全投影。完整约定见[执行监控方案](DATA_AGENT_OBSERVABILITY_PLAN.zh-CN.md)。
+工程页登记不会自动改变 `/data-workspace` 的版本选择、采纳状态或旧财务页登记。未建立且核验旧页映射的新运行，仍可在工程页查看受控产物，但没有财务页链接。大内容按需展开与续读；私密配置只显示安全投影。完整约定见执行监控方案（已归档：`docs/DATA_AGENT_OBSERVABILITY_PLAN.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。
 
 ## 冻结获取记录重放与标准解析包（2026-10-07）
 

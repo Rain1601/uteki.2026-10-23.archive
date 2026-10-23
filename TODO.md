@@ -1,4 +1,4 @@
-# 当前动作：瘦身与技术方案队列 S1 已完成，待用户 review（2026-10-23）
+# 当前动作：瘦身队列 S2 文档归档（2026-10-23，分支 `slim/s2-docs-archive`）
 
 本页其余部分的“核心设计 14.x”等章节号指冻结的 `docs/DATA_AGENT_DESIGN_HISTORY_2026-10-23.zh-CN.md`，不指重写后的核心设计。
 
@@ -28,6 +28,8 @@
 - **S1 核心设计瘦身并写明技术方案：**重写为当前态设计（目标 ≤1,500 行）：职责边界、分层与目录、契约、存储、Agent 运行与双 SDK 适配、验收与费用机制、阶段路线草案。§12–14 的运行记录、review 和已作废方案原文移入一份日期化历史记录（不改写失败/费用/hash），核心文档只留结论与证据入口。
   - **结果（2026-10-23，分支 `slim/s1-core-design`）：**v1.30 原文（4,694 行）用 git mv 整体移到 `docs/DATA_AGENT_DESIGN_HISTORY_2026-10-23.zh-CN.md`，放在同一目录，文中相对链接不受影响；开头加了冻结说明，正文未改。新核心设计 v2.0 约 480 行，共 13 节：目标与范围、职责、架构决定、数据模型、建设管线、查询与交付、运行时、代码组织（按实际文件）、验收方法、实现状态表（附历史章节证据入口）、技术选型、已知技术债、路线草案、待决事项。AGENTS/CLAUDE/README/接口文档的入口引用已更新，旧章节号统一指向历史记录。只改了文档，没有改代码或调用模型。待用户 review 后合入 main。
 - **S2 文档归档：**顶层日期化/已取代文档按 2026-10-09 方法归档（清单 + SHA256 + 备份分支）；LOCAL_DEVELOPMENT、FRONTEND_DESIGN 精简为当前入口。
+  - **S1 已合入 main（2026-10-23，38098480）。**
+  - **S2 第一步结果（2026-10-23）：**按用户确认的清单归档 118 个文件（docs 根目录 43 份，以及 research/releases/archives/research_samples/checks），基线 `38098480` 已在 origin 上，清单为 `docs/REPOSITORY_ARCHIVE.v2.json`，说明见 RETENTION 的 2026-10-23 一节。保留文档中的 40 处链接改成了恢复说明。DATA_AGENT_CLI 留到 S3，ROADMAP、PROJECT_PROGRESS_COMMANDS、schemas/current 留到 S4。下一步：精简 LOCAL_DEVELOPMENT（93KB）和 FRONTEND_DESIGN（302KB，按 AGENTS 先读 uteki-interface Skill）。
 - **S3 解除新核心对旧代码依赖：**run_budget、SEC 取数与 `agent acquire` 迁入 data_platform，`uteki-data` 指向新入口；原测试随迁并通过，真实 acquire 经原入口重放一次（不调用模型）。
 - **S4 旧代码与历史材料归档：**agents/infrastructure/domain/presentation/evaluation 及对应旧测试、脚本；review_workbench 依赖旧模块的部分（届时确认是否需改用新交付产物作审阅入口）；experiments、data-agent-acceptance 中不被保留测试或冻结材料引用的目录。逐项核对依赖闭包，fixture 来源不删。
 - **S5 技术方案定稿：**按瘦身后的实际结构，在核心设计写定 Data Agent 到生产的阶段路线，以及每阶段的验收、所需授权与费用。

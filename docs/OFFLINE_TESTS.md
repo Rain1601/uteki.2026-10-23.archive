@@ -66,7 +66,7 @@ Python 与 JavaScript 都必须通过。Python 失败后仍运行独立的 JavaS
 .venv/bin/python scripts/prepare_m0_review.py --verify data/evaluation/m0_r2a/2026-09-18-candidate
 ```
 
-这个命令重新核验包内完整来源、历史输入、全部证据和机械派生产物；不调用模型，不代替语义审核。真实来源、索引和新目录重建的记录见 [R2-A 执行记录](releases/V0_2_R2A_EXECUTION.zh-CN.md)。
+这个命令重新核验包内完整来源、历史输入、全部证据和机械派生产物；不调用模型，不代替语义审核。真实来源、索引和新目录重建的记录见 R2-A 执行记录（已归档：`docs/releases/V0_2_R2A_EXECUTION.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。
 
 以下文件同时包含可移植单元测试和真实资料回归，所以使用明确的类或方法选择器；未选中的方法仍由 `--integration` 执行：
 

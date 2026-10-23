@@ -237,7 +237,7 @@ Data 交付指标候选、单位与期间原文、用途逐条回答、引用与
 
 ## 11. 依据与下一步
 
-- 职责依据：[Data / Analysis 交接](../DATA_ANALYSIS_AGENT_CONTRACT.zh-CN.md)、[已确认架构边界](../UTEKI_ARCHITECTURE_PROPOSED_ANSWERS_2026-09-29.zh-CN.md)、[Agent 现状](../UTEKI_AGENT_STATUS_2026-09-29.zh-CN.md)。
+- 职责依据：Data / Analysis 交接（已归档：`docs/DATA_ANALYSIS_AGENT_CONTRACT.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、已确认架构边界（已归档：`docs/UTEKI_ARCHITECTURE_PROPOSED_ANSWERS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、Agent 现状（已归档：`docs/UTEKI_AGENT_STATUS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 - 入口与运行：[CompanyQueryInput](../../src/uteki/domain/research_data/company_agent.py)、[coordinator](../../src/uteki/agents/data_query/coordinator.py)、[autonomous](../../src/uteki/agents/data_query/autonomous.py)。
 - 候选与审阅：[记录契约](../../src/uteki/domain/research_data/query_contract.py)、[narrative](../../src/uteki/agents/analysis/narrative_runner.py)、[team 对照](../../src/uteki/agents/analysis/analysis_comparison.py)。
 - 当前先将任务卡映射到实际入口与调用链，完成 Data 的限定真实交付，再验收 Analysis、独立初判/对照、作者修订、Manager 判断与双语报告版本的交接。补齐必要范围后再验收完整公司报告、持续案例和账户；前后台交互稿继续暂缓。

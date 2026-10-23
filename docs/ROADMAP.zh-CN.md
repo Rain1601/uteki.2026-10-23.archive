@@ -2,11 +2,11 @@
 
 - 编制日期：2026-09-18。
 - 状态：工作提案；下一版范围供共同评审，远期方向随证据修订。此文件不代表任何研究结果、Gold 或版本已被验收。
-- 当前能力里程碑仍是 [M0](M0_SCOPE.zh-CN.md)。建议产品版本从 v0.2 开始承接它，不改变现有 package、数据、索引、benchmark 的版本号。
-- 下一版详见 [v0.2 执行计划](releases/V0_2_PLAN.zh-CN.md)，各版使用 [验收记录模板](releases/ACCEPTANCE_TEMPLATE.zh-CN.md)。
-- 目标职责与产品方向见 [Agent 职责与投资闭环提案](AGENT_SYSTEM_DESIGN.zh-CN.md)：六类业务职责，分析领域独立评测，长期多头与偏满仓可配置，阅读、研究采纳和交易授权分别记录。
+- 当前能力里程碑仍是 M0（已归档：`docs/M0_SCOPE.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。建议产品版本从 v0.2 开始承接它，不改变现有 package、数据、索引、benchmark 的版本号。
+- 下一版详见 v0.2 执行计划（已归档：`docs/releases/V0_2_PLAN.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)），各版使用 验收记录模板（已归档：`docs/releases/ACCEPTANCE_TEMPLATE.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。
+- 目标职责与产品方向见 Agent 职责与投资闭环提案（已归档：`docs/AGENT_SYSTEM_DESIGN.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）：六类业务职责，分析领域独立评测，长期多头与偏满仓可配置，阅读、研究采纳和交易授权分别记录。
 - Analysis 的持续 Watch → Review → Update 与团队协作属于核心设计要求；每个版本按下表交付可验证能力，不将设计方向记作已经实现。
-- 投资评价见 [投资与评估章程](INVESTMENT_EVALUATION_CHARTER.zh-CN.md)和[复盘模板](INVESTMENT_REVIEW_TEMPLATE.zh-CN.md)：季度复盘、年度归因、滚动 3–5 年积累长期证据；研究、持仓与收益分别评价。系统、人工和待归类持仓支持按数量手动标记，分别记录结果与人工干预；这些能力待后续版本实现。
+- 投资评价见 投资与评估章程（已归档：`docs/INVESTMENT_EVALUATION_CHARTER.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）和复盘模板（已归档：`docs/INVESTMENT_REVIEW_TEMPLATE.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）：季度复盘、年度归因、滚动 3–5 年积累长期证据；研究、持仓与收益分别评价。系统、人工和待归类持仓支持按数量手动标记，分别记录结果与人工干预；这些能力待后续版本实现。
 
 ## 1. 长期目标
 
@@ -89,7 +89,7 @@ v0.3 开始建立持续研究状态与团队任务边界，v0.4 验证领域协�
 | 评测与实验 | 参考数据、错误分类、研究复核、实验比较 | v0.2 起独立维护；不得成为 Agent 执行输入 |
 | 工作台 | 展示材料、判断与需处置的变化；阅读、采纳、授权分别记录 | 跟随当版真实流程；以重要遗漏、误操作及处置负担验收 |
 
-这是一张职责图，不要求为每项创建服务或目录。六类业务角色及分析内部的领域任务见 [职责提案](AGENT_SYSTEM_DESIGN.zh-CN.md)。架构必须能承载 Analysis Team；具体团队组织以固定任务上的质量、成本和人工负担选择，single 作为同一契约下的基线或单成员配置。持续研究状态独立于模型会话保存。既有 `agents` 中的存储、预算与资料读取仅在当版修改触及边界时逐步迁移。
+这是一张职责图，不要求为每项创建服务或目录。六类业务角色及分析内部的领域任务见 职责提案（已归档：`docs/AGENT_SYSTEM_DESIGN.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。架构必须能承载 Analysis Team；具体团队组织以固定任务上的质量、成本和人工负担选择，single 作为同一契约下的基线或单成员配置。持续研究状态独立于模型会话保存。既有 `agents` 中的存储、预算与资料读取仅在当版修改触及边界时逐步迁移。
 
 ## 6. 每版如何验收
 

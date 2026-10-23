@@ -10,7 +10,7 @@
 
 保留：源码、脚本、测试、配置、数据注册、Swiss C、当前六题/E1 页面、completion/E1 冻结材料及传递依赖。部分大型旧实验是测试 fixture 的来源，不能因为日期旧就删除。历史业务图与市场回测可从备份恢复；它们的原始结果、失败和修订史在备份中完整保留。
 
-流程和标准只维护在[统一验收](DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md)。旧复盘/代码总览文档保留为短入口；主 TODO 只呈现当前队列。其他历史说明中的归档路径需先恢复再访问，不代表当前运行入口。
+流程和标准只维护在统一验收（已归档：`docs/DATA_AGENT_EVIDENCE_ACCEPTANCE.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。旧复盘/代码总览文档保留为短入口；主 TODO 只呈现当前队列。其他历史说明中的归档路径需先恢复再访问，不代表当前运行入口。
 
 只读查看旧文件：
 
@@ -24,7 +24,7 @@ git show a4595ba8:TODO.md
 git restore --source=a4595ba8 -- experiments/market_backtests
 ```
 
-C2清理阶段验收（后续工程和当前提交核验见[交接](MACHINE_HANDOFF.zh-CN.md)）：
+C2清理阶段验收（后续工程和当前提交核验见交接（已归档：`docs/MACHINE_HANDOFF.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)））：
 
 - 核心离线：562 项 Python 与 35 项 JavaScript 检查通过；不是新模型评测。
 - 当前 Swiss C、六题与所有 e1-* 页面的 2,622 个本地链接目标均存在，零新增缺链。
@@ -47,7 +47,7 @@ C2清理阶段验收（后续工程和当前提交核验见[交接](MACHINE_HAND
 
 本轮从 docs 顶层移除 48 份无保留文件引用的旧说明，顶层 Markdown 从 104 份降为 56 份。代码/测试/配置/Skill、历史结果及核心设计仍引用的文档保留；没有把“旧”直接等同“无用”。已有未提交改动保留，原件、结果、冻结契约和费用账本未改。
 
-48 份原文和 README/TODO/两份 AGENTS 的修改前快照共 52 份，已逐一验证与清理前 Git 提交 `e6366df56c7c005499b2ef222fafe3bf406a3794` 的内容完全一致；路径、字节数、SHA256 及恢复提交见[清单](archives/context-cleanup-2026-10-13.json)。旧文档仍可从该历史版本跨机器恢复，内部相对链接需恢复到原路径后使用；归档材料不默认搜索/加载。
+48 份原文和 README/TODO/两份 AGENTS 的修改前快照共 52 份，已逐一验证与清理前 Git 提交 `e6366df56c7c005499b2ef222fafe3bf406a3794` 的内容完全一致；路径、字节数、SHA256 及恢复提交见清单（已归档：`docs/archives/context-cleanup-2026-10-13.json`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。旧文档仍可从该历史版本跨机器恢复，内部相对链接需恢复到原路径后使用；归档材料不默认搜索/加载。
 
 原始压缩包 `docs/archives/context-cleanup-2026-10-13.tar.gz` 保持原始字节并留存本地。提交检查发现其中旧说明含机器路径，因此该压缩包被忽略、不随本次 Git 交付；没有改写原文或原有 Git 历史。换机器查看旧文档使用上述历史提交，不依赖本机压缩包。
 
@@ -129,3 +129,25 @@ git archive e6366df56c7c005499b2ef222fafe3bf406a3794 -- docs/EVOLUTION.md | tar 
 **历史查阅与恢复：**旧文档、历史预检和冻结清单保留原文中的路径，相关链接在恢复前可能不存在。完整原始副本见本机归档；先确认目标不存在，再按原相对路径复制所需项目，并按清单核对哈希与权限。跨机器仅能从清理前提交 `980e52596074b515fc22d9eaa3ff6fa92c6984f1` 恢复当时已跟踪文件，私有运行/账本仍需本机归档；不能把恢复当作新执行授权或重置预算。
 
 **核验：**现有核心离线检查 576 项 Python、37 项 JavaScript 全部通过；阅读器、材料、数据注册/页面、E6 冻结依赖与验收入口的 91 项 Python 回归通过。2,418 个预期 Git 删除逐项一致（含此前迁出的 1 份应用 README），归档及本轮恢复路径全部被忽略；提交新增文字检查未发现机器路径或凭据模式。本轮只做清理与离线检查，不调用模型、不获取新材料、不部署页面。
+
+## 2026-10-23：S2 文档归档
+
+瘦身队列 S2。从活动目录移除 **118 个已跟踪文件 / 3,019,984 B**：docs 根目录 43 份历史设计、计划、报告与交接文档，以及 `docs/research/`（62）、`docs/releases/`（5）、`docs/archives/`（5）、`docs/research_samples/`（2）、`docs/checks/`（1）。移除前确认工作区干净，并逐个确认文件字节与基线提交的 Git 对象一致。
+
+- 基线：`38098480`（已在 origin/main，可从远端恢复，无需本机备份分支）。
+- [精确清单](REPOSITORY_ARCHIVE.v2.json)记录每个文件的路径、字节数、SHA256、Git blob，以及保留入口和延后处理项。
+- 保留：核心设计、设计历史、接口契约、LOCAL_DEVELOPMENT、OFFLINE_TESTS、FRONTEND_DESIGN、MODEL_COLLABORATION_PROTOCOL、COLLABORATION_FOCUS（`apps/claude_dialogue/service.py` 运行时读取）、本文件与两份归档清单、`docs/design/` 整体。
+- 延后：`DATA_AGENT_CLI.zh-CN.md` 随 S3 迁移旧 CLI 处理；`ROADMAP.zh-CN.md`、`PROJECT_PROGRESS_COMMANDS.zh-CN.md`、`docs/schemas/current/` 仍被旧脚本、测试和工作台引用，随 S4 与代码一起归档；`docs/design/data-agent-acceptance/` 也在 S4 处理。
+- 被忽略的本机文件（如 `docs/releases/V0_2_R2A_REPLAY*.json`、`docs/archives/*.tar.gz`）不在跟踪范围内，原样保留。
+
+保留文档中指向这些文件的 40 处链接改成“已归档：`<原路径>`”加本节入口。设计历史、两份归档清单和 `data/` 下的冻结证据不改写，其中的旧链接在恢复前会失效。
+
+只读查看或恢复（替换示例路径，先确认不会覆盖当前改动）：
+
+```bash
+git show 38098480:docs/MACHINE_HANDOFF_HISTORY_2026-10-12.zh-CN.md
+```
+
+```bash
+git restore --source=38098480 -- docs/research
+```

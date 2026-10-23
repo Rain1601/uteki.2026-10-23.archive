@@ -156,7 +156,7 @@ DeepSeek 的原冻结记录为 `finish_reason=length`，4,000 输出 Token 中 r
 
 前端每 2 秒请求事件，保留当前步骤、产物、焦点与阅读位置；隐藏时暂停，失败退避，根终态尾页读尽后停止。接口中的运行中、失联、结束状态和候选、质量、采纳状态分别表达。页面只读，无启动、取消或采纳按钮。现有 `/data-workspace`、公司名单和 Swiss C 不变。
 
-验收使用真实 AMD 6 个父步骤、两次拒绝、1 个提取子任务与 7 次调用；离线实时 HTTP 检查通过运行中步骤、产物、游标补读、终态与旧版本隔离。页面与增量交互有定向 Python/JavaScript 检查；最终检查结果见[实施记录](DATA_AGENT_OBSERVABILITY_PLAN.zh-CN.md#8-实现记录与边界--2026-10-06)。没有发起真实模型请求，没有打开浏览器做视觉检查；页面视觉 review 仍由用户完成。
+验收使用真实 AMD 6 个父步骤、两次拒绝、1 个提取子任务与 7 次调用；离线实时 HTTP 检查通过运行中步骤、产物、游标补读、终态与旧版本隔离。页面与增量交互有定向 Python/JavaScript 检查；最终检查结果见实施记录（已归档：`docs/DATA_AGENT_OBSERVABILITY_PLAN.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。没有发起真实模型请求，没有打开浏览器做视觉检查；页面视觉 review 仍由用户完成。
 
 ## 2026-10-06：下线旧注意力首页
 
@@ -170,7 +170,7 @@ DeepSeek 的原冻结记录为 `finish_reason=length`，4,000 输出 Token 中 r
 
 用户明确确认 Swiss C 与真实研究工作台是实际使用的两套界面，并选择“删除旧页面及不再使用的代码”。本轮验收样例：从当前前台阅读报告、决策和风险仍可返回原路径；从真实工作台进入数据检查与提取记录仍可访问；旧独立原型不再提供页面。
 
-复用当前导航与布局，不重做视觉。Swiss C 移除页面蓝图、旧 v2 对照链接；研究工作台全局数据入口改为 `/data-workspace`，`/evaluation`、`/extractions` 及其子路径归入同一数据导航分组。原文、报告、人工审核与处理记录子页继续保留。两套界面与 Python 服务保留同一仓库，真实发布数据的统一接口仍为后续工作，见 [职责说明](CODE_OVERVIEW.zh-CN.md)。
+复用当前导航与布局，不重做视觉。Swiss C 移除页面蓝图、旧 v2 对照链接；研究工作台全局数据入口改为 `/data-workspace`，`/evaluation`、`/extractions` 及其子路径归入同一数据导航分组。原文、报告、人工审核与处理记录子页继续保留。两套界面与 Python 服务保留同一仓库，真实发布数据的统一接口仍为后续工作，见 职责说明（已归档：`docs/CODE_OVERVIEW.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。
 
 删除 169 个已跟踪的旧 UI 文件（11 个 HTML 入口及对应闲置脚本、样式、测试和专用样本）：公司工作台 v2、Swiss A/B、两个 Agent Demo、页面蓝图、Attention 展示、Logo 独立展示及 Uteki Zero 旧阅读器。保留历史 Markdown、截图、来源清单、公司图标、共享报告样本、品牌解析与素材制作工具。受保护的 `data/`、`experiments/`、`docs/design/baselines/` 和 Logo 封版目录无改动。历史文档中的旧地址保留为当时记录，相关 README 顶部标记退役，不再推荐为当前产品入口。
 
@@ -182,7 +182,7 @@ DeepSeek 的原冻结记录为 `finish_reason=length`，4,000 输出 Token 中 r
 
 用户要求只有明确指定时才使用 frontend-design；本轮不加载或应用。先以“现金为什么增加”和“谁为哪种服务付费”定义两个可观察问题，沿用 uteki-interface 的可追溯、原生阅读与显式点击约定。用 visualize 交付现金图的会话内对照，用独立 Mermaid 业务图控制阅读顺序，不重新设计项目页面。
 
-交付见 [台积电年报图表优化第一轮](research_samples/TSMC_2025_CHART_REVIEW_v2.md)。现金对照采用冻结官网英文年报 §6.1.3 的相同六项合并数据，原文整数换算为十亿新台币展示。新版中间条从上一累计余额开始；原图从零起算作为对照保留。提供中英文、精确值和官方页码；累计端点不冒充实际时点余额，投资／筹资现金流不改名为资本开支／分红。业务图从客户、服务、交付展开，现金图独立呈现；原六图与冻结源文件保持不变。
+交付见 台积电年报图表优化第一轮（已归档：`docs/research_samples/TSMC_2025_CHART_REVIEW_v2.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。现金对照采用冻结官网英文年报 §6.1.3 的相同六项合并数据，原文整数换算为十亿新台币展示。新版中间条从上一累计余额开始；原图从零起算作为对照保留。提供中英文、精确值和官方页码；累计端点不冒充实际时点余额，投资／筹资现金流不改名为资本开支／分红。业务图从客户、服务、交付展开，现金图独立呈现；原六图与冻结源文件保持不变。
 
 本轮是呈现样本，尚未接入正式后台或更改 Data Agent Skill。检查覆盖源金额、现金勾稽、浮动条端点与脚本语法；不以这些检查替代浏览器或用户视觉验收。用户读图反馈后再收敛可复用的材料精编规则。
 
@@ -1115,7 +1115,7 @@ Home hover now reserves two lines for the excerpt, avoiding height changes and r
 
 ## System-wide interface consolidation
 
-The shared style guide now has an implementation token file: `apps/review_workbench/design_tokens.css`. Theme injection loads it before component styles. Company/research/home color forks are removed or mapped to shared tokens; retired homepage renderer and early company universe styling removed. Company detail headings, report rails/body spacing, source/data tables and shared controls are consolidated. All original snapshot, citation, review and edit behavior is retained. See [interface review matrix](INTERFACE_REVIEW.md). Browser visual review is still pending under current access policy; automated tests do not constitute visual approval.
+The shared style guide now has an implementation token file: `apps/review_workbench/design_tokens.css`. Theme injection loads it before component styles. Company/research/home color forks are removed or mapped to shared tokens; retired homepage renderer and early company universe styling removed. Company detail headings, report rails/body spacing, source/data tables and shared controls are consolidated. All original snapshot, citation, review and edit behavior is retained. See interface review matrix（已归档：`docs/INTERFACE_REVIEW.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）. Browser visual review is still pending under current access policy; automated tests do not constitute visual approval.
 
 
 ## Company brief: judgments before metadata
@@ -1464,7 +1464,7 @@ B 重点降低标题和装饰分隔的视觉重量：22–23px 实体标题、16
 
 用户明确要求再次打开参考网站比较舒适度。本轮只做研究及独立对照页，没有修改工作台实现或用户字体偏好。重新核对此前 Niggli 书籍和 Poster House 海报参考的范围，并补充 SBB Lean 数据表格与排版规范。Niggli 商品页用于观察主次关系，SBB 用于观察功能性数据排列，不将两者与金融工作台等同，也不将当代瑞士机构界面称为历史瑞士风格的唯一表达。
 
-实际浏览并保存 Alphabet 有内容、NVIDIA 无报告、已认可机构主页、Niggli 商品页、SBB 可排序表格例图五张截图，放入 [实图对照页](research/swiss-comparison-2026-10-05/index.html)。当前 Uteki 字体实测为经典宋体；同字体下主页仍有更明确的视觉重心，因此没有把问题归因于字体本身。设计判断集中在重复栏目权重偏高、容器留白与内容数量不匹配、主内容与元信息层级接近。后续建议先用相同内容做公司概览和空状态对照，再考虑延伸到 Agent；这些是待讨论建议，尚未采纳为新规则。
+实际浏览并保存 Alphabet 有内容、NVIDIA 无报告、已认可机构主页、Niggli 商品页、SBB 可排序表格例图五张截图，放入 实图对照页（已归档：`docs/research/swiss-comparison-2026-10-05/index.html`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。当前 Uteki 字体实测为经典宋体；同字体下主页仍有更明确的视觉重心，因此没有把问题归因于字体本身。设计判断集中在重复栏目权重偏高、容器留白与内容数量不匹配、主内容与元信息层级接近。后续建议先用相同内容做公司概览和空状态对照，再考虑延伸到 Agent；这些是待讨论建议，尚未采纳为新规则。
 
 检查：在浏览器确认对照页及实图显示，点击切换 Uteki 与参考页面后，图片链接、来源和说明对应更新，已恢复初始比较组合。截图保留实际来源及窗口差异说明；SBB 展示的是规范内例图，不是已验证交互的数据表。没有模型调用、部署、真实账户操作或工作台回归改动。
 
@@ -1598,7 +1598,7 @@ Swiss C 现有与新增 281 项测试通过，覆盖归属与日期、权重、�
 
 ## 2026-10-06：工程后台定位与 Agent 盘点
 
-用户明确后台面向工程侧，核心对象是各 Agent 的运行过程和产物，数据工作台仅为子模块；界面可朴素，优先补齐观察能力。当前源码与历史结果盘点见[代码概览](CODE_OVERVIEW.zh-CN.md)：Data 主线最完整，限定 Analysis 已有真实模型结果，Risk / Portfolio 后端尚未实现。后续目录需区分 Agent、内部执行角色、工具服务和前台模拟。
+用户明确后台面向工程侧，核心对象是各 Agent 的运行过程和产物，数据工作台仅为子模块；界面可朴素，优先补齐观察能力。当前源码与历史结果盘点见代码概览（已归档：`docs/CODE_OVERVIEW.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）：Data 主线最完整，限定 Analysis 已有真实模型结果，Risk / Portfolio 后端尚未实现。后续目录需区分 Agent、内部执行角色、工具服务和前台模拟。
 
 建议首个实现样例为 AMD 主运行 → 拒绝动作 → 提取子运行 → 候选与诊断 → 父任务结束原因，并能查看无进展停止的运行。复用现有原件、数据及报告视图，保留公司、来源、期间和版本范围，分别表达执行、内容核验、采纳与发布状态。统一运行页和运行控制尚未实施。
 
@@ -1625,7 +1625,7 @@ Swiss C 现有与新增 281 项测试通过，覆盖归属与日期、权重、�
 
 ## 2026-10-06：Data Agent 执行监控技术方案（待共同 review）
 
-用户要求制定方案，先 review 再实现。已形成 [技术方案 v0.1](DATA_AGENT_OBSERVABILITY_PLAN.zh-CN.md)：沿用当前 Python 工作台，新增 Agent 运行目录，以一次真实 Run 为中心呈现过程、产物、用量和输入配置；先接 AMD 历史父运行，再补新 Data 运行的原子事件、心跳和轻量轮询。两项完成后才称为过程监控交付。首版只读，启动/取消/重试、人工裁决及发布另做增量。
+用户要求制定方案，先 review 再实现。已形成 技术方案 v0.1（已归档：`docs/DATA_AGENT_OBSERVABILITY_PLAN.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）：沿用当前 Python 工作台，新增 Agent 运行目录，以一次真实 Run 为中心呈现过程、产物、用量和输入配置；先接 AMD 历史父运行，再补新 Data 运行的原子事件、心跳和轻量轮询。两项完成后才称为过程监控交付。首版只读，启动/取消/重试、人工裁决及发布另做增量。
 
 设计取舍：保留现有公司列表、数据工作台、原文和财务页面；工程页使用紧凑列表与选中步骤详情，延续双语、单窗口和原生滚动。输入预览与磁盘完整产物分开；执行、监控连接、交付、内容质量与采纳状态各有依据。历史缺计时只呈现顺序，不补造耗时；新运行才展示有记录的区间。轮询保留当前阅读位置，根运行终态及尾页读尽后停止。
 

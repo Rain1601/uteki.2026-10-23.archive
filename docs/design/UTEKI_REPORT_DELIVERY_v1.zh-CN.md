@@ -171,7 +171,7 @@
 
 本稿先确定产品语义与人工可评审的内容标准；下一步与现有 narrative、hypothesis、archive 产物对照后决定最小增量。写出八个章节不证明实现了深度研究、完整估值、跨材料持续案例或自动发布。
 
-依据：[既有研究与方法建议](../UTEKI_ARCHITECTURE_PROPOSED_ANSWERS_2026-09-29.zh-CN.md)、[Agent 现状](../UTEKI_AGENT_STATUS_2026-09-29.zh-CN.md)。[投资与评估章程](../INVESTMENT_EVALUATION_CHARTER.zh-CN.md)中的研究/决策/结果分开评价仍可复用；其中较早的偏满仓、用户账户及权限设定不覆盖当前允许现金、共享 Manager 平台和自主模拟运行的已确认边界。
+依据：既有研究与方法建议（已归档：`docs/UTEKI_ARCHITECTURE_PROPOSED_ANSWERS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、Agent 现状（已归档：`docs/UTEKI_AGENT_STATUS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。投资与评估章程（已归档：`docs/INVESTMENT_EVALUATION_CHARTER.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）中的研究/决策/结果分开评价仍可复用；其中较早的偏满仓、用户账户及权限设定不覆盖当前允许现金、共享 Manager 平台和自主模拟运行的已确认边界。
 
 1. 先用第 8 节子问题走读“充分回答”和“表面完成”的差别，确认首份报告的内容门槛。
 2. 再将各部分映射到现有产物，选择一条 Data → Analysis → 内容审阅的最小实现与真实验收。
