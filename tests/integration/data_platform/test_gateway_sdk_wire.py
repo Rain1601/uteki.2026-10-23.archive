@@ -20,7 +20,7 @@ from uteki.data_platform.agent.profiles import load_profile
 from uteki.data_platform.agent.providers.gateway_http import GatewayHTTP, GatewayProxy
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, reconcile_response, response_bytes
 from uteki.data_platform.application.execution_clock import ObservedWorker
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 ROOT=Path(__file__).resolve().parents[3]
 CONFIG=ROOT/'config/data_platform'

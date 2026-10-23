@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 from ..contracts.common import CatalogError, canonical, new_id, utc_now
 from ..contracts.run import DeliveryRequest, TaskState
 from .session import ref_key

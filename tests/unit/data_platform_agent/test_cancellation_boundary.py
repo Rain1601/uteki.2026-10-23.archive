@@ -7,7 +7,7 @@ import unittest
 from uteki.data_platform.agent.openai_runtime import run_offline
 from uteki.data_platform.agent.profiles import load_profile
 from uteki.data_platform.application.session import Session
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 ROOT=Path(__file__).resolve().parents[3]
 F=runpy.run_path(str(ROOT/'tests/fixtures/data_platform/sdk_fixture.py'))

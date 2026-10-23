@@ -1,5 +1,4 @@
 """Public acquisition through urllib, with all network and waiting mocked."""
-from argparse import Namespace
 from collections import deque
 from contextlib import ExitStack
 from datetime import datetime, timedelta, timezone
@@ -13,10 +12,10 @@ import unittest
 from unittest.mock import Mock, call, patch
 from urllib.error import HTTPError, URLError
 
-from uteki.infrastructure.research_data.agent_cli import run_agent_command
+from uteki.data_platform.cli import parse_args, run_acquire as cli_acquire
 
 
-MODULE = 'uteki.infrastructure.document_sources.company_acquisition'
+MODULE = 'uteki.data_platform.connectors.company_acquisition'
 AUTO_LENGTH = object()
 
 
@@ -111,8 +110,8 @@ class AcquisitionTransportTests(unittest.TestCase):
         opener.open.side_effect = open_request
         config_path = self.directory / 'source-config.json'
         config_path.write_text(json.dumps(self.config))
-        args = Namespace(agent_action='acquire', config=config_path, workspace=self.workspace,
-                         sec_user_agent=self.config['sec_user_agent'])
+        args = parse_args(['acquire', '--config', str(config_path), '--workspace', str(self.workspace),
+                           '--sec-user-agent', self.config['sec_user_agent']])
         with ExitStack() as stack:
             # Even accidental unmocked HTTP may not establish a real connection.
             guard = stack.enter_context(patch('socket.create_connection', side_effect=AssertionError('Real network forbidden')))
@@ -125,7 +124,7 @@ class AcquisitionTransportTests(unittest.TestCase):
             def advance(seconds):
                 current[0] += timedelta(seconds=seconds)
             self.sleep = stack.enter_context(patch(MODULE + '.time.sleep', side_effect=advance))
-            result = run_agent_command(args)  # No injected fetch: exercise the urllib branch.
+            result = cli_acquire(args)  # No injected fetch: exercise the urllib branch.
             guard.assert_not_called()
             self.assertGreater(dns.call_count, 0)
         return result

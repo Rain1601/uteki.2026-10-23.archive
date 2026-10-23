@@ -2,7 +2,7 @@
 import math
 import time
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 from .gateway_batch import load_gateway_binding
 from .session import Session

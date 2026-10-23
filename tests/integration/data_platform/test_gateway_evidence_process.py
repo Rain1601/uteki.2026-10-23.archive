@@ -12,7 +12,7 @@ import threading
 import unittest
 
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, record_response, response_bytes
-from uteki.infrastructure.run_budget import RunBudget, RequestRecoveryRequired
+from uteki.data_platform.application.run_budget import RunBudget, RequestRecoveryRequired
 
 
 WORKER=Path(__file__).resolve().parents[2]/'fixtures/data_platform/gateway_evidence_worker.py'

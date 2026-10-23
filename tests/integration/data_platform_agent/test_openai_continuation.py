@@ -17,7 +17,7 @@ from uteki.data_platform.catalog import Catalog
 from uteki.data_platform.contracts.common import canonical
 from uteki.data_platform.contracts.content import ObjectRef
 from uteki.data_platform.service import DataService
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 ROOT = Path(__file__).resolve().parents[3]
 F = runpy.run_path(str(ROOT/'tests/fixtures/data_platform/sdk_fixture.py'))

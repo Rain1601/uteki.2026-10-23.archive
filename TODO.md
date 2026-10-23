@@ -1,4 +1,4 @@
-# 当前动作：瘦身队列 S2 已完成，待用户 review（2026-10-23，分支 `slim/s2-docs-archive`）
+# 当前动作：瘦身队列 S3 已完成，待用户 review（2026-10-23，分支 `slim/s3-legacy-deps`）
 
 本页其余部分的“核心设计 14.x”等章节号指冻结的 `docs/DATA_AGENT_DESIGN_HISTORY_2026-10-23.zh-CN.md`，不指重写后的核心设计。
 
@@ -32,6 +32,9 @@
   - **S2 第一步结果（2026-10-23）：**按用户确认的清单归档 118 个文件（docs 根目录 43 份，以及 research/releases/archives/research_samples/checks），基线 `38098480` 已在 origin 上，清单为 `docs/REPOSITORY_ARCHIVE.v2.json`，说明见 RETENTION 的 2026-10-23 一节。保留文档中的 40 处链接改成了恢复说明。DATA_AGENT_CLI 留到 S3，ROADMAP、PROJECT_PROGRESS_COMMANDS、schemas/current 留到 S4。精简 LOCAL_DEVELOPMENT 和 FRONTEND_DESIGN 已完成，见下一条。
   - **S2 第二步结果（2026-10-23）：**两份原文用 git mv 冻结为 `docs/LOCAL_DEVELOPMENT_HISTORY_2026-10-23.md`、`docs/FRONTEND_DESIGN_HISTORY_2026-10-23.md`，与原文件同目录，开头加冻结说明。新 LOCAL_DEVELOPMENT 从 1,024 行精简到约 200 行，分六部分：环境（主环境 / 非 editable SDK 环境 / 只装 data 的环境）、测试、真实运行（live_function 各子命令和规则）、文档库与 PDF、HTML/iXBRL 程序入口、工作台与资料恢复；文中命令已对照代码核实。新 FRONTEND_DESIGN 从 2,126 行精简到约 120 行，包括当前界面清单、视觉基线摘要（详细规则仍在 style guide）、布局交互约定、Swiss C 页面结构、代码与测试、业务图、工作方式和待办。核对时发现 Swiss C 有 1 项过时测试（`institution-view.test.mjs:149` 仍断言 10-21 已移除的前后按钮，330 项中 329 项通过），已记入 FRONTEND_DESIGN 待办，没有修。S2 至此完成，待用户 review 后合入 main。
 - **S3 解除新核心对旧代码依赖：**run_budget、SEC 取数与 `agent acquire` 迁入 data_platform，`uteki-data` 指向新入口；原测试随迁并通过，真实 acquire 经原入口重放一次（不调用模型）。
+  - **S2 已合入 main（2026-10-23，8ca7f9ae）。**
+  - **S3 结果（2026-10-23）：**用 git mv 迁移 `run_budget`→`application/`，`company_acquisition / official_discovery / filing_integrity / sec_settings / company_registry`→`connectors/`，以及盘点时漏掉的 HTML 解析闭包 `sec_index / sec / domain.documents.models`→`build/`（被 `build/html.py` 使用）。旧路径保留 5 行 `sys.modules` 别名，供旧代码、旧测试和冻结实验使用，S4 删除。AST 扫描确认 `data_platform` 不再导入 `uteki.infrastructure / agents / domain`（函数内延迟导入也算在内；第一次漏掉了 `company_acquisition` 函数里的 `.official_discovery`，是测试暴露出来的）。新增 `data_platform/cli.py`，`uteki-data acquire` 参数与原来相同；旧 CLI 改为 `uteki-data-legacy`。9 个只依赖这些模块的测试移到 `tests/unit/data_platform/`（旧的 recovery 测试因同名改为 `test_sec_acquisition_recovery.py`），同伴导入改用 runpy，两种运行方式都可用。SDK 环境（非 editable）中：unit/data_platform 459、agent 单元 40、agent 集成 125 项全部通过；integration/data_platform 101 项中，`test_content_processes` 在只装 data 的环境单独通过；核心离线回归通过。
+  - **真实重放：**`uteki-data acquire` 使用原 `sec-recovery/input.json`（hash 一致）和全新空工作区，联系信息来自本机 `.env`；3 次 SEC 请求，HTTP 200，模型调用 0，两份 10-K 均通过 CIK/form/period 身份校验。**整文件 SHA256 未复现**：两份都比冻结版多 7 字节，原因是 SEC 在 `</body>` 前注入了一个随机路径的 `<script src>`（冻结版里也有，只是路径不同）；去掉这个标签后，两份与 10-14 冻结原件逐字节相同。证据见 `output/data-agent-acquire-replay-20261023/check.json`。这暴露了复用与版本判断的系统性问题，已记入核心设计 11.2，待用户决定处理方式，本步不修。冻结的 `benchmarks/data_agent/v0.1/offline_suites.json` 仍引用 5 个旧测试 ID，随 S4 和旧基准脚本一起处理。
 - **S4 旧代码与历史材料归档：**agents/infrastructure/domain/presentation/evaluation 及对应旧测试、脚本；review_workbench 依赖旧模块的部分（届时确认是否需改用新交付产物作审阅入口）；experiments、data-agent-acceptance 中不被保留测试或冻结材料引用的目录。逐项核对依赖闭包，fixture 来源不删。
 - **S5 技术方案定稿：**按瘦身后的实际结构，在核心设计写定 Data Agent 到生产的阶段路线，以及每阶段的验收、所需授权与费用。
 

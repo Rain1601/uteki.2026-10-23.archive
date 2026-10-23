@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import sys
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 
 if __name__ == '__main__':

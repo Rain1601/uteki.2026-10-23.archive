@@ -12,7 +12,7 @@ from uteki.data_platform.application.run_completion import read_result
 from uteki.data_platform.application.session import Session
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, record_response
 from uteki.data_platform.contracts.common import CatalogError, canonical, digest
-from uteki.infrastructure.run_budget import BudgetExceeded, RequestRecoveryRequired
+from uteki.data_platform.application.run_budget import BudgetExceeded, RequestRecoveryRequired
 
 ROOT=Path(__file__).resolve().parents[3]
 F=runpy.run_path(str(ROOT/'tests/fixtures/data_platform/gateway_peer.py'))

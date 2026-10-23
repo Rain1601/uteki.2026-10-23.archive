@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 import sys
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 budget = RunBudget.open_existing(Path(sys.argv[1]), '1', root_run_id='synthetic-scope-process')
 phase = sys.argv[2]

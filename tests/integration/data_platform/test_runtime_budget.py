@@ -6,7 +6,7 @@ import sys
 import tempfile
 import unittest
 
-from uteki.infrastructure.run_budget import RequestRecoveryRequired, RunBudget
+from uteki.data_platform.application.run_budget import RequestRecoveryRequired, RunBudget
 
 
 WORKER = Path(__file__).resolve().parents[2]/'fixtures/data_platform/runtime_budget_worker.py'

@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 from uteki.infrastructure.document_sources.company_acquisition import prepare_sources
 from uteki.agents.data_query.coordinator import CompanyDataCoordinator, inspect_run
-from tests.unit.test_filing_integrity import filing
+from tests.unit.data_platform.test_filing_integrity import filing
 
 
 class QuarterlyAcquisitionTests(unittest.TestCase):

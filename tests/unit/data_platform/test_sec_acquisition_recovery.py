@@ -5,11 +5,13 @@ from datetime import datetime, timedelta, timezone
 from email.utils import format_datetime
 from pathlib import Path
 import tempfile
+import runpy
 import unittest
 from urllib.error import HTTPError
 
-from uteki.infrastructure.document_sources.company_acquisition import prepare_sources, TICKERS
-from tests.unit.test_filing_integrity import filing
+from uteki.data_platform.connectors.company_acquisition import prepare_sources, TICKERS
+# Load the sibling helper by path so both unittest discover and the offline runner can import it.
+filing = runpy.run_path(str(Path(__file__).with_name('test_filing_integrity.py')))['filing']
 
 
 class AcquisitionRecoveryTests(unittest.TestCase):

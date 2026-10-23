@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from uteki.infrastructure.document_sources.filing_integrity import atomic_write_new, validate_sec_filing
+from uteki.data_platform.connectors.filing_integrity import atomic_write_new, validate_sec_filing
 
 
 def filing(cik='0000098765', form='20-F', period='2031-12-31', *, duplicate='', title='Annual report', date_format=''):
@@ -115,7 +115,7 @@ class AtomicArtifactTests(unittest.TestCase):
         self.assertEqual(other.read_bytes(), b'original')
 
     def test_interrupted_write_does_not_publish_and_retry_succeeds(self):
-        with patch('uteki.infrastructure.document_sources.filing_integrity.os.fsync', side_effect=OSError('disk failure')):
+        with patch('uteki.data_platform.connectors.filing_integrity.os.fsync', side_effect=OSError('disk failure')):
             with self.assertRaises(ValueError):
                 atomic_write_new(self.path, b'complete')
         self.assertFalse(self.path.exists())

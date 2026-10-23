@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from uteki.infrastructure.document_sources.company_acquisition import prepare_sources, TICKERS, _mime
+from uteki.data_platform.connectors.company_acquisition import prepare_sources, TICKERS, _mime
 
 
 class CompanyAcquisitionTests(unittest.TestCase):

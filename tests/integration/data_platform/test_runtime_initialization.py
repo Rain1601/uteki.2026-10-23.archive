@@ -12,7 +12,7 @@ from uteki.data_platform.catalog import Catalog
 from uteki.data_platform.contracts.common import CatalogError
 from uteki.data_platform.contracts.content import ObjectRef
 from uteki.data_platform.service import DataService
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 ROOT=Path(__file__).resolve().parents[3]
 LIMITS=dict(native_max_turns=12,max_model_requests=12,max_request_bytes=2000000,max_response_bytes=2000000)

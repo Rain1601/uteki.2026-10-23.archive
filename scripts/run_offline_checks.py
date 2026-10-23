@@ -52,7 +52,7 @@ CORE_TESTS = (
     "tests.unit.test_business_critic_revision",
     "tests.unit.test_bounded_retry",
     "tests.unit.test_coverage_audit",
-    "tests.unit.test_acquisition_catalog_coverage",
+    "tests.unit.data_platform.test_acquisition_catalog_coverage",
     "tests.unit.test_business_map_models.BusinessMapModelTests.test_rejects_unknown_evidence_reference",
     "tests.unit.test_business_map_models.BusinessMapModelTests.test_accepts_consistent_map",
     "tests.unit.test_business_map_models.BusinessMapModelTests.test_pilot_matches_domain_contract",

@@ -7,7 +7,7 @@ import sqlite3
 import tempfile
 import unittest
 
-from uteki.infrastructure.run_budget import (BudgetExceeded, RequestIdentityConflict,
+from uteki.data_platform.application.run_budget import (BudgetExceeded, RequestIdentityConflict,
     RequestInFlight, RequestRecoveryRequired, RunBudget)
 
 

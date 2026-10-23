@@ -6,7 +6,7 @@ import json
 from pathlib import PurePosixPath
 import time
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 from ..build.pipeline import build_html, recipe_config
 from ..catalog.database import read_regular

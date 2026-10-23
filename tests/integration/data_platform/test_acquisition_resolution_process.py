@@ -18,7 +18,7 @@ from uteki.data_platform.contracts.common import CatalogError, canonical
 from uteki.data_platform.contracts.content import ObjectRef
 from uteki.data_platform.retrieval.content import HtmlReader
 from uteki.data_platform.service import DataService
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 ROOT = Path(__file__).resolve().parents[3]
 WORKER = ROOT/'tests/fixtures/data_platform/acquisition_resolution_worker.py'

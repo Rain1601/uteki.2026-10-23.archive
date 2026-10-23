@@ -12,7 +12,7 @@ import sqlite3
 import tempfile
 import uuid
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 from ..catalog.database import ensure_directory, read_regular
 from ..contracts.common import CatalogError, canonical, digest, new_id, nonblank, utc_now
 from ..contracts.content import ObjectRef

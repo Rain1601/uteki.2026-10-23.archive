@@ -7,7 +7,7 @@ import json
 import os
 import time
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 from ..contracts.common import CatalogError, canonical, nonblank, utc_now
 from ..contracts.content import ObjectRef

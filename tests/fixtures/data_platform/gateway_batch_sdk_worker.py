@@ -41,7 +41,7 @@ async def main():
                 stack.enter_context(patch('uteki.data_platform.agent.providers.gateway_http.record_response',side_effect=withheld))
             else:
                 from uteki.data_platform.agent.providers.gateway_http import GatewayHTTP
-                from uteki.infrastructure.run_budget import RequestRecoveryRequired
+                from uteki.data_platform.application.run_budget import RequestRecoveryRequired
                 stack.enter_context(patch.object(GatewayHTTP,'observe_bill',side_effect=RequestRecoveryRequired('Synthetic billing observation withheld')))
         if kernel=='claude':
             import claude_agent_sdk

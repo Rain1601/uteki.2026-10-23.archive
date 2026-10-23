@@ -13,7 +13,7 @@ import time
 import uuid
 from decimal import Decimal
 
-from uteki.infrastructure.run_budget import RunBudget, BudgetExceeded, RequestRecoveryRequired
+from uteki.data_platform.application.run_budget import RunBudget, BudgetExceeded, RequestRecoveryRequired
 
 from ..catalog.database import ensure_directory
 from ..contracts.common import CatalogError, canonical, digest, nonblank, utc_now

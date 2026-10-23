@@ -18,7 +18,7 @@ from uteki.data_platform.application.session import Session
 from uteki.data_platform.application.execution_clock import ObservedWorker
 from uteki.data_platform.catalog import Catalog
 from uteki.data_platform.contracts.content import ObjectRef
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 from uteki.data_platform.service import DataService
 
 ROOT=Path(__file__).resolve().parents[3]

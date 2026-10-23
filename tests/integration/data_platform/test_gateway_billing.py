@@ -9,7 +9,7 @@ import unittest
 from uteki.data_platform.agent.providers.gateway_http import GatewayHTTP
 from uteki.data_platform.application.gateway_batch import load_gateway_binding
 from uteki.data_platform.application.session import Session
-from uteki.infrastructure.run_budget import BudgetExceeded,RequestIdentityConflict,RequestRecoveryRequired,RunBudget
+from uteki.data_platform.application.run_budget import BudgetExceeded,RequestIdentityConflict,RequestRecoveryRequired,RunBudget
 
 ROOT=Path(__file__).resolve().parents[3]
 F=runpy.run_path(str(ROOT/'tests/fixtures/data_platform/gateway_peer.py'))

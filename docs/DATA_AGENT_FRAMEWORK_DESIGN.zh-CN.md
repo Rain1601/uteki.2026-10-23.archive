@@ -309,7 +309,7 @@ PDF 解析结果另有一个查询存储 `documents.sqlite`（`contracts/documen
 
 ### 7.3 计费、预算与恢复
 
-- **唯一账本**：`RunBudget`（当前位于 `infrastructure/run_budget.py`，S3 迁入）以根运行为单位做事务化的预留、结算和未知费用记录。补数、澄清、重试都记到同一根账本，不拆账本绕过限制。
+- **唯一账本**：`RunBudget`（`application/run_budget.py`，2026-10-23 从旧 `infrastructure/` 迁入）以根运行为单位做事务化的预留、结算和未知费用记录。补数、澄清、重试都记到同一根账本，不拆账本绕过限制。
 - **调用前预留**：每次物理请求先按保守上限预留；拿到可核对的账单才结算。没有 generation 身份或账单时保留全额未知预留，**不记为零**；存在未知费用时新的付费调用先对账。
 - **恢复**：请求已发出、结果未知时，原运行进入 `recovery_required`，不重发请求、不重置预算。响应已落盘但身份或账单无法核实，两套 SDK 都归为 `RECOVERY_REQUIRED`。工具操作有持久幂等键，已接受但无持久响应的操作不盲目重放。
 - **执行时钟**：执行段和恢复段分开计时（`execution_clock.py`、`recovery_clock.py`），恢复宿主不冒记原 worker 的时间。
@@ -331,12 +331,13 @@ src/uteki/data_platform/
   contracts/      pydantic v2（extra=forbid）契约：common、content、assets、evidence、query、run、documents、document_query
   catalog/        SQLite 目录：database（迁移、锁、head）、repository（登记、修订、运行身份）、migrations/0001_catalog.sql
   content/        对象存储 store、发布 publication、恢复 recovery
-  connectors/     official（受限 HTML 获取）、updates（补获取/补处理适配）、recovery
-  build/          dom、html、xbrl、pipeline、validate
+  connectors/     company_acquisition（prepare_sources：SEC/官网受限获取与冻结）、official_discovery、filing_integrity、
+                  sec_settings（resolve_sec_contact）、company_registry、official（HTML 获取适配）、updates、recovery
+  build/          dom、html、sec_index / sec / document_models（HTML 解析算法与块模型）、xbrl、pipeline、validate
   documents/      PDF 文档库：pdf（Docling 适配）、store、schema、query、directory、passages、CLI 入口
   retrieval/      assets（资产发现）、index（FTS5/DuckDB 派生索引）、content（HTML 读回）、cursors
   structured/     records、calculations（Decimal）、document_records
-  application/    tools / document_tools（六工具两个后端）、evidence、reading、delivery / delivery_checks、exports、
+  application/    tools / document_tools（六工具两个后端）、evidence、reading、delivery / delivery_checks、exports、run_budget（根账本）、
                   clarification、session、runtime（RuntimeJournal）、run_completion、operation_recovery、
                   execution_clock / recovery_clock、gateway_batch / gateway_extension / gateway_supervisor、
                   limits、update_resolution、runtime_initialization
@@ -345,6 +346,7 @@ src/uteki/data_platform/
                   providers/（gateway_http、gateway_openai、gateway_claude、claude_transport、
                              openrouter*、deepseek_evidence、live_policy）
   service.py      DataService：create_context、六工具、deliver/clarify、运行检查与收尾
+  cli.py          uteki-data 命令行（acquire）
 config/data_platform/  model-profiles、prompts、skills（document-data-query、financial-data-query）、gateway-contract
 tests/{unit,integration}/data_platform[_agent]/、tests/fixtures/data_platform/  新核心测试与合成夹具
 examples/data_platform/、scripts/data_agent/      可复制入口与验收脚本
@@ -356,11 +358,11 @@ examples/data_platform/、scripts/data_agent/      可复制入口与验收脚�
 |---|---|
 | Python `DataService` + `openai_runtime.run_gateway / claude_runtime.run_gateway` | 已实现；真实运行经 `examples/data_platform/live_function.py` |
 | 文档库 CLI `python -m uteki.data_platform.documents` | 已实现 |
-| `uteki-data`（含 `agent acquire`） | 仍指向旧 `infrastructure.research_data.query_cli`，S3 迁移 |
+| `uteki-data acquire` | 已实现（`data_platform/cli.py`），参数与原 `agent acquire` 相同；旧 CLI 的其余命令保留为 `uteki-data-legacy`，S4 处理 |
 | MCP | 只有旧 v1（`interfaces/data_mcp`，四个只读工具，冻结）；v2 未实现 |
 | `DataService.run_query` | 未实现；当前由调用方直接调用 runtime |
 
-**仍依赖旧代码的地方（S3 处理）：** `infrastructure/run_budget.py`（账本，被 application 和网关引用）；`infrastructure/document_sources/` 的 `prepare_sources`、`validate_sec_filing`、`resolve_sec_contact`（被 `connectors/official.py` 引用）。
+**旧代码依赖：** 2026-10-23（S3）起 `data_platform` 不再导入 `uteki.infrastructure`、`uteki.agents`、`uteki.domain`（含函数内的延迟导入，AST 扫描为零）。账本、SEC 取数、官网发现和 HTML 解析算法（`sec_index` 及其块模型）已迁入；旧路径保留 5 行的 `sys.modules` 兼容别名，供旧代码、旧测试和冻结实验继续使用，S4 随旧代码一起删除。
 
 ## 9. 验收方法
 
@@ -437,11 +439,12 @@ examples/data_platform/、scripts/data_agent/      可复制入口与验收脚�
 | 问题 | 影响 | 处理方向 |
 |---|---|---|
 | 两个后端（catalog/HTML 与 documents/PDF）在数据模型和读取上仍是两套 | 同一能力维护两次；协议规则曾只修在一边 | 协议规则已上移共同层；后续评估是否把 HTML 也迁入文档库形态，先不动 |
-| 新核心依赖旧 `infrastructure`（账本、SEC 取数），`uteki-data` 指向旧 CLI | 旧代码无法整体归档 | S3 迁移 |
+| 旧路径的兼容别名与 `uteki-data-legacy` | 旧代码、旧测试和冻结实验仍经别名使用迁移后的模块 | S4 归档旧代码时删除 |
 | 旧代码约 3.7 万行、旧测试 234 个、约 57 个脚本仍在仓库 | 阅读、测试和维护负担 | S4 归档 |
 | 没有 `run_query`、MCP v2 和统一 CLI | 只能通过示例脚本调用，分析 Agent 无正式入口 | 路线阶段 B |
 | 自主发现来源未实现 | 真实验收依赖预先入库的材料 | 路线阶段 C |
 | 工具 schema 与后端能力、返回体预算之间仍有摩擦（`CAPABILITY_UNSUPPORTED`、`OUTPUT_LIMIT` 在真实运行中反复出现） | 轮次和费用增加 | 每次真实运行后按根因收敛 |
+| SEC HTML 每次响应在 `</body>` 前注入一个随机路径的 `<script src>`（2026-10-23 重放发现） | 同一份申报每次下载的整文件 SHA256 都不同：`reuse_verified` 复用与变化检测、快照和 build 身份会把未变化的申报当成新内容；正文字节完全相同 | 待决：原件以完整原始字节为准，还是在比较身份时剥离已识别的注入内容（原始字节始终保留）。证据 `output/data-agent-acquire-replay-20261023/check.json` |
 | 四项历史偶发事件（收尾恢复、初始化观察归属、澄清 worker 超时、恢复时钟失败）没有原现场因果证明 | 可能复发 | 在受影响链路上保留诊断，有证据再修 |
 | 只有单题单次真实运行，没有稳定性数据；“始终找不到证据/证据冲突”时的停止行为没验证 | 不能宣称泛化 | 阶段 D 的业务验收 |
 

@@ -93,7 +93,7 @@ class ToolAcquisitionTests(unittest.TestCase):
 
     def test_no_network_enabled_does_not_open_transport(self):
         service,context=self.service(None)
-        with patch('uteki.infrastructure.document_sources.company_acquisition.urllib.request.build_opener') as opener:
+        with patch('uteki.data_platform.connectors.company_acquisition.urllib.request.build_opener') as opener:
             result=self.call(service,context)
         self.assertEqual(result['error']['code'],'POLICY_DENIED')
         opener.assert_not_called()

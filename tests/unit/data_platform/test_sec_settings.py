@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from uteki.infrastructure.document_sources.sec_settings import KEY, resolve_sec_contact
+from uteki.data_platform.connectors.sec_settings import KEY, resolve_sec_contact
 
 
 class SecSettingsTests(unittest.TestCase):

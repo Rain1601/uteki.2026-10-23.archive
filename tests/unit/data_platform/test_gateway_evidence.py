@@ -12,7 +12,7 @@ import unittest
 
 from uteki.data_platform.agent.providers.openrouter_evidence import (
     capture_response, observe_response, record_response, reconcile_response, response_bytes)
-from uteki.infrastructure.run_budget import RunBudget, RequestIdentityConflict, RequestRecoveryRequired
+from uteki.data_platform.application.run_budget import RunBudget, RequestIdentityConflict, RequestRecoveryRequired
 
 
 MODEL = 'synthetic/model'

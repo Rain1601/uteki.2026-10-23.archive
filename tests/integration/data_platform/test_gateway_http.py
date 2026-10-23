@@ -15,8 +15,8 @@ from unittest.mock import patch
 
 from uteki.data_platform.agent.providers.gateway_http import GatewayHTTP, GatewayProxy
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, reconcile_response, response_bytes
-from uteki.infrastructure.run_budget import BudgetExceeded, RequestInFlight, RequestRecoveryRequired
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import BudgetExceeded, RequestInFlight, RequestRecoveryRequired
+from uteki.data_platform.application.run_budget import RunBudget
 
 
 def profile(kernel='openai'):

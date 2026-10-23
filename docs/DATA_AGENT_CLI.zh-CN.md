@@ -1,5 +1,7 @@
 # 公司 Data Agent CLI
 
+> 2026-10-23 起，`agent acquire` 改为新核心的 `uteki-data acquire`（参数不变）；本页其余命令属于旧 CLI，入口改名为 `uteki-data-legacy`，随 S4 处理。下文的 `uteki-data agent …` 写法均按此对应。
+
 ## 系统自主取材并提取业务（2026-10-09）
 
 新增 `agent business`：从公司/报告范围和问题进入已有自主查询器，系统选择目录节点、读原文并冻结材料，再调用业务提取器。无调用者章节/block/摘录参数。共享模型预算和规则快照，保留选材与内容质量未评估状态。当前支持单份 SEC inline HTML 10-K / 10-K/A；请求格式、产物与验收边界（已归档：`docs/DATA_AGENT_RUNTIME_MATERIALS.zh-CN.md`，恢复方法见[归档说明](REPOSITORY_RETENTION.zh-CN.md)）。旧 `--packet` 提取脚本仍用于实验重放，不能当作全程自主入口。

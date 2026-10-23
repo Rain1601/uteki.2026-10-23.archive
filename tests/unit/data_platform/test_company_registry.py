@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from uteki.infrastructure.document_sources.company_registry import CATALOG_VERSION, resolve_company_profile
+from uteki.data_platform.connectors.company_registry import CATALOG_VERSION, resolve_company_profile
 
 
 class CompanyRegistryTests(unittest.TestCase):
@@ -126,7 +126,7 @@ class CompanyRegistryTests(unittest.TestCase):
             resolve_company_profile(self.path, 'ACME')
 
     def test_pilot_catalog_resolves_only_explicitly_registered_names(self):
-        catalog = Path(__file__).resolve().parents[2] / 'config/company_sources/annual-pilot-catalog-v1.json'
+        catalog = Path(__file__).resolve().parents[3] / 'config/company_sources/annual-pilot-catalog-v1.json'
         for name, symbol in [('AMD', 'AMD'), ('Advanced Micro Devices', 'AMD'),
                              ('TSM', 'TSM'), ('TSMC', 'TSM'), ('台积电', 'TSM')]:
             with self.subTest(name=name):

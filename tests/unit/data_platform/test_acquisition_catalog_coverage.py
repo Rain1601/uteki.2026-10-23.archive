@@ -3,10 +3,12 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import tempfile
+import runpy
 import unittest
 
-from uteki.infrastructure.document_sources.company_acquisition import prepare_sources
-from tests.unit.test_filing_integrity import filing
+from uteki.data_platform.connectors.company_acquisition import prepare_sources
+# Load the sibling helper by path so both unittest discover and the offline runner can import it.
+filing = runpy.run_path(str(Path(__file__).with_name('test_filing_integrity.py')))['filing']
 
 
 class AcquisitionCatalogCoverageTests(unittest.TestCase):

@@ -6,9 +6,9 @@ from pathlib import Path
 import time
 from urllib.parse import urljoin, urlsplit
 
-from uteki.infrastructure.document_sources.company_acquisition import AcquisitionError, AcquisitionCancelled, prepare_sources
-from uteki.infrastructure.document_sources.filing_integrity import validate_sec_filing
-from uteki.infrastructure.document_sources.sec_settings import resolve_sec_contact
+from uteki.data_platform.connectors.company_acquisition import AcquisitionError, AcquisitionCancelled, prepare_sources
+from uteki.data_platform.connectors.filing_integrity import validate_sec_filing
+from uteki.data_platform.connectors.sec_settings import resolve_sec_contact
 
 from ..content.store import ContentStore, ContentStoreError
 from ..contracts.common import CatalogError, digest

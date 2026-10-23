@@ -1,25 +1,26 @@
 """Explicit proxy routing preserves SEC-only targets and ordinary TLS transport."""
 from copy import deepcopy
-from argparse import Namespace
 import json
 import os
 from pathlib import Path
 import socket
 import tempfile
+import runpy
 import unittest
 from unittest.mock import Mock, patch
 import urllib.request
 
-from uteki.infrastructure.document_sources.company_acquisition import (
+from uteki.data_platform.connectors.company_acquisition import (
     AcquisitionError, _ExplicitProxy, _Redirect, _transport, _url, prepare_sources,
 )
-from tests.unit.test_acquisition_transport import AcquisitionTransportTests, Response
-from uteki.infrastructure.research_data.agent_cli import run_agent_command
+_transport_tests = runpy.run_path(str(Path(__file__).with_name('test_acquisition_transport.py')))
+AcquisitionTransportTests, Response = _transport_tests['AcquisitionTransportTests'], _transport_tests['Response']
+from uteki.data_platform.cli import parse_args, run_acquire
 
 
 PROXY = {'mode': 'trusted_local_http_proxy', 'proxy_url': 'http://127.0.0.1:7897',
          'destination_hosts': ['data.sec.gov', 'www.sec.gov']}
-MODULE = 'uteki.infrastructure.document_sources.company_acquisition'
+MODULE = 'uteki.data_platform.connectors.company_acquisition'
 
 
 class ExplicitProxyTests(unittest.TestCase):
@@ -74,15 +75,15 @@ class ExplicitProxyTests(unittest.TestCase):
         config['transport'] = PROXY
         config_path = fixture.directory/'proxy-source-config.json'
         config_path.write_text(json.dumps(config))
-        args = Namespace(agent_action='acquire', config=config_path, workspace=fixture.workspace,
-                         sec_user_agent=config['sec_user_agent'])
+        args = parse_args(['acquire', '--config', str(config_path), '--workspace', str(fixture.workspace),
+                           '--sec-user-agent', config['sec_user_agent']])
         opener = Mock()
         opener.open.side_effect = [Response(fixture.metadata, fixture.submission_url),
                                    Response(fixture.raw, fixture.filing_url)]
         with patch(MODULE+'.urllib.request.build_opener', return_value=opener) as build, \
                 patch(MODULE+'.socket.getaddrinfo', side_effect=AssertionError('proxy owns DNS')), \
                 patch(MODULE+'.time.sleep'):
-            result = run_agent_command(args)
+            result = run_acquire(args)
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['requests'], 2)
         self.assertEqual(result['documents'][0]['transport']['transport'], 'trusted_local_http_proxy')

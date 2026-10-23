@@ -6,7 +6,7 @@ import sqlite3
 import stat
 import tempfile
 
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 from ..content.store import _fsync_directory
 from ..contracts.common import CatalogError
 from ..contracts.content import ObjectRef

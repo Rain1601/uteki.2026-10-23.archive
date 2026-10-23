@@ -14,7 +14,7 @@ from uteki.data_platform.agent.profiles import load_profile
 from uteki.data_platform.catalog import Catalog
 from uteki.data_platform.service import DataService
 from uteki.data_platform.application.session import Session
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 
 async def main():

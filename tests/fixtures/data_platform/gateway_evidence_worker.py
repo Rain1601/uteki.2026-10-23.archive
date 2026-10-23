@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, record_response, reconcile_response
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 
 budget = RunBudget.open_existing(Path(sys.argv[1]), '2', root_run_id='synthetic-evidence-process')
 phase = sys.argv[2]

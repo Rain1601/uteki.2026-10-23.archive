@@ -21,7 +21,7 @@ from uteki.data_platform.contracts.common import CatalogError
 from uteki.data_platform.contracts.content import ObjectRef
 from uteki.data_platform.service import DataService
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, reconcile_response, record_response, response_bytes
-from uteki.infrastructure.run_budget import RequestRecoveryRequired
+from uteki.data_platform.application.run_budget import RequestRecoveryRequired
 
 ROOT=Path(__file__).resolve().parents[3]
 F=runpy.run_path(str(ROOT/'tests/fixtures/data_platform/gateway_peer.py'))

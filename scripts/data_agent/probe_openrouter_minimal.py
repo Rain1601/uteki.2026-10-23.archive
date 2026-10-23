@@ -13,7 +13,7 @@ import time
 
 import httpx2
 from openai import OpenAI, APIStatusError
-from uteki.infrastructure.run_budget import RunBudget
+from uteki.data_platform.application.run_budget import RunBudget
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, record_response
 
 

@@ -8,7 +8,7 @@ import sys
 import tempfile
 import unittest
 
-from uteki.infrastructure.run_budget import BudgetExceeded, RequestRecoveryRequired, RunBudget
+from uteki.data_platform.application.run_budget import BudgetExceeded, RequestRecoveryRequired, RunBudget
 
 WORKER = Path(__file__).resolve().parents[2]/'fixtures/data_platform/budget_scope_worker.py'
 

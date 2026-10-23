@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 from uteki.infrastructure.document_sources.annual_package import acquire_annual_package
 from uteki.infrastructure.document_sources.company_acquisition import prepare_sources
-from tests.unit.test_filing_integrity import filing
+from tests.unit.data_platform.test_filing_integrity import filing
 
 
 class AnnualPackageTests(unittest.TestCase):

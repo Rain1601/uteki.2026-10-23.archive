@@ -14,7 +14,7 @@ from uteki.data_platform.connectors.official import acquire_html,store_acquisiti
 from uteki.data_platform.content import ContentStore
 from uteki.data_platform.contracts.common import CatalogError
 from uteki.data_platform.contracts.content import MissingResource
-from uteki.infrastructure.document_sources.company_acquisition import AcquisitionError,_Redirect,prepare_sources
+from uteki.data_platform.connectors.company_acquisition import AcquisitionError,_Redirect,prepare_sources
 
 F=runpy.run_path(str(Path(__file__).resolve().parents[2]/'fixtures/data_platform/html_fixture.py'))
 
@@ -97,7 +97,7 @@ class OfficialAcquisitionTests(unittest.TestCase):
             result.open.side_effect=lambda request,**kw:redirect.redirect_request(request,None,302,'Found',{},target)
             return result
         redirected=prepare_sources(config,self.root,_session_only=True,request_guard=guard)
-        with patch('uteki.infrastructure.document_sources.company_acquisition.socket.getaddrinfo',return_value=[(2,1,6,'',('93.184.216.34',443))]), patch('uteki.infrastructure.document_sources.company_acquisition.urllib.request.build_opener',side_effect=opener):
+        with patch('uteki.data_platform.connectors.company_acquisition.socket.getaddrinfo',return_value=[(2,1,6,'',('93.184.216.34',443))]), patch('uteki.data_platform.connectors.company_acquisition.urllib.request.build_opener',side_effect=opener):
             with self.assertRaises(AcquisitionError):redirected['request'](approved,{'example.com'})
         self.assertEqual(calls,[target,approved,target])
         self.assertEqual(redirected['report']['requests'],1)

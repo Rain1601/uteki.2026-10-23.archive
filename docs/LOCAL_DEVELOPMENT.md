@@ -126,7 +126,13 @@ npm run spec:check
 - 已有运行目录和已有导出目录都会被拒绝覆盖；不要删目录或改 manifest 强行重跑。
 - 当前根账本：上限 $40 / 787 次（以 `inspect` 的实时输出为准）。历次批次的 manifest 在 `output/data-agent-*/` 下。
 
-**SEC 原件取数**只用 `query_cli agent acquire` / `prepare_sources`，联系信息由 `resolve_sec_contact` 从私密配置读取；用法见 [DATA_AGENT_CLI.zh-CN.md](DATA_AGENT_CLI.zh-CN.md)（S3 迁移后更新）。
+**SEC 原件取数**只用 `uteki-data acquire`（不调用模型、不解析），联系信息由 `resolve_sec_contact` 按显式参数、`UTEKI_SEC_USER_AGENT`、公司配置、私有 `.env` 的顺序读取，不在命令行明文传入：
+
+```bash
+"$uteki_sdk_env/venv/bin/uteki-data" acquire --config <公司来源配置.json> --workspace <新的空目录或已有原件库> --settings-root "$PWD"
+```
+
+也可用 `--company <名称或代码> --company-catalog <已登记公司目录>` 代替 `--config`。逐份状态写在返回的 `manifest_path`；有缺口或失败时退出码为 2。配置格式与历史用法见 [DATA_AGENT_CLI.zh-CN.md](DATA_AGENT_CLI.zh-CN.md)；其中 `agent prepare/query` 等命令属于旧 CLI，现为 `uteki-data-legacy`。
 
 ## 4. 文档库与 PDF
 

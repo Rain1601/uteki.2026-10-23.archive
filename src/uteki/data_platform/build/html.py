@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import re
 from urllib.parse import urljoin
 
-from uteki.infrastructure.document_sources.sec_index import parse_sec_source
+from .sec_index import parse_sec_source
 
 from ..contracts.common import CatalogError, digest
 from ..contracts.content import InputManifest, MissingResource, PresentResource

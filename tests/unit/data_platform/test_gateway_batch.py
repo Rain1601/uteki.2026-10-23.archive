@@ -12,7 +12,7 @@ from uteki.data_platform.application.runtime import RuntimeJournal
 from uteki.data_platform.application.session import Session
 from uteki.data_platform.contracts.common import CatalogError
 from uteki.data_platform.agent.providers.openrouter_evidence import capture_response, record_response
-from uteki.infrastructure.run_budget import RequestRecoveryRequired
+from uteki.data_platform.application.run_budget import RequestRecoveryRequired
 
 LIMITS=dict(native_max_turns=12,max_model_requests=2,max_request_bytes=10000,max_response_bytes=10000)
 
