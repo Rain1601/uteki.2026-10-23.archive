@@ -8,7 +8,7 @@ Uteki is an evidence-based investment research system (基于原件证据的投�
 
 @AGENTS.md
 
-AGENTS.md is the binding collaboration contract (root-cause-first, one small task at a time, real-component acceptance, cost/authorization limits, no MiniMax, SEC acquisition only via `query_cli agent acquire` / `prepare_sources`). Read order for any task: AGENTS.md → `TODO.md` (the single current action) → `docs/DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md` (the only top-level design; directory/file map in §14.1). Do not read historical plans/reports/archives by default, and do not resume work because an old doc says "next step". Write design refinements back into the core design doc and status into TODO.md — no parallel plans or progress reports.
+AGENTS.md is the binding collaboration contract (root-cause-first, one small task at a time, real-component acceptance, cost/authorization limits, no MiniMax, SEC acquisition only via `query_cli agent acquire` / `prepare_sources`). Read order for any task: AGENTS.md → `TODO.md` (the single current action) → `docs/DATA_AGENT_FRAMEWORK_DESIGN.zh-CN.md` (the only top-level design, rewritten 2026-10-23: code map §8, status §10, roadmap §11; old section numbers like "14.x" refer to `docs/DATA_AGENT_DESIGN_HISTORY_2026-10-23.zh-CN.md`, the frozen v1.30 record). Do not read historical plans/reports/archives by default, and do not resume work because an old doc says "next step". Write design refinements back into the core design doc and status into TODO.md — no parallel plans or progress reports.
 
 ## Commands
 
