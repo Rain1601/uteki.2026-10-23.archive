@@ -42,9 +42,9 @@ class OfflineChecksTests(unittest.TestCase):
                 cwd=folder, text=True, capture_output=True, check=False,
             )
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("SecDocumentIndexUnitTests", result.stdout)
-        self.assertIn("AlphabetDocumentIndexIntegrationTests", result.stdout)
-        self.assertIn("tests/revision_demo.test.cjs", result.stdout)
+        self.assertIn("tests/unit/data_platform", result.stdout)
+        self.assertIn("test_content_processes", result.stdout)
+        self.assertIn("tests/claude_dialogue.test.cjs", result.stdout)
 
 
 if __name__ == "__main__":

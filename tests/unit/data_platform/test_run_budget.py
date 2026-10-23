@@ -27,11 +27,7 @@ class DurableBudgetTests(unittest.TestCase):
     def prepare(self, key='first', amount='.4', **metadata):
         return self.budget.prepare_request(key, dict(model='fixture/model', role='query', **metadata), reserve_usd=amount)
 
-    def test_legacy_imports_are_the_same_implementation_and_new_ledger_is_optional(self):
-        from uteki.agents.run_budget import RunBudget as old_public
-        from uteki.agents.runtime.run_budget import RunBudget as old_runtime
-        self.assertIs(old_public, RunBudget)
-        self.assertIs(old_runtime, RunBudget)
+    def test_ledger_without_root_binding_keeps_reserve_and_settle_semantics(self):
         legacy = RunBudget(self.path.with_name('legacy.sqlite'), '1')
         token = legacy.reserve('.3'); legacy.settle(token, '.2')
         self.assertEqual(Decimal(legacy.summary()['estimated_spent_usd']), Decimal('.2'))

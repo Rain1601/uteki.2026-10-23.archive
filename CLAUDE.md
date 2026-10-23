@@ -15,41 +15,36 @@ AGENTS.md is the binding collaboration contract (root-cause-first, one small tas
 Python 3.11+ (environment reproduced on 3.13), managed by `uv` with the root `uv.lock`. Tests use stdlib `unittest`; always invoke with `-I`.
 
 ```bash
-# Main dev environment (add --extra agent for the OpenAI + Claude SDK paths)
-uv sync --locked --python 3.13 --extra analysis --extra data --extra mcp
+# Main dev environment (editable; no Claude SDK)
+uv sync --locked --python 3.13 --extra analysis --extra data
 
 # Offline core regression (Python + JS via node; no model calls, no downloads)
-.venv/bin/python scripts/run_offline_checks.py            # --list shows selectors, --verbose, --integration
-.venv/bin/python scripts/check_workspace.py               # returns 2 when local data is missing
-.venv/bin/python scripts/smoke_research_workflow.py
+.venv/bin/python scripts/run_offline_checks.py            # --list shows scope and exclusions, --verbose
 
 # Single test file / single test (test dirs have no __init__.py, so use discover -s)
 .venv/bin/python -I -m unittest discover -s tests/unit/data_platform -p test_catalog.py
-.venv/bin/python -I -m unittest discover -s tests/integration/data_platform_agent \
+"$SDK_ENV/bin/python" -I -m unittest discover -s tests/integration/data_platform_agent \
   -p test_gateway_openai.py -k <test_name_substring> -v
 
 # OpenSpec helpers (Node)
 npm run spec:check
 ```
 
-The M0 SDK validation env is separate: base deps + `requirements/m0.txt` (do not merge into the main lock). Some integration tests and reviews run against an installed (non-editable) env — when source changes, reinstall and verify the actual import path; see `docs/LOCAL_DEVELOPMENT.md` for the exact reusable review commands and `docs/OFFLINE_TESTS.md` for test-scope tables (which mixed files are core vs. `--integration`).
+Agent tests (`*/data_platform_agent`, `test_gateway_sdk_wire`) need a separate **non-editable** env with `--extra data --extra agent`; run `scripts/run_offline_checks.py --integration` with that env's python. `test_content_processes` must run alone in a data-only non-editable env. After any source change, reinstall (`uv pip install --reinstall-package uteki-eval --no-deps .`) and verify the actual import path. Exact commands: `docs/LOCAL_DEVELOPMENT.md`.
 
-Console entry points (pyproject): `uteki-data` (`uteki.data_platform.cli`, `acquire` for official SEC filings), `uteki-data-legacy` (old `query_cli`, kept until S4), `uteki-data-mcp` (MCP stdio server), `uteki-reports`, `uteki-eval`.
-
-Review workbench: `PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --check` (then `--host 127.0.0.1 --port 8765`).
+Console entry point (pyproject): `uteki-data acquire` (`uteki.data_platform.cli`, official SEC filings; no parsing or model calls). Real model runs go through `examples/data_platform/live_function.py` (`inspect` first; every batch needs explicit user authorization).
 
 ## Architecture
 
-- `src/uteki/data_platform/` — the **new Data core**; active development happens here. It must not depend on the legacy `research_data` / `data_query` business orchestration (legacy code is kept for comparison/compat only, no new features). Layering:
+- `src/uteki/data_platform/` — the **Data core**, the only Python package under `src/uteki/` since S4 (2026-10-23; legacy agents/infrastructure/domain/interfaces, the review workbench, experiments, benchmarks and tracked `data/` were archived, see `docs/REPOSITORY_RETENTION.zh-CN.md`). Layering:
   - `contracts/` pydantic v2 models (`extra=forbid`); tool JSON Schema, MCP schema and doc examples are all exported from these — change the contract, not three copies.
-  - `catalog/` SQLite metadata (versioned, hashed SQL migrations shipped as package data) · `content/` object store, staging, manifests, hash checks, publication/recovery · `connectors/` official sources (SEC EDGAR/XBRL, company sites, explicit local originals) · `build/` HTML/iXBRL/DOM parsing → validated publishable assets · `retrieval/` asset discovery + in-asset content index · `structured/` DuckDB records and deterministic (Decimal) calculations · `documents/` PDF/document directory & passages.
-  - `application/` SDK-agnostic business tools, requirement state, evidence, delivery/exports, budget/limits, recovery clocks. Read/build layers never depend back on agent code.
+  - `catalog/` SQLite metadata (versioned, hashed SQL migrations shipped as package data) · `content/` object store, staging, manifests, hash checks, publication/recovery · `connectors/` official sources (SEC acquisition `prepare_sources`, official discovery, filing integrity, SEC contact settings) · `build/` HTML/iXBRL/DOM parsing (incl. `sec_index`) → validated publishable assets · `retrieval/` asset discovery + in-asset content index · `structured/` DuckDB records and deterministic (Decimal) calculations · `documents/` PDF document library (Docling, native directory, passages).
+  - `application/` SDK-agnostic business tools, requirement state, evidence, delivery/exports, the `run_budget` root ledger, limits, recovery clocks. Read/build layers never depend back on agent code.
   - `agent/` thin, independent adapters for **two official SDKs** (OpenAI Agents SDK and Claude Agent SDK) sharing the one `application/` core: model profiles, gateway transport (`providers/`), metering, session state, skill runtime. The SDK owns the agent loop; don't reimplement it.
-- `config/data_platform/` — model profiles (`model-profiles/<kernel>/<model_key>/<role>.json`), prompts, source/runtime policies, gateway contract. Shared code must not default to sample companies, paths, dates, or answers.
-- `src/uteki/interfaces/` — `data_mcp` (MCP server/client) and investment-report CLI. `src/uteki/agents/`, `domain/`, `infrastructure/`, `presentation/` are earlier generations (analysis agents, research data, reading/report pipeline).
-- `apps/` — `review_workbench` (Python web workbench), `claude_dialogue` (shared Claude window; read its README and use `scripts/claude_chat.py --conversation-root <private dir>`), `uteki_zero` (JS).
-- `tests/unit|integration/data_platform[_agent]/` — new-core tests; SDK integration tests use local loopback mock gateways (synthetic responses, `real_model_calls=0`) — these validate wiring, not real model behavior. `tests/fixtures/data_platform/` holds synthetic workers.
-- `scripts/data_agent/` and `examples/data_platform/` — acceptance/verification entry points (e.g. `verify_tool_delivery.py`, `verify_html_material.py`).
+- `config/data_platform/` — model profiles (`model-profiles/<kernel>/<model_key>/<role>.json`), prompts, skills, gateway contract. `config/company_sources/` — company source configs for `uteki-data acquire`. Shared code must not default to sample companies, paths, dates, or answers.
+- `apps/` — `claude_dialogue` (shared Claude window; read its README and use `scripts/claude_chat.py --conversation-root <private dir>`), `uteki_zero` (brand/catalog modules used by the Swiss C front end), `logo_studio` (logo source assets). The Swiss C front end lives in `docs/design/company-workspace-swiss-c/` (static ES modules).
+- `tests/unit|integration/data_platform[_agent]/` — Data core tests; SDK integration tests use local loopback mock gateways (synthetic responses, `real_model_calls=0`) — these validate wiring, not real model behavior. `tests/fixtures/data_platform/` holds synthetic workers.
+- `scripts/data_agent/` and `examples/data_platform/` — acceptance/verification entry points (e.g. `verify_tool_delivery.py`, `verify_html_material.py`, `live_function.py`).
 - `output/` holds frozen run evidence (reviews, call traces, deliveries, ledgers). Never modify or "fix" these; they are evidence.
 - `skills/` — dev-collaboration skills. For UI work read `skills/uteki-interface/SKILL.md` + style guide first; for business diagrams read `skills/uteki-business-diagrams/SKILL.md`. Front-end design decisions go in `docs/FRONTEND_DESIGN.md`.
 

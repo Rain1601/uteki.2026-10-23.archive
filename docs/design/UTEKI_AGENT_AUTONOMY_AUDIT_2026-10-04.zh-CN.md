@@ -20,11 +20,11 @@
 
 | 编号 / 优先级 | 实际发现与影响 | 可达范围与处理建议 |
 | --- | --- | --- |
-| A01 / 高 | 缺少 `filing_selection` 时默认选择最新 10-K 及其后披露；系统替调用方决定材料范围 | `agent prepare`，以及带公司配置的 query 准备阶段可达。要求显式选择政策；缺失拒绝。显式选择“最新”的能力可保留。[采集实现](../../src/uteki/infrastructure/document_sources/company_acquisition.py) 第 228 行；[coordinator](../../src/uteki/agents/data_query/coordinator.py) 第 322 行 |
-| A02 / 高 | 期间正则只理解有限语法，可能静默漏掉问题中的年份，然后拒绝模型正确提出的期间 | 当前 Autonomous query 可达。冻结原题解析出 2024、2025，改写题只得到 2025。保留范围隔离，改为明确期间输入或可确认的解析结果，不接受部分解析却当作完整 scope。[period_scope](../../src/uteki/domain/research_data/period_scope.py) 第 58 行；[grounded_query](../../src/uteki/agents/data_query/autonomous.py) 第 617–621 行 |
-| A03 / 高 | Analysis 只执行一次无工具的解读；`missing_data_requests` 是输出字符串，尚未被调度执行 | 当前 Data→Review→Analysis 主链可达。需要真实的研究规划、补数返回、更新判断、独立审阅与作者修订；保留现有同范围交接校验。[data_consumer](../../src/uteki/agents/analysis/data_consumer.py) 第 32–65 行；[SDK 调用](../../src/uteki/agents/data_query/record_review_model.py) 第 181 行 |
-| A04 / 中 | 系统提示词规定有 Worker 就委派，已有真实验收题还指定资本支出任务交给 Worker | 模型确实执行 delegate，但这只证明按既定分工执行，未证明自主选择分工。另设不指定委派对象/步骤的验收输入。[提示词](../../src/uteki/agents/data_query/autonomous.py) 第 44 行；[冻结题](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/input-v1.json) |
-| A05 / 高 | 自动数值供给是有限 US-GAAP 映射；query Agent 的 `extract` 仅保存逐字引用，未连接独立 Direct Extractor 做按需新指标抽取 | 当前默认 materialize/query 可达。未知概念保留缺口是正确行为，但尚不能宣称通用财务抽取。需要显式能力声明及受审的数值补提入口。[基础指标](../../src/uteki/infrastructure/research_data/company_materialization.py) 第 51–67 行；[extract](../../src/uteki/agents/data_query/autonomous.py) 第 825 行 |
+| A01 / 高 | 缺少 `filing_selection` 时默认选择最新 10-K 及其后披露；系统替调用方决定材料范围 | `agent prepare`，以及带公司配置的 query 准备阶段可达。要求显式选择政策；缺失拒绝。显式选择“最新”的能力可保留。采集实现（已归档：`src/uteki/infrastructure/document_sources/company_acquisition.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 228 行；coordinator（已归档：`src/uteki/agents/data_query/coordinator.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 322 行 |
+| A02 / 高 | 期间正则只理解有限语法，可能静默漏掉问题中的年份，然后拒绝模型正确提出的期间 | 当前 Autonomous query 可达。冻结原题解析出 2024、2025，改写题只得到 2025。保留范围隔离，改为明确期间输入或可确认的解析结果，不接受部分解析却当作完整 scope。period_scope（已归档：`src/uteki/domain/research_data/period_scope.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 58 行；grounded_query（已归档：`src/uteki/agents/data_query/autonomous.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 617–621 行 |
+| A03 / 高 | Analysis 只执行一次无工具的解读；`missing_data_requests` 是输出字符串，尚未被调度执行 | 当前 Data→Review→Analysis 主链可达。需要真实的研究规划、补数返回、更新判断、独立审阅与作者修订；保留现有同范围交接校验。data_consumer（已归档：`src/uteki/agents/analysis/data_consumer.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 32–65 行；SDK 调用（已归档：`src/uteki/agents/data_query/record_review_model.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 181 行 |
+| A04 / 中 | 系统提示词规定有 Worker 就委派，已有真实验收题还指定资本支出任务交给 Worker | 模型确实执行 delegate，但这只证明按既定分工执行，未证明自主选择分工。另设不指定委派对象/步骤的验收输入。提示词（已归档：`src/uteki/agents/data_query/autonomous.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 44 行；冻结题（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/input-v1.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） |
+| A05 / 高 | 自动数值供给是有限 US-GAAP 映射；query Agent 的 `extract` 仅保存逐字引用，未连接独立 Direct Extractor 做按需新指标抽取 | 当前默认 materialize/query 可达。未知概念保留缺口是正确行为，但尚不能宣称通用财务抽取。需要显式能力声明及受审的数值补提入口。基础指标（已归档：`src/uteki/infrastructure/research_data/company_materialization.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 51–67 行；extract（已归档：`src/uteki/agents/data_query/autonomous.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 825 行 |
 
 这里的优先级是后续工程建议，不代表本轮已修复。固定核验阶段与数据格式本身无需移除；应开放研究选择，并让选择经过明确的能力与证据边界。
 
@@ -32,21 +32,21 @@
 
 | 编号 | 发现 | 处理边界 |
 | --- | --- | --- |
-| H01 | 旧 `DataQueryAgent` / `TaskPlan` 调用默认期间解析，无财年映射时 `FY2031` 会被解释为 2031-01-01～12-31 | 去掉隐式 FY→自然年转换。当前 Autonomous 路径已经要求公司财年映射，不能将旧入口问题混称全部主链都有。[旧 Agent](../../src/uteki/agents/data_query/agent.py) 第 78 行；[TaskPlan](../../src/uteki/domain/research_data/task_plan.py) 第 81 行 |
-| H02 | `query_dataset.build_dataset` 无条件加载 Alphabet 试点指标目录，再合并通用目录，使通用构建多出 13 个试点指标 | 按显式 adapter 组装目录。这不会凭空生成数值，但会污染可选研究指标。**当前 coordinator 的 materialize 使用自身目录；本轮检查的真实 handoff 数据集只有 6 个通用指标，没有这 13 项。** [构建器](../../src/uteki/infrastructure/research_data/query_dataset.py) 第 120–123 行；[coordinator 使用的构建器](../../src/uteki/infrastructure/research_data/company_materialization.py) 第 297 行 |
-| H03 | Alphabet 电话会 adapter 有固定语句对应的“超过一半”、60/40 比例、40 年措辞及未来投资构成记录等语义处理 | 已要求显式 adapter，并锁定公司和原文哈希；保留为历史受限适配器，不计入通用自主抽取成绩。没有发现其进入本次检查的真实 handoff 数据集。[adapter](../../src/uteki/infrastructure/research_data/adapters/alphabet_query.py) 第 85、129–177 行 |
-| H04 | 旧 Analysis 比较 CLI 默认读取历史 manifest 和 Alphabet 固定题；Cloud 试点锁定公司、年份、指标及原文匹配规则 | 迁入具名实验配置，避免共享 API 缺 scope 时静默使用样本；保留历史结果。当前 handoff 不调用这些入口。Cloud 原文读取锁定来源，未发现固定财务答案替代读取。[比较入口](../../src/uteki/agents/analysis/analysis_comparison.py) 第 115 行；[Cloud](../../src/uteki/agents/analysis/cloud_analysis.py) 第 10 行 |
-| H05 | 旧 `/analysis` 页面读取固定 Alphabet FY2025 原文，读取点未按当前 run 的原件哈希绑定 | 现有历史样本同源，但不能直接扩成通用查看器。应明确隔离历史页或按 run 读取并校验原件。[查看器](../../apps/review_workbench/pages/cloud_analysis.py) 第 41 行 |
+| H01 | 旧 `DataQueryAgent` / `TaskPlan` 调用默认期间解析，无财年映射时 `FY2031` 会被解释为 2031-01-01～12-31 | 去掉隐式 FY→自然年转换。当前 Autonomous 路径已经要求公司财年映射，不能将旧入口问题混称全部主链都有。旧 Agent（已归档：`src/uteki/agents/data_query/agent.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 78 行；TaskPlan（已归档：`src/uteki/domain/research_data/task_plan.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 81 行 |
+| H02 | `query_dataset.build_dataset` 无条件加载 Alphabet 试点指标目录，再合并通用目录，使通用构建多出 13 个试点指标 | 按显式 adapter 组装目录。这不会凭空生成数值，但会污染可选研究指标。**当前 coordinator 的 materialize 使用自身目录；本轮检查的真实 handoff 数据集只有 6 个通用指标，没有这 13 项。** 构建器（已归档：`src/uteki/infrastructure/research_data/query_dataset.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 120–123 行；coordinator 使用的构建器（已归档：`src/uteki/infrastructure/research_data/company_materialization.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 297 行 |
+| H03 | Alphabet 电话会 adapter 有固定语句对应的“超过一半”、60/40 比例、40 年措辞及未来投资构成记录等语义处理 | 已要求显式 adapter，并锁定公司和原文哈希；保留为历史受限适配器，不计入通用自主抽取成绩。没有发现其进入本次检查的真实 handoff 数据集。adapter（已归档：`src/uteki/infrastructure/research_data/adapters/alphabet_query.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 85、129–177 行 |
+| H04 | 旧 Analysis 比较 CLI 默认读取历史 manifest 和 Alphabet 固定题；Cloud 试点锁定公司、年份、指标及原文匹配规则 | 迁入具名实验配置，避免共享 API 缺 scope 时静默使用样本；保留历史结果。当前 handoff 不调用这些入口。Cloud 原文读取锁定来源，未发现固定财务答案替代读取。比较入口（已归档：`src/uteki/agents/analysis/analysis_comparison.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 115 行；Cloud（已归档：`src/uteki/agents/analysis/cloud_analysis.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 10 行 |
+| H05 | 旧 `/analysis` 页面读取固定 Alphabet FY2025 原文，读取点未按当前 run 的原件哈希绑定 | 现有历史样本同源，但不能直接扩成通用查看器。应明确隔离历史页或按 run 读取并校验原件。查看器（已归档：`apps/review_workbench/pages/cloud_analysis.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 41 行 |
 
 历史年报 narrative 实验允许模型自主选择读取工具，但校验修复由程序固定编排；旧 team Reviewer 首次输入已含作者稿。它们可证明局部工具使用与实验效果，尚不满足“独立初判后对照报告”的目标。
 
 ## 4. 应保留的实现及本轮验证边界
 
-- 注入 Planner 必须标明 `scripted_fixture`，模型 SDK 的 `client_factory` 注入路径也标记为 fixture；正式 Analysis 默认拒绝 fixture 交接。此结论限于这些模型执行入口，不覆盖材料获取 `fetch` 等其他注入点。见 [coordinator](../../src/uteki/agents/data_query/coordinator.py) 第 266–275 行和 [handoff](../../src/uteki/agents/data_query/answer_handoff.py) 第 384–386 行。
-- Benchmark 输入导出只使用 `case.input`，不合并 rubric/review；但离线 benchmark runner 本身不会执行模型，不能把协议检查称为模型质量评测。见 [runner](../../scripts/run_data_agent_benchmark.py) 第 25–29 行。
+- 注入 Planner 必须标明 `scripted_fixture`，模型 SDK 的 `client_factory` 注入路径也标记为 fixture；正式 Analysis 默认拒绝 fixture 交接。此结论限于这些模型执行入口，不覆盖材料获取 `fetch` 等其他注入点。见 coordinator（已归档：`src/uteki/agents/data_query/coordinator.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 266–275 行和 handoff（已归档：`src/uteki/agents/data_query/answer_handoff.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 384–386 行。
+- Benchmark 输入导出只使用 `case.input`，不合并 rubric/review；但离线 benchmark runner 本身不会执行模型，不能把协议检查称为模型质量评测。见 runner（已归档：`scripts/run_data_agent_benchmark.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 第 25–29 行。
 - 引用哈希、公司隔离、单位与口径检查、注册公式计算均应保留。未在所检查的当前模型 query→review→analysis 链找到写死 GOOGL 标准财务答案的逻辑；这个结论不是全仓无硬编码的证明。
 - 本轮用当前函数复现冻结原题/改写题期间差异，并复现旧入口 FY2031 默认自然年；离线截断采集调用确认缺 policy 默认值，未联网、未写采集产物；检查真实数据集指标目录，区分 H02 的构建器问题与已运行数据集。
-- 已保存真实结果：Data 在限定 GOOGL 题上通过 7 条事实 / 6 项要求核验；Worker 达到步骤上限后由主角色接手；Analysis 内容仅部分通过。该链在容量修复后从冻结 query 续跑，非一次无中断完成。见 [真实运行评估](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/evaluation-v1.json)。
+- 已保存真实结果：Data 在限定 GOOGL 题上通过 7 条事实 / 6 项要求核验；Worker 达到步骤上限后由主角色接手；Analysis 内容仅部分通过。该链在容量修复后从冻结 query 续跑，非一次无中断完成。见 真实运行评估（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/evaluation-v1.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 - 同义改写真实运行在四次模型决策后因无进展结束，未进入 Worker/原文搜索；Reviewer 判定需要修订，Analysis 未运行。见 [改写验收记录](../../experiments/architecture_baseline/2026-09-30-retrieval-acceptance-v1/README.md)。本轮核对保存结果和当前代码，未重新调用模型。
 - 工作台页面是具名虚构 Demo，不能用其任务/配置展示验收真实 Agent。见 [Demo 边界](agent-workbench-v1/README.md)。
 

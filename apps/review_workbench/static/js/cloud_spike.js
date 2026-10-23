@@ -1,1 +1,0 @@
-const buttons=[...document.querySelectorAll('.fact')];function select(button){buttons.forEach(b=>b.classList.toggle('active',b===button));document.querySelectorAll('.evidence').forEach(e=>e.hidden=e.id!==button.dataset.target)}buttons.forEach(b=>b.onclick=()=>select(b));select(buttons[0]);document.getElementById('language').onclick=()=>document.body.classList.toggle('en');

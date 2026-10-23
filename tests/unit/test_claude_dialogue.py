@@ -14,7 +14,7 @@ from unittest.mock import patch
 
 import httpx2 as httpx
 
-from uteki.agents.runtime.model_configuration import validate_configuration_snapshot
+from apps.claude_dialogue.runtime_support import validate_configuration_snapshot
 
 
 ROOT = Path(__file__).resolve().parents[2]

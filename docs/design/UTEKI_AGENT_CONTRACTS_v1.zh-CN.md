@@ -61,9 +61,9 @@ source_answer 的 statement、temporal_basis、period_context 与逐条精确引
 现状：准备、查询、实际阅读、受限委派与封存已有；六轮真实题仍未通过完整用途分类和稳定收尾验收。
 新增 source_answer 已通过离线合成检查，并在本次限定资本支出用途题获得真实模型内容核验；业务地图及各来源提取覆盖需分别核查，不能从单题推广。
 
-人工验收以[实际产物样本](data-agent-acceptance/README.zh-CN.md)为入口：先看材料变成哪些块、哪些数字/叙述记录，再查看执行与核验。当前冻结库中这份 10-K 的 111 条数值候选来自确定性 XBRL 映射，只覆盖五类有记录指标；现金、债务、股本等核心包内容未补齐。本次模型交付为 4 条既有记录的核对及 3 条新叙述 claim，没有执行整份 10-K Direct Extraction。按 10-K／10-Q／8-K 配置版本化提取清单及统一可读交付仍是待落实的方法规范，不是当前专属 prompt 已运行的声明。
-单独 coordinator.query 仍在 source_answer 产出后封存。新增实验入口 [run_data_handoff.py](../../scripts/run_data_handoff.py) 将 query、独立 Data 内容核验及限定 Analysis 消费串联；[answer_handoff](../../src/uteki/agents/data_query/answer_handoff.py) 绑定来源/答案版本、核对数值记录、校验审阅结果，并在下游调用前阻止未核验或不完整输入。2026-09-30 已完成限定真实任务：Data 的 7 条事实/6 项要求通过内容核验，Analysis 生成候选；首轮核验容量配置失败后，续跑通过外部固定 query manifest 哈希复用原结果。Analysis 对任务核验与全局采纳状态的理解仍有偏差，不能宣称完整报告或稳定研究质量通过。见[实际结果及缺口](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/README.md)。
-2026-09-30 补充核对：现有 [Record Review](../../src/uteki/agents/data_query/record_review.py) 与 [Semantic Review](../../src/uteki/agents/data_query/semantic_review.py) 主要接收选定记录/packet，尚未覆盖叙述性 source_answer 的完整性审阅。独立评审实验不能当作 query 输出已通过核验；接入时须验证输入与输出语义，而非只增加一次 Reviewer 调用。Direct Extractor 已有独立入口，但在本次检查的 experiments 与 data/company_workspace 中未定位该新版入口的真实封存 run，其效果验收仍保留缺口。
+人工验收以实际产物样本（已归档：`docs/design/data-agent-acceptance/README.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）为入口：先看材料变成哪些块、哪些数字/叙述记录，再查看执行与核验。当前冻结库中这份 10-K 的 111 条数值候选来自确定性 XBRL 映射，只覆盖五类有记录指标；现金、债务、股本等核心包内容未补齐。本次模型交付为 4 条既有记录的核对及 3 条新叙述 claim，没有执行整份 10-K Direct Extraction。按 10-K／10-Q／8-K 配置版本化提取清单及统一可读交付仍是待落实的方法规范，不是当前专属 prompt 已运行的声明。
+单独 coordinator.query 仍在 source_answer 产出后封存。新增实验入口 run_data_handoff.py（已归档：`scripts/run_data_handoff.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 将 query、独立 Data 内容核验及限定 Analysis 消费串联；answer_handoff（已归档：`src/uteki/agents/data_query/answer_handoff.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 绑定来源/答案版本、核对数值记录、校验审阅结果，并在下游调用前阻止未核验或不完整输入。2026-09-30 已完成限定真实任务：Data 的 7 条事实/6 项要求通过内容核验，Analysis 生成候选；首轮核验容量配置失败后，续跑通过外部固定 query manifest 哈希复用原结果。Analysis 对任务核验与全局采纳状态的理解仍有偏差，不能宣称完整报告或稳定研究质量通过。见实际结果及缺口（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
+2026-09-30 补充核对：现有 Record Review（已归档：`src/uteki/agents/data_query/record_review.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 与 Semantic Review（已归档：`src/uteki/agents/data_query/semantic_review.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 主要接收选定记录/packet，尚未覆盖叙述性 source_answer 的完整性审阅。独立评审实验不能当作 query 输出已通过核验；接入时须验证输入与输出语义，而非只增加一次 Reviewer 调用。Direct Extractor 已有独立入口，但在本次检查的 experiments 与 data/company_workspace 中未定位该新版入口的真实封存 run，其效果验收仍保留缺口。
 
 ### 新关注公司的基础资料准备：2026-09-30 问答规则
 
@@ -101,7 +101,7 @@ source_answer 的 statement、temporal_basis、period_context 与逐条精确引
 Analysis 提出观察需求；持续追踪与复核能力维护观察计划，案例和行业档案引用其版本。
 双语报告对应同一 Manager、方法、案例和信息截止；不以另一种语言重新生成一套投资判断。语言转换不替代研究审阅，也不改变来源的语言/地区/版本身份。中文、英文都完整且一致才满足双语交付；具体生成顺序和执行角色由工程验证，不因双语要求自动增加独立 Agent。
 现状：已有 narrative 与 analyst → reviewer → revision 实验路径；跨材料持续案例、完整行业档案和统一数据交接尚未接成闭环。
-旧路径存在 ToolSession 直接读文档，目标接口收敛仍未全面完成。新增 [data_consumer](../../src/uteki/agents/analysis/data_consumer.py) 仅接收通过指定内容核验且哈希固定的交接；解释引用事实 ID，由宿主还原原文引用。输出仍是待内容审阅的内部限定候选，不生成完整公司报告、当前买卖判断或发布状态；注册计算结果的交接尚未支持。
+旧路径存在 ToolSession 直接读文档，目标接口收敛仍未全面完成。新增 data_consumer（已归档：`src/uteki/agents/analysis/data_consumer.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 仅接收通过指定内容核验且哈希固定的交接；解释引用事实 ID，由宿主还原原文引用。输出仍是待内容审阅的内部限定候选，不生成完整公司报告、当前买卖判断或发布状态；注册计算结果的交接尚未支持。
 
 ## 5. Manager 任务卡
 
@@ -138,7 +138,7 @@ Manager 可以自主保持现金和有依据地集中持仓；共享风险线索
 独立审阅指任务与上下文独立，不保证模型错误独立；首版可以同模型不同上下文，异构模型是否改善结果由对照验证。
 作者自检成本较低，适合提交前纠错；独立审阅能重新取证并挑战问题覆盖，两者不能互相冒名。
 
-2026-09-30 代码与历史产物核对：[analysis_comparison.run_mode](../../src/uteki/agents/analysis/analysis_comparison.py) 的 team 路径先运行 analyst，再把作者稿放进 Reviewer 的首次输入；[已保存的 reviewer-input](../../experiments/analysis_comparison/aihubmix-gpt54mini-v0.1/single_document/team/reviewer-input.json) 同样包含作者稿，对应 [result](../../experiments/analysis_comparison/aihubmix-gpt54mini-v0.1/single_document/team/result.json) 仍为 candidate_pending_human_review。它允许审阅者独立重新取证，但尚未实现“不看作者稿形成独立初判”的阶段隔离。[narrative_runner](../../src/uteki/agents/analysis/narrative_runner.py) 的修订由程序引用/结构/数值错误触发，最终保留 semantic_review=pending，也不能当作完整内容审阅已通过。后续必须以保存的实际输入、初判产物、对照及修订记录验收这一差异。
+2026-09-30 代码与历史产物核对：analysis_comparison.run_mode（已归档：`src/uteki/agents/analysis/analysis_comparison.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 的 team 路径先运行 analyst，再把作者稿放进 Reviewer 的首次输入；已保存的 reviewer-input（已归档：`experiments/analysis_comparison/aihubmix-gpt54mini-v0.1/single_document/team/reviewer-input.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 同样包含作者稿，对应 result（已归档：`experiments/analysis_comparison/aihubmix-gpt54mini-v0.1/single_document/team/result.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 仍为 candidate_pending_human_review。它允许审阅者独立重新取证，但尚未实现“不看作者稿形成独立初判”的阶段隔离。narrative_runner（已归档：`src/uteki/agents/analysis/narrative_runner.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 的修订由程序引用/结构/数值错误触发，最终保留 semantic_review=pending，也不能当作完整内容审阅已通过。后续必须以保存的实际输入、初判产物、对照及修订记录验收这一差异。
 
 2026-09-30 已确认：Reviewer 检查事实、引用、计算和推理等研究质量；预测或风险取舍有分歧时，Manager 回应重要质疑并对最终判断负责，允许保留分歧发布。不能把质量缺陷归为观点不同，也不要求 Reviewer 同意最终投资立场。完整审阅先独立初判后读作者报告的方式，以及按更新影响决定审阅范围，已在后续问答确认；这不是当前实现已完成的声明。
 
@@ -215,7 +215,7 @@ profiles:
 
 这是明确选定的试点，不是通用 Agent 的默认公司、期间或答案；执行输入不预填标准金额、完整用途答案或评测者定位出的块 ID，运行中可自行检索原文位置。
 执行卡：GOOGL 对应公司身份、FY2025 10-K、选定的唯一原件/索引清单与哈希、信息截止 2026-02-05（日期精度）、研究期间 2024/2025。
-截止已核对：[run-06 冻结请求](../../experiments/architecture_baseline/2026-09-29-deepseek-mixed-v1/run-06/request.json)的 knowledge_cutoff 与[原年报材料清单](../../experiments/analysis_comparison/codex-hypothesis-2025-2026-v0.1/annual/materials.json)的 material_cutoff 均为 2026-02-05；前者及 query/request.json 的文件哈希与封存 manifest 一致。dataset manifest 的 snapshot_id 不能代替信息截止。
+截止已核对：[run-06 冻结请求](../../experiments/architecture_baseline/2026-09-29-deepseek-mixed-v1/run-06/request.json)的 knowledge_cutoff 与原年报材料清单（已归档：`experiments/analysis_comparison/codex-hypothesis-2025-2026-v0.1/annual/materials.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）的 material_cutoff 均为 2026-02-05；前者及 query/request.json 的文件哈希与封存 manifest 一致。dataset manifest 的 snapshot_id 不能代替信息截止。
 执行问题：找出经营现金流和现金购建 PP&E 支出及口径；完整整理主要投入用途，区分报告期实际、一般描述与未来计划；说明原文不能证明什么。
 沿用本轮选定的数据与索引版本；同一原件的另一版索引可能使用不同 block ID，禁止按编号混合两份索引。
 Plan 首先分出数字要求、原表/单位核验、叙述回答要求；是否委派一个子任务由明确任务卡决定，不把委派次数作为成绩。
@@ -238,7 +238,7 @@ Data 交付指标候选、单位与期间原文、用途逐条回答、引用与
 ## 11. 依据与下一步
 
 - 职责依据：Data / Analysis 交接（已归档：`docs/DATA_ANALYSIS_AGENT_CONTRACT.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、已确认架构边界（已归档：`docs/UTEKI_ARCHITECTURE_PROPOSED_ANSWERS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、Agent 现状（已归档：`docs/UTEKI_AGENT_STATUS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
-- 入口与运行：[CompanyQueryInput](../../src/uteki/domain/research_data/company_agent.py)、[coordinator](../../src/uteki/agents/data_query/coordinator.py)、[autonomous](../../src/uteki/agents/data_query/autonomous.py)。
-- 候选与审阅：[记录契约](../../src/uteki/domain/research_data/query_contract.py)、[narrative](../../src/uteki/agents/analysis/narrative_runner.py)、[team 对照](../../src/uteki/agents/analysis/analysis_comparison.py)。
+- 入口与运行：CompanyQueryInput（已归档：`src/uteki/domain/research_data/company_agent.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、coordinator（已归档：`src/uteki/agents/data_query/coordinator.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、autonomous（已归档：`src/uteki/agents/data_query/autonomous.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
+- 候选与审阅：记录契约（已归档：`src/uteki/domain/research_data/query_contract.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、narrative（已归档：`src/uteki/agents/analysis/narrative_runner.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、team 对照（已归档：`src/uteki/agents/analysis/analysis_comparison.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 - 当前先将任务卡映射到实际入口与调用链，完成 Data 的限定真实交付，再验收 Analysis、独立初判/对照、作者修订、Manager 判断与双语报告版本的交接。补齐必要范围后再验收完整公司报告、持续案例和账户；前后台交互稿继续暂缓。
 - 待验证而非请用户猜测：单作者/Worker 组合的质量成本差异；独立审阅的漏项率；自动发布政策在真实材料上的有效性。

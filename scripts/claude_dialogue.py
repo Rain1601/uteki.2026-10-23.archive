@@ -15,12 +15,10 @@ import stat
 import sys
 import time
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import httpx2 as httpx
-from uteki.agents.runtime.call_costs import estimate_anthropic_usage
-from uteki.agents.runtime.claude_messages import ENDPOINT, _identifier, _numeric_usage, _suppress_transport_logging
-from uteki.agents.runtime.local_credentials import load_provider_key
-from uteki.agents.runtime.model_configuration import build_configuration_snapshot, validate_configuration_snapshot
+from apps.claude_dialogue.runtime_support import (ENDPOINT, _identifier, _numeric_usage, _suppress_transport_logging,
+    build_configuration_snapshot, estimate_anthropic_usage, load_provider_key, validate_configuration_snapshot)
 
 MODEL = 'claude-opus-5-5'
 TIMEOUT = 240

@@ -4,7 +4,7 @@
 
 本轮按用户最新范围，先完成 Uteki Agent + Claude，对照既有 Codex v2 参考；不额外启动 Claude 独立第三路。需要完整三方评测时，按项目的[三方协作与复跑约定](../../../docs/MODEL_COLLABORATION_PROTOCOL.zh-CN.md)，Claude 与 Codex 先独立处理相同冻结输入，再由 Codex 整理 Skill 并实现接入，最后由 Uteki Agent 真实复跑。下方参考案例的目标答案不随 Skill 进入同 case 执行输入。复跑检验落地，另用未见材料检验迁移；三方产物及配置差异均需保存。
 
-当前受限单次业务/收入提取入口已用 v0.3 完成一次真实 Claude 执行。原文与收入核验通过，业务语义与展开粒度保留缺口；这不是统一的全报告 API。现有 BusinessMap 结构以 [models.py](../../../src/uteki/domain/business_map/models.py) 为准。当前校验器会检查枚举、ID 与引用；不会证明证据充分、引用精确、期间一致或图完整，消费端仍需检查。
+当前受限单次业务/收入提取入口已用 v0.3 完成一次真实 Claude 执行。原文与收入核验通过，业务语义与展开粒度保留缺口；这不是统一的全报告 API。现有 BusinessMap 结构以 models.py（已归档：`src/uteki/domain/business_map/models.py`，恢复方法见[归档说明](../../../docs/REPOSITORY_RETENTION.zh-CN.md)） 为准。当前校验器会检查枚举、ID 与引用；不会证明证据充分、引用精确、期间一致或图完整，消费端仍需检查。
 
 新版受限 runner 默认使用 `business-revenue-draft-v2`，物化为 `business-map-v0.2`。新版额外强制关系依据与说明、业务字段逐项摘录、摘录与冻结块文本一致、相同公司/文档证据，以及未记录关系仍为未知。字段指针覆盖名称、描述、每项产品/客户和明确赚钱方式。引用相符不证明语义支持；名称译法、对象归类、关系推断和原文覆盖仍要审阅。旧 `ProductDraft` 的 JSON Schema 和旧物化路径保持兼容；读取旧产物不会追补新字段或升级依据。已有冻结结果不因新 Skill 自动改变。
 
@@ -17,7 +17,7 @@
 | 选定本 Skill 的路径和版本，允许的工具/模型与费用范围，输出目录 | 生效 Skill 与输入 hash；实际模型/配置（如调用）、工具/渲染版本与布局理由 |
 | 希望读者核对的问题及已有反馈 | 业务 Mermaid/可见 SVG 与独立收入图（有合格数据时）；ID 对应关系、证据入口与本轮检查/未运行项 |
 
-宿主需显式选择并加载 Skill/相关 reference，保存实际生效版本或 hash，再将明确范围交给执行模型。仅存在于 `skills/`、被 Codex 阅读或写入 system prompt 的计划，都不证明生产 Agent 实际消费。当前 `src/uteki/agents/business_map/product_run.py` 与 `scripts/run_business_revenue_agent.py` 已实现显式加载主 Skill、调用 Claude、严格校验与原文金额绑定。主 Skill 全文进入请求；此 reference 由宿主审阅，其中的案例与评估样例不发送给执行模型。v0.3 已加载并实跑，见 [真实运行与复核](../../../experiments/agent_design/2026-10-07-agent-business-revenue-v1/README.zh-CN.md)。原始输入、Skill、请求、回执和费用均封存。后续 [NVIDIA v0.4 实跑](../../../experiments/agent_design/2026-10-07-nvidia-business-revenue-v1/README.zh-CN.md)已收到完整模型回答，但围栏造成严格格式失败；零调用的格式恢复另存，模型原始格式、程序校验和语义审阅分开记录。公司与 Skill 同时变化，不能借用 v0.3 成绩或声称已隔离证明 v0.4 的效果。主 Skill 目录中的维护状态可能后续更新，以每次请求的实际内容/hash为准。
+宿主需显式选择并加载 Skill/相关 reference，保存实际生效版本或 hash，再将明确范围交给执行模型。仅存在于 `skills/`、被 Codex 阅读或写入 system prompt 的计划，都不证明生产 Agent 实际消费。当前 `src/uteki/agents/business_map/product_run.py` 与 `scripts/run_business_revenue_agent.py` 已实现显式加载主 Skill、调用 Claude、严格校验与原文金额绑定。主 Skill 全文进入请求；此 reference 由宿主审阅，其中的案例与评估样例不发送给执行模型。v0.3 已加载并实跑，见 真实运行与复核（已归档：`experiments/agent_design/2026-10-07-agent-business-revenue-v1/README.zh-CN.md`，恢复方法见[归档说明](../../../docs/REPOSITORY_RETENTION.zh-CN.md)）。原始输入、Skill、请求、回执和费用均封存。后续 [NVIDIA v0.4 实跑](../../../experiments/agent_design/2026-10-07-nvidia-business-revenue-v1/README.zh-CN.md)已收到完整模型回答，但围栏造成严格格式失败；零调用的格式恢复另存，模型原始格式、程序校验和语义审阅分开记录。公司与 Skill 同时变化，不能借用 v0.3 成绩或声称已隔离证明 v0.4 的效果。主 Skill 目录中的维护状态可能后续更新，以每次请求的实际内容/hash为准。
 
 新提取和事实修订保存为候选；只改布局时不改变输入的审阅状态。读取的是原有已采纳图时，保留其事实与状态，新增展示记录，不自动升级或降级。被拒绝或有歧义的数据不得悄悄作为已确认主图事实。
 
@@ -52,9 +52,9 @@
 
 | 案例目录 | 可检查的语义边界 |
 |---|---|
-| [Alphabet FY2025](../../../experiments/agent_design/2026-10-07-business-map-mermaid-v1/alphabet/README.zh-CN.md) | 报告分部、Other Bets 组合及合并收入类别；商业组不等于独立财务披露 |
-| [Microsoft FY2025](../../../experiments/agent_design/2026-10-07-business-map-mermaid-v1/microsoft/README.zh-CN.md) | 当期分部归属与产品组；跨分部商业标签不能重复相加 |
-| [NVIDIA FY2025](../../../experiments/agent_design/2026-10-07-business-map-mermaid-v1/nvidia/README.zh-CN.md) | 报告分部与市场是两个维度；主图和辅图的候选拆分依据 |
-| [TSMC FY2023](../../../experiments/agent_design/2026-10-07-business-map-mermaid-v1/tsmc/README.zh-CN.md) | 应用平台不等于经营分部；共享技术支持多个平台 |
+| Alphabet FY2025（已归档：`experiments/agent_design/2026-10-07-business-map-mermaid-v1/alphabet/README.zh-CN.md`，恢复方法见[归档说明](../../../docs/REPOSITORY_RETENTION.zh-CN.md)） | 报告分部、Other Bets 组合及合并收入类别；商业组不等于独立财务披露 |
+| Microsoft FY2025（已归档：`experiments/agent_design/2026-10-07-business-map-mermaid-v1/microsoft/README.zh-CN.md`，恢复方法见[归档说明](../../../docs/REPOSITORY_RETENTION.zh-CN.md)） | 当期分部归属与产品组；跨分部商业标签不能重复相加 |
+| NVIDIA FY2025（已归档：`experiments/agent_design/2026-10-07-business-map-mermaid-v1/nvidia/README.zh-CN.md`，恢复方法见[归档说明](../../../docs/REPOSITORY_RETENTION.zh-CN.md)） | 报告分部与市场是两个维度；主图和辅图的候选拆分依据 |
+| TSMC FY2023（已归档：`experiments/agent_design/2026-10-07-business-map-mermaid-v1/tsmc/README.zh-CN.md`，恢复方法见[归档说明](../../../docs/REPOSITORY_RETENTION.zh-CN.md)） | 应用平台不等于经营分部；共享技术支持多个平台 |
 
 各目录的 `business_map.json`、原文/证据入口及 README 是候选与审阅记录。用户已认可 v2 业务/收入分图表达，并抽查部分内容；这不等于四案例全部事实采纳、全量视觉审查或默认模板验收。当前方法来自代码与原文复核；后续顾问审阅只在实际执行并留存结果后记录，不能预先归功于 Claude。

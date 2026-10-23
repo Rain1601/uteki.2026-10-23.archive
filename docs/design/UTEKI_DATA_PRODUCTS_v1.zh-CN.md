@@ -8,7 +8,7 @@
 
 系统查询 Agent 已接入 AIHubMix Claude 原生 Messages，使用 adaptive / high / 非流式；Uteki 保留工具执行、引用核验、预算与日志。顺序完成 AMD 现金流原文证据任务和业务分部回答，结果及过程已登记到现有工作台。首次运行因模型在 JSON 前输出工具标记而失败，已留档；修正协议后成功，但仍存在有界格式/动作纠错。
 
-这轮证明了“标准原文 → 系统检索 → 片段引用”的实际链路。尚未证明模型重复运行完全一致，也未补齐 AMD 周制财年数值适配、TSMC IFRS 数值适配或精编产物。完整费用、核验及边界见[试运行报告](../../experiments/agent_design/2026-10-07-parser-runtime-v1/README.zh-CN.md)。
+这轮证明了“标准原文 → 系统检索 → 片段引用”的实际链路。尚未证明模型重复运行完全一致，也未补齐 AMD 周制财年数值适配、TSMC IFRS 数值适配或精编产物。完整费用、核验及边界见试运行报告（已归档：`experiments/agent_design/2026-10-07-parser-runtime-v1/README.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 
 ### 2026-10-07 前一轮记录：先固定解析输出，再做查询案例
 

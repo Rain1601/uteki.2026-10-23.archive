@@ -1,1 +1,0 @@
-This initial run failed while serializing the source review copy (unsupported lxml argument). It is retained for transparency and is not an evaluation result. Superseded by ../d0-cloud-revenue-02/. No source or index was changed.

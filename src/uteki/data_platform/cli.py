@@ -2,7 +2,7 @@
 
 `acquire` discovers and freezes official filings without parsing or model
 calls. Its arguments and behaviour match the former `uteki-data agent
-acquire`; the remaining legacy commands stay under `uteki-data-legacy`.
+acquire` (the legacy CLI was archived in S4, 2026-10-23).
 """
 import argparse
 import json

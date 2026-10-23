@@ -16,7 +16,7 @@
 
 首版选择规则为：**任务类型绑定默认方法，只允许选择该任务声明的方法，缺少能力则申请补充。** 默认配置可以包含多个允许的方法，但不得从全部 Skill 中任意选取，也不得遇到未知任务后改用最相近的提示词。模型配置仍按既有规则由工程固定，选择 Skill 不授予自主换模型权限。
 
-具体例子：输入任务类型 `annual_financial_extraction`、明确公司/原件/截止/期间/指标范围 → [任务配置](../../config/data_tasks/annual-financial-v1.json)选择 `annual-financial-v2` → [方法配置](../../config/data_methods/annual-financial-v2.json)绑定 Skill、Prompt 与分批规则 → 宿主核对适用来源和版本 → 将真实文本交给提取模型。另一个公司的 10-K 仍使用这个方法；10-Q、财报精编或其他未支持任务不能静默复用它。配置声明支持 20-F 不等于台积电已通过效果验收。
+具体例子：输入任务类型 `annual_financial_extraction`、明确公司/原件/截止/期间/指标范围 → 任务配置（已归档：`config/data_tasks/annual-financial-v1.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）选择 `annual-financial-v2` → 方法配置（已归档：`config/data_methods/annual-financial-v2.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）绑定 Skill、Prompt 与分批规则 → 宿主核对适用来源和版本 → 将真实文本交给提取模型。另一个公司的 10-K 仍使用这个方法；10-Q、财报精编或其他未支持任务不能静默复用它。配置声明支持 20-F 不等于台积电已通过效果验收。
 
 运行必须保存任务类型、默认或显式选择的原因、选中方法、实际加载全文及 hash、最终 System Prompt。选择记录证明使用了哪套方法；结果质量仍由独立原文核验决定。修改方法产生新版本，历史任务继续引用原版本。
 
@@ -33,9 +33,9 @@
 | 内容 Review 与修订 | 候选和原文 → 核验发现 → 新版本 | 现有 query 的模型核验与本轮 Codex 独立源复核分开。本轮原文对照、复核结论作为外部冻结产物登记 | 年报的自动内容 Review → 补读/重新提取 → 复审闭环未接成默认系统流程 |
 | 财报精编 | 结构化忠实浓缩、正文/图表/引用 | 应有独立任务方法、输出 schema 与核验规则 | 当前只有已确认产物边界；旧 Analysis narrative 不能算新 Data 精编实现 |
 
-源码入口：[`agent_cli.py`](../../src/uteki/infrastructure/research_data/agent_cli.py)、[`autonomous.py`](../../src/uteki/agents/data_query/autonomous.py)、[`autonomous_model.py`](../../src/uteki/agents/data_query/autonomous_model.py)、[`direct_extraction.py`](../../src/uteki/infrastructure/research_data/direct_extraction.py)、[`direct_normalization.py`](../../src/uteki/infrastructure/research_data/direct_normalization.py)。
+源码入口：`agent_cli.py`（已归档：`src/uteki/infrastructure/research_data/agent_cli.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、`autonomous.py`（已归档：`src/uteki/agents/data_query/autonomous.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、`autonomous_model.py`（已归档：`src/uteki/agents/data_query/autonomous_model.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、`direct_extraction.py`（已归档：`src/uteki/infrastructure/research_data/direct_extraction.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、`direct_normalization.py`（已归档：`src/uteki/infrastructure/research_data/direct_normalization.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 
-现有方法：[acquire](../../skills/data-agent/acquire/SKILL.md)、[materialize](../../skills/data-agent/materialize/SKILL.md)、[query](../../skills/data-agent/query/SKILL.md)、新增的应用 [extract Skill](../../skills/data-agent/extract/SKILL.md)。专业年报 [Prompt v1](../../skills/data-agent/extract/references/annual-financial-extraction-v1.txt) 保留；[Prompt v2](../../skills/data-agent/extract/references/annual-financial-extraction-v2.txt)已从实验版本复制为方法配置绑定的资产。实际加载代码是 [`extraction_batches.py`](../../src/uteki/infrastructure/research_data/extraction_batches.py)，不依赖 Codex 自动发现 Skill 文件。
+现有方法：[acquire](../../skills/data-agent/acquire/SKILL.md)、[materialize](../../skills/data-agent/materialize/SKILL.md)、[query](../../skills/data-agent/query/SKILL.md)、新增的应用 [extract Skill](../../skills/data-agent/extract/SKILL.md)。专业年报 [Prompt v1](../../skills/data-agent/extract/references/annual-financial-extraction-v1.txt) 保留；[Prompt v2](../../skills/data-agent/extract/references/annual-financial-extraction-v2.txt)已从实验版本复制为方法配置绑定的资产。实际加载代码是 `extraction_batches.py`（已归档：`src/uteki/infrastructure/research_data/extraction_batches.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)），不依赖 Codex 自动发现 Skill 文件。
 
 ## 3. 已保存不等于已默认启用
 
@@ -45,15 +45,15 @@
 
 每个登记任务有明确的新批次数额，失败尝试也计入；成功重复请求在本次运行内复用并校验既有产物。上一运行的成功批次尚不自动接续。返回 `candidate_ready` 只说明候选已生成，不代表内容核验或正式采纳；新 DB 独立保存，查询中的原数据集和 scope 不被覆盖。主规划器和提取器分别固定模型、共用账本；提取器目前仅支持 `max_retries=0`，不支持的配置明确拒绝。
 
-用户只输入公司、期间时，正式 prepare 仍不会自动串起整份年报的专业选材与提取。上述接入覆盖“已有冻结选材任务 → 主模型选表 → 方法执行 → 候选交接”，不能扩大为全年报自动处理已完成。具体参数见 [CLI 文档](../DATA_AGENT_CLI.zh-CN.md)。
+用户只输入公司、期间时，正式 prepare 仍不会自动串起整份年报的专业选材与提取。上述接入覆盖“已有冻结选材任务 → 主模型选表 → 方法执行 → 候选交接”，不能扩大为全年报自动处理已完成。具体参数见 CLI 文档（已归档：`docs/DATA_AGENT_CLI.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 
-本轮 `agent extract-batch` 的 16 项定向及受影响工程检查通过，包含两个独立合成公司、不同期间、默认与允许方法选择、真正发送的 Skill/Prompt、未知方法/跨任务拒绝、来源换版与失败留档。独立源码复核补查了方法身份/hash/版本与数据集二次读取绑定。这些是工程证据；真实模型结果单独记入[年报运行记录](../../experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/README.md)。当前一次任务使用一个方法，“申请补充”暂以明确失败/缺口交接，尚无自动新增 Skill 或多 Skill 组合执行。
+本轮 `agent extract-batch` 的 16 项定向及受影响工程检查通过，包含两个独立合成公司、不同期间、默认与允许方法选择、真正发送的 Skill/Prompt、未知方法/跨任务拒绝、来源换版与失败留档。独立源码复核补查了方法身份/hash/版本与数据集二次读取绑定。这些是工程证据；真实模型结果单独记入年报运行记录（已归档：`experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。当前一次任务使用一个方法，“申请补充”暂以明确失败/缺口交接，尚无自动新增 Skill 或多 Skill 组合执行。
 
-正式入口真实验收已完成一次：`amd-fy2023-formal-batch-00-v1` 的任务 profile 默认选择 `annual-financial-v2`，使用 DeepSeek Flash/low；实际模型指令含 Skill 全文及专业 Prompt。输出 9 条草稿和 9 条 DB 候选，三项指标各三期匹配原文，程序未解决项为 0。独立审阅保留缺失附注与口径限定，10 个批次及 24 个未分配正文块仍待处理。这个结果证明了单批任务的选择、加载、执行和结果追踪，尚未证明全文完整或主 Agent 自主编排。查看[实际加载快照](../../experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/amd-fy2023-formal-batch-00-v1/method-snapshot.json)与[真实结果](http://127.0.0.1:8765/evaluation?dataset=amd-annual-v2&tab=records&source=source-291485b98a75d8cfabe47571&run=amd-fy2023-formal-batch-00-v1)。
+正式入口真实验收已完成一次：`amd-fy2023-formal-batch-00-v1` 的任务 profile 默认选择 `annual-financial-v2`，使用 DeepSeek Flash/low；实际模型指令含 Skill 全文及专业 Prompt。输出 9 条草稿和 9 条 DB 候选，三项指标各三期匹配原文，程序未解决项为 0。独立审阅保留缺失附注与口径限定，10 个批次及 24 个未分配正文块仍待处理。这个结果证明了单批任务的选择、加载、执行和结果追踪，尚未证明全文完整或主 Agent 自主编排。查看实际加载快照（已归档：`experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/amd-fy2023-formal-batch-00-v1/method-snapshot.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）与[真实结果](http://127.0.0.1:8765/evaluation?dataset=amd-annual-v2&tab=records&source=source-291485b98a75d8cfabe47571&run=amd-fy2023-formal-batch-00-v1)。
 
 ## 4. 后续优化的完成标准
 
-2026-10-05 主循环真实验收：`agent query` 的 Pro 模型根据登记目录自主选择资产负债表，调用默认方法的 Flash 提取器。6 次规划请求中含两次字段拒绝，1 次提取得到 10 条草稿和 3 条 DB 候选，保留 12 项程序诊断。独立复核确认 9 条数值受原文支持、1 条正确保留未知；仍有相邻表格数值拼接及债务/股本口径映射缺口。模型选择与执行已验证到这个范围，不能称为完整财务包通过。详见[本轮输入、Trace、结果与审核](../../experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/README.md)。
+2026-10-05 主循环真实验收：`agent query` 的 Pro 模型根据登记目录自主选择资产负债表，调用默认方法的 Flash 提取器。6 次规划请求中含两次字段拒绝，1 次提取得到 10 条草稿和 3 条 DB 候选，保留 12 项程序诊断。独立复核确认 9 条数值受原文支持、1 条正确保留未知；仍有相邻表格数值拼接及债务/股本口径映射缺口。模型选择与执行已验证到这个范围，不能称为完整财务包通过。详见本轮输入、Trace、结果与审核（已归档：`experiments/architecture_baseline/2026-10-04-amd-tsmc-annual-v1/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 
 该轮还发现旧实现归档的同名路径冲突；历史文件保持不变，声明的代码 hash 与实际副本不一致已列为追溯限制。后续归档按完整包路径保存并以同一次读取计算 hash，离线检查已通过。
 

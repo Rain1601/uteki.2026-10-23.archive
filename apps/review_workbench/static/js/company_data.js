@@ -1,3 +1,0 @@
-
-document.documentElement.dataset.language=localStorage.getItem('data-language')||'zh';document.querySelector('#language').onclick=()=>{let l=document.documentElement.dataset.language==='en'?'zh':'en';document.documentElement.dataset.language=l;localStorage.setItem('data-language',l)};
-function filter(){let q=(document.querySelector('#search')?.value||'').toLowerCase(),y=document.querySelector('#year')?.value||'',f=document.querySelector('#form')?.value||'';document.querySelectorAll('tr[data-search]').forEach(r=>r.hidden=!(r.dataset.search.includes(q)&&(!y||r.dataset.year===y)&&(!f||r.dataset.form===f)))}document.querySelectorAll('.controls input,.controls select').forEach(x=>x.addEventListener('input',filter));

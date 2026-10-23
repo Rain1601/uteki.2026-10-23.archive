@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "uteki-eval"
 version = "0.1.0"
-description = "Evaluation kernel for Uteki"
+description = "Uteki evidence-based research Data core"
 requires-python = ">=3.11"
 dependencies = ["lxml>=5,<7"]
 
@@ -13,15 +13,10 @@ dependencies = ["lxml>=5,<7"]
 analysis = ["openai-agents==0.24.0"]
 data = ["duckdb==1.5.5", "pydantic>=2.12,<3", "Pillow>=11,<13"]
 pdf = ["docling-slim[convert-core,format-pdf,models-local,feat-ocr-rapidocr-onnx]==2.139.0; python_version < '4.0'"]
-mcp = ["mcp==2.2.0"]
 agent = ["openai-agents==0.24.0", "claude-agent-sdk==0.2.167", "mcp==2.2.0"]
 
 [project.scripts]
-uteki-eval = "uteki_eval.cli:main"
 uteki-data = "uteki.data_platform.cli:main"
-uteki-data-legacy = "uteki.infrastructure.research_data.query_cli:main"
-uteki-data-mcp = "uteki.interfaces.data_mcp.server:main"
-uteki-reports = "uteki.interfaces.investment_reports.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

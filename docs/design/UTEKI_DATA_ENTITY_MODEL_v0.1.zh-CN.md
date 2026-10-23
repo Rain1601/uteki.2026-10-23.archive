@@ -342,7 +342,7 @@ HTML 引用的图片、附属文件并不自动包含在 HTML 字节中。资源
 
 #### 真实例子：2024 年经营现金流
 
-本例复用已保存的 [review 输入](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/e2e-02/data-review/input.json)、[模型响应](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/e2e-02/data-review/response.json)和[程序结果](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/e2e-02/data-review/result.json)，本轮没有再次调用模型。
+本例复用已保存的 review 输入（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/e2e-02/data-review/input.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、模型响应（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/e2e-02/data-review/response.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）和程序结果（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/e2e-02/data-review/result.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)），本轮没有再次调用模型。
 
 | 项目 | 本例内容 |
 | --- | --- |
@@ -355,8 +355,8 @@ HTML 引用的图片、附属文件并不自动包含在 HTML 字节中。资源
 
 #### 当前代码具有什么能力
 
-- [Record Review](../../src/uteki/infrastructure/research_data/record_review.py) 给选定数值记录组装表格、附近正文/适用附注、原件 HTML 片段及指标定义；其[输出契约](../../src/uteki/domain/research_data/record_review.py)已有五项字段检查。当前适配器要求每条记录只有一个已定位 inline evidence，跨附注完整性仍有边界；字段检查结构也不等于字段语义已由程序证明。
-- [任务级内容核验 answer_handoff](../../src/uteki/agents/data_query/answer_handoff.py)重放受限查询、对齐原记录和引文，向独立模型交付原问题、候选、要求、所选来源的完整索引文本/表格及未读图片说明；一次审阅返回 JSON。Reviewer 没有自行搜索、读新文件或网络补采工具。完整索引文本不等于完整 PDF/HTML 多模态内容。
+- Record Review（已归档：`src/uteki/infrastructure/research_data/record_review.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 给选定数值记录组装表格、附近正文/适用附注、原件 HTML 片段及指标定义；其输出契约（已归档：`src/uteki/domain/research_data/record_review.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）已有五项字段检查。当前适配器要求每条记录只有一个已定位 inline evidence，跨附注完整性仍有边界；字段检查结构也不等于字段语义已由程序证明。
+- 任务级内容核验 answer_handoff（已归档：`src/uteki/agents/data_query/answer_handoff.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）重放受限查询、对齐原记录和引文，向独立模型交付原问题、候选、要求、所选来源的完整索引文本/表格及未读图片说明；一次审阅返回 JSON。Reviewer 没有自行搜索、读新文件或网络补采工具。完整索引文本不等于完整 PDF/HTML 多模态内容。
 - 任务级输出校验会检查每条事实/要求/来源恰好覆盖一次、引用存在及范围一致；全部通过且无程序/查询缺口才放行。下游重验 manifest 和 scope，当前用途为 `reviewed_for_this_task_only`，不自动全局 adoption。
 - **待补齐：** 两条核验路径尚未统一；任务级 packet 未附 Record Review 的 metric_definitions，也未输出其五项字段检查。逐字段引用要求、原件与解析的语义保真核验、自动修订复审、计算结果适配，以及跨公司真实效果仍需独立实现/验收。已有 schema/哈希/引文检查和一次成功任务不能替代这些验收。
 
@@ -407,8 +407,8 @@ HTML 引用的图片、附属文件并不自动包含在 HTML 字节中。资源
 
 | 公司 ID | 公司 | 当前代码 | 真实来源 |
 | --- | --- | --- | --- |
-| sec-0001652044 | Alphabet Inc. | GOOGL | [公司清单](../../data/company_workspace/extraction_ab_v1/corpus/googl/dataset/manifest.json) |
-| sec-0000789019 | Microsoft Corporation | MSFT | [公司清单](../../data/company_workspace/extraction_ab_v1/corpus/msft/dataset/manifest.json) |
+| sec-0001652044 | Alphabet Inc. | GOOGL | 公司清单（已归档：`data/company_workspace/extraction_ab_v1/corpus/googl/dataset/manifest.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） |
+| sec-0000789019 | Microsoft Corporation | MSFT | 公司清单（已归档：`data/company_workspace/extraction_ab_v1/corpus/msft/dataset/manifest.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） |
 
 | 现有 source_snapshot_id | form | 材料报告期末 | 当前来源可得日 |
 | --- | --- | --- | --- |
@@ -416,7 +416,7 @@ HTML 引用的图片、附属文件并不自动包含在 HTML 字节中。资源
 | googl-2025q3-10q | 10-Q | 2025-09-30 | 2025-10-30 |
 | msft-2025-10k | 10-K | 2025-06-30 | 2025-07-30 |
 
-来源：[GOOGL 材料清单](../../data/company_workspace/extraction_ab_v1/corpus/googl/dataset/sources.json)、[MSFT 材料清单](../../data/company_workspace/extraction_ab_v1/corpus/msft/dataset/sources.json)。MSFT 的 FY2025 来源映射是 **2024-07-01 至 2025-06-30**。
+来源：GOOGL 材料清单（已归档：`data/company_workspace/extraction_ab_v1/corpus/googl/dataset/sources.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、MSFT 材料清单（已归档：`data/company_workspace/extraction_ab_v1/corpus/msft/dataset/sources.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。MSFT 的 FY2025 来源映射是 **2024-07-01 至 2025-06-30**。
 
 GOOGL 2025 年报中，实际保存了一条 2024 经营现金流记录：
 
@@ -436,7 +436,7 @@ GOOGL 2025 年报中，实际保存了一条 2024 经营现金流记录：
 }
 ```
 
-这是[真实记录](../../data/company_workspace/extraction_ab_v1/corpus/googl/dataset/records.json)的字段节选；[证据](../../data/company_workspace/extraction_ab_v1/corpus/googl/dataset/evidence.json)指向 p52 的 `block-000774-67c9365e`，原值 `125,299`，原表单位为百万美元。[原文块文件](../../data/company_workspace/extraction_ab_v1/corpus/googl/dataset/indexes/googl-2025-10k/blocks.jsonl)第 772 行是标题、773 行是单位、774 行是完整现金流量表。该来源记录的可得日是 2026-02-05，**不能由此认定市场直到这一天才首次知道 2024 数字**；其他更早披露需独立来源支持。
+这是真实记录（已归档：`data/company_workspace/extraction_ab_v1/corpus/googl/dataset/records.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）的字段节选；证据（已归档：`data/company_workspace/extraction_ab_v1/corpus/googl/dataset/evidence.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）指向 p52 的 `block-000774-67c9365e`，原值 `125,299`，原表单位为百万美元。原文块文件（已归档：`data/company_workspace/extraction_ab_v1/corpus/googl/dataset/indexes/googl-2025-10k/blocks.jsonl`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）第 772 行是标题、773 行是单位、774 行是完整现金流量表。该来源记录的可得日是 2026-02-05，**不能由此认定市场直到这一天才首次知道 2024 数字**；其他更早披露需独立来源支持。
 
 现有 sources 中虽有 document_id，但它与 source_snapshot_id 值相同。上述新 Document/Snapshot/ParseRun 分层不能冒充已实现；迁移时建立显式 legacy ID 映射并核验，旧文件和引用保持不变。
 
@@ -446,8 +446,8 @@ GOOGL 2025 年报中，实际保存了一条 2024 经营现金流记录：
 
 | 材料 | 原件 | 解析文件中实际记录 | 已知限制 |
 | --- | --- | --- | --- |
-| GOOGL 2025 10-K | [HTML](../../data/company_workspace/extraction_ab_v1/corpus/googl/dataset/raw/googl-2025-10k.html)，2,616,499 字节 | 1,338 个块；其中 185 个 table、622 个 paragraph、2 个 image | [资源清单](../../data/company_workspace/extraction_ab_v1/corpus/googl/dataset/indexes/googl-2025-10k/assets.json)记录 2 个图片引用，未提供其已归档字节/哈希或内容识别完成证明；无索引诊断也不等于内容齐全 |
-| MSFT 2025 10-K | [HTML](../../data/company_workspace/extraction_ab_v1/corpus/msft/dataset/raw/msft-2025-10k.html)，8,158,179 字节 | 1,401 个块；其中 85 个 table、687 个 paragraph | [索引](../../data/company_workspace/extraction_ab_v1/corpus/msft/dataset/indexes/msft-2025-10k/index.json)有 4 条 item_heading_ambiguous 错误：Part I Item 1B/2、Part II Item 9/9B 未发布章节范围；不能直接推断相应正文不存在 |
+| GOOGL 2025 10-K | HTML（已归档：`data/company_workspace/extraction_ab_v1/corpus/googl/dataset/raw/googl-2025-10k.html`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)），2,616,499 字节 | 1,338 个块；其中 185 个 table、622 个 paragraph、2 个 image | 资源清单（已归档：`data/company_workspace/extraction_ab_v1/corpus/googl/dataset/indexes/googl-2025-10k/assets.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）记录 2 个图片引用，未提供其已归档字节/哈希或内容识别完成证明；无索引诊断也不等于内容齐全 |
+| MSFT 2025 10-K | HTML（已归档：`data/company_workspace/extraction_ab_v1/corpus/msft/dataset/raw/msft-2025-10k.html`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)），8,158,179 字节 | 1,401 个块；其中 85 个 table、687 个 paragraph | 索引（已归档：`data/company_workspace/extraction_ab_v1/corpus/msft/dataset/indexes/msft-2025-10k/index.json`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）有 4 条 item_heading_ambiguous 错误：Part I Item 1B/2、Part II Item 9/9B 未发布章节范围；不能直接推断相应正文不存在 |
 
 块数量包含布局表格和标题候选等；185 个 table 不等于 185 张财务报表。两个样本的索引都记录 parser=`sec-source-blocks-v0.1.6`、schema=`document-index-v0.1`，当前产物状态为 candidate；现有 index_id 也不能未经映射就当作完整 ParseRun 运行记录。
 
@@ -537,6 +537,6 @@ PostgreSQL 为本稿建议选型，用于主外键、事务和多任务并发；
 ## 核对依据
 
 - [既定数据与共享规则](README.md)、[Agent 契约](UTEKI_AGENT_CONTRACTS_v1.zh-CN.md)。
-- [当前数据库表定义](../../src/uteki/infrastructure/research_data/query_dataset.py)、[原件/JSON/DuckDB 生成](../../src/uteki/infrastructure/research_data/company_materialization.py)。
-- [当前读取方式](../../src/uteki/infrastructure/research_data/query_service.py)、[事实契约](../../src/uteki/domain/research_data/query_contract.py)。
-- [真实数据产物](data-agent-acceptance/README.zh-CN.md)、[召回验收及公司/期间查询缺口](data-agent-acceptance/retrieval-acceptance-2026-09-30.zh-CN.md)。
+- 当前数据库表定义（已归档：`src/uteki/infrastructure/research_data/query_dataset.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、原件/JSON/DuckDB 生成（已归档：`src/uteki/infrastructure/research_data/company_materialization.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
+- 当前读取方式（已归档：`src/uteki/infrastructure/research_data/query_service.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、事实契约（已归档：`src/uteki/domain/research_data/query_contract.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
+- 真实数据产物（已归档：`docs/design/data-agent-acceptance/README.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、召回验收及公司/期间查询缺口（已归档：`docs/design/data-agent-acceptance/retrieval-acceptance-2026-09-30.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。

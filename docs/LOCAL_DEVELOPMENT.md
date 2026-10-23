@@ -13,12 +13,11 @@ Python 3.11+（当前复现用 3.13），依赖由 `uv` 按根 `uv.lock` 安装�
 | 主开发环境 `.venv` | 日常开发、核心离线检查（editable） | 见下方第一条命令 |
 | SDK 验收环境 | agent 单元/集成测试、真实运行；**必须非 editable** | 见“SDK 验收环境” |
 | 只装 data 的环境 | `test_content_processes`（要求没有 agent SDK） | 见“只装 data 的环境” |
-| M0 独立环境 | 只用于复现 M0 历史探针，锁在 `requirements/m0.txt` | 见历史记录“M0 独立验证环境” |
 
 **主开发环境：**
 
 ```bash
-uv sync --locked --python 3.13 --extra analysis --extra data --extra mcp
+uv sync --locked --python 3.13 --extra analysis --extra data
 ```
 
 ```bash
@@ -37,7 +36,7 @@ uv pip check --python "$uteki_sdk_env/venv/bin/python"
 "$uteki_sdk_env/venv/bin/python" -I -c "import importlib.metadata as m, uteki; print(m.version('openai-agents'), m.version('claude-agent-sdk'), uteki.__file__)"
 ```
 
-应输出 `0.24.0 0.2.167`，且 `uteki.__file__` 位于该环境的 `site-packages`。**源码改动后必须重跑第二行 `--reinstall-package`**，否则测试的是旧代码；`uv sync` 可能复用旧 wheel。
+应输出 `0.24.0 0.2.167`，且 `uteki.__file__` 位于该环境的 `site-packages`。**源码改动后必须重跑第二行 `--reinstall-package`**，否则测试的是旧代码；`uv sync` 可能复用旧 wheel。**删除或移动了模块时，先删掉仓库根目录的 `build/`**（setuptools 的中间目录，已被忽略）：它不会清理上次构建残留的文件，删掉的模块会被重新打进 wheel。2026-10-23 S4 时实际发生过，安装包里还留着 200 多个旧模块文件。
 
 **只装 data 的环境：**
 
@@ -54,19 +53,19 @@ UV_PROJECT_ENVIRONMENT="$uteki_data_env/venv" uv sync --locked --python 3.13 --e
 
 ## 2. 测试
 
-测试用标准库 `unittest`。测试目录没有 `__init__.py`，用 `discover -s` 运行。覆盖范围和 core / `--integration` 的划分见 [OFFLINE_TESTS.md](OFFLINE_TESTS.md)。
+测试用标准库 `unittest`。测试目录没有 `__init__.py`，用 `discover -s` 运行。范围说明见 [OFFLINE_TESTS.md](OFFLINE_TESTS.md)。
 
-**核心离线回归（主环境，不调用模型、不下载）：**
+**核心离线回归（主环境，不调用模型、不下载，约 5 分钟）：**
 
 ```bash
 .venv/bin/python scripts/run_offline_checks.py
 ```
 
-```bash
-.venv/bin/python scripts/check_workspace.py
-```
+覆盖 `unit/data_platform`、`integration/data_platform`、claude_dialogue 的 Python 测试，以及 claude_dialogue 和 uteki_zero 的 JS 测试。`--list` 显示范围和被排除的环境相关测试及原因。加上 agent 测试组时，用 SDK 验收环境的 Python 运行：
 
-`run_offline_checks.py --list` 列出选择器，`--integration` 运行集成组；`check_workspace.py` 在本地资料缺失时返回 2。
+```bash
+"$uteki_sdk_env/venv/bin/python" scripts/run_offline_checks.py --integration
+```
 
 **新核心测试（SDK 验收环境）：** 在临时目录里运行，避免从仓库根误导入源码。
 
@@ -132,7 +131,7 @@ npm run spec:check
 "$uteki_sdk_env/venv/bin/uteki-data" acquire --config <公司来源配置.json> --workspace <新的空目录或已有原件库> --settings-root "$PWD"
 ```
 
-也可用 `--company <名称或代码> --company-catalog <已登记公司目录>` 代替 `--config`。逐份状态写在返回的 `manifest_path`；有缺口或失败时退出码为 2。配置格式与历史用法见 [DATA_AGENT_CLI.zh-CN.md](DATA_AGENT_CLI.zh-CN.md)；其中 `agent prepare/query` 等命令属于旧 CLI，现为 `uteki-data-legacy`。
+也可用 `--company <名称或代码> --company-catalog <已登记公司目录>` 代替 `--config`。逐份状态写在返回的 `manifest_path`；有缺口或失败时退出码为 2。配置示例在 `config/company_sources/`（如 `amd-annual-v1.json`、`googl-annual-v2.json`）：显式给出 CIK、`filing_selection`、`document_validation`、`download_policy` 和 `limits`，不写 SEC 联系信息。旧 CLI 的其他命令已在 S4 归档。
 
 ## 4. 文档库与 PDF
 
@@ -176,36 +175,12 @@ UV_TOOL_DIR=/tmp/uteki-viewer-tools uv tool run --from datasette==0.65.5 dataset
 
 都需要显式的隔离数据根和请求文件；验收用的 gold 只给验证脚本，不给产品入口。完整参数示例见历史记录对应章节。
 
-## 6. 工作台与资料恢复
+## 6. 归档与恢复
 
-旧审阅工作台（依赖旧代码，计划在 S4 处理）：
-
-```bash
-PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --check
-```
+2026-10-23（S4）起，旧代码、旧审阅工作台（原 8765 端口）、旧测试与脚本、`experiments/`、`benchmarks/` 和 Git 跟踪的 `data/` 旧数据集都已从工作区移除，本页不再提供它们的启动或恢复步骤。需要查看或恢复时，按 [REPOSITORY_RETENTION.zh-CN.md](REPOSITORY_RETENTION.zh-CN.md) 用基线提交读取，例如：
 
 ```bash
-PYTHONPATH=src:. .venv/bin/python -m apps.review_workbench.app --host 127.0.0.1 --port 8765
+git show e563d959:apps/review_workbench/README.md
 ```
 
-`--check` 只检查必需输入，不启动服务。启动后打开 `http://127.0.0.1:8765/agent-results`。
-
-**资料清单与恢复。** 路径相对仓库根。恢复时保留原字节、版本目录、清单和审核记录，不重新赋予 frozen/adopted 状态。
-
-| 内容 | 路径 | 用途与恢复方式 |
-| --- | --- | --- |
-| 公司名单 | `data/company_universe/v0.1-candidate/companies.json` | 公司导航与报告审核必需；从原环境恢复 |
-| 材料目录 | `data/document_library/alphabet/catalog.json`（可选 `earnings.json`） | Alphabet 子页加载；目录里的相对路径须可解析 |
-| 已发布研究数据 | `data/research_data/alphabet_2025_10k/v0.2-candidate/` | 业务图、指标和公司页面必需；恢复清单声明的全部文件 |
-| 完整年报及图片 | `data/source_documents/alphabet_2025_10k/source.html.gz`、`assets/` | 原文阅读与索引重建；解压后须匹配来源清单 SHA-256 |
-| 版本化索引 | 来源目录的 `indexes/`，及材料目录记录的 `index_folder` | 目录导航和精确证据链接 |
-| 候选与审核决定 | `benchmarks/alphabet_2025_business_map/v0.2-candidate/`、`v0.3-candidate/` | 后续构建需要对应候选及 `review_decisions.json` |
-| PDF 资料 | `data/reading_library/alphabet/download_manifest.json` 及声明 downloaded 的文件 | 可选阅读功能 |
-| 个人审核历史 | `data/research_archive/state.json` | 可选；只从可信原状态恢复 |
-| 新核心文档库 | `data/data_agent_documents/`、`data/model_cache/docling/` | 已入库的 Apple/Alphabet 2025 10-K 原件、解析包和本地解析权重 |
-
-建议先把原工作区恢复到单独目录，用 `check_workspace.py --root <目录> --json` 比对，再补齐缺失路径；同一路径已有不同字节时先核对版本和来源，两份都保留。
-
-**已知证据完整性缺口：** 已提交摘录第 90 段按 `sec.text_hash` 规则重算的指纹与存储值不一致（证据 `e-platforms`）。在取得完整固定源文件前不修改原文、摘录或指纹；`scripts/smoke_research_workflow.py --strict-all` 因此返回 1，这个失败应保留。
-
-**仓库归档与恢复**：见 [REPOSITORY_RETENTION.zh-CN.md](REPOSITORY_RETENTION.zh-CN.md)。
+本机未跟踪的数据（`data/data_agent_documents/`、`data/model_cache/`、`output/`）不在归档范围内，原样保留；其中 `data/data_agent_documents/` 是当前文档库，见第 4 节。

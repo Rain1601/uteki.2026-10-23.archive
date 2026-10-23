@@ -8,18 +8,17 @@
 
 ## 1. 当前界面
 
-2026-10-06 用户确认只保留下表中的界面，其余旧页面已删除。
+2026-10-06 用户确认只保留下表中的界面，其余旧页面已删除；其中的研究工作台（8765）于 2026-10-23 随 S4 归档。
 
 | 界面 | 位置 | 本机地址 | 数据 | 状态 |
 |---|---|---|---|---|
 | **投研前台 Swiss C**（前台设计基线） | `docs/design/company-workspace-swiss-c/` | `http://127.0.0.1:8769/docs/design/company-workspace-swiss-c/` | 具名虚构样本（机构、Manager、组合、决策、风险）和共享报告样本 | 在用；按 Editorial 方向持续优化 |
-| **研究工作台**（工程观察后台） | `apps/review_workbench/` | `http://127.0.0.1:8765/agent-results` | 真实登记的 Data 运行、产物和原文 | 在用；依赖旧代码，去留在 S4 决定 |
 | Data Agent 产品评审原型 | `docs/design/data-agent-product-review/` | `serve.py --port 8874` | 全部虚构 | 只作业务案例讨论载体，不是工作台定稿 |
 | Claude 共享对话窗口 | `apps/claude_dialogue/` | 8770 | 私密会话目录 | 在用；样式不符合预期，改为常见对话布局已暂缓 |
 | 文档库浏览 | Datasette | 8001 | `data/data_agent_documents/documents.sqlite` | 只读查看，命令见 LOCAL_DEVELOPMENT |
 | Editorial 设计参考 | `docs/design/dashboard-demos/editorial/` | 静态页面 | 示例 | 当前最佳设计参考（2026-10-15 确认）；原则见其中 `EDITORIAL_DESIGN_PRINCIPLES.md` |
 
-Swiss C 是静态 ES modules 页面，从仓库根目录用本机静态服务提供（页面会引用 `apps/uteki_zero/brands.mjs` 的品牌与公司图标注册表）。研究工作台启动命令见 [LOCAL_DEVELOPMENT](LOCAL_DEVELOPMENT.md) 第 6 节。
+Swiss C 是静态 ES modules 页面，从仓库根目录用本机静态服务提供（页面会引用 `apps/uteki_zero/brands.mjs` 的品牌与公司图标注册表）。原研究工作台（`apps/review_workbench/`，8765）已在 S4 随旧代码归档。
 
 **已退役（2026-10-06 删除，不再提供页面）：** 公司工作台 v2、Swiss A/B 试稿、两个 Agent Demo、页面蓝图、注意力首页、Logo 独立展示、Uteki Zero 旧阅读器。历史地址只在历史记录中保留。
 
@@ -67,7 +66,7 @@ Swiss C 是静态 ES modules 页面，从仓库根目录用本机静态服务提
 node --test docs/design/company-workspace-swiss-c/*.test.mjs
 ```
 
-研究工作台的 JS 检查包含在 `scripts/run_offline_checks.py` 里。
+claude_dialogue 和 uteki_zero 的 JS 检查包含在 `scripts/run_offline_checks.py` 里。
 
 ## 6. 业务图
 
@@ -89,7 +88,7 @@ node --test docs/design/company-workspace-swiss-c/*.test.mjs
 | 夜间配色 | 石墨灰方案待用户视觉确认 |
 | 曲线买卖标记与“投资事件”标题的顺序 | 待用户决定 |
 | `institution-view.test.mjs:149` 失败 | 断言仍要求 Agent 前后切换按钮，而 10-21 已按用户要求移除；测试过时，需同步更新 |
-| 研究工作台的去留 | 依赖旧代码；S4 时决定改接新核心交付产物，还是随旧代码归档 |
+| 新核心运行结果的查看页面 | 原研究工作台已在 S4 归档；在此之前新核心结果只能用 Datasette 和导出的 JSON/Markdown 查看 |
 | Data Agent 真实交付的前台展示 | 尚未开始；产品评审原型只覆盖单题表达 |
 | 前台接入真实已发布研究数据 | 统一接口未实现，Swiss C 仍是虚构样本 |
 | Claude 对话窗口改为常见对话布局 | 暂缓 |

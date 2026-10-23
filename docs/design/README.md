@@ -6,9 +6,9 @@
 
 以下按日期保留设计过程；其中旧原型链接仅是历史记录，不表示仍有对应的可运行页面。当前职责与下一步接口边界见 代码概览（已归档：`docs/CODE_OVERVIEW.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 
-**真实产物查看 · 2026-10-05：** 后台按“公司 → 材料 → 加工产物 → 处理记录”重组。材料下可读原件、按章节查段落与表格、分别查看各次财务提取及核对意见；技术标识和存储位置折叠。提取页展示真实任务、输入、有效 Prompt / Skill、输出与检查，精编和未接入的完整主 Agent trace 明确留缺口。8769 工作台新增真实数据入口，任务区仍是示例。48 项页面/范围检查、27 项 Demo 交互检查及双公司 HTTP 检查通过；不代表浏览器视觉验收。见[查看方式与边界](../../apps/review_workbench/README.md)。
+**真实产物查看 · 2026-10-05：** 后台按“公司 → 材料 → 加工产物 → 处理记录”重组。材料下可读原件、按章节查段落与表格、分别查看各次财务提取及核对意见；技术标识和存储位置折叠。提取页展示真实任务、输入、有效 Prompt / Skill、输出与检查，精编和未接入的完整主 Agent trace 明确留缺口。8769 工作台新增真实数据入口，任务区仍是示例。48 项页面/范围检查、27 项 Demo 交互检查及双公司 HTTP 检查通过；不代表浏览器视觉验收。见查看方式与边界（已归档：`apps/review_workbench/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 
-**只读 MCP 与独立消费者验收 · 2026-10-05：** 用户已选择 A，四个只读工具已实现；全新 Codex 经真实 MCP 协议独立比较 AMD/台积电 FY2023 五项指标，43 次工具调用取得 10 项值：3 项 DB 候选、7 项原文阅读结果，正式采纳为 0。9 项与独立原文精度一致，1 项采用已说明的摘要精度。试用发现的期间目录和大表读取问题已修复并按原请求回放；81 项定向工程检查通过。不是完整财报提取验收，也未修改全局 Codex MCP 配置。见服务说明（已归档：`docs/DATA_AGENT_MCP.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、[原始答案与验收记录](../../experiments/data_agent_mcp/readonly-v1/README.md)。供应商调研（已归档：`docs/research/2026-10-05-financial-data-provider-mcp-notes.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）保留；“Fetch Index”准确名称仍待确认。
+**只读 MCP 与独立消费者验收 · 2026-10-05：** 用户已选择 A，四个只读工具已实现；全新 Codex 经真实 MCP 协议独立比较 AMD/台积电 FY2023 五项指标，43 次工具调用取得 10 项值：3 项 DB 候选、7 项原文阅读结果，正式采纳为 0。9 项与独立原文精度一致，1 项采用已说明的摘要精度。试用发现的期间目录和大表读取问题已修复并按原请求回放；81 项定向工程检查通过。不是完整财报提取验收，也未修改全局 Codex MCP 配置。见服务说明（已归档：`docs/DATA_AGENT_MCP.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、原始答案与验收记录（已归档：`experiments/data_agent_mcp/readonly-v1/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。供应商调研（已归档：`docs/research/2026-10-05-financial-data-provider-mcp-notes.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）保留；“Fetch Index”准确名称仍待确认。
 
 **Prompt / Skill 与系统能力 · 2026-10-04：** 用户确认 Codex 编写、评估和迭代 Uteki 的 Skill；Uteki 负责选择、加载、执行和反馈。任务类型绑定默认方法，只能在任务允许范围内选择或申请补充；模型配置仍由工程固定。正式按表提取模块及任务配置实际选择并加载应用 Skill 和 Prompt，16 项定向工程检查及独立复核通过；正式入口 1 次 DeepSeek 实跑得到 9 条原文核对通过的候选并可查看。2026-10-05 已接入主 query 的登记任务调用，并以真实 DeepSeek 自主选中资产负债表，生成 10 条草稿、3 条 DB 候选和 12 项诊断；内容复核仍为部分通过。全年报选材、prepare 后续编排与跨运行续接仍有缺口。详见[真实参与方式与验收边界](UTEKI_DATA_EXECUTION_v1.zh-CN.md)，不能因单批通过就声称整个系统会自动使用。
 
@@ -24,7 +24,7 @@
 
 **前后台职责再次明确 · 2026-10-01：** 前台面向报告使用者，展示正式报告及理解判断所需的证据、反证与限制；后台面向工程与质量维护者，统一查看系统运行、输入输出、Trace、材料/新闻监控、内部产物、人工 Review 和评测。已将完整能力地图、共用对象关系、当前缺口和首期 A/B 建设选项补入[前后台功能稿第 0 节](UTEKI_WORKSPACES_v1.zh-CN.md)。现有 `/evaluation` 归属后台的局部产物检查能力；前后台接口/权限隔离、统一运行管理和评测闭环尚未完成。本轮先固定职责并评审建设顺序，未新增页面、监控任务、模型调用或运行控制。
 
-**数据评估工作台 · 2026-10-01：** 已在现有本地 Review Workbench 增加[只读评估入口](http://127.0.0.1:8765/evaluation)，对应[启动与使用说明](../../apps/review_workbench/README.md)。首版覆盖 GOOGL/MSFT 两家公司、3 份真实冻结材料、355 条财务候选行；可查看原件、正文/表格块、数据库 Schema、数据行与证据，并回放已登记 GOOGL 运行的 7 条事实核验及 25 个主角色步骤。材料页独立显示解析诊断、未映射概念、图片引用缺口等处理边界；MSFT 没有登记真实运行时明确显示缺口，不借用另一公司的结果。
+**数据评估工作台 · 2026-10-01：** 已在现有本地 Review Workbench 增加[只读评估入口](http://127.0.0.1:8765/evaluation)，对应启动与使用说明（已归档：`apps/review_workbench/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。首版覆盖 GOOGL/MSFT 两家公司、3 份真实冻结材料、355 条财务候选行；可查看原件、正文/表格块、数据库 Schema、数据行与证据，并回放已登记 GOOGL 运行的 7 条事实核验及 25 个主角色步骤。材料页独立显示解析诊断、未映射概念、图片引用缺口等处理边界；MSFT 没有登记真实运行时明确显示缺口，不借用另一公司的结果。
 
 这是内部查看与人工验收的起点：已保存的模型核验、人工验收和共享采纳分开；尚未实现人工标错/裁决持久化、Gold 集、运行对比或 Worker 独立步骤回放。本轮未调用模型、重跑解析或修改历史快照，也未迁移实体模型到新数据库。内容与范围检查、实际 HTTP 路由检查已执行；页面视觉和阅读体验仍由用户评审。
 
@@ -40,7 +40,7 @@
 
 2026-09-29。本文是讨论入口；区分已确认约束、代码现状和待验证提案。本轮不使用 `frontend-design`，不做样式、动效或生产 UI 实现。
 
-**人工验收材料（2026-09-30 补充）：** [这份 10-K 最后变成了什么？](data-agent-acceptance/README.zh-CN.md) 将实际原文、解析结构、全部 111 条财务候选、本题 4 条数字和 3 条叙述陈述、运行环节与核验意见放在一起。当前首先验收可见产物及输出规范，再推进后续能力。必须区分：预先程序解析和 XBRL 候选库、本次按题取证、尚未交付的整份材料数据包；已确认的核心财务包目前也未补齐。这份历史材料本身是本地文档；10 月 1 日新增的只读评估页面见本文开头，完整评估后台仍未完成。
+**人工验收材料（2026-09-30 补充）：** 这份 10-K 最后变成了什么？（已归档：`docs/design/data-agent-acceptance/README.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 将实际原文、解析结构、全部 111 条财务候选、本题 4 条数字和 3 条叙述陈述、运行环节与核验意见放在一起。当前首先验收可见产物及输出规范，再推进后续能力。必须区分：预先程序解析和 XBRL 候选库、本次按题取证、尚未交付的整份材料数据包；已确认的核心财务包目前也未补齐。这份历史材料本身是本地文档；10 月 1 日新增的只读评估页面见本文开头，完整评估后台仍未完成。
 
 用户进一步明确：Uteki 的核心交付是报告，应减少用户与 Agent 的交互。主路径是内部自主研究与审阅，形成可独立阅读的正式报告；用户无需通过追问补齐核心内容。前台优先支持报告阅读、证据追溯、版本变化与不同 Manager 报告的比较。
 
@@ -71,7 +71,7 @@
 
 E2E 可以先通过 CLI、工具接口及持久化产物验收，当前不依赖 Figma 或前端完成。真实模型验收同时记录固定输入、模型/Skill/代码版本、成本、时延、错误与未解决问题；已用于开发修订的评审反馈不再算未见测试。单个成功案例不证明跨公司泛化或投资收益能力。
 
-核对依据：Agent 现状及历史评估边界（已归档：`docs/UTEKI_AGENT_STATUS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、[六轮真实取证记录](../../experiments/architecture_baseline/2026-09-29-deepseek-mixed-v1/README.md)、[Data coordinator](../../src/uteki/agents/data_query/coordinator.py)、[历史分析与审阅入口](../../src/uteki/agents/analysis/analysis_comparison.py)、[narrative 入口](../../src/uteki/agents/analysis/narrative_runner.py)。新增实现、离线检查与本次 37 次真实调用见[交接实验](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/README.md)。此前审批拒绝已在用户直接确认后解除；首轮本地请求容量问题保留为失败记录，修复后以固定 query 哈希续跑，并非一次无中断成功。
+核对依据：Agent 现状及历史评估边界（已归档：`docs/UTEKI_AGENT_STATUS_2026-09-29.zh-CN.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、[六轮真实取证记录](../../experiments/architecture_baseline/2026-09-29-deepseek-mixed-v1/README.md)、Data coordinator（已归档：`src/uteki/agents/data_query/coordinator.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、历史分析与审阅入口（已归档：`src/uteki/agents/analysis/analysis_comparison.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、narrative 入口（已归档：`src/uteki/agents/analysis/narrative_runner.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。新增实现、离线检查与本次 37 次真实调用见交接实验（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。此前审批拒绝已在用户直接确认后解除；首轮本地请求容量问题保留为失败记录，修复后以固定 query 哈希续跑，并非一次无中断成功。
 
 ## 2026-09-30：已确认的报告规则
 
@@ -258,7 +258,7 @@ S08 的 A 是已选定的保守模拟约束，不代表现金账户法律一律�
 
 ## 代码核对与技术探索
 
-截至本次核对，Planner/Worker 可分别绑定模型；Skill 文本及哈希进入任务上下文，尚无按 Skill 解析模型的路由。Coordinator 的查询运行结束后封存结果；新增[实验入口](../../scripts/run_data_handoff.py) 将 `source_answer` 和数值记录接到独立内容核验及限定 Analysis 消费，已完成真实任务串联，并支持绑定冻结 query 哈希续跑。Analysis 内容仍有已记录缺口，正式报告发布尚未接入。见 [coordinator](../../src/uteki/agents/data_query/coordinator.py)、[Skill 与动作循环](../../src/uteki/agents/data_query/autonomous.py)、[模型绑定](../../src/uteki/agents/data_query/autonomous_model.py)。
+截至本次核对，Planner/Worker 可分别绑定模型；Skill 文本及哈希进入任务上下文，尚无按 Skill 解析模型的路由。Coordinator 的查询运行结束后封存结果；新增实验入口（已归档：`scripts/run_data_handoff.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)） 将 `source_answer` 和数值记录接到独立内容核验及限定 Analysis 消费，已完成真实任务串联，并支持绑定冻结 query 哈希续跑。Analysis 内容仍有已记录缺口，正式报告发布尚未接入。见 coordinator（已归档：`src/uteki/agents/data_query/coordinator.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、Skill 与动作循环（已归档：`src/uteki/agents/data_query/autonomous.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）、模型绑定（已归档：`src/uteki/agents/data_query/autonomous_model.py`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。
 
 以下外部资料于 2026-09-29 核对；“用于 Uteki”一栏是设计推断，均未在本项目完成效果验证。
 
@@ -287,7 +287,7 @@ Anthropic 的 [Building effective agents](https://www.anthropic.com/engineering/
 ## 验收与下一步
 
 - **此前设计收口：** R01～R09、S01～S08 均已确认，并同步到 Agent 契约、报告标准与架构建议；设计确认阶段完成文档、代码边界、一手资料与合成例算术核对。
-- **2026-09-30 工程增量：** 已真实贯通 Data 回答 → 独立内容核验 → 限定 Analysis 消费，共 37 次调用，估算约 1.92 美元（非账单）。首轮请求容量错误已修复，保留失败并复用冻结 query 续跑；本次容量/SDK 37 项与入口/续跑 8 项定向检查通过。见[实验记录](../../experiments/architecture_baseline/2026-09-30-data-handoff-v1/README.md)。限定交接成功，Analysis 内容仅部分通过，完整报告仍未验收。
+- **2026-09-30 工程增量：** 已真实贯通 Data 回答 → 独立内容核验 → 限定 Analysis 消费，共 37 次调用，估算约 1.92 美元（非账单）。首轮请求容量错误已修复，保留失败并复用冻结 query 续跑；本次容量/SDK 37 项与入口/续跑 8 项定向检查通过。见实验记录（已归档：`experiments/architecture_baseline/2026-09-30-data-handoff-v1/README.md`，恢复方法见[归档说明](../REPOSITORY_RETENTION.zh-CN.md)）。限定交接成功，Analysis 内容仅部分通过，完整报告仍未验收。
 - **当前优先：** 明确任务核验与全局采纳的交接语义，减少重复核验和不必要的数据申请；改进 Worker 分页、已读正文回放与重复动作。再连接研究 Reviewer 的独立初判、作者修订及双语完整报告。账户规则保留为后续集成约束，不抢先扩展为当前主线。
 - **随后：** 验证未完成的报告及持续研究能力；部署资源在运行前核实。首次阅读、回访变化、Manager 比较和证据返回等界面验收随前端工作暂缓。本轮未运行账户系统或浏览器验收。
 - 持久化恢复与按 Skill 路由保留为待验证方向；动态 UI 暂缓，不列入当前实现计划。

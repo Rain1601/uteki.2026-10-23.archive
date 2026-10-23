@@ -151,3 +151,26 @@ git show 38098480:docs/MACHINE_HANDOFF_HISTORY_2026-10-12.zh-CN.md
 ```bash
 git restore --source=38098480 -- docs/research
 ```
+
+## 2026-10-23：S4 旧代码与历史材料归档
+
+瘦身队列 S4。从活动目录移除 **24,106 个已跟踪文件 / 1,534,473,371 B**（归档前跟踪 24,905 个）。移除前确认每个文件的字节与基线提交的 Git blob 一致。
+
+- 基线：`e563d959`（已在 origin/main）。[精确清单](REPOSITORY_ARCHIVE.v3.json)记录每个文件的路径、字节数、SHA256、Git blob，以及下线的入口。
+- 范围：`experiments`（19297）、`docs/design`（2535）、`data`（1547）、`tests`（269）、`src/uteki`（223）、`apps/review_workbench`（93）、`scripts`（77）、`benchmarks`（38）、`config/sdk_probe`（5）、`docs/schemas`（5）、`openspec/changes`（5）、`src/uteki_eval`（4）、`requirements`（2）、`config/data-mcp-readonly-v1.json`（1）、`config/data_methods`（1）、`config/data_tasks`（1）、`docs/DATA_AGENT_CLI.zh-CN.md`（1）、`docs/PROJECT_PROGRESS_COMMANDS.zh-CN.md`（1）、`docs/ROADMAP.zh-CN.md`（1）。
+- 下线的入口：`uteki-data-legacy`、`uteki-data-mcp`（MCP v1）、`uteki-reports`、`uteki-eval`，以及研究工作台 `apps.review_workbench`（8765）。S3 留下的 9 个兼容别名随旧代码删除；`pyproject.toml` 去掉对应入口和不再使用的 `mcp` extra（锁文件只少了这一个可选组）。
+- 归档前先处理：claude_dialogue 用到的旧 runtime 辅助函数原样拷贝到 `apps/claude_dialogue/runtime_support.py`；`scripts/run_offline_checks.py` 改为只跑新核心与保留工具的测试。
+- 保留：`src/uteki/data_platform/` 及其测试、`examples/data_platform/`、`scripts/data_agent/`、`config/data_platform/`、`config/company_sources/`、`apps/{claude_dialogue,uteki_zero,logo_studio}/`、`docs/design/`（`data-agent-acceptance/` 除外）、`skills/`、`openspec/`。
+- 本机未跟踪的数据（`data/data_agent_documents/`、`data/model_cache/`、`output/`、`archive/`）不在范围内，原样保留。只清理了已归档代码目录下剩余的 `__pycache__`，避免空目录被当成命名空间包导入。
+
+保留文件中指向已归档内容的 106 处链接改成“已归档：`<原路径>`”加本节入口；设计历史、归档清单和 `output/` 证据不改写。
+
+只读查看或恢复（替换示例路径，先确认不会覆盖当前改动）：
+
+```bash
+git show e563d959:apps/review_workbench/README.md
+```
+
+```bash
+git restore --source=e563d959 -- experiments/agent_design/2026-10-07-business-map-mermaid-v1
+```

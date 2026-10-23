@@ -358,11 +358,11 @@ examples/data_platform/、scripts/data_agent/      可复制入口与验收脚�
 |---|---|
 | Python `DataService` + `openai_runtime.run_gateway / claude_runtime.run_gateway` | 已实现；真实运行经 `examples/data_platform/live_function.py` |
 | 文档库 CLI `python -m uteki.data_platform.documents` | 已实现 |
-| `uteki-data acquire` | 已实现（`data_platform/cli.py`），参数与原 `agent acquire` 相同；旧 CLI 的其余命令保留为 `uteki-data-legacy`，S4 处理 |
-| MCP | 只有旧 v1（`interfaces/data_mcp`，四个只读工具，冻结）；v2 未实现 |
+| `uteki-data acquire` | 已实现（`data_platform/cli.py`），参数与原 `agent acquire` 相同；旧 CLI 已在 S4 归档 |
+| MCP | 当前没有：旧 v1（`interfaces/data_mcp`）已在 S4 归档，v2 未实现（路线阶段 B） |
 | `DataService.run_query` | 未实现；当前由调用方直接调用 runtime |
 
-**旧代码依赖：** 2026-10-23（S3）起 `data_platform` 不再导入 `uteki.infrastructure`、`uteki.agents`、`uteki.domain`（含函数内的延迟导入，AST 扫描为零）。账本、SEC 取数、官网发现和 HTML 解析算法（`sec_index` 及其块模型）已迁入；旧路径保留 5 行的 `sys.modules` 兼容别名，供旧代码、旧测试和冻结实验继续使用，S4 随旧代码一起删除。
+**旧代码依赖：** 2026-10-23（S3）起 `data_platform` 不再导入 `uteki.infrastructure`、`uteki.agents`、`uteki.domain`（含函数内的延迟导入，AST 扫描为零）。账本、SEC 取数、官网发现和 HTML 解析算法（`sec_index` 及其块模型）已迁入。S4 归档旧代码时，旧路径的兼容别名一并删除；`src/uteki/` 下现在只有 `data_platform`。
 
 ## 9. 验收方法
 
@@ -439,8 +439,7 @@ examples/data_platform/、scripts/data_agent/      可复制入口与验收脚�
 | 问题 | 影响 | 处理方向 |
 |---|---|---|
 | 两个后端（catalog/HTML 与 documents/PDF）在数据模型和读取上仍是两套 | 同一能力维护两次；协议规则曾只修在一边 | 协议规则已上移共同层；后续评估是否把 HTML 也迁入文档库形态，先不动 |
-| 旧路径的兼容别名与 `uteki-data-legacy` | 旧代码、旧测试和冻结实验仍经别名使用迁移后的模块 | S4 归档旧代码时删除 |
-| 旧代码约 3.7 万行、旧测试 234 个、约 57 个脚本仍在仓库 | 阅读、测试和维护负担 | S4 归档 |
+| 旧研究工作台（8765）、MCP v1、报告 CLI 已归档 | 新核心结果目前只能通过 Datasette 和导出的 JSON/Markdown 查看，没有工程观察页面和 MCP 入口 | 路线阶段 B（统一入口、MCP v2）及前端待办 |
 | 没有 `run_query`、MCP v2 和统一 CLI | 只能通过示例脚本调用，分析 Agent 无正式入口 | 路线阶段 B |
 | 自主发现来源未实现 | 真实验收依赖预先入库的材料 | 路线阶段 C |
 | 工具 schema 与后端能力、返回体预算之间仍有摩擦（`CAPABILITY_UNSUPPORTED`、`OUTPUT_LIMIT` 在真实运行中反复出现） | 轮次和费用增加 | 每次真实运行后按根因收敛 |
@@ -454,7 +453,7 @@ examples/data_platform/、scripts/data_agent/      可复制入口与验收脚�
 
 | 阶段 | 内容 | 完成标志 |
 |---|---|---|
-| S1–S5 瘦身（进行中） | S1 本文重写；S2 历史文档归档；S3 账本/SEC 取数/CLI 迁入 data_platform；S4 旧代码与实验材料归档；S5 根据瘦身后的结构定稿本节 | 新核心不再依赖旧代码；仓库只剩当前代码、测试和必要证据 |
+| S1–S5 瘦身（S1–S4 已完成，S5 待做） | S1 本文重写；S2 历史文档归档；S3 账本/SEC 取数/CLI 迁入 data_platform；S4 旧代码与实验材料归档（2026-10-23，约 2.4 万个文件）；S5 根据瘦身后的结构定稿本节 | 新核心不再依赖旧代码；仓库只剩当前代码、测试和必要证据 |
 | A 复验共享协议 | 用 HTML 后端真实复验证券过滤、发现后读、交付规则 | 一条 HTML 题真实运行并通过原件核对 |
 | B 统一入口 | `DataService.run_query`、MCP v2、统一 CLI；分析 Agent 补数入口 | 同一输入经 Python/CLI/MCP 得到一致结果 |
 | C 补齐建设能力 | 自主发现官方来源；SEC companyfacts dataset；PDF 目录层级、跨页表、OCR 质量 | BC01、BC05–BC07 的正例和反例可跑 |

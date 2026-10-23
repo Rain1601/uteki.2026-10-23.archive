@@ -1,4 +1,4 @@
-> **2026-10-06：旧页面已退役。** 本目录不再提供独立页面；旧页面及其专用代码、测试已删除。当前使用 [Swiss C 投研前台](../../docs/design/company-workspace-swiss-c/README.md) 和 [真实数据工作台](../review_workbench/README.md)。以下文字保留为历史记录，其中旧启动命令与页面链接不再适用。保留的原始素材、来源记录和冻结版本仅用于追溯。
+> **2026-10-06：旧页面已退役。** 本目录不再提供独立页面；旧页面及其专用代码、测试已删除。当前使用 [Swiss C 投研前台](../../docs/design/company-workspace-swiss-c/README.md) 和 真实数据工作台（已归档：`apps/review_workbench/README.md`，恢复方法见[归档说明](../../docs/REPOSITORY_RETENTION.zh-CN.md)）。以下文字保留为历史记录，其中旧启动命令与页面链接不再适用。保留的原始素材、来源记录和冻结版本仅用于追溯。
 
 当前前台仍使用本目录的 `catalog.mjs`、`research.mjs`、`brands.mjs`、公司图标与注册表；相关数据测试及品牌导入工具继续维护。
 

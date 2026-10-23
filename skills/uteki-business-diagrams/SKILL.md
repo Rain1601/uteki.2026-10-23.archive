@@ -16,7 +16,7 @@ metadata:
 
 需要调用方明确公司身份、报告/版本、期间、来源及内容 hash、阅读目的、输入路径和输出位置。财年名称、期间结束日、披露日期分别保留；并排图不自动代表同一期间。缺失或冲突的范围直接列为缺口，不替换为熟悉公司、最新报告或目录中的首份材料。
 
-可从已冻结的原文提取候选，或改善现有 `BusinessMap` 的表达。复用 [BusinessMap 契约](../../src/uteki/domain/business_map/models.py)，用 `business_map_from_dict` 验证。收入图另读带证据的财务记录；BusinessMap 的收入分类名称不是金额数据。不要为画图另建一套业务实体类型。
+可从已冻结的原文提取候选，或改善现有 `BusinessMap` 的表达。复用 BusinessMap 契约（已归档：`src/uteki/domain/business_map/models.py`，恢复方法见[归档说明](../../docs/REPOSITORY_RETENTION.zh-CN.md)），用 `business_map_from_dict` 验证。收入图另读带证据的财务记录；BusinessMap 的收入分类名称不是金额数据。不要为画图另建一套业务实体类型。
 
 ## 先整理事实与关系
 

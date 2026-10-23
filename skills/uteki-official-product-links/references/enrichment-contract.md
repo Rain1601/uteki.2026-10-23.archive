@@ -24,4 +24,4 @@ URL 为不含凭据的 HTTPS 地址；页面文本按文本转义，不执行其
 
 真实小样：[NVIDIA AI Enterprise 补充记录](../../../experiments/agent_design/2026-10-07-official-product-links-v1/nvidia-ai-enterprise.json)。这里只补充一个产品的两个官方入口和两条建议，不代表 NVIDIA 全产品覆盖。它绑定选定 FY2025 图，网页内容属于独立核对时刻。
 
-展示适配：[build_view.py](../../../experiments/agent_design/2026-10-07-agent-business-revenue-v1/build_view.py)。启用时显式传入补充文件；省略时保留原行为。保留原执行和冻结产物，只更新派生验收展示。
+展示适配：build_view.py（已归档：`experiments/agent_design/2026-10-07-agent-business-revenue-v1/build_view.py`，恢复方法见[归档说明](../../../docs/REPOSITORY_RETENTION.zh-CN.md)）。启用时显式传入补充文件；省略时保留原行为。保留原执行和冻结产物，只更新派生验收展示。
