@@ -1,4 +1,4 @@
-# 当前动作：瘦身队列 S2 文档归档（2026-10-23，分支 `slim/s2-docs-archive`）
+# 当前动作：瘦身队列 S2 已完成，待用户 review（2026-10-23，分支 `slim/s2-docs-archive`）
 
 本页其余部分的“核心设计 14.x”等章节号指冻结的 `docs/DATA_AGENT_DESIGN_HISTORY_2026-10-23.zh-CN.md`，不指重写后的核心设计。
 
@@ -29,7 +29,8 @@
   - **结果（2026-10-23，分支 `slim/s1-core-design`）：**v1.30 原文（4,694 行）用 git mv 整体移到 `docs/DATA_AGENT_DESIGN_HISTORY_2026-10-23.zh-CN.md`，放在同一目录，文中相对链接不受影响；开头加了冻结说明，正文未改。新核心设计 v2.0 约 480 行，共 13 节：目标与范围、职责、架构决定、数据模型、建设管线、查询与交付、运行时、代码组织（按实际文件）、验收方法、实现状态表（附历史章节证据入口）、技术选型、已知技术债、路线草案、待决事项。AGENTS/CLAUDE/README/接口文档的入口引用已更新，旧章节号统一指向历史记录。只改了文档，没有改代码或调用模型。待用户 review 后合入 main。
 - **S2 文档归档：**顶层日期化/已取代文档按 2026-10-09 方法归档（清单 + SHA256 + 备份分支）；LOCAL_DEVELOPMENT、FRONTEND_DESIGN 精简为当前入口。
   - **S1 已合入 main（2026-10-23，38098480）。**
-  - **S2 第一步结果（2026-10-23）：**按用户确认的清单归档 118 个文件（docs 根目录 43 份，以及 research/releases/archives/research_samples/checks），基线 `38098480` 已在 origin 上，清单为 `docs/REPOSITORY_ARCHIVE.v2.json`，说明见 RETENTION 的 2026-10-23 一节。保留文档中的 40 处链接改成了恢复说明。DATA_AGENT_CLI 留到 S3，ROADMAP、PROJECT_PROGRESS_COMMANDS、schemas/current 留到 S4。下一步：精简 LOCAL_DEVELOPMENT（93KB）和 FRONTEND_DESIGN（302KB，按 AGENTS 先读 uteki-interface Skill）。
+  - **S2 第一步结果（2026-10-23）：**按用户确认的清单归档 118 个文件（docs 根目录 43 份，以及 research/releases/archives/research_samples/checks），基线 `38098480` 已在 origin 上，清单为 `docs/REPOSITORY_ARCHIVE.v2.json`，说明见 RETENTION 的 2026-10-23 一节。保留文档中的 40 处链接改成了恢复说明。DATA_AGENT_CLI 留到 S3，ROADMAP、PROJECT_PROGRESS_COMMANDS、schemas/current 留到 S4。精简 LOCAL_DEVELOPMENT 和 FRONTEND_DESIGN 已完成，见下一条。
+  - **S2 第二步结果（2026-10-23）：**两份原文用 git mv 冻结为 `docs/LOCAL_DEVELOPMENT_HISTORY_2026-10-23.md`、`docs/FRONTEND_DESIGN_HISTORY_2026-10-23.md`，与原文件同目录，开头加冻结说明。新 LOCAL_DEVELOPMENT 从 1,024 行精简到约 200 行，分六部分：环境（主环境 / 非 editable SDK 环境 / 只装 data 的环境）、测试、真实运行（live_function 各子命令和规则）、文档库与 PDF、HTML/iXBRL 程序入口、工作台与资料恢复；文中命令已对照代码核实。新 FRONTEND_DESIGN 从 2,126 行精简到约 120 行，包括当前界面清单、视觉基线摘要（详细规则仍在 style guide）、布局交互约定、Swiss C 页面结构、代码与测试、业务图、工作方式和待办。核对时发现 Swiss C 有 1 项过时测试（`institution-view.test.mjs:149` 仍断言 10-21 已移除的前后按钮，330 项中 329 项通过），已记入 FRONTEND_DESIGN 待办，没有修。S2 至此完成，待用户 review 后合入 main。
 - **S3 解除新核心对旧代码依赖：**run_budget、SEC 取数与 `agent acquire` 迁入 data_platform，`uteki-data` 指向新入口；原测试随迁并通过，真实 acquire 经原入口重放一次（不调用模型）。
 - **S4 旧代码与历史材料归档：**agents/infrastructure/domain/presentation/evaluation 及对应旧测试、脚本；review_workbench 依赖旧模块的部分（届时确认是否需改用新交付产物作审阅入口）；experiments、data-agent-acceptance 中不被保留测试或冻结材料引用的目录。逐项核对依赖闭包，fixture 来源不删。
 - **S5 技术方案定稿：**按瘦身后的实际结构，在核心设计写定 Data Agent 到生产的阶段路线，以及每阶段的验收、所需授权与费用。
