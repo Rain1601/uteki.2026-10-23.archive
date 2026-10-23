@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 
 from lxml import etree, html
 
-from uteki.domain.documents import (
+from .document_models import (
     AssetReference,
     DocumentIndex,
     DocumentNode,
@@ -20,7 +20,7 @@ from uteki.domain.documents import (
     TableStructure,
     TocEntry,
 )
-from uteki.infrastructure.document_sources.sec import normalize_text, text_hash
+from .sec import normalize_text, text_hash
 
 
 SCHEMA_VERSION = "document-index-v0.1"

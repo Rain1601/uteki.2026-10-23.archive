@@ -5,7 +5,7 @@ import re
 import urllib.request
 from html.parser import HTMLParser
 
-from uteki.domain.documents import Document, Paragraph
+from .document_models import Document, Paragraph
 
 
 def normalize_text(value: str) -> str:
@@ -84,4 +84,3 @@ class SecFilingSource:
         request = urllib.request.Request(source_url, headers={"User-Agent": self.user_agent})
         with urllib.request.urlopen(request, timeout=timeout) as response:
             return parse_sec_html(document_id, source_url, response.read())
-
