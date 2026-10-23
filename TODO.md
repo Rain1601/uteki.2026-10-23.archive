@@ -1,4 +1,4 @@
-# 当前动作：瘦身队列 S4 已完成，待用户 review（2026-10-23，分支 `slim/s4-legacy-archive`）
+# 当前动作：瘦身队列 S5 路线定稿，待用户 review（2026-10-23，分支 `slim/s5-roadmap`）
 
 本页其余部分的“核心设计 14.x”等章节号指冻结的 `docs/DATA_AGENT_DESIGN_HISTORY_2026-10-23.zh-CN.md`，不指重写后的核心设计。
 
@@ -39,6 +39,8 @@
   - **S3 已合入 main（2026-10-23，e563d959）。**
   - **S4 结果（2026-10-23）：**按用户确认的清单归档 24,106 个文件（1463 MB），基线 `e563d959`，清单 `docs/REPOSITORY_ARCHIVE.v3.json`，说明见 RETENTION 的 S4 一节。先把 claude_dialogue 用到的旧 runtime 函数原样拷贝到 `apps/claude_dialogue/runtime_support.py`（它的 Python 和 JS 测试通过），并改写 `run_offline_checks.py`：默认跑新核心与保留工具，`--integration` 在 SDK 环境里加上 agent 测试组，两个环境相关测试按名字排除并说明原因。删除兼容别名和 `uteki-data-legacy`、`uteki-data-mcp`、`uteki-reports`、`uteki-eval` 入口及 `mcp` extra。CLAUDE、LOCAL_DEVELOPMENT、OFFLINE_TESTS、核心设计、FRONTEND_DESIGN 已同步，106 处链接改成恢复说明。下线影响：研究工作台（8765）、MCP v1 和报告 CLI 不再可用；新核心结果暂时用 Datasette 和导出文件查看。
 - **S5 技术方案定稿：**按瘦身后的实际结构，在核心设计写定 Data Agent 到生产的阶段路线，以及每阶段的验收、所需授权与费用。
+  - **S4 已合入 main（2026-10-23，b560f1d2）。**
+  - **S5 结果（2026-10-23，待 review）：**核心设计第 11 节重写为定稿路线 v2.1。阶段 0 前置修正（SEC 注入脚本处理、DeepSeek 账单对账与预留释放、Swiss C 过时测试）→ A HTML 后端真实复验共享协议 → B 统一入口（run_query、CLI query/inspect/export、MCP v2、结果查看页）→ C 补齐建设能力（自主发现 SEC 申报、companyfacts dataset、PDF 质量、概念表 v1、补数链路）→ D 业务验收（3 家公司 × BC01–BC14 × 3 次 × 2 套 SDK）→ E 检索选型与收尾；前端为并行轨道。每项写明内容、验收、授权和费用；费用引用历史真实会话数据，并指出 D 的规模（约 120 个会话、约 2,400 次请求）超出现有根账本剩余的 241 次，且全额预留问题不解决会先触顶。第 12 节待决事项同步更新。只改文档，没有调用模型。
 
 ## 前项：计划/状态与记录预算通用简化、同题 OpenAI 真实复验 — 已完成，停止 review
 
